@@ -101,15 +101,20 @@ Switching source variant never copies page index unless future page corresponden
 - 017: explainable source-selection diagnostics.
 - 018: provider-neutral backup/restore contract.
 - 019: immutable canonical UUID identity policy.
+- 020: manual work-link overrides.
+- 021: integrated R001 domain scenario simulation.
+- 022: source-variant refresh planner.
+- 023: canonical metadata resolver with provenance.
+- 024: canonical-work lifecycle/orphan preservation policy.
 
-Spikes 015–019 also have executable pure-Kotlin tests; see `docs/r001/STATUS.md`.
+Spikes 002–024 are framework-independent/staged; executable pure-Kotlin coverage exists for the decision modules. See `docs/r001/STATUS.md`.
 
 ## Exact Work/Codex order
 
 1. Issue #2: full pinned Yomotsu build + Spike-001 runtime proof.
-2. Issue #3: canonical persistence/schema and chapter mapping.
-3. Issue #5: source health/ranking/open planner + diagnostic traces.
-4. Issue #4: search clustering + semantic matcher + aliases.
+2. Issue #3: canonical persistence/schema, UUID, chapter mapping, metadata and lifecycle.
+3. Issue #5: source health/ranking/open planner + refresh/lifecycle/diagnostic traces.
+4. Issue #4: search clustering + semantic matcher + aliases + manual link overrides.
 5. Issue #6: stable canonical translation context bridge.
 6. Issue #7: acceptance/regression matrix.
 
