@@ -25,6 +25,8 @@ sourceSets {
             "../spike012/src/main/kotlin",
             "../spike013/src/main/kotlin",
             "../spike014/src/main/kotlin",
+            "../spike015/src/main/kotlin",
+            "../spike016/src/main/kotlin",
         )
     }
     test {
@@ -41,6 +43,8 @@ sourceSets {
             "../spike012/src/test/kotlin",
             "../spike013/src/test/kotlin",
             "../spike014/src/test/kotlin",
+            "../spike015/src/test/kotlin",
+            "../spike016/src/test/kotlin",
         )
     }
 }
@@ -65,6 +69,8 @@ val spike011 = registerSpikeTask("spike011", "polaris.domain.semantic.SemanticWo
 val spike012 = registerSpikeTask("spike012", "polaris.domain.health.SourceAccessClassifierTestMainKt")
 val spike013 = registerSpikeTask("spike013", "polaris.domain.language.LanguageRoutePlannerTestMainKt")
 val spike014 = registerSpikeTask("spike014", "polaris.domain.translation.CanonicalTranslationScopeTestMainKt")
+val spike015 = registerSpikeTask("spike015", "polaris.domain.cache.TranslationArtifactKeyTestMainKt")
+val spike016 = registerSpikeTask("spike016", "polaris.domain.progress.CanonicalProgressPolicyTestMainKt")
 
 tasks.register("checkSpikes") {
     group = "verification"
@@ -81,5 +87,7 @@ tasks.register("checkSpikes") {
         spike012,
         spike013,
         spike014,
+        spike015,
+        spike016,
     )
 }
