@@ -76,5 +76,23 @@ fun main() {
         check(result.decision == WorkMatchDecision.DIFFERENT) { result.toString() }
     }
 
+    run {
+        val one = candidate(
+            "one",
+            "en",
+            "Same Work",
+            ids = mapOf("anilist" to "111", "mal" to "222"),
+        )
+        val two = candidate(
+            "two",
+            "pt-BR",
+            "Same Work",
+            ids = mapOf("anilist" to "111", "mal" to "999"),
+        )
+        val result = matcher.compare(one, two)
+        check(result.decision == WorkMatchDecision.DIFFERENT) { result.toString() }
+        check("mal" in result.evidence.conflictingExternalNamespaces)
+    }
+
     println("SPIKE003_WORK_MATCHER_TESTS_PASS")
 }
