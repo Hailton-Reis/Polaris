@@ -1,0 +1,12 @@
+Polaris
+
+Copyright (c) 2026 Polaris contributors.
+
+This project is derived from and/or incorporates ideas and code from projects in the Mihon ecosystem, including:
+- Mihon: https://github.com/mihonapp/mihon
+- Yomotsu: https://github.com/kiritsuguxs/yomotsu
+- TachiyomiSY: https://github.com/jobobby04/TachiyomiSY
+
+Where code from those projects is reused, it remains subject to the Apache License 2.0 and applicable copyright notices.
+
+Additional third-party libraries, models, fonts, assets, OCR engines, translation providers, and other dependencies may be governed by separate licenses. Their licenses must be reviewed and preserved before public distribution.
