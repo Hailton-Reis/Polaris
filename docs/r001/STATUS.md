@@ -17,6 +17,7 @@ Updated: 2026-10-06
 - TachiyomiSY Merged Manga mapped.
 - Yomotsu global-search and translation integration points mapped.
 - Runtime acceptance matrix written.
+- Work/Codex integration checklist written.
 
 ### Spike-001 — multi-source staging
 - static port prepared;
@@ -89,7 +90,7 @@ Validated:
 ### Spike-010 — canonical SQLDelight persistence
 - schema designed;
 - migration 15 staged;
-- canonical progress semantics documented.
+- canonical progress semantics documented;
 - NOT to be applied before Spike-001 Android runtime PASS.
 
 ### Spike-011 — SemanticWorkMatcher contract
@@ -107,6 +108,43 @@ Validated:
 - target -> base language -> EN bridge -> original -> extras;
 - normalized/deduplicated language route.
 
+### Spike-014 — stable canonical translation scope
+- separates friendly display title from stable TranslationMemory/Cache/Glossary identity;
+- preserves old Yomotsu behavior by default;
+- defines migration-compatible memoryScopeKey semantics.
+
+### Spike-015 — content-addressed translation artifact key
+Validated locally:
+- same page bytes/configuration -> same reusable key independent of source URL;
+- target language aliases normalize consistently;
+- glossary/model/page changes invalidate the key.
+
+### Spike-016 — canonical progress policy
+Validated locally:
+- chapter completion survives source switch;
+- same child variant resumes page index;
+- switching child source never copies page index blindly;
+- canonical read/bookmark can mirror to linked child rows.
+
+## Integration design
+
+Written and staged:
+- docs/r001/INTEGRATION_BLUEPRINT.md
+- docs/r001/INTEGRATION_MAP_YOMOTSU.md
+- docs/r001/PERSISTENCE_SCHEMA_V1.md
+- docs/r001/ACCEPTANCE_SCENARIOS.md
+- docs/r001/RUNTIME_ACCEPTANCE_TESTS.md
+- docs/r001/WORK_CODEX_CHECKLIST.md
+
+Key integration choices already fixed:
+- reuse Yomotsu SearchViewModel networking;
+- do not redesign source-api;
+- open selected real child manga/chapter in existing reader;
+- keep translation storage source-specific while making memory/glossary context canonical;
+- no personal server requirement;
+- user handles login/challenge interactively;
+- source health records actual access outcomes rather than aggressive background probing.
+
 ## CI
 
 A JVM domain-lab and GitHub Actions workflow are staged using the Yomotsu toolchain family:
@@ -114,7 +152,11 @@ A JVM domain-lab and GitHub Actions workflow are staged using the Yomotsu toolch
 - Gradle 9.6.1
 - Java 21
 
-The first GitHub Actions run terminated before exposing steps/logs. Treat GitHub Actions execution as an infrastructure/account runner issue until proven otherwise; it is not evidence of a domain-code failure. Framework-independent logic was additionally validated locally where possible.
+The workflow now includes Spikes 002–009 and 011–016.
+
+GitHub Actions jobs currently fail before any step is exposed (empty job step list). Treat this as repository/account runner infrastructure until a runner actually starts; it is not evidence of a Kotlin/domain failure.
+
+Framework-independent modules were additionally compiled/tested locally where possible, including Spikes 015 and 016.
 
 ## PENDING — requires full Android checkout/build/runtime
 
@@ -127,10 +169,11 @@ The first GitHub Actions run terminated before exposing steps/logs. Treat GitHub
 - Real merged/canonical work.
 - Reader routing across two real child sources.
 - Apply/adapt migration 15.
+- Implement repositories/mappers for Polaris canonical tables.
 - Integrate search clustering and semantic LLM provider.
 - Integrate SourceHealth instrumentation/persistence.
 - Integrate ChapterOpenPlanner before reader launch.
-- Bridge canonical translation context into Yomotsu TranslationManager/ChapterTranslator.
+- Bridge stable canonical translation scope into Yomotsu TranslationManager/ChapterTranslator/TranslationMemory/Cache.
 - Execute full runtime acceptance matrix.
 
 ## Gate
