@@ -28,6 +28,7 @@ class SearchResultClusterer(
 
         val parent = IntArray(candidates.size) { it }
         val reviewPairs = mutableListOf<SemanticReviewPair>()
+        val comparisonCache = mutableMapOf<Pair<Int, Int>, WorkMatchResult>()
 
         fun find(index: Int): Int {
             var cursor = index
@@ -38,10 +39,42 @@ class SearchResultClusterer(
             return cursor
         }
 
-        fun union(a: Int, b: Int) {
+        fun comparison(a: Int, b: Int): WorkMatchResult {
+            val key = if (a < b) a to b else b to a
+            return comparisonCache.getOrPut(key) {
+                matcher.compare(candidates[key.first], candidates[key.second])
+            }
+        }
+
+        fun clusterMembers(root: Int): List<Int> =
+            candidates.indices.filter { find(it) == root }
+
+        fun hasHardConflictAcrossClusters(a: Int, b: Int): Boolean {
             val rootA = find(a)
             val rootB = find(b)
-            if (rootA != rootB) parent[rootB] = rootA
+            if (rootA == rootB) return false
+            val membersA = clusterMembers(rootA)
+            val membersB = clusterMembers(rootB)
+
+            return membersA.any { leftIndex ->
+                membersB.any { rightIndex ->
+                    val left = candidates[leftIndex]
+                    val right = candidates[rightIndex]
+                    if (left.sourceId == right.sourceId && left.sourceWorkKey == right.sourceWorkKey) {
+                        false
+                    } else {
+                        comparison(leftIndex, rightIndex).evidence.conflictingExternalNamespaces.isNotEmpty()
+                    }
+                }
+            }
+        }
+
+        fun unionIfSafe(a: Int, b: Int) {
+            val rootA = find(a)
+            val rootB = find(b)
+            if (rootA == rootB) return
+            if (hasHardConflictAcrossClusters(rootA, rootB)) return
+            parent[rootB] = rootA
         }
 
         for (leftIndex in candidates.indices) {
@@ -49,16 +82,14 @@ class SearchResultClusterer(
                 val left = candidates[leftIndex]
                 val right = candidates[rightIndex]
 
-                // Results from the same exact source/work key are duplicates from discovery,
-                // not independent evidence.
                 if (left.sourceId == right.sourceId && left.sourceWorkKey == right.sourceWorkKey) {
-                    union(leftIndex, rightIndex)
+                    unionIfSafe(leftIndex, rightIndex)
                     continue
                 }
 
-                val match = matcher.compare(left, right)
+                val match = comparison(leftIndex, rightIndex)
                 when (match.decision) {
-                    WorkMatchDecision.AUTO_MATCH -> union(leftIndex, rightIndex)
+                    WorkMatchDecision.AUTO_MATCH -> unionIfSafe(leftIndex, rightIndex)
                     WorkMatchDecision.REVIEW -> if (match.shouldAskSemanticProvider) {
                         reviewPairs += SemanticReviewPair(left, right, match)
                     }
