@@ -23,6 +23,12 @@ fun main() {
     }
 
     run {
+        val decision = TranslationDecisionPolicy.decide(input("pt"))
+        check(decision.mode == TranslationOpenMode.READ_ORIGINAL)
+        check(!decision.requiresTranslation)
+    }
+
+    run {
         val decision = TranslationDecisionPolicy.decide(input("en", cached = true))
         check(decision.mode == TranslationOpenMode.READ_TRANSLATED_CACHE)
     }
