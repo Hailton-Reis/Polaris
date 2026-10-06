@@ -37,6 +37,17 @@ CREATE TABLE polaris_external_ids(
     UNIQUE(namespace, external_id)
 );
 
+CREATE TABLE polaris_work_link_overrides(
+    _id INTEGER NOT NULL PRIMARY KEY,
+    left_source_id INTEGER NOT NULL,
+    left_source_work_key TEXT NOT NULL,
+    right_source_id INTEGER NOT NULL,
+    right_source_work_key TEXT NOT NULL,
+    decision INTEGER NOT NULL,
+    created_at INTEGER NOT NULL,
+    UNIQUE(left_source_id, left_source_work_key, right_source_id, right_source_work_key)
+);
+
 CREATE TABLE polaris_source_variants(
     _id INTEGER NOT NULL PRIMARY KEY,
     work_id INTEGER NOT NULL,
@@ -229,3 +240,26 @@ SET read = :read,
     last_read_at = :lastReadAt,
     last_variant_chapter_id = :lastVariantChapterId
 WHERE _id = :canonicalChapterId;
+
+
+selectWorkLinkOverride:
+SELECT * FROM polaris_work_link_overrides
+WHERE left_source_id = :leftSourceId
+AND left_source_work_key = :leftSourceWorkKey
+AND right_source_id = :rightSourceId
+AND right_source_work_key = :rightSourceWorkKey
+LIMIT 1;
+
+upsertWorkLinkOverride:
+INSERT INTO polaris_work_link_overrides(
+    left_source_id, left_source_work_key,
+    right_source_id, right_source_work_key,
+    decision, created_at
+)
+VALUES (
+    :leftSourceId, :leftSourceWorkKey,
+    :rightSourceId, :rightSourceWorkKey,
+    :decision, :createdAt
+)
+ON CONFLICT(left_source_id, left_source_work_key, right_source_id, right_source_work_key)
+DO UPDATE SET decision = excluded.decision, created_at = excluded.created_at;
