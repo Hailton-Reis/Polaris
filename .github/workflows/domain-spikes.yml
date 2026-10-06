@@ -9,6 +9,11 @@ on:
       - "spikes/spike002/**"
       - "spikes/spike003/**"
       - "spikes/spike004/**"
+      - "spikes/spike005/**"
+      - "spikes/spike006/**"
+      - "spikes/spike007/**"
+      - "spikes/spike008/**"
+      - "spikes/spike009/**"
       - "spikes/domain-lab/**"
       - ".github/workflows/domain-spikes.yml"
   pull_request:
@@ -16,6 +21,11 @@ on:
       - "spikes/spike002/**"
       - "spikes/spike003/**"
       - "spikes/spike004/**"
+      - "spikes/spike005/**"
+      - "spikes/spike006/**"
+      - "spikes/spike007/**"
+      - "spikes/spike008/**"
+      - "spikes/spike009/**"
       - "spikes/domain-lab/**"
       - ".github/workflows/domain-spikes.yml"
 
