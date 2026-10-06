@@ -75,16 +75,30 @@ class AutomaticWorkMatcher(
         score = score.coerceIn(0.0, 1.0)
 
         val strongConflict = conflictingNamespaces.isNotEmpty() && sharedIds.isEmpty()
+        val crossLanguage = TitleNormalizer.normalize(a.language) != TitleNormalizer.normalize(b.language)
+        val structuralCrossLanguageCandidate =
+            crossLanguage &&
+                (authorMatch || artistMatch) &&
+                chapterSimilarity >= 0.65
+
+        if (structuralCrossLanguageCandidate) {
+            reasons += "cross_language_structural_candidate"
+        }
+
         val decision = when {
             strongConflict -> WorkMatchDecision.DIFFERENT
             sharedIds.isNotEmpty() -> WorkMatchDecision.AUTO_MATCH
             score >= autoMatchThreshold && (aliasExact || titleSimilarity >= 0.80) -> WorkMatchDecision.AUTO_MATCH
-            score >= reviewThreshold -> WorkMatchDecision.REVIEW
+            score >= reviewThreshold || structuralCrossLanguageCandidate -> WorkMatchDecision.REVIEW
             else -> WorkMatchDecision.DIFFERENT
         }
 
-        val crossLanguage = TitleNormalizer.normalize(a.language) != TitleNormalizer.normalize(b.language)
-        val metadataSupport = authorMatch || artistMatch || chapterSimilarity >= 0.45 || genreSimilarity >= 0.45
+        val metadataSupport =
+            authorMatch ||
+                artistMatch ||
+                chapterSimilarity >= 0.45 ||
+                genreSimilarity >= 0.45
+
         val shouldAskSemanticProvider =
             decision == WorkMatchDecision.REVIEW &&
                 sharedIds.isEmpty() &&
