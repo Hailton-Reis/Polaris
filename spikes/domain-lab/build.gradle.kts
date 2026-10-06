@@ -21,6 +21,8 @@ sourceSets {
             "../spike007/src/main/kotlin",
             "../spike008/src/main/kotlin",
             "../spike009/src/main/kotlin",
+            "../spike011/src/main/kotlin",
+            "../spike012/src/main/kotlin",
         )
     }
     test {
@@ -33,6 +35,8 @@ sourceSets {
             "../spike007/src/test/kotlin",
             "../spike008/src/test/kotlin",
             "../spike009/src/test/kotlin",
+            "../spike011/src/test/kotlin",
+            "../spike012/src/test/kotlin",
         )
     }
 }
@@ -53,6 +57,8 @@ val spike006 = registerSpikeTask("spike006", "polaris.domain.translation.Transla
 val spike007 = registerSpikeTask("spike007", "polaris.domain.open.ChapterOpenPlannerTestMainKt")
 val spike008 = registerSpikeTask("spike008", "polaris.domain.discovery.SearchResultClustererTestMainKt")
 val spike009 = registerSpikeTask("spike009", "polaris.domain.discovery.AliasSearchPlannerTestMainKt")
+val spike011 = registerSpikeTask("spike011", "polaris.domain.semantic.SemanticWorkMatcherTestMainKt")
+val spike012 = registerSpikeTask("spike012", "polaris.domain.health.SourceAccessClassifierTestMainKt")
 
 tasks.register("checkSpikes") {
     group = "verification"
@@ -65,5 +71,7 @@ tasks.register("checkSpikes") {
         spike007,
         spike008,
         spike009,
+        spike011,
+        spike012,
     )
 }
