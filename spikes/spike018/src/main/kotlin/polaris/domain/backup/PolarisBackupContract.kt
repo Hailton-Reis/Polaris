@@ -8,10 +8,20 @@ data class PolarisBackup(
     val schemaVersion: Int = CURRENT_SCHEMA_VERSION,
     val exportedAtEpochMs: Long,
     val works: List<BackupWork>,
+    val linkOverrides: List<BackupWorkLinkOverride> = emptyList(),
 ) {
     init { require(schemaVersion > 0) }
     companion object { const val CURRENT_SCHEMA_VERSION = 1 }
 }
+
+data class BackupWorkLinkOverride(
+    val leftSourceId: Long,
+    val leftSourceWorkKey: String,
+    val rightSourceId: Long,
+    val rightSourceWorkKey: String,
+    val decision: String,
+    val createdAtEpochMs: Long,
+)
 
 data class BackupWork(
     val stableKey: String,
@@ -76,12 +86,28 @@ object PolarisRestorePolicy {
         require(backup.schemaVersion <= PolarisBackup.CURRENT_SCHEMA_VERSION) {
             "Backup schema ${backup.schemaVersion} is newer than supported ${PolarisBackup.CURRENT_SCHEMA_VERSION}"
         }
+        backup.linkOverrides.forEach { override ->
+            require(
+                override.leftSourceId != override.rightSourceId ||
+                    override.leftSourceWorkKey != override.rightSourceWorkKey,
+            ) { "A work-link override cannot reference the same source work twice" }
+            require(
+                override.decision == "FORCE_SAME_WORK" ||
+                    override.decision == "FORCE_DIFFERENT_WORK",
+            ) { "Invalid work-link override decision" }
+        }
         backup.works.forEach { work ->
-            require(work.stableKey.matches(Regex("[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}"))) { "Invalid canonical work UUID" }
+            require(
+                work.stableKey.matches(
+                    Regex("[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}"),
+                ),
+            ) { "Invalid canonical work UUID" }
             require(work.preferredTitle.isNotBlank())
             require(work.translationScopeKey.isNotBlank())
             work.aliases.forEach { require(it.confidence in 0.0..1.0) }
-            val duplicateVariant = work.variants.groupBy { it.sourceId to it.sourceWorkKey }.any { it.value.size > 1 }
+            val duplicateVariant = work.variants
+                .groupBy { it.sourceId to it.sourceWorkKey }
+                .any { it.value.size > 1 }
             require(!duplicateVariant) { "Duplicate source variant in ${work.stableKey}" }
         }
     }
