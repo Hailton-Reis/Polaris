@@ -31,6 +31,7 @@ sourceSets {
             "../spike018/src/main/kotlin",
             "../spike019/src/main/kotlin",
             "../spike020/src/main/kotlin",
+            "../spike022/src/main/kotlin",
         )
     }
     test {
@@ -54,6 +55,7 @@ sourceSets {
             "../spike019/src/test/kotlin",
             "../spike020/src/test/kotlin",
             "../spike021/src/test/kotlin",
+            "../spike022/src/test/kotlin",
         )
     }
 }
@@ -85,6 +87,7 @@ val spike018 = registerSpikeTask("spike018", "polaris.domain.backup.PolarisBacku
 val spike019 = registerSpikeTask("spike019", "polaris.domain.identity.CanonicalIdentityPolicyTestMainKt")
 val spike020 = registerSpikeTask("spike020", "polaris.domain.matching.WorkLinkOverridePolicyTestMainKt")
 val spike021 = registerSpikeTask("spike021", "polaris.domain.e2e.R001ScenarioSimulationTestMainKt")
+val spike022 = registerSpikeTask("spike022", "polaris.domain.refresh.VariantRefreshPlannerTestMainKt")
 
 tasks.register("checkSpikes") {
     group = "verification"
@@ -108,5 +111,6 @@ tasks.register("checkSpikes") {
         spike019,
         spike020,
         spike021,
+        spike022,
     )
 }
