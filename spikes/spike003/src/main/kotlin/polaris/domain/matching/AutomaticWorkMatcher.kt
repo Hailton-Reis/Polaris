@@ -74,7 +74,7 @@ class AutomaticWorkMatcher(
 
         score = score.coerceIn(0.0, 1.0)
 
-        val strongConflict = conflictingNamespaces.isNotEmpty() && sharedIds.isEmpty()
+        val strongConflict = conflictingNamespaces.isNotEmpty()
         val crossLanguage = TitleNormalizer.normalize(a.language) != TitleNormalizer.normalize(b.language)
         val structuralCrossLanguageCandidate =
             crossLanguage &&
