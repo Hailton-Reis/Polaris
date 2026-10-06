@@ -1,0 +1,36 @@
+name: Domain spikes
+
+on:
+  push:
+    branches:
+      - main
+      - r001/multisource-foundation
+    paths:
+      - "spikes/spike002/**"
+      - "spikes/spike003/**"
+      - "spikes/spike004/**"
+      - "spikes/domain-lab/**"
+      - ".github/workflows/domain-spikes.yml"
+  pull_request:
+    paths:
+      - "spikes/spike002/**"
+      - "spikes/spike003/**"
+      - "spikes/spike004/**"
+      - "spikes/domain-lab/**"
+      - ".github/workflows/domain-spikes.yml"
+
+jobs:
+  domain-spikes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "9.6.1"
+      - name: Compile and run domain spikes
+        run: gradle -p spikes/domain-lab checkSpikes --no-daemon --stacktrace
