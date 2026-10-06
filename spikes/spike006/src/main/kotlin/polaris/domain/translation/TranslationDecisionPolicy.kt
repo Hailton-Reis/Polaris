@@ -40,7 +40,7 @@ object TranslationDecisionPolicy {
         val source = normalizeLanguage(input.sourceLanguage)
         val target = normalizeLanguage(input.targetLanguage)
 
-        if (source == target) {
+        if (isReadableWithoutTranslation(source, target)) {
             return TranslationOpenDecision(
                 mode = TranslationOpenMode.READ_ORIGINAL,
                 context = context,
@@ -77,6 +77,13 @@ object TranslationDecisionPolicy {
                 "no_translator_available"
             },
         )
+    }
+
+    fun isReadableWithoutTranslation(source: String, target: String): Boolean {
+        if (source == target) return true
+        // PT is an intentional fallback tier for a PT-BR target. Do not spend OCR/LLM
+        // simply to convert another Portuguese variant into Brazilian Portuguese.
+        return target == "pt-br" && source == "pt"
     }
 
     fun normalizeLanguage(language: String): String = when (language.trim().lowercase()) {
