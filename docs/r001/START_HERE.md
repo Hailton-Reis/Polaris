@@ -25,14 +25,16 @@ Heavy Android work is decomposed into issues:
 
 - Work-first, not source-first.
 - A canonical work owns multiple source variants.
+- CanonicalWork gets an immutable internal UUID; tracker IDs/titles never become its primary identity.
 - Source selection happens per canonical chapter.
 - PT-BR is preferred when usable.
 - Same-language variants are ranked by health, coverage, freshness, success history and latency.
-- Default language route: target PT-BR -> PT -> EN -> original language -> optional extras.
-- If a foreign variant wins, Yomotsu translation is reused.
+- Default route: target PT-BR -> PT -> EN -> original language -> optional extras.
+- If a foreign variant wins, reuse Yomotsu translation.
 - LLM/API calls may be frequent when useful.
 - A personal server is optional acceleration only.
 - Authentication/challenge resolution is user-interactive and valid sessions are reused.
+- Canonical read/bookmark survives source switches; page index does not cross source variants blindly.
 
 ## Pinned baselines
 
@@ -58,73 +60,82 @@ Do not clone child chapters into the virtual parent.
 Yomotsu Global Search already searches enabled sources concurrently with a fixed pool of 5.
 
 Do not create another source-search engine.
-Polaris adds:
-- result clustering;
-- automatic/semantic work matching;
-- alias second pass.
+Polaris adds clustering, automatic/semantic work matching and alias second-pass discovery.
 
 ### Translation
-Yomotsu already provides:
-- OCR;
-- inpainting/typesetting;
-- Gemini/OpenRouter/DeepL/Google/ML Kit;
-- provider fallback;
-- translation cache;
-- translation memory;
-- glossary;
-- contextual sequential-chapter prompt.
+Yomotsu already provides OCR, inpainting/typesetting, Gemini/OpenRouter/DeepL/Google/ML Kit, provider fallback, translation cache, memory, glossary and contextual chapter prompts.
 
 Do not create another translator.
 
-Polaris must only decide WHEN translation is needed and ensure translation memory/glossary/cache use a canonical-work context rather than a source-specific title.
+Polaris decides WHEN translation is needed. Real child manga/source remains translation-file/download identity; canonical work UUID becomes stable memory/glossary/cache intelligence scope.
+
+### Progress
+Canonical:
+- read/unread;
+- bookmark;
+- canonical chapter identity.
+
+Real child:
+- page index and source-specific files.
+
+Switching source variant never copies page index unless future page correspondence proves equivalence.
 
 ## Framework-independent spikes
 
-- Spike-001: staged Merged Manga/multi-source port.
-- Spike-002: CanonicalWork/SourceVariant/SourceHealth + SourceRanker.
-- Spike-003: AutomaticWorkMatcher.
-- Spike-004: CanonicalChapterResolver + number alignment.
-- Spike-005: SourceHealthTracker.
-- Spike-006: TranslationDecisionPolicy.
-- Spike-007: ChapterOpenPlanner.
-- Spike-008: SearchResultClusterer.
-- Spike-009: AliasSearchPlanner.
-- Spike-010: canonical SQLDelight schema/migration 15.
-- Spike-011: SemanticWorkMatcher provider contract/prompt.
-- Spike-012: SourceAccessClassifier.
-- Spike-013: LanguageRoutePlanner.
+- 001: staged Merged Manga/multi-source port.
+- 002: CanonicalWork/SourceVariant/SourceHealth + SourceRanker.
+- 003: AutomaticWorkMatcher.
+- 004: CanonicalChapterResolver + number alignment.
+- 005: SourceHealthTracker.
+- 006: TranslationDecisionPolicy.
+- 007: ChapterOpenPlanner.
+- 008: SearchResultClusterer.
+- 009: AliasSearchPlanner.
+- 010: canonical SQLDelight schema/migration 15.
+- 011: SemanticWorkMatcher LLM contract.
+- 012: SourceAccessClassifier.
+- 013: LanguageRoutePlanner.
+- 014: stable canonical TranslationMemory/Cache/Glossary scope.
+- 015: content-addressed translation artifact identity.
+- 016: canonical progress policy.
+- 017: explainable source-selection diagnostics.
+- 018: provider-neutral backup/restore contract.
+- 019: immutable canonical UUID identity policy.
 
-See `docs/r001/STATUS.md` for validation status.
+Spikes 015–019 also have executable pure-Kotlin tests; see `docs/r001/STATUS.md`.
 
 ## Exact Work/Codex order
 
 1. Issue #2: full pinned Yomotsu build + Spike-001 runtime proof.
 2. Issue #3: canonical persistence/schema and chapter mapping.
-3. Issue #5: source health/ranking/open planner.
+3. Issue #5: source health/ranking/open planner + diagnostic traces.
 4. Issue #4: search clustering + semantic matcher + aliases.
-5. Issue #6: canonical translation context bridge.
-6. Issue #7: run acceptance/regression matrix.
+5. Issue #6: stable canonical translation context bridge.
+6. Issue #7: acceptance/regression matrix.
 
-The order of #4/#5 may be swapped after #3, but do not integrate canonical schema before issue #2 passes.
+Do not apply canonical migration 15 before issue #2 passes.
 
 ## Practical references
 
+- `docs/r001/INTEGRATION_BLUEPRINT.md`
 - `docs/r001/INTEGRATION_MAP_YOMOTSU.md`
+- `docs/r001/PERSISTENCE_SCHEMA_V1.md`
 - `docs/r001/RUNTIME_ACCEPTANCE_TESTS.md`
 - `docs/r001/WORK_CODEX_CHECKLIST.md`
+- `docs/R002_DEFERRED_BACKLOG.md`
 - `spikes/spike001/VALIDATION.md`
 - `spikes/spike010/PROGRESS_SEMANTICS.md`
 
 ## Scope protection
 
-Do not spend Work/Codex time redesigning domain behavior that is already captured by spikes unless the real Yomotsu/Android APIs prove it incompatible.
+Do not spend Work/Codex time redesigning already-tested domain behavior unless real Yomotsu/Android APIs demonstrate incompatibility.
 
 The heavy environment should focus on:
-- checkout;
+- checkout and full upstream tree;
 - Gradle/SQLDelight;
-- adapters;
-- repositories;
+- adapters/repositories;
 - Android UI integration;
 - APK/runtime;
-- real sources;
-- device/emulator testing.
+- real extensions/sources;
+- device/emulator testing;
+- logs and acceptance evidence.
