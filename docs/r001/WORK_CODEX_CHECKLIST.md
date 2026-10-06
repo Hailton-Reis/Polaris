@@ -46,6 +46,10 @@ Hard gate: do not integrate migration 15 until this passes.
 - Persist aliases/external IDs.
 - Persist canonical chapter mappings.
 - Apply Spike-016 progress semantics.
+- Apply Spike-019 immutable UUID identity.
+- Persist Spike-020 manual link overrides.
+- Apply Spike-023 canonical metadata/provenance when projecting the virtual work.
+- Preserve Spike-024 canonical work identity even when all variants disappear.
 - Do not use tracker ID/title as stable work key.
 
 ## Phase 4 — Runtime orchestration
@@ -57,7 +61,9 @@ Port/adapt:
 - spike007 ChapterOpenPlanner;
 - spike012 SourceAccessClassifier;
 - spike013 LanguageRoutePlanner;
-- spike017 SelectionDiagnostics.
+- spike017 SelectionDiagnostics;
+- spike022 VariantRefreshPlanner;
+- spike024 CanonicalWorkLifecyclePolicy.
 
 Requirements:
 - keep these framework-light;
@@ -73,7 +79,8 @@ Integrate:
 - spike003 AutomaticWorkMatcher;
 - spike008 SearchResultClusterer;
 - spike009 AliasSearchPlanner;
-- spike011 SemanticWorkMatcher.
+- spike011 SemanticWorkMatcher;
+- spike020 WorkLinkOverridePolicy.
 
 Rules:
 - conflicting trusted external IDs cannot be overridden by LLM;
