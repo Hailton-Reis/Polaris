@@ -34,6 +34,17 @@ CREATE TABLE polaris_external_ids(
     UNIQUE(namespace, external_id)
 );
 
+CREATE TABLE polaris_work_link_overrides(
+    _id INTEGER NOT NULL PRIMARY KEY,
+    left_source_id INTEGER NOT NULL,
+    left_source_work_key TEXT NOT NULL,
+    right_source_id INTEGER NOT NULL,
+    right_source_work_key TEXT NOT NULL,
+    decision INTEGER NOT NULL,
+    created_at INTEGER NOT NULL,
+    UNIQUE(left_source_id, left_source_work_key, right_source_id, right_source_work_key)
+);
+
 CREATE TABLE polaris_source_variants(
     _id INTEGER NOT NULL PRIMARY KEY,
     work_id INTEGER NOT NULL,
