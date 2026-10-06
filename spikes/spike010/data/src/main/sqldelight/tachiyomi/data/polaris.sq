@@ -1,0 +1,231 @@
+import kotlin.Boolean;
+
+CREATE TABLE polaris_works(
+    _id INTEGER NOT NULL PRIMARY KEY,
+    stable_key TEXT NOT NULL UNIQUE,
+    virtual_manga_id INTEGER NOT NULL UNIQUE,
+    preferred_title TEXT NOT NULL,
+    original_language TEXT,
+    target_language TEXT NOT NULL DEFAULT 'pt-BR',
+    auto_match_enabled INTEGER AS Boolean NOT NULL DEFAULT 1,
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL,
+    FOREIGN KEY(virtual_manga_id) REFERENCES mangas(_id) ON DELETE CASCADE
+);
+
+CREATE TABLE polaris_work_aliases(
+    _id INTEGER NOT NULL PRIMARY KEY,
+    work_id INTEGER NOT NULL,
+    language TEXT NOT NULL DEFAULT '',
+    alias TEXT NOT NULL,
+    normalized_alias TEXT NOT NULL,
+    origin TEXT NOT NULL,
+    confidence REAL NOT NULL DEFAULT 1.0,
+    FOREIGN KEY(work_id) REFERENCES polaris_works(_id) ON DELETE CASCADE,
+    UNIQUE(work_id, language, normalized_alias)
+);
+
+CREATE INDEX polaris_alias_normalized_index
+ON polaris_work_aliases(normalized_alias);
+
+CREATE TABLE polaris_external_ids(
+    work_id INTEGER NOT NULL,
+    namespace TEXT NOT NULL,
+    external_id TEXT NOT NULL,
+    FOREIGN KEY(work_id) REFERENCES polaris_works(_id) ON DELETE CASCADE,
+    PRIMARY KEY(work_id, namespace),
+    UNIQUE(namespace, external_id)
+);
+
+CREATE TABLE polaris_source_variants(
+    _id INTEGER NOT NULL PRIMARY KEY,
+    work_id INTEGER NOT NULL,
+    manga_id INTEGER NOT NULL UNIQUE,
+    language TEXT NOT NULL,
+    chapter_count INTEGER NOT NULL DEFAULT 0,
+    highest_chapter REAL,
+    number_offset REAL NOT NULL DEFAULT 0.0,
+    enabled INTEGER AS Boolean NOT NULL DEFAULT 1,
+    last_seen_at INTEGER,
+    last_success_at INTEGER,
+    FOREIGN KEY(work_id) REFERENCES polaris_works(_id) ON DELETE CASCADE,
+    FOREIGN KEY(manga_id) REFERENCES mangas(_id) ON DELETE CASCADE,
+    UNIQUE(work_id, manga_id)
+);
+
+CREATE INDEX polaris_variants_work_index
+ON polaris_source_variants(work_id);
+
+CREATE TABLE polaris_source_health(
+    source_id INTEGER NOT NULL PRIMARY KEY,
+    state INTEGER NOT NULL,
+    success_rate REAL NOT NULL DEFAULT 1.0,
+    average_latency_ms INTEGER NOT NULL DEFAULT 0,
+    consecutive_failures INTEGER NOT NULL DEFAULT 0,
+    total_successes INTEGER NOT NULL DEFAULT 0,
+    total_failures INTEGER NOT NULL DEFAULT 0,
+    last_success_at INTEGER,
+    last_failure_at INTEGER,
+    last_failure_kind INTEGER,
+    cooldown_until INTEGER,
+    updated_at INTEGER NOT NULL
+);
+
+CREATE TABLE polaris_canonical_chapters(
+    _id INTEGER NOT NULL PRIMARY KEY,
+    work_id INTEGER NOT NULL,
+    canonical_key TEXT NOT NULL,
+    season INTEGER,
+    chapter_number REAL,
+    part INTEGER,
+    kind INTEGER NOT NULL,
+    special_key TEXT,
+    read INTEGER AS Boolean NOT NULL DEFAULT 0,
+    bookmark INTEGER AS Boolean NOT NULL DEFAULT 0,
+    last_read_at INTEGER,
+    last_variant_chapter_id INTEGER,
+    FOREIGN KEY(work_id) REFERENCES polaris_works(_id) ON DELETE CASCADE,
+    FOREIGN KEY(last_variant_chapter_id) REFERENCES chapters(_id) ON DELETE SET NULL,
+    UNIQUE(work_id, canonical_key)
+);
+
+CREATE INDEX polaris_chapters_work_index
+ON polaris_canonical_chapters(work_id);
+
+CREATE TABLE polaris_chapter_variants(
+    canonical_chapter_id INTEGER NOT NULL,
+    source_variant_id INTEGER NOT NULL,
+    chapter_id INTEGER NOT NULL UNIQUE,
+    FOREIGN KEY(canonical_chapter_id) REFERENCES polaris_canonical_chapters(_id) ON DELETE CASCADE,
+    FOREIGN KEY(source_variant_id) REFERENCES polaris_source_variants(_id) ON DELETE CASCADE,
+    FOREIGN KEY(chapter_id) REFERENCES chapters(_id) ON DELETE CASCADE,
+    PRIMARY KEY(canonical_chapter_id, chapter_id)
+);
+
+selectWorkByVirtualMangaId:
+SELECT * FROM polaris_works WHERE virtual_manga_id = :virtualMangaId LIMIT 1;
+
+selectWorkByStableKey:
+SELECT * FROM polaris_works WHERE stable_key = :stableKey LIMIT 1;
+
+selectAliasesByWorkId:
+SELECT * FROM polaris_work_aliases
+WHERE work_id = :workId
+ORDER BY confidence DESC, alias COLLATE NOCASE ASC;
+
+selectExternalIdsByWorkId:
+SELECT * FROM polaris_external_ids
+WHERE work_id = :workId;
+
+selectVariantsByWorkId:
+SELECT V.*, M.source, M.url, M.title
+FROM polaris_source_variants V
+JOIN mangas M ON M._id = V.manga_id
+WHERE V.work_id = :workId
+ORDER BY V.enabled DESC, V.language, M.title COLLATE NOCASE;
+
+selectHealthBySourceId:
+SELECT * FROM polaris_source_health WHERE source_id = :sourceId LIMIT 1;
+
+selectCanonicalChaptersByWorkId:
+SELECT * FROM polaris_canonical_chapters
+WHERE work_id = :workId
+ORDER BY coalesce(season, 0), coalesce(chapter_number, -1), coalesce(part, 0), kind;
+
+selectChapterVariantsByCanonicalChapterId:
+SELECT CV.*, C.*, V.language, M.source, M.title AS manga_title
+FROM polaris_chapter_variants CV
+JOIN chapters C ON C._id = CV.chapter_id
+JOIN polaris_source_variants V ON V._id = CV.source_variant_id
+JOIN mangas M ON M._id = V.manga_id
+WHERE CV.canonical_chapter_id = :canonicalChapterId;
+
+insertWork:
+INSERT INTO polaris_works(
+    stable_key, virtual_manga_id, preferred_title, original_language,
+    target_language, auto_match_enabled, created_at, updated_at
+)
+VALUES (
+    :stableKey, :virtualMangaId, :preferredTitle, :originalLanguage,
+    :targetLanguage, :autoMatchEnabled, :createdAt, :updatedAt
+)
+RETURNING _id;
+
+insertAlias:
+INSERT OR REPLACE INTO polaris_work_aliases(
+    work_id, language, alias, normalized_alias, origin, confidence
+)
+VALUES (:workId, :language, :alias, :normalizedAlias, :origin, :confidence);
+
+insertExternalId:
+INSERT OR REPLACE INTO polaris_external_ids(work_id, namespace, external_id)
+VALUES (:workId, :namespace, :externalId);
+
+insertSourceVariant:
+INSERT OR IGNORE INTO polaris_source_variants(
+    work_id, manga_id, language, chapter_count, highest_chapter,
+    number_offset, enabled, last_seen_at, last_success_at
+)
+VALUES (
+    :workId, :mangaId, :language, :chapterCount, :highestChapter,
+    :numberOffset, :enabled, :lastSeenAt, :lastSuccessAt
+)
+RETURNING _id;
+
+updateSourceVariantCoverage:
+UPDATE polaris_source_variants
+SET chapter_count = :chapterCount,
+    highest_chapter = :highestChapter,
+    last_seen_at = :lastSeenAt,
+    last_success_at = coalesce(:lastSuccessAt, last_success_at)
+WHERE _id = :variantId;
+
+updateSourceVariantOffset:
+UPDATE polaris_source_variants
+SET number_offset = :numberOffset
+WHERE _id = :variantId;
+
+upsertSourceHealth:
+INSERT INTO polaris_source_health(
+    source_id, state, success_rate, average_latency_ms, consecutive_failures,
+    total_successes, total_failures, last_success_at, last_failure_at,
+    last_failure_kind, cooldown_until, updated_at
+)
+VALUES (
+    :sourceId, :state, :successRate, :averageLatencyMs, :consecutiveFailures,
+    :totalSuccesses, :totalFailures, :lastSuccessAt, :lastFailureAt,
+    :lastFailureKind, :cooldownUntil, :updatedAt
+)
+ON CONFLICT(source_id) DO UPDATE SET
+    state = excluded.state,
+    success_rate = excluded.success_rate,
+    average_latency_ms = excluded.average_latency_ms,
+    consecutive_failures = excluded.consecutive_failures,
+    total_successes = excluded.total_successes,
+    total_failures = excluded.total_failures,
+    last_success_at = excluded.last_success_at,
+    last_failure_at = excluded.last_failure_at,
+    last_failure_kind = excluded.last_failure_kind,
+    cooldown_until = excluded.cooldown_until,
+    updated_at = excluded.updated_at;
+
+insertCanonicalChapter:
+INSERT OR IGNORE INTO polaris_canonical_chapters(
+    work_id, canonical_key, season, chapter_number, part, kind, special_key
+)
+VALUES (:workId, :canonicalKey, :season, :chapterNumber, :part, :kind, :specialKey)
+RETURNING _id;
+
+insertChapterVariant:
+INSERT OR REPLACE INTO polaris_chapter_variants(
+    canonical_chapter_id, source_variant_id, chapter_id
+)
+VALUES (:canonicalChapterId, :sourceVariantId, :chapterId);
+
+updateCanonicalChapterProgress:
+UPDATE polaris_canonical_chapters
+SET read = :read,
+    bookmark = :bookmark,
+    last_read_at = :lastReadAt,
+    last_variant_chapter_id = :lastVariantChapterId
+WHERE _id = :canonicalChapterId;
