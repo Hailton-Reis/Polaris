@@ -1,8 +1,9 @@
 package polaris.domain.backup
 
 fun main() {
+    val stableKey = "123e4567-e89b-12d3-a456-426614174000"
     val work = BackupWork(
-        stableKey = "anilist:123",
+        stableKey = stableKey,
         preferredTitle = "The Beginning After the End",
         originalLanguage = "en",
         aliases = listOf(BackupAlias("O Começo Depois do Fim", "pt-BR", provenance = "tracker")),
@@ -24,7 +25,7 @@ fun main() {
     )
     val backup = PolarisBackup(exportedAtEpochMs = 1234L, works = listOf(work))
     PolarisRestorePolicy.validate(backup)
-    check(work.translationScopeKey == "polaris:anilist:123")
+    check(work.translationScopeKey == "polaris:$stableKey")
 
     val duplicate = backup.copy(works = listOf(work.copy(variants = work.variants + work.variants.first())))
     check(runCatching { PolarisRestorePolicy.validate(duplicate) }.isFailure)
