@@ -16,6 +16,7 @@ on:
       - "spikes/spike009/**"
       - "spikes/spike011/**"
       - "spikes/spike012/**"
+      - "spikes/spike013/**"
       - "spikes/domain-lab/**"
       - ".github/workflows/domain-spikes.yml"
   pull_request:
