@@ -126,6 +126,57 @@ Validated locally:
 - switching child source never copies page index blindly;
 - canonical read/bookmark can mirror to linked child rows.
 
+### Spike-017 — selection diagnostics
+Validated:
+- explain selected source, score/reasons and rejected alternatives;
+- translation marker;
+- explicit no-usable-source summary.
+
+### Spike-018 — backup contract
+Validated:
+- portable canonical UUID/aliases/external IDs/source identities;
+- local DB IDs excluded from portable identity;
+- manual FORCE_SAME/FORCE_DIFFERENT overrides preserved.
+
+### Spike-019 — canonical identity policy
+Validated:
+- immutable internal UUID;
+- title/external-ID changes never rotate canonical identity;
+- stable translation scope.
+
+### Spike-020 — manual work-link overrides
+Validated:
+- symmetric pair identity;
+- explicit user same/different decisions precede automatic/semantic matching;
+- latest explicit override wins.
+
+### Spike-021 — integrated R001 domain simulation
+Validated:
+- PT health/ranking -> EN fallback -> translation/cache -> canonical progress -> source recovery;
+- result: SPIKE021_R001_SCENARIO_SIMULATION_PASS.
+
+### Spike-022 — variant refresh planner
+Validated:
+- work-open/background/manual TTL behavior;
+- selected-variant priority;
+- challenge/auth/rate-limit/unreachable guards;
+- bounded refresh concurrency.
+
+### Spike-023 — canonical metadata resolver
+Validated locally:
+- PT-BR display metadata preferred when usable;
+- stable current title avoids UI churn;
+- user metadata overrides win;
+- blocked preferred-language variant falls back cleanly;
+- field provenance retained.
+
+### Spike-024 — canonical work lifecycle
+Validated locally:
+- source loss never deletes canonical work identity/progress;
+- zero usable variants -> DEGRADED;
+- zero linked variants -> ORPHANED;
+- aliases can trigger rediscovery and in-library orphan can request user attention.
+
 ## Integration design
 
 Written and staged:
@@ -152,11 +203,11 @@ A JVM domain-lab and GitHub Actions workflow are staged using the Yomotsu toolch
 - Gradle 9.6.1
 - Java 21
 
-The workflow now includes Spikes 002–009 and 011–016.
+The workflow/domain-lab now targets Spikes 002–009 and 011–024.
 
 GitHub Actions jobs currently fail before any step is exposed (empty job step list). Treat this as repository/account runner infrastructure until a runner actually starts; it is not evidence of a Kotlin/domain failure.
 
-Framework-independent modules were additionally compiled/tested locally where possible, including Spikes 015 and 016.
+Framework-independent modules were additionally compiled/tested locally where possible, including the integrated scenario and Spikes 023/024.
 
 ## PENDING — requires full Android checkout/build/runtime
 
