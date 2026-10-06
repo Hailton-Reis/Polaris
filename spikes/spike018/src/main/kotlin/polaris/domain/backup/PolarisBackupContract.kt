@@ -77,7 +77,7 @@ object PolarisRestorePolicy {
             "Backup schema ${backup.schemaVersion} is newer than supported ${PolarisBackup.CURRENT_SCHEMA_VERSION}"
         }
         backup.works.forEach { work ->
-            require(work.stableKey.isNotBlank())
+            require(work.stableKey.matches(Regex("[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}"))) { "Invalid canonical work UUID" }
             require(work.preferredTitle.isNotBlank())
             require(work.translationScopeKey.isNotBlank())
             work.aliases.forEach { require(it.confidence in 0.0..1.0) }
