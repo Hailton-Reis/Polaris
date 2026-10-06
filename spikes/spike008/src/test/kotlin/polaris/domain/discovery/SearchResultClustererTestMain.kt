@@ -76,5 +76,19 @@ fun main() {
         check(result.clusters.size == 2)
     }
 
+    run {
+        // A<->B and B<->C look identical by title, but A and C have conflicting
+        // trusted external IDs. Transitive clustering must not bridge that conflict.
+        val result = clusterer.cluster(
+            listOf(
+                work(1, "a", "en", "Same Title", ids = mapOf("anilist" to "1")),
+                work(2, "b", "en", "Same Title"),
+                work(3, "c", "en", "Same Title", ids = mapOf("anilist" to "2")),
+            ),
+        )
+        check(result.clusters.size == 2) { result.toString() }
+        check(result.clusters.maxOf { it.members.size } == 2) { result.toString() }
+    }
+
     println("SPIKE008_SEARCH_CLUSTERER_TESTS_PASS")
 }
