@@ -1,0 +1,44 @@
+# Polaris
+
+Polaris is a multilingual, multi-source reader focused on a simple idea:
+
+> Choose the work. Polaris chooses the best available source.
+
+## Goals
+
+- Treat a work as the primary entity instead of tying the library to one source.
+- Correlate equivalent releases across languages and providers.
+- Prefer healthy PT-BR sources when available.
+- Fall back automatically to another source or language when needed.
+- Translate content to PT-BR when the preferred language is unavailable.
+- Keep reading progress attached to the canonical work.
+- Run app-first, without requiring a personal backend.
+- Use external LLM/API providers directly when they improve quality or speed.
+- Keep a personal server optional as an accelerator only.
+
+## Technical direction
+
+Current engineering baseline:
+
+- Yomotsu / Mihon ecosystem as the Android foundation.
+- Merged Manga concepts from TachiyomiSY for multi-source aggregation.
+- Polaris-specific CanonicalWork, SourceVariant, SourceHealth and SourceRanker layers.
+- Existing Yomotsu OCR, translation, inpainting, glossary and translation-memory capabilities as the starting point for multilingual reading.
+
+## Current milestone
+
+R001 — Multi-source foundation.
+
+The first milestone proves that one virtual/canonical work can aggregate chapters from multiple sources and open each chapter using its real underlying source. Automatic work matching and intelligent source ranking are layered on top only after that foundation is stable.
+
+## Status
+
+Early private development.
+
+See the R001 engineering documents on the development branch for current implementation status and handoff notes.
+
+## License and attribution
+
+Polaris is intended to remain compatible with the Apache-2.0 lineage of Mihon, Yomotsu and TachiyomiSY where code is reused. See `LICENSE` and `NOTICE`.
+
+Third-party models, libraries and assets may have their own licenses and must be reviewed individually before distribution.
