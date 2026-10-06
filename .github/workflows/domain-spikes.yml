@@ -22,6 +22,7 @@ on:
       - "spikes/spike016/**"
       - "spikes/spike017/**"
       - "spikes/spike018/**"
+      - "spikes/spike019/**"
       - "spikes/domain-lab/**"
       - ".github/workflows/domain-spikes.yml"
   pull_request:
@@ -42,6 +43,7 @@ on:
       - "spikes/spike016/**"
       - "spikes/spike017/**"
       - "spikes/spike018/**"
+      - "spikes/spike019/**"
       - "spikes/domain-lab/**"
       - ".github/workflows/domain-spikes.yml"
 
