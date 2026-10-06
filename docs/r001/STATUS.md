@@ -1,24 +1,142 @@
 # R001 Status
 
-## PASS
-- Product architecture consolidated.
-- Yomotsu selected as base candidate.
-- TachiyomiSY Merged Manga mapped.
-- Spike-001 static port prepared.
-- Spike-001 applicator mechanically validated.
-- Spike-001 domain Kotlin compiled.
-- Spike-001 dedupe/selection modes tested.
-- Spike-002 SourceRanker prototype compiled and tested.
-- GitHub repository created with write access.
+Updated: 2026-10-06
 
-## PENDING — requires full Android checkout/build environment
-- Apply Spike-001 to full Yomotsu checkout.
-- SQLDelight generation against full schema.
-- Gradle build/test.
-- APK install.
+## Repository
+
+- Repository: Hailton-Reis/Polaris
+- Branch: r001/multisource-foundation
+- Draft PR: #1
+- Practical Android work is tracked in issues #2–#7.
+
+## PASS — architecture / framework-independent engineering
+
+- Product architecture consolidated.
+- Yomotsu selected as Android base candidate.
+- Pinned Yomotsu/TachiyomiSY baselines recorded.
+- TachiyomiSY Merged Manga mapped.
+- Yomotsu global-search and translation integration points mapped.
+- Runtime acceptance matrix written.
+
+### Spike-001 — multi-source staging
+- static port prepared;
+- applicator mechanically validated;
+- domain/source Kotlin slice compiled;
+- priority / most-chapters / highest-chapter / no-dedupe semantics tested.
+
+### Spike-002 — SourceRanker
+Validated:
+- language tiers;
+- PT-BR redundancy;
+- coverage/freshness/latency/health scoring;
+- auth/challenge/rate-limit eligibility;
+- hysteresis against source flapping.
+
+### Spike-003 — AutomaticWorkMatcher
+Validated:
+- shared external IDs;
+- aliases;
+- punctuation normalization;
+- external-ID conflicts;
+- translated titles with structural evidence escalate to semantic review.
+
+### Spike-004 — CanonicalChapterResolver
+Validated:
+- decimal comma/dot;
+- seasons;
+- prologue separation;
+- conservative extras;
+- trusted number-offset detection.
+
+### Spike-005 — SourceHealthTracker
+Validated:
+- success recovery;
+- latency smoothing;
+- timeout/network degradation;
+- unreachable threshold;
+- auth/challenge states;
+- rate-limit cooldown;
+- parser failure -> broken.
+
+### Spike-006 — TranslationDecisionPolicy
+Validated:
+- target-language direct read;
+- translated-cache hit;
+- foreign chapter queues translation;
+- provider-unavailable diagnostic;
+- canonical translation context identity.
+
+### Spike-007 — ChapterOpenPlanner
+Validated:
+- source selection + translation decision composition;
+- PT-BR direct;
+- challenged PT -> EN translate;
+- cached EN translation;
+- no usable source -> no plan.
+
+### Spike-008 — SearchResultClusterer
+Validated:
+- AUTO_MATCH clusters;
+- REVIEW remains separate and emits semantic-review pair;
+- conflicts never silently merge.
+
+### Spike-009 — AliasSearchPlanner
+Validated:
+- PT/EN language-specific second-pass queries;
+- health filtering;
+- canonical-title fallback.
+
+### Spike-010 — canonical SQLDelight persistence
+- schema designed;
+- migration 15 staged;
+- canonical progress semantics documented.
+- NOT to be applied before Spike-001 Android runtime PASS.
+
+### Spike-011 — SemanticWorkMatcher contract
+- provider interface;
+- structured prompt boundary;
+- confidence policy;
+- hard external-ID conflict cannot be overridden by LLM.
+
+### Spike-012 — SourceAccessClassifier
+- cancellation ignored;
+- challenge/auth/rate-limit/5xx/parser/source-removed classification;
+- ordinary content 404 does not poison whole-source health.
+
+### Spike-013 — LanguageRoutePlanner
+- target -> base language -> EN bridge -> original -> extras;
+- normalized/deduplicated language route.
+
+## CI
+
+A JVM domain-lab and GitHub Actions workflow are staged using the Yomotsu toolchain family:
+- Kotlin 2.4.10
+- Gradle 9.6.1
+- Java 21
+
+The first GitHub Actions run terminated before exposing steps/logs. Treat GitHub Actions execution as an infrastructure/account runner issue until proven otherwise; it is not evidence of a domain-code failure. Framework-independent logic was additionally validated locally where possible.
+
+## PENDING — requires full Android checkout/build/runtime
+
+- Build unmodified pinned Yomotsu.
+- Apply Spike-001 to full tree.
+- SQLDelight generation against real project.
+- Gradle Android build/test.
+- APK/emulator/device execution.
 - Two real source extensions.
-- Runtime merged work test.
-- Real reader test across two child sources.
+- Real merged/canonical work.
+- Reader routing across two real child sources.
+- Apply/adapt migration 15.
+- Integrate search clustering and semantic LLM provider.
+- Integrate SourceHealth instrumentation/persistence.
+- Integrate ChapterOpenPlanner before reader launch.
+- Bridge canonical translation context into Yomotsu TranslationManager/ChapterTranslator.
+- Execute full runtime acceptance matrix.
 
 ## Gate
-Do not mark Spike-001 complete until runtime tests pass.
+
+Do not merge Draft PR #1 and do not mark R001 PASS until:
+- issue #2 runtime multi-source proof passes;
+- mandatory scenarios in docs/r001/RUNTIME_ACCEPTANCE_TESTS.md pass.
+
+The framework-independent design should not be redesigned in Work/Codex unless a real Android/API incompatibility is demonstrated.
