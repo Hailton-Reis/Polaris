@@ -1,0 +1,3 @@
+{
+  "reason": "Automatic review rejected emulator startup contacting Firebase Installations with unidentified installation/device payload. No payload authorization or runtime PASS is inferred."
+}

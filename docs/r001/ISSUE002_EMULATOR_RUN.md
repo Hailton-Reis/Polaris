@@ -62,3 +62,25 @@ Changed only the emulator harness: queued app commands now wait for `sys.boot_co
 The recreated Android image reached `sys.boot_completed=1`. Retrying both real extensions after full boot returned `Success` (raw results saved). The subsequent ARM64 Spike install had not produced a result when automatic approval review rejected the long-running execution: the emulator contacted Google Analytics with an unidentified, unauthorized telemetry payload. No successful Spike install or reader result is inferred from that interrupted command.
 
 Stopped the old attempt (no QEMU process remained), preserved stale AVD locks only after checking that no emulator process was running, and consulted the installed emulator's `-help-no-metrics`. It explicitly documents `-no-metrics` as disabling emulator metrics reporting. Added this flag to the harness; no conflicting metrics collection/to-console/to-file flags are used. Python syntax verification passed. A materially safer two-core resume was launched with telemetry disabled and the boot gate active. Guest data/installed extensions were retained. B01/B02/B03 remain pending; no migration15 or policy redesign was applied.
+
+### Firebase rejection and bounded source network
+
+The metrics-disabled attempt was subsequently rejected by automatic review because startup contacted Firebase Installations with an unidentified installation/device payload. Stopped that attempt; no runtime acceptance is inferred. Metrics opt-out alone was insufficient.
+
+Added an optional **test-only bounded network profile**, `--source-network-only --allow-host HOST` (repeat per approved source host). A local CONNECT proxy rejects every unlisted destination and every non-443 remote connection before opening an upstream socket or forwarding client payload. Guest IPv4/IPv6 output rules additionally permit only guest loopback, the local filtering proxy and ADB replies; all other direct TCP/UDP is rejected. Firewall setup must succeed before app commands run. Host emulator control/gRPC stays on host loopback, while external requests use the filter. Emulator metrics remain disabled. This changes only test infrastructure, not Yomotsu or Spikes.
+
+Two local transport tests passed: approved source data tunnels correctly; Firebase is denied without contacting the upstream proxy. Real proxy preflight reached both initial source API hosts with HTTP200. **Transport200 is not a source usability PASS**: the MANGA Plus response contains a protobuf `Account Banned` notice, despite no user account being supplied. Do not bypass it. MangaKatana's normal public search returned One Piece at `/manga/one-piece.49`; its current compatible extension1.6.1 is the replacement fixture candidate.
+
+The first bounded launch terminated QEMU with signal11 before full boot. Its proxy had also intercepted host-local emulator gRPC controls. The next launch exempts only host loopback (`localhost,127.0.0.1`) from proxying; remote allowlisting remains strict. Guest firewall application and Spike runtime are still pending at this checkpoint. Reproduce the safer profile with:
+
+```bash
+python3 scripts/r001/emulator_session.py \\
+  --sdk /path/to/android-sdk --avd polaris_api31 \\
+  --timeout-multiplier 10 --gpu swangle --cores 2 \\
+  --session /path/to/session --max-seconds 1800 \\
+  --source-network-only \\
+  --allow-host api.mangadex.org --allow-host uploads.mangadex.org \\
+  --allow-host mangakatana.com
+```
+
+Permit an image CDN only after verifying it in the real source response. Unknown destinations stay blocked. No B01/B02/B03 PASS, migration15 or domain redesign is claimed.
