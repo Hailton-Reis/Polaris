@@ -9,7 +9,7 @@ import time
 import urllib.parse
 
 
-def start_proxy(upstream_url, allowed_hosts, evidence_path):
+def start_proxy(upstream_url, allowed_hosts, evidence_path, allowlist_path=None):
     upstream = urllib.parse.urlsplit(upstream_url)
     if upstream.scheme != "http" or not upstream.hostname or not upstream.port:
         raise ValueError("Bounded proxy requires an explicit HTTP upstream proxy")
@@ -23,7 +23,16 @@ def start_proxy(upstream_url, allowed_hosts, evidence_path):
         def do_CONNECT(self):
             target = urllib.parse.urlsplit("//" + self.path)
             host = (target.hostname or "").lower().rstrip(".")
-            permitted = host in allowed and target.port == 443
+            current_allowed = allowed
+            if allowlist_path is not None:
+                try:
+                    entries = json.loads(allowlist_path.read_text())
+                    if not isinstance(entries, list) or not all(isinstance(x, str) for x in entries):
+                        raise ValueError("Expected an explicit host array")
+                    current_allowed = frozenset(x.lower().rstrip(".") for x in entries)
+                except (OSError, ValueError):
+                    current_allowed = frozenset()  # Malformed policy fails closed.
+            permitted = host in current_allowed and target.port == 443
             with log_lock, evidence_path.open("a") as log:
                 log.write(json.dumps({"host": host, "port": target.port,
                                       "allowed": permitted}) + "\n")

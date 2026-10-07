@@ -26,7 +26,10 @@ The host lacked `libxkbfile.so.1`/`libXtst.so.6`; verified Ubuntu package archiv
 python3 scripts/r001/emulator_session.py \
   --sdk /path/to/android-sdk --avd polaris_api31 \
   --timeout-multiplier 10 --gpu swangle --cores 2 \
-  --session /path/to/session --max-seconds 1800
+  --session /path/to/session --max-seconds 1800 \
+  --source-network-only \
+  --allow-host api.mangadex.org --allow-host uploads.mangadex.org \
+  --allow-host mangakatana.com --allow-host i1.mangakatana.com
 ```
 
 The helper keeps emulator and ADB in one execution/network session, configures the diagnostic timeout through ADB, refreshes the explicit Android proxy when a localhost host proxy exists, and reads numbered JSON requests from `SESSION/requests`. Each request supplies an ADB `args` array, optional `timeout`, and an optional session-relative `output` filename. Results are written to `SESSION/results`. Screenshot requests use `exec-out screencap -p`; a `STOP` marker ends the session. Root timeout setup requires an image supporting rooted ADB and Android 12's hardware timeout property.
@@ -80,7 +83,23 @@ python3 scripts/r001/emulator_session.py \\
   --session /path/to/session --max-seconds 1800 \\
   --source-network-only \\
   --allow-host api.mangadex.org --allow-host uploads.mangadex.org \\
-  --allow-host mangakatana.com
+  --allow-host mangakatana.com --allow-host i1.mangakatana.com
 ```
 
 Permit an image CDN only after verifying it in the real source response. Unknown destinations stay blocked. No B01/B02/B03 PASS, migration15 or domain redesign is claimed.
+
+## Final observed checkpoint — execution transport interrupted
+
+The second bounded launch **completed Android boot**. IPv4/IPv6 egress setup returned0, Android's explicit proxy was configured, and the proxy recorded repeated Firebase Installations requests with `allowed:false`. This safer profile reached app installation without the prior telemetry review rejection. No Firebase payload was forwarded by the filtering proxy.
+
+- MangaKatana1.6.1 install returned `Success`. APK SHA-256: `83c158cafea666de09926a69e8d9dd4319eb2089576a58e9675c98bb9fb2bdfb`; real source ID `3170561626848540385`.
+- Recovered Spike ARM64 APK install, explicitly selecting `arm64-v8a`, returned `Success`. Its SHA-256 remains `87bb88a1a676caa78fafc3c022ac45a30b8bcc65673c7e4352f3942ec3d21666`.
+- Starting MainActivity returned0. A screenshot displayed its **splash screen**. This is not full UI/reader certification.
+- The next read failed because the execution service disconnected: `exec-server transport disconnected; failed to resume exec-server session: recovery timed out after 25s`. A subsequent read-only `pwd` did not recover. No further device state could be inspected.
+- The three network boundary tests passed, including malformed-policy fail-closed behavior. New sessions write `source-allowlist.json`; only after verifying a source's real image URL may an exact CDN host be added there. Malformed policy denies all destinations. Verified MangaKatana Chapter1 HTML names `i1.mangakatana.com`; include it in the resumed allowlist. This avoids restarting Android just to add a verified source CDN.
+
+The final observations are **transcribed from tool output**, clearly labelled in `evidence/issue002-emulator-recovery-2026-10-07/bounded-runtime-observations.json`. The final session's raw PNG/log files could not be uploaded after the transport disconnect. Earlier baseline screenshots/raw logs remain committed.
+
+**B01/B02/B03 were not run:** no two real children or virtual work were created, no child chapter was opened from the virtual list, and no reference removal was executed. Issue2 remains open; PR1 remains draft; migration15 and issues3–7 integration remain blocked. No incompatibility with frozen Spikes001–024 has been demonstrated.
+
+Resume with the bounded profile, verify installed packages, complete actual onboarding, trust MangaDex/MangaKatana, enable MangaDex PT-BR, fetch the same work from both, obtain actual database IDs, and follow `ISSUE002_DEVICE_RUNBOOK.md`. Do not infer a reader PASS from install, splash, host API probes, or a constructed intent.

@@ -62,6 +62,18 @@ class ProxyBoundaryTest(unittest.TestCase):
             self.assertEqual(client.recv(5), b"hello")
         self.assertEqual(self.forwarded, ["source.example:443"])
 
+    def test_malformed_host_policy_fails_closed(self):
+        self.proxy.shutdown()
+        self.proxy.server_close()
+        policy = Path(self.directory.name) / "hosts.json"
+        policy.write_text('{"wrong":"format"}')
+        self.proxy = start_proxy(f"http://127.0.0.1:{self.upstream.server_port}",
+                                 ["source.example"], Path(self.directory.name) / "destinations.jsonl", policy)
+        client, response = self.connect("source.example:443")
+        with client:
+            self.assertIn(b" 403 ", response)
+        self.assertEqual(self.forwarded, [])
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -39,8 +39,10 @@ def main():
         if not options.allow_host:
             parser.error("source-network-only requires explicit allow-host entries")
         from emulator_source_proxy import start_proxy
+        allowlist_path = root / "source-allowlist.json"
+        allowlist_path.write_text(json.dumps(options.allow_host, indent=2) + "\n")
         source_proxy = start_proxy(os.environ.get("HTTP_PROXY", ""), options.allow_host,
-                                   root / "source-proxy.jsonl")
+                                   root / "source-proxy.jsonl", allowlist_path)
         bounded_url = f"http://127.0.0.1:{source_proxy.server_port}"
         for key in ("HTTP_PROXY", "HTTPS_PROXY", "http_proxy", "https_proxy"):
             env[key] = bounded_url

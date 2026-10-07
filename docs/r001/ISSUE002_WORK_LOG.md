@@ -93,3 +93,7 @@ The user requested software emulation. A pinned baseline x86_64 APK installed an
 - Runtime B01/B02/B03 with actual child/source IDs, sources, APK/device versions, logs and screenshots.
 
 The PR must remain draft and issue #2 must remain open. Issues #3/#5/#4/#6/#7 cannot be reported as integrated while this gate is pending.
+
+## Bounded emulator checkpoint
+
+Android12/API31 completed boot with a source-host allowlist, guest direct-egress restrictions and emulator metrics disabled. The proxy denied Firebase Installations before forwarding payload. MangaKatana1.6.1 installed; the recovered Spike ARM64 APK installed successfully through the advertised native bridge. MainActivity start returned0 and its splash rendered. Full UI/reader tests were interrupted by an exec-server transport disconnect; B01/B02/B03 remain NOT RUN. Raw final files became inaccessible; tool observations are explicitly transcribed in the emulator report/evidence. Three test-proxy boundary tests passed. Spikes001–024 and migration15 are unchanged. Keep issue2 open and PR1 draft.
