@@ -1,0 +1,9 @@
+{
+  "args": [
+    "shell",
+    "pm install --abi x86_64 -r /data/local/tmp/polaris-baseline-x86_64.apk"
+  ],
+  "returncode": 0,
+  "stdout": "Success\n",
+  "stderr": ""
+}

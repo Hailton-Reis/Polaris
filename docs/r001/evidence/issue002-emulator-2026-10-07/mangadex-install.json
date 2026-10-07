@@ -1,0 +1,9 @@
+{
+  "args": [
+    "install",
+    "/workspace/scratch/bab62ab08b4f/emulator-input/tachiyomi-all.mangadex-v1.6.0.apk"
+  ],
+  "returncode": 0,
+  "stdout": "Performing Streamed Install\nSuccess\n",
+  "stderr": ""
+}

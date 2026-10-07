@@ -81,9 +81,13 @@ python3 scripts/r001/check_issue002_sql.py /path/to/pinned-yomotsu
 
 - Agent-preloaded retry: **domain 58/58 PASS**, data `testDebugUnitTest` has no test sources, app **336/370 PASS; 34 failures**. Failures include upstream novel speech expectations, translation detection expectations/mocks, Android JSONObject stubs and missing NetworkHelper test DI. They do not directly exercise merged-work code; the original pinned baseline reproduces the same 34 failing test cases out of 370 with the identical agent-preloaded setup (comparison JSON committed). No additional failing cases were introduced by Spike-001 in this run. The complete unit gate is **not green**. Summaries/excerpts preserve diagnostics without megabyte bitmap array dumps.
 
+## Emulator continuation
+
+The user requested software emulation. A pinned baseline x86_64 APK installed and launched into the onboarding UI on Android 12/API31 without Polaris changes. A01 is **PASS for this emulator configuration**. Both real extension APKs installed; trusting them and fetching real child manga/chapters remain pending. B01/B02/B03 are not passed. Details, environment limitations and screenshots are in `ISSUE002_EMULATOR_RUN.md`.
+
 ## Still required
 
-- A launched baseline APK (A01).
+- A01 now passed on the software API31/x86_64 emulator; see `ISSUE002_EMULATOR_RUN.md` and its raw evidence. ARM64 reader/native translation remains unverified.
 - Two installed compatible real source extensions and populated child manga chapters.
 - Run the compiled debug creation/removal hook on the actual device.
 - Runtime B01/B02/B03 with actual child/source IDs, sources, APK/device versions, logs and screenshots.
