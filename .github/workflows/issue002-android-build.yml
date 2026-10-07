@@ -6,11 +6,13 @@ on:
     paths:
       - 'spikes/spike001/**'
       - 'scripts/r001/**'
+      - 'integration/r001/**'
       - '.github/workflows/issue002-android-build.yml'
   pull_request:
     paths:
       - 'spikes/spike001/**'
       - 'scripts/r001/**'
+      - 'integration/r001/**'
       - '.github/workflows/issue002-android-build.yml'
   workflow_dispatch:
 
@@ -44,7 +46,7 @@ jobs:
       - uses: gradle/actions/setup-gradle@9c971963bec38e04b3d30dcc455b5382be2fdbfb
       - name: Install pinned Android toolchain
         run: |
-          sdkmanager 'platforms;android-37.0' 'build-tools;37.0.0' 'ndk;29.0.14206865' 'ndk;28.2.13676358' 'cmake;3.22.1'
+          sdkmanager 'platforms;android-37.0' 'build-tools;36.0.0' 'build-tools;37.0.0' 'ndk;29.0.14206865' 'ndk;28.2.13676358' 'cmake;3.22.1'
       - name: Build original baseline, then isolated Spike-001
         run: bash scripts/r001/build_issue002.sh upstream-yomotsu "$RUNNER_TEMP/issue002-evidence"
       - name: Upload build evidence and available APKs

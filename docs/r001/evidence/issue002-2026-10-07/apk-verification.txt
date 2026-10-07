@@ -1,0 +1,5 @@
+Both ARM64 debug APKs: APK Signature Scheme v2 verified; one signer.
+Package: app.mihon.tachiyomiat.dev
+Baseline SHA-256: 6f1ebd8e444097307ff9f44efd32d2fcd8c51f34379b9b71ee24100a749cffc2
+Spike-001 SHA-256: 87bb88a1a676caa78fafc3c022ac45a30b8bcc65673c7e4352f3942ec3d21666
+Android runtime: NOT EXECUTED; adb devices has no devices.

@@ -1,0 +1,12 @@
+JAVA_HOME=/tmp/polaris-toolchain/jdk-21.0.12.1+1
+ANDROID_HOME=/tmp/polaris-toolchain/android-sdk
+JAVA_TOOL_OPTIONS=-Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts
+Gradle executable: /tmp/polaris-toolchain/gradle-9.6.1/bin/gradle
+Common flags: -Pkotlin.incremental=false --no-build-cache --no-daemon --console=plain --stacktrace --max-workers=1 -Dorg.gradle.jvmargs="-Xmx3g -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8"
+HTTP/HTTPS JVM proxy host: 127.0.0.1; port read from current command HTTPS_PROXY (changes per execution).
+Baseline task: :app:assembleDebug
+Patched tasks: :data:generateDebugDatabaseInterface verifySqlDelightMigration :app:assembleDebug
+Unit tasks: :domain:testDebugUnitTest :data:testDebugUnitTest :app:testDebugUnitTest
+Source preparation and targeted generated-output recovery documented in ISSUE002_WORK_LOG.md.
+
+Unit retry: preload byte-buddy-agent 1.18.2 with the supplied init script (-I bytebuddy-agent.init.gradle), setting POLARIS_BYTEBUDDY_AGENT to the resolved cached JAR; --continue executes later modules. The local temporary script used the same resolved absolute JAR directly.

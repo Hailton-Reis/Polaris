@@ -1,0 +1,7 @@
+// Optional workaround for hosts where Byte Buddy self-attachment is unavailable.
+// Set POLARIS_BYTEBUDDY_AGENT to the resolved byte-buddy-agent JAR used by MockK.
+allprojects {
+    tasks.withType(Test).configureEach {
+        jvmArgs "-javaagent:${System.getenv('POLARIS_BYTEBUDDY_AGENT')}"
+    }
+}

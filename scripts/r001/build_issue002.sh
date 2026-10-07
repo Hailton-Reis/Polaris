@@ -17,24 +17,41 @@ test ! -e "$patched"
     java -version
     printf 'Android SDK: %s\n' "${ANDROID_HOME:-${ANDROID_SDK_ROOT:-unset}}"
 } > "$evidence/environment.txt" 2>&1
+python3 "$polaris_root/scripts/r001/check_issue002_sql.py" "$baseline" | tee "$evidence/sql-preflight.log"
 
 run_gradle() {
     local tree=$1 log=$2
     shift 2
-    (cd "$tree" && ./gradlew "$@" --no-daemon --console=plain --stacktrace) 2>&1 | tee "$evidence/$log"
+    (cd "$tree" && ./gradlew "$@" -Pkotlin.incremental=false --no-build-cache --no-daemon --console=plain --stacktrace \
+        --max-workers=1 '-Dorg.gradle.jvmargs=-Xmx3g -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8') 2>&1 | tee "$evidence/$log"
 }
 
+# Match the pinned upstream build workflow's required generated branding assets.
+prepare_branding() {
+    local tree=$1 density
+    base64 --decode "$tree/branding/yomotsu-icon.png.b64" > "$evidence/yomotsu-icon.png"
+    for density in mdpi hdpi xhdpi xxhdpi xxxhdpi; do
+        mkdir -p "$tree/app/src/main/res/mipmap-$density"
+        cp "$evidence/yomotsu-icon.png" "$tree/app/src/main/res/mipmap-$density/ic_launcher.png"
+        cp "$evidence/yomotsu-icon.png" "$tree/app/src/main/res/mipmap-$density/ic_launcher_foreground.png"
+    done
+}
+
+prepare_branding "$baseline"
 run_gradle "$baseline" baseline-build.log :app:assembleDebug
+mkdir -p "$evidence/apks/baseline"
+cp "$baseline"/app/build/outputs/apk/debug/*.apk "$evidence/apks/baseline/"
 git -C "$baseline" worktree add --detach "$patched" "$pinned"
 python3 "$polaris_root/spikes/spike001/apply_spike001.py" "$patched" 2>&1 | tee "$evidence/apply-spike001.log"
+python3 "$polaris_root/scripts/r001/apply_debug_hook.py" "$patched" | tee "$evidence/apply-debug-hook.log"
 # Intent-to-add includes all staged new files in the reviewable diff.
 git -C "$patched" add -N .
 git -C "$patched" diff --binary > "$evidence/spike001.patch"
 git -C "$patched" diff --check 2>&1 | tee "$evidence/diff-check.log"
 test ! -e "$patched/data/src/main/sqldelight/tachiyomi/migrations/15.sqm"
+prepare_branding "$patched"
 run_gradle "$patched" patched-build.log :data:generateDebugDatabaseInterface verifySqlDelightMigration :app:assembleDebug
-run_gradle "$patched" patched-unit-tests.log :domain:testDebugUnitTest :data:testDebugUnitTest :app:testDebugUnitTest
-mkdir -p "$evidence/apks/baseline" "$evidence/apks/spike001"
-cp "$baseline"/app/build/outputs/apk/debug/*.apk "$evidence/apks/baseline/"
+mkdir -p "$evidence/apks/spike001"
 cp "$patched"/app/build/outputs/apk/debug/*.apk "$evidence/apks/spike001/"
+run_gradle "$patched" patched-unit-tests.log :domain:testDebugUnitTest :data:testDebugUnitTest :app:testDebugUnitTest
 printf 'BUILD_GATE_PASS\nRuntime A01/B01/B02/B03 still require device evidence.\n' | tee "$evidence/build-status.txt"

@@ -1,0 +1,3 @@
+adb devices: no devices attached.
+/dev/kvm: unavailable.
+No Android app launch, real-source chapter load, merged reader routing, or reference-removal runtime acceptance was executed. A01/B01/B02/B03 remain pending.

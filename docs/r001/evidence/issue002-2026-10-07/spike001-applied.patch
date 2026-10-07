@@ -1,0 +1,968 @@
+diff --git a/app/src/debug/AndroidManifest.xml b/app/src/debug/AndroidManifest.xml
+index 4bf375a..b1d0f7b 100644
+--- a/app/src/debug/AndroidManifest.xml
++++ b/app/src/debug/AndroidManifest.xml
+@@ -6,5 +6,6 @@
+             android:theme="@android:style/Theme.Material.Light.NoActionBar" />
+         <service android:name="eu.kanade.translation.detection.DbnetCrashTestService"
+             android:exported="false" android:process=":dbnet" />
++        <activity android:name="eu.kanade.tachiyomi.polaris.Spike001DebugActivity" android:exported="true" android:theme="@android:style/Theme.Material.Light.NoActionBar" />
+     </application>
+ </manifest>
+diff --git a/app/src/debug/java/eu/kanade/tachiyomi/polaris/Spike001DebugActivity.kt b/app/src/debug/java/eu/kanade/tachiyomi/polaris/Spike001DebugActivity.kt
+new file mode 100644
+index 0000000..dfa7d49
+--- /dev/null
++++ b/app/src/debug/java/eu/kanade/tachiyomi/polaris/Spike001DebugActivity.kt
+@@ -0,0 +1,98 @@
++package eu.kanade.tachiyomi.polaris
++
++import android.app.Activity
++import android.os.Bundle
++import android.util.Log
++import android.widget.TextView
++import kotlinx.coroutines.CancellationException
++import kotlinx.coroutines.CoroutineScope
++import kotlinx.coroutines.Dispatchers
++import kotlinx.coroutines.SupervisorJob
++import kotlinx.coroutines.cancel
++import kotlinx.coroutines.launch
++import kotlinx.coroutines.withContext
++import tachiyomi.domain.chapter.interactor.GetMergedChaptersByMangaId
++import tachiyomi.domain.chapter.repository.ChapterRepository
++import tachiyomi.domain.manga.interactor.CreateMergedManga
++import tachiyomi.domain.manga.interactor.DeleteMergedManga
++import tachiyomi.domain.manga.interactor.GetMergedReferencesById
++import tachiyomi.domain.manga.interactor.UpdateMergedSettings
++import tachiyomi.domain.manga.model.MergeMangaSettingsUpdate
++import tachiyomi.domain.manga.model.MergedMangaReference
++import tachiyomi.domain.manga.repository.MangaRepository
++import tachiyomi.domain.source.model.MERGED_SOURCE_ID
++import uy.kohesive.injekt.Injekt
++import uy.kohesive.injekt.api.get
++
++/** Issue #2 test hook. Included and exported only in the debug build. */
++class Spike001DebugActivity : Activity() {
++    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
++
++    override fun onCreate(savedInstanceState: Bundle?) {
++        super.onCreate(savedInstanceState)
++        val status = TextView(this).apply { text = "Running Spike-001 debug operation…" }
++        setContentView(status)
++        // Do not replay a mutating operation on a configuration/process recreation.
++        if (savedInstanceState != null) {
++            status.text = "Operation was already started. Inspect PolarisSpike001 logcat."
++            return
++        }
++        scope.launch {
++            try {
++                val result = withContext(Dispatchers.IO) {
++                    when (intent.getStringExtra("operation") ?: "create") {
++                        "create" -> create()
++                        "remove" -> remove()
++                        else -> error("Expected operation=create or operation=remove")
++                    }
++                }
++                Log.i("PolarisSpike001", result)
++                status.text = result + "\n\nOpen the library entry and test both child chapters. This hook does not certify reader runtime PASS."
++            } catch (error: CancellationException) {
++                throw error
++            } catch (error: Exception) {
++                Log.e("PolarisSpike001", "Debug operation failed", error)
++                status.text = "FAILED: ${error.message}"
++            }
++        }
++    }
++
++    private suspend fun create(): String {
++        val ids = listOf(intent.getLongExtra("child_a", -1), intent.getLongExtra("child_b", -1))
++        require(ids.all { it > 0 } && ids.distinct().size == 2) { "Supply two distinct positive child IDs" }
++        val mangas = ids.map { Injekt.get<MangaRepository>().getMangaById(it) }
++        require(mangas.all { it.source != MERGED_SOURCE_ID } && mangas.map { it.source }.distinct().size == 2) {
++            "Children must belong to two different real sources"
++        }
++        val counts = ids.map { Injekt.get<ChapterRepository>().getChapterByMangaId(it).size }
++        require(counts.all { it > 0 }) { "Populate chapters for both children before running this hook" }
++        val merged = Injekt.get<CreateMergedManga>()(ids)
++        val root = Injekt.get<GetMergedReferencesById>().await(merged.id).single { it.mangaSourceId == MERGED_SOURCE_ID }
++        // Show both overlapping lists for routing proof without changing the domain default.
++        check(Injekt.get<UpdateMergedSettings>().await(MergeMangaSettingsUpdate(root.id, chapterSortMode = MergedMangaReference.CHAPTER_SORT_NO_DEDUPE)))
++        val chapters = Injekt.get<GetMergedChaptersByMangaId>().await(merged.id)
++        check(ids.all { id -> chapters.any { it.mangaId == id } }) { "Merged list is missing a child" }
++        return "CREATED mergeId=${merged.id} children=$ids sources=${mangas.map { it.source }} chapterCounts=$counts mergedCount=${chapters.size}"
++    }
++
++    private suspend fun remove(): String {
++        val mergeId = intent.getLongExtra("merge_id", -1)
++        val childId = intent.getLongExtra("child_id", -1)
++        require(mergeId > 0 && childId > 0 && mergeId != childId)
++        val refs = Injekt.get<GetMergedReferencesById>().await(mergeId)
++        val children = refs.filter { it.mangaSourceId != MERGED_SOURCE_ID && it.mangaId != null }
++        require(children.size >= 2) { "This gate removes one reference while preserving another" }
++        val reference = children.single { it.mangaId == childId }
++        Injekt.get<DeleteMergedManga>().deleteReference(reference.id)
++        val parent = Injekt.get<MangaRepository>().getMangaById(mergeId)
++        check(parent.source == MERGED_SOURCE_ID)
++        val chapters = Injekt.get<GetMergedChaptersByMangaId>().await(mergeId)
++        check(chapters.isNotEmpty() && chapters.none { it.mangaId == childId })
++        return "REMOVED referenceId=${reference.id} childId=$childId mergeId=$mergeId remainingChildren=${chapters.map { it.mangaId }.distinct()}"
++    }
++
++    override fun onDestroy() {
++        scope.cancel()
++        super.onDestroy()
++    }
++}
+diff --git a/app/src/main/java/eu/kanade/domain/DomainModule.kt b/app/src/main/java/eu/kanade/domain/DomainModule.kt
+index bb822de..b7eaaf7 100644
+--- a/app/src/main/java/eu/kanade/domain/DomainModule.kt
++++ b/app/src/main/java/eu/kanade/domain/DomainModule.kt
+@@ -42,6 +42,7 @@ import tachiyomi.data.category.CategoryRepositoryImpl
+ import tachiyomi.data.chapter.ChapterRepositoryImpl
+ import tachiyomi.data.history.HistoryRepositoryImpl
+ import tachiyomi.data.manga.MangaRepositoryImpl
++import tachiyomi.data.manga.MangaMergeRepositoryImpl
+ import tachiyomi.data.release.ReleaseServiceImpl
+ import tachiyomi.data.source.SourceRepositoryImpl
+ import tachiyomi.data.source.StubSourceRepositoryImpl
+@@ -60,6 +61,7 @@ import tachiyomi.domain.category.repository.CategoryRepository
+ import tachiyomi.domain.chapter.interactor.GetBookmarkedChaptersByMangaId
+ import tachiyomi.domain.chapter.interactor.GetChapter
+ import tachiyomi.domain.chapter.interactor.GetChapterByUrlAndMangaId
++import tachiyomi.domain.chapter.interactor.GetMergedChaptersByMangaId
+ import tachiyomi.domain.chapter.interactor.GetChaptersByMangaId
+ import tachiyomi.domain.chapter.interactor.SetMangaDefaultChapterFlags
+ import tachiyomi.domain.chapter.interactor.ShouldUpdateDbChapter
+@@ -71,6 +73,8 @@ import tachiyomi.domain.history.interactor.GetTotalReadDuration
+ import tachiyomi.domain.history.interactor.RemoveHistory
+ import tachiyomi.domain.history.interactor.UpsertHistory
+ import tachiyomi.domain.history.repository.HistoryRepository
++import tachiyomi.domain.manga.interactor.CreateMergedManga
++import tachiyomi.domain.manga.interactor.DeleteMergedManga
+ import tachiyomi.domain.manga.interactor.FetchInterval
+ import tachiyomi.domain.manga.interactor.GetDuplicateLibraryManga
+ import tachiyomi.domain.manga.interactor.GetFavorites
+@@ -78,10 +82,15 @@ import tachiyomi.domain.manga.interactor.GetLibraryManga
+ import tachiyomi.domain.manga.interactor.GetManga
+ import tachiyomi.domain.manga.interactor.GetMangaByUrlAndSourceId
+ import tachiyomi.domain.manga.interactor.GetMangaWithChapters
++import tachiyomi.domain.manga.interactor.GetMergedMangaById
++import tachiyomi.domain.manga.interactor.GetMergedReferencesById
++import tachiyomi.domain.manga.interactor.InsertMergedReference
+ import tachiyomi.domain.manga.interactor.NetworkToLocalManga
+ import tachiyomi.domain.manga.interactor.ResetViewerFlags
+ import tachiyomi.domain.manga.interactor.SetMangaChapterFlags
+ import tachiyomi.domain.manga.interactor.UpdateMangaNotes
++import tachiyomi.domain.manga.interactor.UpdateMergedSettings
++import tachiyomi.domain.manga.repository.MangaMergeRepository
+ import tachiyomi.domain.manga.repository.MangaRepository
+ import tachiyomi.domain.release.interactor.GetApplicationRelease
+ import tachiyomi.domain.release.service.ReleaseService
+@@ -116,10 +125,18 @@ class DomainModule : InjektModule {
+         addFactory { DeleteCategory(get(), get(), get()) }
+ 
+         addSingletonFactory<MangaRepository> { MangaRepositoryImpl(get()) }
++        addSingletonFactory<MangaMergeRepository> { MangaMergeRepositoryImpl(get()) }
++        addFactory { GetMergedReferencesById(get()) }
++        addFactory { GetMergedMangaById(get()) }
++        addFactory { InsertMergedReference(get()) }
++        addFactory { UpdateMergedSettings(get()) }
++        addFactory { DeleteMergedManga(get()) }
++        addFactory { GetMergedChaptersByMangaId(get(), get()) }
++        addFactory { CreateMergedManga(get(), get()) }
+         addFactory { GetDuplicateLibraryManga(get()) }
+         addFactory { GetFavorites(get()) }
+         addFactory { GetLibraryManga(get()) }
+-        addFactory { GetMangaWithChapters(get(), get()) }
++        addFactory { GetMangaWithChapters(get(), get(), get()) }
+         addFactory { GetMangaByUrlAndSourceId(get()) }
+         addFactory { GetManga(get()) }
+         addFactory { GetNextChapters(get(), get(), get()) }
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/source/AndroidSourceManager.kt b/app/src/main/java/eu/kanade/tachiyomi/source/AndroidSourceManager.kt
+index 14c370e..147e589 100644
+--- a/app/src/main/java/eu/kanade/tachiyomi/source/AndroidSourceManager.kt
++++ b/app/src/main/java/eu/kanade/tachiyomi/source/AndroidSourceManager.kt
+@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.collectLatest
+ import kotlinx.coroutines.flow.map
+ import kotlinx.coroutines.launch
+ import kotlinx.coroutines.runBlocking
++import tachiyomi.domain.source.model.MERGED_SOURCE_ID
+ import tachiyomi.domain.source.model.StubSource
+ import tachiyomi.domain.source.repository.StubSourceRepository
+ import tachiyomi.domain.source.service.SourceManager
+@@ -59,6 +60,7 @@ class AndroidSourceManager(
+                             Injekt.get(),
+                         ),
+                         eu.kanade.tachiyomi.source.TelegramSource.ID to eu.kanade.tachiyomi.source.TelegramSource(context),
++                        MERGED_SOURCE_ID to MergedSource(),
+                     ),
+                 )
+                 mangaExtensions.forEach { extension ->
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/source/MergedSource.kt b/app/src/main/java/eu/kanade/tachiyomi/source/MergedSource.kt
+new file mode 100644
+index 0000000..b46144f
+--- /dev/null
++++ b/app/src/main/java/eu/kanade/tachiyomi/source/MergedSource.kt
+@@ -0,0 +1,36 @@
++package eu.kanade.tachiyomi.source
++
++import eu.kanade.tachiyomi.source.model.FilterList
++import eu.kanade.tachiyomi.source.model.MangasPage
++import eu.kanade.tachiyomi.source.model.Page
++import eu.kanade.tachiyomi.source.model.SChapter
++import eu.kanade.tachiyomi.source.model.SManga
++import eu.kanade.tachiyomi.source.model.SMangaUpdate
++import tachiyomi.domain.source.model.MERGED_SOURCE_ID
++
++/**
++ * Virtual source used only as the identity of a merged work.
++ * Real chapters retain their original mangaId/source and are opened by those real sources.
++ */
++class MergedSource : Source {
++    override val id = MERGED_SOURCE_ID
++    override val name = "Merged"
++    override val lang = "all"
++    override val supportsLatest = false
++
++    override suspend fun getPopularManga(page: Int): MangasPage = unsupported()
++    override suspend fun getLatestUpdates(page: Int): MangasPage = unsupported()
++    override suspend fun getSearchManga(page: Int, query: String, filters: FilterList): MangasPage = unsupported()
++
++    override suspend fun getMangaUpdate(
++        manga: SManga,
++        chapters: List<SChapter>,
++        fetchDetails: Boolean,
++        fetchChapters: Boolean,
++    ): SMangaUpdate = SMangaUpdate(manga, chapters)
++
++    override suspend fun getPageList(chapter: SChapter): List<Page> = unsupported()
++
++    private fun <T> unsupported(): T =
++        throw UnsupportedOperationException("MergedSource is a virtual identity source")
++}
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/manga/MangaScreen.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/manga/MangaScreen.kt
+index 7cc2264..e06dbf3 100644
+--- a/app/src/main/java/eu/kanade/tachiyomi/ui/manga/MangaScreen.kt
++++ b/app/src/main/java/eu/kanade/tachiyomi/ui/manga/MangaScreen.kt
+@@ -40,6 +40,7 @@ import eu.kanade.presentation.manga.components.SetIntervalDialog
+ import eu.kanade.presentation.util.AssistContentScreen
+ import eu.kanade.presentation.util.Screen
+ import eu.kanade.presentation.util.isTabletUi
++import eu.kanade.tachiyomi.source.MergedSource
+ import eu.kanade.tachiyomi.source.Source
+ import eu.kanade.tachiyomi.source.isLocalOrStub
+ import eu.kanade.tachiyomi.source.online.HttpSource
+@@ -126,8 +127,10 @@ class MangaScreen(
+             chapterSwipeEndAction = viewModel.chapterSwipeEndAction,
+             navigateUp = navigator::pop,
+             onChapterClicked = { openChapter(context, it, successState.source) },
+-            onDownloadChapter = viewModel::runChapterDownloadActions.takeIf { !successState.source.isLocalOrStub() },
+-            onTranslationChapter = viewModel::runChapterTranslationActions.takeIf { !isNovel },
++            onDownloadChapter = viewModel::runChapterDownloadActions
++                .takeIf { !successState.source.isLocalOrStub() && successState.source !is MergedSource },
++            onTranslationChapter = viewModel::runChapterTranslationActions
++                .takeIf { !isNovel && successState.source !is MergedSource },
+             onAddToLibraryClicked = {
+                 viewModel.toggleFavorite()
+                 haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+@@ -160,9 +163,10 @@ class MangaScreen(
+             onSearch = { query, global -> scope.launch { performSearch(navigator, query, global) } },
+             onCoverClicked = viewModel::showCoverDialog,
+             onShareClicked = { shareManga(context, viewModel.manga, viewModel.source) }.takeIf { isHttpSource },
+-            onDownloadActionClicked = viewModel::runDownloadAction.takeIf { !successState.source.isLocalOrStub() },
++            onDownloadActionClicked = viewModel::runDownloadAction
++                .takeIf { !successState.source.isLocalOrStub() && successState.source !is MergedSource },
+             onTranslateDownloadedClicked = viewModel::translateDownloadedChapters
+-                .takeIf { !isNovel && successState.hasDownloadedChaptersToTranslate },
++                .takeIf { !isNovel && successState.source !is MergedSource && successState.hasDownloadedChaptersToTranslate },
+             onEditCategoryClicked = viewModel::showChangeCategoryDialog.takeIf { successState.manga.favorite },
+             onEditFetchIntervalClicked = viewModel::showSetFetchIntervalDialog.takeIf {
+                 successState.manga.favorite
+diff --git a/data/src/main/java/tachiyomi/data/manga/MangaMergeRepositoryImpl.kt b/data/src/main/java/tachiyomi/data/manga/MangaMergeRepositoryImpl.kt
+new file mode 100644
+index 0000000..84aa619
+--- /dev/null
++++ b/data/src/main/java/tachiyomi/data/manga/MangaMergeRepositoryImpl.kt
+@@ -0,0 +1,112 @@
++package tachiyomi.data.manga
++
++import app.cash.sqldelight.async.coroutines.awaitAsList
++import app.cash.sqldelight.async.coroutines.awaitAsOneOrNull
++import kotlinx.coroutines.flow.Flow
++import logcat.LogPriority
++import tachiyomi.core.common.util.system.logcat
++import tachiyomi.data.Database
++import tachiyomi.data.subscribeToList
++import tachiyomi.domain.manga.model.Manga
++import tachiyomi.domain.manga.model.MergeMangaSettingsUpdate
++import tachiyomi.domain.manga.model.MergedMangaReference
++import tachiyomi.domain.manga.repository.MangaMergeRepository
++
++class MangaMergeRepositoryImpl(
++    private val database: Database,
++) : MangaMergeRepository {
++
++    override suspend fun getMergedMangaById(id: Long): List<Manga> =
++        database.mergedQueries
++            .selectMergedMangasById(id, MangaMapper::mapManga)
++            .awaitAsList()
++
++    override fun subscribeMergedMangaById(id: Long): Flow<List<Manga>> =
++        database.mergedQueries
++            .selectMergedMangasById(id, MangaMapper::mapManga)
++            .subscribeToList()
++
++    override suspend fun getReferencesById(id: Long): List<MergedMangaReference> =
++        database.mergedQueries
++            .selectByMergeId(id, MergedMangaMapper::map)
++            .awaitAsList()
++
++    override fun subscribeReferencesById(id: Long): Flow<List<MergedMangaReference>> =
++        database.mergedQueries
++            .selectByMergeId(id, MergedMangaMapper::map)
++            .subscribeToList()
++
++    override suspend fun updateSettings(update: MergeMangaSettingsUpdate): Boolean = try {
++        partialUpdate(update)
++        true
++    } catch (e: Exception) {
++        logcat(LogPriority.ERROR, e)
++        false
++    }
++
++    override suspend fun updateAllSettings(values: List<MergeMangaSettingsUpdate>): Boolean = try {
++        partialUpdate(*values.toTypedArray())
++        true
++    } catch (e: Exception) {
++        logcat(LogPriority.ERROR, e)
++        false
++    }
++
++    private suspend fun partialUpdate(vararg values: MergeMangaSettingsUpdate) {
++        database.transaction {
++            values.forEach { value ->
++                database.mergedQueries.updateSettingsById(
++                    id = value.id,
++                    getChapterUpdates = value.getChapterUpdates,
++                    downloadChapters = value.downloadChapters,
++                    infoManga = value.isInfoManga,
++                    chapterPriority = value.chapterPriority?.toLong(),
++                    chapterSortMode = value.chapterSortMode?.toLong(),
++                )
++            }
++        }
++    }
++
++    override suspend fun insert(reference: MergedMangaReference): Long? =
++        database.mergedQueries
++            .insertReturningId(
++                infoManga = reference.isInfoManga,
++                getChapterUpdates = reference.getChapterUpdates,
++                chapterSortMode = reference.chapterSortMode.toLong(),
++                chapterPriority = reference.chapterPriority.toLong(),
++                downloadChapters = reference.downloadChapters,
++                mergeId = requireNotNull(reference.mergeId),
++                mergeUrl = reference.mergeUrl,
++                mangaId = reference.mangaId,
++                mangaUrl = reference.mangaUrl,
++                mangaSource = reference.mangaSourceId,
++            )
++            .awaitAsOneOrNull()
++
++    override suspend fun insertAll(references: List<MergedMangaReference>) {
++        database.transaction {
++            references.forEach { reference ->
++                database.mergedQueries.insert(
++                    infoManga = reference.isInfoManga,
++                    getChapterUpdates = reference.getChapterUpdates,
++                    chapterSortMode = reference.chapterSortMode.toLong(),
++                    chapterPriority = reference.chapterPriority.toLong(),
++                    downloadChapters = reference.downloadChapters,
++                    mergeId = requireNotNull(reference.mergeId),
++                    mergeUrl = reference.mergeUrl,
++                    mangaId = reference.mangaId,
++                    mangaUrl = reference.mangaUrl,
++                    mangaSource = reference.mangaSourceId,
++                )
++            }
++        }
++    }
++
++    override suspend fun deleteById(id: Long) {
++        database.mergedQueries.deleteById(id)
++    }
++
++    override suspend fun deleteByMergeId(mergeId: Long) {
++        database.mergedQueries.deleteByMergeId(mergeId)
++    }
++}
+diff --git a/data/src/main/java/tachiyomi/data/manga/MergedMangaMapper.kt b/data/src/main/java/tachiyomi/data/manga/MergedMangaMapper.kt
+new file mode 100644
+index 0000000..0bce795
+--- /dev/null
++++ b/data/src/main/java/tachiyomi/data/manga/MergedMangaMapper.kt
+@@ -0,0 +1,31 @@
++package tachiyomi.data.manga
++
++import tachiyomi.domain.manga.model.MergedMangaReference
++
++object MergedMangaMapper {
++    fun map(
++        id: Long,
++        isInfoManga: Boolean,
++        getChapterUpdates: Boolean,
++        chapterSortMode: Long,
++        chapterPriority: Long,
++        downloadChapters: Boolean,
++        mergeId: Long,
++        mergeUrl: String,
++        mangaId: Long?,
++        mangaUrl: String,
++        mangaSourceId: Long,
++    ) = MergedMangaReference(
++        id = id,
++        isInfoManga = isInfoManga,
++        getChapterUpdates = getChapterUpdates,
++        chapterSortMode = chapterSortMode.toInt(),
++        chapterPriority = chapterPriority.toInt(),
++        downloadChapters = downloadChapters,
++        mergeId = mergeId,
++        mergeUrl = mergeUrl,
++        mangaId = mangaId,
++        mangaUrl = mangaUrl,
++        mangaSourceId = mangaSourceId,
++    )
++}
+diff --git a/data/src/main/sqldelight/tachiyomi/data/merged.sq b/data/src/main/sqldelight/tachiyomi/data/merged.sq
+new file mode 100644
+index 0000000..6dc74ac
+--- /dev/null
++++ b/data/src/main/sqldelight/tachiyomi/data/merged.sq
+@@ -0,0 +1,80 @@
++import kotlin.Boolean;
++
++CREATE TABLE merged(
++    _id INTEGER NOT NULL PRIMARY KEY,
++    info_manga INTEGER AS Boolean NOT NULL,
++    get_chapter_updates INTEGER AS Boolean NOT NULL,
++    chapter_sort_mode INTEGER NOT NULL,
++    chapter_priority INTEGER NOT NULL,
++    download_chapters INTEGER AS Boolean NOT NULL,
++    merge_id INTEGER NOT NULL,
++    merge_url TEXT NOT NULL,
++    manga_id INTEGER,
++    manga_url TEXT NOT NULL,
++    manga_source INTEGER NOT NULL,
++    FOREIGN KEY(manga_id) REFERENCES mangas (_id) ON DELETE SET NULL,
++    FOREIGN KEY(merge_id) REFERENCES mangas (_id) ON DELETE CASCADE
++);
++
++CREATE INDEX merged_merge_id_index ON merged(merge_id);
++
++selectByMergeId:
++SELECT * FROM merged WHERE merge_id = ?;
++
++selectMergedMangasById:
++SELECT mangas.*
++FROM (SELECT manga_id FROM merged WHERE merge_id = ?) AS M
++JOIN mangas ON mangas._id = M.manga_id;
++
++insertReturningId:
++INSERT INTO merged(
++    info_manga, get_chapter_updates, chapter_sort_mode, chapter_priority,
++    download_chapters, merge_id, merge_url, manga_id, manga_url, manga_source
++)
++VALUES (
++    :infoManga,
++    :getChapterUpdates,
++    :chapterSortMode,
++    :chapterPriority,
++    :downloadChapters,
++    :mergeId,
++    :mergeUrl,
++    :mangaId,
++    :mangaUrl,
++    :mangaSource
++)
++RETURNING _id;
++
++insert:
++INSERT INTO merged(
++    info_manga, get_chapter_updates, chapter_sort_mode, chapter_priority,
++    download_chapters, merge_id, merge_url, manga_id, manga_url, manga_source
++)
++VALUES (
++    :infoManga,
++    :getChapterUpdates,
++    :chapterSortMode,
++    :chapterPriority,
++    :downloadChapters,
++    :mergeId,
++    :mergeUrl,
++    :mangaId,
++    :mangaUrl,
++    :mangaSource
++);
++
++updateSettingsById:
++UPDATE merged
++SET
++    get_chapter_updates = coalesce(:getChapterUpdates, get_chapter_updates),
++    download_chapters = coalesce(:downloadChapters, download_chapters),
++    info_manga = coalesce(:infoManga, info_manga),
++    chapter_priority = coalesce(:chapterPriority, chapter_priority),
++    chapter_sort_mode = coalesce(:chapterSortMode, chapter_sort_mode)
++WHERE _id = :id;
++
++deleteById:
++DELETE FROM merged WHERE _id = ?;
++
++deleteByMergeId:
++DELETE FROM merged WHERE merge_id = ?;
+diff --git a/data/src/main/sqldelight/tachiyomi/migrations/14.sqm b/data/src/main/sqldelight/tachiyomi/migrations/14.sqm
+new file mode 100644
+index 0000000..8f23dc5
+--- /dev/null
++++ b/data/src/main/sqldelight/tachiyomi/migrations/14.sqm
+@@ -0,0 +1,17 @@
++CREATE TABLE merged(
++    _id INTEGER NOT NULL PRIMARY KEY,
++    info_manga INTEGER NOT NULL,
++    get_chapter_updates INTEGER NOT NULL,
++    chapter_sort_mode INTEGER NOT NULL,
++    chapter_priority INTEGER NOT NULL,
++    download_chapters INTEGER NOT NULL,
++    merge_id INTEGER NOT NULL,
++    merge_url TEXT NOT NULL,
++    manga_id INTEGER,
++    manga_url TEXT NOT NULL,
++    manga_source INTEGER NOT NULL,
++    FOREIGN KEY(manga_id) REFERENCES mangas (_id) ON DELETE SET NULL,
++    FOREIGN KEY(merge_id) REFERENCES mangas (_id) ON DELETE CASCADE
++);
++
++CREATE INDEX merged_merge_id_index ON merged(merge_id);
+diff --git a/domain/src/main/java/tachiyomi/domain/chapter/interactor/GetMergedChaptersByMangaId.kt b/domain/src/main/java/tachiyomi/domain/chapter/interactor/GetMergedChaptersByMangaId.kt
+new file mode 100644
+index 0000000..6155fe6
+--- /dev/null
++++ b/domain/src/main/java/tachiyomi/domain/chapter/interactor/GetMergedChaptersByMangaId.kt
+@@ -0,0 +1,107 @@
++package tachiyomi.domain.chapter.interactor
++
++import kotlinx.coroutines.ExperimentalCoroutinesApi
++import kotlinx.coroutines.flow.Flow
++import kotlinx.coroutines.flow.combine
++import kotlinx.coroutines.flow.flatMapLatest
++import kotlinx.coroutines.flow.flowOf
++import tachiyomi.domain.chapter.model.Chapter
++import tachiyomi.domain.chapter.repository.ChapterRepository
++import tachiyomi.domain.manga.model.MergedMangaReference
++import tachiyomi.domain.manga.repository.MangaMergeRepository
++import tachiyomi.domain.source.model.MERGED_SOURCE_ID
++
++class GetMergedChaptersByMangaId(
++    private val chapterRepository: ChapterRepository,
++    private val mergeRepository: MangaMergeRepository,
++) {
++    suspend fun await(
++        mangaId: Long,
++        dedupe: Boolean = true,
++        applyScanlatorFilter: Boolean = false,
++    ): List<Chapter> {
++        val references = mergeRepository.getReferencesById(mangaId)
++        val chapters = childReferences(references)
++            .flatMap { ref -> chapterRepository.getChapterByMangaId(requireNotNull(ref.mangaId), applyScanlatorFilter) }
++        return transform(references, chapters, dedupe)
++    }
++
++    @OptIn(ExperimentalCoroutinesApi::class)
++    fun subscribe(
++        mangaId: Long,
++        dedupe: Boolean = true,
++        applyScanlatorFilter: Boolean = false,
++    ): Flow<List<Chapter>> = mergeRepository.subscribeReferencesById(mangaId)
++        .flatMapLatest { references ->
++            val refs = childReferences(references)
++            if (refs.isEmpty()) {
++                flowOf(emptyList())
++            } else {
++                val flows = refs.map { ref ->
++                    chapterRepository.getChapterByMangaIdAsFlow(requireNotNull(ref.mangaId), applyScanlatorFilter)
++                }
++                combine(flows) { lists ->
++                    transform(references, lists.flatMap { it }, dedupe)
++                }
++            }
++        }
++
++    private fun childReferences(references: List<MergedMangaReference>) =
++        references.filter { it.mangaSourceId != MERGED_SOURCE_ID && it.mangaId != null }
++
++    private fun transform(
++        references: List<MergedMangaReference>,
++        chapters: List<Chapter>,
++        dedupe: Boolean,
++    ): List<Chapter> {
++        if (!dedupe) return chapters
++        return when (rootSettings(references)?.chapterSortMode) {
++            MergedMangaReference.CHAPTER_SORT_NO_DEDUPE,
++            MergedMangaReference.CHAPTER_SORT_NONE,
++            null,
++            -> chapters
++
++            MergedMangaReference.CHAPTER_SORT_PRIORITY -> dedupeByPriority(references, chapters)
++            MergedMangaReference.CHAPTER_SORT_MOST_CHAPTERS -> {
++                val mangaId = chapters.groupBy { it.mangaId }.maxByOrNull { it.value.size }?.key
++                mangaId?.let { id -> chapters.filter { it.mangaId == id } } ?: chapters
++            }
++            MergedMangaReference.CHAPTER_SORT_HIGHEST_CHAPTER_NUMBER -> {
++                val mangaId = chapters.maxByOrNull { it.chapterNumber }?.mangaId
++                mangaId?.let { id -> chapters.filter { it.mangaId == id } } ?: chapters
++            }
++            else -> chapters
++        }
++    }
++
++    private fun rootSettings(references: List<MergedMangaReference>) =
++        references.firstOrNull { it.mangaSourceId == MERGED_SOURCE_ID }
++
++    private fun dedupeByPriority(
++        references: List<MergedMangaReference>,
++        chapters: List<Chapter>,
++    ): List<Chapter> {
++        val out = mutableListOf<Chapter>()
++        val priority = references.associate { it.mangaId to it.chapterPriority }
++
++        chapters.groupBy { it.mangaId }
++            .entries
++            .sortedBy { (mangaId) -> priority[mangaId] ?: Int.MAX_VALUE }
++            .forEach { (_, sourceChapters) ->
++                sourceChapters.forEach { chapter ->
++                    if (!chapter.isRecognizedNumber) {
++                        out += chapter
++                    } else {
++                        val duplicateFromOtherSource = out.any {
++                            it.isRecognizedNumber &&
++                                it.chapterNumber == chapter.chapterNumber &&
++                                it.mangaId != chapter.mangaId
++                        }
++                        if (!duplicateFromOtherSource) out += chapter
++                    }
++                }
++            }
++
++        return out.mapIndexed { index, chapter -> chapter.copy(sourceOrder = index.toLong()) }
++    }
++}
+diff --git a/domain/src/main/java/tachiyomi/domain/manga/interactor/CreateMergedManga.kt b/domain/src/main/java/tachiyomi/domain/manga/interactor/CreateMergedManga.kt
+new file mode 100644
+index 0000000..b049cf1
+--- /dev/null
++++ b/domain/src/main/java/tachiyomi/domain/manga/interactor/CreateMergedManga.kt
+@@ -0,0 +1,73 @@
++package tachiyomi.domain.manga.interactor
++
++import tachiyomi.domain.manga.model.Manga
++import tachiyomi.domain.manga.model.MergedMangaReference
++import tachiyomi.domain.manga.repository.MangaMergeRepository
++import tachiyomi.domain.manga.repository.MangaRepository
++import tachiyomi.domain.source.model.MERGED_SOURCE_ID
++
++class CreateMergedManga(
++    private val mangaRepository: MangaRepository,
++    private val mergeRepository: MangaMergeRepository,
++) {
++    suspend operator fun invoke(
++        childMangaIds: List<Long>,
++        infoMangaId: Long = childMangaIds.first(),
++    ): Manga {
++        val ids = childMangaIds.distinct()
++        require(ids.size >= 2) { "A merged manga requires at least two source variants" }
++        require(infoMangaId in ids) { "infoMangaId must be one of the merged variants" }
++
++        val children = ids.map { mangaRepository.getMangaById(it) }
++        val info = children.first { it.id == infoMangaId }
++        val mergeUrl = "merged://${ids.sorted().joinToString("-")}"
++
++        val existing = mangaRepository.getMangaByUrlAndSourceId(mergeUrl, MERGED_SOURCE_ID)
++        if (existing != null) return existing
++
++        val merged = mangaRepository.insertNetworkManga(
++            listOf(
++                info.copy(
++                    id = -1L,
++                    source = MERGED_SOURCE_ID,
++                    url = mergeUrl,
++                    favorite = true,
++                    initialized = true,
++                ),
++            ),
++        ).single()
++
++        val childReferences = children.mapIndexed { index, child ->
++            MergedMangaReference(
++                id = -1L,
++                isInfoManga = child.id == infoMangaId,
++                getChapterUpdates = true,
++                chapterSortMode = MergedMangaReference.CHAPTER_SORT_PRIORITY,
++                chapterPriority = index,
++                downloadChapters = false,
++                mergeId = merged.id,
++                mergeUrl = merged.url,
++                mangaId = child.id,
++                mangaUrl = child.url,
++                mangaSourceId = child.source,
++            )
++        }
++
++        val rootReference = MergedMangaReference(
++            id = -1L,
++            isInfoManga = false,
++            getChapterUpdates = false,
++            chapterSortMode = MergedMangaReference.CHAPTER_SORT_PRIORITY,
++            chapterPriority = Int.MAX_VALUE,
++            downloadChapters = false,
++            mergeId = merged.id,
++            mergeUrl = merged.url,
++            mangaId = merged.id,
++            mangaUrl = merged.url,
++            mangaSourceId = MERGED_SOURCE_ID,
++        )
++
++        mergeRepository.insertAll(childReferences + rootReference)
++        return merged
++    }
++}
+diff --git a/domain/src/main/java/tachiyomi/domain/manga/interactor/DeleteMergedManga.kt b/domain/src/main/java/tachiyomi/domain/manga/interactor/DeleteMergedManga.kt
+new file mode 100644
+index 0000000..0ff4c41
+--- /dev/null
++++ b/domain/src/main/java/tachiyomi/domain/manga/interactor/DeleteMergedManga.kt
+@@ -0,0 +1,10 @@
++package tachiyomi.domain.manga.interactor
++
++import tachiyomi.domain.manga.repository.MangaMergeRepository
++
++class DeleteMergedManga(
++    private val repository: MangaMergeRepository,
++) {
++    suspend fun deleteReference(id: Long) = repository.deleteById(id)
++    suspend fun deleteMerge(mergeId: Long) = repository.deleteByMergeId(mergeId)
++}
+diff --git a/domain/src/main/java/tachiyomi/domain/manga/interactor/GetMangaWithChapters.kt b/domain/src/main/java/tachiyomi/domain/manga/interactor/GetMangaWithChapters.kt
+index 4fddd81..9713e54 100644
+--- a/domain/src/main/java/tachiyomi/domain/manga/interactor/GetMangaWithChapters.kt
++++ b/domain/src/main/java/tachiyomi/domain/manga/interactor/GetMangaWithChapters.kt
+@@ -1,31 +1,39 @@
+ package tachiyomi.domain.manga.interactor
+ 
+ import kotlinx.coroutines.flow.Flow
+-import kotlinx.coroutines.flow.combine
++import kotlinx.coroutines.flow.flatMapLatest
++import kotlinx.coroutines.flow.map
++import tachiyomi.domain.chapter.interactor.GetMergedChaptersByMangaId
+ import tachiyomi.domain.chapter.model.Chapter
+ import tachiyomi.domain.chapter.repository.ChapterRepository
+ import tachiyomi.domain.manga.model.Manga
+ import tachiyomi.domain.manga.repository.MangaRepository
++import tachiyomi.domain.source.model.MERGED_SOURCE_ID
+ 
+ class GetMangaWithChapters(
+     private val mangaRepository: MangaRepository,
+     private val chapterRepository: ChapterRepository,
++    private val getMergedChaptersByMangaId: GetMergedChaptersByMangaId,
+ ) {
+-
+     suspend fun subscribe(id: Long, applyScanlatorFilter: Boolean = false): Flow<Pair<Manga, List<Chapter>>> {
+-        return combine(
+-            mangaRepository.getMangaByIdAsFlow(id),
+-            chapterRepository.getChapterByMangaIdAsFlow(id, applyScanlatorFilter),
+-        ) { manga, chapters ->
+-            Pair(manga, chapters)
++        return mangaRepository.getMangaByIdAsFlow(id).flatMapLatest { manga ->
++            val chapters = if (manga.source == MERGED_SOURCE_ID) {
++                getMergedChaptersByMangaId.subscribe(id, applyScanlatorFilter = applyScanlatorFilter)
++            } else {
++                chapterRepository.getChapterByMangaIdAsFlow(id, applyScanlatorFilter)
++            }
++            chapters.map { manga to it }
+         }
+     }
+ 
+-    suspend fun awaitManga(id: Long): Manga {
+-        return mangaRepository.getMangaById(id)
+-    }
++    suspend fun awaitManga(id: Long): Manga = mangaRepository.getMangaById(id)
+ 
+     suspend fun awaitChapters(id: Long, applyScanlatorFilter: Boolean = false): List<Chapter> {
+-        return chapterRepository.getChapterByMangaId(id, applyScanlatorFilter)
++        val manga = mangaRepository.getMangaById(id)
++        return if (manga.source == MERGED_SOURCE_ID) {
++            getMergedChaptersByMangaId.await(id, applyScanlatorFilter = applyScanlatorFilter)
++        } else {
++            chapterRepository.getChapterByMangaId(id, applyScanlatorFilter)
++        }
+     }
+ }
+diff --git a/domain/src/main/java/tachiyomi/domain/manga/interactor/GetMergedMangaById.kt b/domain/src/main/java/tachiyomi/domain/manga/interactor/GetMergedMangaById.kt
+new file mode 100644
+index 0000000..9e96cc4
+--- /dev/null
++++ b/domain/src/main/java/tachiyomi/domain/manga/interactor/GetMergedMangaById.kt
+@@ -0,0 +1,19 @@
++package tachiyomi.domain.manga.interactor
++
++import kotlinx.coroutines.flow.Flow
++import kotlinx.coroutines.flow.map
++import tachiyomi.domain.manga.model.Manga
++import tachiyomi.domain.manga.repository.MangaMergeRepository
++import tachiyomi.domain.source.model.MERGED_SOURCE_ID
++
++class GetMergedMangaById(
++    private val repository: MangaMergeRepository,
++) {
++    suspend fun await(id: Long): List<Manga> =
++        repository.getMergedMangaById(id).filterNot { it.source == MERGED_SOURCE_ID }
++
++    fun subscribe(id: Long): Flow<List<Manga>> =
++        repository.subscribeMergedMangaById(id).map { list ->
++            list.filterNot { it.source == MERGED_SOURCE_ID }
++        }
++}
+diff --git a/domain/src/main/java/tachiyomi/domain/manga/interactor/GetMergedReferencesById.kt b/domain/src/main/java/tachiyomi/domain/manga/interactor/GetMergedReferencesById.kt
+new file mode 100644
+index 0000000..c73e966
+--- /dev/null
++++ b/domain/src/main/java/tachiyomi/domain/manga/interactor/GetMergedReferencesById.kt
+@@ -0,0 +1,12 @@
++package tachiyomi.domain.manga.interactor
++
++import kotlinx.coroutines.flow.Flow
++import tachiyomi.domain.manga.model.MergedMangaReference
++import tachiyomi.domain.manga.repository.MangaMergeRepository
++
++class GetMergedReferencesById(
++    private val repository: MangaMergeRepository,
++) {
++    suspend fun await(id: Long): List<MergedMangaReference> = repository.getReferencesById(id)
++    fun subscribe(id: Long): Flow<List<MergedMangaReference>> = repository.subscribeReferencesById(id)
++}
+diff --git a/domain/src/main/java/tachiyomi/domain/manga/interactor/InsertMergedReference.kt b/domain/src/main/java/tachiyomi/domain/manga/interactor/InsertMergedReference.kt
+new file mode 100644
+index 0000000..e991fc8
+--- /dev/null
++++ b/domain/src/main/java/tachiyomi/domain/manga/interactor/InsertMergedReference.kt
+@@ -0,0 +1,11 @@
++package tachiyomi.domain.manga.interactor
++
++import tachiyomi.domain.manga.model.MergedMangaReference
++import tachiyomi.domain.manga.repository.MangaMergeRepository
++
++class InsertMergedReference(
++    private val repository: MangaMergeRepository,
++) {
++    suspend fun await(reference: MergedMangaReference): Long? = repository.insert(reference)
++    suspend fun awaitAll(references: List<MergedMangaReference>) = repository.insertAll(references)
++}
+diff --git a/domain/src/main/java/tachiyomi/domain/manga/interactor/UpdateMergedSettings.kt b/domain/src/main/java/tachiyomi/domain/manga/interactor/UpdateMergedSettings.kt
+new file mode 100644
+index 0000000..6881ef6
+--- /dev/null
++++ b/domain/src/main/java/tachiyomi/domain/manga/interactor/UpdateMergedSettings.kt
+@@ -0,0 +1,11 @@
++package tachiyomi.domain.manga.interactor
++
++import tachiyomi.domain.manga.model.MergeMangaSettingsUpdate
++import tachiyomi.domain.manga.repository.MangaMergeRepository
++
++class UpdateMergedSettings(
++    private val repository: MangaMergeRepository,
++) {
++    suspend fun await(update: MergeMangaSettingsUpdate): Boolean = repository.updateSettings(update)
++    suspend fun awaitAll(values: List<MergeMangaSettingsUpdate>): Boolean = repository.updateAllSettings(values)
++}
+diff --git a/domain/src/main/java/tachiyomi/domain/manga/model/MergeMangaSettingsUpdate.kt b/domain/src/main/java/tachiyomi/domain/manga/model/MergeMangaSettingsUpdate.kt
+new file mode 100644
+index 0000000..bf1a87d
+--- /dev/null
++++ b/domain/src/main/java/tachiyomi/domain/manga/model/MergeMangaSettingsUpdate.kt
+@@ -0,0 +1,10 @@
++package tachiyomi.domain.manga.model
++
++data class MergeMangaSettingsUpdate(
++    val id: Long,
++    val isInfoManga: Boolean? = null,
++    val getChapterUpdates: Boolean? = null,
++    val chapterPriority: Int? = null,
++    val downloadChapters: Boolean? = null,
++    val chapterSortMode: Int? = null,
++)
+diff --git a/domain/src/main/java/tachiyomi/domain/manga/model/MergedMangaReference.kt b/domain/src/main/java/tachiyomi/domain/manga/model/MergedMangaReference.kt
+new file mode 100644
+index 0000000..1643cc7
+--- /dev/null
++++ b/domain/src/main/java/tachiyomi/domain/manga/model/MergedMangaReference.kt
+@@ -0,0 +1,23 @@
++package tachiyomi.domain.manga.model
++
++data class MergedMangaReference(
++    val id: Long,
++    val isInfoManga: Boolean,
++    val getChapterUpdates: Boolean,
++    val chapterSortMode: Int,
++    val chapterPriority: Int,
++    val downloadChapters: Boolean,
++    val mergeId: Long?,
++    val mergeUrl: String,
++    val mangaId: Long?,
++    val mangaUrl: String,
++    val mangaSourceId: Long,
++) {
++    companion object {
++        const val CHAPTER_SORT_NONE = 0
++        const val CHAPTER_SORT_NO_DEDUPE = 1
++        const val CHAPTER_SORT_PRIORITY = 2
++        const val CHAPTER_SORT_MOST_CHAPTERS = 3
++        const val CHAPTER_SORT_HIGHEST_CHAPTER_NUMBER = 4
++    }
++}
+diff --git a/domain/src/main/java/tachiyomi/domain/manga/repository/MangaMergeRepository.kt b/domain/src/main/java/tachiyomi/domain/manga/repository/MangaMergeRepository.kt
+new file mode 100644
+index 0000000..12bd649
+--- /dev/null
++++ b/domain/src/main/java/tachiyomi/domain/manga/repository/MangaMergeRepository.kt
+@@ -0,0 +1,23 @@
++package tachiyomi.domain.manga.repository
++
++import kotlinx.coroutines.flow.Flow
++import tachiyomi.domain.manga.model.Manga
++import tachiyomi.domain.manga.model.MergeMangaSettingsUpdate
++import tachiyomi.domain.manga.model.MergedMangaReference
++
++interface MangaMergeRepository {
++    suspend fun getMergedMangaById(id: Long): List<Manga>
++    fun subscribeMergedMangaById(id: Long): Flow<List<Manga>>
++
++    suspend fun getReferencesById(id: Long): List<MergedMangaReference>
++    fun subscribeReferencesById(id: Long): Flow<List<MergedMangaReference>>
++
++    suspend fun updateSettings(update: MergeMangaSettingsUpdate): Boolean
++    suspend fun updateAllSettings(values: List<MergeMangaSettingsUpdate>): Boolean
++
++    suspend fun insert(reference: MergedMangaReference): Long?
++    suspend fun insertAll(references: List<MergedMangaReference>)
++
++    suspend fun deleteById(id: Long)
++    suspend fun deleteByMergeId(mergeId: Long)
++}
+diff --git a/domain/src/main/java/tachiyomi/domain/source/model/InternalSourceIds.kt b/domain/src/main/java/tachiyomi/domain/source/model/InternalSourceIds.kt
+new file mode 100644
+index 0000000..76dfc4c
+--- /dev/null
++++ b/domain/src/main/java/tachiyomi/domain/source/model/InternalSourceIds.kt
+@@ -0,0 +1,4 @@
++package tachiyomi.domain.source.model
++
++/** Internal virtual source used only to represent a multi-source work. */
++const val MERGED_SOURCE_ID: Long = 6969L
