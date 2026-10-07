@@ -1,0 +1,12 @@
+{
+  "args": [
+    "push",
+    "-z",
+    "zstd",
+    "/workspace/scratch/bab62ab08b4f/deliverables/Polaris_r001_spike001_arm64_debug.apk",
+    "/data/local/tmp/polaris-spike001-arm64.apk"
+  ],
+  "returncode": 0,
+  "stdout": "",
+  "stderr": "/workspace/scratch/bab62ab08b4f/deliverables/Polaris_r001_spike001_arm64_debug.apk: 1 file pushed, 0 skipped. 9.6 MB/s (195337693 bytes in 19.505s)\n"
+}

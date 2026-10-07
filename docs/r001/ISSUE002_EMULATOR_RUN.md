@@ -44,3 +44,9 @@ Raw install results, app startup logs, watchdog evidence and screenshots are in 
 Next: finish onboarding, trust both installed extensions, populate two real children of the same work, install the already-built Spike-001 x86_64 APK, create the virtual work through the debug hook, open real A/B chapters from its list, and remove one reference. Follow `ISSUE002_DEVICE_RUNBOOK.md`. Do not mark issue #2 passed, apply migration 15, or integrate issues #3–#7 before B01/B02/B03 evidence exists.
 
 The diagnostic timeout mechanism is described in the [AOSP framework change](https://android.googlesource.com/platform/frameworks/base/+/0fcb8d6db42f6c20f6b69d47e02c54e2706f88f9%5E2..0fcb8d6db42f6c20f6b69d47e02c54e2706f88f9/).
+
+## Fresh-environment recovery checkpoint
+
+The next user turn found the scratch workspace empty: the prior AVD, toolchain, x86 APK outputs and unpublished session screenshots were no longer present. The GitHub checkpoint and the two saved ARM64 APKs survived. The earlier x86 Spike install returned `Success`, but its reader gate had not run before the environment disappeared; this does not establish B01/B02/B03.
+
+Recovered both saved ARM64 APKs and verified their previously recorded SHA-256 values. Recreated Emulator 37.2.12/build16428233 and the official API31 Google APIs x86_64 image (revision14), verifying archive checksums against official SDK metadata. The new disposable AVD uses four software CPU cores, swangle graphics and the same diagnostic timeout multiplier10. Actual guest properties report `x86_64,arm64-v8a` and `libndk_translation.so`; the recovered Spike ARM64 APK was pushed successfully. At this checkpoint Android's package/settings services have appeared and app installation is queued. **B01/B02/B03 remain pending.** Raw recovery evidence is under `evidence/issue002-emulator-recovery-2026-10-07/`. No migration15 or domain redesign was applied.
