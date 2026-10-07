@@ -1,0 +1,61 @@
+name: Issue 002 Android build gate
+
+on:
+  push:
+    branches: [r001/multisource-foundation]
+    paths:
+      - 'spikes/spike001/**'
+      - 'scripts/r001/**'
+      - '.github/workflows/issue002-android-build.yml'
+  pull_request:
+    paths:
+      - 'spikes/spike001/**'
+      - 'scripts/r001/**'
+      - '.github/workflows/issue002-android-build.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: issue002-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  baseline-then-spike001:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Checkout pinned unmodified Yomotsu
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: kiritsuguxs/yomotsu
+          ref: 0fb80c439ef816eeb50674f1b90af39918b176d8
+          path: upstream-yomotsu
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961
+        with:
+          distribution: temurin
+          java-version-file: upstream-yomotsu/.github/.java-version
+      - uses: gradle/actions/setup-gradle@9c971963bec38e04b3d30dcc455b5382be2fdbfb
+      - name: Install pinned Android toolchain
+        run: |
+          sdkmanager 'platforms;android-37.0' 'build-tools;37.0.0' 'ndk;29.0.14206865' 'ndk;28.2.13676358' 'cmake;3.22.1'
+      - name: Build original baseline, then isolated Spike-001
+        run: bash scripts/r001/build_issue002.sh upstream-yomotsu "$RUNNER_TEMP/issue002-evidence"
+      - name: Upload build evidence and available APKs
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: issue002-build-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/issue002-evidence/*.log
+            ${{ runner.temp }}/issue002-evidence/*.txt
+            ${{ runner.temp }}/issue002-evidence/*.patch
+            ${{ runner.temp }}/issue002-evidence/apks/**/*.apk
+          if-no-files-found: warn
+          retention-days: 14
