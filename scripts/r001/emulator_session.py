@@ -33,7 +33,7 @@ def main():
         (root / name).mkdir(parents=True, exist_ok=True)
     env = dict(os.environ, ANDROID_SDK_ROOT=str(sdk), ANDROID_HOME=str(sdk))
     command = [str(sdk / "emulator/emulator"), "-avd", options.avd,
-               "-no-window", "-no-audio", "-no-boot-anim", "-no-snapshot",
+               "-no-window", "-no-audio", "-no-boot-anim", "-no-snapshot", "-no-metrics",
                "-accel", "off", "-gpu", options.gpu, "-feature", "-Vulkan", "-memory", "2048",
                "-cores", str(options.cores), "-writable-system", "-port", "5554"]
     if os.environ.get("HTTP_PROXY"):
