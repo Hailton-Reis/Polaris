@@ -1,0 +1,15 @@
+--------- beginning of system
+10-07 16:46:35.807   692   692 I SystemServer: Entered the Android system server!
+10-07 16:46:42.091   692   692 I SystemServer: Reading configuration...
+10-07 16:50:17.900   692  1045 I SystemServer: SecondaryZygotePreload
+10-07 16:50:17.928   692  1045 E SystemServer: Exception preloading default resources
+10-07 16:50:17.928   692  1045 E SystemServer: java.lang.ArrayIndexOutOfBoundsException: length=0; index=0
+10-07 16:50:17.928   692  1045 E SystemServer: 	at com.android.server.SystemServer.lambda$startOtherServices$1(SystemServer.java:1384)
+10-07 16:50:17.928   692  1045 E SystemServer: 	at com.android.server.SystemServer$$ExternalSyntheticLambda7.run(Unknown Source:0)
+10-07 16:50:17.928   692  1045 E SystemServer: 	at com.android.server.SystemServerInitThreadPool.lambda$submitTask$0$SystemServerInitThreadPool(SystemServerInitThreadPool.java:105)
+10-07 16:50:17.928   692  1045 E SystemServer: 	at com.android.server.SystemServerInitThreadPool$$ExternalSyntheticLambda0.run(Unknown Source:6)
+10-07 16:50:17.928   692  1045 E SystemServer: 	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:462)
+10-07 16:50:17.928   692  1045 E SystemServer: 	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+10-07 16:50:17.928   692  1045 E SystemServer: 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1167)
+10-07 16:50:17.928   692  1045 E SystemServer: 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:641)
+10-07 16:50:17.928   692  1045 E SystemServer: 	at com.android.internal.util.ConcurrentUtils$1$1.run(ConcurrentUtils.java:65)

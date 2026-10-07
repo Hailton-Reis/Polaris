@@ -47,6 +47,7 @@ def main():
         print(f"Emulator started; PID={emulator.pid}; software CPU/GPU", flush=True)
         try:
             last_boot_check = 0.0
+            booted = False
             timeout_applied = options.timeout_multiplier == 1
             proxy_applied = guest_proxy is None
             while (emulator.poll() is None and not (root / "STOP").exists()
@@ -106,6 +107,11 @@ def main():
                         continue
                     try:
                         data = json.loads(request.read_text())
+                        # Package/settings binder services can appear before their
+                        # internal dependencies finish initialization. Installing
+                        # then can throw StorageManagerService.freeStorage NPEs.
+                        if not booted and not data.get("allow_before_boot", False):
+                            continue
                         args = data["args"]
                         if not isinstance(args, list) or not all(isinstance(x, str) for x in args):
                             raise ValueError("args must be an array of strings")
