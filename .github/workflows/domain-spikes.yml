@@ -72,6 +72,8 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: "9.6.1"
+      - name: Validate actual merged SQLDelight migration and queries (SQLite)
+        run: python3 -m unittest discover -s spikes/spike001/host-sqlite -p 'test_*.py' -v
       - name: Compile and run domain spikes
         run: gradle -p spikes/domain-lab checkSpikes --no-daemon --stacktrace
       - name: Compile real Spike-001 host invariants
