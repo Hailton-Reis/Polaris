@@ -19,6 +19,8 @@ class CreateMergedManga(
         require(infoMangaId in ids) { "infoMangaId must be one of the merged variants" }
 
         val children = ids.map { mangaRepository.getMangaById(it) }
+        require(children.none { it.source == MERGED_SOURCE_ID }) { "Nested merged works are not supported" }
+        require(children.map { it.source }.distinct().size >= 2) { "Merge requires variants from two real sources" }
         val info = children.first { it.id == infoMangaId }
         val mergeUrl = "merged://${ids.sorted().joinToString("-")}"
 
