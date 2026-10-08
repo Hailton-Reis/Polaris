@@ -253,3 +253,10 @@ The framework-independent design should not be redesigned in Work/Codex unless a
 
 - 8/8 additional host-only Kotlin tests PASS using `scripts/r001/test_spike001_host.sh` (JDK21/kotlinc1.9/coroutines), compiling the staged real Spike-001 aggregation interactor and reference/virtual-ID models, not rewritten domain logic.
 - Demonstrates source-specific child `mangaId` preservation, chapter list aggregation, priority selection, live Flow update on reference removal, and orphan-reference tolerance. Does not demonstrate Yomotsu Android ReaderActivity, pages, extensions or device acceptance.
+
+
+## Extended domain proof and CI hook
+
+- 12/12 host Kotlin scenarios PASS locally, using real staged Spike-001 Kotlin interactor/models with fake repository boundaries.
+- Host Gradle lab added under `spikes/spike001/host-lab` and connected to `domain-spikes.yml`. Runner execution unverified: GitHub Actions jobs examined still fail at runner allocation with no steps.
+- Android build latest revision and B01/B02/B03 still unverified. No migration 15.
