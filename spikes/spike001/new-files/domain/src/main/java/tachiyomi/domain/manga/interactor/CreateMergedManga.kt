@@ -23,9 +23,13 @@ class CreateMergedManga(
         val mergeUrl = "merged://${ids.sorted().joinToString("-")}"
 
         val existing = mangaRepository.getMangaByUrlAndSourceId(mergeUrl, MERGED_SOURCE_ID)
-        if (existing != null) return existing
+        // A previous attempt may have inserted the virtual parent but failed
+        // before insertAll persisted its references. Recover only that empty
+        // state. A nonempty reference set can represent intentional removal
+        // of one source; never silently restore those deleted references.
+        if (existing != null && mergeRepository.getReferencesById(existing.id).isNotEmpty()) return existing
 
-        val merged = mangaRepository.insertNetworkManga(
+        val merged = existing ?: mangaRepository.insertNetworkManga(
             listOf(
                 info.copy(
                     id = -1L,
