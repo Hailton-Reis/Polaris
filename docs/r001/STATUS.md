@@ -283,3 +283,10 @@ The framework-independent design should not be redesigned in Work/Codex unless a
 - `scripts/r001/test_spike001_host.sh` and the isolated Gradle host project now include actual staged create/delete interactors. CI has not run the extended Gradle lab because no runner was assigned to recent Actions jobs.
 - Runner diagnosis documented at `ACTIONS_RUNNER_TRIAGE_2026_10_08.md` with exact GitHub job metadata. Account-level cause cannot be inferred.
 - Android B01/B02/B03/B04 and latest compiled APK remain **NOT VERIFIED**. Issue #2 open; PR #1 draft; migration 15 unapplied.
+
+## Reader kind / virtual child routing
+
+- Patched Yomotsu `MangaScreen` to dispatch virtual chapters using their actual child source, preserving novel-reader vs image-reader selection and original chapter ID pair; both chapter click and Continue Reading use a suspend-aware coroutine.
+- Debug-only `route` operation verifies the chapter links to the merged parent and identifies installed source kind via ADB. It is a source classification diagnostic, **not** actual B02 acceptance.
+- 10/10 pinned-upstream MangaScreen patch anchors verified exactly once. Eight new Python patch-check scenarios added; **new Android compilation and their full CI invocation remain pending**. Prior 26 Kotlin + 36 Python locally executed cases remain valid historical evidence, not Android PASS.
+- Supplemental novel case B05 and commands in `ISSUE002_DEVICE_RUNBOOK.md`. No migration 15.
