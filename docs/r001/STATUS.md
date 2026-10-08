@@ -247,3 +247,9 @@ The framework-independent design should not be redesigned in Work/Codex unless a
 - Protected the exported debug-only hook with Android's `android.permission.DUMP`; authorized ADB shell launch must be tested in runtime.
 - 26 offline Python tests PASS locally: comparator 16, ADB evidence tool 6, debug hook installer 4.
 - The latest code and security change still need the full pinned Yomotsu Android build and B01/B02/B03 runtime evidence. Issue #2 remains open and migration 15 is not applied.
+
+
+## Actual staged Kotlin host runtime test (2026-10-08)
+
+- 8/8 additional host-only Kotlin tests PASS using `scripts/r001/test_spike001_host.sh` (JDK21/kotlinc1.9/coroutines), compiling the staged real Spike-001 aggregation interactor and reference/virtual-ID models, not rewritten domain logic.
+- Demonstrates source-specific child `mangaId` preservation, chapter list aggregation, priority selection, live Flow update on reference removal, and orphan-reference tolerance. Does not demonstrate Yomotsu Android ReaderActivity, pages, extensions or device acceptance.
