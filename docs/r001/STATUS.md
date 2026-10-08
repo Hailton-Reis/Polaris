@@ -308,3 +308,11 @@ The framework-independent design should not be redesigned in Work/Codex unless a
 - Pinned Yomotsu uses **BundledSQLiteDriver**, so Android *framework* API31's older SQLite is not evidence of a `RETURNING` incompatibility. Driver configuration static preflight committed; Android runtime still needed.
 - Separate whole-work deletion/virtual-parent leak tracked as [issue #8](https://github.com/Hailton-Reis/Polaris/issues/8), not silently fixed or waived. No migration 15.
 - PR remains draft; issue #2 B01–B05 and current APK build not passed.
+
+## Offline three-suite host gate (2026-10-08)
+
+- Added `scripts/r001/run_host_gate.py` and `docs/r001/HOST_GATE_RUNBOOK.md`: strict host-only gate with minimum **54 Python / 10 SQLite / 30 Kotlin** results, three logs and JSON evidence; missing tests fail closed.
+- Added 7 self-tests for the gate; **7/7 locally PASS**, tested files matched the GitHub blobs exactly. Verified that an intentionally partial local checkout yields SQLite **10/10 PASS** but overall `FAIL_OR_INCONCLUSIVE` with exit code 1 because full Python/Kotlin sources are absent.
+- Rechecked production focused Kotlin **5/5** and SQL migration fixtures **10/10** in the current environment. The complete 30-case Kotlin and 54-case Python suites remain not executed here; do not call them PASS.
+- Domain-spikes workflow now invokes the Python tooling tests in addition to existing host SQLite and Gradle checks. An authorized one-job rerun of GitHub Actions run 37838795183, attempt 2, still received no runner (`steps=[]`, `runner_id=0`).
+- Android B01–B05 remain unverified and migration 15 blocked. Issue #2 open, PR #1 draft.
