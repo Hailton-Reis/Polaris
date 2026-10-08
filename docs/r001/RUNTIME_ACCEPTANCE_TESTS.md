@@ -36,6 +36,15 @@ When a child is orphaned/removed, it is skipped. When one real source is unavail
 
 This is **additional issue #2 regression evidence**, not a substitute for B01/B02/B03 and not permission to apply migration 15.
 
+### B05 — Novel child reader routing (supplemental, when a legal novel source fixture is available)
+Given a merged work containing a chapter belonging to a real novel source (`INovelSource`),
+when the chapter is opened from the virtual parent (or Continue Reading),
+then the actual real child's source type is used and the original Yomotsu `NovelReaderActivity` is launched with `chapter.mangaId/chapter.id`.
+For an image source, launch the original `ReaderActivity` with the same real child pair.
+An uninstalled extension must yield an explicit unavailable-source diagnostic, not silently open the wrong reader.
+
+The debug-only `operation=route` can inspect source kind and linkage but never certifies a real reader launch. This is supplemental and must not be confused with B02. B01–B04 remain the primary issue #2 device gate.
+
 ### B03 — Remove one variant
 Given a work has two variants
 When one variant/reference is removed
