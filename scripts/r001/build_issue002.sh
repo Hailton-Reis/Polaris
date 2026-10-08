@@ -63,5 +63,8 @@ patched_test_exit=0
 run_gradle "$patched" patched-unit-tests.log --continue "${unit_test_tasks[@]}" || patched_test_exit=$?
 python3 "$polaris_root/scripts/r001/compare_android_unit_tests.py" "$baseline" "$patched" \
     --baseline-exit "$baseline_test_exit" --patched-exit "$patched_test_exit" \
+    --baseline-log "$evidence/baseline-unit-tests.log" \
+    --patched-log "$evidence/patched-unit-tests.log" \
+    --min-module domain=58 --min-module app=370 \
     --output "$evidence/unit-test-comparison.json" | tee "$evidence/unit-test-comparison.log"
 printf 'APK_BUILDS_PASS_NO_NEW_UNIT_REGRESSIONS\nExisting upstream unit failures may remain; see comparison JSON.\nRuntime A01/B01/B02/B03 still require device evidence.\n' | tee "$evidence/build-status.txt"
