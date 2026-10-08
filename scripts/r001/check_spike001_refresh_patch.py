@@ -103,10 +103,20 @@ def check_reader(screen_text: str, operations: list[tuple[str, str]], mode: str)
                 raise PatchContractError(f"MangaScreen baseline anchor {i} found {matches} times")
             current = current.replace(old, new, 1)
     elif mode == "patched":
-        for i, (_, new) in enumerate(operations, 1):
+        # Later imports can extend a previous replacement (e.g. MergedSource
+        # followed by INovelSource). Reverse the ordered patches to verify the
+        # final file without falsely rejecting valid nested import changes.
+        for i in range(len(operations) - 1, -1, -1):
+            old, new = operations[i]
             matches = current.count(new)
             if matches != 1:
-                raise PatchContractError(f"MangaScreen patched block {i} found {matches} times")
+                raise PatchContractError(f"MangaScreen reverse patch block {i + 1} found {matches} times")
+            current = current.replace(new, old, 1)
+        for i, (old, new) in enumerate(operations, 1):
+            matches = current.count(old)
+            if matches != 1:
+                raise PatchContractError(f"MangaScreen reconstructed baseline anchor {i} found {matches} times")
+            current = current.replace(old, new, 1)
     else:
         raise ValueError(f"Unknown mode {mode}")
 
