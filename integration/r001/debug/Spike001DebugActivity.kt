@@ -41,9 +41,10 @@ class Spike001DebugActivity : Activity() {
             try {
                 val result = withContext(Dispatchers.IO) {
                     when (intent.getStringExtra("operation") ?: "create") {
+                        "inspect" -> inspect()
                         "create" -> create()
                         "remove" -> remove()
-                        else -> error("Expected operation=create or operation=remove")
+                        else -> error("Expected operation=inspect, create or remove")
                     }
                 }
                 Log.i("PolarisSpike001", result)
@@ -55,6 +56,28 @@ class Spike001DebugActivity : Activity() {
                 status.text = "FAILED: ${error.message}"
             }
         }
+    }
+
+    /** Read-only convenience for collecting actual child IDs from real extensions.
+     *  No URLs/titles are logged by default; optional title_filter limits results.
+     */
+    private suspend fun inspect(): String {
+        val filter = intent.getStringExtra("title_filter")?.trim()?.takeIf { it.isNotEmpty() }
+        val limit = intent.getIntExtra("limit", 50).coerceIn(1, 200)
+        val candidates = Injekt.get<MangaRepository>().getFavorites()
+            .asSequence()
+            .filter { it.source != MERGED_SOURCE_ID }
+            .filter { filter == null || it.title.contains(filter, ignoreCase = true) }
+            .take(limit)
+            .toList()
+        val chapterRepo = Injekt.get<ChapterRepository>()
+        val rows = mutableListOf<String>()
+        for (manga in candidates) {
+            val count = chapterRepo.getChapterByMangaId(manga.id).size
+            rows += "childId=${manga.id} sourceId=${manga.source} chapters=$count"
+        }
+        return "INSPECT candidates=${rows.size} titleFilterUsed=${filter != null}\\n" +
+            rows.joinToString("\\n")
     }
 
     private suspend fun create(): String {
