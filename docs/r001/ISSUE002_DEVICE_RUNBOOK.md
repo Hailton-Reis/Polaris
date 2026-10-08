@@ -98,3 +98,10 @@ adb logcat -d -s PolarisSpike001:I
 ```
 
 Run it once for Source A and again for Source B before opening both chapters through the **real app UI**. The production `MangaScreen` now resolves the real child source for virtual chapters before choosing `ReaderActivity` versus `NovelReaderActivity`. For normal manga, it retains Yomotsu's original reader routing. If the child extension is not installed, the UI reports the missing source instead of launching the wrong reader type. **Runtime proof is still required**, and `android.permission.DUMP` on the debug-only hook requires an authorized ADB shell.
+
+
+## Database backend follow-up (no migration 15)
+
+Before checking real parent/child records, verify the app actually uses the pinned Yomotsu `AndroidxSqliteDriver(driver=BundledSQLiteDriver())` with FK constraints enabled, **not** the Android framework's SQLite 3.32 on API31. The original pinned Yomotsu itself uses SQL `RETURNING`, so its bundled driver is relevant. Save the real runtime SQLite version and FK status as part of Android acceptance; the host SQL preflight only checks this configuration statically.
+
+Host migration integrity suite: `python3 -m unittest discover -s spikes/spike001/host-sqlite -p 'test_*.py' -v` (10/10 PASS locally on exact staged SQL). It does not certify real Android SQLDelight queries. The complete deletion of a virtual work (not single-child unlink) needs explicit follow-up under issue #8; do not assume deleting all references also removed the virtual parent.

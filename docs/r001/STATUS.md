@@ -298,3 +298,13 @@ The framework-independent design should not be redesigned in Work/Codex unless a
 - Patched production interactor to recover **only fully empty** reference sets on retry; intentionally removed source references are never silently restored. One parent remains, two child references plus root are recreated.
 - Verified production file Git blob matches locally compiled replacement `253f8ada08c55730b7138258745ce323d38f222d`; 3 focused JVM checks PASS. Extended host-test code to 28 scenarios, **full 28 not rerun yet**; last full run 26 Kotlin and 36 Python.
 - SQLDelight/Android runtime (including B01–B05) remains pending, migration 15 unapplied and PR draft.
+
+
+## New 2026-10-08 validation — SQLite contract and safe merge creation
+
+- **10/10 actual migration-14/merged.sq SQLite tests PASS** with Git blob equality proven. New runnable test `spikes/spike001/host-sqlite/test_merged_sqlite_contract.py`; wired to domain-spikes CI and issue-002 Android build preflight.
+- Production `CreateMergedManga.kt` now prohibits nested virtual child works and two variants from the same real source before side effects. **5/5 focused local Kotlin tests PASS** on byte-identical production source; existing orphan-repair semantics preserved.
+- Main host Kotlin suite contains **30 committed test definitions** (previously 28); the entire 30-case suite has **not** run in this checkpoint. Previous complete recorded tests: 26/26 Kotlin + 36/36 Python. Do not conflate separate runs.
+- Pinned Yomotsu uses **BundledSQLiteDriver**, so Android *framework* API31's older SQLite is not evidence of a `RETURNING` incompatibility. Driver configuration static preflight committed; Android runtime still needed.
+- Separate whole-work deletion/virtual-parent leak tracked as [issue #8](https://github.com/Hailton-Reis/Polaris/issues/8), not silently fixed or waived. No migration 15.
+- PR remains draft; issue #2 B01–B05 and current APK build not passed.

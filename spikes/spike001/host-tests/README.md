@@ -43,3 +43,10 @@ The Gradle host lab additionally compiles only those two interactor files from t
 The real `CreateMergedManga` inserts the virtual parent before writing its reference transaction. A failed reference insert can therefore leave an orphan parent. The original implementation incorrectly returned this empty parent on the next call. The updated interactor only returns an existing parent directly if there is **at least one** saved reference. If none exist, it uses that same parent to retry the references, without resurrecting a deliberately removed individual child when some references remain.
 
 The defect was first reproduced against the original production source using an injected repository failure (test **FAILED** as expected), then the byte-identical updated production source was compiled using kotlinc1.9/JDK21 and passed **3 focused checks**. The full host suite has two additional corresponding tests staged, now **28 definitions**; it still needs a full rerun before counting all 28 as PASS.
+
+
+## Guard against malformed virtual children
+
+The staged real `CreateMergedManga.kt` now validates that all children have a **real**, non-`MERGED_SOURCE_ID` source and that the child selection spans at least two distinct real source IDs. This is consistent with the existing debug B01 creation gate. Invalid nested merge and same-source inputs are rejected before `insertNetworkManga` can create the virtual parent.
+
+Focused host Kotlin proof on the exact staged production file: **5/5 PASS** (orphan recovery, idempotence, intentional unlink, same-source rejection, nested-merge rejection). Two new scenarios were added to the combined Kotlin host test, increasing committed definitions to **30**. **This does not establish a 30/30 complete host run**; last complete validated combined Kotlin run had 26 scenarios. Run `bash scripts/r001/test_spike001_host.sh` in a fully provisioned checkout.
