@@ -37,6 +37,25 @@ class VirtualRefreshPatchContractTests(unittest.TestCase):
         with self.assertRaises(PatchContractError):
             check_patch(changed, self.operations, "patched")
 
+    def test_patched_coordinator_import_is_required(self):
+        mutated = self.patched.replace(
+            "import tachiyomi.domain.manga.refresh.MergedRefreshCoordinator",
+            "import tachiyomi.domain.manga.refresh.MissingCoordinator",
+            1,
+        )
+        with self.assertRaises(PatchContractError):
+            check_patch(mutated, self.operations, "patched")
+
+    def test_patched_coordinator_call_cannot_be_omitted(self):
+        mutated = self.patched.replace("MergedRefreshCoordinator.refresh(", "fakeRefresh(", 1)
+        with self.assertRaises(PatchContractError):
+            check_patch(mutated, self.operations, "patched")
+
+    def test_patched_retains_existing_nonvirtual_refresh(self):
+        mutated = self.patched.replace("source = state.source,", "source = state.manga,", 1)
+        with self.assertRaises(PatchContractError):
+            check_patch(mutated, self.operations, "patched")
+
     def test_patched_double_insertion_is_rejected(self):
         changed = self.patched + self.operations[-1][1]
         with self.assertRaises(PatchContractError):
