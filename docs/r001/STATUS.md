@@ -274,3 +274,12 @@ The framework-independent design should not be redesigned in Work/Codex unless a
 - Real staged `MergedRefreshCoordinator` added, replacing the one-off error-handling loop in the Yomotsu ViewModel patch. It preserves per-child source identity, tolerates a single failed source, propagates cancellation and fails when every source fails.
 - 22 Kotlin/JVM domain scenarios PASS locally (including 6 new coordinator cases). 36 Python offline integration/tooling cases PASS locally (including 3 coordinator patch-check tests). Total 58 offline cases.
 - Pinned Yomotsu `MangaViewModel` anchor compatibility checked for four replacements. The new Android Kotlin code/Gradle build and B01/B02/B03/B04 on-device runtime acceptance remain **NOT VERIFIED**.
+
+
+## October 8 verification expansion — lifecycle tested on host
+
+- Full local Kotlin host suite **26/26 PASS**: includes 4 new actual staged `CreateMergedManga`/`DeleteMergedManga` lifecycle scenarios, preserving parent/child source IDs and post-removal chapters. Production source Git SHA verified. These tests use fake repository contracts, not Android storage/network.
+- Python offline-tool suite **36/36 PASS**, verified again. Total **62** successful local test cases.
+- `scripts/r001/test_spike001_host.sh` and the isolated Gradle host project now include actual staged create/delete interactors. CI has not run the extended Gradle lab because no runner was assigned to recent Actions jobs.
+- Runner diagnosis documented at `ACTIONS_RUNNER_TRIAGE_2026_10_08.md` with exact GitHub job metadata. Account-level cause cannot be inferred.
+- Android B01/B02/B03/B04 and latest compiled APK remain **NOT VERIFIED**. Issue #2 open; PR #1 draft; migration 15 unapplied.
