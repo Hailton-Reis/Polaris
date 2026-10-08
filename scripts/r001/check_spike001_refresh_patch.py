@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate actual pinned MangaViewModel patch anchors before/after Spike-001.
+"""Validate pinned MangaViewModel and MangaScreen patches before/after Spike-001.
 
 This only checks patch wiring. Android Gradle/Reader runtime remain separate gates.
 """
