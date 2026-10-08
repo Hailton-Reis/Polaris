@@ -17,6 +17,18 @@ def main():
     ).strip()
     if actual != pinned:
         raise SystemExit(f"Wrong baseline: {actual}")
+    # API 31 platform SQLite predates INSERT RETURNING, but pinned Yomotsu
+    # deliberately uses the AndroidX bundled SQLite engine (and RETURNING).
+    # Fail closed if that baseline integration changes; this is a static check
+    # only, not an Android-native SQLite version or connection test.
+    app_module = (args.baseline / "app/src/main/java/eu/kanade/tachiyomi/di/AppModule.kt").read_text()
+    for expected in (
+        "driver = BundledSQLiteDriver()",
+        "isForeignKeyConstraintsEnabled = true",
+    ):
+        if expected not in app_module:
+            raise SystemExit(f"Bundled SQLite driver compatibility not established: missing {expected}")
+    print("PINNED_BUNDLED_SQLITE_DRIVER_STATIC_PASS (not on-device verification)")
     sql_root = Path(__file__).resolve().parents[2] / "spikes/spike001/new-files/data/src/main/sqldelight/tachiyomi"
     migration = (sql_root / "migrations/14.sqm").read_text()
     mangas = (args.baseline / "data/src/main/sqldelight/tachiyomi/data/mangas.sq").read_text()
