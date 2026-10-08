@@ -79,3 +79,8 @@ For multiple connected devices add `--serial DEVICE_SERIAL`. Results are local f
 ## Debug hook privilege boundary
 
 The exported development-only `Spike001DebugActivity` requires `android.permission.DUMP` in the generated **debug** manifest. This is intended to restrict launches to privileged diagnostic callers such as an appropriately authorized ADB shell; ordinary third-party apps must not be able to invoke its create/remove operations. Release manifests remain unmodified. Confirm on the target Android image that `adb shell am start ... --es operation inspect` is permitted; if it fails with `Permission Denial`, record that as a test-harness compatibility issue and use an authorized debug/instrumentation route rather than removing the privilege boundary. The actual Android permission behavior is not yet runtime-tested.
+
+
+## B04 fault isolation observations
+
+The virtual-work refresh now uses `MergedRefreshCoordinator` to enumerate unique linked real child manga IDs and submit a Yomotsu `UpdateMangaFromRemote` request for each in turn. For B04, record the real child `mangaId` and source ID for each request, verify the merged list updates through Flow after real child synchronization, and repeat with the first source unavailable to verify the second is still attempted. When all real child requests fail, the UI should show a refresh error. Cancellation must stop additional attempts. The diagnostic code and 22 host tests do **not** establish this UI/network behavior without an Android emulator/device.
