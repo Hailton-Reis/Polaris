@@ -47,8 +47,8 @@ jobs:
       - name: Install pinned Android toolchain
         run: |
           sdkmanager 'platforms;android-37.0' 'build-tools;36.0.0' 'build-tools;37.0.0' 'ndk;29.0.14206865' 'ndk;28.2.13676358' 'cmake;3.22.1'
-      - name: Verify JUnit baseline comparison checks
-        run: python3 -m unittest discover -s scripts/r001 -p 'test_compare_android_unit_tests.py' -v
+      - name: Verify JUnit comparison and read-only ADB evidence tools
+        run: python3 -m unittest discover -s scripts/r001 -p 'test_*.py' -v
       - name: Build original baseline, then isolated Spike-001
         run: bash scripts/r001/build_issue002.sh upstream-yomotsu "$RUNNER_TEMP/issue002-evidence"
       - name: Upload build evidence and available APKs
