@@ -12,7 +12,7 @@ import subprocess
 import sys
 
 GATES = (
-    ("python", (sys.executable, "-m", "unittest", "discover", "-s", "scripts/r001", "-p", "test_*.py", "-q"), 51),
+    ("python", (sys.executable, "-m", "unittest", "discover", "-s", "scripts/r001", "-p", "test_*.py", "-q"), 54),
     ("sqlite", (sys.executable, "-m", "unittest", "discover", "-s", "spikes/spike001/host-sqlite", "-p", "test_*.py", "-q"), 10),
     ("kotlin", ("bash", "scripts/r001/test_spike001_host.sh"), 30),
 )
