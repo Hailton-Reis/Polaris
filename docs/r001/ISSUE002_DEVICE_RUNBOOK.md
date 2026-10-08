@@ -84,3 +84,17 @@ The exported development-only `Spike001DebugActivity` requires `android.permissi
 ## B04 fault isolation observations
 
 The virtual-work refresh now uses `MergedRefreshCoordinator` to enumerate unique linked real child manga IDs and submit a Yomotsu `UpdateMangaFromRemote` request for each in turn. For B04, record the real child `mangaId` and source ID for each request, verify the merged list updates through Flow after real child synchronization, and repeat with the first source unavailable to verify the second is still attempted. When all real child requests fail, the UI should show a refresh error. Cancellation must stop additional attempts. The diagnostic code and 22 host tests do **not** establish this UI/network behavior without an Android emulator/device.
+
+
+## Read-only reader-source diagnostic (B02 preparation)
+
+The updated debug hook supports `operation=route`. For a **real** chapter ID shown under the virtual work, it verifies that the chapter's child manga is linked to that particular merged parent, that the original source extension is currently installed, and which reader kind (`IMAGE` versus `NOVEL`) should be used. It rejects an unrelated chapter ID, a removed reference, a nested virtual child, or a missing source. It does **not** fetch any page, launch the reader, or count as B02 PASS.
+
+```bash
+# Replace IDs with values from operation=inspect / operation=create:
+adb shell am start -n app.mihon.tachiyomiat.dev/eu.kanade.tachiyomi.polaris.Spike001DebugActivity \
+  --es operation route --el merge_id MERGE_ID --el chapter_id REAL_CHAPTER_ID
+adb logcat -d -s PolarisSpike001:I
+```
+
+Run it once for Source A and again for Source B before opening both chapters through the **real app UI**. The production `MangaScreen` now resolves the real child source for virtual chapters before choosing `ReaderActivity` versus `NovelReaderActivity`. For normal manga, it retains Yomotsu's original reader routing. If the child extension is not installed, the UI reports the missing source instead of launching the wrong reader type. **Runtime proof is still required**, and `android.permission.DUMP` on the debug-only hook requires an authorized ADB shell.
