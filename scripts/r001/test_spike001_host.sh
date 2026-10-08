@@ -9,7 +9,7 @@ test -f "$coroutines" || { echo "Missing Kotlin coroutines JAR in $kotlin_home/l
 tmp=$(mktemp -d)
 trap 'rm -rf "$tmp"' EXIT
 kotlinc \
-  "$root/spikes/spike001/new-files/domain/src/main/java/tachiyomi/domain/chapter/interactor/GetMergedChaptersByMangaId.kt"
+  "$root/spikes/spike001/new-files/domain/src/main/java/tachiyomi/domain/chapter/interactor/GetMergedChaptersByMangaId.kt" \
   "$root/spikes/spike001/new-files/domain/src/main/java/tachiyomi/domain/manga/interactor/CreateMergedManga.kt" \
   "$root/spikes/spike001/new-files/domain/src/main/java/tachiyomi/domain/manga/interactor/DeleteMergedManga.kt" \
   "$root/spikes/spike001/new-files/domain/src/main/java/tachiyomi/domain/manga/model/MergedMangaReference.kt" \
