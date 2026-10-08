@@ -3,6 +3,10 @@ package polaris.spike001.host
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import tachiyomi.domain.chapter.interactor.GetMergedChaptersByMangaId
+import tachiyomi.domain.manga.interactor.CreateMergedManga
+import tachiyomi.domain.manga.interactor.DeleteMergedManga
+import tachiyomi.domain.manga.model.Manga
+import tachiyomi.domain.manga.repository.MangaRepository
 import tachiyomi.domain.chapter.model.Chapter
 import tachiyomi.domain.chapter.repository.ChapterRepository
 import tachiyomi.domain.manga.model.MergedMangaReference
@@ -26,8 +30,27 @@ private fun ch(id: Long, manga: Long, number: Double) = Chapter(id,manga,number)
 
 private class Repository(initial: List<MergedMangaReference> = refs()) : MangaMergeRepository {
   val flow = MutableStateFlow(initial)
+  private var nextReference = 500L
+  override suspend fun insertAll(references: List<MergedMangaReference>) {
+    flow.value = flow.value + references.map { ref -> ref.copy(id = nextReference++) }
+  }
+  override suspend fun deleteById(id: Long) { flow.value = flow.value.filterNot { it.id == id } }
+  override suspend fun deleteByMergeId(mergeId: Long) { flow.value = flow.value.filterNot { it.mergeId == mergeId } }
   override suspend fun getReferencesById(id: Long): List<MergedMangaReference> { check(id == PARENT); return flow.value }
   override fun subscribeReferencesById(id: Long): Flow<List<MergedMangaReference>> { check(id == PARENT); return flow }
+}
+private class MangaStore : MangaRepository {
+  private val rows = mutableMapOf(
+    A to Manga(A, SOURCE_A, "source-a/title", "Work"),
+    B to Manga(B, SOURCE_B, "source-b/title", "Work"),
+  )
+  override suspend fun getMangaById(id: Long): Manga = requireNotNull(rows[id])
+  override suspend fun getMangaByUrlAndSourceId(url: String, source: Long) = rows.values.firstOrNull { it.url == url && it.source == source }
+  override suspend fun insertNetworkManga(mangas: List<Manga>): List<Manga> = mangas.map { manga ->
+    val saved = manga.copy(id = PARENT)
+    check(rows.putIfAbsent(saved.id, saved) == null)
+    saved
+  }
 }
 private class Chapters : ChapterRepository {
   val data = mapOf(A to MutableStateFlow(listOf(ch(101,A,1.0),ch(102,A,2.0))),
@@ -167,6 +190,46 @@ fun main() = runBlocking {
       MergedRefreshCoordinator.refresh(PARENT, listOf(ref(3,PARENT,MERGED_SOURCE_ID)), { called = true })
     } catch (e: IllegalArgumentException) { failed = true }
     check(failed && !called)
+  }
+  test("real CreateMergedManga inserts virtual favorite and three refs") {
+    val source = MangaStore()
+    val refs = Repository(emptyList())
+    val parent = CreateMergedManga(source, refs)(listOf(A,B))
+    check(parent.id == PARENT && parent.source == MERGED_SOURCE_ID)
+    check(parent.favorite && parent.initialized && parent.url == "merged://11-22")
+    val rows = refs.getReferencesById(PARENT)
+    check(rows.size == 3 && rows.map { it.mangaId }.toSet() == setOf(A,B,PARENT))
+    check(rows.single { it.mangaId == PARENT }.mangaSourceId == MERGED_SOURCE_ID)
+    check(rows.single { it.mangaId == A }.mangaSourceId == SOURCE_A)
+    check(rows.single { it.mangaId == B }.mangaSourceId == SOURCE_B)
+    check(source.getMangaById(A).source == SOURCE_A)
+    check(source.getMangaById(B).source == SOURCE_B)
+    check(GetMergedChaptersByMangaId(Chapters(), refs).await(PARENT).map { it.id } == listOf(101L,102L,202L))
+  }
+  test("repeated real CreateMergedManga is idempotent") {
+    val source = MangaStore(); val refs = Repository(emptyList())
+    val create = CreateMergedManga(source, refs)
+    val first = create(listOf(A,B))
+    val second = create(listOf(B,A), infoMangaId = B)
+    check(first.id == second.id)
+    check(refs.getReferencesById(PARENT).size == 3)
+  }
+  test("real DeleteMergedManga removes only requested child reference") {
+    val source = MangaStore(); val refs = Repository(emptyList())
+    val parent = CreateMergedManga(source, refs)(listOf(A,B))
+    val before = refs.getReferencesById(parent.id)
+    val aRef = before.single { it.mangaId == A }
+    DeleteMergedManga(refs).deleteReference(aRef.id)
+    val after = refs.getReferencesById(parent.id)
+    check(after.map { it.mangaId }.toSet() == setOf(B,PARENT))
+    check(source.getMangaById(PARENT).source == MERGED_SOURCE_ID)
+    check(source.getMangaById(A).source == SOURCE_A)
+    check(GetMergedChaptersByMangaId(Chapters(), refs).await(PARENT).all { it.mangaId == B })
+  }
+  test("real CreateMergedManga rejects only one distinct variant") {
+    val store = MangaStore(); val refs = Repository(emptyList()); var denied = false
+    try { CreateMergedManga(store, refs)(listOf(A,A)) } catch (e: IllegalArgumentException) { denied = true }
+    check(denied && refs.getReferencesById(PARENT).isEmpty())
   }
   println("SPIKE001_HOST_INVARIANTS_PASS ($passes scenarios); NOT_ANDROID_RUNTIME")
 }
