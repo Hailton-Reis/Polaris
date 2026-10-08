@@ -83,5 +83,30 @@ fun main() = runBlocking {
     check(merged.await(PARENT).isEmpty())
     check(withTimeout(3_000) { merged.subscribe(PARENT).first() }.isEmpty())
   }
+  test("priority opt-out returns all source chapters without dedupe") {
+    repo.flow.value = refs(MergedMangaReference.CHAPTER_SORT_PRIORITY)
+    check(merged.await(PARENT, dedupe = false).map { it.id } == listOf(101L,102L,201L,202L))
+  }
+  test("none sort mode preserves both source chapter groups") {
+    repo.flow.value = refs(MergedMangaReference.CHAPTER_SORT_NONE)
+    check(merged.await(PARENT).map { it.id } == listOf(101L,102L,201L,202L))
+  }
+  test("live child refresh updates virtual chapter list without parent copies") {
+    repo.flow.value = refs()
+    val updated = async {
+      withTimeout(3_000) { merged.subscribe(PARENT).first { it.size == 5 && it.any { ch -> ch.id == 203L } } }
+    }
+    yield()
+    chapters.data.getValue(B).value = listOf(ch(201,B,1.0),ch(202,B,3.0),ch(203,B,4.0))
+    val list = updated.await()
+    check(list.map { it.id } == listOf(101L,102L,201L,202L,203L))
+    check(list.none { it.mangaId == PARENT })
+  }
+  test("most chapters mode selects source with larger real coverage") {
+    repo.flow.value = refs(MergedMangaReference.CHAPTER_SORT_MOST_CHAPTERS)
+    val winner = merged.await(PARENT)
+    check(winner.map { it.id } == listOf(201L,202L,203L))
+    check(winner.all { it.mangaId == B })
+  }
   println("SPIKE001_HOST_INVARIANTS_PASS ($passes scenarios); NOT_ANDROID_RUNTIME")
 }
