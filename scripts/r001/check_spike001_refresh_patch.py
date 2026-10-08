@@ -53,14 +53,16 @@ def check_patch(vm_text: str, operations: list[tuple[str, str]], mode: str) -> N
         raise ValueError(f"Unknown mode: {mode}")
     for required in (
         "if (state.source is MergedSource)",
-        "MergedRefreshTargets.childMangaIds(state.manga.id, references)",
+        "MergedRefreshCoordinator.refresh(",
         "val child = mangaRepository.getMangaById(childId)",
         "updateMangaFromRemote(\n                                manga = child,",
-        "if (successes == 0)",
-        "Do not auto-download through the virtual parent",
+        "onFailure = { childId, error ->",
+        "no automatic downloads are scheduled from this virtual screen.",
     ):
         if required not in current:
             raise PatchContractError(f"Missing virtual refresh wiring: {required}")
+    if "import tachiyomi.domain.manga.refresh.MergedRefreshCoordinator" not in current:
+        raise PatchContractError("Merged refresh coordinator is not imported")
     if "import tachiyomi.domain.source.model.MERGED_SOURCE_ID" not in current:
         raise PatchContractError("Virtual source identity not imported")
     if "source = state.source,\n                        manga = state.manga" not in current:
