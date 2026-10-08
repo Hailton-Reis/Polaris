@@ -21,6 +21,7 @@ sourceSets {
             "../new-files/domain/src/main/java/tachiyomi/domain/chapter/interactor",
             "../new-files/domain/src/main/java/tachiyomi/domain/manga/model",
             "../new-files/domain/src/main/java/tachiyomi/domain/source/model",
+            "../new-files/domain/src/main/java/tachiyomi/domain/manga/refresh",
         )
     }
 }

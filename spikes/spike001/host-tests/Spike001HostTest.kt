@@ -8,6 +8,7 @@ import tachiyomi.domain.chapter.repository.ChapterRepository
 import tachiyomi.domain.manga.model.MergedMangaReference
 import tachiyomi.domain.manga.repository.MangaMergeRepository
 import tachiyomi.domain.source.model.MERGED_SOURCE_ID
+import tachiyomi.domain.manga.refresh.MergedRefreshTargets
 
 private const val PARENT = 99L
 private const val A = 11L
@@ -107,6 +108,20 @@ fun main() = runBlocking {
     val winner = merged.await(PARENT)
     check(winner.map { it.id } == listOf(201L,202L,203L))
     check(winner.all { it.mangaId == B })
+  }
+  test("merged refresh enumerates both real child mangas") {
+    check(MergedRefreshTargets.childMangaIds(PARENT, refs()) == listOf(A, B))
+  }
+  test("merged refresh ignores removed or orphan child") {
+    val orphan = listOf(ref(1, null, SOURCE_A), ref(2, B, SOURCE_B), ref(3, PARENT, MERGED_SOURCE_ID))
+    check(MergedRefreshTargets.childMangaIds(PARENT, orphan) == listOf(B))
+  }
+  test("merged refresh excludes parent and cross-work references") {
+    val extras = refs() + ref(5, 100, SOURCE_A).copy(mergeId = 500) + ref(6, PARENT, SOURCE_A)
+    check(MergedRefreshTargets.childMangaIds(PARENT, extras) == listOf(A,B))
+  }
+  test("merged refresh deduplicates repeated references without reordering") {
+    check(MergedRefreshTargets.childMangaIds(PARENT, refs() + ref(5,A,SOURCE_A)) == listOf(A,B))
   }
   println("SPIKE001_HOST_INVARIANTS_PASS ($passes scenarios); NOT_ANDROID_RUNTIME")
 }
