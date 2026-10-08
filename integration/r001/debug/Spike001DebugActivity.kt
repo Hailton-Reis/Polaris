@@ -76,8 +76,8 @@ class Spike001DebugActivity : Activity() {
             val count = chapterRepo.getChapterByMangaId(manga.id).size
             rows += "childId=${manga.id} sourceId=${manga.source} chapters=$count"
         }
-        return "INSPECT candidates=${rows.size} titleFilterUsed=${filter != null}\\n" +
-            rows.joinToString("\\n")
+        return "INSPECT candidates=${rows.size} titleFilterUsed=${filter != null}\n" +
+            rows.joinToString("\n")
     }
 
     private suspend fun create(): String {
