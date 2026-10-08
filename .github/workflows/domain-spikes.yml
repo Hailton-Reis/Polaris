@@ -72,6 +72,8 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: "9.6.1"
+      - name: Offline Python tooling regression tests
+        run: python3 -m unittest discover -s scripts/r001 -p 'test_*.py' -v
       - name: Validate actual merged SQLDelight migration and queries (SQLite)
         run: python3 -m unittest discover -s spikes/spike001/host-sqlite -p 'test_*.py' -v
       - name: Compile and run domain spikes
