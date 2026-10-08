@@ -241,3 +241,9 @@ Do not merge Draft PR #1 and do not mark R001 PASS until:
 - mandatory scenarios in docs/r001/RUNTIME_ACCEPTANCE_TESTS.md pass.
 
 The framework-independent design should not be redesigned in Work/Codex unless a real Android/API incompatibility is demonstrated.
+
+## Follow-up safeguards (post-checkpoint)
+
+- Protected the exported debug-only hook with Android's `android.permission.DUMP`; authorized ADB shell launch must be tested in runtime.
+- 26 offline Python tests PASS locally: comparator 16, ADB evidence tool 6, debug hook installer 4.
+- The latest code and security change still need the full pinned Yomotsu Android build and B01/B02/B03 runtime evidence. Issue #2 remains open and migration 15 is not applied.
