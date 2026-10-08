@@ -6,6 +6,7 @@ on:
       - main
       - r001/multisource-foundation
     paths:
+      - "spikes/spike001/**"
       - "spikes/spike002/**"
       - "spikes/spike003/**"
       - "spikes/spike004/**"
@@ -32,6 +33,7 @@ on:
       - ".github/workflows/domain-spikes.yml"
   pull_request:
     paths:
+      - "spikes/spike001/**"
       - "spikes/spike002/**"
       - "spikes/spike003/**"
       - "spikes/spike004/**"
@@ -72,3 +74,5 @@ jobs:
           gradle-version: "9.6.1"
       - name: Compile and run domain spikes
         run: gradle -p spikes/domain-lab checkSpikes --no-daemon --stacktrace
+      - name: Compile real Spike-001 host invariants
+        run: gradle -p spikes/spike001/host-lab checkHost --no-daemon --stacktrace
