@@ -7,8 +7,22 @@ Use the debug APK built with Spike-001 plus `integration/r001/debug/Spike001Debu
 - Android API 26+; prefer an ARM64 device matching the upstream DBNet runtime.
 - Install and trust two compatible real source extensions.
 - Add the same test work from both sources and refresh their chapters.
-- Record the real manga row IDs as CHILD_A and CHILD_B using Android Studio Database Inspector on this debuggable app (`mangas` table, match title and source). Never use virtual/merged IDs for these inputs.
+- After installing the patched debug APK, query child candidates using the read-only `inspect` hook below (or use Android Studio Database Inspector, `mangas` table, as a fallback). Never use virtual/merged IDs for these inputs.
 - First install/launch the original baseline APK and record A01. Then install the patched APK with `adb install -r PATH_TO_SPIKE001_APK` and record its SHA-256. Both APKs use package `app.mihon.tachiyomiat.dev`.
+
+## Find real manga IDs without Android Studio
+
+Once the same work is saved in the library from **two different real sources**, run the read-only hook on the **patched debug APK**:
+
+```bash
+adb shell am start -n app.mihon.tachiyomiat.dev/eu.kanade.tachiyomi.polaris.Spike001DebugActivity \
+  --es operation inspect --es title_filter "One Piece"
+adb logcat -d -s PolarisSpike001:I
+```
+
+Replace `One Piece` with the work's title or a distinctive substring. Omit `--es title_filter ...` to see the first 50 saved, non-merged library entries; use `--ei limit 100` for more (maximum 200). Each line reports **childId**, **sourceId**, and **chapters** only; titles, URLs and cookies are not logged. The same title filter may match aliases differently between sources, so inspect again without the filter if only one candidate appears. Select two IDs belonging to **different** source IDs with chapter counts greater than zero. Do not infer real source availability solely from those rows.
+
+This inspect command is part of the Spike-001 **debug-only** hook. It is not a product feature and is not evidence that B01/B02/B03 passed.
 
 ## Create the test work
 
