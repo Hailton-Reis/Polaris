@@ -2,6 +2,10 @@
 
 Date: 2026-10-06
 
+## Latest execution checkpoint
+
+**First read `docs/r001/RESUME_2026_10_08.md`.** This documents the pinned baseline and patched APK build results, the partial emulator run, current B01/B02/B03 device blocker, and the test/debug-harness improvements made after the original 2026-10-06 handoff. The R000 Drive notes and older `STATUS.md` descriptions must not override newer verified evidence.
+
 ## Start here
 
 Repository:
