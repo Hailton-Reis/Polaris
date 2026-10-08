@@ -7,6 +7,7 @@
 - Recorded GitHub REST fields: `conclusion=failure`, `steps=[]`, `runner_id=0`, `runner_name=""`, `runner_group_id=0`; job lasted ~2 seconds. The job did **not** execute even `actions/checkout`.
 - `Domain spikes` has independently shown the same no-runner/no-step behavior; this affects two separate workflows, not just Android build steps.
 - GitHub REST workflow run metadata lists a real workflow name/path, completed state and failure conclusion. This is **not** the distinct `BuildFailed` + `startup_failure` + zero-jobs case sometimes discussed online.
+- A direct read-only attempt to download job 113478438938 logs returned HTTP 404 with Azure `BlobNotFound` on 2026-10-08: no retrievable job log artifact was exposed by GitHub. This corroborates the missing step logs but does not identify the account-side reason.
 - Neither root cause, payment status, account standing, nor organization policy is accessible from the currently connected repository API. **Do not claim a specific cause.**
 
 ## Owner-side checks in recommended order
