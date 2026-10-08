@@ -24,6 +24,9 @@ Replace `One Piece` with the work's title or a distinctive substring. Omit `--es
 
 This inspect command is part of the Spike-001 **debug-only** hook. It is not a product feature and is not evidence that B01/B02/B03 passed.
 
+## Validate refreshing a virtual work (supplemental B04)
+With two real children already loaded, refresh the merged work from its own manga screen. The patched `MangaViewModel` must enumerate linked children with `MergedRefreshTargets` and call Yomotsu `UpdateMangaFromRemote` against each real child's `mangaId/source` — **never** `MergedSource.getMangaUpdate`. Record which source requests succeed, the updated real chapter counts, and the merged Flow list. Repeat with one source offline/challenged and ensure the second still refreshes; record the error, do not attempt a Cloudflare bypass. Verify no downloads are created using `merged://...` as a file or manga identity. The offline host test cannot establish this Android behavior.
+
 ## Create the test work
 
 ```bash
