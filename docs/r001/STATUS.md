@@ -1,6 +1,6 @@
 # R001 Status
 
-Updated: 2026-10-06
+Updated: 2026-10-08
 
 ## Repository
 
@@ -209,15 +209,22 @@ GitHub Actions jobs currently fail before any step is exposed (empty job step li
 
 Framework-independent modules were additionally compiled/tested locally where possible, including the integrated scenario and Spikes 023/024.
 
-## PENDING — requires full Android checkout/build/runtime
+## Android issue #2 checkpoint — evidence from 2026-10-07 and improvements on 2026-10-08
 
-- Build unmodified pinned Yomotsu.
-- Apply Spike-001 to full tree.
-- SQLDelight generation against real project.
-- Gradle Android build/test.
-- APK/emulator/device execution.
-- Two real source extensions.
-- Real merged/canonical work.
+- PASS: pinned Yomotsu original and patched Spike-001 Android APK builds, with real SQLDelight generation and migration 14 verification. Migration 15 remains unapplied.
+- PASS: software Android 12/API31 x86_64 original Yomotsu onboarding launched. Patched ARM64 APK installed and MainActivity splash rendered; this is not a reader pass.
+- The patched build reproduced the same 34 app unit failures seen in the unmodified baseline with the agent-preloaded setup; 58/58 domain unit tests passed. The full unit suite was not green.
+- On 2026-10-08, added `compare_android_unit_tests.py` and eight offline comparison tests, then changed the CI build script to compare fresh baseline and patched JUnit outcomes. The Android CI job has not successfully executed this updated gate.
+- Added a debug-only read-only `inspect` operation to list saved child IDs, source IDs and chapter counts via ADB for B01/B02 preparation. See `ISSUE002_DEVICE_RUNBOOK.md`. The modified APK has not yet been rebuilt/installed for this addition.
+- GitHub Actions workflows currently report failures **before job steps start** (zero steps in inspected jobs); these failures do not verify Android/Kotlin defects. Do not infer the platform cause without evidence.
+- BLOCKED: B01 merged list, B02 chapters opening from both real sources, and B03 preservation after removing one source. The last emulation attempt ended with execution transport disconnected; no runtime gate completion is claimed.
+
+## PENDING — real Android runtime and higher-level integration
+
+- Rebuild and install the latest debug hook including read-only `inspect`.
+- Trust two real extensions, load and refresh two source-specific manga of the same work, and capture real IDs.
+- Real merged/canonical work and B01/B02/B03 evidence through the reader.
+
 - Reader routing across two real child sources.
 - Apply/adapt migration 15.
 - Implement repositories/mappers for Polaris canonical tables.
