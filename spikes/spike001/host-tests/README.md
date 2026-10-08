@@ -36,3 +36,10 @@ Added four tests that instantiate the actual staged `CreateMergedManga`, `GetMer
 **26/26** host Kotlin scenarios PASS on JDK21/kotlinc1.9 + installed coroutines JAR. Production `CreateMergedManga.kt` and `DeleteMergedManga.kt` Git blobs were compared to the checked-in source: `b049cf1613918ed817bbb4e3b4c13bc439263b5b` and `0ff4c41e757cc510044cdfadc22a968dd2ca50d8`. The four new tests are **host data-contract proof only**, not actual SQLDelight/Android B01/B03 acceptance.
 
 The Gradle host lab additionally compiles only those two interactor files from the directory by excluding the four unrelated production interactors that would require further real repository interfaces. Gradle CI runner execution is still unverified.
+
+
+## Recovery from an interrupted first insert
+
+The real `CreateMergedManga` inserts the virtual parent before writing its reference transaction. A failed reference insert can therefore leave an orphan parent. The original implementation incorrectly returned this empty parent on the next call. The updated interactor only returns an existing parent directly if there is **at least one** saved reference. If none exist, it uses that same parent to retry the references, without resurrecting a deliberately removed individual child when some references remain.
+
+The defect was first reproduced against the original production source using an injected repository failure (test **FAILED** as expected), then the byte-identical updated production source was compiled using kotlinc1.9/JDK21 and passed **3 focused checks**. The full host suite has two additional corresponding tests staged, now **28 definitions**; it still needs a full rerun before counting all 28 as PASS.
