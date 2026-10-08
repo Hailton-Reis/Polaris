@@ -260,3 +260,10 @@ The framework-independent design should not be redesigned in Work/Codex unless a
 - 12/12 host Kotlin scenarios PASS locally, using real staged Spike-001 Kotlin interactor/models with fake repository boundaries.
 - Host Gradle lab added under `spikes/spike001/host-lab` and connected to `domain-spikes.yml`. Runner execution unverified: GitHub Actions jobs examined still fail at runner allocation with no steps.
 - Android build latest revision and B01/B02/B03 still unverified. No migration 15.
+
+## Virtual-work refresh integration (2026-10-08)
+
+- Added real-source refresh delegation to Yomotsu's patched `MangaViewModel` for virtual merged works; previously its refresh incorrectly targeted the virtual no-network MergedSource. New resolver `MergedRefreshTargets` prevents orphan/cross-merge/root IDs.
+- Full existing Yomotsu refresh remains for ordinary manga. Source-specific chapters and fetches retain the real child manga IDs.
+- Kotlin host invariant tests 16/16 PASS; offline Python tests 33/33 PASS, **49 local validations**, not Android acceptance.
+- Pre/post applicator VM compatibility checks added to the issue #2 build gate. Anchors verified against exact pinned Yomotsu source in read-only mode. Full patched Android build and real B04 verification still pending.
