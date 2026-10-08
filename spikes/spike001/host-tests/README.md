@@ -22,3 +22,8 @@ gradle -p spikes/spike001/host-lab checkHost --no-daemon --stacktrace
 ```
 
 The lab uses Kotlin/JVM 2.4.10, JDK21 and kotlinx-coroutines 1.10.2 to compile the real staged Kotlin sources (including `InternalSourceIds.kt`) plus the host-only repository contracts. This Gradle path is committed but **not verified in a CI runner yet** because existing GitHub Actions jobs are failing before any runner step executes. The manual `kotlinc` path passed 12 scenarios locally.
+
+
+## Additional refresh fault-tolerance scenarios (2026-10-08)
+
+The real staged `MergedRefreshCoordinator.kt` is now compiled by both host runners. Six added host cases test: two successful child refreshes, recovery after a failed first source, all-source failure with last exception propagated, prompt cancellation without subsequent requests, rejection of cross-work/orphan/virtual references, and rejection of an empty merge. The complete **22/22 JVM host tests passed locally** using JDK21, Kotlin 1.9.0, the system coroutine jar and exact staged Kotlin production source files. This does not verify Android APK source fetches.
