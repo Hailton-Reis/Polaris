@@ -31,7 +31,12 @@ private fun ch(id: Long, manga: Long, number: Double) = Chapter(id,manga,number)
 private class Repository(initial: List<MergedMangaReference> = refs()) : MangaMergeRepository {
   val flow = MutableStateFlow(initial)
   private var nextReference = 500L
+  var failNextInsert = false
   override suspend fun insertAll(references: List<MergedMangaReference>) {
+    if (failNextInsert) {
+      failNextInsert = false
+      error("Injected reference transaction failure")
+    }
     flow.value = flow.value + references.map { ref -> ref.copy(id = nextReference++) }
   }
   override suspend fun deleteById(id: Long) { flow.value = flow.value.filterNot { it.id == id } }
@@ -46,7 +51,9 @@ private class MangaStore : MangaRepository {
   )
   override suspend fun getMangaById(id: Long): Manga = requireNotNull(rows[id])
   override suspend fun getMangaByUrlAndSourceId(url: String, source: Long) = rows.values.firstOrNull { it.url == url && it.source == source }
+  var insertedParents = 0
   override suspend fun insertNetworkManga(mangas: List<Manga>): List<Manga> = mangas.map { manga ->
+    insertedParents++
     val saved = manga.copy(id = PARENT)
     check(rows.putIfAbsent(saved.id, saved) == null)
     saved
@@ -225,11 +232,40 @@ fun main() = runBlocking {
     check(source.getMangaById(PARENT).source == MERGED_SOURCE_ID)
     check(source.getMangaById(A).source == SOURCE_A)
     check(GetMergedChaptersByMangaId(Chapters(), refs).await(PARENT).all { it.mangaId == B })
+    // Repeating create after a deliberate deletion must not resurrect Source A.
+    val repeated = CreateMergedManga(source, refs)(listOf(A,B))
+    check(repeated.id == PARENT)
+    check(refs.getReferencesById(PARENT).map { it.mangaId }.toSet() == setOf(B,PARENT))
   }
   test("real CreateMergedManga rejects only one distinct variant") {
     val store = MangaStore(); val refs = Repository(emptyList()); var denied = false
     try { CreateMergedManga(store, refs)(listOf(A,A)) } catch (e: IllegalArgumentException) { denied = true }
     check(denied && refs.getReferencesById(PARENT).isEmpty())
+  }
+  test("orphan virtual parent is recovered after failed reference transaction") {
+    val source = MangaStore()
+    val refs = Repository(emptyList())
+    refs.failNextInsert = true
+    val create = CreateMergedManga(source, refs)
+    var failed = false
+    try { create(listOf(A,B)) } catch (e: IllegalStateException) {
+      failed = e.message == "Injected reference transaction failure"
+    }
+    check(failed && source.insertedParents == 1)
+    check(refs.getReferencesById(PARENT).isEmpty())
+    val recovered = create(listOf(A,B))
+    check(recovered.id == PARENT && source.insertedParents == 1)
+    check(refs.getReferencesById(PARENT).map { it.mangaId }.toSet() == setOf(A,B,PARENT))
+  }
+  test("recovery remains idempotent after interrupted first insert") {
+    val source = MangaStore(); val refs = Repository(emptyList())
+    val create = CreateMergedManga(source, refs)
+    refs.failNextInsert = true
+    try { create(listOf(A,B)) } catch (_: IllegalStateException) {}
+    create(listOf(A,B))
+    val count = refs.getReferencesById(PARENT).size
+    create(listOf(B,A), infoMangaId = B)
+    check(count == 3 && refs.getReferencesById(PARENT).size == count && source.insertedParents == 1)
   }
   println("SPIKE001_HOST_INVARIANTS_PASS ($passes scenarios); NOT_ANDROID_RUNTIME")
 }
