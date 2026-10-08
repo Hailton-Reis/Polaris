@@ -39,6 +39,12 @@ prepare_branding() {
 
 prepare_branding "$baseline"
 run_gradle "$baseline" baseline-build.log :app:assembleDebug
+# Compare unmodified-upstream tests with patched tests; upstream failures are
+# not a Polaris regression, but newly failing, skipped or missing tests are.
+# --continue lets unrelated module tasks produce their JUnit reports.
+unit_test_tasks=(:domain:testDebugUnitTest :data:testDebugUnitTest :app:testDebugUnitTest)
+baseline_test_exit=0
+run_gradle "$baseline" baseline-unit-tests.log --continue "${unit_test_tasks[@]}" || baseline_test_exit=$?
 mkdir -p "$evidence/apks/baseline"
 cp "$baseline"/app/build/outputs/apk/debug/*.apk "$evidence/apks/baseline/"
 git -C "$baseline" worktree add --detach "$patched" "$pinned"
@@ -53,5 +59,9 @@ prepare_branding "$patched"
 run_gradle "$patched" patched-build.log :data:generateDebugDatabaseInterface verifySqlDelightMigration :app:assembleDebug
 mkdir -p "$evidence/apks/spike001"
 cp "$patched"/app/build/outputs/apk/debug/*.apk "$evidence/apks/spike001/"
-run_gradle "$patched" patched-unit-tests.log :domain:testDebugUnitTest :data:testDebugUnitTest :app:testDebugUnitTest
-printf 'BUILD_GATE_PASS\nRuntime A01/B01/B02/B03 still require device evidence.\n' | tee "$evidence/build-status.txt"
+patched_test_exit=0
+run_gradle "$patched" patched-unit-tests.log --continue "${unit_test_tasks[@]}" || patched_test_exit=$?
+python3 "$polaris_root/scripts/r001/compare_android_unit_tests.py" "$baseline" "$patched" \
+    --baseline-exit "$baseline_test_exit" --patched-exit "$patched_test_exit" \
+    --output "$evidence/unit-test-comparison.json" | tee "$evidence/unit-test-comparison.log"
+printf 'APK_BUILDS_PASS_NO_NEW_UNIT_REGRESSIONS\nExisting upstream unit failures may remain; see comparison JSON.\nRuntime A01/B01/B02/B03 still require device evidence.\n' | tee "$evidence/build-status.txt"
