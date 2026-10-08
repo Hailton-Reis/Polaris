@@ -1,19 +1,26 @@
 #!/usr/bin/env python3
-"""Compare Android JUnit XML against the unmodified pinned Yomotsu baseline.
+"""Compare complete Android JUnit results with the pinned unmodified baseline.
 
-A zero exit code means NO NEW failures or skips. It does NOT mean all tests pass,
-that the Android runtime was tested, or that a failed Gradle build can be ignored.
+NO_NEW_UNIT_REGRESSIONS is not equivalent to all-tests-green or device PASS.
+Fail closed on absent/truncated report coverage and non-test Gradle failures.
 """
 import argparse
 from collections import Counter
 import json
 from pathlib import Path
+import re
 import sys
 import xml.etree.ElementTree as ET
 
 
 class ReportError(Exception):
     pass
+
+
+FAILED_TASK = re.compile(r"^\s*> Task (:\S+) FAILED\s*$", re.MULTILINE)
+ALLOWED_FAILED_TASKS = {
+    ":domain:testDebugUnitTest", ":data:testDebugUnitTest", ":app:testDebugUnitTest",
+}
 
 
 def collect(root: Path) -> dict[tuple[str, str, str], str]:
@@ -53,8 +60,45 @@ def collect(root: Path) -> dict[tuple[str, str, str], str]:
                 state = "passed"
             cases[key] = state
     if reports == 0 or not cases:
-        raise ReportError(f"No executed testDebugUnitTest JUnit XML test cases under {root}")
+        raise ReportError(f"No executed testDebugUnitTest JUnit XML cases under {root}")
     return cases
+
+
+def check_coverage(cases: dict, minima: dict[str, int], side: str):
+    observed = Counter(module for module, _, _ in cases)
+    for module, required in minima.items():
+        if observed[module] < required:
+            raise ReportError(
+                f"{side} has {observed[module]} tests for {module}; minimum {required}. "
+                "Report may be missing/incomplete or execution aborted."
+            )
+
+
+def check_gradle(log_path: Path | None, exit_code: int, cases: dict, side: str):
+    if log_path is None:
+        if exit_code:
+            raise ReportError(f"{side} nonzero Gradle exit requires --{side}-log for failure classification")
+        return
+    if not log_path.is_file():
+        raise ReportError(f"{side} Gradle log missing: {log_path}")
+    log = log_path.read_text(errors="replace")
+    if "BUILD FAILED" in log and exit_code == 0:
+        raise ReportError(f"{side} Gradle log says BUILD FAILED but exit code is zero")
+    if "BUILD SUCCESSFUL" in log and exit_code != 0:
+        raise ReportError(f"{side} Gradle log says BUILD SUCCESSFUL but exit code is {exit_code}")
+    if exit_code == 0:
+        if "BUILD SUCCESSFUL" not in log:
+            raise ReportError(f"{side} Gradle log lacks BUILD SUCCESSFUL")
+        return
+    failed_tasks = set(FAILED_TASK.findall(log))
+    if not failed_tasks or not failed_tasks.issubset(ALLOWED_FAILED_TASKS):
+        raise ReportError(f"{side} has non-unit-test or unidentified Gradle failure: {sorted(failed_tasks)}")
+    failed_modules = {task.split(":")[1] for task in failed_tasks}
+    if any(not any(key[0] == module and status == "failed" for key, status in cases.items())
+           for module in failed_modules):
+        raise ReportError(f"{side} has failed test tasks without matching failed JUnit cases")
+    if "BUILD FAILED" not in log:
+        raise ReportError(f"{side} nonzero Gradle exit lacks BUILD FAILED")
 
 
 def compare(baseline: dict, patched: dict) -> dict:
@@ -65,38 +109,51 @@ def compare(baseline: dict, patched: dict) -> dict:
         if (state == "failed" and baseline.get(key) != "failed")
         or (state == "skipped" and baseline.get(key) != "skipped")
     )
-    baseline_counts = Counter(baseline.values())
-    patched_counts = Counter(patched.values())
-    existing_failures = sorted(key for key, status in patched.items() if status == "failed" and baseline.get(key) == "failed")
+    counts = lambda cases: {"total": len(cases), **{s: Counter(cases.values())[s] for s in ("passed", "failed", "skipped")}}
+    existing = [key for key, state in patched.items() if state == "failed" and baseline.get(key) == "failed"]
     return {
         "status": "NO_NEW_UNIT_REGRESSIONS" if not missing and not regressions else "REGRESSION_DETECTED",
-        "baseline": {"total": len(baseline), **{status: baseline_counts[status] for status in ("passed", "failed", "skipped")}},
-        "patched": {"total": len(patched), **{status: patched_counts[status] for status in ("passed", "failed", "skipped")}},
-        "preexisting_failures_still_present": len(existing_failures),
-        "missing_baseline_tests": [list(key) for key in missing],
+        "baseline": counts(baseline), "patched": counts(patched),
+        "preexisting_failures_still_present": len(existing),
+        "missing_baseline_tests": [list(k) for k in missing],
         "new_failures_or_skips": [list((*key, old, new)) for key, old, new in regressions],
         "android_runtime_verified": False,
     }
+
+
+def parse_minimum(value: str) -> tuple[str, int]:
+    try:
+        module, count = value.split("=", 1)
+        count = int(count)
+        if not re.fullmatch(r"[A-Za-z0-9_-]+", module) or count < 1:
+            raise ValueError
+        return module, count
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError("Expected MODULE=POSITIVE_INTEGER") from exc
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("baseline", type=Path)
     parser.add_argument("patched", type=Path)
-    parser.add_argument("--output", type=Path, help="Write machine-readable comparison")
+    parser.add_argument("--output", type=Path)
     parser.add_argument("--baseline-exit", type=int, default=0)
     parser.add_argument("--patched-exit", type=int, default=0)
+    parser.add_argument("--baseline-log", type=Path)
+    parser.add_argument("--patched-log", type=Path)
+    parser.add_argument("--min-module", action="append", default=[], type=parse_minimum)
     args = parser.parse_args()
     try:
         original = collect(args.baseline)
         modified = collect(args.patched)
+        minima = dict(args.min_module)
+        check_coverage(original, minima, "baseline")
+        check_coverage(modified, minima, "patched")
+        check_gradle(args.baseline_log, args.baseline_exit, original, "baseline")
+        check_gradle(args.patched_log, args.patched_exit, modified, "patched")
         result = compare(original, modified)
         result["gradle_exit_codes"] = {"baseline": args.baseline_exit, "patched": args.patched_exit}
-        for which, exit_code, cases in (("baseline", args.baseline_exit, original), ("patched", args.patched_exit, modified)):
-            # Nonzero Gradle status is permissible only if the JUnit results actually
-            # contain failing tests. Otherwise a build/infrastructure error may be hidden.
-            if exit_code != 0 and "failed" not in cases.values():
-                raise ReportError(f"{which} Gradle exited {exit_code} but JUnit has no failing tests")
+        result["required_module_coverage"] = minima
         if args.output:
             args.output.parent.mkdir(parents=True, exist_ok=True)
             args.output.write_text(json.dumps(result, indent=2) + "\n")
