@@ -72,3 +72,7 @@ python3 scripts/r001/capture_issue002_device_evidence.py B03   --apk /path/to/sp
 ```
 
 For multiple connected devices add `--serial DEVICE_SERIAL`. Results are local files, one directory per phase; each `evidence.json` deliberately remains `runtime_verdict: CAPTURED_UNVERIFIED`. A reviewer still must establish source identity and chapter content independently before recording B01/B02A/B02B/B03 PASS. Use brief logcat/screenshot captures to avoid prolonged ADB sessions in unstable emulators.
+
+## Debug hook privilege boundary
+
+The exported development-only `Spike001DebugActivity` requires `android.permission.DUMP` in the generated **debug** manifest. This is intended to restrict launches to privileged diagnostic callers such as an appropriately authorized ADB shell; ordinary third-party apps must not be able to invoke its create/remove operations. Release manifests remain unmodified. Confirm on the target Android image that `adb shell am start ... --es operation inspect` is permitted; if it fails with `Permission Denial`, record that as a test-harness compatibility issue and use an authorized debug/instrumentation route rather than removing the privilege boundary. The actual Android permission behavior is not yet runtime-tested.
