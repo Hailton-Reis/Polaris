@@ -19,6 +19,7 @@ if target.exists():
 target.parent.mkdir(parents=True, exist_ok=True)
 shutil.copy2(root / "integration/r001/debug/Spike001DebugActivity.kt", target)
 manifest.write_text(text.replace("    </application>",
-    f'        <activity android:name="{activity}" android:exported="true" '
+    f'        <activity android:name="{activity}" android:exported="true" ' 
+    'android:permission="android.permission.DUMP" '
     'android:theme="@android:style/Theme.Material.Light.NoActionBar" />\n    </application>'))
 print("ISSUE002_DEBUG_HOOK_APPLIED")
