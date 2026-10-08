@@ -3,6 +3,9 @@
 from pathlib import Path
 import tempfile
 import unittest
+import subprocess
+import sys
+import json
 from xml.sax.saxutils import escape
 
 from compare_android_unit_tests import ReportError, collect, compare
@@ -66,6 +69,27 @@ class JunitComparisonTests(unittest.TestCase):
         self.baseline.mkdir()
         with self.assertRaises(ReportError):
             collect(self.baseline)
+
+    def test_cli_preserves_preexisting_failure_disclaimer(self):
+        fixture(self.baseline, {"working": "passed", "known": "failed"})
+        fixture(self.patched, {"working": "passed", "known": "failed"})
+        evidence = Path(self.tmp.name) / "comparison.json"
+        result = subprocess.run([sys.executable, str(Path(__file__).with_name("compare_android_unit_tests.py")),
+                                 str(self.baseline), str(self.patched),
+                                 "--baseline-exit", "1", "--patched-exit", "1", "--output", str(evidence)],
+                                capture_output=True, text=True)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("not all-tests-green", result.stdout)
+        self.assertEqual(json.loads(evidence.read_text())["preexisting_failures_still_present"], 1)
+
+    def test_cli_rejects_gradle_nonzero_without_failed_tests(self):
+        fixture(self.baseline, {"working": "passed"})
+        fixture(self.patched, {"working": "passed"})
+        result = subprocess.run([sys.executable, str(Path(__file__).with_name("compare_android_unit_tests.py")),
+                                 str(self.baseline), str(self.patched), "--patched-exit", "1"],
+                                capture_output=True, text=True)
+        self.assertEqual(result.returncode, 2)
+        self.assertIn("INCONCLUSIVE", result.stderr)
 
     def test_malformed_xml_cannot_be_called_pass(self):
         fixture(self.baseline, {"works": "passed"})
