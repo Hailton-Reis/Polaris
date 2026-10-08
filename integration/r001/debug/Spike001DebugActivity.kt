@@ -21,6 +21,8 @@ import tachiyomi.domain.manga.model.MergeMangaSettingsUpdate
 import tachiyomi.domain.manga.model.MergedMangaReference
 import tachiyomi.domain.manga.repository.MangaRepository
 import tachiyomi.domain.source.model.MERGED_SOURCE_ID
+import tachiyomi.domain.source.service.SourceManager
+import eu.kanade.tachiyomi.source.INovelSource
 import uy.kohesive.injekt.Injekt
 import uy.kohesive.injekt.api.get
 
@@ -41,13 +43,14 @@ class Spike001DebugActivity : Activity() {
             try {
                 val result = withContext(Dispatchers.IO) {
                     val operation = requireNotNull(intent.getStringExtra("operation")) {
-                        "Explicit operation extra required: inspect, create or remove"
+                        "Explicit operation extra required: inspect, route, create or remove"
                     }
                     when (operation) {
                         "inspect" -> inspect()
+                        "route" -> route()
                         "create" -> create()
                         "remove" -> remove()
-                        else -> error("Expected operation=inspect, create or remove")
+                        else -> error("Expected operation=inspect, route, create or remove")
                     }
                 }
                 val lines = result.lines()
@@ -87,6 +90,35 @@ class Spike001DebugActivity : Activity() {
         }
         return "INSPECT candidates=${rows.size} titleFilterUsed=${filter != null}\n" +
             rows.joinToString("\n")
+    }
+
+    /**
+     * Read-only diagnostic: validate that a chapter is linked to the selected
+     * virtual work and identify the real installed source/reader kind.
+     * Does NOT open pages and cannot mark B02 runtime PASS.
+     */
+    private suspend fun route(): String {
+        val mergeId = intent.getLongExtra("merge_id", -1)
+        val chapterId = intent.getLongExtra("chapter_id", -1)
+        require(mergeId > 0 && chapterId > 0) { "Supply positive merge_id and chapter_id" }
+        val mangaRepo = Injekt.get<MangaRepository>()
+        val parent = mangaRepo.getMangaById(mergeId)
+        require(parent.source == MERGED_SOURCE_ID) { "Target is not a virtual merged manga" }
+        val chapter = requireNotNull(Injekt.get<ChapterRepository>().getChapterById(chapterId)) {
+            "Chapter not present"
+        }
+        val child = mangaRepo.getMangaById(chapter.mangaId)
+        require(child.source != MERGED_SOURCE_ID) { "Chapter points at another virtual work" }
+        val links = Injekt.get<GetMergedReferencesById>().await(mergeId)
+        require(links.any {
+            it.mergeId == mergeId && it.mangaId == child.id && it.mangaSourceId == child.source
+        }) { "Chapter's real manga is not linked to this merged parent" }
+        val source = requireNotNull(Injekt.get<SourceManager>().get(child.source)) {
+            "Real source extension is not installed or enabled"
+        }
+        val kind = if (source is INovelSource) "NOVEL" else "IMAGE"
+        return "ROUTE VERIFIED mergeId=$mergeId childId=${child.id} chapterId=$chapterId sourceId=${child.source} readerKind=$kind" +
+            " (diagnostic only, no chapter content fetched)"
     }
 
     private suspend fun create(): String {
