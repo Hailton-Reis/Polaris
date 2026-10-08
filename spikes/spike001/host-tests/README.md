@@ -27,3 +27,12 @@ The lab uses Kotlin/JVM 2.4.10, JDK21 and kotlinx-coroutines 1.10.2 to compile t
 ## Additional refresh fault-tolerance scenarios (2026-10-08)
 
 The real staged `MergedRefreshCoordinator.kt` is now compiled by both host runners. Six added host cases test: two successful child refreshes, recovery after a failed first source, all-source failure with last exception propagated, prompt cancellation without subsequent requests, rejection of cross-work/orphan/virtual references, and rejection of an empty merge. The complete **22/22 JVM host tests passed locally** using JDK21, Kotlin 1.9.0, the system coroutine jar and exact staged Kotlin production source files. This does not verify Android APK source fetches.
+
+
+## 2026-10-08 extension — real virtual-work lifecycle (26 host scenarios)
+
+Added four tests that instantiate the actual staged `CreateMergedManga`, `GetMergedChaptersByMangaId` and `DeleteMergedManga` classes together. Fake `MangaRepository`, `MangaMergeRepository` and `ChapterRepository` boundaries are deliberately in-memory; the production interactor implementations are compiled directly from their unmodified staging paths. The tests verify root + two real references, real source ID preservation, duplicate creation idempotence, one-child reference deletion without losing parent or other source, and rejection of only one distinct child.
+
+**26/26** host Kotlin scenarios PASS on JDK21/kotlinc1.9 + installed coroutines JAR. Production `CreateMergedManga.kt` and `DeleteMergedManga.kt` Git blobs were compared to the checked-in source: `b049cf1613918ed817bbb4e3b4c13bc439263b5b` and `0ff4c41e757cc510044cdfadc22a968dd2ca50d8`. The four new tests are **host data-contract proof only**, not actual SQLDelight/Android B01/B03 acceptance.
+
+The Gradle host lab additionally compiles only those two interactor files from the directory by excluding the four unrelated production interactors that would require further real repository interfaces. Gradle CI runner execution is still unverified.
