@@ -26,6 +26,16 @@ Given chapter A belongs to Source A and chapter B belongs to Source B
 When each is opened from the virtual work
 Then Reader uses the correct real child source without migration.
 
+
+### B04 — Virtual-work refresh delegates to real sources (supplemental issue #2 regression)
+Given a merged work with real child mangas in Source A and Source B,
+when refresh is invoked from the merged manga screen,
+then it must call Yomotsu's existing source refresh for each linked real child, not query the virtual MergedSource, and the combined chapter list should update through the existing repository Flow.
+
+When a child is orphaned/removed, it is skipped. When one real source is unavailable, the other should still be attempted; when all fail, refresh must report failure rather than silently claim success. The virtual merged work must never become the source/download identity for newly fetched child chapters. Verify the actual network/source operations, chapter counts and source IDs in Android runtime.
+
+This is **additional issue #2 regression evidence**, not a substitute for B01/B02/B03 and not permission to apply migration 15.
+
 ### B03 — Remove one variant
 Given a work has two variants
 When one variant/reference is removed
