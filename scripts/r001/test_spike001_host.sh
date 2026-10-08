@@ -13,6 +13,7 @@ kotlinc \
   "$root/spikes/spike001/new-files/domain/src/main/java/tachiyomi/domain/manga/model/MergedMangaReference.kt" \
   "$root/spikes/spike001/new-files/domain/src/main/java/tachiyomi/domain/source/model/InternalSourceIds.kt" \
   "$root/spikes/spike001/new-files/domain/src/main/java/tachiyomi/domain/manga/refresh/MergedRefreshTargets.kt" \
+  "$root/spikes/spike001/new-files/domain/src/main/java/tachiyomi/domain/manga/refresh/MergedRefreshCoordinator.kt" \
   "$root"/spikes/spike001/host-tests/*.kt \
   -cp "$coroutines" -include-runtime -d "$tmp/invariants.jar"
 java -cp "$tmp/invariants.jar:$coroutines" polaris.spike001.host.Spike001HostTestKt

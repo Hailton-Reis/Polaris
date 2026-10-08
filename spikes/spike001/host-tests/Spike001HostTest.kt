@@ -9,6 +9,7 @@ import tachiyomi.domain.manga.model.MergedMangaReference
 import tachiyomi.domain.manga.repository.MangaMergeRepository
 import tachiyomi.domain.source.model.MERGED_SOURCE_ID
 import tachiyomi.domain.manga.refresh.MergedRefreshTargets
+import tachiyomi.domain.manga.refresh.MergedRefreshCoordinator
 
 private const val PARENT = 99L
 private const val A = 11L
@@ -122,6 +123,50 @@ fun main() = runBlocking {
   }
   test("merged refresh deduplicates repeated references without reordering") {
     check(MergedRefreshTargets.childMangaIds(PARENT, refs() + ref(5,A,SOURCE_A)) == listOf(A,B))
+  }
+  test("refresh coordinator calls each real source once") {
+    val visited = mutableListOf<Long>()
+    val result = MergedRefreshCoordinator.refresh(PARENT, refs(), { visited += it })
+    check(visited == listOf(A,B) && result.failedChildIds.isEmpty())
+  }
+  test("refresh coordinator succeeds despite first source error") {
+    val visited = mutableListOf<Long>(); val errors = mutableListOf<Long>()
+    val result = MergedRefreshCoordinator.refresh(
+      PARENT, refs(), { visited += it; if (it == A) error("temporarily offline") },
+      { id, _ -> errors += id },
+    )
+    check(visited == listOf(A,B) && errors == listOf(A))
+    check(result.succeededChildIds == listOf(B) && result.failedChildIds == listOf(A))
+  }
+  test("refresh coordinator fails after both source errors") {
+    val visited = mutableListOf<Long>(); var message = ""
+    try {
+      MergedRefreshCoordinator.refresh(PARENT, refs(), { visited += it; error("offline:$it") })
+    } catch (e: IllegalStateException) { message = e.message.orEmpty() }
+    check(visited == listOf(A,B) && message == "offline:$B")
+  }
+  test("refresh coordinator cancellation never attempts next child") {
+    val visited = mutableListOf<Long>(); var cancelled = false
+    try {
+      MergedRefreshCoordinator.refresh(PARENT, refs(), {
+        visited += it
+        throw CancellationException("cancel requested")
+      })
+    } catch (e: CancellationException) { cancelled = true }
+    check(cancelled && visited == listOf(A))
+  }
+  test("refresh coordinator discards stale and unrelated references") {
+    val extras = refs() + ref(20,null,SOURCE_A) +
+      ref(21,33,SOURCE_B).copy(mergeId=700) + ref(22,PARENT,SOURCE_A)
+    val result = MergedRefreshCoordinator.refresh(PARENT, extras, {})
+    check(result.succeededChildIds == listOf(A,B))
+  }
+  test("refresh coordinator rejects a merge without actual children") {
+    var called = false; var failed = false
+    try {
+      MergedRefreshCoordinator.refresh(PARENT, listOf(ref(3,PARENT,MERGED_SOURCE_ID)), { called = true })
+    } catch (e: IllegalArgumentException) { failed = true }
+    check(failed && !called)
   }
   println("SPIKE001_HOST_INVARIANTS_PASS ($passes scenarios); NOT_ANDROID_RUNTIME")
 }
