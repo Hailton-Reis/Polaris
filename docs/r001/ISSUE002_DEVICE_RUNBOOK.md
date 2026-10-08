@@ -47,3 +47,28 @@ adb logcat -d -s PolarisSpike001:I
 The hook uses `DeleteMergedManga.deleteReference`, asserts the virtual parent survives and the remaining list excludes the removed child. Reopen the entry and a chapter from B; capture evidence (B03). It preserves the real child manga row.
 
 Issue #2 remains open until these device checks pass. A host SQLite test, successful Gradle build or debug hook output does not certify reader runtime acceptance. Migration 15 remains prohibited until this gate passes.
+
+## B01/B02/B03 reproducible evidence snapshots
+
+The short ADB evidence command below collects Android API/ABI/fingerprint, APK SHA-256, a screenshot, and filtered Polaris/crash logcat. It never alters app state, captures no passwords/cookies intentionally, never overwrites an existing nonempty evidence directory, and always marks the result CAPTURED_UNVERIFIED. Review screenshots before sharing; they may contain user data or copyrighted page content. Do **not** commit unreviewed raw logcat or screenshots.
+
+After the debug hook reports the real child IDs and virtual parent ID, open the **merged chapter list** and take the first snapshot:
+
+```bash
+python3 scripts/r001/capture_issue002_device_evidence.py B01   --apk /path/to/spike001-debug.apk --child-a CHILD_A --child-b CHILD_B   --merge-id MERGE_ID --out /path/to/evidence/B01
+```
+
+Open a real chapter from child A and then child B, wait until the actual page contents load, and capture each:
+
+```bash
+python3 scripts/r001/capture_issue002_device_evidence.py B02A   --apk /path/to/spike001-debug.apk --child-a CHILD_A --child-b CHILD_B   --merge-id MERGE_ID --out /path/to/evidence/B02A
+python3 scripts/r001/capture_issue002_device_evidence.py B02B   --apk /path/to/spike001-debug.apk --child-a CHILD_A --child-b CHILD_B   --merge-id MERGE_ID --out /path/to/evidence/B02B
+```
+
+Then remove child A using the debug hook above, reopen child B's chapter via the virtual library entry and capture B03:
+
+```bash
+python3 scripts/r001/capture_issue002_device_evidence.py B03   --apk /path/to/spike001-debug.apk --child-a CHILD_A --child-b CHILD_B   --merge-id MERGE_ID --out /path/to/evidence/B03
+```
+
+For multiple connected devices add `--serial DEVICE_SERIAL`. Results are local files, one directory per phase; each `evidence.json` deliberately remains `runtime_verdict: CAPTURED_UNVERIFIED`. A reviewer still must establish source identity and chapter content independently before recording B01/B02A/B02B/B03 PASS. Use brief logcat/screenshot captures to avoid prolonged ADB sessions in unstable emulators.
