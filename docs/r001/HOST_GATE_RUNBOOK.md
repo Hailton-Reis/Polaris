@@ -1,0 +1,37 @@
+# Polaris R001 — offline host gate
+
+## Purpose
+
+Provide **one reproducible command** that checks the R001 domain slice without an Android SDK. It must never confuse locally tested repository contracts with B01–B05 Android runtime acceptance.
+
+The script is at `scripts/r001/run_host_gate.py`. From a **full Git checkout** of `Hailton-Reis/Polaris` branch `r001/multisource-foundation`:
+
+```bash
+python3 scripts/r001/run_host_gate.py --evidence-dir /tmp/polaris-r001-host-evidence
+```
+
+Prerequisites: Python 3 (stdlib), Bash, Java 21, `kotlinc`, and a Kotlin installation exposing `lib/kotlinx-coroutines-core-jvm.jar`. The Kotlin compiler and JAR paths are resolved by `scripts/r001/test_spike001_host.sh`. No Android SDK, Gradle, credentials, extensions, network access or backend server is needed **after the full repo has been checked out and the prerequisites are installed**.
+
+## Gate matrix
+
+| Gate | What is executed | Required test count |
+| --- | --- | ---: |
+| `python` | `python3 -m unittest discover -s scripts/r001 -p 'test_*.py' -q` | **54** |
+| `sqlite` | `python3 -m unittest discover -s spikes/spike001/host-sqlite -p 'test_*.py' -q` | **10** |
+| `kotlin` | `bash scripts/r001/test_spike001_host.sh` | **30** |
+
+Counts were discovered in the checked-in test files on 2026-10-08: 54 Python test methods across six `scripts/r001/test_*.py` files, 10 SQLite methods, and 30 Kotlin `test(...)` registrations. Update minimum thresholds when expanding these tests.
+
+`run_host_gate.py` captures combined output for each gate as `python.log`, `sqlite.log`, `kotlin.log`, and writes `host-gate-report.json` containing per-gate exit status, reported counts, minimum count and, if available, the Git commit hash. It returns nonzero unless **all three** return exit code 0 and their log summaries report the minimum count; both Python and SQLite must emit `OK` and Kotlin must emit `SPIKE001_HOST_INVARIANTS_PASS (30 scenarios); NOT_ANDROID_RUNTIME`.
+
+Check the JSON `scope` field: always `HOST_ONLY_NOT_ANDROID_RUNTIME`. Missing tests, missing compiler, incomplete checkout or absent log markers are not PASS. The gate never claims an APK build, database engine in Android, original Yomotsu source extension, Cloudflare access, chapter pages, or migration-15 acceptance.
+
+## Verified here vs still pending
+
+On 2026-10-08 the **actual new runner code and its seven regression tests** were executed with Python 3 and passed **7/7**; Git blobs were verified byte-identical to local files. The new runner was also invoked against an **intentionally partial local workspace**, which proved its fail-closed behavior: SQLite **10/10 PASS**, while Python and Kotlin were explicitly `MISSING_OR_INVALID_TEST_SUMMARY`, final status `FAIL_OR_INCONCLUSIVE`, and process exit code 1. The complete 30-scenario suite and total 54 Python tests have **not** been run in this current container, because the full Polaris Git checkout is unavailable.
+
+One GitHub Actions job was retried via the connected GitHub app: `Domain spikes` run [37838795183](https://github.com/Hailton-Reis/Polaris/actions/runs/37838795183), attempt 2. It again failed with `runner_id=0` and `steps=[]`. No Gradle or Kotlin test step executed on that runner. Owner-side diagnostics are in `ACTIONS_RUNNER_TRIAGE_2026_10_08.md`; avoid repeated CI retries until the account-side cause is found.
+
+GitHub CI `.github/workflows/domain-spikes.yml` separately executes the same **Python and SQLite** suites and the **Gradle** host Kotlin/domain tasks when a runner is provisioned. It does not invoke `run_host_gate.py`, since a Kotlin CLI installation is not guaranteed on the standard hosted runner. Both paths provide complementary evidence, not Android acceptance.
+
+**Next gate:** construct the latest APK from pinned Yomotsu with `scripts/r001/build_issue002.sh` and verify the real two-source Android B01/B02/B03/B04 and supplementary B05. Preserve the existing 24 spike decisions, keep issue #2 open, PR #1 draft, and SQLDelight migration 15 unapplied until device evidence is captured.
