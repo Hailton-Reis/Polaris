@@ -290,3 +290,11 @@ The framework-independent design should not be redesigned in Work/Codex unless a
 - Debug-only `route` operation verifies the chapter links to the merged parent and identifies installed source kind via ADB. It is a source classification diagnostic, **not** actual B02 acceptance.
 - 10/10 pinned-upstream MangaScreen patch anchors verified exactly once. Eight new Python patch-check scenarios added; **new Android compilation and their full CI invocation remain pending**. Prior 26 Kotlin + 36 Python locally executed cases remain valid historical evidence, not Android PASS.
 - Supplemental novel case B05 and commands in `ISSUE002_DEVICE_RUNBOOK.md`. No migration 15.
+
+
+## Orphan virtual work repair (host-proven focused case, 2026-10-08)
+
+- Failed initial write can leave a virtual parent without any `merged` reference rows; an ordinary retry previously returned that orphan. Reproduced failure with original `CreateMergedManga.kt` and an injected repository exception.
+- Patched production interactor to recover **only fully empty** reference sets on retry; intentionally removed source references are never silently restored. One parent remains, two child references plus root are recreated.
+- Verified production file Git blob matches locally compiled replacement `253f8ada08c55730b7138258745ce323d38f222d`; 3 focused JVM checks PASS. Extended host-test code to 28 scenarios, **full 28 not rerun yet**; last full run 26 Kotlin and 36 Python.
+- SQLDelight/Android runtime (including B01–B05) remains pending, migration 15 unapplied and PR draft.
