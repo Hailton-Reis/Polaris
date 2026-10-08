@@ -74,7 +74,8 @@ class MangaReaderRoutingPatchTests(unittest.TestCase):
     def setUpClass(cls):
         patcher = Path(__file__).resolve().parents[2] / "spikes/spike001/apply_spike001.py"
         cls.operations = screen_operations(patcher)
-        cls.baseline = "\n".join(old for old, _ in cls.operations)
+        # Source import is patched twice; the pinned file contains it once.
+        cls.baseline = "\n".join(dict.fromkeys(old for old, _ in cls.operations))
         cls.patched = cls.baseline
         for old, new in cls.operations:
             cls.patched = cls.patched.replace(old, new, 1)
