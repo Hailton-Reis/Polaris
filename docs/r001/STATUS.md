@@ -267,3 +267,10 @@ The framework-independent design should not be redesigned in Work/Codex unless a
 - Full existing Yomotsu refresh remains for ordinary manga. Source-specific chapters and fetches retain the real child manga IDs.
 - Kotlin host invariant tests 16/16 PASS; offline Python tests 33/33 PASS, **49 local validations**, not Android acceptance.
 - Pre/post applicator VM compatibility checks added to the issue #2 build gate. Anchors verified against exact pinned Yomotsu source in read-only mode. Full patched Android build and real B04 verification still pending.
+
+
+## Additional refresh isolation verification — 2026-10-08
+
+- Real staged `MergedRefreshCoordinator` added, replacing the one-off error-handling loop in the Yomotsu ViewModel patch. It preserves per-child source identity, tolerates a single failed source, propagates cancellation and fails when every source fails.
+- 22 Kotlin/JVM domain scenarios PASS locally (including 6 new coordinator cases). 36 Python offline integration/tooling cases PASS locally (including 3 coordinator patch-check tests). Total 58 offline cases.
+- Pinned Yomotsu `MangaViewModel` anchor compatibility checked for four replacements. The new Android Kotlin code/Gradle build and B01/B02/B03/B04 on-device runtime acceptance remain **NOT VERIFIED**.
