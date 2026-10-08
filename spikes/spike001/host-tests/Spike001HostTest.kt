@@ -52,6 +52,7 @@ private class MangaStore : MangaRepository {
   override suspend fun getMangaById(id: Long): Manga = requireNotNull(rows[id])
   override suspend fun getMangaByUrlAndSourceId(url: String, source: Long) = rows.values.firstOrNull { it.url == url && it.source == source }
   var insertedParents = 0
+  fun add(manga: Manga) { check(rows.putIfAbsent(manga.id, manga) == null) }
   override suspend fun insertNetworkManga(mangas: List<Manga>): List<Manga> = mangas.map { manga ->
     insertedParents++
     val saved = manga.copy(id = PARENT)
@@ -266,6 +267,27 @@ fun main() = runBlocking {
     val count = refs.getReferencesById(PARENT).size
     create(listOf(B,A), infoMangaId = B)
     check(count == 3 && refs.getReferencesById(PARENT).size == count && source.insertedParents == 1)
+  }
+  test("production create rejects nested merged work before side effects") {
+    val store = MangaStore(); val refs = Repository(emptyList())
+    val create = CreateMergedManga(store, refs)
+    val parent = create(listOf(A, B))
+    check(store.insertedParents == 1)
+    val originalCount = refs.getReferencesById(PARENT).size
+    var rejected = false
+    try { create(listOf(parent.id, A)) }
+    catch (error: IllegalArgumentException) { rejected = error.message == "Nested merged works are not supported" }
+    check(rejected && store.insertedParents == 1)
+    check(refs.getReferencesById(PARENT).size == originalCount)
+  }
+  test("production create rejects same-source variants before any writes") {
+    val store = MangaStore(); val refs = Repository(emptyList())
+    store.add(Manga(33L, SOURCE_A, "source-a/alternate", "Other variant"))
+    var rejected = false
+    try { CreateMergedManga(store, refs)(listOf(A, 33L)) }
+    catch (error: IllegalArgumentException) { rejected = error.message == "Merge requires variants from two real sources" }
+    check(rejected && store.insertedParents == 0)
+    check(refs.getReferencesById(PARENT).isEmpty())
   }
   println("SPIKE001_HOST_INVARIANTS_PASS ($passes scenarios); NOT_ANDROID_RUNTIME")
 }
