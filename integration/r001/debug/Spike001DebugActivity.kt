@@ -40,15 +40,24 @@ class Spike001DebugActivity : Activity() {
         scope.launch {
             try {
                 val result = withContext(Dispatchers.IO) {
-                    when (intent.getStringExtra("operation") ?: "create") {
+                    val operation = requireNotNull(intent.getStringExtra("operation")) {
+                        "Explicit operation extra required: inspect, create or remove"
+                    }
+                    when (operation) {
                         "inspect" -> inspect()
                         "create" -> create()
                         "remove" -> remove()
                         else -> error("Expected operation=inspect, create or remove")
                     }
                 }
-                Log.i("PolarisSpike001", result)
-                status.text = result + "\n\nOpen the library entry and test both child chapters. This hook does not certify reader runtime PASS."
+                val lines = result.lines()
+                Log.i("PolarisSpike001", "BEGIN operation=${intent.getStringExtra("operation")} lines=${lines.size}")
+                lines.forEachIndexed { index, line ->
+                    // ADB logcat entries are size-limited; keep one row per entry.
+                    Log.i("PolarisSpike001", "line=${index + 1}/${lines.size} $line")
+                }
+                Log.i("PolarisSpike001", "END operation=${intent.getStringExtra("operation")}")
+                status.text = result + "\n\nDiagnostic result only. Actual reader behavior requires B01/B02/B03 evidence."
             } catch (error: CancellationException) {
                 throw error
             } catch (error: Exception) {
