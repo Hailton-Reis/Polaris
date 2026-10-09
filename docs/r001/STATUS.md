@@ -316,3 +316,11 @@ The framework-independent design should not be redesigned in Work/Codex unless a
 - Rechecked production focused Kotlin **5/5** and SQL migration fixtures **10/10** in the current environment. The complete 30-case Kotlin and 54-case Python suites remain not executed here; do not call them PASS.
 - Domain-spikes workflow now invokes the Python tooling tests in addition to existing host SQLite and Gradle checks. An authorized one-job rerun of GitHub Actions run 37838795183, attempt 2, still received no runner (`steps=[]`, `runner_id=0`).
 - Android B01–B05 remain unverified and migration 15 blocked. Issue #2 open, PR #1 draft.
+
+## 2026-10-09 — complete R001 host gate verified (SUPERSEDES previous host pending status)
+
+- First full Kotlin host suite executed with exact staged files: **30/30 PASS**, compiled with JDK21/kotlinc1.9.
+- First full Python tooling suite executed: the initial run exposed an actual Python SyntaxError in the applicator's MangaScreen patch. Fixed in commit 4d699352; reran **54/54 PASS**.
+- SQLite migration 14 contracts **10/10 PASS**. Unified scripts/r001/run_host_gate.py executed all three together and reported **94/94 PASS**, exit 0, scope HOST_ONLY_NOT_ANDROID_RUNTIME.
+- Verified **34 exact GitHub blobs** against the local test files. This was a reconstructed source subset, not a full cloned repo; report's repo_commit=null correctly signals that. See docs/r001/RESUME_2026_10_09.md and the Drive evidence ZIP.
+- Android APK and B01–B05 device gates are **NOT VERIFIED**. GitHub Actions runner allocation remains unresolved; issue #2 open, PR #1 draft, migration 15 not applied. Issue #8 remains separate.

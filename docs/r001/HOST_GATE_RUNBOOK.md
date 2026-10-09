@@ -35,3 +35,13 @@ One GitHub Actions job was retried via the connected GitHub app: `Domain spikes`
 GitHub CI `.github/workflows/domain-spikes.yml` separately executes the same **Python and SQLite** suites and the **Gradle** host Kotlin/domain tasks when a runner is provisioned. It does not invoke `run_host_gate.py`, since a Kotlin CLI installation is not guaranteed on the standard hosted runner. Both paths provide complementary evidence, not Android acceptance.
 
 **Next gate:** construct the latest APK from pinned Yomotsu with `scripts/r001/build_issue002.sh` and verify the real two-source Android B01/B02/B03/B04 and supplementary B05. Preserve the existing 24 spike decisions, keep issue #2 open, PR #1 draft, and SQLDelight migration 15 unapplied until device evidence is captured.
+
+## Verified full three-suite run — 2026-10-09 (supersedes earlier partial-workspace note)
+
+Reconstructed and hash-checked the **34 exact source files** required for this offline gate from the connected GitHub branch. The first complete attempt found a genuine unescaped-quote SyntaxError in spikes/spike001/apply_spike001.py, fixed as commit 4d699352. After the fix, the exact committed code passed the unified gate: **Python 54/54; SQLite 10/10; Kotlin 30/30; overall 94/94 PASS**.
+
+Environment: JDK 21.0.12.1, kotlinc 1.9.0, Python 3.13.5, Kotlin coroutines jar. The report's repo_commit=null is honest because the validated environment was a source subset rather than a full git checkout. The Git blob SHA manifest enables independent re-verification.
+
+Evidence ZIP (logs, JSON report, manifest): https://drive.google.com/file/d/11ELrmUrOK_EaoQ-B_Gty0HWijtzdVc6S/view ; SHA-256 b0077bafbd4aabfc7ea84f925346c5cbed2cf6eaa0febc3853ce88a698474772.
+
+**Host PASS does not change the blocked Android B01–B05 status.** Read RESUME_2026_10_09.md before requesting additional fixture-only tests.
