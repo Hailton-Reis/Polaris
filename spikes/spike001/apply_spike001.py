@@ -97,19 +97,19 @@ def main():
     # Background Yomotsu library/metadata jobs must not fetch virtual works.
     # Their real child manga retain their original normal update behavior.
     lj = repo / "app/src/main/java/eu/kanade/tachiyomi/data/library/LibraryUpdateJob.kt"
-    replace_once(lj, "import tachiyomi.domain.source.service.SourceManager\\n",
-        "import tachiyomi.domain.source.model.MERGED_SOURCE_ID\\nimport tachiyomi.domain.source.service.SourceManager\\n")
-    replace_once(lj, "        mangaToUpdate = listToUpdate\\n            .filter {\\n",
-        "        mangaToUpdate = listToUpdate\\n"
-        "            .filter { it.manga.source != MERGED_SOURCE_ID }\\n"
-        "            .filter {\\n")
+    replace_once(lj, "import tachiyomi.domain.source.service.SourceManager\n",
+        "import tachiyomi.domain.source.model.MERGED_SOURCE_ID\nimport tachiyomi.domain.source.service.SourceManager\n")
+    replace_once(lj, "        mangaToUpdate = listToUpdate\n            .filter {\n",
+        "        mangaToUpdate = listToUpdate\n"
+        "            .filter { it.manga.source != MERGED_SOURCE_ID }\n"
+        "            .filter {\n")
 
     mj = repo / "app/src/main/java/eu/kanade/tachiyomi/data/library/MetadataUpdateJob.kt"
-    replace_once(mj, "import tachiyomi.domain.source.service.SourceManager\\n",
-        "import tachiyomi.domain.source.model.MERGED_SOURCE_ID\\nimport tachiyomi.domain.source.service.SourceManager\\n")
-    replace_once(mj, "        mangaToUpdate = getLibraryManga.await()\\n",
-        "        mangaToUpdate = getLibraryManga.await()\\n"
-        "            .filter { it.manga.source != MERGED_SOURCE_ID }\\n")
+    replace_once(mj, "import tachiyomi.domain.source.service.SourceManager\n",
+        "import tachiyomi.domain.source.model.MERGED_SOURCE_ID\nimport tachiyomi.domain.source.service.SourceManager\n")
+    replace_once(mj, "        mangaToUpdate = getLibraryManga.await()\n",
+        "        mangaToUpdate = getLibraryManga.await()\n"
+        "            .filter { it.manga.source != MERGED_SOURCE_ID }\n")
 
     vm = repo / "app/src/main/java/eu/kanade/tachiyomi/ui/manga/MangaViewModel.kt"
     replace_once(vm, "import eu.kanade.tachiyomi.source.Source\n", "import eu.kanade.tachiyomi.source.MergedSource\nimport eu.kanade.tachiyomi.source.Source\n")
