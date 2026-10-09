@@ -45,3 +45,25 @@ Environment: JDK 21.0.12.1, kotlinc 1.9.0, Python 3.13.5, Kotlin coroutines jar.
 Evidence ZIP (logs, JSON report, manifest): https://drive.google.com/file/d/11ELrmUrOK_EaoQ-B_Gty0HWijtzdVc6S/view ; SHA-256 b0077bafbd4aabfc7ea84f925346c5cbed2cf6eaa0febc3853ce88a698474772.
 
 **Host PASS does not change the blocked Android B01–B05 status.** Read RESUME_2026_10_09.md before requesting additional fixture-only tests.
+
+
+## 2026-10-09 updated minimums and new optional source API check
+
+The active `run_host_gate.py` requires **62 Python**, **10 SQLite**, and **30 Kotlin** tests. The new 8 Python cases verify source-ID filtering in both pinned `LibraryUpdateJob` and `MetadataUpdateJob`; the full gate ran **102/102 PASS** with exit 0 and an explicit host-only scope. Older 54-case/94-total counts in this document describe an earlier successful run and are **superseded**, not current gate thresholds.
+
+An additional, independent `MergedSource : Source` compiler check runs against the **exact pinned upstream API interface** using:
+
+```bash
+bash scripts/r001/test_merged_source_api_host.sh /path/to/pinned-yomotsu
+```
+
+This suite passed **8/8** with the pinned `Source.kt` and production `MergedSource.kt` classes; lightweight model/Rx types alone are stubs. See `spikes/spike001/host-source-api/README.md` for provenance and limits. It is not included in the 102-case unified gate because the full Yomotsu checkout is an additional prerequisite.
+
+Actual baseline and patched Yomotsu automatic worker patch checks:
+
+```bash
+python3 scripts/r001/check_spike001_background_patch.py /path/to/pinned-yomotsu --mode baseline
+python3 scripts/r001/check_spike001_background_patch.py /path/to/patched-yomotsu --mode patched
+```
+
+Both passed against hash-verified pinned source files on 2026-10-09. These source checks do not prove on-device library background refresh; user-facing behavior must be checked before release.

@@ -105,3 +105,12 @@ Run it once for Source A and again for Source B before opening both chapters thr
 Before checking real parent/child records, verify the app actually uses the pinned Yomotsu `AndroidxSqliteDriver(driver=BundledSQLiteDriver())` with FK constraints enabled, **not** the Android framework's SQLite 3.32 on API31. The original pinned Yomotsu itself uses SQL `RETURNING`, so its bundled driver is relevant. Save the real runtime SQLite version and FK status as part of Android acceptance; the host SQL preflight only checks this configuration statically.
 
 Host migration integrity suite: `python3 -m unittest discover -s spikes/spike001/host-sqlite -p 'test_*.py' -v` (10/10 PASS locally on exact staged SQL). It does not certify real Android SQLDelight queries. The complete deletion of a virtual work (not single-child unlink) needs explicit follow-up under issue #8; do not assume deleting all references also removed the virtual parent.
+
+
+## New background-worker safety regression (2026-10-09)
+
+Pinned Yomotsu normally includes all library favorites in `LibraryUpdateJob` and `MetadataUpdateJob`. During R001, virtual merged parents are now **excluded by source ID** from these background queues. Ordinary real-source library entries should continue refreshing as usual. Test that scheduled library updates do not invoke `getMangaUpdate` or schedule downloads for virtual parent source `MERGED_SOURCE_ID`, while existing real-source update notifications still work.
+
+**Known intentional limitation:** A virtual title alone in the library will not get its real child variants automatically refreshed by the regular Yomotsu scheduled updater until the source-aware planner of issue #5 is integrated; manual refresh of the merged detail screen follows linked child IDs. This safety restriction should not be described as complete automatic multi-source refresh functionality.
+
+The Android build preflight now verifies both worker patches in the pristine pinned and staged patched checkout. This is static contract verification, not the actual library-update runtime acceptance.

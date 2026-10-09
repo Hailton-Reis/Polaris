@@ -324,3 +324,12 @@ The framework-independent design should not be redesigned in Work/Codex unless a
 - SQLite migration 14 contracts **10/10 PASS**. Unified scripts/r001/run_host_gate.py executed all three together and reported **94/94 PASS**, exit 0, scope HOST_ONLY_NOT_ANDROID_RUNTIME.
 - Verified **34 exact GitHub blobs** against the local test files. This was a reconstructed source subset, not a full cloned repo; report's repo_commit=null correctly signals that. See docs/r001/RESUME_2026_10_09.md and the Drive evidence ZIP.
 - Android APK and B01–B05 device gates are **NOT VERIFIED**. GitHub Actions runner allocation remains unresolved; issue #2 open, PR #1 draft, migration 15 not applied. Issue #8 remains separate.
+
+
+## 2026-10-09 addendum — expanded offline gate and worker safety
+
+- Exact pinned Yomotsu `Source.kt` compiled against real staged `MergedSource.kt`: **8/8 host Kotlin API cases PASS** (with unrelated models and deprecated Rx stand-ins).
+- Found and narrowly prevented direct background updates of virtual parent in `LibraryUpdateJob` and `MetadataUpdateJob`. Both pinned upstream file anchor checks PASS in original and patched states. Only real source manga continue through Yomotsu's normal automatic updater; virtual-only automatic child refresh awaits the planner of issue #5.
+- Eight new Python regression tests for worker patch checking are included; unified offline host gate now **62 Python + 10 SQLite + 30 Kotlin = 102/102 PASS** (retested with committed source bytes). API's 8 cases are separate, not double-counted.
+- Build script now fails closed on broken worker patch anchors in baseline and patched trees. No migration-15 changes or automatic Cloudflare handling.
+- [Expanded verification ZIP in Polaris Drive](https://drive.google.com/file/d/1yDAoe_bGnd1pIu4iGo4YfEZ0L2U1xASL/view). No Android SDK/ADB/Gradle was available in this container; Android B01–B05 and APK remain unverified.
