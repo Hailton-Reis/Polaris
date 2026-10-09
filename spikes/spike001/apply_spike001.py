@@ -94,6 +94,23 @@ def main():
     replace_once(ms, "            onContinueReading = { continueReading(context, viewModel.getNextUnreadChapter(), successState.source) },", "            onContinueReading = { scope.launch { continueReading(context, viewModel.getNextUnreadChapter(), successState.source) } },")
     replace_once(ms, "    private fun continueReading(context: Context, unreadChapter: Chapter?, source: Source?) {\n        if (unreadChapter != null) openChapter(context, unreadChapter, source)\n    }\n\n    private fun openChapter(context: Context, chapter: Chapter, source: Source?) {\n        if (source is eu.kanade.tachiyomi.source.INovelSource) {\n            context.startActivity(eu.kanade.tachiyomi.ui.reader.NovelReaderActivity.newIntent(context, chapter.mangaId, chapter.id))\n        } else {\n            context.startActivity(ReaderActivity.newIntent(context, chapter.mangaId, chapter.id))\n        }\n    }", "    private suspend fun continueReading(context: Context, unreadChapter: Chapter?, source: Source?) {\n        if (unreadChapter != null) openChapter(context, unreadChapter, source)\n    }\n\n    private suspend fun openChapter(context: Context, chapter: Chapter, source: Source?) {\n        // The chapter belongs to a REAL child manga. For a virtual parent,\n        // resolve the actual child source before choosing image vs novel reader.\n        val readerSource = if (source is MergedSource) {\n            try {\n                val realChild = withIOContext { Injekt.get<MangaRepository>().getMangaById(chapter.mangaId) }\n                Injekt.get<SourceManager>().get(realChild.source) ?: error(\"Source extension unavailable for real mangaId=${chapter.mangaId}\")\n            } catch (error: kotlinx.coroutines.CancellationException) {\n                throw error\n            } catch (error: Exception) {\n                logcat(LogPriority.ERROR, error) { \"Cannot resolve merged chapter childId=${chapter.mangaId}\" }\n                context.toast(error.message ?: \"Chapter source unavailable\")\n                return\n            }\n        } else {\n            source\n        }\n        if (readerSource is INovelSource) {\n            context.startActivity(eu.kanade.tachiyomi.ui.reader.NovelReaderActivity.newIntent(context, chapter.mangaId, chapter.id))\n        } else {\n            context.startActivity(ReaderActivity.newIntent(context, chapter.mangaId, chapter.id))\n        }\n    }")
 
+    # Background Yomotsu library/metadata jobs must not fetch virtual works.
+    # Their real child manga retain their original normal update behavior.
+    lj = repo / "app/src/main/java/eu/kanade/tachiyomi/data/library/LibraryUpdateJob.kt"
+    replace_once(lj, "import tachiyomi.domain.source.service.SourceManager\\n",
+        "import tachiyomi.domain.source.model.MERGED_SOURCE_ID\\nimport tachiyomi.domain.source.service.SourceManager\\n")
+    replace_once(lj, "        mangaToUpdate = listToUpdate\\n            .filter {\\n",
+        "        mangaToUpdate = listToUpdate\\n"
+        "            .filter { it.manga.source != MERGED_SOURCE_ID }\\n"
+        "            .filter {\\n")
+
+    mj = repo / "app/src/main/java/eu/kanade/tachiyomi/data/library/MetadataUpdateJob.kt"
+    replace_once(mj, "import tachiyomi.domain.source.service.SourceManager\\n",
+        "import tachiyomi.domain.source.model.MERGED_SOURCE_ID\\nimport tachiyomi.domain.source.service.SourceManager\\n")
+    replace_once(mj, "        mangaToUpdate = getLibraryManga.await()\\n",
+        "        mangaToUpdate = getLibraryManga.await()\\n"
+        "            .filter { it.manga.source != MERGED_SOURCE_ID }\\n")
+
     vm = repo / "app/src/main/java/eu/kanade/tachiyomi/ui/manga/MangaViewModel.kt"
     replace_once(vm, "import eu.kanade.tachiyomi.source.Source\n", "import eu.kanade.tachiyomi.source.MergedSource\nimport eu.kanade.tachiyomi.source.Source\n")
     replace_once(vm, "import tachiyomi.domain.manga.interactor.GetMangaWithChapters\n", "import tachiyomi.domain.manga.interactor.GetMangaWithChapters\nimport tachiyomi.domain.manga.interactor.GetMergedReferencesById\n")
