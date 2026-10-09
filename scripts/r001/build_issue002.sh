@@ -20,6 +20,7 @@ test ! -e "$patched"
 python3 "$polaris_root/scripts/r001/check_issue002_sql.py" "$baseline" | tee "$evidence/sql-preflight.log"
 python3 -m unittest discover -s "$polaris_root/spikes/spike001/host-sqlite" -p 'test_*.py' -v 2>&1 | tee "$evidence/sqlite-contract-tests.log"
 python3 "$polaris_root/scripts/r001/check_spike001_refresh_patch.py" "$baseline" --mode baseline | tee "$evidence/vm-refresh-baseline-preflight.log"
+python3 "$polaris_root/scripts/r001/check_spike001_background_patch.py" "$baseline" --mode baseline | tee "$evidence/background-update-baseline-preflight.log"
 
 run_gradle() {
     local tree=$1 log=$2
@@ -52,6 +53,7 @@ cp "$baseline"/app/build/outputs/apk/debug/*.apk "$evidence/apks/baseline/"
 git -C "$baseline" worktree add --detach "$patched" "$pinned"
 python3 "$polaris_root/spikes/spike001/apply_spike001.py" "$patched" 2>&1 | tee "$evidence/apply-spike001.log"
 python3 "$polaris_root/scripts/r001/check_spike001_refresh_patch.py" "$patched" --mode patched | tee "$evidence/vm-refresh-patched-preflight.log"
+python3 "$polaris_root/scripts/r001/check_spike001_background_patch.py" "$patched" --mode patched | tee "$evidence/background-update-patched-preflight.log"
 python3 "$polaris_root/scripts/r001/apply_debug_hook.py" "$patched" | tee "$evidence/apply-debug-hook.log"
 # Intent-to-add includes all staged new files in the reviewable diff.
 git -C "$patched" add -N .
