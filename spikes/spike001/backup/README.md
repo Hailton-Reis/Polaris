@@ -49,3 +49,15 @@ The planner consumes explicit source identities, installed real-source IDs and e
 ## Decision and gate
 
 **Do not claim #11 fixed by these host tests.** Defer production changes until #2 has real Android build/route evidence B01–B05, then implement the serializer/adapter with a tested upgrade path. No migration 15 at this stage; keep draft PR #1 as draft. The 24/24 Kotlin tests are separate from the earlier 146 host checks, which should not be retroactively relabeled as a unified gate.
+
+## Additional SQL integration finding — orphan relinking, 2026-10-11
+
+The current `merged.sq` `insert` statement is idempotent when repeatedly inserting either the same resolved `mangaId` or the same NULL child. **It is NOT idempotent when an existing NULL orphan later reappears with a real local child ID.** An INSERT of `mergeId+source+URL+mangaId=NULL` followed by an INSERT of the same logical child with `mangaId=30` produces **two rows**, one NULL and one resolved. This was reproduced using the exact published SQLDelight `merged.sq` (Git blob `3e9fb499d0e1d0523aaaaaae336dd9bf5b2d4b62`) and migration-14 (`8f23dc5219f49a0368705ba21d0c4e5a0d7fb1fb`).
+
+A **candidate only** (not added to production queries) exists in `orphan_relink_candidate.sql`: transactionally rebind the oldest NULL source+URL association to the verified destination manga ID, and remove surplus NULL duplicates only once an exact-source+URL resolved association exists. It protects other parents, excludes synthetic source 6969, preserves original link settings/priority, and never guesses by title. The correct Android implementation should add appropriate SQLDelight queries, verify zero/one affected rows, and consider serialization and concurrency together with #10.
+
+```bash
+python3 -m unittest discover -s spikes/spike001/backup -p 'test_*.py' -v
+```
+
+**14/14 SQLite cases PASS**, including one explicit defect reproduction (the old DML creates a duplicate) and successful candidate repair cases. All four staged Kotlin/SQL/test artifact hashes matched the locally executed files. These 14 are **not** Android verification and are **not** part of the existing unified host gate. **Do not change migration14/15 or the production query until the issue #2 Android baseline is proven.**
