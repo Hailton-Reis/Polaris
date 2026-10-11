@@ -31,7 +31,7 @@ INSERT INTO merged(
     info_manga, get_chapter_updates, chapter_sort_mode, chapter_priority,
     download_chapters, merge_id, merge_url, manga_id, manga_url, manga_source
 )
-VALUES (
+SELECT
     :infoManga,
     :getChapterUpdates,
     :chapterSortMode,
@@ -42,6 +42,17 @@ VALUES (
     :mangaId,
     :mangaUrl,
     :mangaSource
+WHERE NOT EXISTS (
+    SELECT 1 FROM merged existing
+    WHERE existing.merge_id = :mergeId
+      AND (
+          (:mangaId IS NOT NULL AND existing.manga_id = :mangaId)
+          OR (
+              :mangaId IS NULL AND existing.manga_id IS NULL
+              AND existing.manga_source = :mangaSource
+              AND existing.manga_url = :mangaUrl
+          )
+      )
 )
 RETURNING _id;
 
@@ -50,7 +61,7 @@ INSERT INTO merged(
     info_manga, get_chapter_updates, chapter_sort_mode, chapter_priority,
     download_chapters, merge_id, merge_url, manga_id, manga_url, manga_source
 )
-VALUES (
+SELECT
     :infoManga,
     :getChapterUpdates,
     :chapterSortMode,
@@ -61,6 +72,17 @@ VALUES (
     :mangaId,
     :mangaUrl,
     :mangaSource
+WHERE NOT EXISTS (
+    SELECT 1 FROM merged existing
+    WHERE existing.merge_id = :mergeId
+      AND (
+          (:mangaId IS NOT NULL AND existing.manga_id = :mangaId)
+          OR (
+              :mangaId IS NULL AND existing.manga_id IS NULL
+              AND existing.manga_source = :mangaSource
+              AND existing.manga_url = :mangaUrl
+          )
+      )
 );
 
 updateSettingsById:
