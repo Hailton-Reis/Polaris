@@ -11,6 +11,7 @@ import tachiyomi.domain.manga.model.Manga
 import tachiyomi.domain.manga.model.MergeMangaSettingsUpdate
 import tachiyomi.domain.manga.model.MergedMangaReference
 import tachiyomi.domain.manga.repository.MangaMergeRepository
+import tachiyomi.domain.source.model.MERGED_SOURCE_ID
 
 class MangaMergeRepositoryImpl(
     private val database: Database,
@@ -107,6 +108,6 @@ class MangaMergeRepositoryImpl(
     }
 
     override suspend fun deleteByMergeId(mergeId: Long) {
-        database.mergedQueries.deleteByMergeId(mergeId)
+        database.mergedQueries.deleteByMergeId(mergeId = mergeId, mergedSourceId = MERGED_SOURCE_ID)
     }
 }

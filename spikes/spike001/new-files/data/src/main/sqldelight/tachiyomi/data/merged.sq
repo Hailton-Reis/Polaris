@@ -107,5 +107,7 @@ WHERE _id = :id;
 deleteById:
 DELETE FROM merged WHERE _id = ?;
 
+-- Remove only virtual manga rows; FK ON DELETE CASCADE removes their links.
+-- Real source mangas can never be deleted through this operation.
 deleteByMergeId:
-DELETE FROM merged WHERE merge_id = ?;
+DELETE FROM mangas WHERE _id = :mergeId AND source = :mergedSourceId;

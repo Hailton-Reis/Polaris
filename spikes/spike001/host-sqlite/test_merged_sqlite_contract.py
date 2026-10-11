@@ -120,11 +120,11 @@ class MergedSqliteContract(unittest.TestCase):
         })
         self.assertEqual(self.db.execute('SELECT get_chapter_updates,chapter_priority,chapter_sort_mode FROM merged WHERE _id=?',(a,)).fetchone(),(1,5,2))
 
-    def test_delete_entire_merge_leaves_children_and_virtual_parent_row(self):
+    def test_delete_entire_merge_removes_only_virtual_parent_with_cascade(self):
         three_refs(self.db)
-        self.db.execute(named_sql('deleteByMergeId'), (900,))
+        self.db.execute(named_sql('deleteByMergeId'), {'mergeId':900,'mergedSourceId':6969})
         self.assertEqual(self.db.execute('SELECT count(*) FROM merged').fetchone()[0],0)
-        self.assertEqual(self.db.execute('SELECT count(*) FROM mangas').fetchone()[0],3)
+        self.assertEqual({r[0] for r in self.db.execute('SELECT _id FROM mangas')}, {101, 102})
 
     def test_select_merged_manga_join_excludes_deleted_child(self):
         three_refs(self.db)
