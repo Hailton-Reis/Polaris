@@ -1,7 +1,7 @@
 import sqlite3
 import unittest
 from pathlib import Path
-SQL = (Path(__file__).parent/'libraryView_prototype.sql').read_text()
+SQL = (Path(__file__).parent/'libraryView_candidate.sql').read_text()
 class LibraryProjectionTests(unittest.TestCase):
     def setUp(self):
         self.con=sqlite3.connect(':memory:')
