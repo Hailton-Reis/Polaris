@@ -1,0 +1,108 @@
+"""Regression tests for the *entire* Spike-001 applicator vs a synthetic pinned fixture.
+
+The production check also runs on the real pinned Yomotsu checkout in CI.
+"""
+from pathlib import Path
+import shutil
+import subprocess
+import sys
+import tempfile
+import unittest
+
+from check_spike001_full_apply import (
+    EXPECTED_NEW_FILES,
+    EXPECTED_OPS,
+    EXISTING,
+    REPLACEMENT,
+    STAGE,
+    IntegrationContractError,
+    operations,
+    verify,
+)
+
+
+class FullApplicationContractTests(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.root = Path(self.tmp.name)
+        self.base = self.root / "upstream"
+        self.out = self.root / "patched"
+        self.stage = self.root / "stage"
+        shutil.copytree(STAGE, self.stage)
+        edits = operations(self.stage / "apply_spike001.py")
+        for name, path in EXISTING.items():
+            lines = list(dict.fromkeys(old for old, _ in edits[name]))
+            target = self.base / path
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_text("\n".join(lines) + "\n")
+        target = self.base / REPLACEMENT
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text("package synthetic.upstream\n")
+        (self.base / "settings.gradle.kts").write_text("// pinned Kotlin baseline subset\n")
+        shutil.copytree(self.base, self.out)
+        p = subprocess.run([sys.executable, str(self.stage / "apply_spike001.py"), str(self.out)],
+                           capture_output=True, text=True)
+        if p.returncode != 0:
+            raise RuntimeError(f"Synthetic upstream did not accept real patcher: {p.stderr}")
+
+    def assertValid(self):
+        return verify(self.base, self.out, stage=self.stage, patcher=self.stage / "apply_spike001.py")
+
+    def test_complete_patch_applies_all_28_edits_and_18_new_files(self):
+        self.assertEqual(self.assertValid(), (28, EXPECTED_NEW_FILES, 7))
+
+    def test_expected_patch_footprint_is_explicit(self):
+        self.assertEqual({k: len(v) for k, v in operations(self.stage / "apply_spike001.py").items()}, EXPECTED_OPS)
+
+    def test_modified_domain_registration_fails(self):
+        p = self.out / EXISTING["dm"]
+        p.write_text(p.read_text().replace("GetMergedReferencesById(get())", "GetMergedReferencesById()"))
+        with self.assertRaises(IntegrationContractError):
+            self.assertValid()
+
+    def test_removed_source_manager_registration_fails(self):
+        p = self.out / EXISTING["sm"]
+        p.write_text(p.read_text().replace("MERGED_SOURCE_ID to MergedSource(),", ""))
+        with self.assertRaises(IntegrationContractError):
+            self.assertValid()
+
+    def test_reader_routing_drift_fails(self):
+        p = self.out / EXISTING["ms"]
+        p.write_text(p.read_text().replace("readerSource is INovelSource", "source is INovelSource"))
+        with self.assertRaises(IntegrationContractError):
+            self.assertValid()
+
+    def test_missing_migration_fails(self):
+        p = self.out / "data/src/main/sqldelight/tachiyomi/migrations/14.sqm"
+        p.unlink()
+        with self.assertRaises(IntegrationContractError):
+            self.assertValid()
+
+    def test_stale_sql_query_fails(self):
+        p = self.out / "data/src/main/sqldelight/tachiyomi/data/merged.sq"
+        p.write_text(p.read_text() + "\n--stale query")
+        with self.assertRaises(IntegrationContractError):
+            self.assertValid()
+
+    def test_unpatched_original_get_manga_with_chapters_fails(self):
+        shutil.copy2(self.base / REPLACEMENT, self.out / REPLACEMENT)
+        with self.assertRaises(IntegrationContractError):
+            self.assertValid()
+
+    def test_baseline_collision_rejected(self):
+        collision = self.base / "domain/src/main/java/tachiyomi/domain/manga/model/MergedMangaReference.kt"
+        collision.parent.mkdir(parents=True, exist_ok=True)
+        collision.write_text("old version")
+        with self.assertRaises(IntegrationContractError):
+            self.assertValid()
+
+    def test_missing_baseline_edit_anchor_rejected(self):
+        p = self.base / EXISTING["lj"]
+        p.write_text(p.read_text().replace("mangaToUpdate = listToUpdate", "mangaToUpdate = candidates"))
+        with self.assertRaises(IntegrationContractError):
+            self.assertValid()
+
+
+if __name__ == "__main__":
+    unittest.main()

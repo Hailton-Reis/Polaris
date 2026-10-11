@@ -54,6 +54,7 @@ git -C "$baseline" worktree add --detach "$patched" "$pinned"
 python3 "$polaris_root/spikes/spike001/apply_spike001.py" "$patched" 2>&1 | tee "$evidence/apply-spike001.log"
 python3 "$polaris_root/scripts/r001/check_spike001_refresh_patch.py" "$patched" --mode patched | tee "$evidence/vm-refresh-patched-preflight.log"
 python3 "$polaris_root/scripts/r001/check_spike001_background_patch.py" "$patched" --mode patched | tee "$evidence/background-update-patched-preflight.log"
+python3 "$polaris_root/scripts/r001/check_spike001_full_apply.py" "$baseline" "$patched" | tee "$evidence/full-apply-contract.log"
 python3 "$polaris_root/scripts/r001/apply_debug_hook.py" "$patched" | tee "$evidence/apply-debug-hook.log"
 # Intent-to-add includes all staged new files in the reviewable diff.
 git -C "$patched" add -N .
