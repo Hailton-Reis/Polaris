@@ -383,3 +383,11 @@ The framework-independent design should not be redesigned in Work/Codex unless a
 - New 9-case SQLite regression file demonstrated original bug (6/8 failures before fix), now **36/36 SQLite PASS**. Full Python **72/72 PASS** and Kotlin **38/38 PASS** completed independently (146 successful checks). The combined gate did NOT finish due timeout during Kotlin: do not claim a unified 146/146 PASS.
 - Source hashes of all five edited/new files match committed GitHub blobs. Fix commit `fbebe210`. Evidence archive `Polaris_R001_Virtual_Deletion_Evidence_2026-10-11.zip` in the ChatGPT conversation.
 - **#8 remains open** pending actual bundled driver cascade, delete UI/caches, Android runtime. #9/#10/#11 remain open; PR #1 draft, migration15 blocked.
+
+## 11/10/2026 — issue #9: projeção testada dos contadores da biblioteca (candidata)
+
+- Protótipo de `libraryView` para obras multifonte implementado, respeitando os 5 modos de ordenação/deduplicação, lidos, bookmarks, scanlator, datas, favoritos e identidades reais.
+- **25/25 testes SQLite do candidato PASS**: 18 de projeção + 7 de reconstrução de view/upgrade simulado. A definição original Yomotsu `libraryView.sq` e a migração14 usada nos testes foram conferidas contra os blobs exatos fixados.
+- Os arquivos ficam em `spikes/spike001/audit/`: `libraryView_candidate.sql`, `migration14_view_candidate.sql`, `test_virtual_library_projection.py` e `test_library_upgrade_candidate.py`. **Não são aplicados pelo Spike-001 atual** nem integram a contagem das suítes de produção; a issue #9 continua aberta.
+- Antes de integrar: SQLDelight/mapper e dependências reativas, benchmark em dispositivo, e estratégia de upgrade para bancos que já receberam a migração14. **Migração15 continua bloqueada**.
+- Ver `docs/r001/ISSUE009_LIBRARY_COUNTER_PROPOSAL_2026_10_11.md`.
