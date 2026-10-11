@@ -15,7 +15,7 @@ GATES = (
     ("python", (sys.executable, "-m", "unittest", "discover", "-s", "scripts/r001", "-p", "test_*.py", "-q"), 72),
     ("sqlite", (sys.executable, "-m", "unittest", "discover", "-s", "spikes/spike001/host-sqlite", "-p", "test_*.py", "-q"), 36),
     ("kotlin", ("bash", "scripts/r001/test_spike001_host.sh"), 38),
-    ("backup-sqlite", (sys.executable, "-m", "unittest", "discover", "-s", "spikes/spike001/backup", "-p", "test_*.py", "-q"), 14),
+    ("backup-sqlite", (sys.executable, "-m", "unittest", "discover", "-s", "spikes/spike001/backup", "-p", "test_*.py", "-q"), 17),
     ("backup-kotlin", ("bash", "spikes/spike001/backup/run_tests.sh"), 24),
 )
 
