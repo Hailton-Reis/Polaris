@@ -67,3 +67,15 @@ python3 scripts/r001/check_spike001_background_patch.py /path/to/patched-yomotsu
 ```
 
 Both passed against hash-verified pinned source files on 2026-10-09. These source checks do not prove on-device library background refresh; user-facing behavior must be checked before release.
+
+## 2026-10-11: full application contract and expanded host minimum
+
+Active full-offline `scripts/r001/run_host_gate.py` now requires **72 Python + 10 SQLite + 30 Kotlin = 112 passing tests**. The added 10 Python tests validate the *entire* Spike-001 applicator against a synthetic pinned-signature source tree. A second check used seven genuine hash-verified pinned Yomotsu files and demonstrated **28/28 edits plus 18/18 added files** and exact interactor replacement.
+
+Run the real end-to-end patch contract with a pristine pinned upstream and its already-patched copy:
+
+```bash
+python3 scripts/r001/check_spike001_full_apply.py /path/to/pristine-pinned-yomotsu /path/to/spike001-applied-yomotsu
+```
+
+The Android build script now runs this automatically after the pre/post checks and before Gradle. The check does **not** invoke Gradle, load an APK or certify B01–B05. Evidence archive: https://drive.google.com/file/d/1pEwZyiiJeuh4vGXfAAyyEYLdBR5venmr/view (SHA256 `cb73fca51f8c45cf77616304bc68500e5f7951ecda4691a0931da7016bb12702`).

@@ -333,3 +333,11 @@ The framework-independent design should not be redesigned in Work/Codex unless a
 - Eight new Python regression tests for worker patch checking are included; unified offline host gate now **62 Python + 10 SQLite + 30 Kotlin = 102/102 PASS** (retested with committed source bytes). API's 8 cases are separate, not double-counted.
 - Build script now fails closed on broken worker patch anchors in baseline and patched trees. No migration-15 changes or automatic Cloudflare handling.
 - [Expanded verification ZIP in Polaris Drive](https://drive.google.com/file/d/1yDAoe_bGnd1pIu4iGo4YfEZ0L2U1xASL/view). No Android SDK/ADB/Gradle was available in this container; Android B01–B05 and APK remain unverified.
+
+## 2026-10-11 — full Spike-001 patch application + 112-test host gate
+
+- Applied the **actual** Spike-001 applicator end-to-end to seven hash-verified original pinned Yomotsu files: all **28 literal edits**, **18 added source/migration files** and the replaced GetMangaWithChapters implementation passed exact whole-file checks. Both existing pre/post patch guards passed.
+- New `scripts/r001/check_spike001_full_apply.py` is fail-closed and runs inside `build_issue002.sh` **before** Gradle. Ten new negative/positive Python regression cases PASS.
+- Re-executed unified offline gate: **72 Python + 10 SQLite + 30 Kotlin = 112/112 PASS**, exit 0, scope HOST_ONLY_NOT_ANDROID_RUNTIME. New files and altered gate files matched GitHub blob hashes; source subset is not a full Git clone.
+- Evidence: https://drive.google.com/file/d/1pEwZyiiJeuh4vGXfAAyyEYLdBR5venmr/view ; SHA256 `cb73fca51f8c45cf77616304bc68500e5f7951ecda4691a0931da7016bb12702`.
+- GitHub Actions issue-002 run 38144387274 and domain run 38144387272 still failed before runner assignment (zero steps, runner_id 0); no Android build/device proof. See docs/r001/RESUME_2026_10_11.md. Issue #2 open, PR #1 draft, migration 15 unchanged.
