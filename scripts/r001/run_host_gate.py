@@ -16,18 +16,24 @@ GATES = (
     ("sqlite", (sys.executable, "-m", "unittest", "discover", "-s", "spikes/spike001/host-sqlite", "-p", "test_*.py", "-q"), 36),
     ("kotlin", ("bash", "scripts/r001/test_spike001_host.sh"), 38),
     ("backup-sqlite", (sys.executable, "-m", "unittest", "discover", "-s", "spikes/spike001/backup", "-p", "test_*.py", "-q"), 17),
-    ("backup-kotlin", ("bash", "spikes/spike001/backup/run_tests.sh"), 24),
+    ("backup-kotlin", ("bash", "spikes/spike001/backup/run_tests.sh"), 44),
 )
 
 
 def extract_count(name: str, output: str):
-    regex = {
-        "kotlin": r"SPIKE001_HOST_INVARIANTS_PASS \((\d+) scenarios\); NOT_ANDROID_RUNTIME",
-        "backup-kotlin": r"(?m)^MERGED_BACKUP_RESTORE_PLANNER_PASS (\d+)$",
-    }.get(name, r"Ran (\d+) tests? in ")
+    if name == "backup-kotlin":
+        # Both programs execute in the same JVM test runner. Missing, repeated
+        # or spoofed success markers must never turn a partial run into PASS.
+        required_markers = (
+            r"(?m)^MERGED_BACKUP_RESTORE_PLANNER_PASS (\d+)$",
+            r"(?m)^MERGED_BACKUP_EXPORT_PLANNER_PASS (\d+)$",
+        )
+        matches = [re.findall(regex, output) for regex in required_markers]
+        return sum(int(values[0]) for values in matches) if all(len(values) == 1 for values in matches) else None
+    regex = (r"SPIKE001_HOST_INVARIANTS_PASS \((\d+) scenarios\); NOT_ANDROID_RUNTIME"
+             if name == "kotlin" else r"Ran (\d+) tests? in ")
     hits = re.findall(regex, output)
     return int(hits[-1]) if len(hits) == 1 else None
-
 
 def evaluate_gate(name: str, output: str, returncode: int, minimum: int):
     count = extract_count(name, output)
