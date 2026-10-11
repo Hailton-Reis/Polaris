@@ -76,6 +76,8 @@ jobs:
         run: python3 -m unittest discover -s scripts/r001 -p 'test_*.py' -v
       - name: Validate actual merged SQLDelight migration and queries (SQLite)
         run: python3 -m unittest discover -s spikes/spike001/host-sqlite -p 'test_*.py' -v
+      - name: Verify orphan-source backup recovery SQL (host-only)
+        run: python3 -m unittest discover -s spikes/spike001/backup -p 'test_*.py' -v
       - name: Compile and run domain spikes
         run: gradle -p spikes/domain-lab checkSpikes --no-daemon --stacktrace
       - name: Compile real Spike-001 host invariants
