@@ -15,12 +15,16 @@ GATES = (
     ("python", (sys.executable, "-m", "unittest", "discover", "-s", "scripts/r001", "-p", "test_*.py", "-q"), 72),
     ("sqlite", (sys.executable, "-m", "unittest", "discover", "-s", "spikes/spike001/host-sqlite", "-p", "test_*.py", "-q"), 36),
     ("kotlin", ("bash", "scripts/r001/test_spike001_host.sh"), 38),
+    ("backup-sqlite", (sys.executable, "-m", "unittest", "discover", "-s", "spikes/spike001/backup", "-p", "test_*.py", "-q"), 14),
+    ("backup-kotlin", ("bash", "spikes/spike001/backup/run_tests.sh"), 24),
 )
 
 
 def extract_count(name: str, output: str):
-    regex = (r"Ran (\d+) tests? in " if name != "kotlin"
-             else r"SPIKE001_HOST_INVARIANTS_PASS \((\d+) scenarios\); NOT_ANDROID_RUNTIME")
+    regex = {
+        "kotlin": r"SPIKE001_HOST_INVARIANTS_PASS \((\d+) scenarios\); NOT_ANDROID_RUNTIME",
+        "backup-kotlin": r"(?m)^MERGED_BACKUP_RESTORE_PLANNER_PASS (\d+)$",
+    }.get(name, r"Ran (\d+) tests? in ")
     hits = re.findall(regex, output)
     return int(hits[-1]) if len(hits) == 1 else None
 
@@ -28,7 +32,7 @@ def extract_count(name: str, output: str):
 def evaluate_gate(name: str, output: str, returncode: int, minimum: int):
     count = extract_count(name, output)
     passed = returncode == 0 and count is not None and count >= minimum
-    if name != "kotlin":
+    if name not in {"kotlin", "backup-kotlin"}:
         passed = passed and bool(re.search(r"(?m)^OK(?:\s|$)", output))
     reason = ("PASS" if passed else
               "MISSING_OR_INVALID_TEST_SUMMARY" if count is None else
