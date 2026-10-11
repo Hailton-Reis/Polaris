@@ -154,3 +154,17 @@ The current SQLite backup suite is **17 tests**, not 14. Its three new RED-then-
 `run_host_gate.py` and `test_run_host_gate.py` were raised to minimum `backup-sqlite=17`. Parser suite **10/10 PASS**. In a hash-matched source subset, the real runner's two backup stages returned `backup-sqlite 17/17 PASS` and `backup-kotlin 24/24 PASS` with `HOST_ONLY_NOT_ANDROID_RUNTIME`. The five-stage mandatory minimum is now **187** (72+36+38+17+24), but a complete five-stage run has **NOT** been executed in this checkpoint.
 
 Preserved failure-before-fix and green evidence, logs and Git hashes: [Polaris Issue11 hardening ZIP](https://drive.google.com/file/d/1XPMcRYO4LHs35xySldVu8k-IDXb8_DNg/view?usp=drivesdk) (SHA256 `0da0bca28355833160a328575540e21b351e7b1b12f94728f9351a7c9719c363`). The candidate does not touch the production Yomotsu SQLDelight schema or migration14/15; Android B01–B05 and protobuf backup round-trip are still blocked on the build/runtime environment.
+
+## 2026-10-11 — backup exporter gate +207 configured minimum
+
+The backup Kotlin stage now compiles and runs **both** the original 24-scenario restore planner and the new 20-scenario export planner in the same `run_tests.sh`. `extract_count("backup-kotlin")` fails closed unless there is **exactly one** standalone marker for each suite:
+- `MERGED_BACKUP_RESTORE_PLANNER_PASS 24`
+- `MERGED_BACKUP_EXPORT_PLANNER_PASS 20`
+
+The backup-kotlin minimum is therefore **44**, with backup-sqlite **17**. The five mandatory configured minimums are **72 + 36 + 38 + 17 + 44 = 207**. The minimum is a threshold, not a passing full-project result.
+
+From a hash-verified local source subset, **both backup gates passed together** through the actual offline `run_all` function: SQLite **17/17**, Kotlin **44/44**, exit 0, `scope=HOST_ONLY_NOT_ANDROID_RUNTIME` and `repo_commit=null` because the checkout was partial. The gate parser regression file also completed **11/11 PASS**, including rejecting missing, duplicate, spoofed or undercounted success markers.
+
+`spikes/domain-lab/build.gradle.kts` requires `spike001BackupExport` alongside `spike001Backup` in `checkSpikes`. CI Gradle compilation **was not executed** here (no Android SDK or Gradle CLI / active Actions runner). The full five-stage 207-case gate was not executed. This validates portable backup selection/restore planning, not serialization of an actual Yomotsu backup nor on-device data recovery.
+
+Evidence: [Polaris R001 — exported child backup test ZIP](https://drive.google.com/file/d/14x40OxzeY3JO0uIpV9DfIBYiBMeWTD8B/view?usp=drivesdk), SHA256 `137acb0181c17026ead2a60f9f3773e352e2b1c64e23efd7735085e1dd3defce`. Backed up in the project Drive folder.
