@@ -79,3 +79,9 @@ python3 scripts/r001/check_spike001_full_apply.py /path/to/pristine-pinned-yomot
 ```
 
 The Android build script now runs this automatically after the pre/post checks and before Gradle. The check does **not** invoke Gradle, load an APK or certify B01–B05. Evidence archive: https://drive.google.com/file/d/1pEwZyiiJeuh4vGXfAAyyEYLdBR5venmr/view (SHA256 `cb73fca51f8c45cf77616304bc68500e5f7951ecda4691a0931da7016bb12702`).
+
+## 11/10/2026 — Atualização da auditoria
+
+O gate vigente requer **72 Python + 10 SQLite + 34 Kotlin = 116 testes**, com resultado host-only. Foram acrescentados 4 cenários Kotlin para validar argumentos de criação, prioridade/deduplicação e zero assinado; novo algoritmo de deduplicação usa mapa linear em vez de busca quadrática.
+
+`python3 spikes/spike001/audit/reproduce_known_gaps.py` é um **diagnóstico de dois defeitos ainda presentes** (#9 e #10), não integra o gate verde. Detalhes e prioridades no novo `docs/r001/AUDIT_GAPS_2026_10_11.md`. Android B01–B05 permanecem sem evidência.

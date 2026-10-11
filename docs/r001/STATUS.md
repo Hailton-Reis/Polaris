@@ -341,3 +341,14 @@ The framework-independent design should not be redesigned in Work/Codex unless a
 - Re-executed unified offline gate: **72 Python + 10 SQLite + 30 Kotlin = 112/112 PASS**, exit 0, scope HOST_ONLY_NOT_ANDROID_RUNTIME. New files and altered gate files matched GitHub blob hashes; source subset is not a full Git clone.
 - Evidence: https://drive.google.com/file/d/1pEwZyiiJeuh4vGXfAAyyEYLdBR5venmr/view ; SHA256 `cb73fca51f8c45cf77616304bc68500e5f7951ecda4691a0931da7016bb12702`.
 - GitHub Actions issue-002 run 38144387274 and domain run 38144387272 still failed before runner assignment (zero steps, runner_id 0); no Android build/device proof. See docs/r001/RESUME_2026_10_11.md. Issue #2 open, PR #1 draft, migration 15 unchanged.
+
+## 11/10/2026 — Auditoria técnica integrada e priorização de lacunas
+
+- Novo relatório: `docs/r001/AUDIT_GAPS_2026_10_11.md`, com riscos confirmados vs hipóteses, prioridades P0/P1/P2 e sequência para uso real.
+- **Issue #9 (contadores)**: SQLite/Yomotsu `libraryView` exibe 0 capítulos/lidos/marcados no parent virtual apesar de 4 capítulos nos filhos reais. **Reproduzido**.
+- **Issue #10 (unicidade)**: migration14 aceita duas referências idênticas ao mesmo filho, provocando risco de capítulos duplicados/concorrência. **Reproduzido**.
+- **Issue #11 (backup)**: Yomotsu backup/restore serializa mangás e seus capítulos mas não as referências da nova tabela `merged`; risco de perda de vínculos ao restaurar. Comprovado por auditoria de código; round-trip em dispositivo não testado.
+- **Issue #8** (exclusão total) permanece; #3–#7 ainda abrangem persistência canônica, matching, saúde/ranking, tradução e aceitação integral.
+- Corrigidos defensivamente a entrada vazia/IDs inválidos em `CreateMergedManga` e desempenho quadrático de `dedupeByPriority`, preservando semântica com novos testes: **34/34 Kotlin**, gate **116/116 offline** (72 Python + 10 SQLite + 34 Kotlin). Sem migração 15 nem alteração em SQL de produção.
+- Script `spikes/spike001/audit/reproduce_known_gaps.py` (NÃO contar no gate) preserva diagnóstico reproduzível usando `libraryView.sq` pinned byte-idêntica ao Yomotsu.
+- CI Android segue sem runner; a conclusão do APK e B01–B05 continuam bloqueadas. PR #1 draft, issue #2 aberta.
