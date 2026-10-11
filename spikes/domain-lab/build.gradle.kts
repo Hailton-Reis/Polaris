@@ -38,6 +38,7 @@ sourceSets {
     }
     test {
         kotlin.srcDirs(
+            "../spike001/backup",
             "../spike002/src/test/kotlin",
             "../spike003/src/test/kotlin",
             "../spike004/src/test/kotlin",
@@ -72,6 +73,7 @@ fun registerSpikeTask(name: String, mainClassName: String) =
         mainClass.set(mainClassName)
     }
 
+val spike001Backup = registerSpikeTask("spike001Backup", "polaris.spike001.backup.MergedBackupRestorePlannerTestKt")
 val spike002 = registerSpikeTask("spike002", "polaris.domain.canonical.SourceRankerTestMainKt")
 val spike003 = registerSpikeTask("spike003", "polaris.domain.matching.AutomaticWorkMatcherTestMainKt")
 val spike004 = registerSpikeTask("spike004", "polaris.domain.chapter.CanonicalChapterResolverTestMainKt")
@@ -98,6 +100,7 @@ val spike024 = registerSpikeTask("spike024", "polaris.domain.lifecycle.Canonical
 tasks.register("checkSpikes") {
     group = "verification"
     dependsOn(
+        spike001Backup,
         spike002,
         spike003,
         spike004,
