@@ -28,3 +28,10 @@ The SQL tests run before Gradle in `.github/workflows/domain-spikes.yml` and bef
 Run `python3 -m unittest discover -s spikes/spike001/host-sqlite -p 'test_*.py' -v`; **20/20 SQLite tests PASS** on the exact staged query definitions. `test_merge_insert_idempotency.py` adds ten cases that verify both conditional `INSERT ... SELECT ... WHERE NOT EXISTS` statements, null-orphan identity fallback, preservation of existing priorities, relink after explicit deletion, separate parents, and concurrent same-child insertion through four separate SQLite file connections.
 
 The red test run before changing the SQL produced **four assertion failures**; the rewritten DML and complete offline host gate (72 Python, 20 SQLite, 38 Kotlin) passed. **The physical `merged` schema and migration14 are byte-identical to the prior checkpoint.** This is **not** a database UNIQUE index or an actual Android driver acceptance; #10 is only partially mitigated. Legacy duplicates must be repaired under an explicit, reversible and tested migration after B01–B04.
+
+
+## 2026-10-11 — returning distinct linked manga objects
+
+`test_merge_select_integrity.py` adds seven tests against the real `selectMergedMangasById` query. A previous unrestricted join returned duplicate manga objects for duplicate legacy `merged` edges, and had no deterministic association priority order. New query groups by local manga ID before joining to `mangas` and orders by the most preferred reference and stable row ID. `selectByMergeId` also now has deterministic priority/row order. The original SQL failed four of these seven tests. New SQLite suite **27/27 PASS**, while Python 72/72 and Kotlin 38/38 completed separately. Source snapshots and red/green logs: https://drive.google.com/file/d/1rpLs10hlX343u0HlSTldyp6O27NBjRRA/view.
+
+No schema/migration14 changes. **SQLite queries have not yet been passed through the on-device Yomotsu/SQLDelight generator**; keep issue #10 open and issue #2 Android baseline unverified.

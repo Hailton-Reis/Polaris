@@ -104,3 +104,10 @@ The **current** host gate has **72 Python + 20 SQLite + 38 Kotlin = 130 total ca
 Execute `python3 -m unittest discover -s spikes/spike001/host-sqlite -p 'test_*.py' -v` for SQLite alone, or `python3 scripts/r001/run_host_gate.py --evidence-dir /tmp/r001-host-evidence` for the combined host gate.
 
 **This is DML-only mitigation and not a SQLDelight-generated Kotlin or Android runtime proof.** A true schema UNIQUE key, existing duplicate repair and two concurrent parent creations await issue #10's tested upgrade path. Evidence: https://drive.google.com/file/d/1Ii4t2QUChADw6KjTIVG82dDbe1XMkIS3/view.
+
+
+## 2026-10-11 — merged work selection SQL regression and 27-case SQLite minimum
+
+Active `run_host_gate.py` thresholds: **72 Python, 27 SQLite, 38 Kotlin**. New `spikes/spike001/host-sqlite/test_merge_select_integrity.py` ensures selection of one manga object per linked manga ID despite legacy duplicate rows, stable priority/tie order, cross-parent separation, missing child behavior, and priority updates. The two production queries in `merged.sq` now use explicit ordering and a grouped `manga_id` subquery.
+
+In this checkpoint the full **27/27 SQLite**, **72/72 Python**, and **38/38 Kotlin/JVM** suites each passed when invoked independently using hash-matched source files. The **unified** gate exceeded tool duration during the Kotlin step and produced no final report; it is therefore not labeled `PASS` for this checkpoint. Evidence ZIP: https://drive.google.com/file/d/1rpLs10hlX343u0HlSTldyp6O27NBjRRA/view. SQLDelight Android generator and runtime remain unverified.

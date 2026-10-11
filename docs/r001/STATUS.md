@@ -367,3 +367,11 @@ The framework-independent design should not be redesigned in Work/Codex unless a
 - New ten-case SQLite test file includes four separate SQLite connections racing to insert the same child. Staged SQLite total **20/20 PASS**. Full gate **72 Python + 20 SQLite + 38 Kotlin = 130/130 PASS**, exit 0, offline only. Full patched Yomotsu subset application guard passed.
 - Evidence ZIP: https://drive.google.com/file/d/1Ii4t2QUChADw6KjTIVG82dDbe1XMkIS3/view (SHA-256 `191258fdd1f1ab859ccfe754e4f8d0ea6a92688323c92c5f19b860b692b194be`). Three source Git blobs match local executed bytes exactly.
 - **Issue #10 remains OPEN**: SQL table still lacks a UNIQUE constraint, existing duplicate rows aren't deleted; SQLDelight code generation/Android execution are unverified. No schema/migration changes or Android B01–B05 evidence.
+
+
+## 2026-10-11 — source-variant query deduplication and ordering
+
+- Demonstrated actual SQL returned duplicate `Manga` objects for repeated `merged` rows. Improved `selectMergedMangasById` to return each distinct manga ID once and stable order by reference priority, and `selectByMergeId` to order references explicitly.
+- Seven new SQL tests: **4 failures before** the fix, **7 PASS after**. SQLite **27/27 PASS**, separately Python **72/72 PASS** and Kotlin/JVM **38/38 PASS**. **Combined gate timed out during Kotlin and has no PASS report** in this checkpoint; these are three independent completed suites, totaling 137 passing checks.
+- Source hashes for updated `merged.sq`, new SQL tests and gate minimum matched GitHub. Evidence: https://drive.google.com/file/d/1rpLs10hlX343u0HlSTldyp6O27NBjRRA/view , SHA256 `a9f9a6d3cd7a876d0f83c7f246aef60c3a5dc79af79eb9c0ff22c0dff6afcb79`.
+- #10 remains open for schema constraints, preexisting duplicates, concurrency; Android codegen/runtime still untested, issue #2 open, PR #1 draft, migration15 blocked.
