@@ -83,6 +83,9 @@ class GetMergedChaptersByMangaId(
     ): List<Chapter> {
         val out = mutableListOf<Chapter>()
         val priority = references.associate { it.mangaId to it.chapterPriority }
+        // Track the winning original manga for each chapter number in O(n).
+        // Duplicate numbers within the same source remain visible, as before.
+        val numberOwner = mutableMapOf<Double, Long>()
 
         chapters.groupBy { it.mangaId }
             .entries
@@ -92,12 +95,14 @@ class GetMergedChaptersByMangaId(
                     if (!chapter.isRecognizedNumber) {
                         out += chapter
                     } else {
-                        val duplicateFromOtherSource = out.any {
-                            it.isRecognizedNumber &&
-                                it.chapterNumber == chapter.chapterNumber &&
-                                it.mangaId != chapter.mangaId
+                        // Normalize signed zero: -0.0 == +0.0 in the old
+                        // equality check, while boxed Double map keys differ.
+                        val number = if (chapter.chapterNumber == 0.0) 0.0 else chapter.chapterNumber
+                        val owner = numberOwner[number]
+                        if (owner == null || owner == chapter.mangaId) {
+                            out += chapter
+                            numberOwner.putIfAbsent(number, chapter.mangaId)
                         }
-                        if (!duplicateFromOtherSource) out += chapter
                     }
                 }
             }

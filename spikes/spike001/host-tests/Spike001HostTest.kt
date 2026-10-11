@@ -289,5 +289,36 @@ fun main() = runBlocking {
     check(rejected && store.insertedParents == 0)
     check(refs.getReferencesById(PARENT).isEmpty())
   }
+  test("empty merged candidate set fails with actionable argument error") {
+    val store = MangaStore(); val refs = Repository(emptyList())
+    var message = ""
+    try { CreateMergedManga(store, refs)(emptyList()) }
+    catch (e: IllegalArgumentException) { message = e.message.orEmpty() }
+    check(message == "A merged manga requires at least two source variants")
+    check(store.insertedParents == 0 && refs.getReferencesById(PARENT).isEmpty())
+  }
+  test("invalid negative child identity is rejected before repository access") {
+    val store = MangaStore(); val refs = Repository(emptyList())
+    var rejected = false
+    try { CreateMergedManga(store, refs)(listOf(A,-42L)) }
+    catch (e: IllegalArgumentException) { rejected = e.message == "Merged variants require persisted positive manga IDs" }
+    check(rejected && store.insertedParents == 0)
+  }
+  test("priority dedupe preserves repeated chapter numbers within one source") {
+    val refs = Repository(refs(MergedMangaReference.CHAPTER_SORT_PRIORITY))
+    val childChapters = Chapters()
+    childChapters.data.getValue(A).value = listOf(ch(101,A,1.0),ch(102,A,1.0),ch(103,A,-1.0))
+    childChapters.data.getValue(B).value = listOf(ch(201,B,1.0),ch(202,B,2.0),ch(203,B,-1.0))
+    val got = GetMergedChaptersByMangaId(childChapters, refs).await(PARENT)
+    check(got.map { it.id } == listOf(101L,102L,103L,202L,203L))
+    check(got.map { it.sourceOrder } == (0L..4L).toList())
+  }
+  test("priority dedupe treats positive and negative zero as the same chapter") {
+    val refs = Repository(refs(MergedMangaReference.CHAPTER_SORT_PRIORITY))
+    val childChapters = Chapters()
+    childChapters.data.getValue(A).value = listOf(ch(101,A,-0.0))
+    childChapters.data.getValue(B).value = listOf(ch(201,B,0.0),ch(202,B,2.0))
+    check(GetMergedChaptersByMangaId(childChapters, refs).await(PARENT).map { it.id } == listOf(101L,202L))
+  }
   println("SPIKE001_HOST_INVARIANTS_PASS ($passes scenarios); NOT_ANDROID_RUNTIME")
 }

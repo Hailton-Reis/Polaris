@@ -12,10 +12,11 @@ class CreateMergedManga(
 ) {
     suspend operator fun invoke(
         childMangaIds: List<Long>,
-        infoMangaId: Long = childMangaIds.first(),
+        infoMangaId: Long = childMangaIds.firstOrNull() ?: -1L,
     ): Manga {
         val ids = childMangaIds.distinct()
         require(ids.size >= 2) { "A merged manga requires at least two source variants" }
+        require(ids.all { it > 0L }) { "Merged variants require persisted positive manga IDs" }
         require(infoMangaId in ids) { "infoMangaId must be one of the merged variants" }
 
         val children = ids.map { mangaRepository.getMangaById(it) }
