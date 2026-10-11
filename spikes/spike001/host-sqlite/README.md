@@ -21,3 +21,10 @@ Important limits:
 - These tests add **no migration 15**, make **no** claims about B01/B02/B03/B04/B05 Android reading, and do not close issue #2.
 
 The SQL tests run before Gradle in `.github/workflows/domain-spikes.yml` and before the Android baseline build in `scripts/r001/build_issue002.sh`. GitHub Actions runner assignment remains a separate blocker.
+
+
+## 2026-10-11: atomic idempotent insert regression
+
+Run `python3 -m unittest discover -s spikes/spike001/host-sqlite -p 'test_*.py' -v`; **20/20 SQLite tests PASS** on the exact staged query definitions. `test_merge_insert_idempotency.py` adds ten cases that verify both conditional `INSERT ... SELECT ... WHERE NOT EXISTS` statements, null-orphan identity fallback, preservation of existing priorities, relink after explicit deletion, separate parents, and concurrent same-child insertion through four separate SQLite file connections.
+
+The red test run before changing the SQL produced **four assertion failures**; the rewritten DML and complete offline host gate (72 Python, 20 SQLite, 38 Kotlin) passed. **The physical `merged` schema and migration14 are byte-identical to the prior checkpoint.** This is **not** a database UNIQUE index or an actual Android driver acceptance; #10 is only partially mitigated. Legacy duplicates must be repaired under an explicit, reversible and tested migration after B01–B04.

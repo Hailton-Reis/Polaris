@@ -95,3 +95,12 @@ Current unified host gate requires **72 Python, 10 SQLite and 38 Kotlin scenario
 - duplicate/cross-work priorities cannot override the selected source.
 
 Source was first run against unpatched reader code (failure reproduced), then corrected and all 38 Kotlin scenarios passed, alongside 72 Python and 10 SQLite. These are host tests; Android/SQLDelight runtime and SQL persistence still require device validation. Evidence: https://drive.google.com/file/d/1x4NA1OAadA23NaWQpYfVDy08zsLt_El9/view.
+
+
+## 2026-10-11 — SQLite idempotency regression extension
+
+The **current** host gate has **72 Python + 20 SQLite + 38 Kotlin = 130 total cases**. Ten new SQLite contract cases execute both actual `merged.sq` insert statements, validating no duplicate writes across retries (including a 4-connection file-backed SQLite race), null/orphan fallback identity, source settings preservation, multi-parent membership and explicit unlink/relink. Prior 120-test/10-SQLite counts in this runbook are superseded.
+
+Execute `python3 -m unittest discover -s spikes/spike001/host-sqlite -p 'test_*.py' -v` for SQLite alone, or `python3 scripts/r001/run_host_gate.py --evidence-dir /tmp/r001-host-evidence` for the combined host gate.
+
+**This is DML-only mitigation and not a SQLDelight-generated Kotlin or Android runtime proof.** A true schema UNIQUE key, existing duplicate repair and two concurrent parent creations await issue #10's tested upgrade path. Evidence: https://drive.google.com/file/d/1Ii4t2QUChADw6KjTIVG82dDbe1XMkIS3/view.

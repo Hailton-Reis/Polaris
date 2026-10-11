@@ -54,3 +54,12 @@ Resultado observado: contador da biblioteca virtual `[0,0,0]` versus filhos vinc
 A auditoria reproduziu mais um bug concreto na camada de leitura: duas associações `merged` ao mesmo `mangaId` produziam capítulos repetidos no modo sem deduplicação e registros de outros pais poderiam influenciar a prioridade de fonte. Correção aplicada em `GetMergedChaptersByMangaId` para normalizar os vínculos em `await` e `subscribe`, sem trocar IDs reais ou mudar a migração 14. Teste antigo falhou antes da correção; quatro novos cenários Kotlin passaram após a alteração. Gate host vigente: **120/120 PASS** (72 Python, 10 SQLite, 38 Kotlin). Evidências no Drive: https://drive.google.com/file/d/1x4NA1OAadA23NaWQpYfVDy08zsLt_El9/view.
 
 **Não encerrar a issue #10**: o banco continua aceitando INSERT duplicado. A correção só impede que referências repetidas/corrompidas afetem a apresentação do leitor; não estabelece UNIQUE, concorrência atômica nem reparação do banco.
+
+
+## 11/10/2026: mitigação idempotente da persistência sem migração
+
+Os dois métodos gerados a partir de `merged.sq` (`insert` e `insertReturningId`) agora usam `INSERT ... SELECT ... WHERE NOT EXISTS` para evitar criar novas duplicatas ao repetir a mesma vinculação. Os vínculos com `manga_id` nulo são identificados por fonte + URL; o vínculo já existente conserva prioridade e configurações. Uma exclusão intencional ainda permite inserção posterior.
+
+O defeito foi reproduzido **antes** (4 falhas na suíte de 9 testes novos) e corrigido **depois** (20/20 SQLite, incluindo quatro conexões simultâneas). Gate offline atualizado: **130/130 PASS** (72 Python, 20 SQLite, 38 Kotlin). Evidências: https://drive.google.com/file/d/1Ii4t2QUChADw6KjTIVG82dDbe1XMkIS3/view.
+
+**Ressalva:** este guardião pertence às consultas SQL, **não** ao esquema da tabela. Um SQL direto ainda pode gravar repetidos, linhas antigas continuam, e nenhum gerador SQLDelight / APK Android foi executado. A issue #10 segue aberta.

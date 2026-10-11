@@ -359,3 +359,11 @@ The framework-independent design should not be redesigned in Work/Codex unless a
 - Four new Kotlin host scenarios PASS; 38/38 Kotlin, combined gate **120/120 PASS** (72 Python + 10 SQLite + 38 Kotlin). Code on GitHub matched tested Git blob hashes exactly.
 - Proof ZIP saved in Polaris Drive: https://drive.google.com/file/d/1x4NA1OAadA23NaWQpYfVDy08zsLt_El9/view (SHA256 `2232a35ba0acdc32514bd8dedd465dd3938a8d6ae4b5da48c4fe40e047afd9c2`). Red test and green logs included.
 - This guards reads only: migration 14 **still allows duplicate records**. #10 remains OPEN, along with #8, #9, #11. Android B01–B05 still required, issue #2 open, PR #1 draft and migration15 blocked.
+
+
+## 2026-10-11 — idempotent source association writes (partial #10)
+
+- Replayed original `merged.sq` inserts; new red tests exposed four violations of idempotency. Patched both `insert` and `insertReturningId` to atomically skip already-linked child IDs (or same source+URL for null/orphan rows) via SQLite `INSERT ... SELECT ... WHERE NOT EXISTS`. Existing settings, explicit unlinking and real child identity remain preserved.
+- New ten-case SQLite test file includes four separate SQLite connections racing to insert the same child. Staged SQLite total **20/20 PASS**. Full gate **72 Python + 20 SQLite + 38 Kotlin = 130/130 PASS**, exit 0, offline only. Full patched Yomotsu subset application guard passed.
+- Evidence ZIP: https://drive.google.com/file/d/1Ii4t2QUChADw6KjTIVG82dDbe1XMkIS3/view (SHA-256 `191258fdd1f1ab859ccfe754e4f8d0ea6a92688323c92c5f19b860b692b194be`). Three source Git blobs match local executed bytes exactly.
+- **Issue #10 remains OPEN**: SQL table still lacks a UNIQUE constraint, existing duplicate rows aren't deleted; SQLDelight code generation/Android execution are unverified. No schema/migration changes or Android B01–B05 evidence.
