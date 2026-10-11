@@ -111,3 +111,10 @@ Execute `python3 -m unittest discover -s spikes/spike001/host-sqlite -p 'test_*.
 Active `run_host_gate.py` thresholds: **72 Python, 27 SQLite, 38 Kotlin**. New `spikes/spike001/host-sqlite/test_merge_select_integrity.py` ensures selection of one manga object per linked manga ID despite legacy duplicate rows, stable priority/tie order, cross-parent separation, missing child behavior, and priority updates. The two production queries in `merged.sq` now use explicit ordering and a grouped `manga_id` subquery.
 
 In this checkpoint the full **27/27 SQLite**, **72/72 Python**, and **38/38 Kotlin/JVM** suites each passed when invoked independently using hash-matched source files. The **unified** gate exceeded tool duration during the Kotlin step and produced no final report; it is therefore not labeled `PASS` for this checkpoint. Evidence ZIP: https://drive.google.com/file/d/1rpLs10hlX343u0HlSTldyp6O27NBjRRA/view. SQLDelight Android generator and runtime remain unverified.
+
+
+## 2026-10-11 — source-scoped virtual work deletion
+
+Current minimum host gate: **72 Python + 36 SQLite + 38 Kotlin**. Nine new test cases in `test_merge_delete_lifecycle.py` plus a revised existing assertion cover deletion of the **virtual parent row** through `deleteByMergeId`, preserving real child rows with FK cascade; single-reference unlink remains separate. On original staged SQL, the new tests failed **6/8**. On corrected SQL, SQLite **36/36 PASS**; Python **72/72** and Kotlin **38/38** passed in separate full executions. Unified orchestration was inconclusive due tool timeout during Kotlin, not reported as PASS.
+
+The repository's Kotlin implementation passes the constant `MERGED_SOURCE_ID` to the source-guarded SQL query. SQLDelight generator output and bundled SQLite Android runtime **have not been compiled/executed**. The Yomotsu remove-from-library UI normally only changes favorite state and is not this explicit deletion path; integration acceptance remains issue #8.

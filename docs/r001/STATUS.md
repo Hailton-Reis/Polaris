@@ -375,3 +375,11 @@ The framework-independent design should not be redesigned in Work/Codex unless a
 - Seven new SQL tests: **4 failures before** the fix, **7 PASS after**. SQLite **27/27 PASS**, separately Python **72/72 PASS** and Kotlin/JVM **38/38 PASS**. **Combined gate timed out during Kotlin and has no PASS report** in this checkpoint; these are three independent completed suites, totaling 137 passing checks.
 - Source hashes for updated `merged.sq`, new SQL tests and gate minimum matched GitHub. Evidence: https://drive.google.com/file/d/1rpLs10hlX343u0HlSTldyp6O27NBjRRA/view , SHA256 `a9f9a6d3cd7a876d0f83c7f246aef60c3a5dc79af79eb9c0ff22c0dff6afcb79`.
 - #10 remains open for schema constraints, preexisting duplicates, concurrency; Android codegen/runtime still untested, issue #2 open, PR #1 draft, migration15 blocked.
+
+
+## 2026-10-11 — whole virtual work deletion protected by real-source guard
+
+- `deleteByMergeId` was proven to leave a virtual parent orphan. Patched it to delete **only the virtual `mangas` row** (`_id=:mergeId AND source=:mergedSourceId`) with `MERGED_SOURCE_ID` passed from `MangaMergeRepositoryImpl`. Existing migration14 FK cascade removes links; child mangas untouched. Single-reference unlink unchanged; no migration/DDL edits.
+- New 9-case SQLite regression file demonstrated original bug (6/8 failures before fix), now **36/36 SQLite PASS**. Full Python **72/72 PASS** and Kotlin **38/38 PASS** completed independently (146 successful checks). The combined gate did NOT finish due timeout during Kotlin: do not claim a unified 146/146 PASS.
+- Source hashes of all five edited/new files match committed GitHub blobs. Fix commit `fbebe210`. Evidence archive `Polaris_R001_Virtual_Deletion_Evidence_2026-10-11.zip` in the ChatGPT conversation.
+- **#8 remains open** pending actual bundled driver cascade, delete UI/caches, Android runtime. #9/#10/#11 remain open; PR #1 draft, migration15 blocked.
