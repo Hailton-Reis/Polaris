@@ -48,3 +48,9 @@ Resultado observado: contador da biblioteca virtual `[0,0,0]` versus filhos vinc
 - **Comprovado por código fonte:** backup atual não grava nem restaura referências da tabela `merged`; exclusão total só remove associações; falta UI pública de fusão e ranking automático.
 - **Riscos que exigem execução real:** concorrência de duas criações simultâneas, crashes de UI, SQLDelight gerado/Gradle, Cloudflare/sessões, desempenho em Android, histórico/capas/contagem final com leitores novel.
 - Não há evidência suficiente para afirmar que uma falha do Gradle existe: os jobs de CI nem iniciaram. Não modificar Spikes 001–024 sem incompatibilidade real.
+
+## Seguimento — 11/10/2026: mitigação de duplicatas ao ler capítulos
+
+A auditoria reproduziu mais um bug concreto na camada de leitura: duas associações `merged` ao mesmo `mangaId` produziam capítulos repetidos no modo sem deduplicação e registros de outros pais poderiam influenciar a prioridade de fonte. Correção aplicada em `GetMergedChaptersByMangaId` para normalizar os vínculos em `await` e `subscribe`, sem trocar IDs reais ou mudar a migração 14. Teste antigo falhou antes da correção; quatro novos cenários Kotlin passaram após a alteração. Gate host vigente: **120/120 PASS** (72 Python, 10 SQLite, 38 Kotlin). Evidências no Drive: https://drive.google.com/file/d/1x4NA1OAadA23NaWQpYfVDy08zsLt_El9/view.
+
+**Não encerrar a issue #10**: o banco continua aceitando INSERT duplicado. A correção só impede que referências repetidas/corrompidas afetem a apresentação do leitor; não estabelece UNIQUE, concorrência atômica nem reparação do banco.

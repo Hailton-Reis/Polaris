@@ -352,3 +352,10 @@ The framework-independent design should not be redesigned in Work/Codex unless a
 - Corrigidos defensivamente a entrada vazia/IDs inválidos em `CreateMergedManga` e desempenho quadrático de `dedupeByPriority`, preservando semântica com novos testes: **34/34 Kotlin**, gate **116/116 offline** (72 Python + 10 SQLite + 34 Kotlin). Sem migração 15 nem alteração em SQL de produção.
 - Script `spikes/spike001/audit/reproduce_known_gaps.py` (NÃO contar no gate) preserva diagnóstico reproduzível usando `libraryView.sq` pinned byte-idêntica ao Yomotsu.
 - CI Android segue sem runner; a conclusão do APK e B01–B05 continuam bloqueadas. PR #1 draft, issue #2 aberta.
+
+## 2026-10-11 — defensive chapter-link normalization (host red/green verified)
+
+- Found, reproduced (original host test FAILED) and fixed a reader integration bug: duplicate `merged` rows gave duplicate chapters in non-deduped reading mode, while incorrect cross-work rows could override chapter-source priority. Reader now filters linked records for the selected parent, suppresses repeated child IDs, excludes parent-as-child and retains only the correct root settings in both `await` and `subscribe`.
+- Four new Kotlin host scenarios PASS; 38/38 Kotlin, combined gate **120/120 PASS** (72 Python + 10 SQLite + 38 Kotlin). Code on GitHub matched tested Git blob hashes exactly.
+- Proof ZIP saved in Polaris Drive: https://drive.google.com/file/d/1x4NA1OAadA23NaWQpYfVDy08zsLt_El9/view (SHA256 `2232a35ba0acdc32514bd8dedd465dd3938a8d6ae4b5da48c4fe40e047afd9c2`). Red test and green logs included.
+- This guards reads only: migration 14 **still allows duplicate records**. #10 remains OPEN, along with #8, #9, #11. Android B01–B05 still required, issue #2 open, PR #1 draft and migration15 blocked.

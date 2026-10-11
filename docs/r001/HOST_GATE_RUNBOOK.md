@@ -85,3 +85,13 @@ The Android build script now runs this automatically after the pre/post checks a
 O gate vigente requer **72 Python + 10 SQLite + 34 Kotlin = 116 testes**, com resultado host-only. Foram acrescentados 4 cenários Kotlin para validar argumentos de criação, prioridade/deduplicação e zero assinado; novo algoritmo de deduplicação usa mapa linear em vez de busca quadrática.
 
 `python3 spikes/spike001/audit/reproduce_known_gaps.py` é um **diagnóstico de dois defeitos ainda presentes** (#9 e #10), não integra o gate verde. Detalhes e prioridades no novo `docs/r001/AUDIT_GAPS_2026_10_11.md`. Android B01–B05 permanecem sem evidência.
+
+## 2026-10-11 revised Kotlin host threshold
+
+Current unified host gate requires **72 Python, 10 SQLite and 38 Kotlin scenario assertions = 120 total**. Four added tests assert reference normalization in the real `GetMergedChaptersByMangaId` implementation:
+- repeated source links produce a single set of chapters even in NO_DEDUPE mode;
+- rows belonging to another merged parent cannot leak into its chapters;
+- a malformed parent-as-real-child reference cannot load a virtual parent as a real child;
+- duplicate/cross-work priorities cannot override the selected source.
+
+Source was first run against unpatched reader code (failure reproduced), then corrected and all 38 Kotlin scenarios passed, alongside 72 Python and 10 SQLite. These are host tests; Android/SQLDelight runtime and SQL persistence still require device validation. Evidence: https://drive.google.com/file/d/1x4NA1OAadA23NaWQpYfVDy08zsLt_El9/view.
