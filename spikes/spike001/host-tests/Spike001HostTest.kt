@@ -320,5 +320,32 @@ fun main() = runBlocking {
     childChapters.data.getValue(B).value = listOf(ch(201,B,0.0),ch(202,B,2.0))
     check(GetMergedChaptersByMangaId(childChapters, refs).await(PARENT).map { it.id } == listOf(101L,202L))
   }
+  test("repeated linked child rows cannot duplicate reader chapters in no-dedupe mode") {
+    val refs = Repository(refs() + ref(501,A,SOURCE_A) + ref(502,B,SOURCE_B))
+    val merged = GetMergedChaptersByMangaId(Chapters(), refs)
+    check(merged.await(PARENT).map { it.id } == listOf(101L,102L,201L,202L))
+    val live = withTimeout(3_000) { merged.subscribe(PARENT).first() }
+    check(live.map { it.id } == listOf(101L,102L,201L,202L))
+  }
+  test("cross-work references never leak into this virtual reader") {
+    val refs = Repository(refs() + ref(503,B,SOURCE_B).copy(mergeId=999L))
+    val merged = GetMergedChaptersByMangaId(Chapters(), refs)
+    check(merged.await(PARENT).map { it.id } == listOf(101L,102L,201L,202L))
+    check(withTimeout(3_000) { merged.subscribe(PARENT).first() }.size == 4)
+  }
+  test("falsely labelled virtual parent cannot be loaded as a child") {
+    val refs = Repository(refs() + ref(504,PARENT,SOURCE_A))
+    val merged = GetMergedChaptersByMangaId(Chapters(), refs)
+    check(merged.await(PARENT).map { it.mangaId }.toSet() == setOf(A,B))
+    check(withTimeout(3_000) { merged.subscribe(PARENT).first() }.size == 4)
+  }
+  test("bad cross-work and duplicate priorities cannot change reader source choice") {
+    val contaminated = refs(MergedMangaReference.CHAPTER_SORT_PRIORITY) +
+      ref(601,A,SOURCE_A,priority=Int.MAX_VALUE) +
+      ref(602,B,SOURCE_B,priority=-100).copy(mergeId=500L)
+    val merged = GetMergedChaptersByMangaId(Chapters(), Repository(contaminated))
+    check(merged.await(PARENT).map { it.id } == listOf(101L,102L,202L))
+    check(withTimeout(3_000) { merged.subscribe(PARENT).first() }.map { it.id } == listOf(101L,102L,202L))
+  }
   println("SPIKE001_HOST_INVARIANTS_PASS ($passes scenarios); NOT_ANDROID_RUNTIME")
 }

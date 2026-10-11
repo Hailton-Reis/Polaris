@@ -20,7 +20,7 @@ class GetMergedChaptersByMangaId(
         dedupe: Boolean = true,
         applyScanlatorFilter: Boolean = false,
     ): List<Chapter> {
-        val references = mergeRepository.getReferencesById(mangaId)
+        val references = validReferences(mangaId, mergeRepository.getReferencesById(mangaId))
         val chapters = childReferences(references)
             .flatMap { ref -> chapterRepository.getChapterByMangaId(requireNotNull(ref.mangaId), applyScanlatorFilter) }
         return transform(references, chapters, dedupe)
@@ -32,7 +32,8 @@ class GetMergedChaptersByMangaId(
         dedupe: Boolean = true,
         applyScanlatorFilter: Boolean = false,
     ): Flow<List<Chapter>> = mergeRepository.subscribeReferencesById(mangaId)
-        .flatMapLatest { references ->
+        .flatMapLatest { rawReferences ->
+            val references = validReferences(mangaId, rawReferences)
             val refs = childReferences(references)
             if (refs.isEmpty()) {
                 flowOf(emptyList())
@@ -46,8 +47,24 @@ class GetMergedChaptersByMangaId(
             }
         }
 
+    /** Ignore duplicate, stale and cross-work edges without changing stored data. */
+    private fun validReferences(mangaId: Long, references: List<MergedMangaReference>): List<MergedMangaReference> {
+        val children = references.asSequence()
+            .filter {
+                it.mergeId == mangaId && it.mangaId != null &&
+                    it.mangaId != mangaId && it.mangaSourceId != MERGED_SOURCE_ID
+            }
+            // A corrupt/retried link must not yield duplicate reader chapters.
+            .distinctBy { it.mangaId }
+            .toList()
+        val root = references.firstOrNull {
+            it.mergeId == mangaId && it.mangaId == mangaId && it.mangaSourceId == MERGED_SOURCE_ID
+        }
+        return children + listOfNotNull(root)
+    }
+
     private fun childReferences(references: List<MergedMangaReference>) =
-        references.filter { it.mangaSourceId != MERGED_SOURCE_ID && it.mangaId != null }
+        references.filter { it.mangaSourceId != MERGED_SOURCE_ID }
 
     private fun transform(
         references: List<MergedMangaReference>,

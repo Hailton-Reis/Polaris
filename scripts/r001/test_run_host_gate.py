@@ -24,11 +24,11 @@ class HostGateParserTests(unittest.TestCase):
         self.assertEqual(evaluate_gate("python", "Ran 44 tests in 0.1s\nOK\n", 0, 72)["status"], "INSUFFICIENT_TEST_COVERAGE")
 
     def test_kotlin_marker_must_match_exactly(self):
-        good = "PASS scenario\nSPIKE001_HOST_INVARIANTS_PASS (34 scenarios); NOT_ANDROID_RUNTIME\n"
-        self.assertEqual(evaluate_gate("kotlin", good, 0, 34)["status"], "PASS")
-        self.assertEqual(evaluate_gate("kotlin", good, 1, 34)["status"], "NONZERO_EXIT")
-        self.assertEqual(evaluate_gate("kotlin", good.replace("34", "30"), 0, 34)["status"], "INSUFFICIENT_TEST_COVERAGE")
-        self.assertEqual(evaluate_gate("kotlin", "SPIKE001_HOST_INVARIANTS_PASS (34 scenarios)\n", 0, 34)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
+        good = "PASS scenario\nSPIKE001_HOST_INVARIANTS_PASS (38 scenarios); NOT_ANDROID_RUNTIME\n"
+        self.assertEqual(evaluate_gate("kotlin", good, 0, 38)["status"], "PASS")
+        self.assertEqual(evaluate_gate("kotlin", good, 1, 38)["status"], "NONZERO_EXIT")
+        self.assertEqual(evaluate_gate("kotlin", good.replace("38", "34"), 0, 38)["status"], "INSUFFICIENT_TEST_COVERAGE")
+        self.assertEqual(evaluate_gate("kotlin", "SPIKE001_HOST_INVARIANTS_PASS (38 scenarios)\n", 0, 38)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
 
     def test_duplicate_test_marker_is_not_accepted(self):
         message = "Ran 72 tests in 0.1s\nRan 72 tests in 0.1s\nOK\n"
@@ -39,7 +39,7 @@ class HostGateParserTests(unittest.TestCase):
             root = Path(tmp) / "empty"
             root.mkdir()
             evidence = Path(tmp) / "evidence"
-            with patch("run_host_gate.GATES", (("kotlin", ("does-not-exist-command",), 34),)):
+            with patch("run_host_gate.GATES", (("kotlin", ("does-not-exist-command",), 38),)):
                 result = run_all(root, evidence)
             self.assertEqual(result, 1)
             report = json.loads((evidence / "host-gate-report.json").read_text())
