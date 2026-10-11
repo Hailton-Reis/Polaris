@@ -118,3 +118,27 @@ In this checkpoint the full **27/27 SQLite**, **72/72 Python**, and **38/38 Kotl
 Current minimum host gate: **72 Python + 36 SQLite + 38 Kotlin**. Nine new test cases in `test_merge_delete_lifecycle.py` plus a revised existing assertion cover deletion of the **virtual parent row** through `deleteByMergeId`, preserving real child rows with FK cascade; single-reference unlink remains separate. On original staged SQL, the new tests failed **6/8**. On corrected SQL, SQLite **36/36 PASS**; Python **72/72** and Kotlin **38/38** passed in separate full executions. Unified orchestration was inconclusive due tool timeout during Kotlin, not reported as PASS.
 
 The repository's Kotlin implementation passes the constant `MERGED_SOURCE_ID` to the source-guarded SQL query. SQLDelight generator output and bundled SQLite Android runtime **have not been compiled/executed**. The Yomotsu remove-from-library UI normally only changes favorite state and is not this explicit deletion path; integration acceptance remains issue #8.
+
+## 2026-10-11 — issue #11 backup contracts added to the mandatory offline gate
+
+`run_host_gate.py` now has **five mandatory stages**. Minimum expected cases: **72 Python + 36 SQLite + 38 Spike-001 Kotlin + 14 backup SQLite + 24 backup Kotlin = 184**. The actual Python suite now includes 3 additional parser regression cases, so counts can exceed the minimum. The total **184 is a configured minimum, not a claim of a completed unified run**.
+
+New stages:
+- `backup-sqlite`: `python3 -m unittest discover -s spikes/spike001/backup -p 'test_*.py' -q`, 14 cases.
+- `backup-kotlin`: `bash spikes/spike001/backup/run_tests.sh`, 24 scenarios, validated by its unique `MERGED_BACKUP_RESTORE_PLANNER_PASS 24` marker.
+
+`test_run_host_gate.py` checks that incomplete, duplicate or low-count markers and nonzero exit codes cannot be recorded as PASS. All **10/10** parser/self-tests passed using the exact published file (`a89699db702a02127d594247de417a11b9b3a6ba`). The Python runner file itself matched Git blob `bb473647aaca5528ecafd452d2d2ef1d3c00e01f` after local execution.
+
+**Actually executed now:** both backup stages under the real `run_all()` aggregator in a hash-checked partial checkout: `backup-sqlite=14/14 PASS`, `backup-kotlin=24/24 PASS`, 0 exit code; `repo_commit=null` is expected because this was not a full Git checkout. The other three stages were *not* run in this checkpoint, therefore **NO combined 184-case PASS** is claimed. Scope remains `HOST_ONLY_NOT_ANDROID_RUNTIME`.
+
+CI integration:
+- `spikes/domain-lab/build.gradle.kts` compiles `spikes/spike001/backup/*.kt` in the test source set and adds `spike001Backup` as a dependency of `checkSpikes`; no Kotlin CLI installation is needed in that Gradle job.
+- `.github/workflows/domain-spikes.yml` independently runs the 14-case backup SQLite suite before Gradle and triggers on `scripts/r001/**` changes as well as the spike code.
+- CI jobs still failed *before any steps*: domain run [38181256441](https://github.com/Hailton-Reis/Polaris/actions/runs/38181256441) and Android run [38181256434](https://github.com/Hailton-Reis/Polaris/actions/runs/38181256434) each show `runner_id=0`, `steps=[]`. This does **not** prove success or failure of Gradle builds. Recheck runner provisioning before declaring build acceptance.
+
+Run the full gate only from a full source checkout with all prerequisites:
+```bash
+python3 scripts/r001/run_host_gate.py --evidence-dir /tmp/polaris-r001-host-evidence
+```
+
+Production backup protobuf serializer, SQLDelight code generation, Android issue #2 B01–B05, and migration15 remain **pending**. The candidate SQL relink is tested only on host SQLite, and is **not** applied to `merged.sq`.
