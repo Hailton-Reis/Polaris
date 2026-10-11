@@ -142,3 +142,15 @@ python3 scripts/r001/run_host_gate.py --evidence-dir /tmp/polaris-r001-host-evid
 ```
 
 Production backup protobuf serializer, SQLDelight code generation, Android issue #2 B01–B05, and migration15 remain **pending**. The candidate SQL relink is tested only on host SQLite, and is **not** applied to `merged.sq`.
+
+## 2026-10-11 — three new backup SQL regressions: 187-case configured minimum
+
+The current SQLite backup suite is **17 tests**, not 14. Its three new RED-then-GREEN cases ensure:
+
+- a source ID + URL shared by two real `mangas` rows is not arbitrarily relinked;
+- a malformed `merged.merge_id` pointing to a real manga is never treated as a virtual parent;
+- a resolved edge whose stored source URL does not match the actual child never authorizes deleting the pending reference.
+
+`run_host_gate.py` and `test_run_host_gate.py` were raised to minimum `backup-sqlite=17`. Parser suite **10/10 PASS**. In a hash-matched source subset, the real runner's two backup stages returned `backup-sqlite 17/17 PASS` and `backup-kotlin 24/24 PASS` with `HOST_ONLY_NOT_ANDROID_RUNTIME`. The five-stage mandatory minimum is now **187** (72+36+38+17+24), but a complete five-stage run has **NOT** been executed in this checkpoint.
+
+Preserved failure-before-fix and green evidence, logs and Git hashes: [Polaris Issue11 hardening ZIP](https://drive.google.com/file/d/1XPMcRYO4LHs35xySldVu8k-IDXb8_DNg/view?usp=drivesdk) (SHA256 `0da0bca28355833160a328575540e21b351e7b1b12f94728f9351a7c9719c363`). The candidate does not touch the production Yomotsu SQLDelight schema or migration14/15; Android B01–B05 and protobuf backup round-trip are still blocked on the build/runtime environment.
