@@ -131,6 +131,27 @@ class PendingSourceRelink(unittest.TestCase):
         insert(self.db)
         self.assertEqual(self.rows(),[(None,2002,'/pt',5)])
 
+    def test_duplicate_real_source_identity_fails_closed(self):
+        """Two local mangas with the same source+URL must not be chosen arbitrarily."""
+        insert(self.db)
+        self.db.execute('INSERT INTO mangas VALUES(31,2002,"/pt")')
+        self.assertEqual(repair(self.db, manga_id=30), (0,0))
+        self.assertEqual(self.rows(), [(None,2002,'/pt',5)])
+
+    def test_wrong_parent_source_must_never_receive_relinked_child(self):
+        """Migration 14 permits a merge row whose parent is a real manga, so guard source."""
+        insert(self.db, merge_id=20)
+        self.assertEqual(repair(self.db, merge_id=20), (0,0))
+        self.assertEqual(self.rows(20), [(None,2002,'/pt',5)])
+
+    def test_ambiguous_existing_resolved_link_does_not_delete_orphan(self):
+        """A stale/malformed resolved edge must not justify orphan deletion."""
+        insert(self.db)
+        self.db.execute('''INSERT INTO merged(info_manga,get_chapter_updates,chapter_sort_mode,chapter_priority,download_chapters,merge_id,merge_url,manga_id,manga_url,manga_source)
+                          VALUES(0,1,2,7,0,900,'merged://900',30,'/wrong-alias',2002)''')
+        self.assertEqual(repair(self.db), (0,0))
+        self.assertEqual([row[0] for row in self.rows()], [None,30])
+
     def test_child_removal_then_reappearance_can_relink(self):
         insert(self.db,manga_id=30)
         self.db.execute('DELETE FROM mangas WHERE _id=30')
