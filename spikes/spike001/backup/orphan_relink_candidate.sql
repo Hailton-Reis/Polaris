@@ -15,6 +15,13 @@ WHERE _id = (
 )
 AND :childSourceId != 6969
 AND EXISTS (
+    SELECT 1 FROM mangas parent WHERE parent._id = :mergeId AND parent.source = 6969
+)
+AND 1 = (
+    SELECT COUNT(*) FROM mangas same_key
+    WHERE same_key.source = :childSourceId AND same_key.url = :childUrl
+)
+AND EXISTS (
     SELECT 1 FROM mangas real
     WHERE real._id = :resolvedMangaId
       AND real.source = :childSourceId
@@ -33,9 +40,18 @@ WHERE merge_id = :mergeId
   AND manga_url = :childUrl
   AND :childSourceId != 6969
   AND EXISTS (
+      SELECT 1 FROM mangas parent WHERE parent._id = :mergeId AND parent.source = 6969
+  )
+  AND 1 = (
+      SELECT COUNT(*) FROM mangas same_key
+      WHERE same_key.source = :childSourceId AND same_key.url = :childUrl
+  )
+  AND EXISTS (
       SELECT 1 FROM mangas real
       JOIN merged attached ON attached.manga_id = real._id
       WHERE attached.merge_id = :mergeId
+        AND attached.manga_source = :childSourceId
+        AND attached.manga_url = :childUrl
         AND real._id = :resolvedMangaId
         AND real.source = :childSourceId
         AND real.url = :childUrl
