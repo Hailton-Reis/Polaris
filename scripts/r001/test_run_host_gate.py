@@ -36,15 +36,15 @@ class HostGateParserTests(unittest.TestCase):
 
 
     def test_backup_kotlin_marker_requires_exact_count_and_clean_exit(self):
-        marker = "MERGED_BACKUP_RESTORE_PLANNER_PASS 24\\n"
+        marker = "MERGED_BACKUP_RESTORE_PLANNER_PASS 24\n"
         self.assertEqual(evaluate_gate("backup-kotlin", marker, 0, 24)["status"], "PASS")
         self.assertEqual(evaluate_gate("backup-kotlin", marker, 1, 24)["status"], "NONZERO_EXIT")
         self.assertEqual(evaluate_gate("backup-kotlin", marker.replace("24", "23"), 0, 24)["status"], "INSUFFICIENT_TEST_COVERAGE")
         self.assertEqual(evaluate_gate("backup-kotlin", marker * 2, 0, 24)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
-        self.assertEqual(evaluate_gate("backup-kotlin", "MERGED_BACKUP_RESTORE_PLANNER_PASS 24 (host)\\n", 0, 24)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
+        self.assertEqual(evaluate_gate("backup-kotlin", "MERGED_BACKUP_RESTORE_PLANNER_PASS 24 (host)\n", 0, 24)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
 
     def test_backup_sqlite_requires_unittest_summary_and_ok(self):
-        output = "Ran 14 tests in 0.1s\\n\\nOK\\n"
+        output = "Ran 14 tests in 0.1s\n\nOK\n"
         self.assertEqual(evaluate_gate("backup-sqlite", output, 0, 14)["status"], "PASS")
         self.assertEqual(evaluate_gate("backup-sqlite", output.replace("OK", "FAILED"), 0, 14)["status"], "MISSING_UNITTEST_OK_MARKER")
         self.assertEqual(evaluate_gate("backup-sqlite", output, 1, 14)["status"], "NONZERO_EXIT")
