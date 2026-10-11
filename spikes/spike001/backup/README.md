@@ -1,6 +1,6 @@
 # Issue #11 — merged-work backup/restore: staged portable planning (2026-10-11)
 
-**Status:** 24 isolated Kotlin/JVM tests PASS. **NOT integrated into Yomotsu's production Backup model/Creator/Restorer; no Android proof; #11 remains P0 open.**
+**Status:** 44 isolated Kotlin/JVM tests PASS (24 restore + 20 export). **NOT integrated into Yomotsu's production Backup model/Creator/Restorer; no Android proof; #11 remains P0 open.**
 
 ## Source of truth and compatibility
 
@@ -77,3 +77,26 @@ Both the relink and cleanup statements now fail closed on an ambiguous local sou
 Evidence archive, including red/green logs, code snapshots, source Git blob hashes and JSON report: [Google Drive — issue11 hardening](https://drive.google.com/file/d/1XPMcRYO4LHs35xySldVu8k-IDXb8_DNg/view?usp=drivesdk), SHA-256 `0da0bca28355833160a328575540e21b351e7b1b12f94728f9351a7c9719c363`.
 
 **Status unchanged:** still a candidate outside production `merged.sq`; issue #11 and the physical uniqueness problem #10 remain OPEN, SQLDelight + Android B01–B05 unverified, migration15 blocked.
+
+## 2026-10-11 — export selection for nonfavorite real-source child mangas
+
+**New host-only code:** `MergedBackupExportPlanner.kt`, `MergedBackupExportPlannerTest.kt`.
+
+The original Yomotsu `BackupCreator.backup()` passes `getFavorites.await() + nonFavoriteManga` to `MangaBackupCreator`, and the latter exports chapters under **each actual manga ID**. A favorite virtual parent (source 6969) has no owned chapter rows; its real child source mangas may be nonfavorite and not otherwise included. The current app therefore **does not yet export those child snapshots**.
+
+`MergedBackupExportPlanner.plan()` now produces:
+- `works`: one `PortableMergedWork` per explicit virtual parent, preserving exact source+URL, current links, per-link flags/priority, root settings and optional canonical UUID; **never reconstruct deleted child links from the available catalog**.
+- `additionalRealChildMangaIds`: deduplicated persisted **real child IDs** absent from the normal Yomotsu selection, including two virtual parents sharing one source; the future Android adapter must load these as ordinary `Manga` rows and pass them through existing `MangaBackupCreator` with the **same backup options**, preserving chapters/read/bookmarks/history/tracking as selected.
+- `pendingSourceWorks`: explicit unresolved `sourceId+url` reference records where there is no live child ID. Do not fabricate an ID or silently discard a pending link.
+
+The planner does **not** serialize the actual chapter records; it returns the exact persisted child IDs for the Yomotsu backup creator to serialize. A missing non-NULL child row, mismatching local ID/source/URL, ambiguous catalog, nonvirtual parent, duplicated links or contradictory root settings causes **a validation error instead of a silent incomplete backup**. When the user disables library entries in the backup, no multifonte records are selected. One intentionally retained child is allowed.
+
+### Evidence and host gates
+
+Local `kotlinc` compiled the **exact checked-in** `MergedBackupRestorePlanner.kt` alongside both test suites and the new export planner. Git blob SHA equality was verified for all seven staged/test/harness files. The project `run_tests.sh` executes both Kotlin test programs, now **24 restoration + 20 export = 44/44 PASS**. The actual offline `run_host_gate.py` executed its two backup stages together: **17/17 SQLite and 44/44 Kotlin = 61/61 PASS**, exit 0; parser tests **11/11 PASS**. This is a **subset**, not the complete five-stage project gate.
+
+`scripts/r001/run_host_gate.py` now requires both unique success markers; missing, duplicate or insufficient markers fail closed. `spikes/domain-lab/build.gradle.kts` requires both tasks `spike001Backup` and `spike001BackupExport` inside `checkSpikes`. Configured five-gate minimum: **207** (72 Python + 36 original SQLite + 38 original Kotlin + 17 backup SQLite + 44 backup Kotlin). **No claim of complete 207-case gate execution, Gradle build, Android APK or real backup protobuf round-trip.**
+
+Downloadable evidence ZIP stored under Polaris Drive: [2026-10-11 export backup host evidence](https://drive.google.com/file/d/14x40OxzeY3JO0uIpV9DfIBYiBMeWTD8B/view?usp=drivesdk), SHA-256 `137acb0181c17026ead2a60f9f3773e352e2b1c64e23efd7735085e1dd3defce`. Contains complete test logs, the two-stage aggregator JSON, 11 parser tests, compiler/environment metadata, seven tested source snapshots and exact Git blob SHA manifest.
+
+**Next production gate:** add versioned `Backup.kt` field and Yomotsu exporter/restorer adapters that actually collect real child rows (including nonfavorite children), save their `BackupManga` snapshots, restore them before parent link reconstruction, and reattach transactionally. Preserve old Yomotsu backups. Still blocked on #2 real Android/SQLDelight baseline. Issue #11 remains P0 open, PR #1 draft, migration15 untouched.
