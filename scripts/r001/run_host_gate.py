@@ -13,7 +13,7 @@ import sys
 
 GATES = (
     ("python", (sys.executable, "-m", "unittest", "discover", "-s", "scripts/r001", "-p", "test_*.py", "-q"), 72),
-    ("sqlite", (sys.executable, "-m", "unittest", "discover", "-s", "spikes/spike001/host-sqlite", "-p", "test_*.py", "-q"), 20),
+    ("sqlite", (sys.executable, "-m", "unittest", "discover", "-s", "spikes/spike001/host-sqlite", "-p", "test_*.py", "-q"), 27),
     ("kotlin", ("bash", "scripts/r001/test_spike001_host.sh"), 38),
 )
 
