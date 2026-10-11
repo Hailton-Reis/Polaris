@@ -61,3 +61,19 @@ python3 -m unittest discover -s spikes/spike001/backup -p 'test_*.py' -v
 ```
 
 **14/14 SQLite cases PASS**, including one explicit defect reproduction (the old DML creates a duplicate) and successful candidate repair cases. All four staged Kotlin/SQL/test artifact hashes matched the locally executed files. These 14 are **not** Android verification and are **not** part of the existing unified host gate. **Do not change migration14/15 or the production query until the issue #2 Android baseline is proven.**
+
+## 2026-10-11 — fail-closed SQL candidate hardening (17 SQLite tests)
+
+Three additional regression tests were written **before** the candidate fix. They reproduced three previously unprotected data-corruption cases:
+
+1. The pinned `mangas` schema does not enforce `UNIQUE(source,url)`, so two real manga rows may share the same source+URL. The candidate had previously relinked to either supplied ID; now it requires **exactly one** real row for the identity and otherwise leaves the orphan pending.
+2. The migration14 schema permits a malformed `merged.merge_id` pointing to a **real** manga. The candidate previously relinked it; now both UPDATE and DELETE require a verified virtual parent whose `source=6969`.
+3. The cleanup query previously deleted NULL pending links if a real manga with matching source+URL happened to have a merged row whose saved association's own `manga_url` was wrong. Cleanup now requires exact `attached.manga_source` **and** `attached.manga_url` equality before removing the pending reference.
+
+Both the relink and cleanup statements now fail closed on an ambiguous local source identity and a nonvirtual parent. No title-based matching, schema migration, or real manga deletion is involved.
+
+**Red/green evidence:** 3 new tests failed against the original candidate; 17/17 SQLite tests passed after correction. Independent runner-parser self-tests: 10/10 PASS. The two backup subsets of the actual offline aggregator completed **17 SQLite + 24 Kotlin = 41/41 host-only PASS**; **this does not mean the full 187-case five-gate set was run**. The new configured minimum is 72 Python + 36 SQLite + 38 main Kotlin + 17 backup SQLite + 24 backup Kotlin = **187**.
+
+Evidence archive, including red/green logs, code snapshots, source Git blob hashes and JSON report: [Google Drive — issue11 hardening](https://drive.google.com/file/d/1XPMcRYO4LHs35xySldVu8k-IDXb8_DNg/view?usp=drivesdk), SHA-256 `0da0bca28355833160a328575540e21b351e7b1b12f94728f9351a7c9719c363`.
+
+**Status unchanged:** still a candidate outside production `merged.sq`; issue #11 and the physical uniqueness problem #10 remain OPEN, SQLDelight + Android B01–B05 unverified, migration15 blocked.
