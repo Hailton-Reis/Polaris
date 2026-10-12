@@ -44,3 +44,25 @@ SHA-256: `704b3f3f261a576821744baca27babdd0b6638b0d0d9d02ed73c385063cb3bd5`.
 5. Android SQLDelight/runtime baseline B01–B05 (#2), real backup roundtrip and old backup compatibility must pass before #11 is closed. PR #1 stays DRAFT and migration 15 BLOCKED.
 
 **Source-code provenance:** the application backup generator/reader has *not* been modified by this candidate; these files are deliberately staged outside `spikes/spike001/new-files` and outside the current `apply_spike001.py`.
+
+## 2026-10-12: verified snapshot completeness bridge (new)
+
+**New files:** `BackupPolarisBundleBuilder.kt` and `host-tests/BackupPolarisBundleBuilderTest.kt`. The DTO `BackupPolarisBundle.kt` has two additions: `BackupPolarisLink.isPending` (optional link tag 5, default false), and `validateSnapshotCoverage(ordinaryManga: List<BackupManga>)`.
+
+This fixes an integrity blind spot in the initial candidate format: previously, it could record links for a resolved real manga without verifying that a normal or supplemental `BackupManga` record existed. Such an archive could look valid while silently losing that child's chapters/progress.
+
+The builder now receives the existing `MergedBackupExportPlan`, explicit current virtual parent/child links, the persisted real child catalog, regular Yomotsu `BackupManga` snapshots and supplementary `BackupManga` snapshots. It checks that:
+- the supplement is an **exact source-ID+URL set match** for `additionalRealChildMangaIds`; no duplicates, missing or extraneous snapshots;
+- no manga snapshot appears in both sections; all **resolved** child links are covered by one section;
+- only explicitly `manga_id=NULL` links are `isPending=true` and can lack a manga snapshot; pending/resolved status is **per link**, not a global source key;
+- no link/title/settings or archive parent identity changed between the export plan and serializing the protobuf DTO.
+
+The future application caller must use Yomotsu `MangaRepository.getMangaById(id)` to load the additional persisted real children, then **the existing `MangaBackupCreator(additionalMangas, options)`** to produce full snapshots respecting the same backup options. The candidate builder does not fetch DB rows or serialize itself, and will throw if caller provides incomplete snapshots. This logic must execute before the app returns any successful backup.
+
+Validation:
+```bash
+bash spikes/spike001/backup/proto-candidate/run_model_validation.sh
+```
+**18/18** old DTO Kotlin checks + **16/16** new builder checks PASS, compiled against explicit serialization and BackupManga stubs (not actual ProtoBuf). In this checkpoint, the older separate 24/24 restore and 20/20 export Kotlin checks, plus 7/7 pinned-apply Python checks, were rerun: **85 isolated host checks PASS**, not a unified five-stage gate. `spikes/domain-lab/build.gradle.kts` now requires both protobuf host test mains as tasks of `checkSpikes`. No actual Gradle task, Kotlin protobuf wire serialization, APK or on-device restore has run.
+
+[Evidence ZIP](https://drive.google.com/file/d/1FuHz10bYD-4-ZfS4-yE9Dq6RQzMaXOac/view) SHA256 `5bec9bf2e3cf5dd5abccffee884a1bc67e2ca8e607dc9d98d9149523788f8998`. The newer [12/10 handoff](../../../..//docs/r001/RESUME_2026_10_12.md) supersedes the older progress count. Do not apply the candidate to production before issue #2 gates and real Kotlin serializer tests.
