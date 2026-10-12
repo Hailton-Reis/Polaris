@@ -168,3 +168,21 @@ From a hash-verified local source subset, **both backup gates passed together** 
 `spikes/domain-lab/build.gradle.kts` requires `spike001BackupExport` alongside `spike001Backup` in `checkSpikes`. CI Gradle compilation **was not executed** here (no Android SDK or Gradle CLI / active Actions runner). The full five-stage 207-case gate was not executed. This validates portable backup selection/restore planning, not serialization of an actual Yomotsu backup nor on-device data recovery.
 
 Evidence: [Polaris R001 — exported child backup test ZIP](https://drive.google.com/file/d/14x40OxzeY3JO0uIpV9DfIBYiBMeWTD8B/view?usp=drivesdk), SHA256 `137acb0181c17026ead2a60f9f3773e352e2b1c64e23efd7735085e1dd3defce`. Backed up in the project Drive folder.
+
+## 2026-10-11 — supplemental protobuf format candidate checks (#11)
+
+A **separate** staged protobuf candidate exists at `spikes/spike001/backup/proto-candidate/`. It is deliberately outside the current `apply_spike001.py` and the normal five-gate offline runner. The **full gate minimum is still 207**, not 244.
+
+Host validations (independent): **7/7** pinned-source patch tests, **18/18** Kotlin DTO validation tests compiled against annotation/BackupManga **stubs**, and **12/12** dynamic `google.protobuf` wire-compatibility simulations (old→new/new→old data and gzip), totaling 37 additional PASS. Real Yomotsu `kotlinx.serialization.protobuf.ProtoBuf`, Gradle, Android, actual `.tachibk` export and database restore **remain unverified**.
+
+To reproduce staging against the pinned `Backup.kt`, run:
+```bash
+python3 -m unittest discover -s spikes/spike001/backup/proto-candidate -p 'test_proto_apply.py' -v
+python3 spikes/spike001/backup/proto-candidate/apply_backup_proto_candidate.py \
+  --pinned-backup /absolute/path/to/pinned/Yomotsu/app/src/main/java/eu/kanade/tachiyomi/data/backup/models/Backup.kt \
+  --output-dir /tmp/polaris-backup-proto-stage-new-dir
+bash spikes/spike001/backup/proto-candidate/run_model_validation.sh
+```
+The GitHub `domain-spikes.yml` CI now **requires the 7 Python staging tests** when a runner is allocated; it does not execute real Kotlin serialization. Complete 12-test protobuf simulation sources and logs are archived in [Polaris Drive evidence](https://drive.google.com/file/d/1dicLCIZXa-DJWW8OaR8J852fryD6Qpdx/view?usp=drivesdk), SHA-256 `704b3f3f261a576821744baca27babdd0b6638b0d0d9d02ed73c385063cb3bd5`.
+
+No migration15, original backup serializer or Android APK was changed, and there is **no complete updated unified-gate PASS claim**. Issue #11 remains P0 open. See [proto candidate README](../../spikes/spike001/backup/proto-candidate/README.md).
