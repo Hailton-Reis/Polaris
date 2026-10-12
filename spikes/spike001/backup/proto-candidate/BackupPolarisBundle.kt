@@ -44,6 +44,23 @@ data class BackupPolarisBundle(
         require(snapshotKeys.distinct().size == snapshotKeys.size) { "Duplicate supplementary manga snapshot" }
         require(snapshotKeys.all { it in identities }) { "Supplementary manga is not linked to any exported work" }
     }
+
+    /**
+     * Refuse an incomplete backup: every resolved child needs a corresponding
+     * real BackupManga, either ordinary or supplemental. Only genuinely pending
+     * source references may omit an actual manga row.
+     */
+    fun validateSnapshotCoverage(ordinaryManga: List<BackupManga>) {
+        validateForImport()
+        val normal = ordinaryManga.map { it.source to it.url }
+        val extra = supplementalManga.map { it.source to it.url }
+        require(normal.distinct().size == normal.size) { "Ambiguous normal manga identities" }
+        require(normal.none { it in extra }) { "Child snapshot appears in both normal and supplemental backup" }
+        val saved = (normal + extra).toSet()
+        require(works.flatMap { it.links }.filterNot { it.isPending }.all {
+            (it.sourceId to it.sourceUrl) in saved
+        }) { "Missing real-child snapshot; refusing incomplete multisource backup" }
+    }
 }
 
 @Serializable
@@ -63,6 +80,8 @@ data class BackupPolarisLink(
     @ProtoNumber(2) val sourceUrl: String,
     @ProtoNumber(3) val observedTitle: String,
     @ProtoNumber(4) val settings: BackupPolarisMergeSettings,
+    // The association's local manga row was absent when exported; no fabricated ID.
+    @ProtoNumber(5) val isPending: Boolean = false,
 )
 
 @Serializable
