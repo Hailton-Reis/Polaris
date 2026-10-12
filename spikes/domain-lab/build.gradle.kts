@@ -75,6 +75,8 @@ fun registerSpikeTask(name: String, mainClassName: String) =
 
 val spike001Backup = registerSpikeTask("spike001Backup", "polaris.spike001.backup.MergedBackupRestorePlannerTestKt")
 val spike001BackupExport = registerSpikeTask("spike001BackupExport", "polaris.spike001.backup.MergedBackupExportPlannerTestKt")
+val spike001ProtoModel = registerSpikeTask("spike001ProtoModel", "eu.kanade.tachiyomi.data.backup.models.BackupPolarisBundleContractTestKt")
+val spike001ProtoBuilder = registerSpikeTask("spike001ProtoBuilder", "polaris.spike001.backup.BackupPolarisBundleBuilderTestKt")
 val spike002 = registerSpikeTask("spike002", "polaris.domain.canonical.SourceRankerTestMainKt")
 val spike003 = registerSpikeTask("spike003", "polaris.domain.matching.AutomaticWorkMatcherTestMainKt")
 val spike004 = registerSpikeTask("spike004", "polaris.domain.chapter.CanonicalChapterResolverTestMainKt")
@@ -103,6 +105,8 @@ tasks.register("checkSpikes") {
     dependsOn(
         spike001Backup,
         spike001BackupExport,
+        spike001ProtoModel,
+        spike001ProtoBuilder,
         spike002,
         spike003,
         spike004,
