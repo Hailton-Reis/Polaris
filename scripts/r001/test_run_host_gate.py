@@ -70,6 +70,14 @@ class HostGateParserTests(unittest.TestCase):
         self.assertEqual(evaluate_gate("backup-adapter", complete + "POLARIS_YOMOTSU_EXPORT_ADAPTER_PASS 12\n", 0, 12)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
         self.assertEqual(evaluate_gate("backup-adapter", "EXPORT_ADAPTER_PASS 12\n", 0, 12)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
 
+    def test_child_first_restore_requires_exact_marker_and_success(self):
+        ok = "RESTORE_COORDINATOR_PASS 20 final\nPOLARIS_YOMOTSU_RESTORE_COORDINATOR_PASS 20\n"
+        self.assertEqual(evaluate_gate("backup-restore", ok, 0, 20)["status"], "PASS")
+        self.assertEqual(evaluate_gate("backup-restore", ok, 1, 20)["status"], "NONZERO_EXIT")
+        self.assertEqual(evaluate_gate("backup-restore", ok.replace("COORDINATOR_PASS 20\n", "COORDINATOR_PASS 19\n"), 0, 20)["status"], "INSUFFICIENT_TEST_COVERAGE")
+        self.assertEqual(evaluate_gate("backup-restore", ok + "POLARIS_YOMOTSU_RESTORE_COORDINATOR_PASS 20\n", 0, 20)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
+        self.assertEqual(evaluate_gate("backup-restore", "RESTORE_COORDINATOR_PASS 20 final\n", 0, 20)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
+
     def test_backup_sqlite_requires_unittest_summary_and_ok(self):
         output = "Ran 17 tests in 0.1s\n\nOK\n"
         self.assertEqual(evaluate_gate("backup-sqlite", output, 0, 17)["status"], "PASS")
@@ -81,6 +89,7 @@ class HostGateParserTests(unittest.TestCase):
         self.assertEqual(gates["backup-sqlite"][1], 17)
         self.assertEqual(gates["backup-kotlin"][1], 65)
         self.assertEqual(gates["backup-adapter"][1], 12)
+        self.assertEqual(gates["backup-restore"][1], 20)
         self.assertIn("yomotsu-candidate/run_tests.sh", gates["backup-adapter"][0][1])
         self.assertIn("spikes/spike001/backup", " ".join(gates["backup-sqlite"][0]))
         self.assertIn("spikes/spike001/backup/run_tests.sh", gates["backup-kotlin"][0])
