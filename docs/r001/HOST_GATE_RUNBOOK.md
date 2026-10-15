@@ -330,3 +330,40 @@ See [new Yomotsu candidate README](../../spikes/spike001/backup/yomotsu-candidat
 **No real Gradle/Android or Kotlin protobuf round trip, SQLDelight migration,
 runtime test B01–B05, restored virtual links or complete six-gate verification.**
 Keep PR #1 DRAFT, issues #2/#10/#11 OPEN, migration15 untouched.
+
+## 2026-10-15 — seventh offline gate: child-first Yomotsu restore candidate
+
+The new `backup-restore` stage runs
+`bash spikes/spike001/backup/restore-candidate/run_tests.sh`, using
+the actual staged `PolarisRestoreCoordinator.kt` with explicit
+host-only ports and `BackupManga`/serialization annotation doubles.
+It requires **one** exact marker
+`POLARIS_YOMOTSU_RESTORE_COORDINATOR_PASS 20`, count >=20 and exit 0.
+The code enforces archive preflight before writes, a verified ordinary
+`MangaRestorer` completion barrier, all supplemental source snapshots
+restored before parent work creation, unambiguous source+URL lookup,
+NULL preserved for explicitly pending links, and one call to a **required**
+atomic parent/UUID ledger port (its Android implementation is pending).
+A failure or inconsistency aborts before parent associations are committed.
+
+**Locally executed:** 20/20 scenario assertions through host Kotlin/JVM.
+The coordinator source matched GitHub Git blob
+`89ef78974d85f7b1770ddbd0baa22e253745cf6d`.
+A locally run test harness preceded a reformatted GitHub-committed test file;
+the *exact published test and runner* still await CI. Never conflate the
+fake atomic port with an implemented SQLDelight transaction.
+
+Seven configured minimum thresholds:
+**72 Python +36 SQLite +38 core Kotlin +17 backup SQLite +
+65 backup Kotlin +12 Yomotsu export +20 child-first restore =260**.
+No complete seven-stage run or Android B01–B05 was executed.
+
+[Evidence ZIP, including source/harness provenance caveat](https://drive.google.com/file/d/1uwitwsFhcPNj3OoTvhld9YKOqaC9nL08/view),
+SHA256 `46077610e28e9675dfb210fe4cedc6f69a4380dc1ace6f04ecf79402cbec88ab`.
+[Restore candidate README](../../spikes/spike001/backup/restore-candidate/README.md).
+CI workflow has a standalone coordinator test job step, but pending/failed
+runner allocation is not evidence of passing tests.
+
+Production `BackupRestorer.kt`, `MangaRestorer`, `merged.sq`,
+migrations 14/15 and APK remain untouched. Issues #2, #10 and #11 open;
+PR #1 remains draft.
