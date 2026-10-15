@@ -113,5 +113,33 @@ fun main() {
         check(block { YomotsuMergedWorkUuidStore(repo).ensureDistinct(listOf(1,2)) } == mapOf(1L to A,2L to B))
         check(repo.writes==0)
     }
+    case("Imported UUID is persisted exactly on a newly restored parent") {
+        val repo=MemoryRepo(virtual(1))
+        check(block { YomotsuMergedWorkUuidStore(repo,factory(A)).assignArchived(1,B) } == B)
+        check((repo.rows.getValue(1).memo[KEY] as JsonPrimitive).content == B)
+    }
+    case("Re-importing the same UUID does not make a second write") {
+        val repo=MemoryRepo(virtual(1)); val store=YomotsuMergedWorkUuidStore(repo,factory(A))
+        check(block { store.assignArchived(1,B) } == block { store.assignArchived(1,B) } && repo.writes==1)
+    }
+    case("Import cannot replace an existing conflicting work UUID") {
+        val repo=MemoryRepo(virtual(1,JsonObject(mapOf(KEY to JsonPrimitive(A)))))
+        rejected { block { YomotsuMergedWorkUuidStore(repo).assignArchived(1,B) } }
+        check(repo.writes==0)
+    }
+    case("Malformed imported UUID is rejected before reading/writing manga") {
+        val repo=MemoryRepo(virtual(1))
+        rejected { block { YomotsuMergedWorkUuidStore(repo).assignArchived(1,"not-a-uuid") } }
+        check(repo.writes==0)
+    }
+    case("Imported UUID cannot be attached to a real source manga") {
+        val repo=MemoryRepo(Manga(1,1001L))
+        rejected { block { YomotsuMergedWorkUuidStore(repo).assignArchived(1,A) } }
+        check(repo.writes==0)
+    }
+    case("Imported UUID readback disagreement stops relinking") {
+        val repo=MemoryRepo(virtual(1)); repo.overrideReadAfterWrite=virtual(1,JsonObject(mapOf(KEY to JsonPrimitive(A))))
+        rejected { block { YomotsuMergedWorkUuidStore(repo).assignArchived(1,B) } }
+    }
     println("POLARIS_PERSISTED_MERGE_UUID_PASS $assertions")
 }
