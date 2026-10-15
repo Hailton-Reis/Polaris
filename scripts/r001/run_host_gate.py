@@ -23,7 +23,7 @@ GATES = (
 
 def extract_count(name: str, output: str):
     if name == "backup-adapter":
-        hits = re.findall(r"(?m)^POLARIS_YOMOTSU_EXPORT_ADAPTER_PASS (\\d+)$", output)
+        hits = re.findall(r"(?m)^POLARIS_YOMOTSU_EXPORT_ADAPTER_PASS (\d+)$", output)
         return int(hits[0]) if len(hits) == 1 else None
     if name == "backup-kotlin":
         # All three Kotlin suites must pass. Missing, repeated or spoofed
