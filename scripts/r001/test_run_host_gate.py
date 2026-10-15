@@ -63,12 +63,12 @@ class HostGateParserTests(unittest.TestCase):
         self.assertIsNone(extract_count("backup-kotlin", good + "POLARIS_PERSISTED_MERGE_UUID_PASS 21\n"))
 
     def test_yomotsu_backup_adapter_requires_exact_success_marker(self):
-        complete = "EXPORT_ADAPTER_PASS 12: scenario\\nPOLARIS_YOMOTSU_EXPORT_ADAPTER_PASS 12\\n".replace("\\\\n", "\\n")
+        complete = "EXPORT_ADAPTER_PASS 12: scenario\nPOLARIS_YOMOTSU_EXPORT_ADAPTER_PASS 12\n"
         self.assertEqual(evaluate_gate("backup-adapter", complete, 0, 12)["status"], "PASS")
         self.assertEqual(evaluate_gate("backup-adapter", complete, 1, 12)["status"], "NONZERO_EXIT")
-        self.assertEqual(evaluate_gate("backup-adapter", complete.replace("PASS 12\\n", "PASS 11\\n"), 0, 12)["status"], "INSUFFICIENT_TEST_COVERAGE")
-        self.assertEqual(evaluate_gate("backup-adapter", complete + "POLARIS_YOMOTSU_EXPORT_ADAPTER_PASS 12\\n", 0, 12)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
-        self.assertEqual(evaluate_gate("backup-adapter", "EXPORT_ADAPTER_PASS 12\\n", 0, 12)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
+        self.assertEqual(evaluate_gate("backup-adapter", complete.replace("PASS 12\n", "PASS 11\n"), 0, 12)["status"], "INSUFFICIENT_TEST_COVERAGE")
+        self.assertEqual(evaluate_gate("backup-adapter", complete + "POLARIS_YOMOTSU_EXPORT_ADAPTER_PASS 12\n", 0, 12)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
+        self.assertEqual(evaluate_gate("backup-adapter", "EXPORT_ADAPTER_PASS 12\n", 0, 12)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
 
     def test_backup_sqlite_requires_unittest_summary_and_ok(self):
         output = "Ran 17 tests in 0.1s\n\nOK\n"
