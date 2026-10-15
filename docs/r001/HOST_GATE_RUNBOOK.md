@@ -367,3 +367,31 @@ runner allocation is not evidence of passing tests.
 Production `BackupRestorer.kt`, `MangaRestorer`, `merged.sq`,
 migrations 14/15 and APK remain untouched. Issues #2, #10 and #11 open;
 PR #1 remains draft.
+
+## 2026-10-15 — eighth host gate: atomic SQLite source-link and UUID restore
+
+`backup-atomic-sqlite` now runs:
+```bash
+python3 -m unittest discover -s spikes/spike001/backup/restore-candidate/atomic-sqlite -p 'test_*.py' -q
+```
+The gate requires **31** tests, exit code 0 and the Python `unittest`
+`OK` marker. The same step is in `.github/workflows/domain-spikes.yml`.
+
+Locally **31/31 PASS**, including concurrent separate SQLite database
+connections, duplicate constraints, idempotent same-archive import and
+rollback of both virtual parents on injected failure. GitHub source blob
+hashes matched all three locally executed files. Evidence:
+https://drive.google.com/file/d/1CXZnrf-uIjtURQBV3HvRL8DRW5H1M14H/view ,
+SHA256 `d2c2aa1a9eb575231bfaae59cb3e09584bfaf42362cae7ac97bc0b4c1648a15a`.
+
+**Eight configured minimums are now 291**:
+72 Python + 36 merged SQLite + 38 domain Kotlin + 17 backup SQLite +
+65 backup Kotlin + 12 Yomotsu export + 20 child-first restore + 31
+atomic SQLite. This is NOT a single completed 291-test gate.
+
+Reference implementation `spikes/spike001/backup/restore-candidate/atomic-sqlite`
+is **Python/SQLite host-only**, not yet a compiled SQLDelight migration or
+Kotlin `PolarisAtomicVirtualWorkPort`. The trial ledger and unique indexes
+are NOT installed in Android; migration15, `merged.sq` and production
+`BackupRestorer.kt` untouched. Review legacy duplicates and confirm
+`merged://polaris/<uuid>` URL compatibility with the real reader first.
