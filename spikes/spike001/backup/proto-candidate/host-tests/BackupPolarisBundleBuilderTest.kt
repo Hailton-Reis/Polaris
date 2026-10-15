@@ -68,5 +68,21 @@ fun main() {
         val result = assemble(works=emptyList(),normal=emptyList(),extra=emptyList())
         check(result.works.isEmpty() && result.supplementalManga.isEmpty())
     }
+    test("Pending child status changing after planning aborts the backup") {
+        val planned = MergedBackupExportPlanner.plan(listOf(work),catalog,setOf(900,101),true)
+        val live = work.copy(links=listOf(work.links[0],work.links[1].copy(localMangaId=null)))
+        fails { BackupPolarisBundleBuilder.build(planned,listOf(live),catalog,listOf(BackupManga(10,"/a")),listOf(BackupManga(20,"/b"))) }
+    }
+    test("New child row appearing after planning requires a fresh snapshot") {
+        val orphan=work.copy(links=listOf(work.links[0],work.links[1].copy(localMangaId=null)))
+        val planned=MergedBackupExportPlanner.plan(listOf(orphan),catalog,setOf(900,101),true)
+        fails { BackupPolarisBundleBuilder.build(planned,listOf(work),catalog,listOf(BackupManga(10,"/a")),emptyList()) }
+    }
+    test("Changing only parent ID or canonical UUID after planning aborts export") {
+        val planned=MergedBackupExportPlanner.plan(listOf(work),catalog,setOf(900,101),true)
+        for (changed in listOf(work.copy(parentLocalId=999), work.copy(canonicalUuid="different"))) {
+            fails { BackupPolarisBundleBuilder.build(planned,listOf(changed),catalog,listOf(BackupManga(10,"/a")),listOf(BackupManga(20,"/b"))) }
+        }
+    }
     println("POLARIS_BACKUP_BUNDLE_BUILDER_PASS $count")
 }
