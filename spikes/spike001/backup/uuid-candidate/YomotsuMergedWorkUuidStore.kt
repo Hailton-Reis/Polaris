@@ -43,6 +43,36 @@ class YomotsuMergedWorkUuidStore(
         return newUuid
     }
 
+    /**
+     * Restore the SAME durable identity from another device. Do not regenerate
+     * a new archive key or replace a different identity already persisted here.
+     * Caller still owns parent creation, uniqueness checks and DB transactions.
+     */
+    suspend fun assignArchived(parentId: Long, archivedUuid: String): String {
+        require(parentId > 0) { "Virtual manga must have a persisted positive local ID" }
+        val parsed = runCatching { UUID.fromString(archivedUuid) }.getOrNull()
+        require(parsed != null && parsed.toString() == archivedUuid) {
+            "Invalid or noncanonical UUID in incoming Polaris backup"
+        }
+        val parent = mangaRepository.getMangaById(parentId)
+        require(parent.source == VIRTUAL_SOURCE_ID) { "Cannot assign virtual identity to real manga" }
+        val existing = readUuid(parent.memo)
+        require(existing == null || existing == archivedUuid) {
+            "Conflicting UUID already belongs to this virtual parent; refusing destructive restore"
+        }
+        if (existing != null) return existing
+
+        val amended = JsonObject(parent.memo + (MEMO_KEY to JsonPrimitive(archivedUuid)))
+        check(mangaRepository.update(MangaUpdate(id = parentId, memo = amended))) {
+            "Imported work identity could not be persisted"
+        }
+        val persisted = mangaRepository.getMangaById(parentId)
+        check(persisted.source == VIRTUAL_SOURCE_ID && readUuid(persisted.memo) == archivedUuid) {
+            "Imported UUID changed or disappeared during write; abort parent relinking"
+        }
+        return archivedUuid
+    }
+
     /** Reject collisions across favorite virtual parents before generating archive keys. */
     suspend fun ensureDistinct(parentIds: List<Long>): Map<Long, String> {
         require(parentIds.size == parentIds.distinct().size) { "Same virtual parent listed twice" }
