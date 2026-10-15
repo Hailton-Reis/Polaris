@@ -59,3 +59,31 @@ and execute full Kotlin ProtoBuf backup/restore on an Android device.
 A `Database.transaction` call alone does not prove concurrency guarantees
 without real database-driver/constraint verification. Issue #2 B01–B05 and
 issues #10/#11 remain OPEN. PR #1 remains DRAFT.
+
+## 2026-10-15 evidence and gate
+
+The locally executed Kotlin test source plus all Kotlin/SQL files and mock
+SQLDelight classes are Git blob-identical to the corresponding committed
+GitHub files. The **19/19** locally executed Kotlin cases include one extra
+regression refusing a changed virtual parent URL, even if the UUID and
+source-link rows still refer to that parent.
+
+**10/10 SQLite syntax/contract checks PASS** with Python's built-in sqlite3
+using a minimal pinned-Yomotsu-schema-shaped database. The GitHub Python
+test suite is a shorter equivalent 10-test implementation; the
+locally executed 10-test file is preserved separately in the evidence ZIP.
+Neither suite is a real SQLDelight code-generation result.
+
+[Full source, logs, SHA manifest (Drive)](https://drive.google.com/file/d/1BJBwYtub_1lYH07C1h8YByAVJLn2Jgjp/view).
+ZIP SHA256: `06a6aa52bfa007f1484deb61236517cfcebc41fe5b34deb1758419841d15cde1`.
+
+The offline host aggregator and CI now configure two more stages:
+`backup-sqldelight-port` minimum **19**,
+`backup-sqldelight-sqlite` minimum **10**. The total threshold for the
+ten host stages becomes **320 configured** cases
+(72+36+38+17+65+12+20+31+19+10). **The complete 320-case runner
+has not been executed.** The 19/19 and 10/10 refer to separate local
+host executions, not Gradle/Android acceptance.
+
+Issue #10/#11 P0 stay open, #2 Android B01–B05 remains unverified,
+PR #1 remains DRAFT and migration 15 is unchanged.
