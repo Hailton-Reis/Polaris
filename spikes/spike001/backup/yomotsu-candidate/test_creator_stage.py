@@ -30,6 +30,21 @@ class PinnedYomotsuCreatorStageTests(unittest.TestCase):
         self.assertIn("polarisBackupExporter.collect(selectedManga, backupManga, options)", content)
         self.assertIn("val backupManga = backupMangas(selectedManga, options)", content)
 
+    def test_previous_auto_backups_remain_until_success(self):
+        content = self.staged.read_text()
+        creation = content.split("file = if (isAutoBackup) {", 1)[1].split("} else {", 1)[0]
+        self.assertNotIn(".listFiles", creation)
+        self.assertIn(".drop(MAX_AUTO_BACKUPS)", content)
+        self.assertNotIn(".drop(MAX_AUTO_BACKUPS - 1)", content)
+        self.assertGreater(content.index(".drop(MAX_AUTO_BACKUPS)"),
+                           content.index("BackupFileValidator(context).validate(fileUri)"))
+
+    def test_multisource_validation_must_not_be_swallowed(self):
+        content = self.staged.read_text()
+        block = content.split("if (polarisBundle != null) {", 1)[1].split("} else {", 1)[0]
+        self.assertIn("BackupFileValidator(context).validate(fileUri)", block)
+        self.assertNotIn("runCatching", block)
+
     def test_original_file_drift_is_a_hard_error(self):
         with self.assertRaises(ValueError):
             render(self.pinned.read_bytes() + b"// different upstream\n")
