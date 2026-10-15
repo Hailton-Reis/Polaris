@@ -186,3 +186,51 @@ bash spikes/spike001/backup/proto-candidate/run_model_validation.sh
 The GitHub `domain-spikes.yml` CI now **requires the 7 Python staging tests** when a runner is allocated; it does not execute real Kotlin serialization. Complete 12-test protobuf simulation sources and logs are archived in [Polaris Drive evidence](https://drive.google.com/file/d/1dicLCIZXa-DJWW8OaR8J852fryD6Qpdx/view?usp=drivesdk), SHA-256 `704b3f3f261a576821744baca27babdd0b6638b0d0d9d02ed73c385063cb3bd5`.
 
 No migration15, original backup serializer or Android APK was changed, and there is **no complete updated unified-gate PASS claim**. Issue #11 remains P0 open. See [proto candidate README](../../spikes/spike001/backup/proto-candidate/README.md).
+
+## 2026-10-15 — persistent UUID candidate is now part of the backup JVM gate
+
+New candidate: `spikes/spike001/backup/uuid-candidate/YomotsuMergedWorkUuidStore.kt`.
+It uses the **existing** pinned Yomotsu `Manga.memo` JSON and
+`MangaRepository.update(MangaUpdate(id, memo))` APIs to persist a
+canonical per-virtual-parent UUID (`polaris.merge.work.uuid`).
+No migration 15 or app runtime files were modified.
+
+`ensure` reuses/persists a UUID for source 6969 virtual parents;
+`ensureDistinct` prevents repeated work IDs and conflicting UUIDs
+in the export selection; `assignArchived` preserves the actual UUID
+from a backup when restoring a new virtual parent, and refuses to overwrite
+a conflicting local UUID. Saves are verified through repository readback.
+
+**Exactly executed (standalone Kotlin host, 2026-10-15):**
+- Restore planner: 24/24
+- Export planner: 20/20
+- New UUID store/restore: 21/21
+- **Combined `bash spikes/spike001/backup/run_tests.sh`: 65/65 PASS**,
+  code, host stubs, test mains and runner hash-matched to the GitHub blobs.
+
+`run_host_gate.py` now requires three unique distinct Kotlin markers,
+`MERGED_BACKUP_RESTORE_PLANNER_PASS 24`,
+`MERGED_BACKUP_EXPORT_PLANNER_PASS 20`,
+`POLARIS_PERSISTED_MERGE_UUID_PASS 21`; duplicate or absent markers
+fail closed. The configured five-gate minimum is
+**72 Python + 36 SQLite + 38 main Kotlin + 17 backup SQLite +
+65 backup Kotlin = 228**. **This is not a claim of a completed
+228/228 unified gate.** The new Python parser tests were updated, but not
+independently executed as a full suite in this checkpoint.
+
+`spikes/domain-lab/build.gradle.kts` has a `spike001UuidStore`
+JavaExec task required by `checkSpikes`, but the Gradle/Android
+tests did NOT execute successfully in GitHub Actions. The 2026-10-15
+runs [Domain Spikes 38799775389](https://github.com/Hailton-Reis/Polaris/actions/runs/38799775389)
+and [Android 38799775637](https://github.com/Hailton-Reis/Polaris/actions/runs/38799775637)
+each have `runner_id=0` and `steps=[]` — a blocked CI infrastructure
+gate, **not** verified application compilation failure.
+
+[JSON/hash-manifest/log evidence](https://drive.google.com/file/d/1KyLLuGPBziDX4hMbudXEpE5pLlDua0Li/view)
+SHA-256 `e057ed04c44b9325072c6a329874bd5feb678264afc411ce5a8bacd5809ac303`.
+[Handoff dated 2026-10-15](RESUME_2026_10_15.md).
+
+**Limits:** tests use Yomotsu API-shaped stubs (not the real Android DB or
+`kotlinx.serialization.json` library), no physical UNIQUE or CAS on memo;
+the exporter/restorer app adapters, actual protobuf codec and Android
+B01–B05 are still required before #11 can be closed.
