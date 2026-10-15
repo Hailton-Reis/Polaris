@@ -234,3 +234,56 @@ SHA-256 `e057ed04c44b9325072c6a329874bd5feb678264afc411ce5a8bacd5809ac303`.
 `kotlinx.serialization.json` library), no physical UNIQUE or CAS on memo;
 the exporter/restorer app adapters, actual protobuf codec and Android
 B01–B05 are still required before #11 can be closed.
+
+## 2026-10-15 — Gradle backup lab split and TOCTOU fail-closed checks
+
+Static audit found a **real task graph error**: `spikes/domain-lab` exposed
+`spike001ProtoModel`, `spike001ProtoBuilder` and `spike001UuidStore`
+JavaExec tasks without adding their nested source files to the compiled
+source set. Even with a runner, those main classes would not be available.
+Blindly adding test doubles into the domain module would risk interfering
+with unrelated spikes.
+
+The fix is the separate `spikes/backup-lab` module: five explicit test
+source roots, five independent JavaExec mains and a `checkBackup` aggregate.
+`domain-lab` no longer advertises backup tasks it cannot compile.
+`domain-spikes.yml` triggers on the new module and invokes
+`gradle -p spikes/backup-lab checkBackup --no-daemon --stacktrace`
+**before** running the unrelated domain tests. A new
+`scripts/r001/test_backup_lab_structure.py` provides offline Python
+preflight against missing paths, ghost tasks and CI drift.
+
+An additional candidate race was reproduced: if the underlying virtual
+work changed a `localMangaId` to/from `NULL` between export planning
+and protobuf bundle assembly, the old builder trusted the new
+`isPending` flag without comparing it to the original association.
+`MergedBackupExportPlan.plannedVirtualWorks` now stores defensive
+per-parent snapshots; `BackupPolarisBundleBuilder.build` refuses
+archive assembly unless the complete current parent and its links match
+the saved plan. Changes to parent ID/UUID or child pending state
+trigger a **retry, not a silent incomplete backup**.
+
+**Verified actual local compiler execution:** all five test mains
+compiled together under host `kotlinc`; **102/102 PASS**:
+24 restore + 20 export + 18 proto DTO + 19 builder + 21 UUID.
+New builder tests fail on old source at scenario 17 (RED) and pass
+19/19 on corrected source (GREEN). The three changed Kotlin files in
+the actual runner matched GitHub blob SHAs
+`d55b227e16b09b35659690e118a54ebd04fd3043`,
+`c2f93019f858f95283f08dcd0cbc4b54ad403af6`,
+`a7140737fd9aadb8ba8ae38edc02e075c6640b90`.
+Additional seven direct GitHub-source CI/task structure assertions all
+passed. No successful **Gradle CLI** execution, Kotlin protobuf runtime
+validation or Android tests were performed.
+
+[Evidence ZIP in Polaris Drive](https://drive.google.com/file/d/1jd9Et9pOZMqDhFd7TL9kMk2qlYwM953D/view),
+SHA256 `380bace69264e44cd634ab91bc41de24a79e1f89a6cb8890362eebe4b62ae5d6`.
+The configured five-gate minimum remains **228**, which is NOT a
+reported completed full gate; `checkBackup` is a separate host
+compiler gate. Latest Actions [domain 38803383325](https://github.com/Hailton-Reis/Polaris/actions/runs/38803383325)
+and [Android 38803383316](https://github.com/Hailton-Reis/Polaris/actions/runs/38803383316)
+had `runner_id=0`, `steps=[]`. This remains an infrastructure
+block rather than evidence of code compile failure.
+
+No production `BackupCreator`, `BackupRestorer`, migrations or
+Android B01–B05 changed. PR #1 remains draft; issues #2/#10/#11 open.
