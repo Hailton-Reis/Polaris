@@ -70,6 +70,21 @@ class HostGateParserTests(unittest.TestCase):
         self.assertEqual(evaluate_gate("backup-adapter", complete + "POLARIS_YOMOTSU_EXPORT_ADAPTER_PASS 12\n", 0, 12)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
         self.assertEqual(evaluate_gate("backup-adapter", "EXPORT_ADAPTER_PASS 12\n", 0, 12)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
 
+    def test_sqldelight_port_kotlin_requires_unique_19_case_marker(self):
+        good = "SQLDELIGHT_PORT_PASS 19 done\nPOLARIS_SQLDELIGHT_PORT_PASS 19\n"
+        self.assertEqual(evaluate_gate("backup-sqldelight-port", good, 0, 19)["status"], "PASS")
+        self.assertEqual(evaluate_gate("backup-sqldelight-port", good, 1, 19)["status"], "NONZERO_EXIT")
+        self.assertEqual(evaluate_gate("backup-sqldelight-port", good.replace("PASS 19\n", "PASS 18\n"), 0, 19)["status"], "INSUFFICIENT_TEST_COVERAGE")
+        self.assertEqual(evaluate_gate("backup-sqldelight-port", good + "POLARIS_SQLDELIGHT_PORT_PASS 19\n", 0, 19)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
+        self.assertIsNone(extract_count("backup-sqldelight-port", "only PASS tests"))
+
+    def test_sqldelight_sqlite_gate_requires_all_10_tests(self):
+        good = "Ran 10 tests in 0.03s\n\nOK\n"
+        self.assertEqual(evaluate_gate("backup-sqldelight-sqlite", good, 0, 10)["status"], "PASS")
+        self.assertEqual(evaluate_gate("backup-sqldelight-sqlite", good, 1, 10)["status"], "NONZERO_EXIT")
+        self.assertEqual(evaluate_gate("backup-sqldelight-sqlite", good.replace("10 tests", "9 tests"), 0, 10)["status"], "INSUFFICIENT_TEST_COVERAGE")
+        self.assertEqual(evaluate_gate("backup-sqldelight-sqlite", good.replace("OK", "FAILED"), 0, 10)["status"], "MISSING_UNITTEST_OK_MARKER")
+
     def test_atomic_sqlite_restore_requires_all_31_checks(self):
         good = "Ran 31 tests in 0.02s\n\nOK\n"
         self.assertEqual(evaluate_gate("backup-atomic-sqlite", good, 0, 31)["status"], "PASS")
