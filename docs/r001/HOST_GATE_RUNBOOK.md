@@ -395,3 +395,33 @@ Kotlin `PolarisAtomicVirtualWorkPort`. The trial ledger and unique indexes
 are NOT installed in Android; migration15, `merged.sq` and production
 `BackupRestorer.kt` untouched. Review legacy duplicates and confirm
 `merged://polaris/<uuid>` URL compatibility with the real reader first.
+
+## 2026-10-15 — two new candidate SQLDelight port gates
+
+Staged only: `spikes/spike001/backup/restore-candidate/sqldelight-port/`.
+Runs in CI and `scripts/r001/run_host_gate.py`:
+
+```bash
+bash spikes/spike001/backup/restore-candidate/sqldelight-port/run_kotlin_host.sh
+python3 -m unittest discover -s spikes/spike001/backup/restore-candidate/sqldelight-port/tests -p 'test_*.py' -v
+```
+
+`backup-sqldelight-port`: one unique exact
+`POLARIS_SQLDELIGHT_PORT_PASS 19` marker, exit 0, minimum 19.
+`backup-sqldelight-sqlite`: Python `Ran 10 tests` and `OK`,
+exit 0, minimum 10. The complete **ten-stage configured minimum becomes 320**
+(72+36+38+17+65+12+20+31+19+10); **320/320 is NOT an execution result**.
+
+**Host evidence:** 19/19 compiled Kotlin candidate / mocked `Database`
+and 10/10 SQLite SQL syntax, uniqueness/FK and metadata settings cases.
+Both are independent suites, not Android codegen or runtime validation.
+The locally executed Kotlin source and fixtures all hash-match committed
+GitHub blobs. [Evidence ZIP](https://drive.google.com/file/d/1BJBwYtub_1lYH07C1h8YByAVJLn2Jgjp/view)
+SHA256 `06a6aa52bfa007f1484deb61236517cfcebc41fe5b34deb1758419841d15cde1`.
+The GitHub Python 10-case suite is slightly shorter than the locally
+executed 10-case test file; do not equate that remote Python test invocation
+with a completed local or CI run.
+
+**No changes to production migration15, SQLDelight generated code, installed
+unique indexes or real app BackupRestorer.** PR #1 remains DRAFT; issues #2,
+#10, #11 remain open.
