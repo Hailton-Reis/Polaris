@@ -20,10 +20,15 @@ GATES = (
     ("backup-adapter", ("bash", "spikes/spike001/backup/yomotsu-candidate/run_tests.sh"), 12),
     ("backup-restore", ("bash", "spikes/spike001/backup/restore-candidate/run_tests.sh"), 20),
     ("backup-atomic-sqlite", (sys.executable, "-m", "unittest", "discover", "-s", "spikes/spike001/backup/restore-candidate/atomic-sqlite", "-p", "test_*.py", "-q"), 31),
+    ("backup-sqldelight-port", ("bash", "spikes/spike001/backup/restore-candidate/sqldelight-port/run_kotlin_host.sh"), 19),
+    ("backup-sqldelight-sqlite", (sys.executable, "-m", "unittest", "discover", "-s", "spikes/spike001/backup/restore-candidate/sqldelight-port/tests", "-p", "test_*.py", "-q"), 10),
 )
 
 
 def extract_count(name: str, output: str):
+    if name == "backup-sqldelight-port":
+        hits = re.findall(r"(?m)^POLARIS_SQLDELIGHT_PORT_PASS (\d+)$", output)
+        return int(hits[0]) if len(hits) == 1 else None
     if name == "backup-restore":
         hits = re.findall(r"(?m)^POLARIS_YOMOTSU_RESTORE_COORDINATOR_PASS (\d+)$", output)
         return int(hits[0]) if len(hits) == 1 else None
@@ -48,7 +53,7 @@ def extract_count(name: str, output: str):
 def evaluate_gate(name: str, output: str, returncode: int, minimum: int):
     count = extract_count(name, output)
     passed = returncode == 0 and count is not None and count >= minimum
-    if name not in {"kotlin", "backup-kotlin", "backup-adapter", "backup-restore"}:
+    if name not in {"kotlin", "backup-kotlin", "backup-adapter", "backup-restore", "backup-sqldelight-port"}:
         passed = passed and bool(re.search(r"(?m)^OK(?:\s|$)", output))
     reason = ("PASS" if passed else
               "MISSING_OR_INVALID_TEST_SUMMARY" if count is None else
