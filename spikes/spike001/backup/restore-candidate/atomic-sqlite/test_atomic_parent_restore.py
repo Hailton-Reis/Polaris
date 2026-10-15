@@ -7,6 +7,9 @@ import unittest
 from pathlib import Path
 from dataclasses import replace
 import json
+from tempfile import TemporaryDirectory
+from concurrent.futures import ThreadPoolExecutor
+from threading import Barrier
 from atomic_parent_restore_host import (Work, Link, commit_all_or_throw,
                                         fingerprint, MEMO_KEY)
 
@@ -162,6 +165,59 @@ class AtomicRestoreHostTests(unittest.TestCase):
         self.c.execute('INSERT INTO mangas(source,url,title,status,favorite,initialized,viewer,chapter_flags,cover_last_modified,date_added) VALUES(99,"/tmp","tmp",0,0,1,0,0,0,0)')
         with self.assertRaises(RuntimeError):commit_all_or_throw(self.c,[work()])
         self.c.rollback()
+    def test_two_database_connections_importing_same_archive_create_one_parent(self):
+        with TemporaryDirectory() as td:
+            dbpath=str(Path(td)/'polaris.db')
+            with sqlite3.connect(dbpath) as setup:
+                setup.execute('PRAGMA foreign_keys=ON')
+                setup.executescript(SCHEMA)
+                setup.executescript((HERE/'atomic_parent_restore_candidate.sql').read_text())
+                setup.execute("INSERT INTO mangas(_id,source,url,title,status,favorite,initialized,viewer,chapter_flags,cover_last_modified,date_added) VALUES(101,11,'/a','A',0,0,1,0,0,0,0)")
+                setup.execute("INSERT INTO mangas(_id,source,url,title,status,favorite,initialized,viewer,chapter_flags,cover_last_modified,date_added) VALUES(202,12,'/b','B',0,0,1,0,0,0,0)")
+            barrier=Barrier(2)
+            def contender():
+                c=sqlite3.connect(dbpath,timeout=10)
+                try:
+                    c.execute('PRAGMA foreign_keys=ON')
+                    barrier.wait(timeout=5)
+                    return commit_all_or_throw(c,[work()])[0]
+                finally:c.close()
+            with ThreadPoolExecutor(max_workers=2) as pool:
+                first=pool.submit(contender);second=pool.submit(contender)
+                self.assertEqual(first.result(timeout=10),second.result(timeout=10))
+            with sqlite3.connect(dbpath) as verify:
+                self.assertEqual(count(verify,'polaris_restore_ledger'),1)
+                self.assertEqual(count(verify,'merged'),3)
+
+    def test_two_database_connections_with_conflicting_archive_are_not_both_accepted(self):
+        with TemporaryDirectory() as td:
+            dbpath=str(Path(td)/'polaris.db')
+            with sqlite3.connect(dbpath) as setup:
+                setup.execute('PRAGMA foreign_keys=ON')
+                setup.executescript(SCHEMA)
+                setup.executescript((HERE/'atomic_parent_restore_candidate.sql').read_text())
+                setup.execute("INSERT INTO mangas(_id,source,url,title,status,favorite,initialized,viewer,chapter_flags,cover_last_modified,date_added) VALUES(101,11,'/a','A',0,0,1,0,0,0,0)")
+                setup.execute("INSERT INTO mangas(_id,source,url,title,status,favorite,initialized,viewer,chapter_flags,cover_last_modified,date_added) VALUES(202,12,'/b','B',0,0,1,0,0,0,0)")
+            barrier=Barrier(2)
+            def contender(w):
+                c=sqlite3.connect(dbpath,timeout=10)
+                try:
+                    c.execute('PRAGMA foreign_keys=ON')
+                    barrier.wait(timeout=5)
+                    return commit_all_or_throw(c,[w])[0]
+                finally:c.close()
+            with ThreadPoolExecutor(max_workers=2) as pool:
+                first=pool.submit(contender,work())
+                second=pool.submit(contender,replace(work(),title='Conflicting work'))
+                results=[]
+                for future in [first,second]:
+                    try:results.append(('success',future.result(timeout=10)))
+                    except ValueError:results.append(('rejected',None))
+            self.assertEqual(sorted(r[0] for r in results),['rejected','success'])
+            with sqlite3.connect(dbpath) as verify:
+                self.assertEqual(count(verify,'polaris_restore_ledger'),1)
+                self.assertEqual(count(verify,'merged'),3)
+
     def test_fingerprint_stable_across_equal_objects(self):
         self.assertEqual(fingerprint(work()),fingerprint(work()))
     def test_manual_local_edit_to_priority_does_not_get_overwritten(self):
