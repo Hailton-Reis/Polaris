@@ -29,6 +29,8 @@ data class MergedBackupExportPlan(
     val additionalRealChildMangaIds: List<Long>,
     /** Links kept without a local manga row. Never infer these from titles. */
     val pendingSourceWorks: Set<SourceWorkIdentity>,
+    /** Immutable per-parent link and identity snapshot for export's TOCTOU guard. */
+    val plannedVirtualWorks: List<ExportVirtualWork> = emptyList(),
 )
 
 object MergedBackupExportPlanner {
@@ -91,6 +93,9 @@ object MergedBackupExportPlanner {
                 exportedParentLocalId = work.parentLocalId,
             )
         }
-        return MergedBackupExportPlan(portable, additional.toList(), pending)
+        return MergedBackupExportPlan(
+            portable, additional.toList(), pending,
+            virtualWorks.map { it.copy(links = it.links.toList()) },
+        )
     }
 }
