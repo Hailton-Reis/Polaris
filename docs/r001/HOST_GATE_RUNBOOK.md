@@ -287,3 +287,46 @@ block rather than evidence of code compile failure.
 
 No production `BackupCreator`, `BackupRestorer`, migrations or
 Android B01–B05 changed. PR #1 remains draft; issues #2/#10/#11 open.
+
+## 2026-10-15 — sixth offline gate: Yomotsu API-linked backup export adapter
+
+Sixth configured offline suite: `backup-adapter` runs
+`bash spikes/spike001/backup/yomotsu-candidate/run_tests.sh`, which compiles
+the **actual committed** `PolarisYomotsuBackupExporter`,
+`YomotsuMergedWorkUuidStore`, the two portable planners and the optional
+protobuf DTO/builder with explicit **host-only** Yomotsu API-shaped doubles.
+It requires a single exact `POLARIS_YOMOTSU_EXPORT_ADAPTER_PASS 12` marker
+and exit 0; missing, repeated, incorrect or below-threshold markers fail.
+
+**12/12 adapter JVM PASS verified** with Git-blob-identical 16 source and
+host fixture files, including original latest planner and UUID code. Tests:
+nonfavorite child snapshots, shared child deduplication, options forwarding,
+pending links, invalid virtual root, wrong source identity, mid-export state
+mutation, parent title mutation, disabled library backup and persisted UUID.
+
+The six configured minimums are
+**72 Python + 36 SQLite + 38 main Kotlin + 17 backup SQLite + 65 backup Kotlin
++ 12 Yomotsu adapter Kotlin = 240**. These are minimums, and a **complete
+six-stage run was NOT executed**. The Gradle backup-lab explicitly excludes
+`**/yomotsu-candidate/**` to prevent host fake classes from conflicting
+with its other stubbed source sets; new candidate tests run in a separate
+`kotlinc` subprocess.
+
+**Separately staged, not production-applied:**
+`spikes/spike001/backup/yomotsu-candidate/BackupCreator.staged.kt`
+from exact pinned original Git blob
+`98036c09002b6058a36520a82ac889fbaa9e93cb`; reproducible
+`apply_backup_creator_candidate.py` and **10 configured Python staging tests**.
+The pinned patched creator forwards options to the exporter, adds source
+metadata for supplementary real Manga, and retains old automatic backups
+until AFTER the new one has been written and validated. Validator failures
+are fatal for archives with a Polaris bundle. The 10 Python source-staging
+tests were **not locally executed** in this checkpoint (CI pending).
+
+[2026-10-15 evidence ZIP](https://drive.google.com/file/d/1_L5Xw5NEcEseNVoTcccx2RIlIWyvGvhH/view)
+SHA256 `9006b19e3a3c47652968554f17ae06faa4050454081421fe141bb318f8ddfe6f`.
+See [new Yomotsu candidate README](../../spikes/spike001/backup/yomotsu-candidate/README.md).
+
+**No real Gradle/Android or Kotlin protobuf round trip, SQLDelight migration,
+runtime test B01–B05, restored virtual links or complete six-gate verification.**
+Keep PR #1 DRAFT, issues #2/#10/#11 OPEN, migration15 untouched.
