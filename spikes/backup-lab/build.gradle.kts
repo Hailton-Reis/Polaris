@@ -24,7 +24,7 @@ sourceSets {
         )
         // This tree also contains a separate Yomotsu adapter host lab
         // with differently shaped API doubles. Never compile both together.
-        kotlin.exclude("**/yomotsu-candidate/**")
+        kotlin.exclude("**/yomotsu-candidate/**", "**/restore-candidate/**")
     }
 }
 
