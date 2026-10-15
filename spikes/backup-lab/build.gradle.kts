@@ -42,6 +42,6 @@ val backupUuidStore = backupMain("backupUuidStore", "polaris.spike001.backup.uui
 
 tasks.register("checkBackup") {
     group = "verification"
-    description = "Run five independently compiled backup-host test mains (99 scenarios)"
+    description = "Run five independently compiled backup-host test mains (102 scenarios)"
     dependsOn(backupRestore, backupExport, backupProtoModel, backupProtoBuilder, backupUuidStore)
 }
