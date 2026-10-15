@@ -20,6 +20,13 @@ object BackupPolarisBundleBuilder {
         ordinaryManga: List<BackupManga>,
         supplementalManga: List<BackupManga>,
     ): BackupPolarisBundle {
+        // Compare the entire recorded relationship snapshot, including local
+        // child IDs and pending state. Otherwise a child can be unlinked while
+        // MangaBackupCreator is writing, and we could silently export the wrong
+        // isPending flag despite identical source/URL/title/settings.
+        require(plan.plannedVirtualWorks == liveVirtualWorks) {
+            "Virtual parent or source links changed after export planning; retry the backup"
+        }
         require(liveVirtualWorks.map { it.archiveWorkKey }.distinct().size == liveVirtualWorks.size) {
             "Duplicated live work keys"
         }
