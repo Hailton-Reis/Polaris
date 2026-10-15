@@ -11,3 +11,5 @@ kotlinc "$DIR/MergedBackupRestorePlanner.kt" "$DIR/MergedBackupRestorePlannerTes
   -include-runtime -d "$TEMP/merged-backup-tests.jar"
 java -cp "$TEMP/merged-backup-tests.jar" polaris.spike001.backup.MergedBackupRestorePlannerTestKt
 java -cp "$TEMP/merged-backup-tests.jar" polaris.spike001.backup.MergedBackupExportPlannerTestKt
+# Verify durable parent identities separately using pinned Yomotsu API-shaped stubs.
+bash "$DIR/uuid-candidate/run_uuid_host.sh"
