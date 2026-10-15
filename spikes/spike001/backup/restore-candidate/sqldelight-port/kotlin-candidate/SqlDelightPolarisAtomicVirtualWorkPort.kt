@@ -56,6 +56,9 @@ class SqlDelightPolarisAtomicVirtualWorkPort(
                         "Ledger parent was removed or modified"
                     }
                     check(memoUuid(parent.memo) == work.archiveUuid) { "Parent UUID memo disagrees with ledger" }
+                    check(parent.url == "merged://polaris/${work.archiveUuid}") {
+                        "Virtual parent URL no longer matches its stable archive identity"
+                    }
                     val expected = desiredEdges(work, parentId, parent.url)
                     val existing = q.selectRestoredParentEdges(parentId).awaitAsList().map {
                         Edge(it.info_manga, it.get_chapter_updates, it.chapter_sort_mode,
