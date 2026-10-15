@@ -31,6 +31,7 @@ fun main(){
  case("different archives sharing a real source can coexist") {val db=setup();run(db,work(),work(B));check(db.polarisRestoreQueries.ledgers.size==2&&db.polarisRestoreQueries.edges.size==6)}
  case("different archive fingerprint refuses replacement") {val db=setup();run(db,work());fail{run(db,work().copy(title="different"))};check(db.polarisRestoreQueries.edges.size==3)}
  case("manual unlink remains unlinked on repeated backup") {val db=setup();run(db,work());db.polarisRestoreQueries.edges.removeIf{it.manga_source==12L};fail{run(db,work())};check(db.polarisRestoreQueries.edges.size==2)}
+ case("virtual parent URL mutation is not accepted on replay") {val db=setup();run(db,work());val q=db.polarisRestoreQueries;val r=q.mangas.getValue(900);q.mangas[900]=r.copy(url="merged://bad-url");fail{run(db,work())}}
  case("manual priority edit refuses replay") {val db=setup();run(db,work());val q=db.polarisRestoreQueries;q.edges[0]=q.edges[0].copy(chapter_priority=99);fail{run(db,work())}}
  case("failed second parent rolls back first parent") {val db=setup();val q=db.polarisRestoreQueries;q.failAtEdge=3;fail{run(db,work(),work(B))};check(q.mangas.size==2&&q.edges.isEmpty()&&q.ledgers.isEmpty())}
  case("real child missing aborts before parent creation") {val db=setup();db.polarisRestoreQueries.mangas.remove(202L);fail{run(db,work())};check(db.polarisRestoreQueries.ledgers.isEmpty())}
