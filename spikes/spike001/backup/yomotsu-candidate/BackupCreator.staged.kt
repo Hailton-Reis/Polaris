@@ -69,13 +69,6 @@ class BackupCreator(
                 // Get dir of file and create
                 val dir = UniFile.fromUri(context, uri)
 
-                // Delete older backups
-                dir?.listFiles { _, filename -> FILENAME_REGEX.matches(filename) }
-                    .orEmpty()
-                    .sortedByDescending { it.name }
-                    .drop(MAX_AUTO_BACKUPS - 1)
-                    .forEach { it.delete() }
-
                 // Create new file to place backup
                 dir?.createFile(getFilename())
             } else {
@@ -124,14 +117,28 @@ class BackupCreator(
             }
             val fileUri = file.uri
 
-            // Make sure it's a valid backup file (only if readable)
-            runCatching {
+            // For a multifonte archive the validator is a mandatory gate:
+            // never report a successful incomplete or invalid backup.
+            if (polarisBundle != null) {
                 BackupFileValidator(context).validate(fileUri)
-            }.onFailure { e ->
-                logcat(LogPriority.WARN, e) { "Validação de backup ignorada: ${e.message}" }
+            } else {
+                // Preserve existing Yomotsu handling for legacy backups.
+                runCatching {
+                    BackupFileValidator(context).validate(fileUri)
+                }.onFailure { e ->
+                    logcat(LogPriority.WARN, e) { "Validação de backup ignorada: ${e.message}" }
+                }
             }
 
             if (isAutoBackup) {
+                // Rotate only AFTER new backup bytes have been written and
+                // validated; a failed Polaris export must keep older backups.
+                val dir = UniFile.fromUri(context, uri)
+                dir?.listFiles { _, filename -> FILENAME_REGEX.matches(filename) }
+                    .orEmpty()
+                    .sortedByDescending { it.name }
+                    .drop(MAX_AUTO_BACKUPS)
+                    .forEach { it.delete() }
                 backupPreferences.lastAutoBackupTimestamp.set(Clock.System.now().toEpochMilliseconds())
             }
 
