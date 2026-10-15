@@ -17,10 +17,14 @@ GATES = (
     ("kotlin", ("bash", "scripts/r001/test_spike001_host.sh"), 38),
     ("backup-sqlite", (sys.executable, "-m", "unittest", "discover", "-s", "spikes/spike001/backup", "-p", "test_*.py", "-q"), 17),
     ("backup-kotlin", ("bash", "spikes/spike001/backup/run_tests.sh"), 65),
+    ("backup-adapter", ("bash", "spikes/spike001/backup/yomotsu-candidate/run_tests.sh"), 12),
 )
 
 
 def extract_count(name: str, output: str):
+    if name == "backup-adapter":
+        hits = re.findall(r"(?m)^POLARIS_YOMOTSU_EXPORT_ADAPTER_PASS (\\d+)$", output)
+        return int(hits[0]) if len(hits) == 1 else None
     if name == "backup-kotlin":
         # All three Kotlin suites must pass. Missing, repeated or spoofed
         # success markers must never turn a partial run into PASS.
@@ -39,7 +43,7 @@ def extract_count(name: str, output: str):
 def evaluate_gate(name: str, output: str, returncode: int, minimum: int):
     count = extract_count(name, output)
     passed = returncode == 0 and count is not None and count >= minimum
-    if name not in {"kotlin", "backup-kotlin"}:
+    if name not in {"kotlin", "backup-kotlin", "backup-adapter"}:
         passed = passed and bool(re.search(r"(?m)^OK(?:\s|$)", output))
     reason = ("PASS" if passed else
               "MISSING_OR_INVALID_TEST_SUMMARY" if count is None else
