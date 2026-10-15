@@ -70,6 +70,14 @@ class HostGateParserTests(unittest.TestCase):
         self.assertEqual(evaluate_gate("backup-adapter", complete + "POLARIS_YOMOTSU_EXPORT_ADAPTER_PASS 12\n", 0, 12)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
         self.assertEqual(evaluate_gate("backup-adapter", "EXPORT_ADAPTER_PASS 12\n", 0, 12)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
 
+    def test_atomic_sqlite_restore_requires_all_31_checks(self):
+        good = "Ran 31 tests in 0.02s\n\nOK\n"
+        self.assertEqual(evaluate_gate("backup-atomic-sqlite", good, 0, 31)["status"], "PASS")
+        self.assertEqual(evaluate_gate("backup-atomic-sqlite", good, 1, 31)["status"], "NONZERO_EXIT")
+        self.assertEqual(evaluate_gate("backup-atomic-sqlite", good.replace("31 tests", "29 tests"), 0, 31)["status"], "INSUFFICIENT_TEST_COVERAGE")
+        self.assertEqual(evaluate_gate("backup-atomic-sqlite", good.replace("OK", "FAILED"), 0, 31)["status"], "MISSING_UNITTEST_OK_MARKER")
+        self.assertIn("atomic-sqlite", next(c for n,c,m in GATES if n == "backup-atomic-sqlite"))
+
     def test_child_first_restore_requires_exact_marker_and_success(self):
         ok = "RESTORE_COORDINATOR_PASS 20 final\nPOLARIS_YOMOTSU_RESTORE_COORDINATOR_PASS 20\n"
         self.assertEqual(evaluate_gate("backup-restore", ok, 0, 20)["status"], "PASS")
