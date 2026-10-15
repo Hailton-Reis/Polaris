@@ -1,0 +1,50 @@
+-- R001 STAGING ONLY. Production migration 15 remains untouched.
+-- Before integrating, audit legacy duplicate merged links and all existing virtual UUID memos.
+CREATE TABLE polaris_restore_ledger (
+    archive_uuid TEXT NOT NULL PRIMARY KEY,
+    parent_manga_id INTEGER NOT NULL UNIQUE,
+    archive_digest TEXT NOT NULL,
+    FOREIGN KEY(parent_manga_id) REFERENCES mangas(_id) ON DELETE CASCADE
+);
+
+CREATE UNIQUE INDEX polaris_merged_source_identity_unique
+ON merged(merge_id, manga_source, manga_url);
+
+CREATE UNIQUE INDEX polaris_merged_real_id_unique
+ON merged(merge_id, manga_id) WHERE manga_id IS NOT NULL;
+
+selectLedgerForUuid:
+SELECT parent_manga_id, archive_digest FROM polaris_restore_ledger WHERE archive_uuid = :archiveUuid;
+
+selectAllVirtualUuidMemos:
+SELECT _id, memo FROM mangas WHERE source = 6969;
+
+selectVirtualParentById:
+SELECT _id, source, url, title, memo FROM mangas WHERE _id = :parentId;
+
+selectVirtualParentByUrl:
+SELECT _id FROM mangas WHERE source = 6969 AND url = :parentUrl;
+
+selectAllExactSourceChildIds:
+SELECT _id FROM mangas WHERE source = :sourceId AND url = :sourceUrl;
+
+selectRestoredParentEdges:
+SELECT info_manga, get_chapter_updates, chapter_sort_mode, chapter_priority,
+       download_chapters, manga_id, manga_url, manga_source, merge_url
+FROM merged WHERE merge_id = :parentId ORDER BY _id;
+
+insertNewRestoredParent:
+INSERT INTO mangas(source,url,title,status,favorite,initialized,viewer,chapter_flags,
+                  cover_last_modified,date_added,memo)
+VALUES(6969, :parentUrl, :parentTitle, 0, 1, 1, 0, 0, 0, 0, :memo)
+RETURNING _id;
+
+insertArchiveLedger:
+INSERT INTO polaris_restore_ledger(archive_uuid,parent_manga_id,archive_digest)
+VALUES(:archiveUuid,:parentId,:archiveDigest);
+
+insertRestoredEdge:
+INSERT INTO merged(info_manga,get_chapter_updates,chapter_sort_mode,chapter_priority,
+                   download_chapters,merge_id,merge_url,manga_id,manga_url,manga_source)
+VALUES(:infoManga,:getChapterUpdates,:chapterSortMode,:chapterPriority,:downloadChapters,
+       :parentId,:parentUrl,:mangaId,:mangaUrl,:mangaSource);
