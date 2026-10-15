@@ -38,20 +38,29 @@ class HostGateParserTests(unittest.TestCase):
     def test_backup_kotlin_marker_requires_both_stages_and_clean_exit(self):
         restore = "MERGED_BACKUP_RESTORE_PLANNER_PASS 24\n"
         export = "MERGED_BACKUP_EXPORT_PLANNER_PASS 20\n"
-        both = restore + export
-        self.assertEqual(evaluate_gate("backup-kotlin", both, 0, 44)["status"], "PASS")
-        self.assertEqual(evaluate_gate("backup-kotlin", both, 1, 44)["status"], "NONZERO_EXIT")
-        self.assertEqual(evaluate_gate("backup-kotlin", both.replace("PASS 20", "PASS 19"), 0, 44)["status"], "INSUFFICIENT_TEST_COVERAGE")
-        self.assertEqual(evaluate_gate("backup-kotlin", restore, 0, 44)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
-        self.assertEqual(evaluate_gate("backup-kotlin", export, 0, 44)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
-        self.assertEqual(evaluate_gate("backup-kotlin", both + export, 0, 44)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
-        self.assertEqual(evaluate_gate("backup-kotlin", both + restore, 0, 44)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
+        uuid = "POLARIS_PERSISTED_MERGE_UUID_PASS 15\n"
+        both = restore + export + uuid
+        self.assertEqual(evaluate_gate("backup-kotlin", both, 0, 59)["status"], "PASS")
+        self.assertEqual(evaluate_gate("backup-kotlin", both, 1, 59)["status"], "NONZERO_EXIT")
+        self.assertEqual(evaluate_gate("backup-kotlin", both.replace("PASS 20", "PASS 19"), 0, 59)["status"], "INSUFFICIENT_TEST_COVERAGE")
+        self.assertEqual(evaluate_gate("backup-kotlin", restore, 0, 59)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
+        self.assertEqual(evaluate_gate("backup-kotlin", export, 0, 59)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
+        self.assertEqual(evaluate_gate("backup-kotlin", uuid, 0, 59)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
+        self.assertEqual(evaluate_gate("backup-kotlin", both + export, 0, 59)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
+        self.assertEqual(evaluate_gate("backup-kotlin", both + uuid, 0, 59)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
+        self.assertEqual(evaluate_gate("backup-kotlin", both + restore, 0, 59)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
 
     def test_backup_kotlin_rejects_false_marker_and_missing_report(self):
-        good = "MERGED_BACKUP_RESTORE_PLANNER_PASS 24\nMERGED_BACKUP_EXPORT_PLANNER_PASS 20\n"
+        good = "MERGED_BACKUP_RESTORE_PLANNER_PASS 24\nMERGED_BACKUP_EXPORT_PLANNER_PASS 20\nPOLARIS_PERSISTED_MERGE_UUID_PASS 15\n"
         self.assertIsNone(extract_count("backup-kotlin", good.replace("EXPORT_PLANNER", "EXPORT_PLAN")))
         self.assertIsNone(extract_count("backup-kotlin", good.replace("PASS 24", "PASS 24 (host)")))
         self.assertIsNone(extract_count("backup-kotlin", ""))
+
+    def test_uuid_backup_gate_requires_third_unique_marker(self):
+        good = "MERGED_BACKUP_RESTORE_PLANNER_PASS 24\nMERGED_BACKUP_EXPORT_PLANNER_PASS 20\nPOLARIS_PERSISTED_MERGE_UUID_PASS 15\n"
+        self.assertEqual(evaluate_gate("backup-kotlin", good, 0, 59)["status"], "PASS")
+        self.assertIsNone(extract_count("backup-kotlin", good.replace("POLARIS_PERSISTED_MERGE_UUID_PASS 15\n", "")))
+        self.assertIsNone(extract_count("backup-kotlin", good + "POLARIS_PERSISTED_MERGE_UUID_PASS 15\n"))
 
     def test_backup_sqlite_requires_unittest_summary_and_ok(self):
         output = "Ran 17 tests in 0.1s\n\nOK\n"
@@ -62,7 +71,7 @@ class HostGateParserTests(unittest.TestCase):
     def test_backup_suites_are_mandatory_host_gates(self):
         gates = {name: (command, required) for name, command, required in GATES}
         self.assertEqual(gates["backup-sqlite"][1], 17)
-        self.assertEqual(gates["backup-kotlin"][1], 44)
+        self.assertEqual(gates["backup-kotlin"][1], 59)
         self.assertIn("spikes/spike001/backup", " ".join(gates["backup-sqlite"][0]))
         self.assertIn("spikes/spike001/backup/run_tests.sh", gates["backup-kotlin"][0])
 
