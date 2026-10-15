@@ -88,6 +88,8 @@ jobs:
         run: python3 -m unittest discover -s spikes/spike001/backup/yomotsu-candidate -p 'test_creator_stage.py' -v
       - name: Compile and test Yomotsu source-aware backup adapter (host-only)
         run: bash spikes/spike001/backup/yomotsu-candidate/run_tests.sh
+      - name: Restore source-child snapshots before parent associations (host-only)
+        run: bash spikes/spike001/backup/restore-candidate/run_tests.sh
       - name: Compile and run isolated backup/UUID host candidates
         run: gradle -p spikes/backup-lab checkBackup --no-daemon --stacktrace
       - name: Compile and run domain spikes
