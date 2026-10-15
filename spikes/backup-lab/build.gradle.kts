@@ -22,6 +22,9 @@ sourceSets {
             "../spike001/backup/uuid-candidate",
             "../spike001/backup/uuid-candidate/host-tests",
         )
+        // This tree also contains a separate Yomotsu adapter host lab
+        // with differently shaped API doubles. Never compile both together.
+        kotlin.exclude("**/yomotsu-candidate/**")
     }
 }
 
