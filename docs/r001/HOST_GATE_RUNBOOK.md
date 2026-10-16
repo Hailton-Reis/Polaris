@@ -433,3 +433,18 @@ unique indexes or real app BackupRestorer.** PR #1 remains DRAFT; issues #2,
 python3 -m unittest discover -s spikes/spike001/backup/restore-candidate/migration-audit -p 'test_*.py' -v
 ```
 **20/20 PASS locally**, published code and tests Git blob-identical to executed sources. Source key/root/UUID collision preflight deliberately writes NO database rows, CLI opens the supplied database snapshot in `mode=ro`. The host-only eleven-stage **configured** threshold becomes **340**; the full 340 checks were not executed. [Evidence ZIP](https://drive.google.com/file/d/1_rEGkzRc1WbJRBNsODkDf8tUliGZmUzZ/view) SHA256 `76cb74f9cd7e8a6332b4d7d0fb46760d1dfcf7e9e9eb635df23233d0a678cdb6`. Before Android migration, perform a consistent database backup, review reported legacy conflicts, compile actual SQLDelight/Gradle and test on devices; migration15 remains unchanged.
+
+## 2026-10-15 — safe in-memory migration rehearsal and report no-clobber
+
+The mandatory `backup-migration-audit` stage now contains **40** tests
+(20 legacy audit + 20 `:memory:` DDL rehearsal, report overwrite safety).
+The verified candidate checks all staged UNIQUE indexes, FK/PK ledger,
+SQLite integrity and row hashes without applying migrations to the
+original DB. Both CLI report paths are guarded by `O_EXCL` and 0600:
+cannot truncate an existing SQLite file or a report symlink.
+
+**40/40 PASS locally** against exact GitHub blob-matched sources;
+eleven-stage *configured* minimum is **360**, not an executed full
+360/360. [Evidence ZIP](https://drive.google.com/file/d/1yDAhdjx4tpoItj-NfbjmfjYO7Ay70QaO/view)
+SHA256 `140b2c192a2ccfbf4d9efe765148b0f0db63c8aad6f89f22e6fa40851ae7adb2`.
+No actual Gradle SQLDelight generation or Android database migration.
