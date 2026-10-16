@@ -7,6 +7,7 @@ physical uniqueness or silently damage a user's source choices. NEVER mutates.
 from __future__ import annotations
 
 import argparse
+import os
 from collections import Counter, defaultdict
 import json
 from pathlib import Path
@@ -172,6 +173,28 @@ def inspect_file(path: Path):
         connection.close()
 
 
+def save_report_without_overwrite(database: Path, report_path: Path, output: str) -> None:
+    """Safely create a new JSON file; NEVER truncate any existing path.
+
+    Report paths must not point at the SQLite database, its journal/WAL/SHM
+    sidecars, or an existing file (including symlink or hard link). O_EXCL
+    protects against a last-moment symlink/filename race at creation time.
+    """
+    db_path = database.resolve()
+    target = report_path.resolve(strict=False)
+    forbidden = {Path(str(db_path) + suffix) for suffix in ("", "-wal", "-shm", "-journal")}
+    if target in forbidden or report_path.suffix.lower() != '.json':
+        raise ValueError('Report must be a distinct new .json file, not the database/sidecar')
+    fd = os.open(report_path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+    try:
+        with os.fdopen(fd, 'w', encoding='utf-8') as f:
+            f.write(output + '\n')
+    except BaseException:
+        # Remove a partially-written *new* report if it could not complete.
+        report_path.unlink(missing_ok=True)
+        raise
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('database', type=Path, help='Path to a COPY of a Yomotsu/Polaris SQLite DB')
@@ -179,12 +202,16 @@ def main(argv=None):
     args = parser.parse_args(argv)
     try:
         report = inspect_file(args.database)
-    except (sqlite3.DatabaseError, OSError, FileNotFoundError) as exc:
+    except (sqlite3.DatabaseError, OSError, FileNotFoundError, ValueError) as exc:
         print(json.dumps({'error': str(exc), 'safe_to_install_unique_indexes': False}), file=sys.stderr)
         return 3
     output = json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True)
     if args.report:
-        args.report.write_text(output + '\n', encoding='utf-8')
+        try:
+            save_report_without_overwrite(args.database, args.report, output)
+        except (OSError, ValueError) as exc:
+            print(json.dumps({'error': str(exc), 'safe_to_install_unique_indexes': False}), file=sys.stderr)
+            return 3
     print(output)
     return 0 if report['safe_to_install_unique_indexes'] else 2
 
