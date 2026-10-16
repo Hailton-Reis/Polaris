@@ -34,7 +34,7 @@ python3 -m unittest discover \
 
 **40/40 testes Python/SQLite executados localmente e aprovados**, incluindo casos em que a ferramenta deve recusar índices, respeitar pending, detectar UUID conflituoso e preservar os bytes do banco. O código e o teste publicados foram comparados pelos hashes Git blob às versões exatas executadas. O `run_host_gate.py` e `domain-spikes.yml` exigem a suíte de 40 como estágio `backup-migration-audit` quando o runner estiver disponível.
 
-O mínimo **configurado** dos agora **11 grupos** do host gate é **360 testes** (320 anteriores +40), mas **o gate completo 340 não foi executado**. Não houve alteração no `mangas.sq`, `merged.sq`, migration 15, classes SQLDelight de produção nem no APK. Issues #2/#10/#11 permanecem abertas e PR #1 em DRAFT.
+O mínimo **configurado** dos agora **11 grupos** do host gate é **360 testes** (320 anteriores +40), mas **o gate completo 360 não foi executado**. Não houve alteração no `mangas.sq`, `merged.sq`, migration 15, classes SQLDelight de produção nem no APK. Issues #2/#10/#11 permanecem abertas e PR #1 em DRAFT.
 
 ## Ensaio real da migração sem tocar no banco original (2026-10-15)
 
@@ -83,3 +83,64 @@ bytes do arquivo original. [ZIP no Drive](https://drive.google.com/file/d/1yDAhd
 SHA-256 `140b2c192a2ccfbf4d9efe765148b0f0db63c8aad6f89f22e6fa40851ae7adb2`.
 O 11º gate host agora exige 40, elevando o mínimo configurado total
 de **340 para 360**, sem execução conjunta dos onze grupos.
+
+## 2026-10-15 — plano de reconciliação sem exclusões automáticas
+
+`plan_legacy_reconciliation.py` estende as ferramentas anteriores com
+**grupos de conflitos relacionados** antes de ativar índices físicos UNIQUE:
+
+- Duas referências podem compartilhar a mesma `(merge_id,manga_source,manga_url)`,
+  inclusive uma pendente (`manga_id=NULL`) e outra resolvida.
+- Duas referências podem apontar o mesmo `(merge_id,manga_id)` real
+  embora armazenem `source+URL` diferentes.
+- Esses conflitos podem estar conectados indiretamente: a linha A
+  conflita com B por fonte+URL e B com C por manga_id. O plano
+  une o trio num **único grupo de revisão**, evitando resolver partes
+  de um problema e criar outro.
+
+Classes: `EXACT_DUPLICATE_CANDIDATE_REVIEW` (TODOS os campos iguais,
+exceto `_id`); `PENDING_VS_RESOLVED_MANUAL_REVIEW`;
+`REAL_IDENTITY_MANUAL_REVIEW`;
+`SETTINGS_OR_IDENTITY_MANUAL_REVIEW` e
+`VIRTUAL_ROOT_REVIEW_REQUIRED`.
+
+Mesmo para cópias idênticas, a ferramenta somente **sugere** o ID
+a preservar e os IDs redundantes para análise. Não assume que ninguém
+referencia o antigo `merged._id`. **Não cria SQL DELETE para produção,
+não atribui prioridade arbitrária e não reconecta links NULL.**
+Para conflitos de configurações, raiz, IDs ou estado pendente, nem sequer
+sugere uma linha vencedora.
+
+A opção `--simulate-exact` remove SOMENTE as candidatas idênticas
+em `:memory:`, preserva e compara integralmente os registros
+sobreviventes, chama o ensaio DDL anterior sobre outra cópia em memória e
+mostra se os índices passariam **nesse cenário hipotético**. A análise
+continua exigindo revisão humana. Relatórios são redigidos (somente
+IDs locais, tipos de conflito, contagens e hashes) e gerados com
+`O_EXCL` para não sobrescrever arquivos.
+
+```bash
+python3 spikes/spike001/backup/restore-candidate/migration-audit/plan_legacy_reconciliation.py \
+  /caminho/copia-consistente.db --simulate-exact \
+  --report /caminho/novo-relatorio-revisao.json
+```
+
+Exit codes: `0` apenas sem bloqueadores ou grupos pendentes
+(`0` **não autoriza a migração**); `2` se requer revisão,
+possui conflitos ou ensaio bloqueado; `3` para falha de abertura,
+esquema ou relatório. Um ensaio `PASS_IN_MEMORY_ONLY` com
+cópias idênticas ainda retorna **2** no CLI, pois exige revisão antes
+de qualquer alteração real.
+
+**Validação executada:** 22/22 novos testes PASS e **62/62 no grupo
+completo de auditoria (40 anteriores + 22 novos)**; ambos os arquivos
+Python publicados possuem hashes Git idênticos aos executados.
+Dois exemplos sintéticos no ZIP mostram a classificação, sem dados reais.
+[ZIP com código, 62 testes, relatório fictício e hashes no Drive](https://drive.google.com/file/d/1sBlgoCNOSQYCLnjDirQNJJDJLlq5OTLU/view).
+SHA256 `f21374ce7373f54ab16154c9e25a69c7e1ca33a146e8226d62931ccf48145d35`.
+
+O gate `backup-migration-audit` passa a exigir **62 casos**
+(e não 40), total mínimo configurado da R001 agora **382**
+(360+22) distribuídos em 11 grupos. **Não houve execução
+conjunta das 382 verificações nem compilação SQLDelight/Android.**
+Não usar para alterar o banco do aparelho ou migration 15.
