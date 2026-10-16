@@ -425,3 +425,11 @@ with a completed local or CI run.
 **No changes to production migration15, SQLDelight generated code, installed
 unique indexes or real app BackupRestorer.** PR #1 remains DRAFT; issues #2,
 #10, #11 remain open.
+
+## 2026-10-15 — eleventh mandatory host gate: read-only legacy migration audit
+
+`backup-migration-audit` requires **20** passing Python/SQLite test cases:
+```bash
+python3 -m unittest discover -s spikes/spike001/backup/restore-candidate/migration-audit -p 'test_*.py' -v
+```
+**20/20 PASS locally**, published code and tests Git blob-identical to executed sources. Source key/root/UUID collision preflight deliberately writes NO database rows, CLI opens the supplied database snapshot in `mode=ro`. The host-only eleven-stage **configured** threshold becomes **340**; the full 340 checks were not executed. [Evidence ZIP](https://drive.google.com/file/d/1_rEGkzRc1WbJRBNsODkDf8tUliGZmUzZ/view) SHA256 `76cb74f9cd7e8a6332b4d7d0fb46760d1dfcf7e9e9eb635df23233d0a678cdb6`. Before Android migration, perform a consistent database backup, review reported legacy conflicts, compile actual SQLDelight/Gradle and test on devices; migration15 remains unchanged.
