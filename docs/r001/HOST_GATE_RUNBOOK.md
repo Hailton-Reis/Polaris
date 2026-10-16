@@ -448,3 +448,25 @@ eleven-stage *configured* minimum is **360**, not an executed full
 360/360. [Evidence ZIP](https://drive.google.com/file/d/1yDAhdjx4tpoItj-NfbjmfjYO7Ay70QaO/view)
 SHA256 `140b2c192a2ccfbf4d9efe765148b0f0db63c8aad6f89f22e6fa40851ae7adb2`.
 No actual Gradle SQLDelight generation or Android database migration.
+
+## 2026-10-15 — conservative legacy reconciliation planner, 62 host checks
+
+The existing `backup-migration-audit` group adds 22 regression tests
+for a new **read-only** `plan_legacy_reconciliation.py`. It groups
+conflicts transitively across both proposed UNIQUE keys, refuses
+to choose settings for pending-vs-resolved, mismatching priorities or
+synthetic virtual root, and creates no production DELETE statement.
+`--simulate-exact` makes *hypothetical* exact-duplicate removals
+in `:memory:` only; survivor rows and candidate DDL are checked
+without touching the input SQLite copy.
+
+Executed **22/22 new** and **62/62 complete migration-audit group** locally.
+Git blob hashes verified identical for both new source/test files.
+[Evidence ZIP in Polaris Drive](https://drive.google.com/file/d/1sBlgoCNOSQYCLnjDirQNJJDJLlq5OTLU/view)
+SHA256 `f21374ce7373f54ab16154c9e25a69c7e1ca33a146e8226d62931ccf48145d35`.
+
+`backup-migration-audit` threshold is **62**; combined eleven-stage
+configured minimum is **382** (previous 360+22). A completed
+`62/62` audit **does not imply `382/382` host**. Gradle,
+Android APK, ProtoBuf serialization and actual DB migration still
+unverified. Migration15 and installed DB unaffected.
