@@ -36,6 +36,7 @@ def link(c,p,manga,url,source,info=0,merge_url=None):
       'download_chapters,merge_id,merge_url,manga_id,manga_url,manga_source) VALUES(?,?,?,?,?,?,?,?,?,?)',
       (info,1,2,1,0,p,merge_url or f'merged://{p}',manga,url,source))
 
+
 def codes(c): return [f['code'] for f in inspect_database(c)['findings']]
 
 class MigrationAuditTests(unittest.TestCase):
