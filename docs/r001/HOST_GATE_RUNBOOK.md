@@ -470,3 +470,12 @@ configured minimum is **382** (previous 360+22). A completed
 `62/62` audit **does not imply `382/382` host**. Gradle,
 Android APK, ProtoBuf serialization and actual DB migration still
 unverified. Migration15 and installed DB unaffected.
+
+## 2026-10-16 — reviewed undo-only migration simulation: 85 host checks
+
+`migration-audit/rehearse_reviewed_reconciliation.py` adds an **explicit human-approved JSON manifest** for exact duplicate groups only, bound to the entire original `mangas`+`merged` content fingerprint and each group's SHA256. A successful SQLite clone rehearsal recreates all removed `merged` rows with original `_id` and flags and proves byte-value identity before discarding the clone. Unknown foreign keys to `merged` and table triggers force review. Pending/resolved and settings conflicts remain ineligible.
+
+**23/23 new, 85/85 whole audit group PASS** locally on Python3.13.5 / SQLite3.46.1; two exact new Git blobs equal locally tested files. `backup-migration-audit` now requires **85** (formerly 62). **405 is the minimum configured across 11 groups, NOT an executed 405-case run**. No production DELETE or Android migration; installed migration15 intact.
+
+[Source, tests and usage](../../spikes/spike001/backup/restore-candidate/migration-audit/README_REVIEWED_UNDO.md).
+Local evidence ZIP `Polaris_R001_Reconciliacao_Reversivel_2026-10-16.zip`, SHA256 `17562de0426f9c9011222c14944824b7fda9425bfdecac46fbea7079343c56c2` (also saved under Library `/Polaris/R001/`).
