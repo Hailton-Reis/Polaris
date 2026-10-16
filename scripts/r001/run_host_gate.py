@@ -22,6 +22,7 @@ GATES = (
     ("backup-atomic-sqlite", (sys.executable, "-m", "unittest", "discover", "-s", "spikes/spike001/backup/restore-candidate/atomic-sqlite", "-p", "test_*.py", "-q"), 31),
     ("backup-sqldelight-port", ("bash", "spikes/spike001/backup/restore-candidate/sqldelight-port/run_kotlin_host.sh"), 19),
     ("backup-sqldelight-sqlite", (sys.executable, "-m", "unittest", "discover", "-s", "spikes/spike001/backup/restore-candidate/sqldelight-port/tests", "-p", "test_*.py", "-q"), 10),
+    ("backup-migration-audit", (sys.executable, "-m", "unittest", "discover", "-s", "spikes/spike001/backup/restore-candidate/migration-audit", "-p", "test_*.py", "-q"), 20),
 )
 
 
