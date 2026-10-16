@@ -32,6 +32,54 @@ python3 -m unittest discover \
   -p 'test_*.py' -v
 ```
 
-**20/20 testes Python/SQLite executados localmente e aprovados**, incluindo casos em que a ferramenta deve recusar índices, respeitar pending, detectar UUID conflituoso e preservar os bytes do banco. O código e o teste publicados foram comparados pelos hashes Git blob às versões exatas executadas. O `run_host_gate.py` e `domain-spikes.yml` exigem a suíte de 20 como estágio `backup-migration-audit` quando o runner estiver disponível.
+**40/40 testes Python/SQLite executados localmente e aprovados**, incluindo casos em que a ferramenta deve recusar índices, respeitar pending, detectar UUID conflituoso e preservar os bytes do banco. O código e o teste publicados foram comparados pelos hashes Git blob às versões exatas executadas. O `run_host_gate.py` e `domain-spikes.yml` exigem a suíte de 40 como estágio `backup-migration-audit` quando o runner estiver disponível.
 
-O mínimo **configurado** dos agora **11 grupos** do host gate é **340 testes** (320 anteriores +20), mas **o gate completo 340 não foi executado**. Não houve alteração no `mangas.sq`, `merged.sq`, migration 15, classes SQLDelight de produção nem no APK. Issues #2/#10/#11 permanecem abertas e PR #1 em DRAFT.
+O mínimo **configurado** dos agora **11 grupos** do host gate é **360 testes** (320 anteriores +40), mas **o gate completo 340 não foi executado**. Não houve alteração no `mangas.sq`, `merged.sq`, migration 15, classes SQLDelight de produção nem no APK. Issues #2/#10/#11 permanecem abertas e PR #1 em DRAFT.
+
+## Ensaio real da migração sem tocar no banco original (2026-10-15)
+
+O novo `rehearse_restore_migration.py` executa a auditoria acima e, **somente
+se não houver bloqueadores**, usa a API `sqlite3.Connection.backup` para
+copiar o SQLite fornecido para **um banco `:memory:`**. Aplica nesse clone
+o DDL exato do candidato `../atomic-sqlite/atomic_parent_restore_candidate.sql`
+e valida:
+
+- A presença e unicidade dos dois índices `merged`, inclusive o índice
+  parcial de `manga_id`, e o índice único do pai no ledger.
+- A integridade do `polaris_restore_ledger`: colunas obrigatórias, chave
+  primária UUID e FK para o pai com `ON DELETE CASCADE`.
+- `PRAGMA integrity_check` e `foreign_key_check`, bem como **hashes
+  dos dados originais de todas as linhas `mangas` e `merged`** antes e
+  depois de executar o DDL em memória.
+
+```bash
+python3 spikes/spike001/backup/restore-candidate/migration-audit/rehearse_restore_migration.py \
+  /caminho/copia-consistente.db \
+  --report /outro/caminho/novo-relatorio.json
+```
+
+As duas ferramentas agora geram relatórios com `os.O_EXCL`, permissão
+`0600`: **nunca sobrescrevem um arquivo existente**, mesmo se for um
+atalho simbólico/hard link para o banco. O parâmetro `--report` exige
+arquivo **novo** `.json`, distinto de `.db`, `-wal`, `-shm` ou
+`-journal`. A versão anterior de `--report` usava `write_text` e
+poderia truncar acidentalmente o próprio banco se o usuário escolhesse
+o mesmo caminho; este problema foi corrigido.
+
+O ensaio retorna `PASS_IN_MEMORY_ONLY` no relatório e código 0 quando
+passa; um bloqueio ou falha no DDL retorna código 2; ausência de banco,
+erro de leitura ou relatório indisponível retorna código 3. **Isso NÃO
+significa que a migração está liberada para instalação no Android**:
+a execução é SQLite/Python host, não geração SQLDelight nem Gradle/APK.
+Se houver WAL ativo, faça uma cópia consistente pela API SQLite de backup
+antes do ensaio.
+
+**Evidência verificada:** 40/40 cenários no host (20 antigos +20
+novos), hashes Git de todos os arquivos de código e testes idênticos
+aos executados. Os testes incluem tentativa de usar o próprio banco
+como relatório, symlink/hardlink, relatório existente, SQL destrutivo
+em memória, índice não único, ledger incompatível e confirmação dos
+bytes do arquivo original. [ZIP no Drive](https://drive.google.com/file/d/1yDAhdjx4tpoItj-NfbjmfjYO7Ay70QaO/view),
+SHA-256 `140b2c192a2ccfbf4d9efe765148b0f0db63c8aad6f89f22e6fa40851ae7adb2`.
+O 11º gate host agora exige 40, elevando o mínimo configurado total
+de **340 para 360**, sem execução conjunta dos onze grupos.
