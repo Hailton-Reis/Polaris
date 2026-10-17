@@ -114,3 +114,48 @@ The **database and query generator are still host fakes**, as are the
 serialization annotations and the source `BackupManga` restorer.
 This is neither a real protobuf roundtrip nor a real SQLDelight
 code-generation or Android runtime test. Migration15 remains unchanged.
+
+## 2026-10-17 — fixed stale resolved real-child identity on ledger replays
+
+**Newly reproduced failure:** on UUID ledger reuse, the prior
+`SqlDelightPolarisAtomicVirtualWorkPort` validated its cached
+`merged` edges and digest but skipped revalidating whether
+`mangas._id` still points to the same exact `(sourceId,sourceUrl)`
+saved for each real child. The previously unguarded replay could accept a
+real manga row whose `source` or `url` had changed without altering its
+local `_id`. A new negative test FAILED on the old implementation,
+demonstrating the problem before patching.
+
+**Fix:** move the exact-key query
+`selectAllExactSourceChildIds(sourceId,sourceUrl)` to the start of EACH
+work's database transaction, before checking either existing or new
+UUID ledger entries. Every resolved child's result must be the singleton
+`[realMangaId]`. Missing, moved, renamed or ambiguous real rows cause
+the entire transaction to abort; no title guessing or automatic relink.
+Explicit `manga_id=NULL` pending references stay pending even if a matching
+real row appears later.
+
+**New regressions:** 6 Kotlin cases (URL changed, source ID changed,
+missing local manga, ambiguous same source+URL, rollback when the SECOND
+ledger work has a stale real ID, pending association remaining NULL after
+source arrival). Verified **25/25 Kotlin parent adapter cases** plus
+**16/16 integration cases = 41/41 PASS locally**. New 6 SQLite
+tests execute the actual staged SQLDelight lookup and real SQLite FK
+behavior, for **16/16 SQLite PASS** (the existing 10 plus 6).
+Therefore **57 assertions/cases across two separately executed host
+suites**, not a single Android suite.
+
+The updated files are checked against their GitHub blobs:
+- Adapter: `09edf277b9060ce0e0df5b9b7dcf0d4810a29ccc`
+- Kotlin tests: `563f04df2aa45b1f901e9d8b216eea62c5b9f7a2`
+- SQLite regressions: `7c31425d186f70aec285971eb4253c6cef39ddf2`
+
+Host thresholds: `backup-sqldelight-port` increased 35→41;
+`backup-sqldelight-sqlite` 10→16. The R001 twelve-stage **configured
+minimum is 486**, up from 474. **486/486 was NOT executed.**
+Only the 41/41 Kotlin and 16/16 SQLite candidate suites completed here.
+The actual generated SQLDelight 2.3.2 Kotlin types, Android database driver,
+ProtoBuf and Android B01–B05 remain untested. Production migration 15 is
+unchanged. The archive `Polaris_R001_Replay_Identidade_Real_2026-10-17.zip`
+contains the pre-fix failing log, post-fix logs, exact code and SHA256
+manifest.
