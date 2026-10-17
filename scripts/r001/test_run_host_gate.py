@@ -70,6 +70,23 @@ class HostGateParserTests(unittest.TestCase):
         self.assertEqual(evaluate_gate("backup-adapter", complete + "POLARIS_YOMOTSU_EXPORT_ADAPTER_PASS 12\n", 0, 12)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
         self.assertEqual(evaluate_gate("backup-adapter", "EXPORT_ADAPTER_PASS 12\n", 0, 12)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
 
+    def test_backup_portable_field_and_pending_model_require_all_four_suites(self):
+        base = ("POLARIS_BACKUP_PROTO_MODEL_PASS 18\n"
+                "POLARIS_BACKUP_BUNDLE_BUILDER_PASS 19\n"
+                "POLARIS_PENDING_SNAPSHOT_MODEL_PASS 7\n"
+                "POLARIS_BACKUP_FIELD_INTEROP_PASS 5\n")
+        self.assertEqual(evaluate_gate("backup-proto-contract", base, 0, 49)["status"], "PASS")
+        self.assertEqual(evaluate_gate("backup-proto-contract", base, 1, 49)["status"], "NONZERO_EXIT")
+        for item in base.splitlines(keepends=True):
+            self.assertEqual(evaluate_gate("backup-proto-contract", base.replace(item, ""), 0, 49)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
+            self.assertEqual(evaluate_gate("backup-proto-contract", base + item, 0, 49)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
+        for value, replacement in (("PASS 18", "PASS 17"), ("PASS 19", "PASS 18"),
+                                   ("PASS 7", "PASS 6"), ("PASS 5", "PASS 4")):
+            self.assertEqual(evaluate_gate("backup-proto-contract", base.replace(value, replacement), 0, 49)["status"], "INSUFFICIENT_TEST_COVERAGE")
+        self.assertEqual(evaluate_gate("backup-proto-contract",
+                         base.replace("PASS 18", "PASS 100").replace("PASS 5", "PASS 4"),
+                         0, 49)["status"], "INSUFFICIENT_TEST_COVERAGE")
+
     def test_sqldelight_port_kotlin_requires_real_models_and_both_suites(self):
         port = "POLARIS_SQLDELIGHT_PORT_PASS 25\n"
         real = "POLARIS_REAL_MODEL_END_TO_END_PASS 16\n"
