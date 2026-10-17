@@ -18,6 +18,7 @@ GATES = (
     ("backup-sqlite", (sys.executable, "-m", "unittest", "discover", "-s", "spikes/spike001/backup", "-p", "test_*.py", "-q"), 17),
     ("backup-kotlin", ("bash", "spikes/spike001/backup/run_tests.sh"), 65),
     ("backup-proto-contract", ("bash", "spikes/spike001/backup/proto-candidate/run_model_validation.sh"), 51),
+    ("backup-parent-split", ("bash", "spikes/spike001/backup/parent-candidate/run_tests.sh"), 23),
     ("backup-adapter", ("bash", "spikes/spike001/backup/yomotsu-candidate/run_tests.sh"), 12),
     ("backup-restore", ("bash", "spikes/spike001/backup/restore-candidate/run_tests.sh"), 20),
     ("backup-atomic-sqlite", (sys.executable, "-m", "unittest", "discover", "-s", "spikes/spike001/backup/restore-candidate/atomic-sqlite", "-p", "test_*.py", "-q"), 31),
@@ -29,6 +30,9 @@ GATES = (
 
 
 def extract_count(name: str, output: str):
+    if name == "backup-parent-split":
+        found = re.findall(r"(?m)^POLARIS_PARENT_SPLIT_HOST_PASS (\d+)$", output)
+        return min(int(found[0]), 23) if len(found) == 1 else None
     if name == "backup-proto-contract":
         required = (
             (r"(?m)^POLARIS_BACKUP_PROTO_MODEL_PASS (\d+)$", 18),
@@ -74,7 +78,7 @@ def extract_count(name: str, output: str):
 def evaluate_gate(name: str, output: str, returncode: int, minimum: int):
     count = extract_count(name, output)
     passed = returncode == 0 and count is not None and count >= minimum
-    if name not in {"kotlin", "backup-kotlin", "backup-adapter", "backup-restore", "backup-sqldelight-port", "backup-yomotsu-children", "backup-proto-contract"}:
+    if name not in {"kotlin", "backup-kotlin", "backup-adapter", "backup-restore", "backup-sqldelight-port", "backup-yomotsu-children", "backup-proto-contract", "backup-parent-split"}:
         passed = passed and bool(re.search(r"(?m)^OK(?:\s|$)", output))
     reason = ("PASS" if passed else
               "MISSING_OR_INVALID_TEST_SUMMARY" if count is None else
