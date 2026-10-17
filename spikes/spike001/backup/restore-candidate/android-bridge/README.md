@@ -13,3 +13,15 @@ Upstream locked revision `kiritsuguxs/yomotsu@0fb80c439ef816eeb50674f1b90af39918
 Host command: `bash spikes/spike001/backup/restore-candidate/yomotsu-source-port/run_tests.sh`.
 
 **Still P0 release blockers:** generated SQLDelight 2.3.2 types + actual SQLite migration strategy, application DI of source and parent ports, true Kotlin ProtoBuf old/new roundtrip, actual `MangaRestorer` read/history/tracking/category verification and Android issue #2 B01–B05. The GitHub CI runner still reports no runner/no executed steps. PR #1 DRAFT; issues #2/#10/#11 OPEN; migration 15 unchanged.
+## 2026-10-17 contract corrections and blocked parent duplication
+The staged `Backup` optional ProtoBuf 107 property is now `polaris`,
+matching `BackupCreator.staged.kt`, `BackupRestorer.staged.kt` and
+`apply_backup_proto_candidate.py`. Static regression checks now protect
+the name and nullable default. Restoring a pending-only full supplemental
+manga is rejected before any writes. Archives containing a real Polaris
+bundle **and** ordinary synthetic source=6969 parent backups are
+also refused before stock jobs: such mixed archives risk creating two
+virtual parents and losing parent-specific metadata.
+The current staged exporter still emits synthetic parents as ordinary
+mangas, so the Android feature remains **P0 blocked**, not production ready.
+See [technical details](../../../../../docs/r001/BACKUP_WIRE_AND_PENDING_GUARDS_2026_10_17.md).
