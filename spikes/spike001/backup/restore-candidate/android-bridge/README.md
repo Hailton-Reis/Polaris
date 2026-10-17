@@ -1,0 +1,15 @@
+# Polaris R001 — staged BackupRestorer integration (17 October 2026)
+
+**Only staged candidate files.** Do not copy into Android production until the SQLDelight schema, ProtoBuf serialisation and dependency wiring are actually compiled and reviewed.
+
+- `yomotsu-source-port/kotlin/PolarisBackupRestorerLifecycle.kt`: a narrow suspending wrapper around Yomotsu's **structured** restore jobs. Preflight the optional Polaris segment **before any stock jobs write**, invoke the unmodified stock restoration exactly once, wait for the entire structured coroutine scope, then call the strict required-child and atomic-virtual-parent coordinator. Stock exceptions or strict child verification errors prevent any parent association commit. The source manga restore may already have written data; not a global transaction.
+- `Backup.staged.kt`: SHA-pinned Yomotsu Backup.kt plus optional field `@ProtoNumber(107) val polarisBundle: BackupPolarisBundle? = null`; legacy decoding is intended to stay compatible but **ProtoBuf encode/decode is not yet tested**.
+- `BackupRestorer.staged.kt`: SHA-pinned original stock `BackupRestorer`, with an injected nullable lifecycle seam. It wraps the **existing** `coroutineScope` in a suspending callback; preflight happens before launching normal restorers. A Polaris archive without configured lifecycle throws rather than silently dropping its linked works. The nullable constructor argument is **not injected** into production yet.
+
+Upstream locked revision `kiritsuguxs/yomotsu@0fb80c439ef816eeb50674f1b90af39918b176d8`; pinned blobs: `BackupRestorer.kt ce21be4073a5a168376e95e0fa6f317bf88b8c98`, `Backup.kt 0c021d34a8426dc0bd5844b4e00f9c13767610bf`. Published staging blobs: `BackupRestorer.staged.kt 68746299526cd4a4643ebc975a8d37d18846f012`, `Backup.staged.kt 7cd6a1c6dbb4ce4529a125ce35e186839c8977fc`.
+
+**53/53 Kotlin/JVM host tests PASSED on this turn:** 23 strict source/chapters, 14 source+coordinator, and 16 new `HostLifecycleTest.kt` cases. Their exact new Kotlin sources and runner are Git blob-identical to the GitHub files. New success marker `POLARIS_BACKUP_RESTORER_LIFECYCLE_PASS 16` is mandatory as an **independent** third component of the `backup-yomotsu-children` stage. Stage minimum rises 37→53. Across 12 configured groups, the minimum rises **458→474**; this is **not an executed aggregate run**.
+
+Host command: `bash spikes/spike001/backup/restore-candidate/yomotsu-source-port/run_tests.sh`.
+
+**Still P0 release blockers:** generated SQLDelight 2.3.2 types + actual SQLite migration strategy, application DI of source and parent ports, true Kotlin ProtoBuf old/new roundtrip, actual `MangaRestorer` read/history/tracking/category verification and Android issue #2 B01–B05. The GitHub CI runner still reports no runner/no executed steps. PR #1 DRAFT; issues #2/#10/#11 OPEN; migration 15 unchanged.
