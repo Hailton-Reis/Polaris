@@ -109,12 +109,12 @@ class HostGateParserTests(unittest.TestCase):
         self.assertEqual(evaluate_gate("backup-migration-audit", good.replace("OK", "FAILED"), 0, 85)["status"], "MISSING_UNITTEST_OK_MARKER")
         self.assertTrue(any("migration-audit" in item for n, cmd, m in GATES if n == "backup-migration-audit" for item in cmd))
 
-    def test_sqldelight_sqlite_gate_requires_all_10_tests(self):
-        good = "Ran 10 tests in 0.03s\n\nOK\n"
-        self.assertEqual(evaluate_gate("backup-sqldelight-sqlite", good, 0, 10)["status"], "PASS")
-        self.assertEqual(evaluate_gate("backup-sqldelight-sqlite", good, 1, 10)["status"], "NONZERO_EXIT")
-        self.assertEqual(evaluate_gate("backup-sqldelight-sqlite", good.replace("10 tests", "9 tests"), 0, 10)["status"], "INSUFFICIENT_TEST_COVERAGE")
-        self.assertEqual(evaluate_gate("backup-sqldelight-sqlite", good.replace("OK", "FAILED"), 0, 10)["status"], "MISSING_UNITTEST_OK_MARKER")
+    def test_sqldelight_sqlite_gate_requires_all_16_tests(self):
+        good = "Ran 16 tests in 0.03s\n\nOK\n"
+        self.assertEqual(evaluate_gate("backup-sqldelight-sqlite", good, 0, 16)["status"], "PASS")
+        self.assertEqual(evaluate_gate("backup-sqldelight-sqlite", good, 1, 16)["status"], "NONZERO_EXIT")
+        self.assertEqual(evaluate_gate("backup-sqldelight-sqlite", good.replace("16 tests", "15 tests"), 0, 16)["status"], "INSUFFICIENT_TEST_COVERAGE")
+        self.assertEqual(evaluate_gate("backup-sqldelight-sqlite", good.replace("OK", "FAILED"), 0, 16)["status"], "MISSING_UNITTEST_OK_MARKER")
 
     def test_atomic_sqlite_restore_requires_all_31_checks(self):
         good = "Ran 31 tests in 0.02s\n\nOK\n"
