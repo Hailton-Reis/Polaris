@@ -21,12 +21,20 @@ GATES = (
     ("backup-restore", ("bash", "spikes/spike001/backup/restore-candidate/run_tests.sh"), 20),
     ("backup-atomic-sqlite", (sys.executable, "-m", "unittest", "discover", "-s", "spikes/spike001/backup/restore-candidate/atomic-sqlite", "-p", "test_*.py", "-q"), 31),
     ("backup-sqldelight-port", ("bash", "spikes/spike001/backup/restore-candidate/sqldelight-port/run_kotlin_host.sh"), 35),
+    ("backup-yomotsu-children", ("bash", "spikes/spike001/backup/restore-candidate/yomotsu-source-port/run_tests.sh"), 37),
     ("backup-sqldelight-sqlite", (sys.executable, "-m", "unittest", "discover", "-s", "spikes/spike001/backup/restore-candidate/sqldelight-port/tests", "-p", "test_*.py", "-q"), 10),
     ("backup-migration-audit", (sys.executable, "-m", "unittest", "discover", "-s", "spikes/spike001/backup/restore-candidate/migration-audit", "-p", "test_*.py", "-q"), 85),
 )
 
 
 def extract_count(name: str, output: str):
+    if name == "backup-yomotsu-children":
+        required = (
+            (r"(?m)^POLARIS_YOMOTSU_SOURCE_RESTORE_PASS (\d+)$", 23),
+            (r"(?m)^POLARIS_YOMOTSU_RESTORE_SEQUENCE_PASS (\d+)$", 14),
+        )
+        groups = [re.findall(pattern, output) for pattern, _ in required]
+        return sum(min(int(match[0]), minimum) for match, (_, minimum) in zip(groups, required)) if all(len(x) == 1 for x in groups) else None
     if name == "backup-sqldelight-port":
         port = re.findall(r"(?m)^POLARIS_SQLDELIGHT_PORT_PASS (\d+)$", output)
         real = re.findall(r"(?m)^POLARIS_REAL_MODEL_END_TO_END_PASS (\d+)$", output)
@@ -55,7 +63,7 @@ def extract_count(name: str, output: str):
 def evaluate_gate(name: str, output: str, returncode: int, minimum: int):
     count = extract_count(name, output)
     passed = returncode == 0 and count is not None and count >= minimum
-    if name not in {"kotlin", "backup-kotlin", "backup-adapter", "backup-restore", "backup-sqldelight-port"}:
+    if name not in {"kotlin", "backup-kotlin", "backup-adapter", "backup-restore", "backup-sqldelight-port", "backup-yomotsu-children"}:
         passed = passed and bool(re.search(r"(?m)^OK(?:\s|$)", output))
     reason = ("PASS" if passed else
               "MISSING_OR_INVALID_TEST_SUMMARY" if count is None else
