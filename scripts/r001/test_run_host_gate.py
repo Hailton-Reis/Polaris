@@ -86,6 +86,20 @@ class HostGateParserTests(unittest.TestCase):
         self.assertIsNone(extract_count("backup-sqldelight-port", "port-only test passes"))
 
 
+    def test_yomotsu_real_child_gate_requires_both_unique_stages(self):
+        port = "POLARIS_YOMOTSU_SOURCE_RESTORE_PASS 23\n"
+        sequence = "POLARIS_YOMOTSU_RESTORE_SEQUENCE_PASS 14\n"
+        both = port + sequence
+        self.assertEqual(evaluate_gate("backup-yomotsu-children", both, 0, 37)["status"], "PASS")
+        self.assertEqual(evaluate_gate("backup-yomotsu-children", both, 1, 37)["status"], "NONZERO_EXIT")
+        self.assertEqual(evaluate_gate("backup-yomotsu-children", port, 0, 37)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
+        self.assertEqual(evaluate_gate("backup-yomotsu-children", sequence, 0, 37)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
+        self.assertEqual(evaluate_gate("backup-yomotsu-children", both + sequence, 0, 37)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
+        self.assertEqual(evaluate_gate("backup-yomotsu-children", both + port, 0, 37)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
+        self.assertEqual(evaluate_gate("backup-yomotsu-children", port.replace("23", "22") + sequence, 0, 37)["status"], "INSUFFICIENT_TEST_COVERAGE")
+        self.assertEqual(evaluate_gate("backup-yomotsu-children", port + sequence.replace("14", "13"), 0, 37)["status"], "INSUFFICIENT_TEST_COVERAGE")
+        self.assertEqual(evaluate_gate("backup-yomotsu-children", port.replace("23", "100") + sequence.replace("14", "13"), 0, 37)["status"], "INSUFFICIENT_TEST_COVERAGE")
+
     def test_reviewed_migration_rehearsal_requires_eighty_five_clean_cases(self):
         good = "Ran 85 tests in 0.09s\n\nOK\n"
         self.assertEqual(evaluate_gate("backup-migration-audit", good, 0, 85)["status"], "PASS")
