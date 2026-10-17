@@ -90,7 +90,7 @@ class BackupRestorer(
     private suspend fun restoreFromFile(uri: Uri, options: RestoreOptions) {
         val backup = BackupDecoder(context).decode(uri)
         // Field 107 is optional: legacy Yomotsu backups decode as null.
-        val polarisBundle = backup.polarisBundle
+        val polarisBundle = backup.polaris
 
         // Store source mapping for error messages
         val backupMaps = backup.backupSources
