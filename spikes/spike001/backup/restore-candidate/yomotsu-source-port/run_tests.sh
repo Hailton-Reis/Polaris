@@ -17,3 +17,4 @@ kotlinc "$PROTO" "$COORD" "$DIR"/kotlin/*.kt "$DIR"/tests/*.kt \
     -include-runtime -d "$TMP/run.jar"
 java -cp "$TMP/run.jar" polaris.spike001.backup.restore.yomotsu.HostPortTestKt
 java -cp "$TMP/run.jar" polaris.spike001.backup.restore.yomotsu.HostSequenceTestKt
+java -cp "$TMP/run.jar" polaris.spike001.backup.restore.yomotsu.HostLifecycleTestKt
