@@ -1,5 +1,6 @@
 package polaris.spike001.backup.restore.sqldelight
 
+import eu.kanade.tachiyomi.data.backup.models.BackupPolarisMergeSettings
 import polaris.spike001.backup.restore.*
 import tachiyomi.data.*
 import kotlinx.serialization.json.*
