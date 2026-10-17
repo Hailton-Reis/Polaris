@@ -31,10 +31,10 @@ GATES = (
 def extract_count(name: str, output: str):
     if name == "backup-proto-contract":
         required = (
-            (r"(?m)^POLARIS_BACKUP_PROTO_MODEL_PASS (\\d+)$", 18),
-            (r"(?m)^POLARIS_BACKUP_BUNDLE_BUILDER_PASS (\\d+)$", 19),
-            (r"(?m)^POLARIS_PENDING_SNAPSHOT_MODEL_PASS (\\d+)$", 7),
-            (r"(?m)^POLARIS_BACKUP_FIELD_INTEROP_PASS (\\d+)$", 5),
+            (r"(?m)^POLARIS_BACKUP_PROTO_MODEL_PASS (\d+)$", 18),
+            (r"(?m)^POLARIS_BACKUP_BUNDLE_BUILDER_PASS (\d+)$", 19),
+            (r"(?m)^POLARIS_PENDING_SNAPSHOT_MODEL_PASS (\d+)$", 7),
+            (r"(?m)^POLARIS_BACKUP_FIELD_INTEROP_PASS (\d+)$", 5),
         )
         matches = [re.findall(pattern, output) for pattern, _ in required]
         return sum(min(int(found[0]), minimum) for found, (_, minimum) in zip(matches, required)) if all(len(found) == 1 for found in matches) else None
