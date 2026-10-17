@@ -70,13 +70,21 @@ class HostGateParserTests(unittest.TestCase):
         self.assertEqual(evaluate_gate("backup-adapter", complete + "POLARIS_YOMOTSU_EXPORT_ADAPTER_PASS 12\n", 0, 12)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
         self.assertEqual(evaluate_gate("backup-adapter", "EXPORT_ADAPTER_PASS 12\n", 0, 12)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
 
-    def test_sqldelight_port_kotlin_requires_unique_19_case_marker(self):
-        good = "SQLDELIGHT_PORT_PASS 19 done\nPOLARIS_SQLDELIGHT_PORT_PASS 19\n"
-        self.assertEqual(evaluate_gate("backup-sqldelight-port", good, 0, 19)["status"], "PASS")
-        self.assertEqual(evaluate_gate("backup-sqldelight-port", good, 1, 19)["status"], "NONZERO_EXIT")
-        self.assertEqual(evaluate_gate("backup-sqldelight-port", good.replace("PASS 19\n", "PASS 18\n"), 0, 19)["status"], "INSUFFICIENT_TEST_COVERAGE")
-        self.assertEqual(evaluate_gate("backup-sqldelight-port", good + "POLARIS_SQLDELIGHT_PORT_PASS 19\n", 0, 19)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
-        self.assertIsNone(extract_count("backup-sqldelight-port", "only PASS tests"))
+    def test_sqldelight_port_kotlin_requires_real_models_and_both_suites(self):
+        port = "POLARIS_SQLDELIGHT_PORT_PASS 19\n"
+        real = "POLARIS_REAL_MODEL_END_TO_END_PASS 16\n"
+        both = port + real
+        self.assertEqual(evaluate_gate("backup-sqldelight-port", both, 0, 35)["status"], "PASS")
+        self.assertEqual(evaluate_gate("backup-sqldelight-port", both, 1, 35)["status"], "NONZERO_EXIT")
+        self.assertEqual(evaluate_gate("backup-sqldelight-port", port, 0, 35)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
+        self.assertEqual(evaluate_gate("backup-sqldelight-port", real, 0, 35)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
+        self.assertEqual(evaluate_gate("backup-sqldelight-port", both + real, 0, 35)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
+        self.assertEqual(evaluate_gate("backup-sqldelight-port", both + port, 0, 35)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
+        self.assertEqual(evaluate_gate("backup-sqldelight-port", port.replace("19", "18") + real, 0, 35)["status"], "INSUFFICIENT_TEST_COVERAGE")
+        self.assertEqual(evaluate_gate("backup-sqldelight-port", port + real.replace("16", "15"), 0, 35)["status"], "INSUFFICIENT_TEST_COVERAGE")
+        self.assertEqual(evaluate_gate("backup-sqldelight-port", port.replace("19", "18") + real.replace("16", "100"), 0, 35)["status"], "INSUFFICIENT_TEST_COVERAGE")
+        self.assertIsNone(extract_count("backup-sqldelight-port", "port-only test passes"))
+
 
     def test_reviewed_migration_rehearsal_requires_eighty_five_clean_cases(self):
         good = "Ran 85 tests in 0.09s\n\nOK\n"
