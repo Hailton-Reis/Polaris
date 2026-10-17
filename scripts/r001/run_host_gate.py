@@ -20,7 +20,7 @@ GATES = (
     ("backup-adapter", ("bash", "spikes/spike001/backup/yomotsu-candidate/run_tests.sh"), 12),
     ("backup-restore", ("bash", "spikes/spike001/backup/restore-candidate/run_tests.sh"), 20),
     ("backup-atomic-sqlite", (sys.executable, "-m", "unittest", "discover", "-s", "spikes/spike001/backup/restore-candidate/atomic-sqlite", "-p", "test_*.py", "-q"), 31),
-    ("backup-sqldelight-port", ("bash", "spikes/spike001/backup/restore-candidate/sqldelight-port/run_kotlin_host.sh"), 35),
+    ("backup-sqldelight-port", ("bash", "spikes/spike001/backup/restore-candidate/sqldelight-port/run_kotlin_host.sh"), 41),
     ("backup-yomotsu-children", ("bash", "spikes/spike001/backup/restore-candidate/yomotsu-source-port/run_tests.sh"), 53),
     ("backup-sqldelight-sqlite", (sys.executable, "-m", "unittest", "discover", "-s", "spikes/spike001/backup/restore-candidate/sqldelight-port/tests", "-p", "test_*.py", "-q"), 10),
     ("backup-migration-audit", (sys.executable, "-m", "unittest", "discover", "-s", "spikes/spike001/backup/restore-candidate/migration-audit", "-p", "test_*.py", "-q"), 85),
@@ -39,7 +39,7 @@ def extract_count(name: str, output: str):
     if name == "backup-sqldelight-port":
         port = re.findall(r"(?m)^POLARIS_SQLDELIGHT_PORT_PASS (\d+)$", output)
         real = re.findall(r"(?m)^POLARIS_REAL_MODEL_END_TO_END_PASS (\d+)$", output)
-        return (min(int(port[0]), 19) + min(int(real[0]), 16)) if len(port) == 1 and len(real) == 1 else None
+        return (min(int(port[0]), 25) + min(int(real[0]), 16)) if len(port) == 1 and len(real) == 1 else None
     if name == "backup-restore":
         hits = re.findall(r"(?m)^POLARIS_YOMOTSU_RESTORE_COORDINATOR_PASS (\d+)$", output)
         return int(hits[0]) if len(hits) == 1 else None
