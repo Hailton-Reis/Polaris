@@ -25,3 +25,30 @@ Esta rodada **não gerou classes SQLDelight via Gradle**, não rodou ProtoBuf re
 Repositório: https://github.com/Hailton-Reis/Polaris/tree/r001/multisource-foundation/spikes/spike001/backup/proto-candidate
 
 Handoff: https://github.com/Hailton-Reis/Polaris/blob/r001/multisource-foundation/docs/r001/RESUME_2026_10_15.md
+
+## 17 October 2026 — lossless virtual-parent snapshot partition (23 new tests)
+
+The staged Yomotsu full `BackupManga` already contains notes, categories,
+chapters, history, tracking, viewer flags, memo and user metadata.
+`spikes/spike001/backup/parent-candidate/` has a standalone **full snapshot**
+partition plan: bind original selected local manga ID and canonical parent
+UUID; separate source-6969 parent payloads from stock ordinary backups
+WITHOUT dropping any field; keep original list indices to prove reversibility.
+It refuses orphan/mismatching parents, changed titles/URLs and duplicate UUIDs.
+`bash spikes/spike001/backup/parent-candidate/run_tests.sh` ran
+**23/23 Kotlin/JVM host cases PASS** with BackupManga/ProtoBuf host doubles.
+Source code was checked against pinned BackupManga's source/url/title field
+names but not compiled against real Android dependencies.
+
+`backup-parent-split` is now the 14th fail-closed gate, minimum 23.
+Aggregate **configured** 560 cases across 14 groups, not executed 560/560.
+[GitHub candidate](https://github.com/Hailton-Reis/Polaris/tree/r001/multisource-foundation/spikes/spike001/backup/parent-candidate).
+[Drive ZIP](https://drive.google.com/file/d/1Qj-6J0Ie0Be2CVFfhuBt44N5kCdTi5kb/view),
+SHA256 `411e5d91333a58386074b4ee11d8044531157ec74bbd0c8c217cf779a563f6af`.
+
+Critical P0 remains: add a versioned archive payload for full parent
+snapshots, real ProtoBuf roundtrip, ensure stock path excludes virtual
+manga, restore full metadata onto exactly one UUID parent ID inside
+reviewed DB operations, safely merge memo JSON and map categories/history.
+Keep the preflight guard that refuses duplicate virtual parents.
+Migration 15 and production source files untouched.
