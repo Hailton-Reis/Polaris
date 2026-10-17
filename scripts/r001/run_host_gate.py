@@ -17,7 +17,7 @@ GATES = (
     ("kotlin", ("bash", "scripts/r001/test_spike001_host.sh"), 38),
     ("backup-sqlite", (sys.executable, "-m", "unittest", "discover", "-s", "spikes/spike001/backup", "-p", "test_*.py", "-q"), 17),
     ("backup-kotlin", ("bash", "spikes/spike001/backup/run_tests.sh"), 65),
-    ("backup-proto-contract", ("bash", "spikes/spike001/backup/proto-candidate/run_model_validation.sh"), 49),
+    ("backup-proto-contract", ("bash", "spikes/spike001/backup/proto-candidate/run_model_validation.sh"), 51),
     ("backup-adapter", ("bash", "spikes/spike001/backup/yomotsu-candidate/run_tests.sh"), 12),
     ("backup-restore", ("bash", "spikes/spike001/backup/restore-candidate/run_tests.sh"), 20),
     ("backup-atomic-sqlite", (sys.executable, "-m", "unittest", "discover", "-s", "spikes/spike001/backup/restore-candidate/atomic-sqlite", "-p", "test_*.py", "-q"), 31),
@@ -33,7 +33,7 @@ def extract_count(name: str, output: str):
         required = (
             (r"(?m)^POLARIS_BACKUP_PROTO_MODEL_PASS (\d+)$", 18),
             (r"(?m)^POLARIS_BACKUP_BUNDLE_BUILDER_PASS (\d+)$", 19),
-            (r"(?m)^POLARIS_PENDING_SNAPSHOT_MODEL_PASS (\d+)$", 7),
+            (r"(?m)^POLARIS_PENDING_SNAPSHOT_MODEL_PASS (\d+)$", 9),
             (r"(?m)^POLARIS_BACKUP_FIELD_INTEROP_PASS (\d+)$", 5),
         )
         matches = [re.findall(pattern, output) for pattern, _ in required]
