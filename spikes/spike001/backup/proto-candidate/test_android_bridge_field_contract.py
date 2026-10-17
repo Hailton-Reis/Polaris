@@ -6,7 +6,7 @@ from pathlib import Path
 import re
 import unittest
 
-ROOT = Path(__file__).resolve().parents[2]
+ROOT = Path(__file__).resolve().parents[1]
 BACKUP = ROOT / 'restore-candidate/android-bridge/Backup.staged.kt'
 RESTORER = ROOT / 'restore-candidate/android-bridge/BackupRestorer.staged.kt'
 CREATOR = ROOT / 'yomotsu-candidate/BackupCreator.staged.kt'
