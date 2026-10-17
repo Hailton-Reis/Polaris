@@ -71,18 +71,18 @@ class HostGateParserTests(unittest.TestCase):
         self.assertEqual(evaluate_gate("backup-adapter", "EXPORT_ADAPTER_PASS 12\n", 0, 12)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
 
     def test_sqldelight_port_kotlin_requires_real_models_and_both_suites(self):
-        port = "POLARIS_SQLDELIGHT_PORT_PASS 19\n"
+        port = "POLARIS_SQLDELIGHT_PORT_PASS 25\n"
         real = "POLARIS_REAL_MODEL_END_TO_END_PASS 16\n"
         both = port + real
-        self.assertEqual(evaluate_gate("backup-sqldelight-port", both, 0, 35)["status"], "PASS")
-        self.assertEqual(evaluate_gate("backup-sqldelight-port", both, 1, 35)["status"], "NONZERO_EXIT")
-        self.assertEqual(evaluate_gate("backup-sqldelight-port", port, 0, 35)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
-        self.assertEqual(evaluate_gate("backup-sqldelight-port", real, 0, 35)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
-        self.assertEqual(evaluate_gate("backup-sqldelight-port", both + real, 0, 35)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
-        self.assertEqual(evaluate_gate("backup-sqldelight-port", both + port, 0, 35)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
-        self.assertEqual(evaluate_gate("backup-sqldelight-port", port.replace("19", "18") + real, 0, 35)["status"], "INSUFFICIENT_TEST_COVERAGE")
-        self.assertEqual(evaluate_gate("backup-sqldelight-port", port + real.replace("16", "15"), 0, 35)["status"], "INSUFFICIENT_TEST_COVERAGE")
-        self.assertEqual(evaluate_gate("backup-sqldelight-port", port.replace("19", "18") + real.replace("16", "100"), 0, 35)["status"], "INSUFFICIENT_TEST_COVERAGE")
+        self.assertEqual(evaluate_gate("backup-sqldelight-port", both, 0, 41)["status"], "PASS")
+        self.assertEqual(evaluate_gate("backup-sqldelight-port", both, 1, 41)["status"], "NONZERO_EXIT")
+        self.assertEqual(evaluate_gate("backup-sqldelight-port", port, 0, 41)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
+        self.assertEqual(evaluate_gate("backup-sqldelight-port", real, 0, 41)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
+        self.assertEqual(evaluate_gate("backup-sqldelight-port", both + real, 0, 41)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
+        self.assertEqual(evaluate_gate("backup-sqldelight-port", both + port, 0, 41)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
+        self.assertEqual(evaluate_gate("backup-sqldelight-port", port.replace("25", "24") + real, 0, 41)["status"], "INSUFFICIENT_TEST_COVERAGE")
+        self.assertEqual(evaluate_gate("backup-sqldelight-port", port + real.replace("16", "15"), 0, 41)["status"], "INSUFFICIENT_TEST_COVERAGE")
+        self.assertEqual(evaluate_gate("backup-sqldelight-port", port.replace("25", "24") + real.replace("16", "100"), 0, 41)["status"], "INSUFFICIENT_TEST_COVERAGE")
         self.assertIsNone(extract_count("backup-sqldelight-port", "port-only test passes"))
 
 
