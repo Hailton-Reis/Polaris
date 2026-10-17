@@ -498,3 +498,35 @@ both suites to meet their own minima, not merely a sum.
 Evidence ZIP SHA256 `8d5db7cee61ec6145691cf6dc00cc3c98a4a18cb062aa9d73ca9c510f9f6b287`
 is in Library `/Polaris/R001/`. Actual SQLDelight generation,
 ProtoBuf roundtrip and Android B01-B05 remain untested.
+
+## 17/10/2026 — verified Yomotsu child restore barrier, 37 new Kotlin cases
+
+Pinned `BackupRestorer.restoreManga()` catches failed individual manga
+restorations without throwing; domain `GetChaptersByMangaId.await()`
+also swallows errors. The staged `yomotsu-source-port/` adapter invokes
+the real `MangaRestorer.restore()` signature directly and then checks
+every required backed-up chapter via typed SQLDelight query (without
+the error-catching domain interactor).
+
+`PolarisYomotsuStrictRestoreSequence` preflights the real portable
+bundle and coordinator, then strictly retries only the ordinary manga
+needed by resolved Polaris links AFTER stock jobs complete, before
+committing any virtual parents. Supplemental children are restored
+strictly and verified. Exceptions block virtual parent association.
+
+```bash
+bash spikes/spike001/backup/restore-candidate/yomotsu-source-port/run_tests.sh
+```
+
+**23/23 +14/14 =37/37 Kotlin/JVM PASS**, also rerun under the actual
+repository directory layout. Two independent exact success markers
+are required; stage `backup-yomotsu-children` minimum 37 raises
+twelve-stage *configured* threshold to **458**, NOT a completed full
+458-suite execution. Sources and GitHub blobs exactly match local
+compiled files. [Evidence ZIP](https://drive.google.com/file/d/1PjToUKEOZMSG8RN5bPvbtw2gM3iKcXpj/view),
+SHA256 `3e6448ae34fa4146c7db5676368fc5d279e37e9276c991852056583a4a4aa963`.
+
+**Not Android:** `MangaRestorer`, DB/generated SQLDelight queries and
+serialization are stubbed in host tests; actual codegen, real ProtoBuf,
+full history/tracking verification and Android runtime B01–B05 remain
+unverified. Production `BackupRestorer.kt` and migration15 unchanged.
