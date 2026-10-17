@@ -540,3 +540,33 @@ SHA-pinned **non-production** `android-bridge/Backup.staged.kt` adds optional `p
 `backup-yomotsu-children` now runs three mains and checks independent exact markers, with minima 23 source +14 sequence +16 new lifecycle = **53**. Local **53/53 Kotlin/JVM PASS**, same source blobs published to GitHub; runner's third main is `HostLifecycleTestKt`. Overall **12 host groups configured minimum 474**, NOT a completed 474-case run. New package `Polaris_R001_BackupRestorer_Lifecycle_2026-10-17.zip` SHA256 `b83c850a65dfdf44e1d9375a256d68fc18dd0315abaa4533bfd5a2e92db35f11`, saved in Library `/Polaris/R001/`. Remote Drive upload of this ZIP did not succeed; use the verified sandbox ZIP link.
 
 Production gate unchanged: SQLDelight codegen and DI, real ProtoBuf encode/decode, Android B01–B05, tracks/history verification, migration15 review. PR #1 remains DRAFT.
+
+## 2026-10-17 — UUID-ledger replay must revalidate real-child identity
+
+A **confirmed** bug allowed `SqlDelightPolarisAtomicVirtualWorkPort` to
+reuse an existing UUID ledger while the linked real `mangas._id`
+now had a changed source ID or URL. The old implementation skipped the
+exact source+URL lookup on ledger hits. A new negative regression failed
+on the previous Kotlin code. The fix runs the exact-key query in the
+transaction BEFORE both new and existing ledger paths.
+
+Six Kotlin regressions check URL drift, source drift, deleted or ambiguous
+rows, pending-NULL preservation, and rollback of a newly created FIRST
+parent if the SECOND old UUID has an invalid real source identity.
+Another six tests run the query and FK semantics on **actual SQLite**
+rather than the fake Kotlin database.
+
+**25/25 Kotlin adapter + 16/16 real portable-model integration = 41/41
+Kotlin host PASS**, and **16/16 SQLite host PASS**. That is 57
+separately executed host cases, NOT an Android acceptance test.
+New Git blobs for Kotlin adapter, Kotlin tests and SQLite test:
+`09edf277b9060ce0e0df5b9b7dcf0d4810a29ccc`,
+`563f04df2aa45b1f901e9d8b216eea62c5b9f7a2`,
+`7c31425d186f70aec285971eb4253c6cef39ddf2`.
+
+Gate minima: `backup-sqldelight-port` = 41 and
+`backup-sqldelight-sqlite` = 16. Combined 12-stage configured
+minimum **486**, NOT executed in full. Evidence
+`Polaris_R001_Replay_Identidade_Real_2026-10-17.zip`
+SHA256 `45ad1d62d8d0f69fa1deb2da6921890c290a36f11c6a9cd5b7935202ae141cf7`.
+No production schema, migration 15 or user DB changes.
