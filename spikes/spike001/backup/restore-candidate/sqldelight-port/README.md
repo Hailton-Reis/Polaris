@@ -87,3 +87,30 @@ host executions, not Gradle/Android acceptance.
 
 Issue #10/#11 P0 stay open, #2 Android B01–B05 remains unverified,
 PR #1 remains DRAFT and migration 15 is unchanged.
+
+## 16 Oct 2026: integrated real portable data classes and coordinator
+
+The Kotlin runner now compiles **the actual** `BackupPolarisBundle.kt`,
+`PolarisRestoreCoordinator.kt`, `SqlDelightPolarisAtomicVirtualWorkPort.kt`
+and `PolarisRestoreDigest.kt` together, instead of using
+`tests/HostModel.kt`. The latter remains in the tree but is no longer
+compiled. The adapter test imports the real backup settings class.
+
+The updated runner executes two independent suites: 19 adapter and
+16 cross-module integration cases. **35/35 Kotlin/JVM PASS locally**,
+including backup preflight, child-before-parent order, pending state,
+UUID checks, unchanged legacy backup, idempotent import, unlink
+preservation and all-parent rollback on an injected transaction error.
+Their executed source Git hashes match the published branch.
+
+The R001 host gate now checks both unique markers:
+`POLARIS_SQLDELIGHT_PORT_PASS 19` and
+`POLARIS_REAL_MODEL_END_TO_END_PASS 16`. A missing or undercounted
+suite fails regardless of the other suite's count. The eleven-stage
+configured minimum rises from 405 to **421**, NOT an executed
+aggregate.
+
+The **database and query generator are still host fakes**, as are the
+serialization annotations and the source `BackupManga` restorer.
+This is neither a real protobuf roundtrip nor a real SQLDelight
+code-generation or Android runtime test. Migration15 remains unchanged.
