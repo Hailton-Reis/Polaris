@@ -70,6 +70,16 @@ class HostGateParserTests(unittest.TestCase):
         self.assertEqual(evaluate_gate("backup-adapter", complete + "POLARIS_YOMOTSU_EXPORT_ADAPTER_PASS 12\n", 0, 12)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
         self.assertEqual(evaluate_gate("backup-adapter", "EXPORT_ADAPTER_PASS 12\n", 0, 12)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
 
+    def test_parent_snapshot_split_requires_unique_23_case_marker(self):
+        good = "POLARIS_PARENT_SPLIT_HOST_PASS 23\n"
+        self.assertEqual(evaluate_gate("backup-parent-split", good, 0, 23)["status"], "PASS")
+        self.assertEqual(evaluate_gate("backup-parent-split", good, 1, 23)["status"], "NONZERO_EXIT")
+        self.assertEqual(evaluate_gate("backup-parent-split", "", 0, 23)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
+        self.assertEqual(evaluate_gate("backup-parent-split", good + good, 0, 23)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
+        self.assertEqual(evaluate_gate("backup-parent-split", good.replace("23", "22"), 0, 23)["status"], "INSUFFICIENT_TEST_COVERAGE")
+        self.assertEqual(evaluate_gate("backup-parent-split", good.replace("23", "100"), 0, 23)["status"], "PASS")
+        self.assertEqual(evaluate_gate("backup-parent-split", good + "ERROR", 1, 23)["status"], "NONZERO_EXIT")
+
     def test_backup_portable_field_and_pending_model_require_all_four_suites(self):
         base = ("POLARIS_BACKUP_PROTO_MODEL_PASS 18\n"
                 "POLARIS_BACKUP_BUNDLE_BUILDER_PASS 19\n"
