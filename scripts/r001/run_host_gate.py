@@ -21,7 +21,7 @@ GATES = (
     ("backup-restore", ("bash", "spikes/spike001/backup/restore-candidate/run_tests.sh"), 20),
     ("backup-atomic-sqlite", (sys.executable, "-m", "unittest", "discover", "-s", "spikes/spike001/backup/restore-candidate/atomic-sqlite", "-p", "test_*.py", "-q"), 31),
     ("backup-sqldelight-port", ("bash", "spikes/spike001/backup/restore-candidate/sqldelight-port/run_kotlin_host.sh"), 35),
-    ("backup-yomotsu-children", ("bash", "spikes/spike001/backup/restore-candidate/yomotsu-source-port/run_tests.sh"), 37),
+    ("backup-yomotsu-children", ("bash", "spikes/spike001/backup/restore-candidate/yomotsu-source-port/run_tests.sh"), 53),
     ("backup-sqldelight-sqlite", (sys.executable, "-m", "unittest", "discover", "-s", "spikes/spike001/backup/restore-candidate/sqldelight-port/tests", "-p", "test_*.py", "-q"), 10),
     ("backup-migration-audit", (sys.executable, "-m", "unittest", "discover", "-s", "spikes/spike001/backup/restore-candidate/migration-audit", "-p", "test_*.py", "-q"), 85),
 )
@@ -32,6 +32,7 @@ def extract_count(name: str, output: str):
         required = (
             (r"(?m)^POLARIS_YOMOTSU_SOURCE_RESTORE_PASS (\d+)$", 23),
             (r"(?m)^POLARIS_YOMOTSU_RESTORE_SEQUENCE_PASS (\d+)$", 14),
+            (r"(?m)^POLARIS_BACKUP_RESTORER_LIFECYCLE_PASS (\d+)$", 16),
         )
         groups = [re.findall(pattern, output) for pattern, _ in required]
         return sum(min(int(match[0]), minimum) for match, (_, minimum) in zip(groups, required)) if all(len(x) == 1 for x in groups) else None
