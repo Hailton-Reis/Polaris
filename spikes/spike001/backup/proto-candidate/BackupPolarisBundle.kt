@@ -60,6 +60,13 @@ data class BackupPolarisBundle(
      */
     fun validateSnapshotCoverage(ordinaryManga: List<BackupManga>) {
         validateForImport()
+        // Importing a virtual manga through the ordinary Yomotsu restorer AND
+        // recreating it from a Polaris UUID produces two parents. Until the
+        // portable bundle preserves parent categories/notes and defines safe
+        // reuse of the original row, reject this mixed-format archive.
+        require(works.isEmpty() || ordinaryManga.none { it.source == 6969L }) {
+            "A Polaris archive cannot also carry legacy virtual parents in ordinary manga backups"
+        }
         val normal = ordinaryManga.map { it.source to it.url }
         val extra = supplementalManga.map { it.source to it.url }
         require(normal.distinct().size == normal.size) { "Ambiguous normal manga identities" }
