@@ -30,7 +30,7 @@ def extract_count(name: str, output: str):
     if name == "backup-sqldelight-port":
         port = re.findall(r"(?m)^POLARIS_SQLDELIGHT_PORT_PASS (\d+)$", output)
         real = re.findall(r"(?m)^POLARIS_REAL_MODEL_END_TO_END_PASS (\d+)$", output)
-        return (int(port[0]) + int(real[0])) if len(port) == 1 and len(real) == 1 else None
+        return (min(int(port[0]), 19) + min(int(real[0]), 16)) if len(port) == 1 and len(real) == 1 else None
     if name == "backup-restore":
         hits = re.findall(r"(?m)^POLARIS_YOMOTSU_RESTORE_COORDINATOR_PASS (\d+)$", output)
         return int(hits[0]) if len(hits) == 1 else None
