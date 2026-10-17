@@ -530,3 +530,13 @@ SHA256 `3e6448ae34fa4146c7db5676368fc5d279e37e9276c991852056583a4a4aa963`.
 serialization are stubbed in host tests; actual codegen, real ProtoBuf,
 full history/tracking verification and Android runtime B01–B05 remain
 unverified. Production `BackupRestorer.kt` and migration15 unchanged.
+
+## 17/10/2026 — stage optional ProtoBuf 107 and fail-closed stock restore lifecycle
+
+New `yomotsu-source-port/kotlin/PolarisBackupRestorerLifecycle.kt` preflights the real portable bundle before stock Yomotsu DB jobs, awaits one structured stock restore operation and then enforces strict required-child source checks before virtual-parent associations. It leaves legacy backups on the one-pass stock path.
+
+SHA-pinned **non-production** `android-bridge/Backup.staged.kt` adds optional `polarisBundle` ProtoBuf field 107; `BackupRestorer.staged.kt` wraps the upstream structured `coroutineScope` in a suspend callback. If a Polaris segment is present but the lifecycle has not been DI-injected, it **fails explicitly**. Neither staged file is in the Android source set or compiled with Gradle.
+
+`backup-yomotsu-children` now runs three mains and checks independent exact markers, with minima 23 source +14 sequence +16 new lifecycle = **53**. Local **53/53 Kotlin/JVM PASS**, same source blobs published to GitHub; runner's third main is `HostLifecycleTestKt`. Overall **12 host groups configured minimum 474**, NOT a completed 474-case run. New package `Polaris_R001_BackupRestorer_Lifecycle_2026-10-17.zip` SHA256 `b83c850a65dfdf44e1d9375a256d68fc18dd0315abaa4533bfd5a2e92db35f11`, saved in Library `/Polaris/R001/`. Remote Drive upload of this ZIP did not succeed; use the verified sandbox ZIP link.
+
+Production gate unchanged: SQLDelight codegen and DI, real ProtoBuf encode/decode, Android B01–B05, tracks/history verification, migration15 review. PR #1 remains DRAFT.
