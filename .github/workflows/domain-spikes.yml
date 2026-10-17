@@ -82,8 +82,10 @@ jobs:
         run: python3 -m unittest discover -s spikes/spike001/host-sqlite -p 'test_*.py' -v
       - name: Verify orphan-source backup recovery SQL (host-only)
         run: python3 -m unittest discover -s spikes/spike001/backup -p 'test_*.py' -v
-      - name: Check pinned optional backup protobuf patch (host-only)
-        run: python3 -m unittest discover -s spikes/spike001/backup/proto-candidate -p 'test_proto_apply.py' -v
+      - name: Validate pinned backup tag 107 and shared exporter/restorer field (Python host-only)
+        run: python3 -m unittest discover -s spikes/spike001/backup/proto-candidate -p 'test_*.py' -v
+      - name: Compile actual staged Backup and Polaris portable model with 4 host suites
+        run: bash spikes/spike001/backup/proto-candidate/run_model_validation.sh
       - name: Validate SHA-pinned Yomotsu BackupCreator staging (Python host-only)
         run: python3 -m unittest discover -s spikes/spike001/backup/yomotsu-candidate -p 'test_creator_stage.py' -v
       - name: Compile and test Yomotsu source-aware backup adapter (host-only)
