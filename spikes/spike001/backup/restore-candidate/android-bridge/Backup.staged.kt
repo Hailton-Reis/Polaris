@@ -13,5 +13,5 @@ data class Backup(
     @ProtoNumber(105) var backupSourcePreferences: List<BackupSourcePreferences> = emptyList(),
     @ProtoNumber(106) var backupExtensionStores: List<BackupExtensionStore> = emptyList(),
     // Optional Polaris segment: decoding legacy archives must stay compatible.
-    @ProtoNumber(107) val polarisBundle: BackupPolarisBundle? = null,
+    @ProtoNumber(107) val polaris: BackupPolarisBundle? = null,
 )
