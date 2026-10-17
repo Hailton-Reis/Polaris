@@ -43,6 +43,14 @@ data class BackupPolarisBundle(
         }
         require(snapshotKeys.distinct().size == snapshotKeys.size) { "Duplicate supplementary manga snapshot" }
         require(snapshotKeys.all { it in identities }) { "Supplementary manga is not linked to any exported work" }
+        // Do not materialize a real manga for an association explicitly
+        // marked pending; another virtual work may still resolve the same key.
+        val resolvedIdentities = works.flatMap { work ->
+            work.links.filterNot { it.isPending }.map { it.sourceId to it.sourceUrl }
+        }.toSet()
+        require(snapshotKeys.all { it in resolvedIdentities }) {
+            "Supplementary manga only referenced by pending links must not be restored"
+        }
     }
 
     /**
