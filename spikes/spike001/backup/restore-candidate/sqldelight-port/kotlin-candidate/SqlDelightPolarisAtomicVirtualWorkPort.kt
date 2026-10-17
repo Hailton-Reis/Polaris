@@ -46,6 +46,18 @@ class SqlDelightPolarisAtomicVirtualWorkPort(
         database.transaction {
             for (work in works) {
                 val q = database.polarisRestoreQueries
+                // A ledger hit is not proof that the linked REAL manga rows
+                // still represent the original portable source+URL identities.
+                // Recheck on every import, including a byte-identical replay.
+                // This also detects missing/moved children and ambiguous data
+                // without ever attempting an automatic relink by title.
+                for (link in work.children) {
+                    if (link.realMangaId == null) continue // explicitly pending
+                    check(q.selectAllExactSourceChildIds(link.sourceId, link.sourceUrl)
+                        .awaitAsList() == listOf(link.realMangaId)) {
+                        "Resolved local child no longer matches exactly one source+URL identity"
+                    }
+                }
                 val digest = PolarisRestoreDigest.of(work)
                 val registered = q.selectLedgerForUuid(work.archiveUuid).awaitAsOneOrNull()
                 if (registered != null) {
@@ -78,13 +90,6 @@ class SqlDelightPolarisAtomicVirtualWorkPort(
                 for (legacy in q.selectAllVirtualUuidMemos().awaitAsList()) {
                     check(memoUuid(legacy.memo) != work.archiveUuid) {
                         "UUID already exists on a parent without restore ledger; manual repair required"
-                    }
-                }
-                for (link in work.children) {
-                    if (link.realMangaId == null) continue
-                    check(q.selectAllExactSourceChildIds(link.sourceId, link.sourceUrl)
-                        .awaitAsList() == listOf(link.realMangaId)) {
-                        "Real child source/URL does not identify exactly the restored manga"
                     }
                 }
 
