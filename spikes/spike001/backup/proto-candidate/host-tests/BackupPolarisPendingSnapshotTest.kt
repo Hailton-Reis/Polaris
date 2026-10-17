@@ -33,5 +33,12 @@ fun main() {
         val b=bundle(work(UUID_A,link(11,"/active")),extras=listOf(BackupManga(11,"/active")))
         failure { b.validateSnapshotCoverage(listOf(BackupManga(11,"/active"))) }
     }
+    scenario("portable multi-source backup refuses ordinary virtual parent duplicate") {
+        val b=bundle(work(UUID_A,link(11,"/active")))
+        failure { b.validateSnapshotCoverage(listOf(BackupManga(11,"/active"), BackupManga(6969,"merged://legacy"))) }
+    }
+    scenario("empty optional Polaris section keeps ordinary legacy backup compatible") {
+        BackupPolarisBundle().validateSnapshotCoverage(listOf(BackupManga(6969,"merged://legacy")))
+    }
     println("POLARIS_PENDING_SNAPSHOT_MODEL_PASS $checked")
 }
