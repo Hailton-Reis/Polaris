@@ -94,6 +94,8 @@ jobs:
         run: python3 -m unittest discover -s spikes/spike001/backup/restore-candidate/atomic-sqlite -p 'test_*.py' -v
       - name: Compile staged SQLDelight Kotlin atomic restore port (host-only)
         run: bash spikes/spike001/backup/restore-candidate/sqldelight-port/run_kotlin_host.sh
+      - name: Verify strict Yomotsu source-child restore and portable coordinator (Kotlin host-only)
+        run: bash spikes/spike001/backup/restore-candidate/yomotsu-source-port/run_tests.sh
       - name: Validate staged typed SQLDelight query syntax (SQLite host-only)
         run: python3 -m unittest discover -s spikes/spike001/backup/restore-candidate/sqldelight-port/tests -p 'test_*.py' -v
       - name: Audit pre-migration legacy UUIDs and duplicate links (read-only host tests)
