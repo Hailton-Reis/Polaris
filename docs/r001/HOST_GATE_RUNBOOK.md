@@ -479,3 +479,22 @@ unverified. Migration15 and installed DB unaffected.
 
 [Source, tests and usage](../../spikes/spike001/backup/restore-candidate/migration-audit/README_REVIEWED_UNDO.md).
 Local evidence ZIP `Polaris_R001_Reconciliacao_Reversivel_2026-10-16.zip`, SHA256 `17562de0426f9c9011222c14944824b7fda9425bfdecac46fbea7079343c56c2` (also saved under Library `/Polaris/R001/`).
+
+## 16/10/2026 — 35 Kotlin checks using real portable model + coordinator
+
+`sqldelight-port/run_kotlin_host.sh` compiles actual
+`BackupPolarisBundle.kt`, `PolarisRestoreCoordinator.kt` and
+the Kotlin atomic SQLDelight candidate together, instead of an
+invented portable settings model. Only SQLDelight DB and protobuf
+serialization/BackupManga are host stubs.
+
+It executes two separate mains with unique markers:
+`POLARIS_SQLDELIGHT_PORT_PASS 19` and
+`POLARIS_REAL_MODEL_END_TO_END_PASS 16`. The parser requires
+both suites to meet their own minima, not merely a sum.
+**35/35 PASS locally.** Exact executed Kotlin blobs match GitHub.
+
+11-stage configured minimum **421**, NOT a completed 421-test run.
+Evidence ZIP SHA256 `8d5db7cee61ec6145691cf6dc00cc3c98a4a18cb062aa9d73ca9c510f9f6b287`
+is in Library `/Polaris/R001/`. Actual SQLDelight generation,
+ProtoBuf roundtrip and Android B01-B05 remain untested.
