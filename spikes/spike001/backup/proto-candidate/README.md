@@ -66,3 +66,39 @@ bash spikes/spike001/backup/proto-candidate/run_model_validation.sh
 **18/18** old DTO Kotlin checks + **16/16** new builder checks PASS, compiled against explicit serialization and BackupManga stubs (not actual ProtoBuf). In this checkpoint, the older separate 24/24 restore and 20/20 export Kotlin checks, plus 7/7 pinned-apply Python checks, were rerun: **85 isolated host checks PASS**, not a unified five-stage gate. `spikes/domain-lab/build.gradle.kts` now requires both protobuf host test mains as tasks of `checkSpikes`. No actual Gradle task, Kotlin protobuf wire serialization, APK or on-device restore has run.
 
 [Evidence ZIP](https://drive.google.com/file/d/1FuHz10bYD-4-ZfS4-yE9Dq6RQzMaXOac/view) SHA256 `5bec9bf2e3cf5dd5abccffee884a1bc67e2ca8e607dc9d98d9149523788f8998`. The newer [12/10 handoff](../../../../docs/r001/RESUME_2026_10_12.md) supersedes the older progress count. Do not apply the candidate to production before issue #2 gates and real Kotlin serializer tests.
+
+## 2026-10-17 — backup field 107, pending-only and duplicate parent fail-closed
+
+Three concrete staging errors corrected: `BackupCreator.staged.kt` wrote
+`Backup.polaris` while `Backup.staged.kt` defined `polarisBundle`
+and `BackupRestorer.staged.kt` read `backup.polarisBundle`. Both now
+use the same `polaris` property as the existing 107-tag patcher.
+`BackupPolarisBundle` now forbids supplemental full-manga snapshots
+if ALL associated source links are pending. A shared source remains
+eligible when at least one parent has a resolved link.
+
+Critically, `BackupPolarisBundle.validateSnapshotCoverage` fails closed
+when an archive contains both actual Polaris virtual works and ordinary
+Yomotsu backup mangas with `source=6969`, which would otherwise
+create two different virtual parent rows on import. This is a P0
+incompatibility with the current staged exporter: **do not bypass**.
+Complete portable parent metadata preservation and duplicate-free
+restoration before enabling Android export/import.
+
+New `backup-proto-contract` host gate compiles the staged
+`Backup.staged.kt`, real portable DTO and requires four unique
+success markers with minima 18+19+9+5 = **51**. It runs via
+`bash spikes/spike001/backup/proto-candidate/run_model_validation.sh`.
+CI also checks the six cross-file field-107 contracts in Python.
+
+Locally executed **32/32** DTO/staged field tests, **53/53** strict
+restore, **41/41** atomic port and **16/16** SQLite = 142 distinct
+host test cases across four suites, plus **7/7** pinned proto staging
+Python cases; all PASS. The builder's 19 tests are configured but
+not rerun here. The 13-stage **configured** host minimum is
+**537**, not an executed full gate. No actual ProtoBuf or Android
+Gradle SQLDelight codegen.
+
+[Evidence ZIP](https://drive.google.com/file/d/164HHr-yLvfW9Br24WNISJyDDQsULA4Bj/view):
+SHA256 `2d525668bca17556211bc8d6cc554add4b10d3d405bc49f12133bd44d6a53c09`.
+No production migrations or file writes to a user's Android data.
