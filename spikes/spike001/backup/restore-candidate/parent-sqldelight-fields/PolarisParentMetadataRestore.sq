@@ -95,3 +95,25 @@ VALUES (:parentId, :excludedScanlator);
 
 -- The merge-link insert must be the existing Spike-001 query or its exact
 -- equivalent inside the same transaction; never invent a local child ID.
+
+-- EXPERIMENTAL NEW-PARENT-ONLY PATH, not compiled against Yomotsu/Android.
+-- Called LAST, after writing all referencing rows in ONE BEGIN IMMEDIATE
+-- transaction with PRAGMA defer_foreign_keys=ON on the SAME connection.
+-- A prevalidated, reserved parentId is allocated while holding write lock.
+-- Existing parents must NEVER use this path, and the whole transaction must
+-- reject duplicate ID/source URL/UUID claims and verify FK + full readback.
+-- Parent and chapter inserts use isSyncing=0, avoiding an UPDATE finalizer.
+insertPolarisRestoredReservedParentLast:
+INSERT INTO mangas(
+    _id, source, url, artist, author, description, genre, title, status,
+    thumbnail_url, favorite, last_update, next_update, initialized, viewer,
+    chapter_flags, cover_last_modified, date_added, update_strategy,
+    calculate_interval, last_modified_at, favorite_modified_at, version,
+    is_syncing, notes, memo
+) VALUES (
+    :parentId, 6969, :destinationUrl, :artist, :author, :description, :genre,
+    :title, :status, :thumbnailUrl, :favorite, :lastUpdate, :nextUpdate,
+    :initialized, :viewer, :chapterFlags, :coverLastModified, :dateAdded,
+    :updateStrategy, :calculateInterval, :lastModifiedAt,
+    :favoriteModifiedAt, :version, 0, :notes, :memo
+) RETURNING _id;
