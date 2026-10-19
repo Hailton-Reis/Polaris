@@ -707,3 +707,29 @@ The fifteenth `backup-parent-metadata-plan` gate now requires **28 cases**.
 No production Yomotsu, migration15, UUID ledger or v2 coordinator preflight
 was modified. [Detailed report](PARENT_V2_UUID_DESTINATION_URL_FIX_2026_10_19.md).
 Android B01–B05 and real transactions/serialization remain P0 blockers.
+
+
+### 2026-10-19 — source-confirmed category order and stock restoration hazards
+
+Audited pinned Yomotsu `BackupManga.kt`, `MangaRestorer.kt`, and
+`CategoriesRestorer.kt` at commit `0fb80c439ef816eeb50674f1b90af39918b176d8`.
+`BackupManga.categories` is interpreted by stock `MangaRestorer` through
+`BackupCategory.order`, then category `name`, then local destination ID;
+its use of `mapNotNull` can silently skip missing mappings. The staging
+planner's parameter is now explicitly `categoryOrderToDestinationId` and
+still refuses missing or collapsed categories. Stock `MangaRestorer` also
+looks up manga by source+URL and is UNSAFE to call directly with an old
+virtual-parent URL; archived parent URL and UUID-stable destination URL
+must remain distinct. Missing parent chapter URLs can silently suppress
+history restore. Local progress/tracking restores are merges, not exact copies.
+
+After this source-grounded annotation change, the host planner remains
+**28/28 Kotlin/JVM PASS** with test doubles; production constraints are
+unchanged. Updated source Git blobs match the locally executed files. New
+source audit: [PINNED_YOMOTSU_FULL_PARENT_RESTORE_AUDIT_2026_10_19.md](PINNED_YOMOTSU_FULL_PARENT_RESTORE_AUDIT_2026_10_19.md).
+Updated evidence ZIP SHA256:
+`8e5f98c5b747d448782334db9049f659d46ce04b8f5546a65d8fe24be5d66009`,
+Library `/Polaris/R001/parent-metadata-restore/`.
+The configured aggregate remains **614 minima / 15 groups**, NOT executed.
+Do not remove the v2 fail-closed coordinator guard. No migration 15 or
+user Android data changes.
