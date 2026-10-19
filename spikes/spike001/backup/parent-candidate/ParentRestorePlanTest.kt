@@ -26,7 +26,7 @@ private fun archive() = BackupPolarisBundle(2, listOf(work()), emptyList(), list
 private fun ordinary(uuid: String = U1) = listOf(BackupManga(77L, "/child/$uuid", "Child"))
 private val mapping = mapOf(4L to 91L, 7L to 92L)
 private fun existing(uuid: String = U1, state: Planner.MetadataDisposition = Planner.MetadataDisposition.EMPTY_PLACEHOLDER,
-    id: Long = 500L, url: String = "merged://$uuid", source: Long = 6969L) =
+    id: Long = 500L, url: String = "merged://polaris/$uuid", source: Long = 6969L) =
     Planner.ExistingParentRow(id, uuid, source, url, state)
 private fun plan(b: BackupPolarisBundle = archive(), ordinary: List<BackupManga> = ordinary(),
     rows: Map<String,List<Planner.ExistingParentRow>> = emptyMap(), cats: Map<Long,Long> = mapping) =
@@ -107,6 +107,20 @@ fun main() {
         val b=archive().copy(works=listOf(work(),work(U2,"Two")),
             parentSnapshots=listOf(parent(),parent(U2,"Two",ordinal=1)))
         plan(b,ordinary()+ordinary(U2))
+    }
+    ok("archived source URL differs from the UUID-stable destination parent URL") {
+        val result = plan(rows=mapOf(U1 to listOf(existing(url="merged://polaris/$U1")))).single()
+        check(result.operation == Planner.Operation.APPLY_TO_EMPTY)
+        check(result.destinationUrl == "merged://polaris/$U1")
+        check(result.fullBackupManga.url == "merged://$U1")
+    }
+    fail("reject replay against legacy local URL lacking UUID-stable destination identity") {
+        plan(rows=mapOf(U1 to listOf(existing(url="merged://$U1"))))
+    }
+    ok("new parent operation targets UUID-stable local URL without mutating archive") {
+        val result = plan().single()
+        check(result.destinationUrl == "merged://polaris/$U1")
+        check(result.fullBackupManga.url == "merged://$U1")
     }
     println("POLARIS_PARENT_METADATA_RESTORE_PLAN_PASS $cases")
 }
