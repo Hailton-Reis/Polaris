@@ -633,3 +633,21 @@ manga, restore full metadata onto exactly one UUID parent ID inside
 reviewed DB operations, safely merge memo JSON and map categories/history.
 Keep the preflight guard that refuses duplicate virtual parents.
 Migration 15 and production source files untouched.
+
+
+## 19/10/2026 — portable parent-v2 contract
+
+`BackupPolarisBundle` extends v1 with additive Proto tag 4
+`parentSnapshots` (full `BackupManga` + UUID + original ordinal).
+`PolarisParentBundleAssembler` matches the full partition to portable works.
+`PolarisRestoreCoordinator.preflight` refuses v2 **before stock writes**
+until an atomic full-parent metadata restore exists. Keep this fail-closed barrier.
+
+New standalone 26/26 Kotlin/JVM suite, total 74/74 across locally available
+model suites (16-case old Builder fixture, rather than the 19-case latest).
+Host `backup-proto-contract` now REQUIRES 77 via five independent unique
+markers (18+19+9+5+26); total configured **586/14 groups, not executed**.
+[Evidence ZIP](https://drive.google.com/file/d/12EPjHFr695yWWRKOO50PvI3EXPPD4vyk/view),
+SHA256 `c6d09c031f2738239cb288a637f2b0cf9595709f1e009177aa812b85cfee6d13`.
+Real serialization/codegen/Android B01–B05 remain open. See
+[technical report](PARENT_V2_PORTABLE_2026_10_19.md).
