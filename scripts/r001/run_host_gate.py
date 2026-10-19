@@ -32,7 +32,7 @@ GATES = (
 
 def extract_count(name: str, output: str):
     if name == "backup-parent-metadata-plan":
-        found = re.findall(r"(?m)^POLARIS_PARENT_METADATA_RESTORE_PLAN_PASS (\\d+)$", output)
+        found = re.findall(r"(?m)^POLARIS_PARENT_METADATA_RESTORE_PLAN_PASS (\d+)$", output)
         return min(int(found[0]), 25) if len(found) == 1 else None
     if name == "backup-parent-split":
         found = re.findall(r"(?m)^POLARIS_PARENT_SPLIT_HOST_PASS (\d+)$", output)
