@@ -116,6 +116,8 @@ jobs:
         run: bash spikes/spike001/backup/restore-candidate/parent-sqldelight-fields/run_tests.sh
       - name: Verify pinned AndroidX SQLDelight deferred FK Kotlin transaction guard (host only)
         run: bash spikes/spike001/backup/restore-candidate/pinned-driver-transaction/run_tests.sh
+      - name: Validate exact BackupManga-to-SQLDelight typed parent field projection (host only)
+        run: bash spikes/spike001/backup/restore-candidate/parent-field-projection/run_tests.sh
       - name: Audit pre-migration legacy UUIDs and duplicate links (read-only host tests)
         run: python3 -m unittest discover -s spikes/spike001/backup/restore-candidate/migration-audit -p 'test_*.py' -v
       - name: Compile and run isolated backup/UUID host candidates
