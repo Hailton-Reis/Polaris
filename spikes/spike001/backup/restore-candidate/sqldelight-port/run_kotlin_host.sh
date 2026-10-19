@@ -13,6 +13,7 @@ kotlinc \
   "$BACKUP/proto-candidate/host-tests/SerializationStubs.kt" \
   "$BACKUP/proto-candidate/host-tests/ProtoStubs.kt" \
   "$BACKUP/proto-candidate/BackupPolarisBundle.kt" \
+  "$BACKUP/parent-candidate/PolarisParentSnapshotPartition.kt" \
   "$BACKUP/restore-candidate/PolarisRestoreCoordinator.kt" \
   "$DIR/kotlin-candidate/PolarisRestoreDigest.kt" \
   "$DIR/kotlin-candidate/SqlDelightPolarisAtomicVirtualWorkPort.kt" \
