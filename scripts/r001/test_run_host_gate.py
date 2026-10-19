@@ -90,6 +90,16 @@ class HostGateParserTests(unittest.TestCase):
         self.assertEqual(evaluate_gate(gate, "", 0, 44)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
         self.assertTrue(any(n == gate and m == 44 for n, cmd, m in GATES))
 
+    def test_parent_sqldelight_fields_requires_35_cases(self):
+        gate = "backup-parent-sqldelight-fields"
+        good = "Ran 35 tests in 0.13s\n\nOK\n"
+        self.assertEqual(evaluate_gate(gate, good, 0, 35)["status"], "PASS")
+        self.assertEqual(evaluate_gate(gate, good, 1, 35)["status"], "NONZERO_EXIT")
+        self.assertEqual(evaluate_gate(gate, good.replace("35", "34"), 0, 35)["status"], "INSUFFICIENT_TEST_COVERAGE")
+        self.assertEqual(evaluate_gate(gate, good.replace("OK", "FAILED"), 0, 35)["status"], "MISSING_UNITTEST_OK_MARKER")
+        self.assertEqual(evaluate_gate(gate, "", 0, 35)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
+        self.assertTrue(any(n == gate and count == 35 for n, cmd, count in GATES))
+
     def test_spike001_layering_requires_98_sqlite_cases(self):
         gate = "backup-spike001-layering"
         good = "Ran 98 tests in 0.15s\n\nOK\n"
