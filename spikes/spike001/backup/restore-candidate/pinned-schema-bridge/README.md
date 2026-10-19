@@ -25,3 +25,8 @@ python3 -m unittest discover -s spikes/spike001/backup/restore-candidate/pinned-
 A `manga_sync` unique constraint uses `ON CONFLICT REPLACE`, so live local tracking can be replaced by naïve replays; the port must preserve fail-closed replay behavior. The original Yomotsu `genre` adapter serializes list values as delimited text and might be lossy for embedded delimiters, which this host implementation refuses. Real v2 metadata restoration cannot be considered proven until adapter round trips and complete field readbacks are verified under Yomotsu's actual runtime triggers.
 
 **Do not lift the v2 fail-closed import guard in `PolarisRestoreCoordinator`, merge Draft PR #1, or alter migration 15 on this evidence alone.**
+
+
+## Correction (2026-10-19) — do not install a second merged table
+
+This README previously characterized missing `merged` in pristine Yomotsu as a newly discovered integration blocker. **That wording is incomplete.** Polaris Spike-001 already supplies `new-files/data/src/main/sqldelight/tachiyomi/data/merged.sq` and migration14; baseline and patched builds were reported successful in `docs/r001/ISSUE002_WORK_LOG.md`. The independent `merged_bridge_candidate.sql` is an **alternative test-only bridge for the pristine upstream** and MUST NOT be applied to a tree/database after Spike-001, where it would attempt a duplicate `CREATE TABLE merged`. For the actual existing Polaris path, audit legacy data then add ONLY the restore ledger and unique indexes on top of migration14; see `../spike001-layering/README.md` and `docs/r001/SPIKE001_LEDGER_LAYERING_CORRECTION_2026_10_19.md`. No production DB migration was performed. Android B01–B05 and full metadata restore are still open.
