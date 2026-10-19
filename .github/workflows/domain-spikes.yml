@@ -88,6 +88,8 @@ jobs:
         run: bash spikes/spike001/backup/proto-candidate/run_model_validation.sh
       - name: Check lossless full virtual-parent BackupManga split (host only)
         run: bash spikes/spike001/backup/parent-candidate/run_tests.sh
+      - name: Verify unified full-parent atomic Kotlin transaction protocol (host only)
+        run: bash spikes/spike001/backup/parent-candidate/unified-transaction/run_tests.sh
       - name: Reject unsafe v2 parent metadata restores and verify UUID replay plan (host only)
         run: bash spikes/spike001/backup/parent-candidate/run_restore_plan_tests.sh
       - name: Validate SHA-pinned Yomotsu BackupCreator staging (Python host-only)
