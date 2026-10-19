@@ -43,3 +43,8 @@ ChatGPT Library folder: `/Polaris/R001/parent-sqldelight-fields/`.
 Implement a reviewed transaction-safe strategy to finalize `is_syncing` and preserve relevant timestamps and versions (or explicitly record and adjudicate an unavoidable deviation **without** silently claiming exact restore). Compile candidate queries against pinned SQLDelight generated Kotlin types and adapters. Implement concrete `PolarisFullParentAtomicTransactionPort` with exact field+edge readback and a single real DB transaction, validate actual ProtoBuf v1/v2 and Android B01–B05. The current fail-closed `PolarisRestoreCoordinator.preflight` v2 block must remain.
 
 **No production migration, migration15, Yomotsu source logic, user SQLite database or PR merge was changed.** PR #1 stays Draft; issues #2 and #11 stay OPEN.
+
+
+## 2026-10-19 follow-up: NEW parent-LAST deferred-FK workaround under host test
+
+The trigger mismatch remains real for **parent-first / UPDATE-based** restore. A new staging-only new-parent strategy using one write-locked, deferred-FK transaction and a reserved parent ID inserts all referencing rows first and the full parent **LAST**, already with `is_syncing=0`; it avoids touching the parent with UPDATE after creation. **16/16 new host tests pass**; combined 51/51 in the field suite. **No SQLDelight/Android execution yet** and it does not solve existing empty-parent reuse. See [new parent-LAST candidate](NEW_PARENT_LAST_DEFERRED_FK_CANDIDATE_2026_10_19.md). The original negative trigger tests still guard against unsafe parent-first restoration.
