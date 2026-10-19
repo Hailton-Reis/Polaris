@@ -13,7 +13,7 @@ TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
 # Real portable protobuf DTO and coordinator; host doubles only for Android DB,
 # MangaRestorer, BackupManga/chapter and serialization annotation types.
-kotlinc "$PROTO" "$COORD" "$DIR"/kotlin/*.kt "$DIR"/tests/*.kt \
+kotlinc "$PROTO" "$COORD" "$BACKUP/parent-candidate/PolarisParentSnapshotPartition.kt" "$DIR"/kotlin/*.kt "$DIR"/tests/*.kt \
     -include-runtime -d "$TMP/run.jar"
 java -cp "$TMP/run.jar" polaris.spike001.backup.restore.yomotsu.HostPortTestKt
 java -cp "$TMP/run.jar" polaris.spike001.backup.restore.yomotsu.HostSequenceTestKt
