@@ -6,6 +6,7 @@ TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
 # Compile only host-only DTO stubs and real coordinator; NOT Android or actual ProtoBuf.
 kotlinc "$BACKUP/proto-candidate/BackupPolarisBundle.kt" \
+  "$BACKUP/parent-candidate/PolarisParentSnapshotPartition.kt" \
   "$BACKUP/proto-candidate/host-tests/BackupStubs.kt" \
   "$BACKUP/proto-candidate/host-tests/SerializationStubs.kt" \
   "$BACKUP/proto-candidate/host-tests/ProtoStubs.kt" \
