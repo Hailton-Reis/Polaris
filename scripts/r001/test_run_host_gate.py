@@ -81,7 +81,7 @@ class HostGateParserTests(unittest.TestCase):
         self.assertEqual(evaluate_gate("backup-parent-split", good + "ERROR", 1, 23)["status"], "NONZERO_EXIT")
 
     def test_parent_metadata_plan_requires_unique_25_case_marker(self):
-        good = "POLARIS_PARENT_METADATA_RESTORE_PLAN_PASS 25\\n"
+        good = "POLARIS_PARENT_METADATA_RESTORE_PLAN_PASS 25\n"
         self.assertEqual(evaluate_gate("backup-parent-metadata-plan", good, 0, 25)["status"], "PASS")
         self.assertEqual(evaluate_gate("backup-parent-metadata-plan", good, 1, 25)["status"], "NONZERO_EXIT")
         self.assertEqual(evaluate_gate("backup-parent-metadata-plan", "", 0, 25)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
