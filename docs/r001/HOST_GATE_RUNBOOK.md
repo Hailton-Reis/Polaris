@@ -681,3 +681,29 @@ Mandatory blockers remain: transactional UUID-indexed metadata applier and
 verified conflict handling, actual Kotlin ProtoBuf encode/decode, SQLDelight
 code generation/bundled driver, Android B01-B05. PR #1 Draft, issue #11 open,
 no migration15 or production Yomotsu modifications.
+
+
+## 2026-10-19 — destination UUID URL regression (supersedes earlier 25-case threshold)
+
+The staging v2 parent metadata planner originally compared the destination
+virtual parent's `mangas.url` to the **archived source-6969 URL**. But the
+staged SQLDelight restore port creates the destination at
+`merged://polaris/<canonicalUuid>`, independent of the origin device's URL.
+A reused UUID parent could therefore be wrongly rejected. Corrected the
+staging-only planner to preserve the original full `BackupManga` while
+explicitly carrying `destinationUrl=merged://polaris/<canonicalUuid>` and
+requiring exact stable URLs for existing ledger parents. Legacy untracked
+parents must still fail closed rather than title-matching.
+
+**Local 28/28 Kotlin/JVM tests PASS**, including 3 new regression cases,
+with representative model doubles (not real Android ProtoBuf/SQLDelight).
+The new tests did not compile against the pre-fix model because the required
+`destinationUrl` contract was absent. Evidence ZIP SHA256:
+`bd07f88ea8b82ff48829ac04fee2300f33098c473ae1152060a52759e3660d11`,
+Library `/Polaris/R001/parent-metadata-restore/`.
+
+The fifteenth `backup-parent-metadata-plan` gate now requires **28 cases**.
+**Configured minimum: 614 tests in 15 gates; no aggregate run.**
+No production Yomotsu, migration15, UUID ledger or v2 coordinator preflight
+was modified. [Detailed report](PARENT_V2_UUID_DESTINATION_URL_FIX_2026_10_19.md).
+Android B01–B05 and real transactions/serialization remain P0 blockers.
