@@ -80,22 +80,22 @@ class HostGateParserTests(unittest.TestCase):
         self.assertEqual(evaluate_gate("backup-parent-split", good.replace("23", "100"), 0, 23)["status"], "PASS")
         self.assertEqual(evaluate_gate("backup-parent-split", good + "ERROR", 1, 23)["status"], "NONZERO_EXIT")
 
-    def test_backup_portable_field_and_pending_model_require_all_four_suites(self):
+    def test_backup_portable_field_and_pending_model_require_all_five_suites(self):
         base = ("POLARIS_BACKUP_PROTO_MODEL_PASS 18\n"
                 "POLARIS_BACKUP_BUNDLE_BUILDER_PASS 19\n"
                 "POLARIS_PENDING_SNAPSHOT_MODEL_PASS 9\n"
-                "POLARIS_BACKUP_FIELD_INTEROP_PASS 5\n")
-        self.assertEqual(evaluate_gate("backup-proto-contract", base, 0, 51)["status"], "PASS")
-        self.assertEqual(evaluate_gate("backup-proto-contract", base, 1, 51)["status"], "NONZERO_EXIT")
+                "POLARIS_BACKUP_FIELD_INTEROP_PASS 5\n"\n                "POLARIS_PARENT_V2_HOST_PASS 26\n")
+        self.assertEqual(evaluate_gate("backup-proto-contract", base, 0, 77)["status"], "PASS")
+        self.assertEqual(evaluate_gate("backup-proto-contract", base, 1, 77)["status"], "NONZERO_EXIT")
         for item in base.splitlines(keepends=True):
-            self.assertEqual(evaluate_gate("backup-proto-contract", base.replace(item, ""), 0, 51)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
-            self.assertEqual(evaluate_gate("backup-proto-contract", base + item, 0, 51)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
+            self.assertEqual(evaluate_gate("backup-proto-contract", base.replace(item, ""), 0, 77)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
+            self.assertEqual(evaluate_gate("backup-proto-contract", base + item, 0, 77)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
         for value, replacement in (("PASS 18", "PASS 17"), ("PASS 19", "PASS 18"),
-                                   ("PASS 9", "PASS 8"), ("PASS 5", "PASS 4")):
-            self.assertEqual(evaluate_gate("backup-proto-contract", base.replace(value, replacement), 0, 51)["status"], "INSUFFICIENT_TEST_COVERAGE")
+                                   ("PASS 9", "PASS 8"), ("PASS 5", "PASS 4"), ("PASS 26", "PASS 25")):
+            self.assertEqual(evaluate_gate("backup-proto-contract", base.replace(value, replacement), 0, 77)["status"], "INSUFFICIENT_TEST_COVERAGE")
         self.assertEqual(evaluate_gate("backup-proto-contract",
                          base.replace("PASS 18", "PASS 100").replace("PASS 5", "PASS 4"),
-                         0, 51)["status"], "INSUFFICIENT_TEST_COVERAGE")
+                         0, 77)["status"], "INSUFFICIENT_TEST_COVERAGE")
 
     def test_sqldelight_port_kotlin_requires_real_models_and_both_suites(self):
         port = "POLARIS_SQLDELIGHT_PORT_PASS 25\n"
