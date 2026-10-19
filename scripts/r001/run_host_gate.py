@@ -21,6 +21,7 @@ GATES = (
     ("backup-parent-split", ("bash", "spikes/spike001/backup/parent-candidate/run_tests.sh"), 23),
     ("backup-parent-metadata-plan", ("bash", "spikes/spike001/backup/parent-candidate/run_restore_plan_tests.sh"), 28),
     ("backup-full-parent-sqlite", (sys.executable, "-m", "unittest", "discover", "-s", "spikes/spike001/backup/restore-candidate/full-parent-sqlite", "-p", "test_atomic_full_parent_v2_host.py", "-v"), 42),
+    ("backup-pinned-schema-bridge", (sys.executable, "-m", "unittest", "discover", "-s", "spikes/spike001/backup/restore-candidate/pinned-schema-bridge", "-p", "test_pinned_schema_bridge.py", "-v"), 49),
     ("backup-full-parent-unified-kotlin", ("bash", "spikes/spike001/backup/parent-candidate/unified-transaction/run_tests.sh"), 44),
     ("backup-adapter", ("bash", "spikes/spike001/backup/yomotsu-candidate/run_tests.sh"), 12),
     ("backup-restore", ("bash", "spikes/spike001/backup/restore-candidate/run_tests.sh"), 20),
