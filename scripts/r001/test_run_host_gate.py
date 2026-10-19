@@ -90,6 +90,16 @@ class HostGateParserTests(unittest.TestCase):
         self.assertEqual(evaluate_gate(gate, "", 0, 44)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
         self.assertTrue(any(n == gate and m == 44 for n, cmd, m in GATES))
 
+    def test_typed_parent_projection_requires_unique_89_case_marker(self):
+        gate = "backup-typed-parent-projection"
+        good = "POLARIS_BACKUP_MANGA_TYPED_PROJECTION_PASS 89\n"
+        self.assertEqual(evaluate_gate(gate, good, 0, 89)["status"], "PASS")
+        self.assertEqual(evaluate_gate(gate, good, 1, 89)["status"], "NONZERO_EXIT")
+        self.assertEqual(evaluate_gate(gate, good.replace("89", "88"), 0, 89)["status"], "INSUFFICIENT_TEST_COVERAGE")
+        self.assertEqual(evaluate_gate(gate, good + good, 0, 89)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
+        self.assertEqual(evaluate_gate(gate, "", 0, 89)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
+        self.assertTrue(any(n == gate and minimum == 89 for n, command, minimum in GATES))
+
     def test_pinned_driver_kotlin_requires_unique_33_case_marker(self):
         gate = "backup-pinned-driver-kotlin"
         good = "POLARIS_PINNED_DEFERRED_FK_GUARD_PASS 33\n"
