@@ -20,6 +20,7 @@ GATES = (
     ("backup-proto-contract", ("bash", "spikes/spike001/backup/proto-candidate/run_model_validation.sh"), 77),
     ("backup-parent-split", ("bash", "spikes/spike001/backup/parent-candidate/run_tests.sh"), 23),
     ("backup-parent-metadata-plan", ("bash", "spikes/spike001/backup/parent-candidate/run_restore_plan_tests.sh"), 28),
+    ("backup-full-parent-sqlite", (sys.executable, "-m", "unittest", "discover", "-s", "spikes/spike001/backup/restore-candidate/full-parent-sqlite", "-p", "test_atomic_full_parent_v2_host.py", "-v"), 42),
     ("backup-adapter", ("bash", "spikes/spike001/backup/yomotsu-candidate/run_tests.sh"), 12),
     ("backup-restore", ("bash", "spikes/spike001/backup/restore-candidate/run_tests.sh"), 20),
     ("backup-atomic-sqlite", (sys.executable, "-m", "unittest", "discover", "-s", "spikes/spike001/backup/restore-candidate/atomic-sqlite", "-p", "test_*.py", "-q"), 31),
