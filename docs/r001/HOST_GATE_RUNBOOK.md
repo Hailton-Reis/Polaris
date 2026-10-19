@@ -841,3 +841,14 @@ Complete reproduction instructions and exact upstream blob SHA list:
 Evidence ZIP SHA256 `1623226cefcddc72c6963228ba768987a27401cceb41e734d8726300ca393290`;
 Library `/Polaris/R001/pinned-schema-bridge/`.
 **Do not change migration15 or unblock v2 restore; PR #1 Draft and issue #11 OPEN.**
+
+
+## 2026-10-19 — CORRECTION: Spike-001 already provides the merged table
+
+The earlier pinned-schema-bridge blocker diagnosis conflated pristine Yomotsu with Yomotsu after the Polaris Spike-001 patch. The pristine Yomotsu tree is expected to lack merged; Polaris already supplies `new-files/data/src/main/sqldelight/tachiyomi/data/merged.sq` and migration `14.sqm`. The prior issue #2 work log confirms that the baseline and Spike-001-patched Android APKs built, including SQLDelight migration verification. Therefore the missing upstream merged table is NOT an unexpected incompatibility of the existing Spike-001.
+
+Do not apply the older `pinned-schema-bridge/merged_bridge_candidate.sql` after Spike-001: it attempts to create a second merged table. The correct candidate integration is additive UUID restore ledger + physical uniqueness indexes on TOP of the existing Spike-001 migration 14, after a full duplicate/UUID audit. The actual SQLDelight metadata adapter and mobile runtime evidence remain incomplete.
+
+Created `spikes/spike001/backup/restore-candidate/spike001-layering/` with precise Git blob checks of the existing migration14/merged.sq, normalized schema equivalence, in-memory-only additive DDL rehearsal and 49 regression tests (including real staged insert/select queries, duplicate pending or resolved refs, orphan FK, UUID collision, stale URL, and ambiguous physical source child). **49/49 Python/SQLite host tests PASS locally**. No Android or real ProtoBuf tests executed this turn.
+
+Added `backup-spike001-layering` to host aggregator and Domain spikes CI YAML: **798 minimum configured tests / 19 groups, NOT executed as a whole**. This does not mean CI passed. Details: [reconciliation report](SPIKE001_LEDGER_LAYERING_CORRECTION_2026_10_19.md). Evidence ZIP SHA-256 `7b8684e673f96d3b358de02e7b6d1d401fc03c79b4b9fc282afba6a056a6229c`, Library `/Polaris/R001/spike001-layering-reconciliation/`. Migration15 and v2 fail-closed guard remain unchanged, Draft PR #1 and issues #2/#11 remain open.
