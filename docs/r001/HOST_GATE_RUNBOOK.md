@@ -766,3 +766,36 @@ Evidence ZIP in Library `/Polaris/R001/full-parent-atomic-sqlite/`, SHA256
 `6cc579aa285d83fe20d764ec14461f79c7343d4f8ea114943e0b2f408f533909`.
 PR #1 remains Draft, issue #11 remains open, `PolarisRestoreCoordinator`
 continues to refuse v2 before stock writes, and migration15 is unchanged.
+
+
+## 2026-10-19 — full-parent Kotlin single transaction orchestration (44 new cases)
+
+New `spikes/spike001/backup/parent-candidate/unified-transaction/`
+contains a **staging-only** `PolarisFullParentTransactionCoordinator` and
+`PolarisFullParentAtomicTransactionPort` contract. It composes the actual
+portable v2 parent/child work topology with `PolarisParentMetadataRestorePlanner`
+INSIDE one future DB transaction, validates archived category order->name->ID,
+rechecks each live source child identity, and mandates physical complete
+metadata readback after create, empty-parent apply and no-op replay.
+
+**Local 44/44 Kotlin/JVM test-double cases PASS**, re-executed alongside the
+previous **42/42 synthetic SQLite host cases**, for **86 cases across two
+separate suites**. Kotlin host fixture does not use actual serialized
+BackupManga, actual SQLDelight generated APIs or an Android runtime. The
+published Kotlin runner is configured to compile the real staged portable DTO
+and coordinator, but could not be executed from a full checkout here.
+CI YAML now has BOTH Kotlin and SQLite steps; this only confirms steps were
+committed, not that a workflow actually ran.
+
+New `backup-full-parent-unified-kotlin` gate minimum 44 raises aggregate to
+**700 configured minimum cases in 17 groups, NOT executed as an aggregate.**
+The Kotlin fake port demonstrates transaction rollback; the live SQLDelight
+port must still implement the contract. This transaction protects the virtual
+parent, links, ledger and parent metadata together; earlier source-child
+MangaRestorer jobs remain a separate previous phase, not part of this rollback.
+
+Archive / local logs in Library `/Polaris/R001/unified-full-parent-kotlin/`,
+ZIP SHA256 `9fb014ca1c820d9ed9a7f05fa388fba8a28549bd322cc6527c49b63808c41da0`.
+[Detailed audit and next steps](FULL_PARENT_UNIFIED_TRANSACTION_2026_10_19.md).
+Issue #11 / Draft PR #1 remain open; v2 preflight still rejects before stock
+writes. No migration15 or production Android schema changes.
