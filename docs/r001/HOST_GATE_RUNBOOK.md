@@ -799,3 +799,45 @@ ZIP SHA256 `9fb014ca1c820d9ed9a7f05fa388fba8a28549bd322cc6527c49b63808c41da0`.
 [Detailed audit and next steps](FULL_PARENT_UNIFIED_TRANSACTION_2026_10_19.md).
 Issue #11 / Draft PR #1 remain open; v2 preflight still rejects before stock
 writes. No migration15 or production Android schema changes.
+
+
+## 2026-10-19 — pinned Yomotsu merged-schema compatibility blocker (49 cases)
+
+Audited full Git tree of upstream Yomotsu commit
+`0fb80c439ef816eeb50674f1b90af39918b176d8` (2,325 entries),
+including the seven relevant original SQLDelight tables. **There is no
+`merged.sq` or `merged` table/DDL in this pin.** Existing staging
+`SqlDelightPolarisAtomicVirtualWorkPort` and `polarisRestore.sq` refer to
+`merged`, so compilation/integration as originally staged is blocked. This
+is a concrete upstream incompatibility, not merely a missing test.
+
+Added a **host-only schema bridge candidate** in
+`spikes/spike001/backup/restore-candidate/pinned-schema-bridge/`:
+`pinned_schema_fixture.py` mirrors original Yomotsu column sets with
+SQLDelight custom type annotations removed and original triggers deliberately
+excluded; `merged_bridge_candidate.sql` proposes missing merged and UUID
+ledger tables **only in SQLite test fixtures**, with FK and uniqueness;
+`native_restore_sql.py` writes source-shaped parent/chapters/history/
+`manga_sync`/categories/exclusions/merged tables rather than synthetic
+`payload_json` columns. The code refuses ambiguous/lossy conversions and
+checks full physical readback. No upstream source/feature wiring or Android
+migration has been performed.
+
+**49/49 new Python/SQLite native-shaped tests PASS locally**, demonstrating
+baseline `SELECT FROM merged` failure, bridge schema, native fields, replay
+conflicts, pending links, FK/index constraints and all-parent rollback.
+**42/42 prior synthetic SQLite tests rerun PASS** separately = 91 local
+host checks this round; not 91 real SQLDelight/Android tests.
+
+Host aggregator and CI workflow now configure an 18th gate
+`backup-pinned-schema-bridge`, minimum 49. Total **749 cases configured
+across 18 gates**, not executed together and not CI-verified. Upstream column
+adapter codecs, SQLite triggers, generated SQLDelight Kotlin and Android
+B01–B05 remain untested. The feature/domain semantics of merged source must
+be implemented/reconciled, not just the DB table.
+
+Complete reproduction instructions and exact upstream blob SHA list:
+[bridge README](../../spikes/spike001/backup/restore-candidate/pinned-schema-bridge/README.md).
+Evidence ZIP SHA256 `1623226cefcddc72c6963228ba768987a27401cceb41e734d8726300ca393290`;
+Library `/Polaris/R001/pinned-schema-bridge/`.
+**Do not change migration15 or unblock v2 restore; PR #1 Draft and issue #11 OPEN.**
