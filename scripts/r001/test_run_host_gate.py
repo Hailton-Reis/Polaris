@@ -80,6 +80,16 @@ class HostGateParserTests(unittest.TestCase):
         self.assertEqual(evaluate_gate("backup-parent-split", good.replace("23", "100"), 0, 23)["status"], "PASS")
         self.assertEqual(evaluate_gate("backup-parent-split", good + "ERROR", 1, 23)["status"], "NONZERO_EXIT")
 
+    def test_unified_parent_kotlin_requires_unique_44_case_marker(self):
+        good = "POLARIS_FULL_PARENT_UNIFIED_KOTLIN_PASS 44\n"
+        gate = "backup-full-parent-unified-kotlin"
+        self.assertEqual(evaluate_gate(gate, good, 0, 44)["status"], "PASS")
+        self.assertEqual(evaluate_gate(gate, good, 1, 44)["status"], "NONZERO_EXIT")
+        self.assertEqual(evaluate_gate(gate, good.replace("44", "43"), 0, 44)["status"], "INSUFFICIENT_TEST_COVERAGE")
+        self.assertEqual(evaluate_gate(gate, good + good, 0, 44)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
+        self.assertEqual(evaluate_gate(gate, "", 0, 44)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
+        self.assertTrue(any(n == gate and m == 44 for n, cmd, m in GATES))
+
     def test_full_parent_sqlite_gate_requires_42_cases(self):
         gate = "backup-full-parent-sqlite"
         good = "Ran 42 tests in 0.04s\n\nOK\n"
