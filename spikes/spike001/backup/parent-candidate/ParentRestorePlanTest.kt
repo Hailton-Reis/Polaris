@@ -41,7 +41,7 @@ fun main() {
         check(result.fullBackupManga.history==listOf("/read") && result.fullBackupManga.tracking==listOf("anilist"))
         check(result.fullBackupManga.memo.contentEquals(byteArrayOf(4,5,6)))
     }
-    ok("archives category IDs mapped into destination category IDs") {
+    ok("archived category orders mapped by name into destination category IDs") {
         check(plan().single().mappedCategoryIds==listOf(91L,92L))
     }
     ok("empty precreated matching parent is reused, not duplicated") {
