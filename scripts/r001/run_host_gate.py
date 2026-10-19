@@ -23,6 +23,7 @@ GATES = (
     ("backup-full-parent-sqlite", (sys.executable, "-m", "unittest", "discover", "-s", "spikes/spike001/backup/restore-candidate/full-parent-sqlite", "-p", "test_atomic_full_parent_v2_host.py", "-v"), 42),
     ("backup-pinned-schema-bridge", (sys.executable, "-m", "unittest", "discover", "-s", "spikes/spike001/backup/restore-candidate/pinned-schema-bridge", "-p", "test_pinned_schema_bridge.py", "-v"), 49),
     ("backup-spike001-layering", (sys.executable, "-m", "unittest", "discover", "-s", "spikes/spike001/backup/restore-candidate/spike001-layering", "-p", "test_*.py", "-v"), 98),
+    ("backup-parent-sqldelight-fields", (sys.executable, "-m", "unittest", "discover", "-s", "spikes/spike001/backup/restore-candidate/parent-sqldelight-fields", "-p", "test_parent_sqldelight_fields.py", "-v"), 35),
     ("backup-full-parent-unified-kotlin", ("bash", "spikes/spike001/backup/parent-candidate/unified-transaction/run_tests.sh"), 44),
     ("backup-adapter", ("bash", "spikes/spike001/backup/yomotsu-candidate/run_tests.sh"), 12),
     ("backup-restore", ("bash", "spikes/spike001/backup/restore-candidate/run_tests.sh"), 20),
