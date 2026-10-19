@@ -733,3 +733,36 @@ Library `/Polaris/R001/parent-metadata-restore/`.
 The configured aggregate remains **614 minima / 15 groups**, NOT executed.
 Do not remove the v2 fail-closed coordinator guard. No migration 15 or
 user Android data changes.
+
+
+## 2026-10-19 — full parent SQLite atomic host rehearsal (42 new cases)
+
+Created `spikes/spike001/backup/restore-candidate/full-parent-sqlite/` with
+`atomic_full_parent_v2_host.py`, `test_atomic_full_parent_v2_host.py` and
+`run_tests.sh`. **42/42 local Python SQLite tests PASS**, including
+single-transaction multi-parent create, complete rollback after an injected
+second-parent failure, canonical UUID replay, unchanged-memory/state checks,
+explicit category order/name mapping, chapter-to-history linkage, tracking,
+scanlator exclusions, nested memo key preservation and pending child IDs.
+
+**Crucial scope:** the test fixture mirrors named fields in pinned Yomotsu
+BackupManga/Chapter/History/Tracking but persists complete data in synthetic
+`payload_json` fixture columns. Those fields are NOT the real Yomotsu
+SQLDelight schema; the actual Kotlin/SQLDelight metadata applier is NOT implemented.
+The actual pinned Kotlin protobuf and Android B01–B05 are NOT tested. This is
+host proof of transactional invariants, not an Android restore solution.
+Do NOT chain the existing association commit and metadata restore as two
+transactions; a production port must make both one transaction.
+
+The aggregate host gate now contains `backup-full-parent-sqlite` with
+**42 minimum new assertions**, bringing the **configured** total to **656
+minimum tests across 16 groups**. Only the new 42-case harness ran here,
+not the 656-case suite or GitHub CI. CI workflow modification was attempted
+but could not be published in this turn, so the workflow step is NOT confirmed.
+Run the standalone tests with:
+`bash spikes/spike001/backup/restore-candidate/full-parent-sqlite/run_tests.sh`.
+
+Evidence ZIP in Library `/Polaris/R001/full-parent-atomic-sqlite/`, SHA256
+`6cc579aa285d83fe20d764ec14461f79c7343d4f8ea114943e0b2f408f533909`.
+PR #1 remains Draft, issue #11 remains open, `PolarisRestoreCoordinator`
+continues to refuse v2 before stock writes, and migration15 is unchanged.
