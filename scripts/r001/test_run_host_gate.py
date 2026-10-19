@@ -80,6 +80,16 @@ class HostGateParserTests(unittest.TestCase):
         self.assertEqual(evaluate_gate("backup-parent-split", good.replace("23", "100"), 0, 23)["status"], "PASS")
         self.assertEqual(evaluate_gate("backup-parent-split", good + "ERROR", 1, 23)["status"], "NONZERO_EXIT")
 
+    def test_parent_metadata_plan_requires_unique_25_case_marker(self):
+        good = "POLARIS_PARENT_METADATA_RESTORE_PLAN_PASS 25\\n"
+        self.assertEqual(evaluate_gate("backup-parent-metadata-plan", good, 0, 25)["status"], "PASS")
+        self.assertEqual(evaluate_gate("backup-parent-metadata-plan", good, 1, 25)["status"], "NONZERO_EXIT")
+        self.assertEqual(evaluate_gate("backup-parent-metadata-plan", "", 0, 25)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
+        self.assertEqual(evaluate_gate("backup-parent-metadata-plan", good + good, 0, 25)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
+        self.assertEqual(evaluate_gate("backup-parent-metadata-plan", good.replace("25", "24"), 0, 25)["status"], "INSUFFICIENT_TEST_COVERAGE")
+        self.assertTrue(any(n == "backup-parent-metadata-plan" and m == 25 for n, c, m in GATES))
+
+
     def test_backup_portable_field_and_pending_model_require_all_five_suites(self):
         base = ("POLARIS_BACKUP_PROTO_MODEL_PASS 18\n"
                 "POLARIS_BACKUP_BUNDLE_BUILDER_PASS 19\n"
