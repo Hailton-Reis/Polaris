@@ -39,6 +39,8 @@ object PolarisParentMetadataRestorePlanner {
         val canonicalUuid: String,
         val originalOrdinal: Int,
         val fullBackupManga: BackupManga,
+        /** Actual UUID-stable local URL; archive URL is immutable input, NOT a destination key. */
+        val destinationUrl: String,
         val mappedCategoryIds: List<Long>,
         val operation: Operation,
         val existingParentId: Long?,
@@ -67,6 +69,11 @@ object PolarisParentMetadataRestorePlanner {
             val uuid = payload.archiveUuid
             val work = requireNotNull(works[uuid]) { "Missing canonical work for parent payload" }
             val snapshot = payload.manga
+            // Existing staged SQLDelight creates a parent at merged://polaris/<uuid>.
+            // The source-6969 URL inside BackupManga is a historical archive
+            // identity (often tied to the original device ID) and MUST NOT be
+            // used as the destination row URL or matched as if unchanged.
+            val destinationUrl = "merged://polaris/$uuid"
             require(snapshot.source == VIRTUAL_SOURCE && snapshot.url.isNotBlank() && snapshot.title == work.displayTitle) {
                 "Invalid or changed complete virtual parent snapshot"
             }
@@ -85,7 +92,7 @@ object PolarisParentMetadataRestorePlanner {
             val existing = matches.singleOrNull()
             if (existing != null) {
                 check(existing.mangaId > 0L && existing.canonicalUuid == uuid &&
-                    existing.sourceId == VIRTUAL_SOURCE && existing.sourceUrl == snapshot.url) {
+                    existing.sourceId == VIRTUAL_SOURCE && existing.sourceUrl == destinationUrl) {
                     "Existing UUID belongs to a different/invalid parent identity"
                 }
                 check(seenExistingIds.add(existing.mangaId)) {
@@ -104,6 +111,7 @@ object PolarisParentMetadataRestorePlanner {
                 canonicalUuid = uuid,
                 originalOrdinal = payload.originalOrdinal,
                 fullBackupManga = snapshot,
+                destinationUrl = destinationUrl,
                 mappedCategoryIds = mappedCategories,
                 operation = operation,
                 existingParentId = existing?.mangaId,
