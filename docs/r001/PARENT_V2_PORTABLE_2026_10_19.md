@@ -1,0 +1,17 @@
+# Polaris R001 — Full parent portable v2 (19 October 2026)
+
+## 19/10/2026 — formato portátil v2 do pai virtual e bloqueio de importação sem metadados
+
+**Implementado em STAGING:** `BackupPolarisBundle.kt` agora suporta versões 1 e 2 e adiciona `@ProtoNumber(4) parentSnapshots: List<BackupPolarisParentPayload>`. Tags existentes da seção Polaris (1–3) e campo opcional 107 do `Backup` externo permanecem inalterados. O payload v2 contém o `BackupManga` integral do pai, UUID e posição original, reutilizando `PolarisParentSnapshotPartitioner`. A versão 1 não pode transportar snapshots v2, mas permanece legível quando não os possui.
+
+**Validações v2:** associação 1:1 entre `works` e `parentSnapshots`; igualdade entre UUID do payload, chave e UUID canônico da obra, sem duplicados e em forma canônica; fonte 6969, título idêntico, URL não vazia, URLs de pais distintas e ordinal válido/único. O construtor adicional `PolarisParentBundleAssembler.kt` recebe o resultado do planner v1 e a partição integral, preserva o `BackupManga` sem projeção de campos, cria bundle v2 e executa `validateSnapshotCoverage`. Os pais ficam fora de `ordinaryManga`.
+
+**Proteção de perda de dados:** `PolarisRestoreCoordinator.preflight()` **REJEITA TODA importação v2 com snapshots completos ANTES do início das gravações stock**, pois ainda não existe aplicador transacional que transfira categorias, notas, capítulos, histórico, tracking, flags e `memo` ao `mangas._id` do ÚNICO pai UUID resolvido. O candidato de backup **não foi instalado** no Android. Essa rejeição é intencional e não deve ser removida para antecipar o release.
+
+**Execução local comprovada:** `26/26` novos testes Kotlin/JVM `POLARIS_PARENT_V2_HOST_PASS` (modelo, UUID, duplicatas, versão, ordinal, fonte/título, assembler e preflight). Compilei no mesmo JAR o modelo real candidato, DTO staged, particionador, assembler, coordenador e testes antigos disponíveis: **74/74 PASS** (18 modelo + **16 builder de uma fotografia mais antiga** + 9 pending + 5 campo107 +26 v2). ATENÇÃO: versão atual do repositório contém **19** testes do builder, então **NÃO declarar 77/77 local**, nem gates completos. O pacote ZIP é reproduzível e contém logs, fontes executadas e hashes Git; os cinco blobs mudados confirmados exatamente iguais aos publicados.
+
+**CI:** cinco marcadores obrigatórios no `backup-proto-contract`: 18+19+9+5+26 = **77** mínimos (antes 51). Atualizados `scripts/r001/run_host_gate.py` e `test_run_host_gate.py`, runners Kotlin em `proto-candidate`, `yomotsu-candidate`, `restore-candidate`, `sqldelight-port` e `yomotsu-source-port`, além dos stubs Kotlin para o campo `title`. O total **CONFIGURADO** é **586 mínimos em 14 gates**, **não executado em conjunto**. Workflow GitHub Actions continua dependente de runner.
+
+**Evidência:** `Polaris_R001_Parent_V2_Portable_2026-10-19.zip`, SHA256 `c6d09c031f2738239cb288a637f2b0cf9595709f1e009177aa812b85cfee6d13`, Drive Polaris: https://drive.google.com/file/d/12EPjHFr695yWWRKOO50PvI3EXPPD4vyk/view ; cópia na Biblioteca `/Polaris/R001/`.
+
+**Pendências P0:** persistência de metadados do pai com idempotência e rollback por UUID, categorias mapeadas por nome, estratégia sem sobrescrever notas/`memo` e progresso já alterados localmente; adicionar split antes do `BackupCreator` escrever o arquivo; protobuf **real** encode/decode v1/v2; SQLDelight 2.3.2 real; Android B01–B05. Migração15 e dados usuários NÃO alterados. PR #1 DRAFT; issues #2/#10/#11 OPEN.
