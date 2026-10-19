@@ -651,3 +651,33 @@ markers (18+19+9+5+26); total configured **586/14 groups, not executed**.
 SHA256 `c6d09c031f2738239cb288a637f2b0cf9595709f1e009177aa812b85cfee6d13`.
 Real serialization/codegen/Android B01–B05 remain open. See
 [technical report](PARENT_V2_PORTABLE_2026_10_19.md).
+
+
+## 2026-10-19 — v2 parent metadata restore preflight (host staging)
+
+Added `PolarisParentMetadataRestorePlanner` in `spikes/spike001/backup/parent-candidate/`.
+It carries each FULL original `BackupManga` into a UUID-bound restore command,
+requires category ID mapping (archive category -> destination category, obtained by
+name from the archive's category restoration phase), and fails closed for local
+metadata conflicts, ambiguous UUID lookups, reused destination IDs, cross-source
+identity, unknown source URL and missing child snapshots. Replays are a no-op ONLY
+when an Android adapter independently proves a byte/field-complete identical state.
+The candidate deliberately does NOT write metadata, and is NOT proof of an
+atomic SQLDelight transaction or authorization to remove the v2 import guard.
+
+25/25 **NEW** standalone Kotlin/JVM assertions passed locally with representative
+BackupManga/DTO/annotation doubles. Source and log are in the Polaris Library:
+`/Polaris/R001/parent-metadata-restore/` (ZIP SHA256
+`aec1c270d8f63e3a96b25c88ae99ff7f11cbdc4eb906cfe7d76bcdb8cfa0ecf3`).
+The exact committed runner against the *real staged DTO* and CI are pending.
+
+The 15th fail-closed offline gate is `backup-parent-metadata-plan`:
+`bash spikes/spike001/backup/parent-candidate/run_restore_plan_tests.sh`.
+Its minimum is 25 unique cases with exact success marker; both Domain spikes
+workflow and gate parser/self-test were updated. **15 configured groups /
+611 required cases; NOT executed together, NOT Android validation.**
+See [candidate report](PARENT_V2_METADATA_RESTORE_PLAN_2026_10_19.md).
+Mandatory blockers remain: transactional UUID-indexed metadata applier and
+verified conflict handling, actual Kotlin ProtoBuf encode/decode, SQLDelight
+code generation/bundled driver, Android B01-B05. PR #1 Draft, issue #11 open,
+no migration15 or production Yomotsu modifications.
