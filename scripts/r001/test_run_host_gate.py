@@ -84,7 +84,8 @@ class HostGateParserTests(unittest.TestCase):
         base = ("POLARIS_BACKUP_PROTO_MODEL_PASS 18\n"
                 "POLARIS_BACKUP_BUNDLE_BUILDER_PASS 19\n"
                 "POLARIS_PENDING_SNAPSHOT_MODEL_PASS 9\n"
-                "POLARIS_BACKUP_FIELD_INTEROP_PASS 5\n"\n                "POLARIS_PARENT_V2_HOST_PASS 26\n")
+                "POLARIS_BACKUP_FIELD_INTEROP_PASS 5\n"
+                "POLARIS_PARENT_V2_HOST_PASS 26\n")
         self.assertEqual(evaluate_gate("backup-proto-contract", base, 0, 77)["status"], "PASS")
         self.assertEqual(evaluate_gate("backup-proto-contract", base, 1, 77)["status"], "NONZERO_EXIT")
         for item in base.splitlines(keepends=True):
