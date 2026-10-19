@@ -11,6 +11,7 @@ kotlinc \
   "$BACKUP/MergedBackupRestorePlanner.kt" \
   "$BACKUP/MergedBackupExportPlanner.kt" \
   "$BACKUP/proto-candidate/BackupPolarisBundle.kt" \
+  "$BACKUP/parent-candidate/PolarisParentSnapshotPartition.kt" \
   "$BACKUP/proto-candidate/BackupPolarisBundleBuilder.kt" \
   "$BACKUP/uuid-candidate/YomotsuMergedWorkUuidStore.kt" \
   "$BACKUP/yomotsu-candidate/PolarisYomotsuBackupExporter.kt" \
