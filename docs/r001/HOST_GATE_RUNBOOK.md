@@ -852,3 +852,32 @@ Do not apply the older `pinned-schema-bridge/merged_bridge_candidate.sql` after 
 Created `spikes/spike001/backup/restore-candidate/spike001-layering/` with precise Git blob checks of the existing migration14/merged.sq, normalized schema equivalence, in-memory-only additive DDL rehearsal and 49 regression tests (including real staged insert/select queries, duplicate pending or resolved refs, orphan FK, UUID collision, stale URL, and ambiguous physical source child). **49/49 Python/SQLite host tests PASS locally**. No Android or real ProtoBuf tests executed this turn.
 
 Added `backup-spike001-layering` to host aggregator and Domain spikes CI YAML: **798 minimum configured tests / 19 groups, NOT executed as a whole**. This does not mean CI passed. Details: [reconciliation report](SPIKE001_LEDGER_LAYERING_CORRECTION_2026_10_19.md). Evidence ZIP SHA-256 `7b8684e673f96d3b358de02e7b6d1d401fc03c79b4b9fc282afba6a056a6229c`, Library `/Polaris/R001/spike001-layering-reconciliation/`. Migration15 and v2 fail-closed guard remain unchanged, Draft PR #1 and issues #2/#11 remain open.
+
+
+## 2026-10-19 — 98-case restore readiness: strict root is NOT index-migration safety
+
+An executable regression proved a gap in the earlier migration-only audit: a
+virtual parent having a valid real-source edge **but lacking its synthetic root**
+passes the old additive-index audit. This is not necessarily unsafe for installing
+indexes, but it is **NOT** safe evidence for a complete backup-v2 restore. The
+new independent **read-only**, fail-closed
+`spikes/spike001/backup/restore-candidate/spike001-layering/audit_v2_readiness.py`
+requires exactly one correct root reference, full physical source/URL identity,
+UUID ledger ↔ memo ↔ canonical destination URL consistency, no untracked or
+duplicate UUID claims, valid SHA256 digest shape, no duplicate virtual URLs,
+valid JSON memo (unknown keys retained), FK integrity, and redacted reason codes.
+
+**49/49 new tests PASS**, combined with the unchanged 49/49 earlier SQLite
+migration-layering tests in one local `run_tests.sh`: **98/98 PASS**. The
+existing `backup-spike001-layering` host gate now requires **98**; configured
+total **847 minimum cases / 19 groups**, NOT an executed full suite. CI YAML
+already invokes the updated runner, but this does not prove GitHub Actions ran.
+Evidence ZIP SHA256:
+`01ee7811bf2f4df64acd7f7d6fac879d9f3233559d0b3187a998581bc34785b0`,
+Library `/Polaris/R001/spike001-layering-reconciliation/`.
+
+[Detailed audit](V2_PHYSICAL_RESTORE_READINESS_2026_10_19.md).
+The new audit is NOT yet wired into a real Android transaction. Complete
+`BackupManga` user metadata equality, SQLDelight codegen, actual ProtoBuf and
+Android B01-B05 remain unverified. Do not remove the coordinator v2 preflight
+block or apply migration15. PR #1 remains Draft; issues #2 and #11 open.
