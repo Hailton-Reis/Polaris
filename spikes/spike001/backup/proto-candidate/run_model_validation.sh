@@ -6,6 +6,9 @@ trap 'rm -rf "$TMP"' EXIT
 # Lightweight host Kotlin syntax/validation gate only; annotations and
 # BackupManga are test doubles. This is NOT real kotlinx.protobuf serialization.
 kotlinc "$HERE/BackupPolarisBundle.kt" \
+  "$HERE/../parent-candidate/PolarisParentSnapshotPartition.kt" \
+  "$HERE/../parent-candidate/PolarisParentBundleAssembler.kt" \
+  "$HERE/../restore-candidate/PolarisRestoreCoordinator.kt" \
   "$HERE/../restore-candidate/android-bridge/Backup.staged.kt" \
   "$HERE/BackupPolarisBundleBuilder.kt" \
   "$HERE/../MergedBackupRestorePlanner.kt" \
@@ -14,6 +17,7 @@ kotlinc "$HERE/BackupPolarisBundle.kt" \
   "$HERE/host-tests/SerializationStubs.kt" \
   "$HERE/host-tests/ProtoStubs.kt" \
   "$HERE/host-tests/BackupPolarisBundleContractTest.kt" \
+  "$HERE/../parent-candidate/ParentBundleV2Test.kt" \
   "$HERE/host-tests/BackupPolarisPendingSnapshotTest.kt" \
   "$HERE/host-tests/BackupPolarisInteropTest.kt" \
   "$HERE/host-tests/BackupPolarisBundleBuilderTest.kt" \
@@ -22,3 +26,4 @@ java -cp "$TMP/contract.jar" eu.kanade.tachiyomi.data.backup.models.BackupPolari
 java -cp "$TMP/contract.jar" polaris.spike001.backup.BackupPolarisBundleBuilderTestKt
 java -cp "$TMP/contract.jar" eu.kanade.tachiyomi.data.backup.models.BackupPolarisPendingSnapshotTestKt
 java -cp "$TMP/contract.jar" eu.kanade.tachiyomi.data.backup.models.BackupPolarisInteropTestKt
+java -cp "$TMP/contract.jar" polaris.spike001.backup.parent.ParentBundleV2TestKt
