@@ -54,6 +54,13 @@ class PolarisRestoreCoordinator(
     fun preflight(bundle: BackupPolarisBundle?, ordinary: List<BackupManga>, libraryEntries: Boolean) {
         if (!libraryEntries || bundle == null) return
         bundle.validateSnapshotCoverage(ordinary)
+        // v2 includes complete parent BackupManga data. Until a transactional
+        // metadata applier is wired to the UUID-resolved parent ID, importing
+        // it here would silently discard categories, notes and user progress.
+        // Fail BEFORE stock MangaRestorer writes any child/parent records.
+        require(bundle.parentSnapshots.isEmpty()) {
+            "Full-parent v2 restore requires atomic metadata applier; blocked before database writes"
+        }
         for (work in bundle.works) {
             val uuid = work.canonicalUuid
             require(uuid != null && uuid == work.archiveWorkKey && isCanonicalUuid(uuid)) {
