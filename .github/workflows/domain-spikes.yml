@@ -110,6 +110,8 @@ jobs:
         run: bash spikes/spike001/backup/restore-candidate/full-parent-sqlite/run_tests.sh
       - name: Verify pinned Yomotsu schema gap and native-shaped bridge (host only)
         run: bash spikes/spike001/backup/restore-candidate/pinned-schema-bridge/run_tests.sh
+      - name: Reconcile staged Spike-001 migration14 with additive restore ledger (host only)
+        run: bash spikes/spike001/backup/restore-candidate/spike001-layering/run_tests.sh
       - name: Audit pre-migration legacy UUIDs and duplicate links (read-only host tests)
         run: python3 -m unittest discover -s spikes/spike001/backup/restore-candidate/migration-audit -p 'test_*.py' -v
       - name: Compile and run isolated backup/UUID host candidates
