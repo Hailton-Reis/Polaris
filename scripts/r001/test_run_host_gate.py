@@ -90,6 +90,15 @@ class HostGateParserTests(unittest.TestCase):
         self.assertEqual(evaluate_gate(gate, "", 0, 44)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
         self.assertTrue(any(n == gate and m == 44 for n, cmd, m in GATES))
 
+    def test_pinned_schema_bridge_requires_49_sqlite_cases(self):
+        gate = "backup-pinned-schema-bridge"
+        good = "Ran 49 tests in 0.07s\n\nOK\n"
+        self.assertEqual(evaluate_gate(gate, good, 0, 49)["status"], "PASS")
+        self.assertEqual(evaluate_gate(gate, good, 1, 49)["status"], "NONZERO_EXIT")
+        self.assertEqual(evaluate_gate(gate, good.replace("49", "48"), 0, 49)["status"], "INSUFFICIENT_TEST_COVERAGE")
+        self.assertEqual(evaluate_gate(gate, good.replace("OK", "FAILED"), 0, 49)["status"], "MISSING_UNITTEST_OK_MARKER")
+        self.assertTrue(any(n == gate and minimum == 49 for n, command, minimum in GATES))
+
     def test_full_parent_sqlite_gate_requires_42_cases(self):
         gate = "backup-full-parent-sqlite"
         good = "Ran 42 tests in 0.04s\n\nOK\n"
