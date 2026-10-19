@@ -892,3 +892,12 @@ Added staging-only `parent-sqldelight-fields/PolarisParentMetadataRestore.sq` fu
 20th gate `backup-parent-sqldelight-fields` min 35 configured in host aggregate and CI YAML: **882 configured minimum tests in 20 groups**, NOT an aggregate/CI PASS. Detailed audit: [PINNED_SQLDELIGHT_PARENT_FIELD_TRIGGER_BLOCKER_2026_10_19.md](PINNED_SQLDELIGHT_PARENT_FIELD_TRIGGER_BLOCKER_2026_10_19.md). Library `/Polaris/R001/parent-sqldelight-fields/`; ZIP SHA256 `47e590c65c5397865ee16a5ceca63277d03099b66f5589289475b0cc23f95d7c`.
 
 Existing Spike-001 migration14, migration15, v2 coordinator fail-closed preflight, and production Android tree remain unchanged. PR #1 Draft; issues #2/#11 open.
+
+
+## 2026-10-19 — deferred-FK parent-LAST: 51-case native field/trigger host suite
+
+Built new staging SQLDelight query statements and a 16-case **new-parent-only** deferred-FK parent-LAST rehearsal. A write-locked SQLite transaction with `PRAGMA defer_foreign_keys=ON` pre-reserves a parent ID, creates categories, chapters/history/tracking, pending/real edges, root and ledger before inserting the full parent **LAST** with `is_syncing=0`. The pinned category/timestamp UPDATE triggers therefore never update the newly inserted parent's archive fields. No triggers are removed, and deferred FKs are checked at COMMIT. This is **not Android-approved**, and preexisting empty placeholder application remains unresolved.
+
+Local **51/51** parent field/trigger tests PASS (35 old + 16 new) and separate earlier **98/98** migration14/UUID readiness tests rerun PASS: **149 actual host SQLite cases** across 2 suites. Host gate `backup-parent-sqldelight-fields` now min 51; **898 minimum configured cases in 20 groups, NOT the aggregate executed**. CI workflow is staged, not proven green. [Full strategy and limitations](NEW_PARENT_LAST_DEFERRED_FK_CANDIDATE_2026_10_19.md). Library `/Polaris/R001/parent-sqldelight-fields/`, ZIP SHA256 `d0a5823ce85dee0a35940ac510acc28fd78ff4306171267a80ade5354787f8d3`.
+
+Do NOT implement as an unconditional Android migration until generated SQLDelight, connection affinity, ID reservation, app trigger compatibility, complete full-field readback, ProtoBuf and B01–B05 tests pass. Coordinator v2 import block and migration15 stay untouched. PR #1 Draft, issues #2/#11 open.
