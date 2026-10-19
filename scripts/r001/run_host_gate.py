@@ -24,6 +24,7 @@ GATES = (
     ("backup-pinned-schema-bridge", (sys.executable, "-m", "unittest", "discover", "-s", "spikes/spike001/backup/restore-candidate/pinned-schema-bridge", "-p", "test_pinned_schema_bridge.py", "-v"), 49),
     ("backup-spike001-layering", (sys.executable, "-m", "unittest", "discover", "-s", "spikes/spike001/backup/restore-candidate/spike001-layering", "-p", "test_*.py", "-v"), 98),
     ("backup-parent-sqldelight-fields", (sys.executable, "-m", "unittest", "discover", "-s", "spikes/spike001/backup/restore-candidate/parent-sqldelight-fields", "-p", "test_*.py", "-v"), 51),
+    ("backup-pinned-driver-kotlin", ("bash", "spikes/spike001/backup/restore-candidate/pinned-driver-transaction/run_tests.sh"), 33),
     ("backup-full-parent-unified-kotlin", ("bash", "spikes/spike001/backup/parent-candidate/unified-transaction/run_tests.sh"), 44),
     ("backup-adapter", ("bash", "spikes/spike001/backup/yomotsu-candidate/run_tests.sh"), 12),
     ("backup-restore", ("bash", "spikes/spike001/backup/restore-candidate/run_tests.sh"), 20),
@@ -36,6 +37,9 @@ GATES = (
 
 
 def extract_count(name: str, output: str):
+    if name == "backup-pinned-driver-kotlin":
+        matches = re.findall(r"(?m)^POLARIS_PINNED_DEFERRED_FK_GUARD_PASS (\d+)$", output)
+        return min(int(matches[0]), 33) if len(matches) == 1 else None
     if name == "backup-full-parent-unified-kotlin":
         found = re.findall(r"(?m)^POLARIS_FULL_PARENT_UNIFIED_KOTLIN_PASS (\d+)$", output)
         return min(int(found[0]), 44) if len(found) == 1 else None
@@ -91,7 +95,7 @@ def extract_count(name: str, output: str):
 def evaluate_gate(name: str, output: str, returncode: int, minimum: int):
     count = extract_count(name, output)
     passed = returncode == 0 and count is not None and count >= minimum
-    if name not in {"kotlin", "backup-kotlin", "backup-adapter", "backup-restore", "backup-sqldelight-port", "backup-yomotsu-children", "backup-proto-contract", "backup-parent-split", "backup-parent-metadata-plan", "backup-full-parent-unified-kotlin"}:
+    if name not in {"kotlin", "backup-kotlin", "backup-adapter", "backup-restore", "backup-sqldelight-port", "backup-yomotsu-children", "backup-proto-contract", "backup-parent-split", "backup-parent-metadata-plan", "backup-full-parent-unified-kotlin", "backup-pinned-driver-kotlin"}:
         passed = passed and bool(re.search(r"(?m)^OK(?:\s|$)", output))
     reason = ("PASS" if passed else
               "MISSING_OR_INVALID_TEST_SUMMARY" if count is None else
