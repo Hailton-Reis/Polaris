@@ -19,7 +19,7 @@ GATES = (
     ("backup-kotlin", ("bash", "spikes/spike001/backup/run_tests.sh"), 65),
     ("backup-proto-contract", ("bash", "spikes/spike001/backup/proto-candidate/run_model_validation.sh"), 77),
     ("backup-parent-split", ("bash", "spikes/spike001/backup/parent-candidate/run_tests.sh"), 23),
-    ("backup-parent-metadata-plan", ("bash", "spikes/spike001/backup/parent-candidate/run_restore_plan_tests.sh"), 25),
+    ("backup-parent-metadata-plan", ("bash", "spikes/spike001/backup/parent-candidate/run_restore_plan_tests.sh"), 28),
     ("backup-adapter", ("bash", "spikes/spike001/backup/yomotsu-candidate/run_tests.sh"), 12),
     ("backup-restore", ("bash", "spikes/spike001/backup/restore-candidate/run_tests.sh"), 20),
     ("backup-atomic-sqlite", (sys.executable, "-m", "unittest", "discover", "-s", "spikes/spike001/backup/restore-candidate/atomic-sqlite", "-p", "test_*.py", "-q"), 31),
@@ -33,7 +33,7 @@ GATES = (
 def extract_count(name: str, output: str):
     if name == "backup-parent-metadata-plan":
         found = re.findall(r"(?m)^POLARIS_PARENT_METADATA_RESTORE_PLAN_PASS (\d+)$", output)
-        return min(int(found[0]), 25) if len(found) == 1 else None
+        return min(int(found[0]), 28) if len(found) == 1 else None
     if name == "backup-parent-split":
         found = re.findall(r"(?m)^POLARIS_PARENT_SPLIT_HOST_PASS (\d+)$", output)
         return min(int(found[0]), 23) if len(found) == 1 else None
