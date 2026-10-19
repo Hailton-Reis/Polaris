@@ -881,3 +881,14 @@ The new audit is NOT yet wired into a real Android transaction. Complete
 `BackupManga` user metadata equality, SQLDelight codegen, actual ProtoBuf and
 Android B01-B05 remain unverified. Do not remove the coordinator v2 preflight
 block or apply migration15. PR #1 remains Draft; issues #2 and #11 open.
+
+
+## 2026-10-19 — candidate full-column SQLDelight queries, pinned UPDATE trigger lossless blocker
+
+Added staging-only `parent-sqldelight-fields/PolarisParentMetadataRestore.sq` full-column INSERT/readback queries for actual Yomotsu table column names (`mangas`, `chapters`, `history`, `manga_sync`, `mangas_categories`, `excluded_scanlators`, `categories`, Spike-001 `merged`). Companion regression SQL recreates named timestamp/version UPDATE triggers observed in pinned Yomotsu and exercises candidate statements against native-shaped disposable SQLite tables. The candidate **has NOT been compiled by SQLDelight or integrated into Android**.
+
+**35/35 new host tests PASS**; independently reran previous **98/98 migration14/UUID readiness tests PASS** = **133 executed host cases across two suites**, no Android/codegen/protobuf. The new suite reproduces a real field-level problem: adding a category to `mangas.is_syncing=0` increments version and advances `last_modified_at`; temporarily using `is_syncing=1` avoids intermediate drift but finishing with `UPDATE is_syncing=0` advances timestamp anyway. Similar chapter UPDATE trigger resets chapter timestamps. Strict full-backup equality must refuse/roll back this drift. Never leave `is_syncing=1`, bypass/drop triggers, or silently treat drift as a success. The actual production-safe finalize strategy remains a blocker.
+
+20th gate `backup-parent-sqldelight-fields` min 35 configured in host aggregate and CI YAML: **882 configured minimum tests in 20 groups**, NOT an aggregate/CI PASS. Detailed audit: [PINNED_SQLDELIGHT_PARENT_FIELD_TRIGGER_BLOCKER_2026_10_19.md](PINNED_SQLDELIGHT_PARENT_FIELD_TRIGGER_BLOCKER_2026_10_19.md). Library `/Polaris/R001/parent-sqldelight-fields/`; ZIP SHA256 `47e590c65c5397865ee16a5ceca63277d03099b66f5589289475b0cc23f95d7c`.
+
+Existing Spike-001 migration14, migration15, v2 coordinator fail-closed preflight, and production Android tree remain unchanged. PR #1 Draft; issues #2/#11 open.
