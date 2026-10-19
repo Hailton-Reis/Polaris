@@ -49,14 +49,16 @@ object PolarisParentMetadataRestorePlanner {
     /**
      * existingByUuid must come from an authoritative UUID ledger; each lookup
      * must return ALL exact matches, including collisions. Missing = new parent.
-     * categoryIdMap comes from restoring the archive's category definitions by
-     * name, NOT from copying foreign numeric category IDs to this device.
+     * categoryOrderToDestinationId maps BackupCategory.order to destination ID:
+     * the pinned Yomotsu MangaRestorer resolves these values via the saved
+     * category order, then category name, then actual local category ID.
+     * Never copy category database IDs from the origin device.
      */
     fun prepare(
         bundle: BackupPolarisBundle,
         ordinaryManga: List<BackupManga>,
         existingByUuid: Map<String, List<ExistingParentRow>>,
-        categoryIdMap: Map<Long, Long>,
+        categoryOrderToDestinationId: Map<Long, Long>,
     ): List<ParentRestoreCommand> {
         bundle.validateSnapshotCoverage(ordinaryManga)
         require(bundle.formatVersion == BackupPolarisBundle.FULL_PARENT_FORMAT_VERSION) {
@@ -77,9 +79,9 @@ object PolarisParentMetadataRestorePlanner {
             require(snapshot.source == VIRTUAL_SOURCE && snapshot.url.isNotBlank() && snapshot.title == work.displayTitle) {
                 "Invalid or changed complete virtual parent snapshot"
             }
-            val mappedCategories = snapshot.categories.map { archiveId ->
-                val localId = requireNotNull(categoryIdMap[archiveId]) {
-                    "Unmapped backup category $archiveId for parent $uuid"
+            val mappedCategories = snapshot.categories.map { archiveOrder ->
+                val localId = requireNotNull(categoryOrderToDestinationId[archiveOrder]) {
+                    "Unmapped archive category order $archiveOrder for parent $uuid"
                 }
                 require(localId > 0L) { "Invalid destination category ID" }
                 localId
