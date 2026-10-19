@@ -82,11 +82,11 @@ class HostGateParserTests(unittest.TestCase):
 
     def test_full_parent_sqlite_gate_requires_42_cases(self):
         gate = "backup-full-parent-sqlite"
-        good = "Ran 42 tests in 0.04s\\n\\nOK\\n"
+        good = "Ran 42 tests in 0.04s\n\nOK\n"
         self.assertEqual(evaluate_gate(gate, good, 0, 42)["status"], "PASS")
         self.assertEqual(evaluate_gate(gate, good, 1, 42)["status"], "NONZERO_EXIT")
         self.assertEqual(evaluate_gate(gate, good.replace("42", "41"), 0, 42)["status"], "INSUFFICIENT_TEST_COVERAGE")
-        self.assertEqual(evaluate_gate(gate, good + "Ran 42 tests in 0.05s\\n", 0, 42)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
+        self.assertEqual(evaluate_gate(gate, good + "Ran 42 tests in 0.05s\n", 0, 42)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
         self.assertEqual(evaluate_gate(gate, good.replace("OK", "FAILED"), 0, 42)["status"], "MISSING_UNITTEST_OK_MARKER")
         self.assertTrue(any(n == gate and m == 42 for n, c, m in GATES))
 
