@@ -25,3 +25,33 @@ bash spikes/spike001/backup/restore-candidate/spike001-layering/run_tests.sh
 **49/49 new Python SQLite tests PASS locally.** Staged `merged.sq` Git blob `3e9fb499d0e1d0523aaaaaae336dd9bf5b2d4b62`, migration14 blob `8f23dc5219f49a0368705ba21d0c4e5a0d7fb1fb`. The tests also execute the actual staged `insertReturningId` and `selectMergedMangasById` queries, test pending/root behavior, FK cascades, ledger and index enforcement, legacy duplicate/conflict refusal, and an **in-memory-only upgrade rehearsal** that does not mutate its source DB.
 
 **The pristine Yomotsu base schema is a previously-authored host fixture** `pinned-schema-bridge/pinned_schema_fixture.py`, with SQLDelight aliases/adapters and original timestamp/version triggers removed. The real Android database, SQLDelight code generator, Kotlin adapters, ProtoBuf, source extensions and runtime B01/B02/B03 were **NOT executed this turn**. This candidate does not create migration15, does not unblock v2 backup restoration, and does not merge Draft PR #1.
+
+## 2026-10-19 — stricter physical restore-v2 readiness, separate from index migration
+
+**Important newly reproduced gap:** the prior `audit_existing_links` may report
+PASS for a virtual parent with a real child edge but **without its synthetic
+root reference** (`manga_source=6969, manga_id=merge_id`). That can be safe
+for additive UNIQUE-index installation but is **NOT** evidence that its
+full-parent backup v2 can be replayed safely. Do not reinterpret the old
+migration audit as a restore-ready verdict.
+
+Added a **separate, read-only** `audit_v2_readiness.py` to check complete
+synthetic-root cardinality/identity, physical child source+URL identity,
+UUID ledger ↔ memo ↔ canonical destination URL agreement, lower-case SHA256
+ledger digest shape, duplicate canonical UUID claims, duplicate virtual URLs,
+valid memo JSON (retaining unknown keys), and foreign-key integrity. Its
+returned values are anonymous reason codes, not manga URLs or other user data.
+Never attempt title matching, automatically repair a root, or relink pending
+mangas. Actual Android adapter must RECHECK WITHIN its one atomic transaction,
+and complete `BackupManga` field comparison still remains to be implemented.
+
+`test_audit_v2_readiness.py` adds **49/49** checks. The original 49 migration
+layering checks continue to pass: **98/98 host Python/SQLite tests PASS** in a
+single unittest discover invocation. `run_tests.sh` now discovers both files.
+This updates the existing `backup-spike001-layering` gate minimum from 49 to
+98; aggregate configured minimum becomes **847 tests in 19 host gates**,
+not an executed full aggregate/CI/Android suite.
+
+No migration15, schema, original `merged.sq`/migration14, production Kotlin,
+or fail-closed v2 preflight guard was changed. Full state readback, real Kotlin
+ProtoBuf, SQLDelight generation and device B01–B05 remain release blockers.
