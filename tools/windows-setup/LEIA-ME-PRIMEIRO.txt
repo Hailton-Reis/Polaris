@@ -1,14 +1,15 @@
 POLARIS — CONFIGURADOR UNICO WINDOWS
 
-1. Extraia o ZIP para uma pasta local (por exemplo, Downloads\Polaris_Instalador).
-2. Dê dois cliques em 00_POLARIS_TUDO_EM_UM.cmd.
+1. No GitHub, abra tools/windows-setup/00_POLARIS_TUDO_EM_UM.cmd e clique em Download raw.
+   Salve como 00_POLARIS_TUDO_EM_UM.cmd no seu computador. Nenhum outro arquivo e necessario para abrir o menu.
+2. De dois cliques nesse unico arquivo CMD.
 3. Escolha:
    1 = Diagnostico (sem instalar; cria apenas log)
    2 = Instalar ferramentas faltantes e SDK Android
    3 = Clonar/preparar Polaris e Yomotsu fixado
    4 = Compilar APKs originais + Spike-001, sem GitHub Actions
    5 = Diagnostico informativo de Python, Node.js e .NET dos outros projetos
-   6 = Fazer tudo (2+3+4; solicita confirmacao antes de instalar)
+   6 = Fazer tudo (diagnostico + 2 + diagnostico + 3 + 4; solicita confirmacao antes de instalar)
    7 = Opcional: instalar Node.js LTS e .NET SDK 8 para outros projetos
    0 = Sair
 
@@ -25,17 +26,24 @@ IMPORTANTE
   gravacao CameraGuard ou arquivos de producao sao alterados por este programa.
 - Nao usa GitHub Actions; nao mexe na migracao 15 nem desbloqueia backup v2.
 - Erros abortam em vez de apagar arquivos, fazer git reset ou ignorar hashes.
+- O CMD embute o PowerShell, extrai copia temporaria e remove-a no fim. O instalador nao exige ZIP.
+- Se uma opcao falhar, o CMD nao deve terminar como sucesso ao sair do menu.
 
-Arquivos:
-  00_POLARIS_TUDO_EM_UM.cmd     ponto de entrada para dois cliques
-  Polaris_Setup.ps1              orquestracao Windows PowerShell 5.1
-  COMO_FUNCIONA.md              relatorio tecnico e verificacoes
-  test_setup.py                 testes estaticos (somente verificacao)
+Arquivo necessario ao usuario:
+  00_POLARIS_TUDO_EM_UM.cmd     unico arquivo para dois cliques
+
+Arquivos internos de manutencao no GitHub (nao precisa baixar):
+  Polaris_Setup.ps1             fonte PowerShell que esta embutida no CMD
+  generate_single_cmd.py       sincroniza CMD com o PowerShell
+  COMO_FUNCIONA.md             guia tecnico
+  test_setup.py                testes estaticos
 
 O codigo usa winget (Git, Python, Temurin 21 e Android Studio), e para o
 SDK usa sdkmanager. Se Command-line Tools nao estiver instalado, tenta obter
 arquivo do indice OFICIAL do Google e verifica seu SHA256 antes de extrair;
 se a verificacao falhar, aborta e orienta instalar pelo Android Studio.
 
-Nao é possivel validar uma instalacao real Windows ou build Android neste
-ambiente Linux; o diagnostico inicial no seu PC e a proxima validacao.
+Esta revisao de arquivo unico ainda exige validacao real em Windows 10/11.
+Testes estaticos nao comprovam funcionamento de winget, SDK, Gradle ou APK.
+Comece pela opcao 1. A opcao 6 instala, prepara e compila apos a confirmacao,
+mas NAO instala APK no celular nem libera backup v2.
