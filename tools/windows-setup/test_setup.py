@@ -12,9 +12,29 @@ PS = (ROOT / 'Polaris_Setup.ps1').read_text(encoding='utf-8')
 DOC = (ROOT / 'COMO_FUNCIONA.md').read_text(encoding='utf-8')
 
 class LauncherSafety(unittest.TestCase):
-    def test_cmd_uses_local_ps_file_and_not_untrusted_eval(self):
-        self.assertIn('powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -File "%~dp0Polaris_Setup.ps1"',CMD)
-        self.assertNotIn('-NonInteractive',CMD)
+    def test_cmd_is_single_file_with_embedded_powershell(self):
+        self.assertIn('set "POLARIS_MAIN_CMD=%~f0"', CMD)
+        self.assertIn('ReadAllText($env:POLARIS_MAIN_CMD)', CMD)
+        self.assertIn('Remove-Item -LiteralPath $tmp -Force', CMD)
+        self.assertIn("powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -Command", CMD)
+        self.assertIn("powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -File $tmp", CMD)
+        self.assertNotIn('-NonInteractive', CMD)
+        marker = '\\n:POLARIS_PS1_BEGIN\\n'
+        self.assertEqual(CMD.split(marker, 1)[1], PS)
+
+    def test_cmd_propagates_nested_powershell_exit_status(self):
+        self.assertIn('$rc=$LASTEXITCODE', CMD)
+        self.assertIn('exit $rc', CMD)
+        self.assertIn('set "RESULTADO=%ERRORLEVEL%"', CMD)
+
+    def test_menu_errors_fail_closed(self):
+        self.assertIn('$script:HadMenuFailure=$false', PS)
+        self.assertIn('$script:HadMenuFailure=$true', PS)
+        self.assertIn("if($script:HadMenuFailure){throw", PS)
+
+    def test_full_setup_runs_diagnostics_before_and_after_install(self):
+        self.assertIn("'6' { [void](Get-Status); Install-Tools; [void](Get-Status); Prepare-Polaris; Build-Polaris }", PS)
+        self.assertIn("All { [void](Get-Status);Install-Tools;[void](Get-Status);Prepare-Polaris;Build-Polaris }", PS)
     def test_cmd_handles_failures(self):
         self.assertIn('if errorlevel 1',CMD)
         self.assertIn('exit /b %RESULTADO%',CMD)
