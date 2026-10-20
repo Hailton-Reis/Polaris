@@ -1,0 +1,41 @@
+POLARIS — CONFIGURADOR UNICO WINDOWS
+
+1. Extraia o ZIP para uma pasta local (por exemplo, Downloads\Polaris_Instalador).
+2. Dê dois cliques em 00_POLARIS_TUDO_EM_UM.cmd.
+3. Escolha:
+   1 = Diagnostico (sem instalar; cria apenas log)
+   2 = Instalar ferramentas faltantes e SDK Android
+   3 = Clonar/preparar Polaris e Yomotsu fixado
+   4 = Compilar APKs originais + Spike-001, sem GitHub Actions
+   5 = Diagnostico informativo de Python, Node.js e .NET dos outros projetos
+   6 = Fazer tudo (2+3+4; solicita confirmacao antes de instalar)
+   7 = Opcional: instalar Node.js LTS e .NET SDK 8 para outros projetos
+   0 = Sair
+
+IMPORTANTE
+- A opcao 6 pode baixar muitos GB e exigir permissoes de administrador e aceite
+  de licencas Android. Nao execute em computador corporativo sem autorizacao.
+- Necessita Windows 10/11 64 bits, internet, espaco livre recomendavel >=25 GB.
+- Quando falta winget, instale o App Installer pela Microsoft Store.
+- Android Studio e SDK nao sao a mesma coisa: detectamos AMBOS.
+- O codigo fonte sempre e clonado em %USERPROFILE%\PolarisDev\Polaris.
+- Yomotsu fixado e evidencias ficam em %USERPROFILE%\PolarisDev\PolarisLocal.
+- Cada resultado cria log em %USERPROFILE%\PolarisDev\relatorios.
+- Nenhum banco de dados do celular, APK instalado, repositorio de outros projetos,
+  gravacao CameraGuard ou arquivos de producao sao alterados por este programa.
+- Nao usa GitHub Actions; nao mexe na migracao 15 nem desbloqueia backup v2.
+- Erros abortam em vez de apagar arquivos, fazer git reset ou ignorar hashes.
+
+Arquivos:
+  00_POLARIS_TUDO_EM_UM.cmd     ponto de entrada para dois cliques
+  Polaris_Setup.ps1              orquestracao Windows PowerShell 5.1
+  COMO_FUNCIONA.md              relatorio tecnico e verificacoes
+  test_setup.py                 testes estaticos (somente verificacao)
+
+O codigo usa winget (Git, Python, Temurin 21 e Android Studio), e para o
+SDK usa sdkmanager. Se Command-line Tools nao estiver instalado, tenta obter
+arquivo do indice OFICIAL do Google e verifica seu SHA256 antes de extrair;
+se a verificacao falhar, aborta e orienta instalar pelo Android Studio.
+
+Nao é possivel validar uma instalacao real Windows ou build Android neste
+ambiente Linux; o diagnostico inicial no seu PC e a proxima validacao.

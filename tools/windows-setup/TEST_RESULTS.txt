@@ -1,0 +1,22 @@
+test_android_sdk_and_pinned_versions (test_setup.LauncherSafety.test_android_sdk_and_pinned_versions) ... ok
+test_check_mode_is_separate (test_setup.LauncherSafety.test_check_mode_is_separate) ... ok
+test_cmd_handles_failures (test_setup.LauncherSafety.test_cmd_handles_failures) ... ok
+test_cmd_uses_local_ps_file_and_not_untrusted_eval (test_setup.LauncherSafety.test_cmd_uses_local_ps_file_and_not_untrusted_eval) ... ok
+test_documentation_discloses_no_windows_validation (test_setup.LauncherSafety.test_documentation_discloses_no_windows_validation) ... ok
+test_existing_checkout_protected (test_setup.LauncherSafety.test_existing_checkout_protected) ... ok
+test_install_requires_confirmation (test_setup.LauncherSafety.test_install_requires_confirmation) ... ok
+test_installs_exact_official_packages (test_setup.LauncherSafety.test_installs_exact_official_packages) ... ok
+test_menu_has_all_actions (test_setup.LauncherSafety.test_menu_has_all_actions) ... ok
+test_no_android_or_backup_mutation (test_setup.LauncherSafety.test_no_android_or_backup_mutation) ... ok
+test_no_dangerous_persistent_env_update (test_setup.LauncherSafety.test_no_dangerous_persistent_env_update) ... ok
+test_other_project_install_is_optional_and_confirmed (test_setup.LauncherSafety.test_other_project_install_is_optional_and_confirmed) ... ok
+test_other_projects_are_read_only (test_setup.LauncherSafety.test_other_projects_are_read_only) ... ok
+test_repo_pins_and_build_scripts (test_setup.LauncherSafety.test_repo_pins_and_build_scripts) ... ok
+test_secure_sdk_bootstrap (test_setup.LauncherSafety.test_secure_sdk_bootstrap) ... ok
+test_shell_shim_is_private (test_setup.LauncherSafety.test_shell_shim_is_private) ... ok
+
+----------------------------------------------------------------------
+Ran 16 tests in 0.001s
+
+OK
+PowerShell lexical token errors: 0 unclosed bracket groups: 0

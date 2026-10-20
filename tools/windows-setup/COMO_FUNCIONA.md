@@ -1,0 +1,43 @@
+# Polaris — instalador único para Windows (R001)
+
+**Objetivo:** reproduzir o padrão do orquestrador de um CMD do CameraGuard sem consumir GitHub Actions. Um ponto de entrada, validação antes de mutações, logs isolados, ferramentas instaladas apenas sob opção explícita e sem tocar em outros projetos.
+
+## Projetos consultados como referência
+
+| Projeto | Padrão identificado | Aplicação no instalador |
+|---|---|---|
+| CameraGuard | Um CMD único, helper PowerShell, evidências por sessão, hashes e estados de staging distintos de produção | CMD + PowerShell; log por sessão; falha fechada; nenhuma mudança em câmeras/gravações/banco instalado |
+| Analista (antigo Madeira / Analista-AI) | Pipelines Python, controle de versões e validação determinística antes de promoção | Verificador de pré-requisitos e recusa de checkout divergente, nenhuma promoção ou alteração nesse projeto |
+| Vai Quem Quer | Testes isolados, modo offline, validação por dispositivo e proibição de mexer em produção sem autorização | Build isolado e sem instalar APK; teste de dispositivo apenas como etapa posterior |
+| Polaris | Yomotsu fixado, SQLDelight, Android/Gradle e trilha B01–B05 | Reutiliza `tools/local-android/polaris_local.py` e `scripts/r001/build_issue002.sh` existentes |
+
+O **Projeto Viking** não foi identificado com segurança; não foi incluído como destino ou dependência. Projetos profissionais CAPEX e ForQuest são independentes do ambiente Android e não sofrerão alterações.
+
+## Ações
+
+- **1 — Diagnóstico:** confere Git, Git Bash, Python 3.10+, JDK 21 com javac, Android Studio, Android SDK, command-line tools, plataforma API 37, duas versões de Build Tools, dois NDKs, CMake, Platform Tools. Node.js e .NET aparecem como opcionais. Não baixa nem instala.
+- **2 — Instalação assistida:** o usuário digita `SIM`; instala somente pacotes faltantes via `winget`. Para o SDK, usa o índice oficial e um SHA-256 antes de executar command-line tools; instala pacotes exatos e solicita a aceitação interativa de licenças. Se faltar `winget`, recusa e orienta instalar `App Installer`.
+- **3 — Preparação:** clona o Polaris na branch `r001/multisource-foundation`, verifica `origin` e preserva diretórios existentes. Clona Yomotsu no commit `0fb80c439ef816eeb50674f1b90af39918b176d8`, sem reset.
+- **4 — Build:** inicializa JDK/SDK somente no processo local, cria shim Python3 somente sob `PolarisDev`, reutiliza o orquestrador Python existente, que executa baseline, aplica Spike-001 em worktree separado, gera SQLDelight, verifica migração 14 e gera APKs e evidências.
+- **5 — Outros projetos:** apenas checa a presença de Python, Node e `dotnet`, sem instalar dependências desses projetos.
+- **6 — Tudo do Polaris:** opções 2 → 3 → 4, após consentimento explícito da etapa de instalação.
+- **7 — Ferramentas gerais opcionais:** instala Node.js LTS e SDK .NET 8 se ausentes, com confirmação. O CameraGuard fixa a versão 8.0.425 separadamente; a instalação genérica não substitui esse SDK nem executa código do projeto.
+
+## Convenções e segurança
+
+- Local padrão: `%USERPROFILE%\PolarisDev`.
+- `PolarisLocal\Yomotsu-pinned` e `PolarisLocal\evidence\issue002-*` são áreas separadas.
+- Logs são salvos em `PolarisDev\relatorios\polaris-YYYYMMDD-HHMMSS-<id>.log` e `.json` (diagnóstico estruturado).
+- Preserva `JAVA_HOME` e `ANDROID_HOME` permanentes do usuário: configura-os somente no processo de execução para evitar quebrar CameraGuard/Analista e outras IDEs.
+- Não executa `git reset --hard`, não faz `git clean`, não altera pastas preexistentes de terceiros, não toca em imagens, gravações, bancos SQLite de usuário ou instalação no Android.
+- A ferramenta não faz upgrade indiscriminado de softwares já instalados.
+- Requer rede para instalações iniciais e Gradle; **não usa os minutos do GitHub Actions**.
+- Por segurança, o comando `check` apenas cria arquivo de log local; não modifica instalações.
+- Se os pacotes do Google não estiverem no índice, tiverem hash diferente ou a licença for rejeitada, a operação é interrompida.
+- A etapa B01–B05 com fontes reais e leitura de capítulos só pode ser declarada concluída depois de testes manuais/instrumentados em um Android real/emulador.
+
+## Compatibilidade conhecida
+
+Foi preparado para **Windows PowerShell 5.1**, que normalmente acompanha Windows 10/11. A versão exata e a disponibilidade dos pacotes winget dependem do sistema e da rede do operador. O SDK do Yomotsu exige Android API 37, Build Tools 36.0.0 e 37.0.0, NDKs 29.0.14206865 e 28.2.13676358, CMake 3.22.1 e JDK 21.
+
+**Validação deste pacote:** testes estáticos locais do conteúdo e dos invariantes de segurança. A interface gráfica/CMD, instalação winget, sdkmanager, compilação Android, APK e testes de dispositivo **não** foram executados em Windows neste ambiente. Os resultados do diagnóstico do PC são a próxima evidência obrigatória.
