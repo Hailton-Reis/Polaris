@@ -957,3 +957,10 @@ Real Yomotsu BackupCategory codec, SQLDelight codegen, Android runtime B01–B05
 ## 2026-10-20 — scalar SQLDelight category/exclusion query results
 
 Fixed an API-shape mismatch hidden by synthetic host classes. Single-column SELECT category_id yields Long, and SELECT scanlator yields String. Updated full-parent Kotlin readback to List<Long> and List<String> and made host query doubles faithfully scalar. Added four negative-proof contract checks. **68/68 Kotlin+Python host checks PASS**; gate total now **1171 minimum configured in 24 gates, NOT executed aggregate/Android CI**. Detailed report: [scalar query fix](SCALAR_SQLDELIGHT_RETURN_FIX_2026_10_20.md). Backup v2 remains fail-closed; migrations unchanged.
+
+
+## 2026-10-20 — SHA256 binding of opaque v2 snapshot bytes (76 host cases)
+
+The generated-query adapter previously accepted a caller-supplied 64-digit lowercase SHA256 value solely by checking its format; it was never recalculated. `FreshWork.archiveSnapshotBytes` now requires nonempty raw snapshot bytes from the future decoder, and `restoreNewOnly` recalculates SHA256 and rejects mismatches **before opening its SQLDelight writer transaction**. Four Kotlin behavioral and four Python contract checks were added. **42/42 Kotlin + 34/34 Python contract = 76/76 local host PASS.** Gate `backup-generated-query-adapter` min 76; configured total **1179 cases/24 groups, NOT aggregate executed**.
+
+Important release blocker: the snapshot bytes are opaque and the staged adapter **does not prove** that the bytes decode to the same `BackupManga`/child settings. Only the real v2 ProtoBuf decoder, canonical versioned serialization and Android driver integration can prove this. A malicious caller could still supply unrelated bytes and a matching digest. This change is a partial fail-closed admission improvement, not authorization to restore v2. [Report](OPAQUE_SNAPSHOT_DIGEST_ADMISSION_2026_10_20.md). ZIP SHA256 `aadc80a2e234c5fd7c14778ed74dc53d782538087f535e95267b541b6a58a7f4`, Library `/Polaris/R001/opaque-snapshot-digest/`. PR #1 Draft, issues #2/#11 open, migration14/15 unchanged.

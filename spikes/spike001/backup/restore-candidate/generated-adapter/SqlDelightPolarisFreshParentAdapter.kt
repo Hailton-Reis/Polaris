@@ -10,6 +10,7 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import tachiyomi.data.Database
 import java.util.Date
+import java.security.MessageDigest
 import java.util.UUID
 
 /**
@@ -41,6 +42,11 @@ class SqlDelightPolarisFreshParentAdapter(
     data class FreshWork(
         val archiveUuid: String,
         val archiveDigest: String,
+        /** Opaque exact per-parent serialized snapshot bytes from the trusted decoder.
+         *  The decoder must ALSO prove these bytes actually produced [archive].
+         *  This host-only candidate does NOT yet provide that ProtoBuf proof.
+         */
+        val archiveSnapshotBytes: ByteArray = byteArrayOf(),
         val archive: BackupManga,
         val categoryIdsByArchiveOrder: Map<Long, Long>,
         val children: List<ChildLink>,
@@ -63,6 +69,9 @@ class SqlDelightPolarisFreshParentAdapter(
         require(works.map { it.archiveUuid }.distinct().size == works.size) {
             "POLARIS_FRESH_DUPLICATE_UUID"
         }
+        // Require content-addressed evidence before opening a write transaction.
+        // The real decoder-to-DTO binding remains a separate Android/ProtoBuf gate.
+        works.forEach(::verifyOpaqueArchiveSnapshotHash)
         // The driver guard begins BEGIN IMMEDIATE before this block; every
         // query runs through the same coroutine-bound writer connection.
         return transaction.restoreNewParents {
@@ -114,6 +123,14 @@ class SqlDelightPolarisFreshParentAdapter(
             }
             parentIds
         }
+    }
+
+    private fun verifyOpaqueArchiveSnapshotHash(work: FreshWork) {
+        require(work.archiveSnapshotBytes.isNotEmpty()) { "POLARIS_FRESH_MISSING_ARCHIVE_BYTES" }
+        val encoded = MessageDigest.getInstance("SHA-256")
+            .digest(work.archiveSnapshotBytes)
+            .joinToString("") { "%02x".format(it) }
+        require(encoded == work.archiveDigest) { "POLARIS_FRESH_ARCHIVE_HASH_MISMATCH" }
     }
 
     private fun destinationUrl(uuid: String) = "merged://polaris/$uuid"

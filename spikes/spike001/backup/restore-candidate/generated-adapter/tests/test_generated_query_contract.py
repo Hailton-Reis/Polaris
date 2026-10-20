@@ -224,6 +224,23 @@ class Contract(unittest.TestCase):
         self.assertIn('POLARIS_FRESH_CATEGORY_NAME_OR_ID_CHANGED',KOTLIN)
         self.assertIn('POLARIS_FRESH_CATEGORY_ARCHIVE_ORDER_MISMATCH',KOTLIN)
 
+    def test_archive_digest_requires_raw_serialized_snapshot(self):
+        self.assertIn('val archiveSnapshotBytes: ByteArray = byteArrayOf()', KOTLIN)
+        self.assertIn('POLARIS_FRESH_MISSING_ARCHIVE_BYTES', KOTLIN)
+
+    def test_archive_digest_recomputed_instead_of_format_only(self):
+        self.assertIn('MessageDigest.getInstance("SHA-256")', KOTLIN)
+        self.assertIn('POLARIS_FRESH_ARCHIVE_HASH_MISMATCH', KOTLIN)
+
+    def test_hash_proof_precedes_writer_transaction(self):
+        a=KOTLIN.index('works.forEach(::verifyOpaqueArchiveSnapshotHash)')
+        b=KOTLIN.index('return transaction.restoreNewParents {')
+        self.assertLess(a,b)
+
+    def test_opaque_proof_does_not_claim_real_protobuf_decoder_binding(self):
+        self.assertIn('decoder-to-DTO binding remains a separate Android/ProtoBuf gate', KOTLIN)
+        self.assertIn('Do NOT connect to PolarisRestoreCoordinator', KOTLIN)
+
     def test_release_flag_must_remain_fail_closed(self):
         self.assertNotIn('PolarisRestoreCoordinator(',KOTLIN)
         self.assertNotIn('migration15',KOTLIN)

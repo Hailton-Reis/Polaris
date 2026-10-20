@@ -3,6 +3,7 @@ package polaris.spike001.backup.restore
 import eu.kanade.tachiyomi.data.backup.models.*
 import tachiyomi.data.Database
 import kotlin.coroutines.*
+import java.security.MessageDigest
 
 private var passed=0
 private fun <T> runBlockingHost(block:suspend()->T):T {
@@ -16,15 +17,18 @@ private fun <T> runBlockingHost(block:suspend()->T):T {
 private fun ok(msg:String, block:()->Unit) {block();passed++; println("PASS $passed $msg")}
 private fun reject(msg:String,block:()->Unit) = ok(msg) {check(runCatching(block).isFailure){"EXPECTED REJECT: $msg"}}
 private val uuid="123e4567-e89b-42d3-a456-426614174000"
+private val defaultSnapshot="test-only-parent-snapshot-v1".toByteArray()
+private fun digestBytes(bytes:ByteArray):String = MessageDigest.getInstance("SHA-256")
+    .digest(bytes).joinToString("") { "%02x".format(it) }
 private fun work(archive:BackupManga=BackupManga(source=6969,url="merged://archive-url",title="Parent",
     chapters=listOf(BackupChapter("/one","Chapter One",read=true,lastPageRead=4,version=3)),
     history=listOf(BackupHistory("/one",1234,7)), categories=emptyList(),
     memo="{\"nested\":\"ok\"}".encodeToByteArray(),version=9,lastModifiedAt=4321),
-    id:String=uuid,digest:String="a".repeat(64),child:SqlDelightPolarisFreshParentAdapter.ChildLink?=null
+    id:String=uuid,digest:String=digestBytes(defaultSnapshot),child:SqlDelightPolarisFreshParentAdapter.ChildLink?=null
 ):SqlDelightPolarisFreshParentAdapter.FreshWork {
     val source=child?:SqlDelightPolarisFreshParentAdapter.ChildLink(77,"/real-101",101,
         SqlDelightPolarisFreshParentAdapter.LinkSettings(infoManga=true,chapterPriority=0))
-    return SqlDelightPolarisFreshParentAdapter.FreshWork(id,digest,archive,emptyMap(),listOf(source),
+    return SqlDelightPolarisFreshParentAdapter.FreshWork(id,digest,defaultSnapshot,archive,emptyMap(),listOf(source),
         SqlDelightPolarisFreshParentAdapter.LinkSettings(chapterPriority=10))
 }
 private fun setup():Triple<SqlDelightPolarisFreshParentAdapter,Database,TestDriver>{
@@ -47,6 +51,21 @@ fun main(){
   reject("reject duplicated UUID within batch") {val(a,_,_)=setup();runBlockingHost{a.restoreNewOnly(listOf(work(),work()))}}
   reject("reject invalid UUID") {val(a,_,_)=setup();runBlockingHost{a.restoreNewOnly(listOf(work(id="invalid")))}}
   reject("reject invalid digest") {val(a,_,_)=setup();runBlockingHost{a.restoreNewOnly(listOf(work(digest="not-a-sha")))}}
+  reject("reject valid-looking but incorrect archive digest") {
+    val(a,_,_)=setup();runBlockingHost{a.restoreNewOnly(listOf(work(digest="f".repeat(64))))}
+  }
+  reject("reject missing encoded snapshot proof") {
+    val(a,_,_)=setup();runBlockingHost{a.restoreNewOnly(listOf(work().copy(archiveSnapshotBytes=byteArrayOf())))}
+  }
+  reject("reject tampered archive snapshot bytes") {
+    val(a,_,_)=setup();runBlockingHost{a.restoreNewOnly(listOf(work().copy(archiveSnapshotBytes="tampered".toByteArray())))}
+  }
+  ok("matching snapshot digest still allows parent-last transaction") {
+    val(a,db,d)=setup();val w=work()
+    check(digestBytes(w.archiveSnapshotBytes)==w.archiveDigest)
+    check(runBlockingHost{a.restoreNewOnly(listOf(w))}==listOf(103L))
+    check(db.parent!=null && d.commitCount==1)
+  }
   reject("reject invalid virtual source") {val(a,_,_)=setup();runBlockingHost{a.restoreNewOnly(listOf(work(BackupManga(1,"a","t"))))}}
   reject("reject missing source child") {val(a,_,_)=setup();runBlockingHost{a.restoreNewOnly(listOf(work(child=SqlDelightPolarisFreshParentAdapter.ChildLink(77,"/not-found",101,SqlDelightPolarisFreshParentAdapter.LinkSettings(infoManga=true,chapterPriority=0)))))}}
   reject("reject two info sources absent") {val(a,_,_)=setup();runBlockingHost{a.restoreNewOnly(listOf(work(child=SqlDelightPolarisFreshParentAdapter.ChildLink(77,"/real-101",101,SqlDelightPolarisFreshParentAdapter.LinkSettings(infoManga=false,chapterPriority=0)))))}}
@@ -95,7 +114,7 @@ fun main(){
     check(db.categories.isEmpty()&&db.parent==null&&d.rollbackCount==1)
   }
   ok("a bad second work undoes writes from first") {
-    val(a,db,d)=setup();val second=work(id="223e4567-e89b-42d3-a456-426614174001",digest="b".repeat(64))
+    val(a,db,d)=setup();val second=work(id="223e4567-e89b-42d3-a456-426614174001")
     check(runCatching{runBlockingHost{a.restoreNewOnly(listOf(work(),second))}}.isFailure)
     check(db.parent==null&&db.history.isEmpty()&&db.edges.isEmpty()&&db.ledger.isEmpty()&&d.rollbackCount==1)
   }

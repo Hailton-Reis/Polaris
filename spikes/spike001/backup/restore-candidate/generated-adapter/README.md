@@ -45,6 +45,19 @@ No local category name/flags are updated automatically.
 **38 Kotlin/JVM checks** (10 new) and **26 SQL/source checks** (4 new):
 **64 combined host-only cases**, not real SQLDelight/Android compilation.
 
-### 2026-10-20: SQLDelight single-column query results
 
-The original SQL SELECT returns one scalar category_id (Long) and one scalar scanlator (String). The Kotlin readback and generated API-shape host doubles now consume List<Long> and List<String>, without synthetic row wrappers. Four tests prevent this source/type mismatch from returning. Android/actual SQLDelight code generation remains unverified.
+### 2026-10-20: single-column query return types
+
+Fixed an API-shape error hidden by the old host doubles: `selectPolarisParentCategoriesFull` selects only `category_id` and returns `Query<Long>` (not `Query<CategoryRec>`); `selectPolarisParentExclusionsFull` selects only `scanlator` and returns `Query<String>` (not `Query<ExclusionRec>`). The Kotlin readback now uses `List<Long>` and `List<String>` directly. Host mocks reproduce scalar query results and four new contract tests guard against a regression. These are source/API-shape checks, not actual SQLDelight-generated Kotlin compilation.
+
+### 2026-10-20: fail-closed opaque snapshot-digest evidence
+
+A caller-supplied 64-character hex digest alone was not proof of anything.
+The host-only adapter now requires raw per-parent snapshot bytes, recalculates
+SHA-256 and refuses missing or mismatched evidence *before* starting the write
+transaction. Four Kotlin behaviors and four contract tests cover this.
+**Critical remaining P0:** the bytes are opaque: only the future *real*
+ProtoBuf decoder can demonstrate that they encode the exact supplied
+BackupManga + children/settings and are canonical/versioned. A caller could
+still supply unrelated bytes with a matching digest, so this is NOT a secure
+full-v2 digest guarantee and must not enable v2 restore.
