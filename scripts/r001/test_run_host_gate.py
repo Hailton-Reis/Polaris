@@ -90,6 +90,16 @@ class HostGateParserTests(unittest.TestCase):
         self.assertEqual(evaluate_gate(gate, "", 0, 44)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
         self.assertTrue(any(n == gate and m == 44 for n, cmd, m in GATES))
 
+    def test_parent_relational_write_requires_69_integrated_cases(self):
+        gate = "backup-parent-relational-write"
+        good = "Ran 69 tests in 0.31s\n\nOK\n"
+        self.assertEqual(evaluate_gate(gate, good, 0, 69)["status"], "PASS")
+        self.assertEqual(evaluate_gate(gate, good, 1, 69)["status"], "NONZERO_EXIT")
+        self.assertEqual(evaluate_gate(gate, good.replace("69", "68"), 0, 69)["status"], "INSUFFICIENT_TEST_COVERAGE")
+        self.assertEqual(evaluate_gate(gate, good.replace("OK", "FAILED"), 0, 69)["status"], "MISSING_UNITTEST_OK_MARKER")
+        self.assertEqual(evaluate_gate(gate, "", 0, 69)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
+        self.assertTrue(any(n == gate and minimum == 69 for n, command, minimum in GATES))
+
     def test_typed_parent_projection_requires_unique_89_case_marker(self):
         gate = "backup-typed-parent-projection"
         good = "POLARIS_BACKUP_MANGA_TYPED_PROJECTION_PASS 89\n"
