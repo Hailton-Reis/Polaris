@@ -34,7 +34,10 @@ private fun json(obj: Any?): String = when (obj) {
     else -> error("unsupported fixture type: ${obj.javaClass.simpleName}")
 }
 
-fun main() {
+fun main(args: Array<String>) {
+    require(args.size <= 1) { "POLARIS_EXTRA_RESERVED_ID_ARGUMENTS" }
+    val targetId = if (args.isEmpty()) 103L else requireNotNull(args[0].toLongOrNull()) { "POLARIS_INVALID_RESERVED_ID_ARGUMENT" }
+    require(targetId > 0L) { "POLARIS_BAD_TEST_RESERVED_ID" }
     val archive = BackupManga(
         source=6969, url="merged://old-url",title="Projected Parent",artist="Artist",
         description="Bridge", genre=listOf("Action", "Mystery"),status=2, dateAdded=120,
@@ -50,7 +53,7 @@ fun main() {
         excludedScanlators=listOf("Bad Scan"),
         memo="{\"preserved\":\"yes\"}".toByteArray(),
     )
-    val p=PolarisBackupMangaSqlProjection.prepare(archive, UUID, 103, mapOf(7L to 71L))
+    val p=PolarisBackupMangaSqlProjection.prepare(archive, UUID, targetId, mapOf(7L to 71L))
     val parent=p.parent.run { mapOf(
         "reservedParentId" to reservedParentId, "source" to source, "destinationUrl" to destinationUrl,
         "artist" to artist, "author" to author, "description" to description,
