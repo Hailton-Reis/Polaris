@@ -952,3 +952,8 @@ Updated `generated-adapter/SqlDelightPolarisFreshParentAdapter.kt`: `FreshWork.a
 New 10 Kotlin/JVM host behaviors (38 total) and 4 source/SQL tests (26 total), including disposable SQLite proof that duplicate physical category names are allowed. **64/64 combined local tests PASS** with `POLARIS_GENERATED_QUERY_BRIDGE_PASS 64`; no skips. New configured gate minimum 64 (up from 50), total **1,167 minimum configured host cases across 24 groups, NOT a full aggregate/CI/Android PASS**. Library `/Polaris/R001/category-identity/`; evidence ZIP SHA256 `d62ebb9af38044654d9713f46ba5b657bb1aef7f1a661d3d3c1f123cb8ed520a`.
 
 Real Yomotsu BackupCategory codec, SQLDelight codegen, Android runtime B01–B05, complete ProtoBuf and other existing restore blockers remain pending. `PolarisRestoreCoordinator` v2 preflight stays fail-closed; migration14/15 not changed, PR #1 Draft, issues #2/#11 OPEN.
+
+
+## 2026-10-20 — scalar SQLDelight category/exclusion query results
+
+Fixed an API-shape mismatch hidden by synthetic host classes. Single-column SELECT category_id yields Long, and SELECT scanlator yields String. Updated full-parent Kotlin readback to List<Long> and List<String> and made host query doubles faithfully scalar. Added four negative-proof contract checks. **68/68 Kotlin+Python host checks PASS**; gate total now **1171 minimum configured in 24 gates, NOT executed aggregate/Android CI**. Detailed report: [scalar query fix](SCALAR_SQLDELIGHT_RETURN_FIX_2026_10_20.md). Backup v2 remains fail-closed; migrations unchanged.

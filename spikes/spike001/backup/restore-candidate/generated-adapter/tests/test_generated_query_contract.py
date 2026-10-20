@@ -130,6 +130,28 @@ class Contract(unittest.TestCase):
         self.assertIn('categories.size == prepared.categories.size',KOTLIN)
         self.assertIn('excluded.size == prepared.excludedScanlators.size',KOTLIN)
 
+    def test_category_full_readback_query_is_single_scalar_integer(self):
+        body = self.q['selectPolarisParentCategoriesFull']
+        self.assertRegex(body, r'(?is)^SELECT\s+category_id\s+FROM\s+mangas_categories')
+        self.assertNotRegex(body, r'(?is)^SELECT\s+\*')
+
+    def test_category_full_readback_kotlin_is_typed_scalar_not_synthetic_dto(self):
+        self.assertIn('val categories: List<Long> = q.selectPolarisParentCategoriesFull(id).awaitAsList()', KOTLIN)
+        self.assertNotIn('selectPolarisParentCategoriesFull(id).awaitAsList().map', KOTLIN)
+        self.assertIn('fun selectPolarisParentCategoriesFull(parentId:Long):Query<Long>',
+                      (HERE / 'host' / 'DatabaseHostStub.kt').read_text())
+
+    def test_exclusion_full_readback_query_is_single_scalar_string(self):
+        body = self.q['selectPolarisParentExclusionsFull']
+        self.assertRegex(body, r'(?is)^SELECT\s+scanlator\s+FROM\s+excluded_scanlators')
+        self.assertNotRegex(body, r'(?is)^SELECT\s+\*')
+
+    def test_exclusion_full_readback_kotlin_is_typed_scalar_not_synthetic_dto(self):
+        self.assertIn('val excluded: List<String> = q.selectPolarisParentExclusionsFull(id).awaitAsList()', KOTLIN)
+        self.assertNotIn('selectPolarisParentExclusionsFull(id).awaitAsList().map', KOTLIN)
+        self.assertIn('fun selectPolarisParentExclusionsFull(parentId:Long):Query<String>',
+                      (HERE / 'host' / 'DatabaseHostStub.kt').read_text())
+
     def test_parent_last_ordering_is_real(self):
         a=KOTLIN.index('stageDependencies(id, work, prepared, edges)')
         b=KOTLIN.index('q.insertPolarisRestoredReservedParentLast(')

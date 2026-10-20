@@ -66,9 +66,9 @@ fun main(){
     val w=work(archive).copy(categoryIdsByArchiveOrder=mapOf(2L to 71L),
         archiveCategories=listOf(BackupCategory("Original",order=2L)))
     runBlockingHost {a.restoreNewOnly(listOf(w))}
-    check(db.categories.single().category_id==71L)
+    check(db.categories.single()==71L)
     check(db.tracks.single().remote_id==999L && db.tracks.single().score==7.5)
-    check(db.exclusions.single().scanlator=="Group")
+    check(db.exclusions.single()=="Group")
   }
   ok("rollback if persisted tracker score drifts") {
     val (a,db,d)=setup();db.tamperTrack=true
@@ -116,7 +116,7 @@ fun main(){
     val w=work(ar).copy(categoryIdsByArchiveOrder=mapOf(2L to 71L),
         archiveCategories=listOf(BackupCategory("Original",order=2L)))
     runBlockingHost { a.restoreNewOnly(listOf(w)) }
-    check(db.categories.single().category_id==71L)
+    check(db.categories.single()==71L)
   }
   ok("category identity: rename after backup rolls back everything") {
     val(a,db,d)=setup();db.physicalCategories.clear();db.physicalCategories.add(71L to "Renamed")

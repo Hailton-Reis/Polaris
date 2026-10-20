@@ -37,17 +37,15 @@ class EdgeRecord(
 )
 class Ledger(val parent_manga_id:Long,val archive_digest:String)
 class LegacyVirtual(val memo:JsonObject)
-class CategoryRec(val category_id:Long)
-class ExclusionRec(val scanlator:String)
 
 class Database(val driver: TestDriver) {
     var parent:MangaRecord? = null
     val chapters = mutableListOf<ChapterRecord>()
-    val categories = mutableListOf<CategoryRec>()
+    val categories = mutableListOf<Long>()
     val physicalCategories = mutableListOf(71L to "Original")
     val history = mutableListOf<HistoryRecord>()
     val tracks = mutableListOf<TrackRecord>()
-    val exclusions = mutableListOf<ExclusionRec>()
+    val exclusions = mutableListOf<String>()
     val edges = mutableListOf<EdgeRecord>()
     val ledger = mutableMapOf<String,Ledger>()
     var tamperParent = false
@@ -108,7 +106,7 @@ class PolarisParentMetadataRestoreQueries(private val db:Database) {
         if(db.missingPhysicalChild) emptyList()
         else if(childSource==77L && childUrl=="/real-101") listOf(101L) else emptyList()
     }
-    fun insertPolarisRestoredCategoryExact(parentId:Long,categoryId:Long){db.categories.add(CategoryRec(categoryId))}
+    fun insertPolarisRestoredCategoryExact(parentId:Long,categoryId:Long){db.categories.add(categoryId)}
     fun insertPolarisRestoredChapterFull(parentId:Long,chapterUrl:String,chapterName:String,
         scanlator:String?,read:Boolean,bookmark:Boolean,lastPageRead:Long,chapterNumber:Double,
         sourceOrder:Long,dateFetch:Long,dateUpload:Long,chapterLastModifiedAt:Long,
@@ -127,7 +125,7 @@ class PolarisParentMetadataRestoreQueries(private val db:Database) {
         db.tracks.add(TrackRecord(parentId,syncId,remoteId,libraryId,trackTitle,lastChapterRead,
             totalChapters,trackStatus,trackScore,remoteUrl,startDate,finishDate,isPrivate))
     }
-    fun insertPolarisRestoredExclusionExact(parentId:Long,excludedScanlator:String){db.exclusions.add(ExclusionRec(excludedScanlator))}
+    fun insertPolarisRestoredExclusionExact(parentId:Long,excludedScanlator:String){db.exclusions.add(excludedScanlator)}
     fun insertPolarisRestoredReservedParentLast(parentId:Long,destinationUrl:String,artist:String?,
         author:String?,description:String?,genre:List<String>,title:String,status:Long,
         thumbnailUrl:String?,favorite:Boolean,lastUpdate:Long?,nextUpdate:Long?,initialized:Boolean,
@@ -154,7 +152,7 @@ class PolarisParentMetadataRestoreQueries(private val db:Database) {
     fun selectPolarisParentChaptersFull(parentId:Long):Query<ChapterRecord> = Query {db.chapters.filter {it.manga_id==parentId}}
     fun selectPolarisParentHistoryFull(parentId:Long):Query<HistoryRecord> = Query {db.history.filter {h->db.chapters.any{it._id==h.chapter_id && it.manga_id==parentId}}.map{if(db.tamperHistory)HistoryRecord(it.chapter_id,it.chapter_url,it.last_read,it.time_read+1) else it}}
     fun selectPolarisParentTrackingFull(parentId:Long):Query<TrackRecord> = Query {db.tracks.filter {it.manga_id==parentId}.map{if(db.tamperTrack)TrackRecord(it.manga_id,it.sync_id,it.remote_id,it.library_id,it.title,it.last_chapter_read,it.total_chapters,it.status,it.score+1,it.remote_url,it.start_date,it.finish_date,it.private) else it}}
-    fun selectPolarisParentCategoriesFull(parentId:Long):Query<CategoryRec> = Query {if(db.tamperCategory)emptyList() else db.categories.toList()}
-    fun selectPolarisParentExclusionsFull(parentId:Long):Query<ExclusionRec> = Query {db.exclusions.toList()}
+    fun selectPolarisParentCategoriesFull(parentId:Long):Query<Long> = Query {if(db.tamperCategory)emptyList() else db.categories.toList()}
+    fun selectPolarisParentExclusionsFull(parentId:Long):Query<String> = Query {db.exclusions.toList()}
     fun selectPolarisParentEdgesFull(parentId:Long):Query<EdgeRecord> = Query {db.edges.filter {it.merge_id==parentId}.map{if(db.tamperEdge)EdgeRecord(it.info_manga,it.get_chapter_updates,it.chapter_sort_mode,it.chapter_priority+1,it.download_chapters,it.merge_id,it.merge_url,it.manga_id,it.manga_url,it.manga_source) else it}}
 }

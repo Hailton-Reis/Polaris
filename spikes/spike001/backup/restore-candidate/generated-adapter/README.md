@@ -15,7 +15,7 @@ persistent physical manga/chapter column plus all relations/ledger before the
 transaction may commit. Any discrepancy must abort all parents. Old or
 identical parents are always rejected; no user-row overwrite.
 
-`bash run_host_contract.sh` runs **26 source/SQL binding and coverage tests**,
+`bash run_host_contract.sh` runs **30 source/SQL binding and coverage tests**,
 plus **38 Kotlin/JVM behavioral tests**, compiling this exact candidate Kotlin
 file against explicitly named **API-shape test doubles** for Database,
 generated queries, `SqlDriver`, BackupManga and JSON. This is **NOT**
@@ -44,3 +44,7 @@ No local category name/flags are updated automatically.
 
 **38 Kotlin/JVM checks** (10 new) and **26 SQL/source checks** (4 new):
 **64 combined host-only cases**, not real SQLDelight/Android compilation.
+
+### 2026-10-20: SQLDelight single-column query results
+
+The original SQL SELECT returns one scalar category_id (Long) and one scalar scanlator (String). The Kotlin readback and generated API-shape host doubles now consume List<Long> and List<String>, without synthetic row wrappers. Four tests prevent this source/type mismatch from returning. Android/actual SQLDelight code generation remains unverified.

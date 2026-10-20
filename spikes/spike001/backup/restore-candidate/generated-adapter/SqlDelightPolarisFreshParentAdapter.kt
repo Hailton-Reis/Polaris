@@ -307,10 +307,10 @@ class SqlDelightPolarisFreshParentAdapter(
                 "POLARIS_FRESH_TRACK_READBACK_DRIFT"
             }
         }
-        val categories = q.selectPolarisParentCategoriesFull(id).awaitAsList().map { it.category_id }
+        val categories: List<Long> = q.selectPolarisParentCategoriesFull(id).awaitAsList()
         check(categories.size == prepared.categories.size &&
             categories.sorted() == prepared.categories.sorted()) { "POLARIS_FRESH_CATEGORY_READBACK_DRIFT" }
-        val excluded = q.selectPolarisParentExclusionsFull(id).awaitAsList().map { it.scanlator }
+        val excluded: List<String> = q.selectPolarisParentExclusionsFull(id).awaitAsList()
         check(excluded.size == prepared.excludedScanlators.size &&
             excluded.sorted() == prepared.excludedScanlators.sorted()) { "POLARIS_FRESH_EXCLUSION_READBACK_DRIFT" }
         val actualEdges = q.selectPolarisParentEdgesFull(id).awaitAsList()
