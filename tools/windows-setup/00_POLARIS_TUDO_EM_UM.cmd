@@ -149,10 +149,16 @@ function Find-AndroidStudio {
     }
     foreach($p in $paths){if(Test-Path -LiteralPath $p -PathType Leaf){return $p}}
     foreach($key in @('HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\*','HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*','HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\*')) {
-        $items=Get-ItemProperty -Path $key -ErrorAction SilentlyContinue | Where-Object {$_.DisplayName -like 'Android Studio*'}
+        # StrictMode: not every Windows uninstall registry entry contains DisplayName or InstallLocation.
+        # Read optional properties defensively; unrelated programs must never abort our preflight.
+        $items=Get-ItemProperty -Path $key -ErrorAction SilentlyContinue | Where-Object {
+            $display=$_.PSObject.Properties['DisplayName']
+            $null -ne $display -and ([string]$display.Value -like 'Android Studio*')
+        }
         foreach($entry in $items){
-            if($entry.InstallLocation){
-                $p=Join-Path $entry.InstallLocation 'bin\studio64.exe'
+            $location=$entry.PSObject.Properties['InstallLocation']
+            if($null -ne $location -and -not [string]::IsNullOrWhiteSpace([string]$location.Value)){
+                $p=Join-Path ([string]$location.Value) 'bin\studio64.exe'
                 if(Test-Path -LiteralPath $p -PathType Leaf){return $p}
             }
         }
