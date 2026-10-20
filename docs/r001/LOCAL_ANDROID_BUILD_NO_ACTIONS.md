@@ -61,3 +61,14 @@ Se tiver de escolher **uma ação agora**, instale Android Studio e execute o co
 - Os testes SQLite/Kotlin do repositório continuam disponíveis para desenvolvimento sem Actions; uma compilação local é evidência mais útil agora do que disparar workflows sem cota.
 - O script se recusa a alterar checkout Yomotsu já existente se estiver sujo ou em commit divergente. Evidências são sempre criadas em pasta nova.
 - A fonte de verdade é o GitHub branch `r001/multisource-foundation`. Nenhum commit na branch principal é necessário.
+
+## CMD unico (2026-10-20)
+
+Foi adicionado um configurador de dois cliques que detecta **Android Studio e SDK separadamente**, alem de Git/Bash, Python, JDK21 e todas as versoes exatas do SDK Yomotsu. Ao escolher a opcao de instalacao, confirma explicitamente as instalacoes winget e licencas Android. Tambem permite clonar a branch, preparar o Yomotsu fixado e chamar o build local existente sem consumir GitHub Actions.
+
+- [Ponto de entrada CMD](../../tools/windows-setup/00_POLARIS_TUDO_EM_UM.cmd)
+- [Guia e protecoes](../../tools/windows-setup/COMO_FUNCIONA.md)
+- [PowerShell de orquestracao](../../tools/windows-setup/Polaris_Setup.ps1)
+- [16 testes estaticos executados](../../tools/windows-setup/TEST_RESULTS.txt)
+
+O instalador nao foi executado em Windows neste ambiente. Qualquer problema de `winget`, instalacao do SDK ou Gradle deve ser registrado a partir do log local, nao confundido com resultados aprovados de Android. Ele mantem os projetos CameraGuard/Analista/Vai Quem Quer intactos e trata seus requisitos Node/.NET apenas como opcionais.
