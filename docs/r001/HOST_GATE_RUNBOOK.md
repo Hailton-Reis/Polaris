@@ -912,3 +912,12 @@ Staged `spikes/spike001/backup/restore-candidate/pinned-driver-transaction/Polar
 New host gate `backup-pinned-driver-kotlin` min 33 configured in aggregate and Domain spikes CI: **931 minimum cases across 21 groups configured, not executed as a whole**. Self-contained ZIP with source and transcripts in Library `/Polaris/R001/pinned-driver-transaction/`, SHA256 `e0ae1d69455391ef5a66e7f412b31bb90f237bcdb3b4dfd8231baaca4abd9c31`.
 
 Do NOT wire the guard into the real backup v2 import until field-complete SQLDelight implementation, test-generated Kotlin APIs with the exact pinned fork, runtime same connection/deferred FK, real codec/Android B01–B05, and existing-parent semantics are proven. Keep migration14/15 and v2 refusal unchanged; PR #1 Draft, issues #2/#11 OPEN.
+
+
+## 2026-10-19 — typed BackupManga to SQLDelight field projection (89 host cases)
+
+Published `spikes/spike001/backup/restore-candidate/parent-field-projection/PolarisBackupMangaSqlProjection.kt`, matching the public names and field contracts of pinned Yomotsu BackupManga, BackupChapter, BackupHistory, BackupTracking, MemoColumnAdapter and StringListColumnAdapter. Strongly typed read-only ParentRow/ChapterRow/HistoryRow/TrackingRow payloads separate source archive URL from stable destination UUID URL, preserve existing memo keys, map category archive order to local IDs, require exact chapter-history links, and refuse ambiguous tracking media IDs or lossy genre delimiter encodings. The code does not write SQL and is not wired into Android; host tests compile against small declaration doubles, not real upstream JARs.
+
+**89/89 new Kotlin/JVM host cases PASS**. Rechecked 33/33 pinned-driver Kotlin protocol tests, 51/51 SQL trigger/parent-LAST SQLite fixtures, 98/98 migration14/UUID readiness SQLite fixtures: **271 separately run host checks PASS** across four suites. Host gate `backup-typed-parent-projection` min 89, configuring **1,020 minimum cases / 22 groups**, NOT a full executed aggregate or GitHub CI PASS. [Detailed report](TYPED_BACKUP_MANGA_SQL_PROJECTION_2026_10_19.md). Library `/Polaris/R001/typed-parent-field-projection/`, new 271-evidence ZIP SHA256 `5cf2d82cc7e59a9264552b21d7234a9d1a6a2017755e625eb5cef5d4d44f8a65`.
+
+Still required: bind fields to real generated SQLDelight queries in the same parent-LAST transaction, full physical readback, test MemoColumnAdapter unknown nested data and actual ProtoBuf, separate existing-parent policy, Android B01–B05. Keep v2 preflight refused, migration15 unchanged, PR #1 Draft, issue #11 open.
