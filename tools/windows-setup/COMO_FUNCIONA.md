@@ -1,13 +1,22 @@
 # Polaris — instalador único para Windows (R001)
 
-**Objetivo:** reproduzir o padrão do orquestrador de um CMD do CameraGuard sem consumir GitHub Actions. Um ponto de entrada, validação antes de mutações, logs isolados, ferramentas instaladas apenas sob opção explícita e sem tocar em outros projetos.
+**Objetivo:** reproduzir o padrão do orquestrador de um CMD do CameraGuard sem consumir GitHub Actions. **Um único arquivo CMD distribuível**, diagnóstico antes de mutações, logs isolados, ferramentas instaladas apenas sob confirmação explícita e sem tocar em outros projetos.
+
+## Distribuição autossuficiente — apenas um CMD
+
+- Baixe somente [`00_POLARIS_TUDO_EM_UM.cmd`](00_POLARIS_TUDO_EM_UM.cmd) na página GitHub (botão de download do arquivo). **Não é necessário baixar ZIP nem o PowerShell separado para abrir o menu.**
+- O CMD carrega uma cópia do PowerShell 5.1 **embutida no próprio arquivo** em um `.ps1` temporário sob a pasta temporária do Windows e remove esse temporário ao concluir.
+- `Polaris_Setup.ps1` permanece versionado como **fonte de manutenção**, não como dependência que o usuário precisa colocar ao lado do CMD. `generate_single_cmd.py` sincroniza o conteúdo embutido: `python generate_single_cmd.py`, ou `python generate_single_cmd.py --check`.
+- Para somente verificar o PC, use **opção 1**. Para instalar, preparar e compilar, use **opção 6** (com confirmação de instalação, licenças e possíveis privilégios administrativos).
+- Se qualquer opção do menu falhar, a falha é registrada e **o processo CMD termina com código diferente de zero**, mesmo que o usuário retorne ao menu e saia depois. Erro de compilação não deve ser confundido com resultado aprovado.
+- **Não há garantia de build até executar em Windows real**; o CMD não substitui testes Android em emulador/celular.
 
 ## Projetos consultados como referência
 
 | Projeto | Padrão identificado | Aplicação no instalador |
 |---|---|---|
 | CameraGuard | Um CMD único, helper PowerShell, evidências por sessão, hashes e estados de staging distintos de produção | CMD + PowerShell; log por sessão; falha fechada; nenhuma mudança em câmeras/gravações/banco instalado |
-| Analista (antigo Madeira / Analista-AI) | Pipelines Python, controle de versões e validação determinística antes de promoção | Verificador de pré-requisitos e recusa de checkout divergente, nenhuma promoção ou alteração nesse projeto |
+| MADEIRA (projeto distinto do Analista/Analista-AI) | Pipelines Python, controle de versões e validação determinística antes de promoção | Verificador de pré-requisitos e recusa de checkout divergente, nenhuma promoção ou alteração nesse projeto |
 | Vai Quem Quer | Testes isolados, modo offline, validação por dispositivo e proibição de mexer em produção sem autorização | Build isolado e sem instalar APK; teste de dispositivo apenas como etapa posterior |
 | Polaris | Yomotsu fixado, SQLDelight, Android/Gradle e trilha B01–B05 | Reutiliza `tools/local-android/polaris_local.py` e `scripts/r001/build_issue002.sh` existentes |
 
@@ -20,7 +29,7 @@ O **Projeto Viking** não foi identificado com segurança; não foi incluído co
 - **3 — Preparação:** clona o Polaris na branch `r001/multisource-foundation`, verifica `origin` e preserva diretórios existentes. Clona Yomotsu no commit `0fb80c439ef816eeb50674f1b90af39918b176d8`, sem reset.
 - **4 — Build:** inicializa JDK/SDK somente no processo local, cria shim Python3 somente sob `PolarisDev`, reutiliza o orquestrador Python existente, que executa baseline, aplica Spike-001 em worktree separado, gera SQLDelight, verifica migração 14 e gera APKs e evidências.
 - **5 — Outros projetos:** apenas checa a presença de Python, Node e `dotnet`, sem instalar dependências desses projetos.
-- **6 — Tudo do Polaris:** opções 2 → 3 → 4, após consentimento explícito da etapa de instalação.
+- **6 — Tudo do Polaris:** diagnóstico inicial → instalação assistida → novo diagnóstico → preparação → build, após consentimento explícito. Não instala APK nem executa os cenários B01–B05 automaticamente.
 - **7 — Ferramentas gerais opcionais:** instala Node.js LTS e SDK .NET 8 se ausentes, com confirmação. O CameraGuard fixa a versão 8.0.425 separadamente; a instalação genérica não substitui esse SDK nem executa código do projeto.
 
 ## Convenções e segurança
