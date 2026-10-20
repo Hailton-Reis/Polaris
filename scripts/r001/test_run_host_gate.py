@@ -90,6 +90,17 @@ class HostGateParserTests(unittest.TestCase):
         self.assertEqual(evaluate_gate(gate, "", 0, 44)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
         self.assertTrue(any(n == gate and m == 44 for n, cmd, m in GATES))
 
+    def test_v2_bound_adapter_requires_26_cases_without_skips(self):
+        name = "backup-v2-bound-adapter"
+        good = "POLARIS_V2_BOUND_RESTORE_BRIDGE_PASS 26\n"
+        self.assertEqual(evaluate_gate(name, good, 0, 26)["status"], "PASS")
+        self.assertEqual(evaluate_gate(name, good, 1, 26)["status"], "NONZERO_EXIT")
+        self.assertEqual(evaluate_gate(name, good.replace("26", "25"), 0, 26)["status"], "INSUFFICIENT_TEST_COVERAGE")
+        self.assertEqual(evaluate_gate(name, good + good, 0, 26)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
+        self.assertEqual(evaluate_gate(name, good + "skipped=1\n", 0, 26)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
+        self.assertEqual(evaluate_gate(name, "", 0, 26)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
+        self.assertTrue(any(g == name and n == 26 for g, _, n in GATES))
+
     def test_decoded_v2_envelope_requires_all_three_host_suites(self):
         name = "backup-v2-decoded-envelope"
         a = "POLARIS_V2_BOUND_SNAPSHOT_HOST_PASS 20\n"
