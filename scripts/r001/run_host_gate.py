@@ -26,7 +26,7 @@ GATES = (
     ("backup-parent-sqldelight-fields", (sys.executable, "-m", "unittest", "discover", "-s", "spikes/spike001/backup/restore-candidate/parent-sqldelight-fields", "-p", "test_*.py", "-v"), 51),
     ("backup-pinned-driver-kotlin", ("bash", "spikes/spike001/backup/restore-candidate/pinned-driver-transaction/run_tests.sh"), 33),
     ("backup-typed-parent-projection", ("bash", "spikes/spike001/backup/restore-candidate/parent-field-projection/run_tests.sh"), 89),
-    ("backup-parent-relational-write", ("bash", "spikes/spike001/backup/restore-candidate/parent-relational-port/run_tests.sh"), 69),
+    ("backup-parent-relational-write", ("bash", "spikes/spike001/backup/restore-candidate/parent-relational-port/run_tests.sh"), 83),
     ("backup-full-parent-unified-kotlin", ("bash", "spikes/spike001/backup/parent-candidate/unified-transaction/run_tests.sh"), 44),
     ("backup-adapter", ("bash", "spikes/spike001/backup/yomotsu-candidate/run_tests.sh"), 12),
     ("backup-restore", ("bash", "spikes/spike001/backup/restore-candidate/run_tests.sh"), 20),
@@ -41,7 +41,11 @@ GATES = (
 def extract_count(name: str, output: str):
     if name == "backup-parent-relational-write":
         found = re.findall(r"(?m)^Ran (\d+) tests? in ", output)
-        return min(int(found[0]), 69) if len(found) == 1 else None
+        bridge = re.findall(r"(?m)^POLARIS_KOTLIN_SQL_BRIDGE_PASS$", output)
+        # A unittest SKIP still reports OK; never count an unexecuted Kotlin-to-SQL test.
+        if len(found) != 1 or len(bridge) != 1 or "skipped=" in output:
+            return None
+        return min(int(found[0]), 83)
     if name == "backup-typed-parent-projection":
         found = re.findall(r"(?m)^POLARIS_BACKUP_MANGA_TYPED_PROJECTION_PASS (\d+)$", output)
         return min(int(found[0]), 89) if len(found) == 1 else None
