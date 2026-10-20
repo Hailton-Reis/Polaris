@@ -37,7 +37,7 @@ function New-Session {
     $id=(Get-Date).ToString('yyyyMMdd-HHmmss')+'-'+[Guid]::NewGuid().ToString('N').Substring(0,6)
     $script:LogFile=Join-Path $script:ReportDir ('polaris-'+$id+'.log')
     $script:JsonReport=Join-Path $script:ReportDir ('polaris-'+$id+'.json')
-    Say "Polaris R001 - sessao $id" 'Cyan'
+    Say "Polaris R001 - CORRECAO REGISTRO 2026-10-20 - sessao $id" 'Cyan'
     Say "Workspace: $script:Workspace"
 }
 function Found([string]$Name,[bool]$Present,[string]$Details,[bool]$Required=$true) {
@@ -409,7 +409,7 @@ function Run-Action([string]$Chosen){
 function Menu {
     do {
         Write-Host ''
-        Write-Host '===== POLARIS - CMD UNICO =====' -ForegroundColor Cyan
+        Write-Host '===== POLARIS - CMD UNICO - R001 FIX 20/10 =====' -ForegroundColor Cyan
         Write-Host '1. Verificar TUDO (somente diagnostico; salva log em PolarisDev)'
         Write-Host '2. Instalar/configurar ferramentas ausentes (winget + SDK)'
         Write-Host '3. Preparar Polaris + Yomotsu (Git)'
