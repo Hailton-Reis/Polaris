@@ -19,7 +19,7 @@ class LauncherSafety(unittest.TestCase):
         self.assertIn("powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -Command", CMD)
         self.assertIn("powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -File $tmp", CMD)
         self.assertNotIn('-NonInteractive', CMD)
-        marker = '\\n:POLARIS_PS1_BEGIN\\n'
+        marker = chr(10) + ':POLARIS_PS1_BEGIN' + chr(10)
         self.assertEqual(CMD.split(marker, 1)[1], PS)
 
     def test_cmd_propagates_nested_powershell_exit_status(self):
@@ -35,6 +35,7 @@ class LauncherSafety(unittest.TestCase):
     def test_full_setup_runs_diagnostics_before_and_after_install(self):
         self.assertIn("'6' { [void](Get-Status); Install-Tools; [void](Get-Status); Prepare-Polaris; Build-Polaris }", PS)
         self.assertIn("All { [void](Get-Status);Install-Tools;[void](Get-Status);Prepare-Polaris;Build-Polaris }", PS)
+
     def test_cmd_handles_failures(self):
         self.assertIn('if errorlevel 1',CMD)
         self.assertIn('exit /b %RESULTADO%',CMD)
