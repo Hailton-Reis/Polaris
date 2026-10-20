@@ -29,6 +29,7 @@ GATES = (
     ("backup-parent-relational-write", ("bash", "spikes/spike001/backup/restore-candidate/parent-relational-port/run_tests.sh"), 83),
     ("backup-generated-query-adapter", ("bash", "spikes/spike001/backup/restore-candidate/generated-adapter/run_host_contract.sh"), 76),
     ("backup-v2-decoded-envelope", ("bash", "spikes/spike001/backup/restore-candidate/v2-decoded-envelope/run_all.sh"), 58),
+    ("backup-v2-bound-adapter", ("bash", "spikes/spike001/backup/restore-candidate/v2-decoded-envelope/run_bound_adapter_tests.sh"), 26),
     ("backup-full-parent-unified-kotlin", ("bash", "spikes/spike001/backup/parent-candidate/unified-transaction/run_tests.sh"), 44),
     ("backup-adapter", ("bash", "spikes/spike001/backup/yomotsu-candidate/run_tests.sh"), 12),
     ("backup-restore", ("bash", "spikes/spike001/backup/restore-candidate/run_tests.sh"), 20),
@@ -41,6 +42,11 @@ GATES = (
 
 
 def extract_count(name: str, output: str):
+    if name == "backup-v2-bound-adapter":
+        results = re.findall(r"(?m)^POLARIS_V2_BOUND_RESTORE_BRIDGE_PASS (\d+)$", output)
+        if len(results) != 1 or "skipped=" in output:
+            return None
+        return min(int(results[0]), 26)
     if name == "backup-v2-decoded-envelope":
         admission = re.findall(r"(?m)^POLARIS_V2_BOUND_SNAPSHOT_HOST_PASS (\d+)$", output)
         gateway = re.findall(r"(?m)^POLARIS_V2_DECODED_ENVELOPE_HOST_PASS (\d+)$", output)
@@ -127,7 +133,7 @@ def extract_count(name: str, output: str):
 def evaluate_gate(name: str, output: str, returncode: int, minimum: int):
     count = extract_count(name, output)
     passed = returncode == 0 and count is not None and count >= minimum
-    if name not in {"kotlin", "backup-kotlin", "backup-adapter", "backup-restore", "backup-sqldelight-port", "backup-yomotsu-children", "backup-proto-contract", "backup-parent-split", "backup-parent-metadata-plan", "backup-full-parent-unified-kotlin", "backup-pinned-driver-kotlin", "backup-typed-parent-projection"}:
+    if name not in {"kotlin", "backup-kotlin", "backup-adapter", "backup-restore", "backup-sqldelight-port", "backup-yomotsu-children", "backup-proto-contract", "backup-parent-split", "backup-parent-metadata-plan", "backup-full-parent-unified-kotlin", "backup-pinned-driver-kotlin", "backup-typed-parent-projection", "backup-v2-bound-adapter"}:
         passed = passed and bool(re.search(r"(?m)^OK(?:\s|$)", output))
     reason = ("PASS" if passed else
               "MISSING_OR_INVALID_TEST_SUMMARY" if count is None else
