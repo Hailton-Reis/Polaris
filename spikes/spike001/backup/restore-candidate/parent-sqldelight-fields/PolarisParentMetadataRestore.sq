@@ -7,6 +7,11 @@
 -- The real Yomotsu UPDATE/category triggers can modify last_modified_at/version.
 -- Unverifiable exact metadata is a HARD FAILURE; NEVER leave is_syncing=1.
 
+-- Allocate the parent after BEGIN IMMEDIATE, before any rows are inserted.
+-- All generated-query writes MUST run on the same transaction/writer connection.
+selectPolarisNextFreshParentId:
+SELECT COALESCE(MAX(_id), 0) + 1 AS next_parent_id FROM mangas;
+
 selectPolarisRestoredParentFull:
 SELECT * FROM mangas WHERE _id = :parentId AND source = 6969;
 
