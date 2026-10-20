@@ -126,6 +126,8 @@ jobs:
         run: python3 -m pip install -r spikes/spike001/backup/restore-candidate/v2-decoded-envelope/requirements_host.txt
       - name: Validate decoder-bound v2 canonical envelope admission (host only)
         run: bash spikes/spike001/backup/restore-candidate/v2-decoded-envelope/run_all.sh
+      - name: Verify decoder-bound v2 work survives Kotlin SQLDelight parent transaction (host only)
+        run: bash spikes/spike001/backup/restore-candidate/v2-decoded-envelope/run_bound_adapter_tests.sh
       - name: Audit pre-migration legacy UUIDs and duplicate links (read-only host tests)
         run: python3 -m unittest discover -s spikes/spike001/backup/restore-candidate/migration-audit -p 'test_*.py' -v
       - name: Compile and run isolated backup/UUID host candidates
