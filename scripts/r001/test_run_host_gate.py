@@ -90,6 +90,22 @@ class HostGateParserTests(unittest.TestCase):
         self.assertEqual(evaluate_gate(gate, "", 0, 44)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
         self.assertTrue(any(n == gate and m == 44 for n, cmd, m in GATES))
 
+    def test_generated_query_adapter_requires_both_host_suites_and_unique_proof(self):
+        gate = "backup-generated-query-adapter"
+        good = ("Ran 22 tests in 0.02s\n\nOK\n"
+                "POLARIS_FRESH_PARENT_ADAPTER_HOST_PASS 28\n"
+                "POLARIS_GENERATED_QUERY_BRIDGE_PASS 50\n")
+        self.assertEqual(evaluate_gate(gate, good, 0, 50)["status"], "PASS")
+        self.assertEqual(evaluate_gate(gate, good, 1, 50)["status"], "NONZERO_EXIT")
+        self.assertEqual(evaluate_gate(gate, good.replace("Ran 22", "Ran 21"), 0, 50)["status"], "INSUFFICIENT_TEST_COVERAGE")
+        self.assertEqual(evaluate_gate(gate, good.replace("PASS 28", "PASS 27"), 0, 50)["status"], "INSUFFICIENT_TEST_COVERAGE")
+        self.assertEqual(evaluate_gate(gate, good.replace("PASS 50", "PASS 49"), 0, 50)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
+        self.assertEqual(evaluate_gate(gate, good.replace("OK", "FAILED"), 0, 50)["status"], "MISSING_UNITTEST_OK_MARKER")
+        self.assertEqual(evaluate_gate(gate, good.replace("OK", "OK (skipped=1)"), 0, 50)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
+        self.assertEqual(evaluate_gate(gate, good+good, 0, 50)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
+        self.assertEqual(evaluate_gate(gate, "", 0, 50)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
+        self.assertTrue(any(n == gate and count == 50 for n, command, count in GATES))
+
     def test_parent_relational_write_requires_83_cases_and_executed_kotlin_bridge(self):
         gate = "backup-parent-relational-write"
         marker = "POLARIS_KOTLIN_SQL_BRIDGE_PASS\n"
