@@ -1,3 +1,7 @@
+# HISTORICAL RECORD (before single-file launcher revision)
+# The 16 unittest results below were recorded for the earlier two-file CMD + PS1 package.
+# They do not certify the embedded single-file CMD on Windows.
+
 test_android_sdk_and_pinned_versions (test_setup.LauncherSafety.test_android_sdk_and_pinned_versions) ... ok
 test_check_mode_is_separate (test_setup.LauncherSafety.test_check_mode_is_separate) ... ok
 test_cmd_handles_failures (test_setup.LauncherSafety.test_cmd_handles_failures) ... ok
@@ -20,3 +24,18 @@ Ran 16 tests in 0.001s
 
 OK
 PowerShell lexical token errors: 0 unclosed bracket groups: 0
+
+# SOURCE-LEVEL VERIFICATION FOR SINGLE-FILE REVISION (2026-10-20)
+# 19/19 connector-side source invariants PASS:
+# - embedded payload byte-for-byte agrees with Polaris_Setup.ps1
+# - CMD extracts and removes temporary PowerShell
+# - nested PowerShell and batch exit codes propagated
+# - menu failures return non-zero at session end
+# - option 6 performs preflight, install, recheck, prepare, build
+# - installation remains confirmed, repo/SDK versions pinned, source paths protected
+# - no adb install or backup-v2 import
+# - documentation and generator updated
+# IMPORTANT: Not a Python unittest run, not a PowerShell execution, and not Windows SDK/Gradle/APK proof.
+# New test_setup.py contains 19 test cases; execute in a real environment with:
+#   py -3 -m unittest discover -s tools/windows-setup -p test_setup.py -v
+# Physical Windows validation, emulator/device and B01-B05 remain PENDING.
