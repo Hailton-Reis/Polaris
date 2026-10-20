@@ -315,7 +315,7 @@ def restore_fresh_parents(con:sqlite3.Connection, batches:Sequence[Batch], fault
         if con.execute('PRAGMA defer_foreign_keys').fetchone()!=(1,): raise ValueError('POLARIS_DEFERRED_FK_UNAVAILABLE')
         result=[]
         for b in batches:
-            pid=con.execute('SELECT COALESCE(MAX(_id),0)+1 FROM mangas').fetchone()[0]
+            pid=con.execute(SQL['selectPolarisNextFreshParentId']).fetchone()[0]
             if pid <= 0 or pid>=9223372036854775807: raise ValueError('POLARIS_ID_RESERVATION_FAILED')
             _write_one(con,b,pid,fault)
             result.append(pid)
