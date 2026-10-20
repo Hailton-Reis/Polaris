@@ -55,6 +55,8 @@ class SqlDelightPolarisFreshParentAdapter(
             PolarisBackupMangaSqlProjection.TechnicalState(),
         /** Full BackupCategory snapshots for the orders listed in archive.categories. */
         val archiveCategories: List<BackupCategory> = emptyList(),
+        /** Only the decoder gateway may supply this bound proof for v2. */
+        val boundV2Admission: PolarisV2SnapshotAdmission<PolarisV2ProtoBufEnvelope>? = null,
     )
 
     private data class ExpectedEdge(
@@ -63,20 +65,32 @@ class SqlDelightPolarisFreshParentAdapter(
 
     private val transaction = PolarisDeferredFkTransaction(database, driver)
 
+    /** V2-only entrypoint. Refuse legacy opaque-byte-only work in this path. */
+    suspend fun restoreBoundNewOnly(works: List<FreshWork>): List<Long> {
+        require(works.isNotEmpty() && works.all { it.boundV2Admission != null }) {
+            "POLARIS_BOUND_ADMISSION_REQUIRED"
+        }
+        return restoreNewOnly(works)
+    }
+
     /** ONE transaction across all new parents and their associated physical rows. */
-    suspend fun restoreNewOnly(works: List<FreshWork>): List<Long> {
+    internal suspend fun restoreNewOnly(works: List<FreshWork>): List<Long> {
         require(works.isNotEmpty()) { "POLARIS_FRESH_EMPTY_BATCH" }
         require(works.map { it.archiveUuid }.distinct().size == works.size) {
             "POLARIS_FRESH_DUPLICATE_UUID"
         }
         // Require content-addressed evidence before opening a write transaction.
         // The real decoder-to-DTO binding remains a separate Android/ProtoBuf gate.
-        works.forEach(::verifyOpaqueArchiveSnapshotHash)
+        works.forEach {
+            verifyOpaqueArchiveSnapshotHash(it)
+            verifyBoundAdmission(it)
+        }
         // The driver guard begins BEGIN IMMEDIATE before this block; every
         // query runs through the same coroutine-bound writer connection.
         return transaction.restoreNewParents {
             val parentIds = mutableListOf<Long>()
             works.forEach { work ->
+                verifyBoundAdmission(work)
                 validateWork(work)
                 val q = database.polarisParentMetadataRestoreQueries
                 check(database.polarisRestoreQueries.selectLedgerForUuid(work.archiveUuid)
@@ -119,8 +133,13 @@ class SqlDelightPolarisFreshParentAdapter(
                 ).awaitAsOne()
                 check(insertedId == id) { "POLARIS_FRESH_PARENT_LAST_ID_CHANGED" }
                 assertExactRows(id, work, prepared, edges)
+                // Recheck mutable DTOs AFTER all suspended writes but BEFORE COMMIT.
+                verifyBoundAdmission(work)
                 parentIds += id
             }
+            // The first decoded DTO may change while a later parent suspends.
+            // No committed batch may contain ANY mutated admitted envelope.
+            works.forEach(::verifyBoundAdmission)
             parentIds
         }
     }
@@ -131,6 +150,36 @@ class SqlDelightPolarisFreshParentAdapter(
             .digest(work.archiveSnapshotBytes)
             .joinToString("") { "%02x".format(it) }
         require(encoded == work.archiveDigest) { "POLARIS_FRESH_ARCHIVE_HASH_MISMATCH" }
+    }
+
+    private fun verifyBoundAdmission(work: FreshWork) {
+        val proof = work.boundV2Admission ?: return // legacy HOST-ONLY path
+        check(proof.verifyBeforeTransaction() == work.archiveDigest) {
+            "POLARIS_BOUND_DIGEST_CHANGED"
+        }
+        check(java.security.MessageDigest.isEqual(proof.canonicalBytes(), work.archiveSnapshotBytes)) {
+            "POLARIS_BOUND_SNAPSHOT_BYTES_MISMATCH"
+        }
+        val envelope = proof.decoded
+        check(envelope.parent.manga === work.archive && envelope.parent.archiveUuid == work.archiveUuid &&
+            envelope.work.archiveWorkKey == work.archiveUuid && envelope.work.canonicalUuid == work.archiveUuid) {
+            "POLARIS_BOUND_PARENT_MISMATCH"
+        }
+        check(envelope.referencedCategories.size == work.archiveCategories.size &&
+            envelope.referencedCategories.indices.all {
+                envelope.referencedCategories[it] === work.archiveCategories[it]
+            }) { "POLARIS_BOUND_CATEGORY_SNAPSHOT_MISMATCH" }
+        fun sameSettings(a: eu.kanade.tachiyomi.data.backup.models.BackupPolarisMergeSettings, b: LinkSettings) =
+            a.infoManga == b.infoManga && a.getChapterUpdates == b.getChapterUpdates &&
+            a.chapterSortMode == b.chapterSortMode && a.chapterPriority == b.chapterPriority &&
+            a.downloadChapters == b.downloadChapters
+        check(sameSettings(envelope.work.rootSettings, work.rootSettings) &&
+            envelope.work.links.size == work.children.size &&
+            envelope.work.links.zip(work.children).all { (source, prepared) ->
+                source.sourceId == prepared.sourceId && source.sourceUrl == prepared.sourceUrl &&
+                (source.isPending == (prepared.realMangaId == null)) &&
+                sameSettings(source.settings, prepared.settings)
+            }) { "POLARIS_BOUND_SOURCE_LINKS_MISMATCH" }
     }
 
     private fun destinationUrl(uuid: String) = "merged://polaris/$uuid"

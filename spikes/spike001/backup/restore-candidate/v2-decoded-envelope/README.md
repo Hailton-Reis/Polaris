@@ -31,3 +31,30 @@ This code addresses the prior `generated-adapter/SqlDelightPolarisFreshParentAda
 4. The two GitHub Actions jobs have previously failed with **zero executed steps**, so CI success cannot be claimed.
 
 PR #1 Draft; issues #2 and #11 open. Migration14 and migration15 and v2 fail-closed preflight remain untouched.
+
+## 2026-10-20 — bound decoded-envelope → SQLDelight fresh-parent staging bridge
+
+`PolarisV2BoundFreshRestoreBridge.kt` converts the SAME decoded validated v2
+`BackupPolarisBundle` into `FreshWork` for the existing staged Kotlin
+`SqlDelightPolarisFreshParentAdapter`. It forbids caller-supplied raw bytes or
+hashes, asks the decoder-owned admission to canonicalize, verifies original
+category orders, matches every resolved source identity to a physical child ID
+and preserves explicitly pending links (NULL local ID). Every work carries a
+`PolarisV2SnapshotAdmission` proof and unmodified original object references.
+
+The staged adapter now exposes `restoreBoundNewOnly()` for this v2 route, and its
+old opaque-only `restoreNewOnly()` is **internal** for legacy host protocol tests.
+It rechecks the bound proof **before the write transaction**, **inside it before
+each parent's writes**, **after readback** and **for every parent again before
+commit**, so mutations during Kotlin suspension cannot silently succeed. Tests
+inject mutations just before the final parent INSERT, demonstrating rollback of
+both the parent and all dependent tables. 
+
+`bash spikes/spike001/backup/restore-candidate/v2-decoded-envelope/run_bound_all.sh`
+executes **26 new Kotlin/JVM bound-restore checks** plus the prior **76**
+SQLDelight-shaped adapter Kotlin/SQL checks and **58** v2-envelope checks =
+**160 locally executed checks across separate suites**, all with host doubles
+and Python protobuf proxy. This is NOT a real generated SQLDelight driver or
+Android implementation and NOT the actual kotlinx.serialization ProtoBuf
+serializer. `PolarisRestoreCoordinator` still refuses v2, and original
+migrations 14/15 are untouched.

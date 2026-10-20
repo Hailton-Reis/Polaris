@@ -61,3 +61,14 @@ ProtoBuf decoder can demonstrate that they encode the exact supplied
 BackupManga + children/settings and are canonical/versioned. A caller could
 still supply unrelated bytes with a matching digest, so this is NOT a secure
 full-v2 digest guarantee and must not enable v2 restore.
+
+## 2026-10-20 — decoded v2 bound restore candidate
+
+For the v2 route, use `PolarisV2BoundFreshRestoreBridge.restoreDecodedNewOnly`
+which constructs `FreshWork` only from the decoder-owned admitted DTO and supplies
+a bound proof. `restoreBoundNewOnly` verifies that proof before and during its
+transaction and again before commit; the earlier opaque-only `restoreNewOnly`
+remains `internal` and **must not** become a production backup v2 entrypoint.
+Host test fixtures live in this directory, bridge and 26 additional Kotlin
+negative/replay tests in sibling `v2-decoded-envelope/`. No real ProtoBuf or
+Android SQLDelight execution has been established.

@@ -55,6 +55,7 @@ class Database(val driver: TestDriver) {
     var tamperCategory = false
     var missingPhysicalChild = false
     var forceInsertParentFailure = false
+    var beforeParentInsert: (() -> Unit)? = null
     var nextId = 103L
     val polarisParentMetadataRestoreQueries=PolarisParentMetadataRestoreQueries(this)
     val mangasQueries=MangasQueries(this)
@@ -132,6 +133,7 @@ class PolarisParentMetadataRestoreQueries(private val db:Database) {
         viewer:Long,chapterFlags:Long,coverLastModified:Long,dateAdded:Long,
         updateStrategy:UpdateStrategy,calculateInterval:Long,lastModifiedAt:Long,
         favoriteModifiedAt:Long?,version:Long,notes:String,memo:JsonObject):Query<Long> = Query {
+        db.beforeParentInsert?.invoke()
         if(db.forceInsertParentFailure) error("SIMULATED_PARENT_INSERT_FAIL")
         db.parent=MangaRecord(parentId,6969L,destinationUrl,artist,author,description,genre,title,
             status,thumbnailUrl,favorite,lastUpdate,nextUpdate,initialized,viewer,chapterFlags,
