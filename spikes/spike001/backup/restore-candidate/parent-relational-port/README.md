@@ -34,3 +34,30 @@ Requires `kotlinc`, `java`, `python3`, no Android SDK. The runner compiles the K
 3. Verify the legitimate prior migration for `polaris_restore_ledger` + unique indexes after safely auditing preexisting data. Do not apply a second `merged` table or prematurely change `15.sqm`.
 4. Cover existing EMPTY parent and IDENTICAL replay separately; current writer intentionally refuses both rather than silently replacing edited data.
 5. Resolve GitHub Actions failures occurring **before any step**, run Android B01–B05 using two real source extensions, then consider removing v2 fail-closed guard.
+
+
+## 2026-10-20 — dynamic transaction-reserved parent ID and mandatory Kotlin bridge evidence
+
+The previous Kotlin→SQLite bridge used a fixed test parent ID (`103`). It now
+accepts the physical ID selected **inside** `BEGIN IMMEDIATE` by the staged
+SQLDelight query `selectPolarisNextFreshParentId` (selecting `MAX(_id)+1`). The
+local test launcher generates Kotlin parent payloads for IDs `103` and `203`,
+and runs another dynamically generated payload for `204` from the same compiled
+JAR. It checks mismatched ID rejection, no changes to existing real manga rows,
+failed write rollback, and explicit rejection of invalid/multiple CLI arguments.
+
+Important additional safety fix: `test_kotlin_projection_sql_bridge.py` now
+**fails**, rather than reporting a Python unittest SKIP, if the compiled Kotlin
+projection fixture is missing. The enclosing R001 host gate must also require
+exactly ONE `POLARIS_KOTLIN_SQL_BRIDGE_PASS` marker in addition to `Ran 83 tests`
+and `OK`. This prevents a fake 83/83 pass if the Kotlin→SQL bridge never ran.
+
+**83/83 test cases PASS locally**, 14 new since the prior 69-case runner. The
+same staged SQLDelight query text is used by the Python SQLite writer. This
+proves source-level binding logic and host transaction behavior, **not** actual
+SQLDelight generated Kotlin or Android driver runtime.
+
+The production implementation still requires reserving the ID and computing
+the real BackupManga projection on the *same* writer transaction/connection;
+SQLDelight codegen, Android instrumentation and real ProtoBuf remain open.
+No production migration, app install, or v2 import enablement here.
