@@ -21,6 +21,7 @@ $script:RequiredSDK=@('platform-tools','platforms;android-37','build-tools;36.0.
 $script:Findings=New-Object System.Collections.ArrayList
 $script:LogFile=$null
 $script:JsonReport=$null
+$script:HadMenuFailure=$false
 $script:WingetPackages=[ordered]@{
     'Git for Windows'='Git.Git'
     'Python 3'='Python.Python.3.13'
@@ -393,7 +394,7 @@ function Run-Action([string]$Chosen){
         '3' { Prepare-Polaris }
         '4' { Build-Polaris }
         '5' { [void](Get-Status); Other-Projects }
-        '6' { Install-Tools; Prepare-Polaris; Build-Polaris }
+        '6' { [void](Get-Status); Install-Tools; [void](Get-Status); Prepare-Polaris; Build-Polaris }
         '7' { Install-OtherTools }
         '0' { Say 'Saindo sem alterar arquivos.';return }
         default { Say '[ERRO] Opcao invalida.' 'Yellow' }
@@ -413,8 +414,13 @@ function Menu {
         Write-Host '0. Sair'
         $choice=Read-Host 'Escolha'
         if($choice -eq '0'){break}
-        try{Run-Action $choice}catch{Say ('[ERRO] '+$_.Exception.Message) 'Red'}
+        try{Run-Action $choice}catch{
+            $script:HadMenuFailure=$true
+            Say ('[ERRO] '+$_.Exception.Message) 'Red'
+            Say 'Uma falha ocorreu nesta sessao; o CMD principal retornara codigo diferente de zero ao sair.' 'Yellow'
+        }
     }while($true)
+    if($script:HadMenuFailure){throw 'Uma ou mais operacoes falharam. Consulte o log antes de considerar a configuracao concluida.'}
 }
 New-Session
 try{
@@ -424,7 +430,7 @@ try{
         Install { Install-Tools }
         Prepare { Prepare-Polaris }
         Build { Build-Polaris }
-        All { Install-Tools;Prepare-Polaris;Build-Polaris }
+        All { [void](Get-Status);Install-Tools;[void](Get-Status);Prepare-Polaris;Build-Polaris }
         OtherProjects { Other-Projects }
     }
     Say ('Logs: '+$script:LogFile) 'Cyan'
