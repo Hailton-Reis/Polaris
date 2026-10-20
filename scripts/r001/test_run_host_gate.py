@@ -90,6 +90,24 @@ class HostGateParserTests(unittest.TestCase):
         self.assertEqual(evaluate_gate(gate, "", 0, 44)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
         self.assertTrue(any(n == gate and m == 44 for n, cmd, m in GATES))
 
+    def test_decoded_v2_envelope_requires_all_three_host_suites(self):
+        name = "backup-v2-decoded-envelope"
+        a = "POLARIS_V2_BOUND_SNAPSHOT_HOST_PASS 20\n"
+        b = "POLARIS_V2_DECODED_ENVELOPE_HOST_PASS 22\n"
+        c = "Ran 16 tests in 0.001s\n\nOK\n"
+        d = "POLARIS_V2_BOUND_ARCHIVE_GATE_PASS 58\n"
+        good = a + b + c + d
+        self.assertEqual(evaluate_gate(name, good, 0, 58)["status"], "PASS")
+        self.assertEqual(evaluate_gate(name, good, 1, 58)["status"], "NONZERO_EXIT")
+        for missing in (a, b, c, d):
+            self.assertEqual(evaluate_gate(name, good.replace(missing, ""), 0, 58)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
+        self.assertEqual(evaluate_gate(name, good + d, 0, 58)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
+        self.assertEqual(evaluate_gate(name, good.replace("HOST_PASS 22", "HOST_PASS 20"), 0, 58)["status"], "INSUFFICIENT_TEST_COVERAGE")
+        self.assertEqual(evaluate_gate(name, good.replace("Ran 16", "Ran 14"), 0, 58)["status"], "INSUFFICIENT_TEST_COVERAGE")
+        self.assertEqual(evaluate_gate(name, good.replace("OK", "FAILED"), 0, 58)["status"], "MISSING_UNITTEST_OK_MARKER")
+        self.assertEqual(evaluate_gate(name, good.replace("OK", "OK (skipped=1)"), 0, 58)["status"], "MISSING_OR_INVALID_TEST_SUMMARY")
+        self.assertTrue(any(g == name and n == 58 for g, _, n in GATES))
+
     def test_generated_query_adapter_requires_both_host_suites_and_archive_category_integrity_proof(self):
         gate = "backup-generated-query-adapter"
         good = ("Ran 34 tests in 0.02s\n\nOK\n"

@@ -28,6 +28,7 @@ GATES = (
     ("backup-typed-parent-projection", ("bash", "spikes/spike001/backup/restore-candidate/parent-field-projection/run_tests.sh"), 89),
     ("backup-parent-relational-write", ("bash", "spikes/spike001/backup/restore-candidate/parent-relational-port/run_tests.sh"), 83),
     ("backup-generated-query-adapter", ("bash", "spikes/spike001/backup/restore-candidate/generated-adapter/run_host_contract.sh"), 76),
+    ("backup-v2-decoded-envelope", ("bash", "spikes/spike001/backup/restore-candidate/v2-decoded-envelope/run_all.sh"), 58),
     ("backup-full-parent-unified-kotlin", ("bash", "spikes/spike001/backup/parent-candidate/unified-transaction/run_tests.sh"), 44),
     ("backup-adapter", ("bash", "spikes/spike001/backup/yomotsu-candidate/run_tests.sh"), 12),
     ("backup-restore", ("bash", "spikes/spike001/backup/restore-candidate/run_tests.sh"), 20),
@@ -40,6 +41,16 @@ GATES = (
 
 
 def extract_count(name: str, output: str):
+    if name == "backup-v2-decoded-envelope":
+        admission = re.findall(r"(?m)^POLARIS_V2_BOUND_SNAPSHOT_HOST_PASS (\d+)$", output)
+        gateway = re.findall(r"(?m)^POLARIS_V2_DECODED_ENVELOPE_HOST_PASS (\d+)$", output)
+        wire = re.findall(r"(?m)^Ran (\d+) tests? in ", output)
+        combined = re.findall(r"(?m)^POLARIS_V2_BOUND_ARCHIVE_GATE_PASS (\d+)$", output)
+        if any(len(v) != 1 for v in (admission, gateway, wire, combined)) or "skipped=" in output:
+            return None
+        if int(combined[0]) != 58:
+            return None
+        return min(int(admission[0]), 20) + min(int(gateway[0]), 22) + min(int(wire[0]), 16)
     if name == "backup-generated-query-adapter":
         complete = re.findall(r"(?m)^POLARIS_GENERATED_QUERY_BRIDGE_PASS (\d+)$", output)
         kotlin = re.findall(r"(?m)^POLARIS_FRESH_PARENT_ADAPTER_HOST_PASS (\d+)$", output)
