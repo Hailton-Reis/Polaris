@@ -36,6 +36,17 @@ class LauncherSafety(unittest.TestCase):
         self.assertIn("'6' { [void](Get-Status); Install-Tools; [void](Get-Status); Prepare-Polaris; Build-Polaris }", PS)
         self.assertIn("All { [void](Get-Status);Install-Tools;[void](Get-Status);Prepare-Polaris;Build-Polaris }", PS)
 
+    def test_android_studio_registry_missing_optional_properties_is_safe(self):
+        # Most uninstall registry entries do not have DisplayName or InstallLocation.
+        # PowerShell 5.1 StrictMode must never dereference an absent optional property.
+        part = PS.split('function Find-AndroidStudio {', 1)[1].split('function Find-Sdk {', 1)[0]
+        self.assertIn("PSObject.Properties['DisplayName']", part)
+        self.assertIn("PSObject.Properties['InstallLocation']", part)
+        self.assertIn('$null -ne $display', part)
+        self.assertIn('$null -ne $location', part)
+        self.assertNotIn('$_.DisplayName', part)
+        self.assertNotIn('$entry.InstallLocation', part)
+
     def test_cmd_handles_failures(self):
         self.assertIn('if errorlevel 1',CMD)
         self.assertIn('exit /b %RESULTADO%',CMD)
