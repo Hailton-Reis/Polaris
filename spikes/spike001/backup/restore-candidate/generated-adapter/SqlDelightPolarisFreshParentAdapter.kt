@@ -4,6 +4,7 @@ import app.cash.sqldelight.async.coroutines.awaitAsList
 import app.cash.sqldelight.async.coroutines.awaitAsOne
 import app.cash.sqldelight.async.coroutines.awaitAsOneOrNull
 import app.cash.sqldelight.db.SqlDriver
+import eu.kanade.tachiyomi.data.backup.models.BackupCategory
 import eu.kanade.tachiyomi.data.backup.models.BackupManga
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
@@ -46,6 +47,8 @@ class SqlDelightPolarisFreshParentAdapter(
         val rootSettings: LinkSettings,
         val technical: PolarisBackupMangaSqlProjection.TechnicalState =
             PolarisBackupMangaSqlProjection.TechnicalState(),
+        /** Full BackupCategory snapshots for the orders listed in archive.categories. */
+        val archiveCategories: List<BackupCategory> = emptyList(),
     )
 
     private data class ExpectedEdge(
@@ -88,6 +91,7 @@ class SqlDelightPolarisFreshParentAdapter(
                 check(prepared.parent.reservedParentId == id &&
                     prepared.chapters.all { it.parentId == id }) { "POLARIS_FRESH_MISMATCHED_PREPARED_ID" }
                 validatePhysicalChildren(work)
+                validateArchiveCategories(work)
                 val edges = expectedEdges(work, id)
                 stageDependencies(id, work, prepared, edges)
                 val p = prepared.parent
@@ -149,6 +153,37 @@ class SqlDelightPolarisFreshParentAdapter(
         // the expected physical IDs; names/order matching occurs upstream.
         for (catId in w.categoryIdsByArchiveOrder.values) {
             check(catId > 0L) { "POLARIS_FRESH_INVALID_CATEGORY_ID" }
+        }
+    }
+
+    /**
+     * Verify archive category ORDER -> archived NAME -> exactly one real local ID.
+     * Merely checking an ID exists would silently attach a manga to a renamed or
+     * unrelated user category. The snapshot list must come from the SAME decoded
+     * backup as the BackupManga: never reconstruct it from local DB category IDs.
+     * All queries run under the deferred-FK transaction before any category write.
+     */
+    private suspend fun validateArchiveCategories(w: FreshWork) {
+        val expectedOrders = w.archive.categories.toSet()
+        check(expectedOrders.size == w.archive.categories.size &&
+            w.archiveCategories.size == expectedOrders.size &&
+            w.archiveCategories.map { it.order }.toSet() == expectedOrders &&
+            w.categoryIdsByArchiveOrder.keys == expectedOrders) {
+            "POLARIS_FRESH_CATEGORY_ARCHIVE_ORDER_MISMATCH"
+        }
+        val names = w.archiveCategories.map { it.name }
+        check(names.all { it.isNotBlank() } && names.toSet().size == names.size) {
+            "POLARIS_FRESH_AMBIGUOUS_ARCHIVED_CATEGORY"
+        }
+        val q = database.polarisParentMetadataRestoreQueries
+        for (archived in w.archiveCategories) {
+            val id = requireNotNull(w.categoryIdsByArchiveOrder[archived.order]) {
+                "POLARIS_FRESH_CATEGORY_MAPPING_MISSING"
+            }
+            check(id > 0L && q.selectPolarisRestoreCategoryCandidates(archived.name)
+                .awaitAsList() == listOf(id)) {
+                "POLARIS_FRESH_CATEGORY_NAME_OR_ID_CHANGED"
+            }
         }
     }
 

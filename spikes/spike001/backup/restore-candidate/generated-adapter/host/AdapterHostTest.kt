@@ -63,7 +63,8 @@ fun main(){
     val archive=BackupManga(source=6969,url="archive://old",title="Full Parent",
         categories=listOf(2L),tracking=listOf(BackupTracking(syncId=4,libraryId=5,mediaId=999,
             title="Remote",score=7.5f,totalChapters=12)),excludedScanlators=listOf("Group"))
-    val w=work(archive).copy(categoryIdsByArchiveOrder=mapOf(2L to 71L))
+    val w=work(archive).copy(categoryIdsByArchiveOrder=mapOf(2L to 71L),
+        archiveCategories=listOf(BackupCategory("Original",order=2L)))
     runBlockingHost {a.restoreNewOnly(listOf(w))}
     check(db.categories.single().category_id==71L)
     check(db.tracks.single().remote_id==999L && db.tracks.single().score==7.5)
@@ -89,7 +90,8 @@ fun main(){
   ok("rollback if a prepared category is removed in readback") {
     val(a,db,d)=setup();db.tamperCategory=true
     val archive=BackupManga(source=6969,url="archive://old",title="Full Parent",categories=listOf(2L))
-    check(runCatching{runBlockingHost{a.restoreNewOnly(listOf(work(archive).copy(categoryIdsByArchiveOrder=mapOf(2L to 71L))))}}.isFailure)
+    check(runCatching{runBlockingHost{a.restoreNewOnly(listOf(work(archive).copy(categoryIdsByArchiveOrder=mapOf(2L to 71L),
+            archiveCategories=listOf(BackupCategory("Original",order=2L)))))}}.isFailure)
     check(db.categories.isEmpty()&&db.parent==null&&d.rollbackCount==1)
   }
   ok("a bad second work undoes writes from first") {
@@ -107,6 +109,73 @@ fun main(){
     val(a,_,_)=setup();val w=work(child=SqlDelightPolarisFreshParentAdapter.ChildLink(77,"/real-101",null,
         SqlDelightPolarisFreshParentAdapter.LinkSettings(infoManga=true,chapterPriority=0)))
     runBlockingHost{a.restoreNewOnly(listOf(w))}
+  }
+  ok("category identity: valid archive order and local name are verified") {
+    val(a,db,_)=setup()
+    val ar=BackupManga(source=6969,url="a",title="Category",categories=listOf(2L))
+    val w=work(ar).copy(categoryIdsByArchiveOrder=mapOf(2L to 71L),
+        archiveCategories=listOf(BackupCategory("Original",order=2L)))
+    runBlockingHost { a.restoreNewOnly(listOf(w)) }
+    check(db.categories.single().category_id==71L)
+  }
+  ok("category identity: rename after backup rolls back everything") {
+    val(a,db,d)=setup();db.physicalCategories.clear();db.physicalCategories.add(71L to "Renamed")
+    val ar=BackupManga(source=6969,url="a",title="Category",categories=listOf(2L))
+    val w=work(ar).copy(categoryIdsByArchiveOrder=mapOf(2L to 71L),
+        archiveCategories=listOf(BackupCategory("Original",order=2L)))
+    check(runCatching { runBlockingHost { a.restoreNewOnly(listOf(w)) } }.isFailure)
+    check(db.categories.isEmpty()&&db.parent==null&&d.rollbackCount==1)
+  }
+  reject("category identity: duplicate physical names cannot be chosen by ID") {
+    val(a,db,_)=setup();db.physicalCategories.add(72L to "Original")
+    val ar=BackupManga(source=6969,url="a",title="Category",categories=listOf(2L))
+    runBlockingHost { a.restoreNewOnly(listOf(work(ar).copy(
+        categoryIdsByArchiveOrder=mapOf(2L to 71L),
+        archiveCategories=listOf(BackupCategory("Original",order=2L))))) }
+  }
+  reject("category identity: archive category snapshot is mandatory") {
+    val(a,_,_)=setup()
+    val ar=BackupManga(source=6969,url="a",title="Category",categories=listOf(2L))
+    runBlockingHost {a.restoreNewOnly(listOf(work(ar).copy(categoryIdsByArchiveOrder=mapOf(2L to 71L))))}
+  }
+  reject("category identity: archive order cannot be substituted") {
+    val(a,_,_)=setup()
+    val ar=BackupManga(source=6969,url="a",title="Category",categories=listOf(2L))
+    runBlockingHost { a.restoreNewOnly(listOf(work(ar).copy(
+        categoryIdsByArchiveOrder=mapOf(2L to 71L),
+        archiveCategories=listOf(BackupCategory("Original",order=3L))))) }
+  }
+  reject("category identity: duplicate backup order cannot pass") {
+    val(a,_,_)=setup()
+    val ar=BackupManga(source=6969,url="a",title="Category",categories=listOf(2L))
+    runBlockingHost { a.restoreNewOnly(listOf(work(ar).copy(
+        categoryIdsByArchiveOrder=mapOf(2L to 71L),
+        archiveCategories=listOf(BackupCategory("Original",order=2L),BackupCategory("Other",order=2L))))) }
+  }
+  reject("category identity: wrong existing category ID cannot be selected") {
+    val(a,_,_)=setup()
+    val ar=BackupManga(source=6969,url="a",title="Category",categories=listOf(2L))
+    runBlockingHost { a.restoreNewOnly(listOf(work(ar).copy(
+        categoryIdsByArchiveOrder=mapOf(2L to 999L),
+        archiveCategories=listOf(BackupCategory("Original",order=2L))))) }
+  }
+  reject("category identity: unused category mapping must not be accepted") {
+    val(a,_,_)=setup()
+    runBlockingHost { a.restoreNewOnly(listOf(work().copy(categoryIdsByArchiveOrder=mapOf(2L to 71L)))) }
+  }
+  reject("category identity: blank backup category name is invalid") {
+    val(a,_,_)=setup()
+    val ar=BackupManga(source=6969,url="a",title="Category",categories=listOf(2L))
+    runBlockingHost { a.restoreNewOnly(listOf(work(ar).copy(
+        categoryIdsByArchiveOrder=mapOf(2L to 71L),
+        archiveCategories=listOf(BackupCategory(" ",order=2L))))) }
+  }
+  reject("category identity: repeated archived names under different orders ambiguous") {
+    val(a,db,_)=setup();db.physicalCategories.add(72L to "Other")
+    val ar=BackupManga(source=6969,url="a",title="Category",categories=listOf(2L,3L))
+    runBlockingHost { a.restoreNewOnly(listOf(work(ar).copy(
+        categoryIdsByArchiveOrder=mapOf(2L to 71L,3L to 72L),
+        archiveCategories=listOf(BackupCategory("Original",order=2L),BackupCategory("Original",order=3L))))) }
   }
   println("POLARIS_FRESH_PARENT_ADAPTER_HOST_PASS $passed")
 }

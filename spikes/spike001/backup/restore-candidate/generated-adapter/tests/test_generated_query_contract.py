@@ -166,6 +166,42 @@ class Contract(unittest.TestCase):
                     '!w.rootSettings.getChapterUpdates'):
             self.assertIn(key,KOTLIN)
 
+    def test_category_query_selects_sorted_ids_by_name(self):
+        sql=self.q['selectPolarisRestoreCategoryCandidates']
+        self.assertRegex(sql,r'(?i)SELECT\s+_id\s+FROM\s+categories')
+        self.assertRegex(sql,r'(?i)WHERE\s+name\s*=\s*:categoryName')
+        self.assertRegex(sql,r'(?i)ORDER\s+BY\s+_id')
+
+    def test_category_db_allows_name_duplicates_so_id_alone_is_unsafe(self):
+        self.conn.execute('SAVEPOINT category_names')
+        try:
+            self.conn.execute('INSERT INTO categories(_id,name,sort,flags) VALUES(?,?,?,?)',(17001,'Polaris Category',100,0))
+            sql=self.q['selectPolarisRestoreCategoryCandidates']
+            self.assertEqual([r[0] for r in self.conn.execute(sql,{'categoryName':'Polaris Category'})],[17001])
+            self.conn.execute('INSERT INTO categories(_id,name,sort,flags) VALUES(?,?,?,?)',(17002,'Polaris Category',101,0))
+            self.assertEqual([r[0] for r in self.conn.execute(sql,{'categoryName':'Polaris Category'})],[17001,17002])
+        finally:
+            self.conn.execute('ROLLBACK TO SAVEPOINT category_names')
+            self.conn.execute('RELEASE SAVEPOINT category_names')
+
+    def test_category_binding_enforces_backup_order_and_name_in_same_transaction(self):
+        self.assertIn('import eu.kanade.tachiyomi.data.backup.models.BackupCategory',KOTLIN)
+        self.assertIn('val archiveCategories: List<BackupCategory>',KOTLIN)
+        self.assertIn('w.archiveCategories.map { it.order }.toSet() == expectedOrders',KOTLIN)
+        self.assertIn('w.categoryIdsByArchiveOrder.keys == expectedOrders',KOTLIN)
+        self.assertIn('w.archiveCategories.map { it.name }',KOTLIN)
+        self.assertIn('q.selectPolarisRestoreCategoryCandidates(archived.name)',KOTLIN)
+        self.assertIn('.awaitAsList() == listOf(id)',KOTLIN)
+
+    def test_category_validation_precedes_all_physical_writes(self):
+        start=KOTLIN.index('transaction.restoreNewParents {')
+        physical=KOTLIN.index('stageDependencies(id, work, prepared, edges)')
+        checks=KOTLIN.index('validateArchiveCategories(work)', start)
+        self.assertLess(start,checks)
+        self.assertLess(checks,physical)
+        self.assertIn('POLARIS_FRESH_CATEGORY_NAME_OR_ID_CHANGED',KOTLIN)
+        self.assertIn('POLARIS_FRESH_CATEGORY_ARCHIVE_ORDER_MISMATCH',KOTLIN)
+
     def test_release_flag_must_remain_fail_closed(self):
         self.assertNotIn('PolarisRestoreCoordinator(',KOTLIN)
         self.assertNotIn('migration15',KOTLIN)

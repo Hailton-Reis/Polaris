@@ -27,7 +27,7 @@ GATES = (
     ("backup-pinned-driver-kotlin", ("bash", "spikes/spike001/backup/restore-candidate/pinned-driver-transaction/run_tests.sh"), 33),
     ("backup-typed-parent-projection", ("bash", "spikes/spike001/backup/restore-candidate/parent-field-projection/run_tests.sh"), 89),
     ("backup-parent-relational-write", ("bash", "spikes/spike001/backup/restore-candidate/parent-relational-port/run_tests.sh"), 83),
-    ("backup-generated-query-adapter", ("bash", "spikes/spike001/backup/restore-candidate/generated-adapter/run_host_contract.sh"), 50),
+    ("backup-generated-query-adapter", ("bash", "spikes/spike001/backup/restore-candidate/generated-adapter/run_host_contract.sh"), 64),
     ("backup-full-parent-unified-kotlin", ("bash", "spikes/spike001/backup/parent-candidate/unified-transaction/run_tests.sh"), 44),
     ("backup-adapter", ("bash", "spikes/spike001/backup/yomotsu-candidate/run_tests.sh"), 12),
     ("backup-restore", ("bash", "spikes/spike001/backup/restore-candidate/run_tests.sh"), 20),
@@ -45,9 +45,9 @@ def extract_count(name: str, output: str):
         kotlin = re.findall(r"(?m)^POLARIS_FRESH_PARENT_ADAPTER_HOST_PASS (\d+)$", output)
         python = re.findall(r"(?m)^Ran (\d+) tests? in ", output)
         if (len(complete) != 1 or len(kotlin) != 1 or len(python) != 1 or
-                "skipped=" in output or int(complete[0]) != 50):
+                "skipped=" in output or int(complete[0]) != 64):
             return None
-        return min(int(kotlin[0]), 28) + min(int(python[0]), 22)
+        return min(int(kotlin[0]), 38) + min(int(python[0]), 26)
     if name == "backup-parent-relational-write":
         found = re.findall(r"(?m)^Ran (\d+) tests? in ", output)
         bridge = re.findall(r"(?m)^POLARIS_KOTLIN_SQL_BRIDGE_PASS$", output)

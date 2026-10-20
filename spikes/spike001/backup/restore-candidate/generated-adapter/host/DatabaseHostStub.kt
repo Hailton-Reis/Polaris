@@ -44,6 +44,7 @@ class Database(val driver: TestDriver) {
     var parent:MangaRecord? = null
     val chapters = mutableListOf<ChapterRecord>()
     val categories = mutableListOf<CategoryRec>()
+    val physicalCategories = mutableListOf(71L to "Original")
     val history = mutableListOf<HistoryRecord>()
     val tracks = mutableListOf<TrackRecord>()
     val exclusions = mutableListOf<ExclusionRec>()
@@ -96,6 +97,9 @@ class MergedQueries(private val db:Database){
     }
 }
 class PolarisParentMetadataRestoreQueries(private val db:Database) {
+    fun selectPolarisRestoreCategoryCandidates(categoryName:String):Query<Long> = Query {
+        db.physicalCategories.filter { it.second == categoryName }.map { it.first }.sorted()
+    }
     fun selectPolarisRestoreParentUrlCandidates(destinationUrl:String):Query<Long> = Query {
         db.parent?.takeIf { it.url==destinationUrl }?.let {listOf(it._id)}?:emptyList()
     }
