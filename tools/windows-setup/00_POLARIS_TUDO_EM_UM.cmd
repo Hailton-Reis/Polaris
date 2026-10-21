@@ -132,11 +132,13 @@ function Find-Jdk21 {
             }
         }
     }
-    foreach($home in ($homes | Select-Object -Unique)) {
-        $java=Join-Path $home 'bin\java.exe'
-        $javac=Join-Path $home 'bin\javac.exe'
+    # $HOME is a built-in read-only PowerShell variable (names are case-insensitive).
+    # Never use $home as a loop variable; it fails once an installed JDK is discovered.
+    foreach($jdkHome in ($homes | Select-Object -Unique)) {
+        $java=Join-Path $jdkHome 'bin\java.exe'
+        $javac=Join-Path $jdkHome 'bin\javac.exe'
         if(!(Test-Path -LiteralPath $java -PathType Leaf) -or !(Test-Path -LiteralPath $javac -PathType Leaf)){continue}
-        try{ $ver=(& $java --version 2>$null | Out-String); if($ver -match '(?i)(openjdk|java) 21(?:\.|\s|$)'){return $home} }catch{}
+        try{ $ver=(& $java --version 2>$null | Out-String); if($ver -match '(?i)(openjdk|java) 21(?:\.|\s|$)'){return $jdkHome} }catch{}
     }
     return $null
 }
@@ -427,7 +429,7 @@ function Run-Action([string]$Chosen){
 function Menu {
     do {
         Write-Host ''
-        Write-Host '===== POLARIS - CMD UNICO - R001 FIX 20/10 =====' -ForegroundColor Cyan
+        Write-Host '===== POLARIS - CMD UNICO - R001 FIX2 HOME 20/10 =====' -ForegroundColor Cyan
         Write-Host '1. Verificar TUDO (somente diagnostico; salva log em PolarisDev)'
         Write-Host '2. Instalar/configurar ferramentas ausentes (winget + SDK)'
         Write-Host '3. Preparar Polaris + Yomotsu (Git)'
