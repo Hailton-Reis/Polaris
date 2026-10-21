@@ -92,7 +92,7 @@ class LauncherSafety(unittest.TestCase):
         self.assertIn('if($downloadHash -ine $expectedSHA256)',PS)
         self.assertIn('if($actual -ine $expectedSHA256)',PS)
         self.assertIn('source.properties',PS)
-        self.assertIn('cmdline-tools\latest',PS)
+        self.assertIn(r'cmdline-tools\latest',PS)
     def test_existing_checkout_protected(self):
         self.assertIn("branch divergente",PS)
         self.assertIn('Repositorio origin inesperado',PS)
