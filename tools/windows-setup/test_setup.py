@@ -49,11 +49,22 @@ class LauncherSafety(unittest.TestCase):
         self.assertIn('return $jdkHome', part)
         self.assertNotRegex(part, r'(?im)^\s*foreach\(\$home\b')
 
-    def test_android_index_does_not_write_reserved_host(self):
+    def test_commandline_tools_pinned_to_official_google_sha256(self):
         part = PS.split('function Install-CmdlineTools(', 1)[1].split('function Set-LocalProcessEnvironment', 1)[0]
-        self.assertIn('$hostOsNode=$archive.SelectSingleNode', part)
-        self.assertIn("$hostOsNode.InnerText -eq 'windows'", part)
-        self.assertNotRegex(part, r'(?im)^\s*\$host\s*=')
+        self.assertIn('https://developer.android.com/studio', part)
+        self.assertIn('commandlinetools-win-15859902_latest.zip', part)
+        self.assertIn('90ae805d20434428bffcb699c290860f19bb5f66a67e6b330067e3de801fb04a', part)
+        self.assertIn('https://dl.google.com/android/repository/', part)
+        self.assertIn('Get-FileHash', part)
+        self.assertIn('-Algorithm SHA256', part)
+        self.assertIn('if($downloadHash -ine $expectedSHA256)', part)
+        self.assertIn('if($actual -ine $expectedSHA256)', part)
+        self.assertNotIn('repository2-1.xml', part)
+        self.assertNotIn('$host=', part)
+
+    def test_licenses_accepted_before_sdk_package_install(self):
+        installation = PS.split('function Install-Tools {', 1)[1].split('function Install-CmdlineTools(', 1)[0]
+        self.assertLess(installation.index("--licenses"), installation.index("@($script:RequiredSDK)"))
 
     def test_no_assignments_to_reserved_powershell_variables(self):
         # This catches collisions even in new functions or future revisions.
@@ -75,11 +86,13 @@ class LauncherSafety(unittest.TestCase):
         for pkg in ('android-37','36.0.0','37.0.0','29.0.14206865','28.2.13676358','3.22.1','platform-tools'):
             self.assertIn(pkg,PS)
     def test_secure_sdk_bootstrap(self):
-        self.assertIn('https://dl.google.com/android/repository/repository2-1.xml',PS)
+        self.assertIn('https://dl.google.com/android/repository/',PS)
         self.assertIn('Get-FileHash',PS)
         self.assertIn("-Algorithm SHA256",PS)
-        self.assertIn('O indice oficial nao inclui SHA-256 verificavel',PS)
-        self.assertIn('sha256',PS)
+        self.assertIn('if($downloadHash -ine $expectedSHA256)',PS)
+        self.assertIn('if($actual -ine $expectedSHA256)',PS)
+        self.assertIn('source.properties',PS)
+        self.assertIn('cmdline-tools\latest',PS)
     def test_existing_checkout_protected(self):
         self.assertIn("branch divergente",PS)
         self.assertIn('Repositorio origin inesperado',PS)
