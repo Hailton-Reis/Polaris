@@ -279,8 +279,9 @@ function Install-CmdlineTools([string]$Sdk){
     $archives=$remote.SelectNodes(".//*[local-name()='archive']")
     $selected=$null
     foreach($archive in $archives){
-        $host=$archive.SelectSingleNode("./*[local-name()='host-os']")
-        if($host -and $host.InnerText -eq 'windows'){$selected=$archive;break}
+        # $Host is a built-in read-only variable in Windows PowerShell (case-insensitive).
+        $hostOsNode=$archive.SelectSingleNode("./*[local-name()='host-os']")
+        if($hostOsNode -and $hostOsNode.InnerText -eq 'windows'){$selected=$archive;break}
     }
     if(!$selected){throw 'Nao achei arquivo Windows no indice oficial.'}
     $url=$selected.SelectSingleNode(".//*[local-name()='complete']/*[local-name()='url']")
@@ -411,7 +412,7 @@ function Run-Action([string]$Chosen){
 function Menu {
     do {
         Write-Host ''
-        Write-Host '===== POLARIS - CMD UNICO - R001 FIX2 HOME 20/10 =====' -ForegroundColor Cyan
+        Write-Host '===== POLARIS - CMD UNICO - R001 FIX3 HOST 21/10 =====' -ForegroundColor Cyan
         Write-Host '1. Verificar TUDO (somente diagnostico; salva log em PolarisDev)'
         Write-Host '2. Instalar/configurar ferramentas ausentes (winget + SDK)'
         Write-Host '3. Preparar Polaris + Yomotsu (Git)'
