@@ -25,7 +25,7 @@ O **Projeto Viking** não foi identificado com segurança; não foi incluído co
 ## Ações
 
 - **1 — Diagnóstico:** confere Git, Git Bash, Python 3.10+, JDK 21 com javac, Android Studio, Android SDK, command-line tools, plataforma API 37, duas versões de Build Tools, dois NDKs, CMake, Platform Tools. Node.js e .NET aparecem como opcionais. Não baixa nem instala.
-- **2 — Instalação assistida:** o usuário digita `SIM`; instala somente pacotes faltantes via `winget`. Para o SDK, usa o índice oficial e um SHA-256 antes de executar command-line tools; instala pacotes exatos e solicita a aceitação interativa de licenças. Se faltar `winget`, recusa e orienta instalar `App Installer`.
+- **2 — Instalação assistida:** o usuário digita `SIM`; instala somente pacotes faltantes via `winget`. Para as Command-line Tools usa a versão oficial 22.0 para Windows (`commandlinetools-win-15859902_latest.zip`) e valida o SHA-256 publicado em https://developer.android.com/studio antes de extraí-la; aceita licenças interativamente antes de baixar os pacotes SDK exatos. Se faltar `winget`, recusa e orienta instalar `App Installer`.
 - **3 — Preparação:** clona o Polaris na branch `r001/multisource-foundation`, verifica `origin` e preserva diretórios existentes. Clona Yomotsu no commit `0fb80c439ef816eeb50674f1b90af39918b176d8`, sem reset.
 - **4 — Build:** inicializa JDK/SDK somente no processo local, cria shim Python3 somente sob `PolarisDev`, reutiliza o orquestrador Python existente, que executa baseline, aplica Spike-001 em worktree separado, gera SQLDelight, verifica migração 14 e gera APKs e evidências.
 - **5 — Outros projetos:** apenas checa a presença de Python, Node e `dotnet`, sem instalar dependências desses projetos.
@@ -42,7 +42,7 @@ O **Projeto Viking** não foi identificado com segurança; não foi incluído co
 - A ferramenta não faz upgrade indiscriminado de softwares já instalados.
 - Requer rede para instalações iniciais e Gradle; **não usa os minutos do GitHub Actions**.
 - Por segurança, o comando `check` apenas cria arquivo de log local; não modifica instalações.
-- Se os pacotes do Google não estiverem no índice, tiverem hash diferente ou a licença for rejeitada, a operação é interrompida.
+- Se o download oficial Google divergir do SHA-256 publicado ou a licença for rejeitada, a operação é interrompida. A versão 22.0 de Command-line Tools permanece fixada até uma atualização deliberada de URL e hash.
 - A etapa B01–B05 com fontes reais e leitura de capítulos só pode ser declarada concluída depois de testes manuais/instrumentados em um Android real/emulador.
 
 ## Compatibilidade conhecida
