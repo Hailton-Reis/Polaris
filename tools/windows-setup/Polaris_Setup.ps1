@@ -246,65 +246,57 @@ function Install-Tools {
         $manager=Find-SdkManager $sdk
     }
     if(!$manager){throw 'Nao foi possivel localizar sdkmanager. Use Android Studio > SDK Manager > SDK Tools > Android SDK Command-line Tools.'}
-    Say 'Os pacotes Android podem ser grandes. O SDK Manager mostrara licencas para sua aprovacao.' 'Yellow'
-    & $manager ('--sdk_root='+$sdk) @($script:RequiredSDK)
-    if($LASTEXITCODE -ne 0){throw "SDK Manager falhou (codigo $LASTEXITCODE). Consulte licencas, espaco em disco e conexao."}
-    Say 'Verificando licencas do Android SDK...' 'Yellow'
+    Say 'Verificando licencas Android ANTES de instalar os pacotes. Leia e aceite os termos do Google, se concordar.' 'Yellow'
     & $manager ('--sdk_root='+$sdk) --licenses
-    if($LASTEXITCODE -ne 0){throw 'Licencas Android nao aceitas. Execute a instalacao novamente e analise os termos.'}
+    if($LASTEXITCODE -ne 0){throw 'Licencas Android nao aceitas. A instalacao dos pacotes nao sera iniciada.'}
+    Say 'Instalando pacotes Android necessarios; o SDK Manager pode baixar varios gigabytes.' 'Yellow'
+    & $manager ('--sdk_root='+$sdk) @($script:RequiredSDK)
+    if($LASTEXITCODE -ne 0){throw "SDK Manager falhou (codigo $LASTEXITCODE). Verifique licencas, espaco em disco, rede e versoes solicitadas."}
     Say 'Dependencias conferidas. Execute a opcao 1 para revisar o relatorio.' 'Green'
 }
 function Install-CmdlineTools([string]$Sdk){
-    # Download SOMENTE do indice oficial, com hash SHA-256 declarado pelo Google.
+    # Google publishes this Windows package AND its SHA-256 on https://developer.android.com/studio
+    # Pin both together: do not derive a 256-bit checksum from the repository XML (which can publish SHA-1).
+    # Verified on 2026-10-21. Update the pair only after consulting Google's official download page.
+    $archiveName='commandlinetools-win-15859902_latest.zip'
+    $expectedSHA256='90ae805d20434428bffcb699c290860f19bb5f66a67e6b330067e3de801fb04a'
+    $download='https://dl.google.com/android/repository/'+$archiveName
     [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
-    $index='https://dl.google.com/android/repository/repository2-1.xml'
     $work=Join-Path $script:Workspace 'downloads'
     [IO.Directory]::CreateDirectory($work) | Out-Null
-    $xmlPath=Join-Path $work 'android-repository-index.xml'
-    Invoke-WebRequest -UseBasicParsing -Uri $index -OutFile $xmlPath -TimeoutSec 120
-    [xml]$xml=Get-Content -LiteralPath $xmlPath -Raw
-    $remote=$xml.SelectSingleNode("//*[local-name()='remotePackage' and @path='cmdline-tools;latest']")
-    if(!$remote){
-        $all=$xml.SelectNodes("//*[local-name()='remotePackage' and starts-with(@path,'cmdline-tools;')]")
-        $bestVersion=-1
-        foreach($entry in $all){
-            $major=$entry.SelectSingleNode("./*[local-name()='revision']/*[local-name()='major']")
-            if($major -and $major.InnerText -match '^\d+$' -and [int]$major.InnerText -gt $bestVersion){
-                $bestVersion=[int]$major.InnerText
-                $remote=$entry
-            }
+    $zip=Join-Path $work $archiveName
+    if(Test-Path -LiteralPath $zip -PathType Leaf){
+        Say 'Arquivo Command-line Tools ja baixado; validando o cache pelo SHA-256 oficial.' 'Cyan'
+    }else{
+        Say "Baixando Command-line Tools 22.0 oficiais do Google: $archiveName" 'Yellow'
+        Invoke-WebRequest -UseBasicParsing -Uri $download -OutFile ($zip+'.partial') -TimeoutSec 900
+        $downloadHash=(Get-FileHash -LiteralPath ($zip+'.partial') -Algorithm SHA256).Hash
+        if($downloadHash -ine $expectedSHA256){
+            throw "SHA-256 do download nao confere com o hash publicado pelo Google. Instalacao interrompida. Esperado: $expectedSHA256; obtido: $downloadHash"
         }
+        Move-Item -LiteralPath ($zip+'.partial') -Destination $zip
     }
-    if(!$remote){throw 'Google repository index nao expoe Command-line Tools verificaveis.'}
-    $archives=$remote.SelectNodes(".//*[local-name()='archive']")
-    $selected=$null
-    foreach($archive in $archives){
-        # $Host is a built-in read-only variable in Windows PowerShell (case-insensitive).
-        $hostOsNode=$archive.SelectSingleNode("./*[local-name()='host-os']")
-        if($hostOsNode -and $hostOsNode.InnerText -eq 'windows'){$selected=$archive;break}
+    $actual=(Get-FileHash -LiteralPath $zip -Algorithm SHA256).Hash
+    if($actual -ine $expectedSHA256){
+        throw "Arquivo SDK em cache tem SHA-256 diferente do publicado pelo Google. Nao sera extraido: $zip"
     }
-    if(!$selected){throw 'Nao achei arquivo Windows no indice oficial.'}
-    $url=$selected.SelectSingleNode(".//*[local-name()='complete']/*[local-name()='url']")
-    $checksum=$selected.SelectSingleNode(".//*[local-name()='complete']/*[local-name()='checksum' and @type='sha256']")
-    if(!$url -or !$checksum -or $checksum.InnerText -notmatch '^[a-fA-F0-9]{64}$'){
-        throw 'O indice oficial nao inclui SHA-256 verificavel. Instale Command-line Tools via Android Studio manualmente.'
-    }
-    if($url.InnerText -notmatch '^commandlinetools-win-[a-zA-Z0-9._-]+\.zip$'){throw 'Caminho de download oficial inesperado; abortado.'}
-    $zip=Join-Path $work $url.InnerText
-    $download='https://dl.google.com/android/repository/'+$url.InnerText
-    Invoke-WebRequest -UseBasicParsing -Uri $download -OutFile ($zip+'.partial') -TimeoutSec 900
-    $actual=(Get-FileHash -LiteralPath ($zip+'.partial') -Algorithm SHA256).Hash
-    if($actual -ine $checksum.InnerText){throw 'SHA256 do SDK Google divergiu: arquivo nao sera executado.'}
-    Move-Item -LiteralPath ($zip+'.partial') -Destination $zip -Force
+    Say "[OK] SHA-256 oficial confirmado: $actual" 'Green'
     $temp=Join-Path $work ('cmdtools-'+[Guid]::NewGuid().ToString('N'))
     Expand-Archive -LiteralPath $zip -DestinationPath $temp
     $source=Join-Path $temp 'cmdline-tools'
-    if(!(Test-Path -LiteralPath (Join-Path $source 'bin\sdkmanager.bat'))){throw 'Arquivo SDK extraido sem sdkmanager.bat.'}
+    if(!(Test-Path -LiteralPath (Join-Path $source 'bin\sdkmanager.bat') -PathType Leaf)){
+        throw 'ZIP oficial extraido sem sdkmanager.bat; instalacao interrompida.'
+    }
+    if(!(Test-Path -LiteralPath (Join-Path $source 'source.properties') -PathType Leaf)){
+        throw 'ZIP oficial extraido sem source.properties; instalacao interrompida.'
+    }
     $dest=Join-Path $Sdk 'cmdline-tools\latest'
-    if(Test-Path -LiteralPath $dest){throw 'SDK latest ja existe, mas nao e utilizavel; recusado sobrescrever.'}
+    if(Test-Path -LiteralPath $dest){
+        throw 'SDK cmdline-tools/latest ja existe, mas nao e utilizavel; recusado sobrescrever. Revise a pasta manualmente.'
+    }
     [IO.Directory]::CreateDirectory((Split-Path $dest -Parent)) | Out-Null
     Move-Item -LiteralPath $source -Destination $dest
-    Say '[OK] Command-line Tools Android verificados por SHA256 e instalados.' 'Green'
+    Say '[OK] Command-line Tools Google 22.0 instaladas e verificadas com SHA-256.' 'Green'
 }
 function Set-LocalProcessEnvironment {
     Refresh-Path
@@ -412,7 +404,7 @@ function Run-Action([string]$Chosen){
 function Menu {
     do {
         Write-Host ''
-        Write-Host '===== POLARIS - CMD UNICO - R001 FIX3 HOST 21/10 =====' -ForegroundColor Cyan
+        Write-Host '===== POLARIS - CMD UNICO - R001 FIX4 SDK SHA256 21/10 =====' -ForegroundColor Cyan
         Write-Host '1. Verificar TUDO (somente diagnostico; salva log em PolarisDev)'
         Write-Host '2. Instalar/configurar ferramentas ausentes (winget + SDK)'
         Write-Host '3. Preparar Polaris + Yomotsu (Git)'
