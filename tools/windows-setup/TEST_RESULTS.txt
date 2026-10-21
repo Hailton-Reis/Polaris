@@ -51,3 +51,17 @@ PowerShell lexical token errors: 0 unclosed bracket groups: 0
 # generated PowerShell, test module and documentation. The Python module was also py_compile checked.
 # CMD/embedded PowerShell content parity PASS. Synced Google Drive file ID kept unchanged.
 # Does NOT prove Windows SDK installation, Android build, or B01-B05 runtime.
+
+# R001 FIX4 SDK SHA256 - 2026-10-21
+# User Windows observation: installed JDK21/Android Studio; 8 SDK requirements remain.
+# Previous command line tools bootstrap failed because Google's repository XML lacks an explicit
+# SHA-256 field in the format required by the original script.
+# Replaced XML-index dependency with officially published Google Command-line Tools 22.0
+# artifact: commandlinetools-win-15859902_latest.zip
+# Official SHA256: 90ae805d20434428bffcb699c290860f19bb5f66a67e6b330067e3de801fb04a
+# Reference: https://developer.android.com/studio
+# Download is verified before extraction; cached ZIP checked on reuse; no unsafe hash bypass.
+# Moved sdkmanager --licenses before package installation, requiring operator approval.
+# Verification: 24/24 Python unittest source-contract checks passed in Linux environment;
+# CMD embedded script parity and Google Drive file metadata/no-BOM verified.
+# NOT Windows execution proof, SDK installation success, build, APK output or Android B01–B05.
