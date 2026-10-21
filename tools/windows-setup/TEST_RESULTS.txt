@@ -39,3 +39,15 @@ PowerShell lexical token errors: 0 unclosed bracket groups: 0
 # New test_setup.py contains 19 test cases; execute in a real environment with:
 #   py -3 -m unittest discover -s tools/windows-setup -p test_setup.py -v
 # Physical Windows validation, emulator/device and B01-B05 remain PENDING.
+
+# R001 FIX3 HOST - 2026-10-21
+# Runtime observation on user's Windows:
+# Git, Python, Temurin JDK 21 and Android Studio were installed/detected.
+# SDK commandline-tools bootstrap stopped at:
+# "Cannot overwrite variable Host because it is read-only or constant."
+# Root cause: PowerShell $host loop-local binding collided with built-in read-only $Host.
+# Fix: renamed SDK XML archive host-os node to $hostOsNode and added a reserved-variable regression test.
+# Test evidence: 23/23 Python source-contract tests PASSED on Linux using the reconstructed CMD,
+# generated PowerShell, test module and documentation. The Python module was also py_compile checked.
+# CMD/embedded PowerShell content parity PASS. Synced Google Drive file ID kept unchanged.
+# Does NOT prove Windows SDK installation, Android build, or B01-B05 runtime.
