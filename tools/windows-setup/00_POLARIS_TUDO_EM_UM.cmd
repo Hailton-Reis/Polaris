@@ -35,7 +35,7 @@ $script:ReportDir=Join-Path $script:Workspace 'relatorios'
 $script:Branch='r001/multisource-foundation'
 $script:Pin='0fb80c439ef816eeb50674f1b90af39918b176d8'
 $script:Repo='https://github.com/Hailton-Reis/Polaris.git'
-$script:RequiredSDK=@('platform-tools','platforms;android-37','build-tools;36.0.0','build-tools;37.0.0','ndk;29.0.14206865','ndk;28.2.13676358','cmake;3.22.1')
+$script:RequiredSDK=@('platform-tools','platforms;android-37.0','build-tools;36.0.0','build-tools;37.0.0','ndk;29.0.14206865','ndk;28.2.13676358','cmake;3.22.1')
 $script:Findings=New-Object System.Collections.ArrayList
 $script:LogFile=$null
 $script:JsonReport=$null
@@ -268,8 +268,16 @@ function Install-Tools {
     & $manager ('--sdk_root='+$sdk) --licenses
     if($LASTEXITCODE -ne 0){throw 'Licencas Android nao aceitas. A instalacao dos pacotes nao sera iniciada.'}
     Say 'Instalando pacotes Android necessarios; o SDK Manager pode baixar varios gigabytes.' 'Yellow'
-    & $manager ('--sdk_root='+$sdk) @($script:RequiredSDK)
+    # Android 17 platform is published as platforms;android-37.0, not android-37.
+    # Channel 3 exposes exact preview package IDs when stable repositories do not list them.
+    & $manager ('--sdk_root='+$sdk) @($script:RequiredSDK) '--channel=3'
     if($LASTEXITCODE -ne 0){throw "SDK Manager falhou (codigo $LASTEXITCODE). Verifique licencas, espaco em disco, rede e versoes solicitadas."}
+    # sdkmanager can warn about a missing package and still return success; verify every pinned package on disk.
+    $missingSdkPackages=@($script:RequiredSDK | Where-Object { -not (Check-SdkPackage $sdk $_) })
+    if($missingSdkPackages.Count -gt 0){
+        throw ("SDK incompleto apos a instalacao. Pacotes ausentes: " + ($missingSdkPackages -join ', ') + ". O build nao sera iniciado.")
+    }
+    Say '[OK] Todos os pacotes SDK fixados foram encontrados no disco com source.properties.' 'Green'
     Say 'Dependencias conferidas. Execute a opcao 1 para revisar o relatorio.' 'Green'
 }
 function Install-CmdlineTools([string]$Sdk){
@@ -422,7 +430,7 @@ function Run-Action([string]$Chosen){
 function Menu {
     do {
         Write-Host ''
-        Write-Host '===== POLARIS - CMD UNICO - R001 FIX4 SDK SHA256 21/10 =====' -ForegroundColor Cyan
+        Write-Host '===== POLARIS - CMD UNICO - R001 FIX5 API37.0 22/10 =====' -ForegroundColor Cyan
         Write-Host '1. Verificar TUDO (somente diagnostico; salva log em PolarisDev)'
         Write-Host '2. Instalar/configurar ferramentas ausentes (winget + SDK)'
         Write-Host '3. Preparar Polaris + Yomotsu (Git)'
