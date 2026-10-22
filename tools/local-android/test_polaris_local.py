@@ -23,7 +23,7 @@ class LocalBuildTests(unittest.TestCase):
             self.assertFalse(p.java_is_21(v), v)
 
     def test_sdk_pins(self):
-        self.assertIn('platforms/android-37', p.SDK_REQUIREMENTS)
+        self.assertIn('platforms/android-37.0', p.SDK_REQUIREMENTS)
         self.assertIn('ndk/28.2.13676358', p.SDK_REQUIREMENTS)
         self.assertIn('ndk/29.0.14206865', p.SDK_REQUIREMENTS)
 
