@@ -83,8 +83,16 @@ class LauncherSafety(unittest.TestCase):
         self.assertIn("-eq 'SIM'",PS)
         self.assertIn('Instalacao cancelada pelo operador.',PS)
     def test_android_sdk_and_pinned_versions(self):
-        for pkg in ('android-37','36.0.0','37.0.0','29.0.14206865','28.2.13676358','3.22.1','platform-tools'):
+        for pkg in ('android-37.0','36.0.0','37.0.0','29.0.14206865','28.2.13676358','3.22.1','platform-tools'):
             self.assertIn(pkg,PS)
+    def test_android_api_37_minor_version_and_post_install_verification(self):
+        self.assertIn("'platforms;android-37.0'", PS)
+        self.assertNotIn("'platforms;android-37'", PS)
+        self.assertIn("'--channel=3'", PS)
+        self.assertIn('$missingSdkPackages=@($script:RequiredSDK', PS)
+        self.assertIn('Check-SdkPackage $sdk $_', PS)
+        self.assertIn('SDK incompleto apos a instalacao', PS)
+
     def test_secure_sdk_bootstrap(self):
         self.assertIn('https://dl.google.com/android/repository/',PS)
         self.assertIn('Get-FileHash',PS)
