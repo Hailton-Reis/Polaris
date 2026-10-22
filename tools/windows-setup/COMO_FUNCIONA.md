@@ -24,7 +24,7 @@ O **Projeto Viking** não foi identificado com segurança; não foi incluído co
 
 ## Ações
 
-- **1 — Diagnóstico:** confere Git, Git Bash, Python 3.10+, JDK 21 com javac, Android Studio, Android SDK, command-line tools, plataforma API 37, duas versões de Build Tools, dois NDKs, CMake, Platform Tools. Node.js e .NET aparecem como opcionais. Não baixa nem instala.
+- **1 — Diagnóstico:** confere Git, Git Bash, Python 3.10+, JDK 21 com javac, Android Studio, Android SDK, command-line tools, plataforma API 37.0, duas versões de Build Tools, dois NDKs, CMake, Platform Tools. Node.js e .NET aparecem como opcionais. Não baixa nem instala.
 - **2 — Instalação assistida:** o usuário digita `SIM`; instala somente pacotes faltantes via `winget`. Para as Command-line Tools usa a versão oficial 22.0 para Windows (`commandlinetools-win-15859902_latest.zip`) e valida o SHA-256 publicado em https://developer.android.com/studio antes de extraí-la; aceita licenças interativamente antes de baixar os pacotes SDK exatos. Se faltar `winget`, recusa e orienta instalar `App Installer`.
 - **3 — Preparação:** clona o Polaris na branch `r001/multisource-foundation`, verifica `origin` e preserva diretórios existentes. Clona Yomotsu no commit `0fb80c439ef816eeb50674f1b90af39918b176d8`, sem reset.
 - **4 — Build:** inicializa JDK/SDK somente no processo local, cria shim Python3 somente sob `PolarisDev`, reutiliza o orquestrador Python existente, que executa baseline, aplica Spike-001 em worktree separado, gera SQLDelight, verifica migração 14 e gera APKs e evidências.
@@ -47,6 +47,14 @@ O **Projeto Viking** não foi identificado com segurança; não foi incluído co
 
 ## Compatibilidade conhecida
 
-Foi preparado para **Windows PowerShell 5.1**, que normalmente acompanha Windows 10/11. A versão exata e a disponibilidade dos pacotes winget dependem do sistema e da rede do operador. O SDK do Yomotsu exige Android API 37, Build Tools 36.0.0 e 37.0.0, NDKs 29.0.14206865 e 28.2.13676358, CMake 3.22.1 e JDK 21.
+Foi preparado para **Windows PowerShell 5.1**, que normalmente acompanha Windows 10/11. A versão exata e a disponibilidade dos pacotes winget dependem do sistema e da rede do operador. O SDK do Yomotsu exige a plataforma publicada como `platforms;android-37.0` para API 37, Build Tools 36.0.0 e 37.0.0, NDKs 29.0.14206865 e 28.2.13676358, CMake 3.22.1 e JDK 21.
 
 **Validação deste pacote:** testes estáticos locais do conteúdo e dos invariantes de segurança. A interface gráfica/CMD, instalação winget, sdkmanager, compilação Android, APK e testes de dispositivo **não** foram executados em Windows neste ambiente. Os resultados do diagnóstico do PC são a próxima evidência obrigatória.
+
+## Correção de compatibilidade Android 17 — 22/10/2026
+
+- O pacote oficial do SDK correspondente à API 37 é `platforms;android-37.0`, e não `platforms;android-37`. O instalador utiliza o ID exato e `--channel=3` para permitir a descoberta das versões publicadas, sem atualizar pacotes indiscriminadamente.
+- O pós-instalação verifica **todos** os diretórios exatos e seus `source.properties`. Uma falha de download ou aviso com retorno 0 não libera a compilação.
+- O verificador Python local também exige `platforms/android-37.0`.
+- O Yomotsu fixado define `compileSdk=37` na Gradle DSL. O novo pacote pode revelar uma incompatibilidade Gradle/AGP no build real; isso será tratado conforme evidências concretas, sem modificar ou sobrescrever o checkout base de referência.
+- Evidência fornecida pelo operador: Command-line Tools instaladas, 8/8 licenças aceitas, falha no antigo identificador `platforms;android-37` antes do build.
