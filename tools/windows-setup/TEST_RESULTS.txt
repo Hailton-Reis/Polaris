@@ -65,3 +65,19 @@ PowerShell lexical token errors: 0 unclosed bracket groups: 0
 # Verification: 24/24 Python unittest source-contract checks passed in Linux environment;
 # CMD embedded script parity and Google Drive file metadata/no-BOM verified.
 # NOT Windows execution proof, SDK installation success, build, APK output or Android B01–B05.
+
+# R001 FIX5 Android 37.0 - 2026-10-22
+# User Windows session: 20261022-145949-dd0765
+# Installed/detected: Git, Git Bash, Python3.13, Temurin JDK21, Android Studio, SDK root.
+# Command-line Tools Google 22.0 SHA256 verified; 8 of 8 licenses accepted.
+# Attempt to install packages failed before build:
+#   Warning: Failed to find package 'platforms;android-37'
+# Root cause: Google's published package path is platforms;android-37.0, not android-37.
+# FIX5: use exact platforms;android-37.0 with --channel=3, validate each source.properties
+# after installation even if sdkmanager returns 0; update Polaris local Python preflight path.
+# Upstream pinned Yomotsu build-logic compileSdk=37 retained unchanged.
+# Validation in Linux/container: 25/25 CMD source contract tests passed,
+# 8/8 local Python runner tests passed; embedded PS1 parity verified.
+# Published to original Google Drive 00_POLARIS_TUDO_EM_UM.cmd ID
+# 1NgW4w_sVL2EGfuVE9rOYahhSFMNxOZxP; original filename/id maintained, CRLF/no BOM.
+# Does NOT prove SDK actual successful installation or Gradle/Android APK build.
