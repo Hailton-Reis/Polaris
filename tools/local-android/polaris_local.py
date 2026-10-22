@@ -20,7 +20,7 @@ PINNED = "0fb80c439ef816eeb50674f1b90af39918b176d8"
 BRANCH = "r001/multisource-foundation"
 YOMOTSU_URL = "https://github.com/kiritsuguxs/yomotsu.git"
 SDK_REQUIREMENTS = (
-    "platforms/android-37",
+    "platforms/android-37.0",
     "build-tools/36.0.0",
     "build-tools/37.0.0",
     "ndk/29.0.14206865",
