@@ -37,3 +37,14 @@ It intentionally avoids ReaderViewModel changes because Yomotsu's `MangaScreen.o
 7. Remove one reference and verify the virtual work survives.
 
 See `VALIDATION.md` for completed compiler/domain tests.
+
+
+## Windows 10/11 — contract mismatch FIX9, 23/10/2026
+
+A execução real do CMD FIX8 chegou ao aplicador Spike-001, mas a validação `check_spike001_full_apply.py` recusou `DomainModule.kt`, mesmo com `apply_spike001.py` concluído. Em Python no Windows, `Path.write_text` converte quebras LF para CRLF; a validação compara bytes exatos. O aplicador agora grava UTF-8 com LF fixo por `write_bytes`, e o verificador normaliza **apenas o checkout de entrada**. O arquivo patchado continua sendo comparado byte a byte; alterações de código ou CRLF inesperado são rejeitados.
+
+**Validação executada:** 13/13 testes do contrato; aplicação e verificação de todas as 28 alterações e 18 novos arquivos no conjunto real de fontes Kotlin do Yomotsu fixado em `0fb80c439ef816eeb50674f1b90af39918b176d8`, tanto com entradas LF quanto com CRLF simulado, PASS. Verificação `bash -n` do script de build, PASS.
+
+Um `BUILD FAILED` anterior no console pode vir do gate de testes unitários **da baseline original**, cujo retorno não zero é deliberadamente registrado para comparação com a variante Spike-001. Isso não constitui por si só falha do `:app:assembleDebug` da baseline. Os logs `baseline-build.log` e `baseline-unit-tests.log` devem ser diferenciados.
+
+O CMD **FIX8 SAFE-CLONE** não precisa ser substituído: a opção 4 clona a versão atual do GitHub em nova pasta isolada, se o checkout do usuário estiver alterado. **Ainda não houve comprovação de APK Spike-001 compilado no Windows**. Nenhum arquivo local do usuário foi apagado ou corrigido à força.
