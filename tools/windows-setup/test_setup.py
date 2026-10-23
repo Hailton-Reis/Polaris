@@ -101,6 +101,24 @@ class LauncherSafety(unittest.TestCase):
         self.assertIn('if($actual -ine $expectedSHA256)',PS)
         self.assertIn('source.properties',PS)
         self.assertIn(r'cmdline-tools\latest',PS)
+    def test_checkout_sync_is_fast_forward_only(self):
+        part = PS.split('function Ensure-PolarisCheckout {', 1)[1].split('function Ensure-GitBashPythonShim', 1)[0]
+        for required in ('status --porcelain --untracked-files=normal', 'fetch --no-tags origin $script:Branch',
+                         'rev-parse FETCH_HEAD', 'merge-base --is-ancestor $localHead $remoteHead',
+                         'merge --ff-only FETCH_HEAD', '$postDirty'):
+            self.assertIn(required, part)
+        self.assertIn('Checkout Polaris tem alteracoes locais', part)
+        self.assertIn('Commits locais divergem da branch do GitHub', part)
+        self.assertNotIn('reset --hard', part)
+        self.assertNotIn('clean -fd', part)
+
+    def test_transcript_captures_external_commands_when_supported(self):
+        self.assertIn('$script:TranscriptFile=', PS)
+        self.assertIn('Start-Transcript -LiteralPath $script:TranscriptFile', PS)
+        self.assertIn('Stop-Transcript | Out-Null', PS)
+        self.assertIn('.transcript.txt', PS)
+        self.assertIn('}finally{', PS)
+
     def test_existing_checkout_protected(self):
         self.assertIn("branch divergente",PS)
         self.assertIn('Repositorio origin inesperado',PS)
