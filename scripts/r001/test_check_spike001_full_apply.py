@@ -55,6 +55,35 @@ class FullApplicationContractTests(unittest.TestCase):
     def test_expected_patch_footprint_is_explicit(self):
         self.assertEqual({k: len(v) for k, v in operations(self.stage / "apply_spike001.py").items()}, EXPECTED_OPS)
 
+    def test_win32_crlf_baseline_is_normalized_for_exact_patch_contract(self):
+        # Git autocrlf can produce CRLF in a pristine pinned Windows worktree.
+        # The patcher reads it as LF and writes canonical LF output.
+        base_file = self.base / EXISTING["dm"]
+        base_file.write_bytes(base_file.read_bytes().replace(b"\n", b"\r\n"))
+        self.assertEqual(self.assertValid(), (28, EXPECTED_NEW_FILES, 7))
+
+    def test_win32_crlf_patched_file_is_rejected(self):
+        # Do not weaken the contract by accepting noncanonical patched bytes.
+        patched_file = self.out / EXISTING["dm"]
+        patched_file.write_bytes(patched_file.read_bytes().replace(b"\n", b"\r\n"))
+        with self.assertRaisesRegex(IntegrationContractError, "Windows CRLF"):
+            self.assertValid()
+
+    def test_replace_once_always_writes_lf_without_host_newline_translation(self):
+        import runpy
+        from unittest.mock import patch
+        replace_once = runpy.run_path(
+            str(self.stage / "apply_spike001.py"),
+            run_name="polaris_test_patcher"
+        )["replace_once"]
+        path = self.root / "original_CRLF.kt"
+        path.write_bytes(b"before\r\nANCHOR\r\nafter\r\n")
+        # A Win32-style Path.write_text would translate LF to CRLF.
+        # Forbid that API to ensure deterministic binary writes are used.
+        with patch.object(Path, "write_text", side_effect=AssertionError("OS-dependent newline writer")):
+            replace_once(path, "ANCHOR\n", "REPLACED\n")
+        self.assertEqual(path.read_bytes(), b"before\nREPLACED\nafter\n")
+
     def test_modified_domain_registration_fails(self):
         p = self.out / EXISTING["dm"]
         p.write_text(p.read_text().replace("GetMergedReferencesById(get())", "GetMergedReferencesById()"))
