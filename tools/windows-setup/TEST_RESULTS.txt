@@ -81,3 +81,21 @@ PowerShell lexical token errors: 0 unclosed bracket groups: 0
 # Published to original Google Drive 00_POLARIS_TUDO_EM_UM.cmd ID
 # 1NgW4w_sVL2EGfuVE9rOYahhSFMNxOZxP; original filename/id maintained, CRLF/no BOM.
 # Does NOT prove SDK actual successful installation or Gradle/Android APK build.
+
+# R001 FIX6 AUTO-SYNC - 2026-10-23
+# Proactive reliability hardening after FIX5; no newer user Windows runtime log received.
+# Root issue: a preexisting %USERPROFILE%/PolarisDev/Polaris checkout remained stale,
+# although the standalone CMD was synced, and could run older Python SDK checks.
+# Added clean-checkout git fetch + merge-base ancestry + merge --ff-only, with
+# refusal for dirty trees and diverged branches. No reset/clean/rebase/forced merge.
+# Added optional Start-Transcript / Stop-Transcript to capture external command output
+# in polaris-<session>.transcript.txt alongside historical .log and .json.
+# VALIDATION performed in Linux environment (NOT Windows execution):
+# 27/27 static unittest checks of Windows CMD/PowerShell source PASS,
+# 8/8 local Android Python runner unit tests PASS, py_compile PASS.
+# Isolated local Git simulation PASS: fast-forward succeeded, dirty files preserved/blocked.
+# Embedded CMD PowerShell source identity PASS.
+# Updated SAME original Google Drive filename/id (00_POLARIS_TUDO_EM_UM.cmd,
+# 1NgW4w_sVL2EGfuVE9rOYahhSFMNxOZxP), CRLF and BOM-free, 28853 bytes.
+# NOT YET PROVEN: Android SDK installation after FIX5, real Windows ff-only script execution,
+# Gradle baseline/Spike-001 APK, B01-B05 runtime acceptance.
