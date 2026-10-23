@@ -6,12 +6,16 @@ BASELINE = "0fb80c439ef816eeb50674f1b90af39918b176d8"
 BUNDLE = Path(__file__).resolve().parent
 
 def replace_once(path: Path, old: str, new: str):
-    text = path.read_text()
+    # read_text normalizes checkout CRLF into LF even with Git autocrlf on Windows.
+    # Path.write_text uses the host OS newline by default; on Windows that
+    # silently rewrites every Kotlin line to CRLF and fails the byte-exact gate.
+    # Encode explicitly instead, so both Linux and Windows emit identical LF bytes.
+    text = path.read_text(encoding="utf-8")
     if old not in text:
         raise SystemExit(f"Baseline mismatch: expected block not found in {path}")
     if text.count(old) != 1:
         raise SystemExit(f"Unsafe patch: expected exactly one match in {path}, got {text.count(old)}")
-    path.write_text(text.replace(old, new, 1))
+    path.write_bytes(text.replace(old, new, 1).encode("utf-8"))
 
 def main():
     if len(sys.argv) != 2:
