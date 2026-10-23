@@ -172,3 +172,21 @@ PowerShell lexical token errors: 0 unclosed bracket groups: 0
 # Windows Gradle patched APK compile, unit parity and Android runtime NOT VERIFIED.
 # CMD FIX8 needs NO REPLACEMENT: on option 4 it fetches latest Polaris in a clean
 # verified build clone, preserving user's modified checkout.
+
+# R001 FIX10 GIT DIFF WHITESPACE - 2026-10-23
+# User's real Windows screenshot from CMD FIX8 build attempt:
+#   warning: CRLF will be replaced by LF ... (informative, not fatal)
+#   app/src/main/java/eu/kanade/tachiyomi/ui/manga/MangaViewModel.kt:339: trailing whitespace.
+#   [FALHOU] build codigo 2, before patched Gradle APK assembly.
+# Root cause: vm replace_once literal in spikes/spike001/apply_spike001.py inserted
+# a whitespace-only line after ".getOrThrow()" in the virtual/non-virtual refresh branch.
+# Removed four spaces on this blank line; preserved 28 exact patch operations,
+# 18 staged files, Kotlin behavior and strict git diff --check.
+# Regression test now examines every literal replacement for trailing whitespace.
+# Local validation: 14/14 full-apply contract unittest PASS (Python);
+# actual staged patch against pinned-Yomotsu Kotlin fixture LF and CRLF: Git diff --check PASS,
+# and Python py_compile PASS. Validation performed in Linux, not native Windows.
+# IMPORTANT: no user checkout, SDK, CMD or evidence file was changed in this run.
+# CMD FIX8 safe-clone needs no update: option 4 retrieves latest GitHub branch
+# into a new isolated checkout. Existing failed evidence is retained.
+# Real Windows patched Gradle compile, two APKs and Android runtime remain PENDING.
