@@ -48,3 +48,11 @@ A execução real do CMD FIX8 chegou ao aplicador Spike-001, mas a validação `
 Um `BUILD FAILED` anterior no console pode vir do gate de testes unitários **da baseline original**, cujo retorno não zero é deliberadamente registrado para comparação com a variante Spike-001. Isso não constitui por si só falha do `:app:assembleDebug` da baseline. Os logs `baseline-build.log` e `baseline-unit-tests.log` devem ser diferenciados.
 
 O CMD **FIX8 SAFE-CLONE** não precisa ser substituído: a opção 4 clona a versão atual do GitHub em nova pasta isolada, se o checkout do usuário estiver alterado. **Ainda não houve comprovação de APK Spike-001 compilado no Windows**. Nenhum arquivo local do usuário foi apagado ou corrigido à força.
+
+## 2026-10-23 — FIX10: trailing whitespace detected on Windows
+
+A nova execução do CMD FIX8 avançou pelo contrato de integração, mas `git diff --check` rejeitou a linha 339 de `MangaViewModel.kt` porque um literal de `apply_spike001.py` gerava uma linha vazia com quatro espaços. Esses espaços foram removidos no **literal que produz o arquivo**, e a verificação `git diff --check` foi mantida.
+
+Novo teste em `scripts/r001/test_check_spike001_full_apply.py`: percorre todas as 28 operações `replace_once` e rejeita qualquer linha produzida com espaços ou tabs finais. Resultado local: **14/14 testes PASS**, `git diff --check` PASS com fixtures da baseline Yomotsu tanto LF quanto CRLF. As advertências do Git sobre normalização CRLF/LF não constituem falha por si sós.
+
+Não é necessário atualizar o CMD FIX8 no Drive; a opção 4 sincroniza a branch GitHub para um clone isolado. O APK patched ainda não foi compilado no Windows nesta revisão.
