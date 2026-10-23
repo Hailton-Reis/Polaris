@@ -36,6 +36,47 @@ class LocalBuildTests(unittest.TestCase):
                 p.choose_evidence_dir(root, dest)
             self.assertEqual(p.choose_evidence_dir(root, root/'free'), (root/'free').resolve())
 
+    def test_build_script_keeps_original_yomotsu_checkout_clean(self):
+        source = SRC.resolve().parents[2] / 'scripts/r001/build_issue002.sh'
+        script = source.read_text(encoding='utf-8')
+        self.assertIn('baseline_source=$(realpath ', script)
+        self.assertIn('baseline="$evidence/baseline-yomotsu"', script)
+        self.assertIn('patched="$evidence/patched-yomotsu"', script)
+        self.assertIn('test ! -e "$evidence"', script)
+        self.assertIn('git -C "$baseline_source" worktree add --detach "$baseline" "$pinned"', script)
+        self.assertIn('git -C "$baseline_source" worktree add --detach "$patched" "$pinned"', script)
+        self.assertIn('test -z "$(git -C "$baseline_source" status --porcelain)"', script)
+        self.assertNotIn('prepare_branding "$baseline_source"', script)
+        self.assertLess(script.index('worktree add --detach "$baseline"'), script.index('prepare_branding "$baseline"'))
+
+    def test_isolated_git_worktrees_do_not_modify_pinned_source(self):
+        import shutil
+        import subprocess
+        if not shutil.which('git'):
+            self.skipTest('git unavailable')
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            source = root / 'pinned'
+            source.mkdir()
+            def git(*args):
+                return subprocess.run(['git', *args], check=True, stdout=subprocess.PIPE,
+                                      stderr=subprocess.PIPE, text=True).stdout.strip()
+            git('-C', str(source), 'init', '-q')
+            (source/'source.txt').write_text('pinned', encoding='utf-8')
+            git('-C', str(source), 'add', 'source.txt')
+            git('-C', str(source), '-c', 'user.name=Polaris Test',
+                '-c', 'user.email=polaris@example.invalid', 'commit', '-qm', 'test')
+            sha = git('-C', str(source), 'rev-parse', 'HEAD')
+            for index in (1, 2):
+                evidence = root / f'evidence-{index}'
+                evidence.mkdir()
+                for variant in ('baseline-yomotsu', 'patched-yomotsu'):
+                    workspace = evidence / variant
+                    git('-C', str(source), 'worktree', 'add', '--detach', str(workspace), sha)
+                    (workspace/'generated-icon.png').write_bytes(b'generated icon')
+                self.assertEqual('', git('-C', str(source), 'status', '--porcelain'))
+                self.assertEqual(sha, git('-C', str(source), 'rev-parse', 'HEAD'))
+
     def test_shell_never_interpolates_user_paths(self):
         cmd = p.bash_prelude()
         self.assertIn('POLARIS_REPO', cmd)
