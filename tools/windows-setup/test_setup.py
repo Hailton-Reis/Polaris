@@ -101,6 +101,28 @@ class LauncherSafety(unittest.TestCase):
         self.assertIn('if($actual -ine $expectedSHA256)',PS)
         self.assertIn('source.properties',PS)
         self.assertIn(r'cmdline-tools\latest',PS)
+    def test_dirty_primary_checkout_is_preserved_and_builds_from_fresh_clone(self):
+        source = PS.split('function Ensure-PolarisCheckout {', 1)[1].split('function Ensure-GitBashPythonShim', 1)[0]
+        self.assertIn("$primary=Join-Path $script:Workspace 'Polaris'", source)
+        self.assertIn("if($dirty){", source)
+        self.assertIn("$copies=Join-Path $script:Workspace 'PolarisBuildCopies'", source)
+        self.assertIn("if(Test-Path -LiteralPath $isolated){throw", source)
+        self.assertIn("& $git clone --branch $script:Branch --single-branch $script:Repo $isolated", source)
+        self.assertIn('$script:PolarisDir=$isolated', source)
+        self.assertIn('rev-parse HEAD', source)
+        self.assertIn('$cloneOrigin', source)
+        self.assertIn('$cloneBranch', source)
+        self.assertIn('$cloneDirty', source)
+        self.assertIn('return', source)
+        self.assertIn("if($script:PolarisDir -ne $primary)", source)
+        for unsafe in ('git reset --hard', 'git clean -fd', 'stash pop', 'git stash', 'Remove-Item'):
+            self.assertNotIn(unsafe, source)
+
+    def test_powershell_blocks_further_pycache_generation(self):
+        self.assertIn("$env:PYTHONDONTWRITEBYTECODE='1'", PS)
+        self.assertLess(PS.index("$env:PYTHONDONTWRITEBYTECODE='1'"),
+                        PS.index('function Ensure-PolarisCheckout {'))
+
     def test_checkout_sync_is_fast_forward_only(self):
         part = PS.split('function Ensure-PolarisCheckout {', 1)[1].split('function Ensure-GitBashPythonShim', 1)[0]
         for required in ('status --porcelain --untracked-files=normal', 'fetch --no-tags origin $script:Branch',
