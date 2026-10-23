@@ -58,3 +58,11 @@ Foi preparado para **Windows PowerShell 5.1**, que normalmente acompanha Windows
 - O verificador Python local também exige `platforms/android-37.0`.
 - O Yomotsu fixado define `compileSdk=37` na Gradle DSL. O novo pacote pode revelar uma incompatibilidade Gradle/AGP no build real; isso será tratado conforme evidências concretas, sem modificar ou sobrescrever o checkout base de referência.
 - Evidência fornecida pelo operador: Command-line Tools instaladas, 8/8 licenças aceitas, falha no antigo identificador `platforms;android-37` antes do build.
+
+
+## FIX6 — Sincronização Git e transcrição de execução (23/10/2026)
+
+- Ao preparar e compilar, o CMD verifica a pasta `%USERPROFILE%\PolarisDev\Polaris`. Se já existir, valida a branch, o repositório de origem e a ausência de modificações locais. Em seguida consulta a branch GitHub com `git fetch` e só avança por `git merge --ff-only FETCH_HEAD` quando o commit local é ancestral do remoto. Se houver divergência ou modificações (inclusive arquivos não versionados), interrompe sem `git reset`, `git clean` ou `git rebase`.
+- Além do `.json` e do `.log` do instalador, tenta criar `polaris-<sessão>.transcript.txt` para registrar as saídas de `winget`, `sdkmanager`, `git` e ferramentas de compilação exibidas no console. Caso a transcrição não seja compatível com o host, avisa o operador e mantém os relatórios existentes.
+- O arquivo de transcrição pode registrar caminhos de usuário e informações do ambiente. Revise antes de compartilhar.
+- Continuam pendentes a conclusão real da instalação do SDK e o build de APK em Windows; nenhuma validação de Android foi presumida.
