@@ -4,6 +4,7 @@ These execute the *real staged SQLDelight SQL* on SQLite, not mock SQL strings.
 """
 import unittest
 import tempfile
+from contextlib import closing
 from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor
 from threading import Barrier
@@ -81,21 +82,33 @@ class MergeInsertIdempotency(unittest.TestCase):
     def test_multiple_sqlite_connections_write_same_child_at_most_once(self):
         # SQLite host race exercise with separate connections and no Python lock;
         # Android's bundled driver concurrency still needs on-device validation.
+        # A sqlite3.Connection context manager does NOT close the connection on exit;
+        # keep all file-based handles inside closing() to release Windows locks.
         self.db.commit()
         with tempfile.TemporaryDirectory() as tmp:
             name = str(Path(tmp) / 'shared.sqlite')
-            with __import__('sqlite3').connect(name) as disk:
+            with closing(__import__('sqlite3').connect(name)) as disk:
                 self.db.backup(disk)
             barrier = Barrier(4)
             def worker(i):
-                with __import__('sqlite3').connect(name, timeout=10, isolation_level=None) as con:
+                with closing(__import__('sqlite3').connect(name, timeout=10, isolation_level=None)) as con:
                     con.execute('PRAGMA busy_timeout = 10000')
                     barrier.wait(timeout=5)
                     con.execute(named_sql('insert'), self.params(priority=i))
             with ThreadPoolExecutor(max_workers=4) as pool:
                 list(pool.map(worker, range(4)))
-            with __import__('sqlite3').connect(name) as final:
+            with closing(__import__('sqlite3').connect(name)) as final:
                 self.assertEqual(final.execute('SELECT count(*) FROM merged').fetchone()[0], 1)
+
+    def test_concurrent_fixture_explicitly_closes_every_file_connection(self):
+        # On Windows TemporaryDirectory.cleanup fails with WinError 32 if a
+        # SQLite connection is still open. Guard the fixture's closure pattern.
+        from pathlib import Path
+        source = Path(__file__).read_text(encoding='utf-8')
+        fixture = source.split('    def test_multiple_sqlite_connections_write_same_child_at_most_once(self):', 1)[1]
+        fixture = fixture.split('    def test_concurrent_fixture_explicitly_closes_every_file_connection(self):', 1)[0]
+        self.assertEqual(fixture.count("with closing(__import__('sqlite3').connect("), 3)
+        self.assertNotIn("with __import__('sqlite3').connect(", fixture)
 
     def test_different_parent_work_keeps_separate_membership(self):
         self.db.execute("INSERT INTO mangas VALUES (901,6969,'merged://other')")
