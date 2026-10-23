@@ -60,7 +60,7 @@ class FullApplicationContractTests(unittest.TestCase):
             for change_index, (_old, replacement) in enumerate(changes, start=1):
                 for line_index, line in enumerate(replacement.splitlines(), start=1):
                     self.assertEqual(
-                        line, line.rstrip(" \\t"),
+                        line, line.rstrip(),
                         f"{name} replacement {change_index} line {line_index} "
                         "introduces trailing whitespace",
                     )
