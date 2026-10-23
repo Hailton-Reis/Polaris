@@ -66,3 +66,13 @@ Foi preparado para **Windows PowerShell 5.1**, que normalmente acompanha Windows
 - Além do `.json` e do `.log` do instalador, tenta criar `polaris-<sessão>.transcript.txt` para registrar as saídas de `winget`, `sdkmanager`, `git` e ferramentas de compilação exibidas no console. Caso a transcrição não seja compatível com o host, avisa o operador e mantém os relatórios existentes.
 - O arquivo de transcrição pode registrar caminhos de usuário e informações do ambiente. Revise antes de compartilhar.
 - Continuam pendentes a conclusão real da instalação do SDK e o build de APK em Windows; nenhuma validação de Android foi presumida.
+
+## FIX7 — Build repetivel e APKs auditaveis (23/10/2026)
+
+- O checkout `%USERPROFILE%\PolarisDev\PolarisLocal\Yomotsu-pinned` fica como **fonte imutavel**, sempre no commit `0fb80c439ef816eeb50674f1b90af39918b176d8` e sem alteracoes.
+- Cada nova tentativa de build cria dois Git worktrees isolados na nova pasta de evidencias: `baseline-yomotsu` e `patched-yomotsu`. Apenas nessas copias sao gravadas imagens de branding, artefatos Gradle e o patch Spike-001.
+- O script nao cria as pastas sobre evidencias preexistentes e recusa alterar um checkout pinado que ja esteja sujo. Isso evita a falha de uma segunda execucao provocada por arquivos de branding deixados no original.
+- Em caso de sucesso, o relatorio `apks/SHA256SUMS.txt` registra o SHA-256 de cada APK baseline e Spike-001; a checagem final exige o Yomotsu pinado limpo.
+- **Atencao:** se o Yomotsu original ja foi modificado por uma execucao antiga, o configurador interrompe para proteger esses arquivos. A nova rotina nao apaga nem corrige silenciosamente essa situacao.
+- Esta correcao reside no repositorio GitHub e e sincronizada automaticamente pelo **CMD FIX6** ao preparar o Polaris, quando a copia local nao possui alteracoes ou commits divergentes.
+- Os testes de contrato e de isolamento usam ambiente Python/Git local e **nao** comprovam APK ou comportamento de fontes Android em celular/emulador.
