@@ -82,4 +82,12 @@ python3 "$polaris_root/scripts/r001/compare_android_unit_tests.py" "$baseline" "
     --patched-log "$evidence/patched-unit-tests.log" \
     --min-module domain=58 --min-module app=370 \
     --output "$evidence/unit-test-comparison.json" | tee "$evidence/unit-test-comparison.log"
+# Artifact integrity manifest: APK hashes can be checked independently after copying.
+# Unlike Gradle logs, SHA256SUMS.txt is small enough to compare or archive easily.
+(
+    cd "$evidence/apks"
+    sha256sum baseline/*.apk spike001/*.apk > SHA256SUMS.txt
+)
+test -s "$evidence/apks/SHA256SUMS.txt"
+test -z "$(git -C "$baseline_source" status --porcelain)"
 printf 'APK_BUILDS_PASS_NO_NEW_UNIT_REGRESSIONS\nExisting upstream unit failures may remain; see comparison JSON.\nRuntime A01/B01/B02/B03 still require device evidence.\n' | tee "$evidence/build-status.txt"
