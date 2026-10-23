@@ -51,12 +51,17 @@ prepare_branding() {
 prepare_branding "$baseline"
 test -z "$(git -C "$baseline_source" status --porcelain)"
 run_gradle "$baseline" baseline-build.log :app:assembleDebug
+printf '[OK] BASELINE_ASSEMBLE_DEBUG_PASS - APK original compilado; iniciando testes unitarios upstream.\n' | tee "$evidence/baseline-assemble-status.log"
 # Compare unmodified-upstream tests with patched tests; upstream failures are
 # not a Polaris regression, but newly failing, skipped or missing tests are.
 # --continue lets unrelated module tasks produce their JUnit reports.
 unit_test_tasks=(:domain:testDebugUnitTest :data:testDebugUnitTest :app:testDebugUnitTest)
 baseline_test_exit=0
 run_gradle "$baseline" baseline-unit-tests.log --continue "${unit_test_tasks[@]}" || baseline_test_exit=$?
+if (( baseline_test_exit != 0 )); then
+    printf '[AVISO] BASELINE_UNIT_TESTS_NONZERO exit=%s; sao testes do upstream, nao o assemble APK.\n' "$baseline_test_exit" | tee "$evidence/baseline-unit-status.log"
+    printf 'Comparacao com os testes patched ainda sera obrigatoria antes de declarar PASS.\n' | tee -a "$evidence/baseline-unit-status.log"
+fi
 mkdir -p "$evidence/apks/baseline"
 cp "$baseline"/app/build/outputs/apk/debug/*.apk "$evidence/apks/baseline/"
 git -C "$baseline_source" worktree add --detach "$patched" "$pinned"
@@ -64,6 +69,7 @@ python3 "$polaris_root/spikes/spike001/apply_spike001.py" "$patched" 2>&1 | tee 
 python3 "$polaris_root/scripts/r001/check_spike001_refresh_patch.py" "$patched" --mode patched | tee "$evidence/vm-refresh-patched-preflight.log"
 python3 "$polaris_root/scripts/r001/check_spike001_background_patch.py" "$patched" --mode patched | tee "$evidence/background-update-patched-preflight.log"
 python3 "$polaris_root/scripts/r001/check_spike001_full_apply.py" "$baseline" "$patched" | tee "$evidence/full-apply-contract.log"
+printf '[OK] SPIKE001_FULL_APPLY_CONTRACT_PASS; iniciando preparacao do Gradle patched.\n' | tee "$evidence/full-apply-status.log"
 python3 "$polaris_root/scripts/r001/apply_debug_hook.py" "$patched" | tee "$evidence/apply-debug-hook.log"
 # Intent-to-add includes all staged new files in the reviewable diff.
 git -C "$patched" add -N .
