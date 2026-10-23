@@ -116,3 +116,17 @@ PowerShell lexical token errors: 0 unclosed bracket groups: 0
 # Total: 38/38 Python tests. Android SDK/Gradle execution NOT performed.
 # No new CMD was needed: FIX6 safely fetches this GitHub change into a clean local checkout.
 # Real APK output and Android source/runtime checks remain PENDING.
+
+# R001 SQLITE WINDOWS LOCK - 2026-10-23
+# User real Windows execution: 36 tests, errors=1, WinError 32 at tempfile cleanup:
+# C:\Users\Usuario\AppData\Local\Temp\...\shared.sqlite locked during shutil.rmtree.
+# The failure occurs in host SQLite test concurrency, before Gradle compilation.
+# Root cause: context manager on sqlite3.Connection does not call close().
+# Updated test_merge_insert_idempotency.py with contextlib.closing for backup,
+# concurrent worker, and final read connections, plus regression test.
+# Validation using actual committed staged SQL, migration14 and Kotlin reference:
+# 37/37 Python SQLite tests PASS on Linux Python 3.13.
+# 50 additional repeated SQLite concurrency test runs PASS in same environment.
+# Windows confirmation PENDING. APKs not built in this runtime.
+# FIX6 CMD can receive patch by safe git fetch + merge --ff-only; option 4 builds
+# without repeating already completed JDK/Android Studio/SDK installation.
