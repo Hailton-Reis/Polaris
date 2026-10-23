@@ -149,3 +149,26 @@ PowerShell lexical token errors: 0 unclosed bracket groups: 0
 # SHA256 e3127a00205a042b9d1cdd35e64fa4df274c28ffff3c9f0ea96a855352f4a617
 # (31,354 bytes); byte-identical with post-update Drive readback.
 # PENDING: running FIX8 on actual Windows, completing Gradle and producing APKs.
+
+# R001 WINDOWS LF/CRLF PATCH CONTRACT FIX - 2026-10-23
+# User actual Windows run, CMD FIX8:
+#   "BUILD FAILED in 3m 5s" then "Spike-001 applied successfully"
+#   "SPIKE001_FULL_APPLY_CONTRACT_FAILED: Patched ... DomainModule.kt differs from exact expected edits"
+# Build script permits nonzero baseline unit tasks and compares them later;
+# reaching Spike-001 patch implies baseline assemble proceeded.
+# Root cause: pathlib.Path.write_text default newline handling on Windows converts
+# Python LF strings into CRLF, while the full patch gate compares exact bytes.
+# Fixed apply_spike001.replace_once to write UTF-8 LF bytes with write_bytes.
+# Checker now normalizes only pristine pinned source read_text CRLF -> LF,
+# while patched bytes must still match EXACTLY (CRLF in patched output FAILS).
+# This does NOT relax the 28-literal-operation/18-added-file integrity gate.
+# Validation in Linux container using actual GitHub staged sources:
+# 13/13 full-apply Python tests PASS, including 3 CRLF regressions.
+# Against actual pinned Yomotsu commit's 7 Kotlin files:
+# REAL_PINNED_LF: PASS, 28 edits + 18 added files + 7 modified/replaced.
+# REAL_PINNED_WIN_CRLF simulated checkout: PASS, same exact footprint.
+# scripts/r001/build_issue002.sh bash -n PASS. Script now clearly labels
+# baseline assemble success vs potentially nonzero upstream unit tasks.
+# Windows Gradle patched APK compile, unit parity and Android runtime NOT VERIFIED.
+# CMD FIX8 needs NO REPLACEMENT: on option 4 it fetches latest Polaris in a clean
+# verified build clone, preserving user's modified checkout.
