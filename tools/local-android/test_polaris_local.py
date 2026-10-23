@@ -77,6 +77,15 @@ class LocalBuildTests(unittest.TestCase):
                 self.assertEqual('', git('-C', str(source), 'status', '--porcelain'))
                 self.assertEqual(sha, git('-C', str(source), 'rev-parse', 'HEAD'))
 
+    def test_apk_integrity_manifest_and_pinned_checkout_final_gate(self):
+        source = SRC.resolve().parents[2] / 'scripts/r001/build_issue002.sh'
+        script = source.read_text(encoding='utf-8')
+        self.assertIn('sha256sum baseline/*.apk spike001/*.apk > SHA256SUMS.txt', script)
+        self.assertIn('test -s "$evidence/apks/SHA256SUMS.txt"', script)
+        self.assertIn('test -z "$(git -C "$baseline_source" status --porcelain)"', script)
+        self.assertLess(script.index('sha256sum baseline/*.apk'),
+                        script.index("printf 'APK_BUILDS_PASS_NO_NEW_UNIT_REGRESSIONS"))
+
     def test_shell_never_interpolates_user_paths(self):
         cmd = p.bash_prelude()
         self.assertIn('POLARIS_REPO', cmd)
