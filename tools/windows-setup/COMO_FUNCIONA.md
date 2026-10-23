@@ -76,3 +76,13 @@ Foi preparado para **Windows PowerShell 5.1**, que normalmente acompanha Windows
 - **Atencao:** se o Yomotsu original ja foi modificado por uma execucao antiga, o configurador interrompe para proteger esses arquivos. A nova rotina nao apaga nem corrige silenciosamente essa situacao.
 - Esta correcao reside no repositorio GitHub e e sincronizada automaticamente pelo **CMD FIX6** ao preparar o Polaris, quando a copia local nao possui alteracoes ou commits divergentes.
 - Os testes de contrato e de isolamento usam ambiente Python/Git local e **nao** comprovam APK ou comportamento de fontes Android em celular/emulador.
+
+
+## FIX8 — checkout local modificado, sem perder arquivos (23/10/2026)
+
+- Uma execução real do Windows retornou `Checkout Polaris tem alteracoes locais; sincronizacao bloqueada` ao selecionar 4. O bloqueio da FIX6 protegia os arquivos do usuario, mas impedia o primeiro APK.
+- A FIX8 **mantém a pasta original do usuario intocada**, exibe e registra seu `git status --porcelain` e, quando existem alteracoes locais no checkout principal `PolarisDev\\Polaris`, cria uma **nova cópia limpa, isolada, em `PolarisDev\\PolarisBuildCopies\\checkout-<data>-<id>`** com `git clone` da branch oficial.
+- O clone novo é validado quanto a branch, origin, SHA de commit e ausência de alterações antes de usar os scripts. Não usa `git reset`, `git clean`, `git stash` ou `git rebase` na pasta original. Se o clone falhar, o build para sem destruir nenhum arquivo.
+- O processo define `PYTHONDONTWRITEBYTECODE=1` apenas para a sessão para evitar criar novas pastas `__pycache__` de testes Python.
+- Quando o checkout principal estiver limpo, a atualização por fast-forward da FIX6 continua valendo. Clones isolados são preservados como evidência e podem ocupar espaço; não há limpeza automática.
+- A FIX8 está incorporada no **mesmo arquivo CMD** e precisa sincronizar do Drive antes de executar a opção 4. O primeiro build Gradle e o teste real de Windows com checkout modificado continuam pendentes.
