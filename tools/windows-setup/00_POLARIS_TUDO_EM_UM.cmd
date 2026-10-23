@@ -335,6 +335,8 @@ function Install-CmdlineTools([string]$Sdk){
     Say '[OK] Command-line Tools Google 22.0 instaladas e verificadas com SHA-256.' 'Green'
 }
 function Set-LocalProcessEnvironment {
+    # Prevent new __pycache__ entries in user checkouts during the Python host gates.
+    $env:PYTHONDONTWRITEBYTECODE='1'
     Refresh-Path
     $jdk=Find-Jdk21
     if(!$jdk){throw 'JDK21 ausente; execute a opcao 2.'}
@@ -351,7 +353,11 @@ function Set-LocalProcessEnvironment {
 function Ensure-PolarisCheckout {
     $git=Find-Git
     if(!$git){throw 'Git ausente. Execute a instalacao primeiro.'}
+    $primary=Join-Path $script:Workspace 'Polaris'
+    # The primary checkout belongs to the user; never discard any changes in it.
+    # A dirty checkout may contain generated Python cache files from earlier test runs.
     if(!(Test-Path -LiteralPath $script:PolarisDir)){
+        if($script:PolarisDir -ne $primary){throw 'Copia isolada ausente; interrompido sem tocar no checkout original.'}
         [IO.Directory]::CreateDirectory($script:Workspace) | Out-Null
         Say ('Baixando Polaris na branch '+$script:Branch+'...') 'Yellow'
         & $git clone --branch $script:Branch --single-branch $script:Repo $script:PolarisDir
@@ -366,10 +372,39 @@ function Ensure-PolarisCheckout {
     if($LASTEXITCODE -ne 0 -or $origin -notmatch '(?i)(github\.com[:/])Hailton-Reis/Polaris(\.git)?$'){
         throw "Repositorio origin inesperado ($origin). Nao executarei scripts deste checkout."
     }
-    # Only PolarisDev/Polaris is touched. No reset, clean, rebase or forced merge.
     $dirty=(& $git -C $script:PolarisDir status --porcelain --untracked-files=normal | Out-String).Trim()
     if($LASTEXITCODE -ne 0){throw 'Nao foi possivel verificar o estado local do Polaris.'}
-    if($dirty){throw 'Checkout Polaris tem alteracoes locais; sincronizacao bloqueada para preservar seus arquivos.'}
+    if($dirty){
+        Say ('[ATENCAO] Checkout possui alteracoes locais: '+$script:PolarisDir) 'Yellow'
+        Say $dirty 'Yellow'
+        if($script:PolarisDir -ne $primary){
+            throw 'Copia isolada Polaris foi modificada. Nao sobrescrever; verifique o log.'
+        }
+        # Never auto-stash, reset, clean, move or delete the user's files.
+        # Clone trusted remote into a fresh path instead; preserve primary checkout as-is.
+        $copies=Join-Path $script:Workspace 'PolarisBuildCopies'
+        [IO.Directory]::CreateDirectory($copies) | Out-Null
+        $newName='checkout-'+(Get-Date).ToString('yyyyMMdd-HHmmss')+'-'+[Guid]::NewGuid().ToString('N').Substring(0,8)
+        $isolated=Join-Path $copies $newName
+        if(Test-Path -LiteralPath $isolated){throw 'Caminho isolado ja existe. Nenhum arquivo sobrescrito.'}
+        Say '[AVISO] Copia original preservada. Criando clone LIMPO separado para este build.' 'Yellow'
+        Say ('Clone de build: '+$isolated) 'Cyan'
+        & $git clone --branch $script:Branch --single-branch $script:Repo $isolated
+        if($LASTEXITCODE -ne 0){throw 'Clone limpo do Polaris falhou. Copia original preservada.'}
+        $script:PolarisDir=$isolated
+        $cloneHead=(& $git -C $isolated rev-parse HEAD | Out-String).Trim()
+        if($LASTEXITCODE -ne 0 -or $cloneHead -notmatch '^[0-9a-f]{40}$'){throw 'Clone isolado sem commit verificavel.'}
+        $cloneOrigin=(& $git -C $isolated remote get-url origin | Out-String).Trim()
+        if($LASTEXITCODE -ne 0 -or $cloneOrigin -notmatch '(?i)(github\.com[:/])Hailton-Reis/Polaris(\.git)?$'){
+            throw 'Clone isolado com origin inesperado; interrompido.'
+        }
+        $cloneBranch=(& $git -C $isolated branch --show-current | Out-String).Trim()
+        if($LASTEXITCODE -ne 0 -or $cloneBranch -ne $script:Branch){throw 'Clone isolado com branch inesperada.'}
+        $cloneDirty=(& $git -C $isolated status --porcelain --untracked-files=normal | Out-String).Trim()
+        if($LASTEXITCODE -ne 0 -or $cloneDirty){throw 'Clone isolado nao esta limpo; build bloqueado.'}
+        Say ('[OK] Clone isolado verificado no commit '+$cloneHead) 'Green'
+        return
+    }
     Say 'Conferindo a versao atual da branch Polaris...' 'Cyan'
     & $git -C $script:PolarisDir fetch --no-tags origin $script:Branch
     if($LASTEXITCODE -ne 0){throw 'Git fetch falhou; checkout existente foi preservado.'}
@@ -466,7 +501,7 @@ function Run-Action([string]$Chosen){
 function Menu {
     do {
         Write-Host ''
-        Write-Host '===== POLARIS - CMD UNICO - R001 FIX6 AUTO-SYNC 23/10 =====' -ForegroundColor Cyan
+        Write-Host '===== POLARIS - CMD UNICO - R001 FIX8 SAFE-CLONE 23/10 =====' -ForegroundColor Cyan
         Write-Host '1. Verificar TUDO (somente diagnostico; salva log em PolarisDev)'
         Write-Host '2. Instalar/configurar ferramentas ausentes (winget + SDK)'
         Write-Host '3. Preparar Polaris + Yomotsu (Git)'
