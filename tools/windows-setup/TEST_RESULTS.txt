@@ -99,3 +99,20 @@ PowerShell lexical token errors: 0 unclosed bracket groups: 0
 # 1NgW4w_sVL2EGfuVE9rOYahhSFMNxOZxP), CRLF and BOM-free, 28853 bytes.
 # NOT YET PROVEN: Android SDK installation after FIX5, real Windows ff-only script execution,
 # Gradle baseline/Spike-001 APK, B01-B05 runtime acceptance.
+
+# R001 FIX7 REPEATABLE BUILD - 2026-10-23
+# Source audit: upstream pinned Yomotsu does not gitignore generated
+# app/src/main/res/mipmap-*/ic_launcher*.png; old build script wrote them directly
+# into the pinned baseline, causing a dirty checkout and subsequent rerun failures.
+# Correction: create disposable baseline-yomotsu and patched-yomotsu Git worktrees
+# inside the new evidence directory; branding and Spike-001 apply only there.
+# The original pinned checkout remains unchanged and is checked at the end.
+# New apks/SHA256SUMS.txt lists baseline and Spike-001 APK hashes on build success.
+# Tests run locally on Linux from GitHub sources:
+# 27/27 standalone CMD/PowerShell source tests PASS;
+# 11/11 Python local Android runner tests PASS (including real two-run Git worktree isolation);
+# build_issue002.sh bash -n PASS; Python py_compile PASS;
+# CMD embedding parity via generate_single_cmd.py --check PASS.
+# Total: 38/38 Python tests. Android SDK/Gradle execution NOT performed.
+# No new CMD was needed: FIX6 safely fetches this GitHub change into a clean local checkout.
+# Real APK output and Android source/runtime checks remain PENDING.
