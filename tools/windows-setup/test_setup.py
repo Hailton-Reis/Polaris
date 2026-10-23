@@ -129,7 +129,7 @@ class LauncherSafety(unittest.TestCase):
                          'rev-parse FETCH_HEAD', 'merge-base --is-ancestor $localHead $remoteHead',
                          'merge --ff-only FETCH_HEAD', '$postDirty'):
             self.assertIn(required, part)
-        self.assertIn('Checkout Polaris tem alteracoes locais', part)
+        self.assertIn('[ATENCAO] Checkout possui alteracoes locais:', part)
         self.assertIn('Commits locais divergem da branch do GitHub', part)
         self.assertNotIn('reset --hard', part)
         self.assertNotIn('clean -fd', part)
