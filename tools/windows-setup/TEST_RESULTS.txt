@@ -190,3 +190,22 @@ PowerShell lexical token errors: 0 unclosed bracket groups: 0
 # CMD FIX8 safe-clone needs no update: option 4 retrieves latest GitHub branch
 # into a new isolated checkout. Existing failed evidence is retained.
 # Real Windows patched Gradle compile, two APKs and Android runtime remain PENDING.
+
+# FIRST_LOCAL_APK_BUILD_REPORTED_SUCCESS_2026_10_23
+# Evidence: screenshot of real Windows CMD FIX8 session, received 2026-10-23,
+# from PolarisLocal/evidence/issue002-20261023-190348.
+# Script printed [OK] Build finalizado and:
+#   APK_BUILDS_PASS_NO_NEW_UNIT_REGRESSIONS
+#   baseline: total=428, passed=394, failed=34, skipped=0
+#   patched: total=428, passed=394, failed=34, skipped=0
+#   Preexisting failures still present: 34; no new JUnit regressions detected.
+# A preceding Gradle BUILD FAILED in 2m35s belongs to the unit-test run,
+# NOT a contradiction of the successful assemble gates / final overall script status.
+# Build script copies baseline and patched debug APKs into evidence/apks/
+# and writes apks/SHA256SUMS.txt. Actual SHA-256 values were not present in screenshot.
+# NOTE: This is user-provided runtime evidence; assistant did not execute Windows build.
+# State: local baseline and Spike-001 APK build = PASS_REPORTED_ON_WINDOWS,
+#       A01 app launch = PENDING, B01-B05 device/emulator = PENDING,
+#       backup-v2 real Android restore = BLOCKED, Draft PR #1 remains Draft.
+# Next: read docs/r001/ISSUE002_DEVICE_RUNBOOK.md and test on a disposable
+# emulator / test phone, NEVER daily data app without a backup.
