@@ -22,6 +22,8 @@ $script:Findings=New-Object System.Collections.ArrayList
 $script:LogFile=$null
 $script:JsonReport=$null
 $script:HadMenuFailure=$false
+$script:TranscriptFile=$null
+$script:TranscriptStarted=$false
 $script:WingetPackages=[ordered]@{
     'Git for Windows'='Git.Git'
     'Python 3'='Python.Python.3.13'
@@ -37,7 +39,15 @@ function New-Session {
     $id=(Get-Date).ToString('yyyyMMdd-HHmmss')+'-'+[Guid]::NewGuid().ToString('N').Substring(0,6)
     $script:LogFile=Join-Path $script:ReportDir ('polaris-'+$id+'.log')
     $script:JsonReport=Join-Path $script:ReportDir ('polaris-'+$id+'.json')
-    Say "Polaris R001 - CORRECAO REGISTRO 2026-10-20 - sessao $id" 'Cyan'
+    $script:TranscriptFile=Join-Path $script:ReportDir ('polaris-'+$id+'.transcript.txt')
+    try {
+        Start-Transcript -LiteralPath $script:TranscriptFile -ErrorAction Stop | Out-Null
+        $script:TranscriptStarted=$true
+    } catch {
+        Say ('[AVISO] Registro completo indisponivel: '+$_.Exception.Message) 'Yellow'
+    }
+    Say "Polaris R001 - CORRECAO 2026-10-23 - sessao $id" 'Cyan'
+    if($script:TranscriptStarted){Say ('Transcricao completa: '+$script:TranscriptFile)}
     Say "Workspace: $script:Workspace"
 }
 function Found([string]$Name,[bool]$Present,[string]$Details,[bool]$Required=$true) {
@@ -331,10 +341,36 @@ function Ensure-PolarisCheckout {
     }
     if(!(Test-Path -LiteralPath (Join-Path $script:PolarisDir '.git'))){throw 'Pasta Polaris existente nao e checkout Git; nao sobrescrever.'}
     $branch=(& $git -C $script:PolarisDir branch --show-current 2>$null | Out-String).Trim()
-    if($branch -ne $script:Branch){throw "Polaris branch divergente ($branch); nao farei reset/checkout automatico."}
+    if($LASTEXITCODE -ne 0 -or $branch -ne $script:Branch){
+        throw "Polaris branch divergente ($branch); nao farei reset/checkout automatico."
+    }
     $origin=(& $git -C $script:PolarisDir remote get-url origin 2>$null | Out-String).Trim()
-    if($origin -notmatch '(?i)(github\.com[:/])Hailton-Reis/Polaris(\.git)?$'){throw "Repositorio origin inesperado ($origin). Nao executarei scripts deste checkout."}
-    Say '[OK] Polaris localizado, branch correta e origin verificado.' 'Green'
+    if($LASTEXITCODE -ne 0 -or $origin -notmatch '(?i)(github\.com[:/])Hailton-Reis/Polaris(\.git)?$'){
+        throw "Repositorio origin inesperado ($origin). Nao executarei scripts deste checkout."
+    }
+    # Only PolarisDev/Polaris is touched. No reset, clean, rebase or forced merge.
+    $dirty=(& $git -C $script:PolarisDir status --porcelain --untracked-files=normal | Out-String).Trim()
+    if($LASTEXITCODE -ne 0){throw 'Nao foi possivel verificar o estado local do Polaris.'}
+    if($dirty){throw 'Checkout Polaris tem alteracoes locais; sincronizacao bloqueada para preservar seus arquivos.'}
+    Say 'Conferindo a versao atual da branch Polaris...' 'Cyan'
+    & $git -C $script:PolarisDir fetch --no-tags origin $script:Branch
+    if($LASTEXITCODE -ne 0){throw 'Git fetch falhou; checkout existente foi preservado.'}
+    $localHead=(& $git -C $script:PolarisDir rev-parse HEAD | Out-String).Trim()
+    if($LASTEXITCODE -ne 0){throw 'Falha na leitura do commit local do Polaris.'}
+    $remoteHead=(& $git -C $script:PolarisDir rev-parse FETCH_HEAD | Out-String).Trim()
+    if($LASTEXITCODE -ne 0){throw 'Falha na leitura do commit remoto do Polaris.'}
+    if($localHead -ne $remoteHead){
+        & $git -C $script:PolarisDir merge-base --is-ancestor $localHead $remoteHead
+        if($LASTEXITCODE -ne 0){throw 'Commits locais divergem da branch do GitHub; recusado reset ou rebase.'}
+        & $git -C $script:PolarisDir merge --ff-only FETCH_HEAD
+        if($LASTEXITCODE -ne 0){throw 'Fast-forward falhou; nenhum reset ou rebase realizado.'}
+        Say ('[OK] Polaris atualizado: '+$remoteHead) 'Green'
+    } else {
+        Say ('[OK] Polaris ja atualizado: '+$localHead) 'Green'
+    }
+    $postDirty=(& $git -C $script:PolarisDir status --porcelain --untracked-files=normal | Out-String).Trim()
+    if($LASTEXITCODE -ne 0 -or $postDirty){throw 'Checkout ficou alterado apos sincronizacao. Build bloqueado.'}
+    Say '[OK] Polaris pronto na branch e origin corretos.' 'Green'
 }
 function Ensure-GitBashPythonShim {
     # Git Bash needs `python3`, but Windows often only supplies `py -3`/`python.exe`.
@@ -412,7 +448,7 @@ function Run-Action([string]$Chosen){
 function Menu {
     do {
         Write-Host ''
-        Write-Host '===== POLARIS - CMD UNICO - R001 FIX5 API37.0 22/10 =====' -ForegroundColor Cyan
+        Write-Host '===== POLARIS - CMD UNICO - R001 FIX6 AUTO-SYNC 23/10 =====' -ForegroundColor Cyan
         Write-Host '1. Verificar TUDO (somente diagnostico; salva log em PolarisDev)'
         Write-Host '2. Instalar/configurar ferramentas ausentes (winget + SDK)'
         Write-Host '3. Preparar Polaris + Yomotsu (Git)'
@@ -448,4 +484,8 @@ try{
     Say ('[FALHOU] '+$_.Exception.Message) 'Red'
     Say ('Log: '+$script:LogFile)
     exit 2
+}finally{
+    if($script:TranscriptStarted){
+        try{Stop-Transcript | Out-Null}catch{}
+    }
 }
