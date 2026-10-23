@@ -130,3 +130,22 @@ PowerShell lexical token errors: 0 unclosed bracket groups: 0
 # Windows confirmation PENDING. APKs not built in this runtime.
 # FIX6 CMD can receive patch by safe git fetch + merge --ff-only; option 4 builds
 # without repeating already completed JDK/Android Studio/SDK installation.
+
+# R001 FIX8 SAFE-CLONE - 2026-10-23
+# User-provided Windows screenshot showed:
+#   [ERRO] Checkout Polaris tem alteracoes locais; sincronizacao bloqueada ...
+# This is a protection gate, not a reason to erase local files.
+# New Ensure-PolarisCheckout keeps dirty PolarisDev/Polaris unchanged.
+# It reports git status --porcelain, creates a uniquely named clean clone at
+# PolarisDev/PolarisBuildCopies/checkout-<datetime>-<id>, checks commit,
+# branch, origin, and clean tree, then builds using the isolated checkout.
+# No reset, clean, rebase, stash or deletion of the original directory.
+# Adds session-only PYTHONDONTWRITEBYTECODE=1 to reduce future pycache debris.
+# QA: 29/29 Windows CMD/PowerShell source-contract Python unit tests PASS,
+# generate_single_cmd.py --check PASS, py_compile PASS.
+# Isolated real-git simulation PASS: untracked user file in original preserved,
+# new clone clean and on expected branch (local repository simulation).
+# Same Google Drive file ID, name and parent preserved; CRLF, no BOM;
+# SHA256 e3127a00205a042b9d1cdd35e64fa4df274c28ffff3c9f0ea96a855352f4a617
+# (31,354 bytes); byte-identical with post-update Drive readback.
+# PENDING: running FIX8 on actual Windows, completing Gradle and producing APKs.
