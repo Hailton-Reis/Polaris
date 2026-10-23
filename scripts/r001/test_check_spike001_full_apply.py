@@ -52,6 +52,19 @@ class FullApplicationContractTests(unittest.TestCase):
     def test_complete_patch_applies_all_28_edits_and_18_new_files(self):
         self.assertEqual(self.assertValid(), (28, EXPECTED_NEW_FILES, 7))
 
+    def test_all_literal_patch_replacements_are_free_of_trailing_whitespace(self):
+        # Git diff --check must reject whitespace errors, not be bypassed.
+        # Regression: MangaViewModel.kt:339 had an inserted whitespace-only line.
+        edits = operations(self.stage / "apply_spike001.py")
+        for name, changes in edits.items():
+            for change_index, (_old, replacement) in enumerate(changes, start=1):
+                for line_index, line in enumerate(replacement.splitlines(), start=1):
+                    self.assertEqual(
+                        line, line.rstrip(" \\t"),
+                        f"{name} replacement {change_index} line {line_index} "
+                        "introduces trailing whitespace",
+                    )
+
     def test_expected_patch_footprint_is_explicit(self):
         self.assertEqual({k: len(v) for k, v in operations(self.stage / "apply_spike001.py").items()}, EXPECTED_OPS)
 
