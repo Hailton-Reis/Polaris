@@ -68,7 +68,11 @@ def verify(baseline, patched, stage=STAGE, patcher=PATCHER):
         base_file = baseline / relative
         patched_file = patched / relative
         try:
-            source = base_file.read_bytes().decode("utf-8")
+            # Git on Windows can check out the upstream file with CRLF;
+            # Path.read_text normalizes this to the same LF anchors used by
+            # apply_spike001.replace_once. Patched output must still be
+            # byte-exact and LF-only: never normalize the output being checked.
+            source = base_file.read_text(encoding="utf-8")
             actual = patched_file.read_bytes().decode("utf-8")
         except OSError as exc:
             raise IntegrationContractError(f"Missing input {relative}: {exc}") from exc
@@ -79,7 +83,15 @@ def verify(baseline, patched, stage=STAGE, patcher=PATCHER):
                 raise IntegrationContractError(f"Pinned {relative} edit {i}: {n} old anchors (expected 1)")
             expected = expected.replace(old, new, 1)
         if actual != expected:
-            raise IntegrationContractError(f"Patched {relative} differs from exact expected edits")
+            if "\r\n" in actual:
+                raise IntegrationContractError(
+                    f"Patched {relative} contains Windows CRLF bytes; "
+                    "the Spike-001 applicator must write canonical LF bytes"
+                )
+            raise IntegrationContractError(
+                f"Patched {relative} differs from exact expected edits "
+                f"(expected_chars={len(expected)}, actual_chars={len(actual)})"
+            )
 
     # The replacement is deliberate, and must not leave the old file in place.
     replacement = stage / "REPLACEMENT_GetMangaWithChapters.kt"
