@@ -35,3 +35,14 @@ The red test run before changing the SQL produced **four assertion failures**; t
 `test_merge_select_integrity.py` adds seven tests against the real `selectMergedMangasById` query. A previous unrestricted join returned duplicate manga objects for duplicate legacy `merged` edges, and had no deterministic association priority order. New query groups by local manga ID before joining to `mangas` and orders by the most preferred reference and stable row ID. `selectByMergeId` also now has deterministic priority/row order. The original SQL failed four of these seven tests. New SQLite suite **27/27 PASS**, while Python 72/72 and Kotlin 38/38 completed separately. Source snapshots and red/green logs: https://drive.google.com/file/d/1rpLs10hlX343u0HlSTldyp6O27NBjRRA/view.
 
 No schema/migration14 changes. **SQLite queries have not yet been passed through the on-device Yomotsu/SQLDelight generator**; keep issue #10 open and issue #2 Android baseline unverified.
+
+
+## 2026-10-23 — correção de limpeza SQLite no Windows (WinError 32)
+
+Em uma execução real do CMD único FIX6, o gate `python -m unittest discover` passou pelos testes de SQL mas falhou ao remover o arquivo temporário `shared.sqlite`: `PermissionError: [WinError 32]`. O arquivo era utilizado no teste `test_multiple_sqlite_connections_write_same_child_at_most_once`.
+
+Causa: `with sqlite3.connect(path) as conn` **não fecha** a conexão ao sair do bloco; gerencia commit/rollback. Windows impede excluir um arquivo SQLite aberto. A correção usa `contextlib.closing(...)` nas conexões de backup, nas quatro conexões concorrentes e na verificação final. O teste de regressão verifica os três contextos explicitamente fechados.
+
+Evidências executadas em Python 3.13/Linux com as definições SQL e fonte Kotlin reais do repositório: **37/37 testes PASS**, mais **50 execuções repetidas do teste de concorrência PASS**. Isso demonstra o fechamento explícito e que as rotinas passam no ambiente de validação; **WinError 32 só será confirmado como resolvido na próxima execução do usuário no Windows**.
+
+A correção está na branch `r001/multisource-foundation` e será recebida automaticamente pelo CMD FIX6 quando este sincronizar um checkout limpo antes do build. Não é necessário reinstalar JDK/SDK nem baixar outro CMD.
