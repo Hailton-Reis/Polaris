@@ -180,6 +180,24 @@ class LauncherSafety(unittest.TestCase):
         self.assertIn('Confirm-Action',part)
         self.assertIn('OpenJS.NodeJS.LTS',part)
         self.assertIn('Microsoft.DotNet.SDK.8',part)
+    def test_emulator_actions_are_separate_and_approved(self):
+        self.assertIn("'8' { Invoke-PolarisEmulator 'baseline' }", PS)
+        self.assertIn("'9' { Invoke-PolarisEmulator 'spike001' }", PS)
+        self.assertIn("EmulatorBaseline { Invoke-PolarisEmulator 'baseline' }", PS)
+        self.assertIn("EmulatorPatched { Invoke-PolarisEmulator 'spike001' }", PS)
+        self.assertIn('function Invoke-PolarisEmulator([string]$Stage)', PS)
+        self.assertIn('Confirm-Action', PS.split('function Invoke-PolarisEmulator',1)[1].split('function Other-Projects',1)[0])
+        self.assertIn("polaris_emulator.py", PS)
+        self.assertIn("'--workspace',$script:Workspace,'--consent'", PS)
+        self.assertIn("8. EMULAR Yomotsu original", PS)
+        self.assertIn("9. EMULAR Polaris Spike-001", PS)
+
+    def test_original_all_action_never_installs_on_device(self):
+        all_action = PS.split("'6' {",1)[1].split("}\n",1)[0]
+        self.assertNotIn('Invoke-PolarisEmulator', all_action)
+        self.assertNotIn('Test-PolarisEmulator', all_action)
+        self.assertNotIn('adb install', PS)
+
     def test_no_dangerous_persistent_env_update(self):
         self.assertNotIn('SetEnvironmentVariable',PS)
         self.assertIn('function Set-LocalProcessEnvironment',PS)
