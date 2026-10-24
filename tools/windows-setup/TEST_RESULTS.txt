@@ -209,3 +209,25 @@ PowerShell lexical token errors: 0 unclosed bracket groups: 0
 #       backup-v2 real Android restore = BLOCKED, Draft PR #1 remains Draft.
 # Next: read docs/r001/ISSUE002_DEVICE_RUNBOOK.md and test on a disposable
 # emulator / test phone, NEVER daily data app without a backup.
+
+# R001 EMULATOR A01/A02 PREPARATION - 2026-10-23
+# User chose Android Studio emulator after successful Windows baseline + Spike001 APK builds.
+# Added tools/local-android/polaris_emulator.py and test_polaris_emulator.py:
+#   8/EmulatorBaseline: validate latest complete build and both APK SHA256 hashes,
+#     install official emulator + Google APIs API35 x86_64 system image, create
+#     dedicated Polaris_R001_API35_x64 AVD, verify WHPX acceleration, boot and
+#     install/start baseline debug APK ONLY on matching emulator serial.
+#   9/EmulatorPatched: explicit separate consent after visual A01 check; install
+#     Spike-001 APK over baseline ONLY on the dedicated virtual device.
+#   Never selects physical devices or an unrelated preexisting AVD; no wipe,
+#   no uninstall, no silent overwrite of an existing name without ownership marker.
+#   JSON reports distinguish launch request from visual/runtime PASS.
+#   Build task #6 is unchanged and does NOT install APKs.
+# Test evidence on Linux: 31/31 Windows CMD/PowerShell source tests PASS,
+#   9/9 emulator helper mock/security unit tests PASS,
+#   generator --check PASS, py_compile PASS. TOTAL 40 Python tests.
+# CMD embedded PS source byte-exact; Drive original file ID kept unchanged,
+# BOM-free CRLF size 33361 SHA256 78629df7098bcb2ec22f222043b40197b819339035541aca2a45ca40ab07a7e7.
+# Does NOT prove x86_64 emulator creation, Windows Hypervisor Platform enabled,
+# A01/A02 actual UI launch, B01-B05, APK installer signing or data migrations
+# on user's Windows machine; all require operator execution and review.
