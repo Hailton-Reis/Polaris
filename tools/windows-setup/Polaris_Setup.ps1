@@ -2,7 +2,7 @@
 # Respeita outras ferramentas/projetos: nenhum reset de repo, nenhuma remocao ou alteracao de banco de dados.
 [CmdletBinding()]
 param(
-    [ValidateSet('Menu','Check','Install','Prepare','Build','All','OtherProjects')]
+    [ValidateSet('Menu','Check','Install','Prepare','Build','All','OtherProjects','EmulatorBaseline','EmulatorPatched')]
     [string]$Action='Menu',
     [string]$Workspace=(Join-Path $env:USERPROFILE 'PolarisDev'),
     [switch]$Yes
@@ -449,6 +449,30 @@ function Build-Polaris {
     Say ('[OK] Verifique os APKs e logs em '+(Join-Path $script:BuildWorkspace 'evidence')) 'Green'
     Say 'Lembrete: B01-B05 precisam de celular/emulador; o backup v2 permanece bloqueado.' 'Yellow'
 }
+function Invoke-PolarisEmulator([string]$Stage){
+    if($Stage -notin @('baseline','spike001')){throw 'Etapa do emulador nao reconhecida.'}
+    Say '=== EMULADOR POLARIS ANDROID STUDIO API 35 ===' 'Cyan'
+    Say 'Somente um AVD isolado. Nunca instalar em celular fisico ou outro AVD.' 'Yellow'
+    Say 'A instalacao da imagem Android pode ocupar varios GB; Windows WHPX e necessario.' 'Yellow'
+    if($Stage -eq 'baseline'){
+        if(!(Confirm-Action 'Preparar AVD dedicado, instalar e abrir Yomotsu original (A01)?')){throw 'Teste A01 cancelado.'}
+    }else{
+        Say 'Instalar Spike-001 substitui a baseline e pode migrar o banco SOMENTE do AVD Polaris.' 'Yellow'
+        if(!(Confirm-Action 'Ja verificou visualmente A01 e quer instalar Spike-001 no AVD Polaris (A02)?')){throw 'Teste A02 cancelado.'}
+    }
+    Set-LocalProcessEnvironment
+    Ensure-PolarisCheckout
+    $py=Find-Python
+    if(!$py){throw 'Python ausente para executar o emulador.'}
+    $runner=Join-Path $script:PolarisDir 'tools\local-android\polaris_emulator.py'
+    if(!(Test-Path -LiteralPath $runner -PathType Leaf)){throw 'Driver de emulador ausente no checkout Polaris.'}
+    $pythonExe=[string]$py.run
+    $pythonArgs=@($py.args) + @($runner,$Stage,'--workspace',$script:Workspace,'--consent')
+    & $pythonExe @pythonArgs
+    if($LASTEXITCODE -ne 0){throw "Teste no emulador encerrou com codigo $LASTEXITCODE. Revise PolarisDev\relatorios e PolarisDev\emulador."}
+    Say ('[OK] Teste '+$Stage+' iniciado. Confirme a tela no Android Studio; sem PASS automatico de runtime.') 'Green'
+}
+
 function Other-Projects {
     Say '=== FERRAMENTAS RELACIONADAS A OUTROS PROJETOS (somente leitura) ===' 'Cyan'
     foreach($p in @(@('Analista/Madeira','python.exe'),@('CameraGuard','.NET'),@('Vai Quem Quer','node.exe'))){
@@ -476,6 +500,8 @@ function Run-Action([string]$Chosen){
         '5' { [void](Get-Status); Other-Projects }
         '6' { [void](Get-Status); Install-Tools; [void](Get-Status); Prepare-Polaris; Build-Polaris }
         '7' { Install-OtherTools }
+        '8' { Invoke-PolarisEmulator 'baseline' }
+        '9' { Invoke-PolarisEmulator 'spike001' }
         '0' { Say 'Saindo sem alterar arquivos.';return }
         default { Say '[ERRO] Opcao invalida.' 'Yellow' }
     }
@@ -483,7 +509,7 @@ function Run-Action([string]$Chosen){
 function Menu {
     do {
         Write-Host ''
-        Write-Host '===== POLARIS - CMD UNICO - R001 FIX8 SAFE-CLONE 23/10 =====' -ForegroundColor Cyan
+        Write-Host '===== POLARIS - CMD UNICO - R001 EMULADOR A01/A02 23/10 =====' -ForegroundColor Cyan
         Write-Host '1. Verificar TUDO (somente diagnostico; salva log em PolarisDev)'
         Write-Host '2. Instalar/configurar ferramentas ausentes (winget + SDK)'
         Write-Host '3. Preparar Polaris + Yomotsu (Git)'
@@ -491,6 +517,8 @@ function Menu {
         Write-Host '5. Verificar ferramentas dos outros projetos'
         Write-Host '6. FAZER TUDO DO POLARIS: instalar + preparar + compilar'
         Write-Host '7. Instalar Node.js/.NET 8 OPCIONAIS (outros projetos)'
+        Write-Host '8. EMULAR Yomotsu original (Android Studio / A01)'
+        Write-Host '9. EMULAR Polaris Spike-001 (Android Studio / A02)'
         Write-Host '0. Sair'
         $choice=Read-Host 'Escolha'
         if($choice -eq '0'){break}
@@ -512,6 +540,8 @@ try{
         Build { Build-Polaris }
         All { [void](Get-Status);Install-Tools;[void](Get-Status);Prepare-Polaris;Build-Polaris }
         OtherProjects { Other-Projects }
+        EmulatorBaseline { Invoke-PolarisEmulator 'baseline' }
+        EmulatorPatched { Invoke-PolarisEmulator 'spike001' }
     }
     Say ('Logs: '+$script:LogFile) 'Cyan'
     exit 0
