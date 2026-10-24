@@ -86,3 +86,15 @@ Foi preparado para **Windows PowerShell 5.1**, que normalmente acompanha Windows
 - O processo define `PYTHONDONTWRITEBYTECODE=1` apenas para a sessão para evitar criar novas pastas `__pycache__` de testes Python.
 - Quando o checkout principal estiver limpo, a atualização por fast-forward da FIX6 continua valendo. Clones isolados são preservados como evidência e podem ocupar espaço; não há limpeza automática.
 - A FIX8 está incorporada no **mesmo arquivo CMD** e precisa sincronizar do Drive antes de executar a opção 4. O primeiro build Gradle e o teste real de Windows com checkout modificado continuam pendentes.
+
+## EMULADOR A01 / A02 — Android Studio (23/10/2026)
+
+- O **mesmo CMD** inclui a opcao **8 — EMULAR Yomotsu original (A01)** e **9 — EMULAR Polaris Spike-001 (A02)**, ambas com confirmacao explicita e somente para dispositivo virtual dedicado `Polaris_R001_API35_x64`.
+- O driver `tools/local-android/polaris_emulator.py` e baixado pelo checkout oficial automaticamente via `Ensure-PolarisCheckout`, sem segundo CMD nem download manual. Utiliza Android 15 (API 35), sistema `google_apis;x86_64`, **Android Emulator** e ferramentas oficiais do Android SDK. O SDK de compilacao API 37.0 continua intocado.
+- Requer computador Windows x64 com virtualizacao de CPU e **Windows Hypervisor Platform (WHPX)** habilitada. Se faltarem, imprime diagnostico; **nao** altera BIOS nem recursos do Windows e nao reinicia o PC. Android ARM64 requer preparacao via Device Manager, nao instala a imagem x86_64 incorreta.
+- O Android Studio Device Manager mostra o AVD criado pelo comando `avdmanager`, com dados em `%USERPROFILE%\\PolarisDev\\emulador`. Se um AVD com o mesmo nome ja existir sem marcador de propriedade, o script **recusa sobrescrever**. Nao usa `-wipe-data`, `adb uninstall`, device serial generico ou aparelho fisico.
+- O driver seleciona somente builds com `build-status.txt` aprovado, exatamente um APK original e um Spike-001 e `apks/SHA256SUMS.txt` com hashes conferidos. Conecta-se exclusivamente ao serial `emulator-XXXX` cujo nome AVD retorna exatamente `Polaris_R001_API35_x64`.
+- Opcao **8**: prepara AVD, verifica aceleracao de hardware, instala e tenta abrir o **APK original**. Observe visualmente a tela e salve a comprovacao de A01; a entrega do comando de abertura **nao** prova renderizacao real. A opcao **9** so deve ser executada **depois** da conferencia de A01; instala a versao Spike-001 sobre a baseline **no banco exclusivo do emulador** e solicita a abertura para teste A02.
+- Evidencias: `%USERPROFILE%\\PolarisDev\\relatorios\\emulador-<fase>-<sessao>\\result.json` marcado `INSTALLED_AND_LAUNCH_REQUESTED_NOT_VISUALLY_VERIFIED` e logs de inicializacao do emulador em `PolarisDev\\emulador`. Os testes A01/A02 e B01–B05 exigem confirmacao visual e uso de fontes reais; **nenhum PASS automatico de leitor**.
+- A opcao 6 permanece so diagnostico/instalacao/build, sem dispositivos. O PR #1 continua Draft e backup v2 permanece bloqueado.
+- Fonte de seguranca: Android Developers, guias `avdmanager`, `emulator -accel-check` e Windows WHPX.
