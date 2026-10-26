@@ -12,7 +12,8 @@ POLARIS — CONFIGURADOR UNICO WINDOWS
    6 = Fazer tudo (diagnostico + 2 + diagnostico + 3 + 4; solicita confirmacao antes de instalar)
    7 = Opcional: instalar Node.js LTS e .NET SDK 8 para outros projetos
    8 = Criar/abrir emulador Android Studio dedicado e testar Yomotsu original
-   9 = Instalar Polaris Spike-001 no MESMO emulador apos observar a baseline
+   9 = Emular Polaris Spike-001 em AVD separado (configuracoes proprias)
+   10 = COMPARAR Yomotsu e Polaris lado a lado (2 AVDs, dados persistentes)
    0 = Sair
 
 IMPORTANTE
@@ -51,3 +52,5 @@ Testes estaticos nao comprovam funcionamento de winget, SDK, Gradle ou APK.
 Comece pela opcao 1. A opcao 6 instala, prepara e compila apos a confirmacao,
 mas NAO instala APK no celular nem libera backup v2.
 O emulador usa Android 15 API 35 x86_64, requer virtualizacao/WHPX e pode baixar arquivos grandes. Ele nao prova visualmente a interface sem inspecao do usuario.
+
+Emuladores A01/A02 em AVDs distintos; dados do usuario persistem em PolarisDev\emulador\avd, nao sincronizados automaticamente. Para comparacao use opcao 10. Nao use Wipe Data nem desinstale o aplicativo se quiser preservar configuracoes.
