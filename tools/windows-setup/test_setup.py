@@ -192,6 +192,15 @@ class LauncherSafety(unittest.TestCase):
         self.assertIn("8. EMULAR Yomotsu original", PS)
         self.assertIn("9. EMULAR Polaris Spike-001", PS)
 
+    def test_dual_avd_menu_and_explicit_consent(self):
+        self.assertIn("'10' { Invoke-PolarisEmulator 'duo' }", PS)
+        self.assertIn("EmulatorDuo { Invoke-PolarisEmulator 'duo' }", PS)
+        self.assertIn("'baseline','spike001','duo'", PS)
+        self.assertIn('10. COMPARAR lado a lado', PS)
+        self.assertIn('Cada Android tera fontes, biblioteca e preferencias independentes e persistentes.', PS)
+        self.assertIn('Confirm-Action', PS.split("elseif($Stage -eq 'spike001')", 1)[1])
+        self.assertIn('R001 DUAL-AVD FIX 25/10', PS)
+
     def test_original_all_action_never_installs_on_device(self):
         all_action = PS.split("'6' {",1)[1].split("}\n",1)[0]
         self.assertNotIn('Invoke-PolarisEmulator', all_action)
