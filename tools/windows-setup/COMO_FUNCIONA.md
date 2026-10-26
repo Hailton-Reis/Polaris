@@ -98,3 +98,14 @@ Foi preparado para **Windows PowerShell 5.1**, que normalmente acompanha Windows
 - Evidencias: `%USERPROFILE%\\PolarisDev\\relatorios\\emulador-<fase>-<sessao>\\result.json` marcado `INSTALLED_AND_LAUNCH_REQUESTED_NOT_VISUALLY_VERIFIED` e logs de inicializacao do emulador em `PolarisDev\\emulador`. Os testes A01/A02 e B01–B05 exigem confirmacao visual e uso de fontes reais; **nenhum PASS automatico de leitor**.
 - A opcao 6 permanece so diagnostico/instalacao/build, sem dispositivos. O PR #1 continua Draft e backup v2 permanece bloqueado.
 - Fonte de seguranca: Android Developers, guias `avdmanager`, `emulator -accel-check` e Windows WHPX.
+
+
+## Comparacao lado a lado e persistencia — 25/10/2026
+
+- Nova **opcao 10** do CMD: inicia dois emuladores Android 15 API35 x86_64 independentes, `Polaris_R001_Yomotsu_API35_x64` e `Polaris_R001_Spike001_API35_x64`. O usuario pode posicionar as duas janelas lado a lado usando Win+seta esquerda/direita. O programa nao modifica a posicao de outras janelas.
+- **Opcao 8** abre somente o AVD original; **opcao 9** abre somente o AVD Polaris; ambas mantem as bibliotecas e preferencias distintas. Nao se substituem mais no mesmo AVD.
+- Dados de aplicativos, configuracoes, extensoes instaladas, leituras e bibliotecas ficam nos discos virtuais separados `%USERPROFILE%\PolarisDev\emulador\avd\<AVD>.avd` e persistem depois de fechar normalmente. Sem `-wipe-data`, `-read-only` ou limpeza automatica. Ao reinstalar APK com `adb install -r`, os dados sao preservados se a assinatura for compativel; se nao for, falha sem desinstalar.
+- Os repositorios e credenciais **nao sao sincronizados automaticamente entre AVDs**: configure individualmente dentro dos aplicativos. Uma planilha JSON de comparacao vazia e salva no relatorio para registro de B01–B05 sem inventar resultados. Manter configuracoes no disco virtual nao significa backup externo; fazer copia somente com AVD fechado e proteja eventuais credenciais.
+- **FIX do seletor APK:** upstream Yomotsu `app/build.gradle.kts` define splits ABI armeabi-v7a, arm64-v8a, x86, x86_64, universal. A versao anterior do driver exigia `len(apks)==1` e retornava 'Nao encontrei build completo' mesmo quando Gradle havia terminado com sucesso. Agora ele confere SHA256 de **todos** os APKs do manifesto e seleciona exatamente o x86_64 (ou o universal como fallback deterministico). Nenhum rebuild e exigido.
+- AVD de comparacao pode demandar RAM alta (recomendavel pelo menos 16 GB); VM acceleration WHPX/VT-x ou AMD-V precisa estar habilitada. Um pedido de abertura do aplicativo nao prova funcionalidade real, por isso resultados A01, A02 e B01–B05 continuam PENDENTES ate execucao e verificacao visual do usuario.
+- Os 16 testes Python locais validaram selecao por arquitetura, manifesto, isolamento, dados persistentes, alvo ADB e relatorio sem resultados inventados. Emulacao real no Windows ainda nao validada.
