@@ -231,3 +231,31 @@ PowerShell lexical token errors: 0 unclosed bracket groups: 0
 # Does NOT prove x86_64 emulator creation, Windows Hypervisor Platform enabled,
 # A01/A02 actual UI launch, B01-B05, APK installer signing or data migrations
 # on user's Windows machine; all require operator execution and review.
+
+# R001 DUAL AVD / ABI APK FIX - 2026-10-25
+# Real Windows screenshot: after choosing A01, original CMD created a clean
+# Polaris checkout, but emulator driver said:
+# [ERRO EMULADOR] Nao encontrei build completo com baseline, Spike-001 e hashes validos.
+# Verified upstream pinned Yomotsu app/build.gradle.kts has ABI splits for
+# armeabi-v7a, arm64-v8a, x86, x86_64 AND universal. Original helper expected
+# exactly one *.apk in each variant directory; finished build had multiple.
+# FIX: verify sha256 of ALL APKs listed in apks/SHA256SUMS.txt, select exact
+# x86_64 APK (fallback unambiguous universal), refuse corrupted/ambiguous builds.
+# Feature: two independent, persistent Android Studio API35 AVDs:
+#   Polaris_R001_Yomotsu_API35_x64 (baseline only)
+#   Polaris_R001_Spike001_API35_x64 (patched only)
+# CMD option 8: original alone; option 9: patched alone; option 10: both
+# launched side by side (user snaps windows manually).
+# Each AVD's userdata, installed repos/extensions, library & settings persist
+# across normal shutdowns/restarts, without -wipe-data, -read-only or uninstall.
+# No cross-AVD credential sync; no automatic Google Drive upload of AVD user data.
+# All installs target emulator-NNNN serials verified against exact AVD names.
+# Local comparison template contains only pending B01-B05 results, never fake PASS.
+# Tests executed Linux/Python: 32/32 CMD source contract tests PASS;
+# 16/16 emulator helper tests PASS, multi-APK and SHA corruption cases covered.
+# python -m py_compile PASS, CMD embedded PS1 generator --check PASS.
+# Same Drive file ID/name retained; exact verified SHA256:
+# 31f02aa9a832c89647cc18268738beae1c0596614746512b931a1aeb772e0f36
+# size 33976 bytes; no BOM, Windows CRLF. Original user files preserved.
+# IMPORTANT: NOT YET PROVEN on Windows: simultaneous AVD launch, WHPX,
+# A01/A02 actual UI, repository configurations, B01-B05 runtime or backup v2.
