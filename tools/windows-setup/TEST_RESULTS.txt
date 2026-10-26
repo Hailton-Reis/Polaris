@@ -259,3 +259,27 @@ PowerShell lexical token errors: 0 unclosed bracket groups: 0
 # size 33976 bytes; no BOM, Windows CRLF. Original user files preserved.
 # IMPORTANT: NOT YET PROVEN on Windows: simultaneous AVD launch, WHPX,
 # A01/A02 actual UI, repository configurations, B01-B05 runtime or backup v2.
+
+# R001 AUTOMATED READ-ONLY A01/A02 SMOKE - 2026-10-25
+# User screenshot: two separate Android Studio API35 emulator windows visibly
+# render Mihon/Yomotsu onboarding Welcome screen at the same time.
+# User requested automatic testing BEFORE configuring extensions/sources.
+# Added tools/local-android/polaris_smoke.py and test_polaris_smoke.py.
+# Added CMD option 11: explicit approval, check ONLY already-running
+# Polaris_R001_Yomotsu_API35_x64 and Polaris_R001_Spike001_API35_x64.
+# ADB read-only operations: getprop boot/API, pm path, pidof, dumpsys window,
+# dumpsys activity activities, recent AndroidRuntime:E logcat -d, exec-out
+# screencap -p. No click, app install/uninstall, app-data clear, force-stop,
+# background tests, source configuration, internet calls or GitHub/Drive uploads.
+# Writes local relatorios/smoke-A01-A02-<timestamp>-<id>:
+# report.json, report.html, baseline.png, spike001.png (with user approval).
+# Tests in Linux/Python 3.13: 33/33 Windows CMD/static contract tests PASSED,
+# 12/12 new AVD smoke Python unittest cases PASSED,
+# 16/16 existing dual emulator helper tests PASSED. TOTAL 61/61.
+# generator --check PASSED, py_compile PASSED, exact CMD PS1 parity PASSED.
+# SAME original Drive CMD file ID/name retained. CRLF, BOM-free, 35476 bytes.
+# SHA256 bee9ce6397f1f1850b083f737e8a71d6948aad5c3a1873d0742aaa864c2460f5.
+# Drive readback matched GitHub content byte-for-byte after CRLF translation.
+# Real Windows automatic smoke diagnostics NOT executed in this environment.
+# A01/A02 visually reached Welcome screen by user's screenshot, but functional
+# A01/A02, sources B01-B05 and backup v2 remain pending/blocked.
