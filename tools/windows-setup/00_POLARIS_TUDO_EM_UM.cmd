@@ -20,7 +20,7 @@ exit /b %RESULTADO%
 # Respeita outras ferramentas/projetos: nenhum reset de repo, nenhuma remocao ou alteracao de banco de dados.
 [CmdletBinding()]
 param(
-    [ValidateSet('Menu','Check','Install','Prepare','Build','All','OtherProjects','EmulatorBaseline','EmulatorPatched','EmulatorDuo')]
+    [ValidateSet('Menu','Check','Install','Prepare','Build','All','OtherProjects','EmulatorBaseline','EmulatorPatched','EmulatorDuo','EmulatorSmoke')]
     [string]$Action='Menu',
     [string]$Workspace=(Join-Path $env:USERPROFILE 'PolarisDev'),
     [switch]$Yes
@@ -495,6 +495,28 @@ function Invoke-PolarisEmulator([string]$Stage){
     Say ('[OK] Teste '+$Stage+' iniciado. Confirme a tela no Android Studio; sem PASS automatico de runtime.') 'Green'
 }
 
+function Invoke-PolarisSmoke {
+    Say '=== POLARIS: TESTE AUTOMATICO SEM CONFIGURAR FONTES ===' 'Cyan'
+    Say 'Ambos os emuladores devem estar abertos. Nao sera feito clique, instalacao, login ou Wipe Data.' 'Yellow'
+    Say 'Capturas de tela e relatorios ficarao SOMENTE no computador, em PolarisDev\\relatorios.' 'Yellow'
+    if(!(Confirm-Action 'Verificar os dois AVDs sem alterar seus dados e salvar capturas locais das telas?')){
+        throw 'Teste automatico cancelado. Nenhum AVD alterado.'
+    }
+    Set-LocalProcessEnvironment
+    Ensure-PolarisCheckout
+    $py=Find-Python
+    if(!$py){throw 'Python indisponivel para executar o teste automatico.'}
+    $runner=Join-Path $script:PolarisDir 'tools\local-android\polaris_smoke.py'
+    if(!(Test-Path -LiteralPath $runner -PathType Leaf)){
+        throw 'Verificador Polaris de emuladores nao localizado apos sincronizacao Git.'
+    }
+    $pythonExe=[string]$py.run
+    $args=@($py.args) + @($runner,'--workspace',$script:Workspace,'--consent')
+    & $pythonExe @args
+    if($LASTEXITCODE -ne 0){throw "Teste automatico encontrou problemas (codigo $LASTEXITCODE). Consulte PolarisDev\relatorios\smoke-A01-A02-*."}
+    Say '[OK] Diagnosticos A01/A02 coletados. B01-B05 continuam aguardando fontes configuradas.' 'Green'
+}
+
 function Other-Projects {
     Say '=== FERRAMENTAS RELACIONADAS A OUTROS PROJETOS (somente leitura) ===' 'Cyan'
     foreach($p in @(@('Analista/Madeira','python.exe'),@('CameraGuard','.NET'),@('Vai Quem Quer','node.exe'))){
@@ -525,6 +547,7 @@ function Run-Action([string]$Chosen){
         '8' { Invoke-PolarisEmulator 'baseline' }
         '9' { Invoke-PolarisEmulator 'spike001' }
         '10' { Invoke-PolarisEmulator 'duo' }
+        '11' { Invoke-PolarisSmoke }
         '0' { Say 'Saindo sem alterar arquivos.';return }
         default { Say '[ERRO] Opcao invalida.' 'Yellow' }
     }
@@ -532,7 +555,7 @@ function Run-Action([string]$Chosen){
 function Menu {
     do {
         Write-Host ''
-        Write-Host '===== POLARIS - CMD UNICO - R001 DUAL-AVD FIX 25/10 =====' -ForegroundColor Cyan
+        Write-Host '===== POLARIS - CMD UNICO - R001 AUTO-SMOKE A01/A02 25/10 =====' -ForegroundColor Cyan
         Write-Host '1. Verificar TUDO (somente diagnostico; salva log em PolarisDev)'
         Write-Host '2. Instalar/configurar ferramentas ausentes (winget + SDK)'
         Write-Host '3. Preparar Polaris + Yomotsu (Git)'
@@ -543,6 +566,7 @@ function Menu {
         Write-Host '8. EMULAR Yomotsu original (Android Studio / A01)'
         Write-Host '9. EMULAR Polaris Spike-001 (AVD separado / A02)'
         Write-Host '10. COMPARAR lado a lado: Yomotsu + Polaris (2 AVDs, dados salvos)'
+        Write-Host '11. TESTES AUTOMATICOS sem repositorios (sem modificar os 2 AVDs)'
         Write-Host '0. Sair'
         $choice=Read-Host 'Escolha'
         if($choice -eq '0'){break}
@@ -567,6 +591,7 @@ try{
         EmulatorBaseline { Invoke-PolarisEmulator 'baseline' }
         EmulatorPatched { Invoke-PolarisEmulator 'spike001' }
         EmulatorDuo { Invoke-PolarisEmulator 'duo' }
+        EmulatorSmoke { Invoke-PolarisSmoke }
     }
     Say ('Logs: '+$script:LogFile) 'Cyan'
     exit 0
