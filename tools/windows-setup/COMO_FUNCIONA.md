@@ -109,3 +109,14 @@ Foi preparado para **Windows PowerShell 5.1**, que normalmente acompanha Windows
 - **FIX do seletor APK:** upstream Yomotsu `app/build.gradle.kts` define splits ABI armeabi-v7a, arm64-v8a, x86, x86_64, universal. A versao anterior do driver exigia `len(apks)==1` e retornava 'Nao encontrei build completo' mesmo quando Gradle havia terminado com sucesso. Agora ele confere SHA256 de **todos** os APKs do manifesto e seleciona exatamente o x86_64 (ou o universal como fallback deterministico). Nenhum rebuild e exigido.
 - AVD de comparacao pode demandar RAM alta (recomendavel pelo menos 16 GB); VM acceleration WHPX/VT-x ou AMD-V precisa estar habilitada. Um pedido de abertura do aplicativo nao prova funcionalidade real, por isso resultados A01, A02 e B01–B05 continuam PENDENTES ate execucao e verificacao visual do usuario.
 - Os 16 testes Python locais validaram selecao por arquitetura, manifesto, isolamento, dados persistentes, alvo ADB e relatorio sem resultados inventados. Emulacao real no Windows ainda nao validada.
+
+
+## Testes automaticos SEM CONFIGURAR FONTES — 25/10/2026
+
+Nova **opcao 11** do mesmo CMD: testes de observacao dos dois AVDs abertos, SEM adicionar repositorios, completar onboarding, alterar preferencias ou reiniciar o aplicativo. Ela exige a confirmacao do usuario, recupera o script `tools/local-android/polaris_smoke.py` via checkout Polaris no GitHub, confere a identidade exata dos AVDs e inspeciona ADB `getprop`, `pm path`, `pidof`, `dumpsys window`, `dumpsys activity activities`, e apenas eventos `AndroidRuntime:E` recentes. Captura PNG local com `adb exec-out screencap -p`. Nenhum `adb install`, `pm clear`, `input tap`, `force-stop`, `logcat -c` ou alteracao de dados do emulador.
+
+O relatorio fica em `%USERPROFILE%\PolarisDev\relatorios\smoke-A01-A02-<data>-<id>\`, como `report.html` (duas capturas lado a lado), `report.json`, `baseline.png`, `spike001.png`. As capturas podem registrar informacoes privadas e **NAO sao enviadas automaticamente ao Drive ou GitHub**. Um crash encontrado em historico `logcat` e so aviso, nao prova crash atual; a inspecao de primeiro plano nao prova todas as funcionalidades do leitor. Vereditos referem-se apenas ao diagnostico, nunca a PASS dos testes B01-B05.
+
+Uso: abrir os dois emuladores com a opcao 10, deixar ambos na tela inicial, executar **11**. A opcao 11 NAO recompila APK, NAO instala APK, NAO reconfigura fontes. O estado do assistente de boas-vindas e preservado para que o usuario complete depois. Nao usar Wipe Data quando configurar fontes.
+
+Fonte oficial para ADB e screencap: https://developer.android.com/tools/adb
