@@ -45,7 +45,7 @@ class CanonicalChapterResolver {
         var value = normalizedTitle
             .replace(Regex("""\b(?:chapter|chap|ch|capitulo|cap|episode|episodio|ep)\b"""), " ")
             .replace(Regex("""\b\d+(?:[.,]\d+)?\b"""), " ")
-            .replace(Regex("\s+"), " ")
+            .replace(Regex("""\s+"""), " ")
             .trim()
         if (value.isBlank()) value = "special"
         return if (number == null) value else "$value#$number"

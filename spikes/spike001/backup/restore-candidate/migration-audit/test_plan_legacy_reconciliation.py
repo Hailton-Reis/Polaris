@@ -103,7 +103,10 @@ class LegacyReconciliationPlanTests(unittest.TestCase):
     def test_plan_fingerprint_changes_on_settings_edit(self):
         self.duplicate()
         first=candidate_plan(self.db)['review_groups'][0]['row_fingerprint_sha256']
-        self.db.execute('UPDATE merged SET chapter_priority=102 WHERE manga_source=11 LIMIT 1')
+        self.db.execute(
+            'UPDATE merged SET chapter_priority=102 WHERE _id=('
+            'SELECT _id FROM merged WHERE manga_source=11 ORDER BY _id LIMIT 1)'
+        )
         self.db.commit()
         second=candidate_plan(self.db)['review_groups'][0]['row_fingerprint_sha256']
         self.assertNotEqual(first,second)

@@ -48,10 +48,10 @@ object ChapterLabelParser {
 
     fun normalize(value: String): String = Normalizer.normalize(value, Normalizer.Form.NFKD)
         .lowercase(Locale.ROOT)
-        .replace(Regex("\p{M}+"), "")
-        .replace(Regex("[^\p{L}\p{N}.,]+"), " ")
+        .replace(Regex("""\p{M}+"""), "")
+        .replace(Regex("""[^\p{L}\p{N}.,]+"""), " ")
         .trim()
-        .replace(Regex("\s+"), " ")
+        .replace(Regex("""\s+"""), " ")
 
     private fun containsWord(text: String, word: String): Boolean =
         Regex("""(?:^|\s)${Regex.escape(word)}(?:\s|$)""").containsMatchIn(text)
