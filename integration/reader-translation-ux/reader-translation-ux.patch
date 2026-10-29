@@ -1,0 +1,418 @@
+diff --git a/app/src/main/java/eu/kanade/presentation/manga/components/ChapterTranslationIndicator.kt b/app/src/main/java/eu/kanade/presentation/manga/components/ChapterTranslationIndicator.kt
+index 7774cda..47eb001 100644
+--- a/app/src/main/java/eu/kanade/presentation/manga/components/ChapterTranslationIndicator.kt
++++ b/app/src/main/java/eu/kanade/presentation/manga/components/ChapterTranslationIndicator.kt
+@@ -10,8 +10,14 @@ import androidx.compose.material.icons.outlined.Translate
+ import androidx.compose.material3.CircularProgressIndicator
+ import androidx.compose.material3.DropdownMenuItem
+ import androidx.compose.material3.Icon
++import androidx.compose.material3.IconButton
+ import androidx.compose.material3.MaterialTheme
++import androidx.compose.material3.PlainTooltip
+ import androidx.compose.material3.Text
++import androidx.compose.material3.TooltipAnchorPosition
++import androidx.compose.material3.TooltipBox
++import androidx.compose.material3.TooltipDefaults.rememberTooltipPositionProvider
++import androidx.compose.material3.rememberTooltipState
+ import androidx.compose.material3.ripple
+ import androidx.compose.runtime.Composable
+ import androidx.compose.runtime.getValue
+@@ -47,10 +53,12 @@ fun ChapterTranslationIndicator(
+     translationStateProvider: () -> Translation.State,
+     onClick: (ChapterTranslationAction) -> Unit,
+     modifier: Modifier = Modifier,
++    downloaded: Boolean = true,
+ ) {
+     when (val translationState = translationStateProvider()) {
+         Translation.State.NOT_TRANSLATED -> NotTranslatedIndicator(
+             enabled = enabled,
++            downloaded = downloaded,
+             modifier = modifier,
+             onClick = onClick,
+         )
+@@ -75,27 +83,31 @@ fun ChapterTranslationIndicator(
+ @Composable
+ private fun NotTranslatedIndicator(
+     enabled: Boolean,
++    downloaded: Boolean,
+     modifier: Modifier = Modifier,
+     onClick: (ChapterTranslationAction) -> Unit,
+ ) {
+-    Box(
+-        modifier = modifier
+-            .size(IconButtonTokens.StateLayerSize)
+-            .commonClickable(
+-                enabled = enabled,
+-                hapticFeedback = LocalHapticFeedback.current,
+-                onLongClick = { onClick(ChapterTranslationAction.START) },
+-                onClick = { onClick(ChapterTranslationAction.START) },
+-            )
+-            .secondaryItemAlpha(),
+-        contentAlignment = Alignment.Center,
++    val label = stringResource(
++        if (downloaded) ATMR.strings.manga_translate else ATMR.strings.manga_download_and_translate,
++    )
++    TooltipBox(
++        positionProvider = rememberTooltipPositionProvider(TooltipAnchorPosition.Above),
++        tooltip = { PlainTooltip { Text(label) } },
++        state = rememberTooltipState(),
++        focusable = false,
+     ) {
+-        Icon(
+-            imageVector = Icons.Outlined.Translate,
+-            contentDescription = stringResource(ATMR.strings.manga_translate),
+-            modifier = Modifier.size(IndicatorSize),
+-            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+-        )
++        IconButton(
++            onClick = { onClick(ChapterTranslationAction.START) },
++            enabled = enabled,
++            modifier = modifier.size(IconButtonTokens.StateLayerSize).secondaryItemAlpha(),
++        ) {
++            Icon(
++                imageVector = Icons.Outlined.Translate,
++                contentDescription = label,
++                modifier = Modifier.size(IndicatorSize),
++                tint = MaterialTheme.colorScheme.onSurfaceVariant,
++            )
++        }
+     }
+ }
+ 
+diff --git a/app/src/main/java/eu/kanade/presentation/manga/components/MangaChapterListItem.kt b/app/src/main/java/eu/kanade/presentation/manga/components/MangaChapterListItem.kt
+index c581eef..0d5120d 100644
+--- a/app/src/main/java/eu/kanade/presentation/manga/components/MangaChapterListItem.kt
++++ b/app/src/main/java/eu/kanade/presentation/manga/components/MangaChapterListItem.kt
+@@ -176,9 +176,10 @@ fun MangaChapterListItem(
+                 }
+             }
+             //TachiyomiAT
+-            if (onTranslationClick != null && downloadStateProvider() == Download.State.DOWNLOADED) {
++            if (onTranslationClick != null) {
+                 ChapterTranslationIndicator(
+-                    enabled = true,
++                    enabled = downloadIndicatorEnabled || downloadStateProvider() == Download.State.DOWNLOADED,
++                    downloaded = downloadStateProvider() == Download.State.DOWNLOADED,
+                     modifier = Modifier.padding(start = 4.dp),
+                     translationStateProvider = translationStateProvider,
+                     onClick = { onTranslationClick.invoke(it) },
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/data/download/DownloadManager.kt b/app/src/main/java/eu/kanade/tachiyomi/data/download/DownloadManager.kt
+index 921f8d0..c45a189 100644
+--- a/app/src/main/java/eu/kanade/tachiyomi/data/download/DownloadManager.kt
++++ b/app/src/main/java/eu/kanade/tachiyomi/data/download/DownloadManager.kt
+@@ -4,6 +4,7 @@ import android.content.Context
+ import eu.kanade.tachiyomi.data.download.model.Download
+ import eu.kanade.tachiyomi.source.Source
+ import eu.kanade.tachiyomi.source.model.Page
++import eu.kanade.translation.TranslationManager
+ import kotlinx.coroutines.flow.Flow
+ import kotlinx.coroutines.flow.asFlow
+ import kotlinx.coroutines.flow.drop
+@@ -46,6 +47,7 @@ class DownloadManager(
+      * Downloader whose only task is to download chapters.
+      */
+     private val downloader = Downloader(context, provider, cache)
++    private val translationManager by lazy { Injekt.get<TranslationManager>() }
+ 
+     val isRunning: Boolean
+         get() = downloader.isRunning
+@@ -90,6 +92,7 @@ class DownloadManager(
+      * Empties the download queue.
+      */
+     fun clearQueue() {
++        translationManager.pendingDownloads.clear()
+         downloader.clearQueue()
+         downloader.stop()
+     }
+@@ -250,6 +253,9 @@ class DownloadManager(
+     fun deleteManga(manga: Manga, source: Source, removeQueued: Boolean = true) {
+         launchIO {
+             if (removeQueued) {
++                translationManager.pendingDownloads.cancel(
++                    queueState.value.filter { it.manga.id == manga.id }.map { it.chapter.id },
++                )
+                 downloader.removeFromQueue(manga)
+             }
+             provider.findMangaDir(manga.title, source)?.delete()
+@@ -265,6 +271,7 @@ class DownloadManager(
+     }
+ 
+     private fun removeFromDownloadQueue(chapters: List<Chapter>) {
++        translationManager.pendingDownloads.cancel(chapters.map { it.id })
+         val wasRunning = downloader.isRunning
+         if (wasRunning) {
+             downloader.pause()
+@@ -342,6 +349,9 @@ class DownloadManager(
+         if (oldFolder.name == newName) return
+ 
+         // just to be safe, don't allow downloads for this manga while renaming it
++        translationManager.pendingDownloads.cancel(
++            queueState.value.filter { it.manga.id == manga.id }.map { it.chapter.id },
++        )
+         downloader.removeFromQueue(manga)
+ 
+         val capitalizationChanged = oldFolder.name.equals(newName, ignoreCase = true)
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/data/download/Downloader.kt b/app/src/main/java/eu/kanade/tachiyomi/data/download/Downloader.kt
+index 74ac77c..d56914c 100644
+--- a/app/src/main/java/eu/kanade/tachiyomi/data/download/Downloader.kt
++++ b/app/src/main/java/eu/kanade/tachiyomi/data/download/Downloader.kt
+@@ -16,7 +16,6 @@ import eu.kanade.tachiyomi.util.storage.DiskUtil
+ import eu.kanade.tachiyomi.util.storage.DiskUtil.NOMEDIA_FILE
+ import eu.kanade.tachiyomi.util.storage.saveTo
+ import eu.kanade.translation.TranslationManager
+-import eu.kanade.translation.TranslationRequestOrigin
+ import kotlinx.coroutines.CancellationException
+ import kotlinx.coroutines.CoroutineScope
+ import kotlinx.coroutines.Dispatchers
+@@ -450,11 +449,7 @@ class Downloader(
+             }
+ 
+             runCatching {
+-                translationManager.translateChapter(
+-                    manga = download.manga,
+-                    chapter = download.chapter,
+-                    origin = TranslationRequestOrigin.DOWNLOAD_COMPLETION,
+-                )
++                translationManager.translateDownloadedChapter(download.manga, download.chapter)
+             }.onFailure { error ->
+                 logcat(LogPriority.ERROR, error) {
+                     "Download concluído, mas não foi possível enfileirar a tradução automática."
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/manga/MangaViewModel.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/manga/MangaViewModel.kt
+index 19de11d..11ba990 100644
+--- a/app/src/main/java/eu/kanade/tachiyomi/ui/manga/MangaViewModel.kt
++++ b/app/src/main/java/eu/kanade/tachiyomi/ui/manga/MangaViewModel.kt
+@@ -796,8 +796,24 @@ class MangaViewModel(
+     ) {
+         when (action) {
+             ChapterTranslationAction.START -> {
+-                if (item.downloadState != Download.State.DOWNLOADED) return
+                 val manga = successState?.manga ?: return
++                if (item.downloadState != Download.State.DOWNLOADED) {
++                    translationManager.pendingDownloads.request(item.chapter.id)
++                    // Recheck after persisting the request to close the completion race.
++                    val downloaded = downloadManager.isChapterDownloaded(
++                        item.chapter.name,
++                        item.chapter.scanlator,
++                        item.chapter.url,
++                        manga.title,
++                        manga.source,
++                    )
++                    if (downloaded) {
++                        translationManager.completeRequestedDownload(manga, item.chapter)
++                    } else {
++                        startDownload(listOf(item.chapter), startNow = false)
++                    }
++                    return
++                }
+                 viewModelScope.launchNonCancellable {
+                     translationManager.translateChapter(
+                         manga,
+diff --git a/app/src/main/java/eu/kanade/translation/PendingDownloadTranslations.kt b/app/src/main/java/eu/kanade/translation/PendingDownloadTranslations.kt
+new file mode 100644
+index 0000000..f6e9da9
+--- /dev/null
++++ b/app/src/main/java/eu/kanade/translation/PendingDownloadTranslations.kt
+@@ -0,0 +1,25 @@
++package eu.kanade.translation
++
++/** Explicit per-chapter requests survive restart and are consumed only after enqueue succeeds. */
++class PendingDownloadTranslations(
++    private val load: () -> Set<String>,
++    private val save: (Set<String>) -> Unit,
++) {
++    @Synchronized
++    fun request(chapterId: Long) = save(load() + chapterId.toString())
++
++    @Synchronized
++    fun cancel(chapterIds: Iterable<Long>) = save(load() - chapterIds.map(Long::toString).toSet())
++
++    @Synchronized
++    fun clear() = save(emptySet())
++
++    @Synchronized
++    fun complete(chapterId: Long, enqueue: () -> Unit): Boolean {
++        val key = chapterId.toString()
++        if (key !in load()) return false
++        enqueue()
++        save(load() - key)
++        return true
++    }
++}
+diff --git a/app/src/main/java/eu/kanade/translation/TranslationManager.kt b/app/src/main/java/eu/kanade/translation/TranslationManager.kt
+index d2aad1f..63aa258 100644
+--- a/app/src/main/java/eu/kanade/translation/TranslationManager.kt
++++ b/app/src/main/java/eu/kanade/translation/TranslationManager.kt
+@@ -53,6 +53,22 @@ class TranslationManager(
+     private val sourceManager: SourceManager = Injekt.get(),
+     private val translationPreferences: TranslationPreferences = Injekt.get(),
+ ) {
++    val pendingDownloads = PendingDownloadTranslations(
++        load = { translationPreferences.pendingDownloadTranslations().get() },
++        save = { translationPreferences.pendingDownloadTranslations().set(it) },
++    )
++
++    fun completeRequestedDownload(manga: Manga, chapter: Chapter): Boolean =
++        pendingDownloads.complete(chapter.id) {
++            translateChapter(manga, chapter, TranslationRequestOrigin.USER_ACTION)
++        }
++
++    fun translateDownloadedChapter(manga: Manga, chapter: Chapter) {
++        if (!completeRequestedDownload(manga, chapter)) {
++            translateChapter(manga, chapter, TranslationRequestOrigin.DOWNLOAD_COMPLETION)
++        }
++    }
++
+     private val translator = ChapterTranslator(context, provider)
+     private val editorScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+     private val translationFileMutex = Mutex()
+diff --git a/app/src/main/java/eu/kanade/translation/presentation/TranslationTextFit.kt b/app/src/main/java/eu/kanade/translation/presentation/TranslationTextFit.kt
+index b43aaac..ae93f81 100644
+--- a/app/src/main/java/eu/kanade/translation/presentation/TranslationTextFit.kt
++++ b/app/src/main/java/eu/kanade/translation/presentation/TranslationTextFit.kt
+@@ -14,13 +14,15 @@ object TranslationTextFit {
+     ): Selection {
+         val measured = mutableMapOf<Int, Measurement>()
+         fun measurement(size: Int) = measured.getOrPut(size) { measure(size) }
+-        val wholeWords = TranslationFontSizeSearch.largestFitting(minimum, maximum) {
+-            val result = measurement(it)
+-            result.fits && result.keepsWords
++        val largest = TranslationFontSizeSearch.largestFitting(minimum, maximum) { measurement(it).fits }
++            ?: return Selection(minimum.coerceAtMost(maximum), false, false)
++        // Word-boundary preservation is not monotonic: a smaller font can wrap
++        // at a different word. Binary search is valid for fit, not for this predicate.
++        for (size in largest downTo minimum) {
++            val result = measurement(size)
++            if (result.fits && result.keepsWords) return Selection(size, true, true)
+         }
+-        if (wholeWords != null) return Selection(wholeWords, true, true)
+-        val fallback = TranslationFontSizeSearch.selectWithFloor(minimum, maximum) { measurement(it).fits }
+-        return Selection(fallback.fontSizeSp, fallback.fits, false)
++        return Selection(largest, true, false)
+     }
+ 
+     fun keepsWords(text: String, lineEnds: List<Int>): Boolean = lineEnds.none { end ->
+diff --git a/app/src/test/java/eu/kanade/translation/PendingDownloadTranslationsTest.kt b/app/src/test/java/eu/kanade/translation/PendingDownloadTranslationsTest.kt
+new file mode 100644
+index 0000000..f9f38c4
+--- /dev/null
++++ b/app/src/test/java/eu/kanade/translation/PendingDownloadTranslationsTest.kt
+@@ -0,0 +1,55 @@
++package eu.kanade.translation
++
++import org.junit.jupiter.api.Assertions.assertEquals
++import org.junit.jupiter.api.Assertions.assertFalse
++import org.junit.jupiter.api.Assertions.assertThrows
++import org.junit.jupiter.api.Assertions.assertTrue
++import org.junit.jupiter.api.Test
++
++class PendingDownloadTranslationsTest {
++    private var stored = emptySet<String>()
++    private fun requests() = PendingDownloadTranslations({ stored }, { stored = it })
++
++    @Test
++    fun `explicit chapter request survives restart and does not select other chapters`() {
++        requests().request(42)
++        var enqueued = 0
++        assertFalse(requests().complete(43) { enqueued++ })
++        assertTrue(requests().complete(42) { enqueued++ })
++        assertEquals(1, enqueued)
++        assertTrue(stored.isEmpty())
++        assertFalse(requests().complete(42) { enqueued++ })
++    }
++
++    @Test
++    fun `enqueue failure preserves request for retry`() {
++        val requests = requests()
++        requests.request(42)
++        assertThrows(IllegalStateException::class.java) {
++            requests.complete(42) { error("queue unavailable") }
++        }
++        assertEquals(setOf("42"), stored)
++        assertTrue(requests.complete(42) {})
++    }
++
++    @Test
++    fun `cancellation prevents a later ordinary download from consuming the request`() {
++        val requests = requests()
++        requests.request(42)
++        requests.request(43)
++        requests.cancel(listOf(42))
++        assertFalse(requests.complete(42) { error("cancelled chapter enqueued") })
++        assertEquals(setOf("43"), stored)
++        requests.clear()
++        assertTrue(stored.isEmpty())
++    }
++
++    @Test
++    fun `duplicate clicks and simultaneous requests do not lose chapters`() {
++        val requests = requests()
++        val threads = (1L..20L).map { id -> Thread { repeat(5) { requests.request(id) } } }
++        threads.forEach(Thread::start)
++        threads.forEach(Thread::join)
++        assertEquals((1L..20L).map(Long::toString).toSet(), stored)
++    }
++}
+diff --git a/app/src/test/java/eu/kanade/translation/presentation/TranslationTextFitTest.kt b/app/src/test/java/eu/kanade/translation/presentation/TranslationTextFitTest.kt
+index f26ef06..dc8cbdf 100644
+--- a/app/src/test/java/eu/kanade/translation/presentation/TranslationTextFitTest.kt
++++ b/app/src/test/java/eu/kanade/translation/presentation/TranslationTextFitTest.kt
+@@ -60,4 +60,16 @@ class TranslationTextFitTest {
+         assertTrue(wider.keepsWords)
+         assertEquals(7, wider.fontSizeSp)
+     }
++    @Test
++    fun `does not discard a larger intact word layout when boundaries are nonmonotonic`() {
++        val calls = mutableMapOf<Int, Int>()
++        val result = TranslationTextFit.select(6, 25) { size ->
++            calls[size] = calls.getOrDefault(size, 0) + 1
++            TranslationTextFit.Measurement(size <= 23, size <= 14 || size == 22)
++        }
++        assertEquals(22, result.fontSizeSp)
++        assertTrue(result.keepsWords)
++        assertTrue(calls.values.all { it == 1 })
++    }
++
+ }
+diff --git a/domain/src/main/java/tachiyomi/domain/translation/TranslationPreferences.kt b/domain/src/main/java/tachiyomi/domain/translation/TranslationPreferences.kt
+index 18b804f..1c71bb3 100644
+--- a/domain/src/main/java/tachiyomi/domain/translation/TranslationPreferences.kt
++++ b/domain/src/main/java/tachiyomi/domain/translation/TranslationPreferences.kt
+@@ -1,5 +1,6 @@
+ package tachiyomi.domain.translation
+ 
++import tachiyomi.core.common.preference.Preference
+ import tachiyomi.core.common.preference.PreferenceStore
+ 
+ enum class TranslationLlmProvider(
+@@ -21,6 +22,11 @@ class TranslationPreferences(
+         preferenceStore.getString("translation_${provider.preferenceKey}_model", provider.defaultModel)
+     }
+ 
++    fun pendingDownloadTranslations() = preferenceStore.getStringSet(
++        Preference.appStateKey("pending_download_translations"),
++        emptySet(),
++    )
++
+     fun autoTranslateAfterDownload() = preferenceStore.getBoolean("auto_translate_after_download", false)
+     fun autoTranslateNovels() = preferenceStore.getBoolean("auto_translate_novels", true)
+     fun novelTranslationEngine() = preferenceStore.getInt("novel_translation_engine", 1)
+diff --git a/i18n-at/src/commonMain/moko-resources/base/strings.xml b/i18n-at/src/commonMain/moko-resources/base/strings.xml
+index aab8cdd..eb7fe61 100644
+--- a/i18n-at/src/commonMain/moko-resources/base/strings.xml
++++ b/i18n-at/src/commonMain/moko-resources/base/strings.xml
+@@ -54,4 +54,5 @@
+     <string name="translation_notification_text_progress">Translating the text from %1$d pages</string>
+     <string name="translation_notification_chapter_progress">Chapter %1$d of %2$d</string>
+     <string name="translation_notification_error">Could not finish the translation</string>
++    <string name="manga_download_and_translate">Download and translate</string>
+ </resources>
+diff --git a/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml b/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
+index 3a4b6eb..7d6db47 100644
+--- a/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
++++ b/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
+@@ -54,4 +54,5 @@
+     <string name="translation_notification_text_progress">Traduzindo os textos de %1$d páginas</string>
+     <string name="translation_notification_chapter_progress">Capítulo %1$d de %2$d</string>
+     <string name="translation_notification_error">Não foi possível concluir a tradução</string>
++    <string name="manga_download_and_translate">Baixar e traduzir</string>
+ </resources>
