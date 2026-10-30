@@ -1,21 +1,79 @@
 {
   "date": "2026-10-30",
-  "scope": "Overlay placement and English-source automatic download translation",
+  "scope": "Bundled repository discovery, chapter group/version clarity and responsive work action buttons; includes previous translation UX/placement overlay",
   "pinned_yomotsu": "0fb80c439ef816eeb50674f1b90af39918b176d8",
-  "patch_sha256": "a037a6222862ea076c294d4c0b3f9f1010936bcb38efdb61d24c88085b686f13",
-  "assembly": "PASS: app:assembleDebug completed; overall Gradle exit1 from known unit failures",
+  "patch_sha256": "fee526c5537f1354261a1fd034044bed219e899305007b97d6f46fa44862029c",
+  "assembly": "PASS: app:assembleDebug completed; overall Gradle exit 1 from known unit failures",
   "apk_signature_verification": "PASS",
-  "apk_x86_64_sha256": "a3e6b6869952b202245a4cacee2d5003a4bd4b591acf657739db7d39b01c58d2",
-  "selected_translation_tests": {
-    "tests": 27,
+  "apk_x86_64_sha256": "18cfaab06def1b66aa7d602585b391c6f1e5ead63b0cb1515d4b94ee4aacfcd6",
+  "selected_tests": {
+    "tests": 37,
     "failures": 0,
+    "errors": 0,
     "skipped": 0
+  },
+  "selected_test_suites": {
+    "EnglishDownloadTranslationPolicyTest": {
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "PendingDownloadTranslationsTest": {
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "TranslationLaunchPolicyTest": {
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "TranslationTextFitTest": {
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "TranslationFontSizeSearchTest": {
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "TranslationFitPolicyTest": {
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "TranslationViewportScaleTest": {
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "RepositoryCatalogTest": {
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "RepositoryDiscoveryControllerTest": {
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
   },
   "overlay_application_tests": {
     "passed": 4,
     "failed": 0,
     "crlf_simulation_included": true
   },
+  "targeted_formatting": "PASS: Spotless IDE formatter completed for the 15 Kotlin files touched in this change; not a repository-wide lint run",
   "android_unit_comparison": {
     "status": "NO_NEW_UNIT_REGRESSIONS",
     "baseline": {
@@ -25,8 +83,8 @@
       "skipped": 0
     },
     "patched": {
-      "total": 441,
-      "passed": 407,
+      "total": 449,
+      "passed": 415,
       "failed": 34,
       "skipped": 0
     },
@@ -43,8 +101,17 @@
       "app": 370
     }
   },
-  "visual_acceptance": "PENDING; arithmetic tests and compilation do not certify balloon placement",
+  "repository_catalog": {
+    "entries": 2,
+    "search": "Bundled local catalog only; no internet-wide search",
+    "http_and_declared_metadata_checks": "PASS for both modern indexes at the time of check; see REPOSITORY_INDEX_CHECKS_2026_10_30.json",
+    "android_registration_and_installation": "PENDING on Windows test device",
+    "extension_apk_audit": false
+  },
+  "visual_acceptance": "PENDING; includes translation balloon placement, chapter list presentation and responsive action layout",
   "language_identification": "Source metadata, not chapter-content detection",
+  "installed_user_version": "User explicitly stated their screenshots remain from the old version",
+  "multi_source_runtime_acceptance": "PENDING, separate from these candidate improvements",
   "migration15_applied": false,
   "backup_v2_enabled": false
 }

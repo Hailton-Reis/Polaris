@@ -1,3 +1,112 @@
+diff --git a/app/src/main/java/eu/kanade/presentation/browse/GlobalSearchScreen.kt b/app/src/main/java/eu/kanade/presentation/browse/GlobalSearchScreen.kt
+index 1f9e2d4..4887205 100644
+--- a/app/src/main/java/eu/kanade/presentation/browse/GlobalSearchScreen.kt
++++ b/app/src/main/java/eu/kanade/presentation/browse/GlobalSearchScreen.kt
+@@ -1,10 +1,14 @@
+ package eu.kanade.presentation.browse
+ 
+ import androidx.compose.foundation.layout.PaddingValues
++import androidx.compose.foundation.layout.padding
+ import androidx.compose.foundation.lazy.LazyColumn
++import androidx.compose.material3.MaterialTheme
++import androidx.compose.material3.Text
+ import androidx.compose.runtime.Composable
+ import androidx.compose.runtime.State
+ import androidx.compose.ui.Modifier
++import androidx.compose.ui.unit.dp
+ import eu.kanade.presentation.browse.components.GlobalSearchCardRow
+ import eu.kanade.presentation.browse.components.GlobalSearchErrorResultItem
+ import eu.kanade.presentation.browse.components.GlobalSearchLoadingResultItem
+@@ -16,7 +20,9 @@ import eu.kanade.tachiyomi.ui.browse.source.globalsearch.SearchViewModel
+ import eu.kanade.tachiyomi.ui.browse.source.globalsearch.SourceFilter
+ import eu.kanade.tachiyomi.util.system.LocaleHelper
+ import tachiyomi.domain.manga.model.Manga
++import tachiyomi.i18n.at.ATMR
+ import tachiyomi.presentation.core.components.material.Scaffold
++import tachiyomi.presentation.core.i18n.stringResource
+ 
+ @Composable
+ fun GlobalSearchScreen(
+@@ -73,6 +79,13 @@ internal fun GlobalSearchContent(
+     LazyColumn(
+         contentPadding = contentPadding,
+     ) {
++        item(key = "polaris-source-search-info") {
++            Text(
++                stringResource(ATMR.strings.source_search_separate_results),
++                modifier = Modifier.padding(16.dp),
++                style = MaterialTheme.typography.bodySmall,
++            )
++        }
+         items.forEach { (source, result) ->
+             item(key = source.id) {
+                 GlobalSearchResultItem(
+diff --git a/app/src/main/java/eu/kanade/presentation/manga/ChapterSettingsDialog.kt b/app/src/main/java/eu/kanade/presentation/manga/ChapterSettingsDialog.kt
+index e4f9082..1aa3af7 100644
+--- a/app/src/main/java/eu/kanade/presentation/manga/ChapterSettingsDialog.kt
++++ b/app/src/main/java/eu/kanade/presentation/manga/ChapterSettingsDialog.kt
+@@ -34,6 +34,7 @@ import eu.kanade.presentation.components.TabbedDialogPaddings
+ import tachiyomi.core.common.preference.TriState
+ import tachiyomi.domain.manga.model.Manga
+ import tachiyomi.i18n.MR
++import tachiyomi.i18n.at.ATMR
+ import tachiyomi.presentation.core.components.LabeledCheckbox
+ import tachiyomi.presentation.core.components.RadioItem
+ import tachiyomi.presentation.core.components.SortItem
+@@ -154,6 +155,11 @@ private fun ColumnScope.FilterPage(
+         state = bookmarkedFilter,
+         onClick = onBookmarkedFilterChanged,
+     )
++    Text(
++        stringResource(ATMR.strings.chapter_versions_hint),
++        modifier = Modifier.padding(horizontal = TabbedDialogPaddings.Horizontal, vertical = 8.dp),
++        style = MaterialTheme.typography.bodySmall,
++    )
+     ScanlatorFilterItem(
+         active = scanlatorFilterActive,
+         onClick = onScanlatorFilterClicked,
+@@ -183,7 +189,7 @@ fun ScanlatorFilterItem(
+             },
+         )
+         Text(
+-            text = stringResource(MR.strings.scanlator),
++            text = stringResource(ATMR.strings.chapter_versions_filter),
+             style = MaterialTheme.typography.bodyMedium,
+         )
+     }
+diff --git a/app/src/main/java/eu/kanade/presentation/manga/components/ChapterHeader.kt b/app/src/main/java/eu/kanade/presentation/manga/components/ChapterHeader.kt
+index 6067d24..d93fc06 100644
+--- a/app/src/main/java/eu/kanade/presentation/manga/components/ChapterHeader.kt
++++ b/app/src/main/java/eu/kanade/presentation/manga/components/ChapterHeader.kt
+@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
+ import androidx.compose.ui.text.style.TextOverflow
+ import androidx.compose.ui.unit.dp
+ import tachiyomi.i18n.MR
++import tachiyomi.i18n.at.ATMR
+ import tachiyomi.presentation.core.components.material.SECONDARY_ALPHA
+ import tachiyomi.presentation.core.components.material.padding
+ import tachiyomi.presentation.core.i18n.pluralStringResource
+@@ -39,12 +40,19 @@ fun ChapterHeader(
+             text = if (chapterCount == null) {
+                 stringResource(MR.strings.chapters)
+             } else {
+-                pluralStringResource(MR.plurals.manga_num_chapters, count = chapterCount, chapterCount)
++                stringResource(ATMR.strings.chapter_entries_count, chapterCount)
+             },
+             style = MaterialTheme.typography.titleMedium,
+             color = MaterialTheme.colorScheme.onBackground,
+         )
+ 
++        if (enabled && chapterCount != null && chapterCount > 0) {
++            Text(
++                stringResource(ATMR.strings.chapter_versions_shortcut),
++                style = MaterialTheme.typography.bodySmall,
++                color = MaterialTheme.colorScheme.primary,
++            )
++        }
+         MissingChaptersWarning(missingChapterCount)
+     }
+ }
 diff --git a/app/src/main/java/eu/kanade/presentation/manga/components/ChapterTranslationIndicator.kt b/app/src/main/java/eu/kanade/presentation/manga/components/ChapterTranslationIndicator.kt
 index 7774cda..47eb001 100644
 --- a/app/src/main/java/eu/kanade/presentation/manga/components/ChapterTranslationIndicator.kt
@@ -80,14 +189,81 @@ index 7774cda..47eb001 100644
  }
  
 diff --git a/app/src/main/java/eu/kanade/presentation/manga/components/MangaChapterListItem.kt b/app/src/main/java/eu/kanade/presentation/manga/components/MangaChapterListItem.kt
-index c581eef..0d5120d 100644
+index c581eef..661b4ee 100644
 --- a/app/src/main/java/eu/kanade/presentation/manga/components/MangaChapterListItem.kt
 +++ b/app/src/main/java/eu/kanade/presentation/manga/components/MangaChapterListItem.kt
-@@ -176,9 +176,10 @@ fun MangaChapterListItem(
+@@ -41,6 +41,7 @@ import eu.kanade.translation.model.Translation
+ import me.saket.swipe.SwipeableActionsBox
+ import tachiyomi.domain.library.service.LibraryPreferences
+ import tachiyomi.i18n.MR
++import tachiyomi.i18n.at.ATMR
+ import tachiyomi.presentation.core.components.material.DISABLED_ALPHA
+ import tachiyomi.presentation.core.components.material.SECONDARY_ALPHA
+ import tachiyomi.presentation.core.i18n.stringResource
+@@ -57,7 +58,7 @@ fun MangaChapterListItem(
+     selected: Boolean,
+     downloadIndicatorEnabled: Boolean,
+     downloadStateProvider: () -> Download.State,
+-    //TachiyomiAT
++    // TachiyomiAT
+     translationStateProvider: () -> Translation.State,
+     downloadProgressProvider: () -> Int,
+     chapterSwipeStartAction: LibraryPreferences.ChapterSwipeAction,
+@@ -65,7 +66,7 @@ fun MangaChapterListItem(
+     onLongClick: () -> Unit,
+     onClick: () -> Unit,
+     onDownloadClick: ((ChapterDownloadAction) -> Unit)?,
+-    //TachiyomiAT
++    // TachiyomiAT
+     onTranslationClick: ((ChapterTranslationAction) -> Unit)?,
+     onChapterSwipe: (LibraryPreferences.ChapterSwipeAction) -> Unit,
+     modifier: Modifier = Modifier,
+@@ -134,7 +135,7 @@ fun MangaChapterListItem(
+                     Text(
+                         text = title,
+                         style = MaterialTheme.typography.bodyMedium,
+-                        maxLines = 1,
++                        maxLines = 2,
+                         overflow = TextOverflow.Ellipsis,
+                         onTextLayout = { textHeight = it.size.height },
+                         color = LocalContentColor.current.copy(alpha = if (read) DISABLED_ALPHA else 1f),
+@@ -154,7 +155,7 @@ fun MangaChapterListItem(
+                                 maxLines = 1,
+                                 overflow = TextOverflow.Ellipsis,
+                             )
+-                            if (readProgress != null || scanlator != null) DotSeparatorText()
++                            if (readProgress != null) DotSeparatorText()
+                         }
+                         if (readProgress != null) {
+                             Text(
+@@ -163,22 +164,24 @@ fun MangaChapterListItem(
+                                 overflow = TextOverflow.Ellipsis,
+                                 color = LocalContentColor.current.copy(alpha = DISABLED_ALPHA),
+                             )
+-                            if (scanlator != null) DotSeparatorText()
+-                        }
+-                        if (scanlator != null) {
+-                            Text(
+-                                text = scanlator,
+-                                maxLines = 1,
+-                                overflow = TextOverflow.Ellipsis,
+-                            )
+                         }
+                     }
                  }
++                if (!scanlator.isNullOrBlank()) {
++                    Text(
++                        stringResource(ATMR.strings.chapter_group_version, scanlator),
++                        style = MaterialTheme.typography.bodySmall,
++                        color = LocalContentColor.current.copy(alpha = SECONDARY_ALPHA),
++                        maxLines = 2,
++                        overflow = TextOverflow.Ellipsis,
++                    )
++                }
              }
-             //TachiyomiAT
+-            //TachiyomiAT
 -            if (onTranslationClick != null && downloadStateProvider() == Download.State.DOWNLOADED) {
++            // TachiyomiAT
 +            if (onTranslationClick != null) {
                  ChapterTranslationIndicator(
 -                    enabled = true,
@@ -96,6 +272,192 @@ index c581eef..0d5120d 100644
                      modifier = Modifier.padding(start = 4.dp),
                      translationStateProvider = translationStateProvider,
                      onClick = { onTranslationClick.invoke(it) },
+diff --git a/app/src/main/java/eu/kanade/presentation/manga/components/MangaInfoHeader.kt b/app/src/main/java/eu/kanade/presentation/manga/components/MangaInfoHeader.kt
+index 6e38d19..ff57af5 100644
+--- a/app/src/main/java/eu/kanade/presentation/manga/components/MangaInfoHeader.kt
++++ b/app/src/main/java/eu/kanade/presentation/manga/components/MangaInfoHeader.kt
+@@ -9,12 +9,13 @@ import androidx.compose.animation.graphics.vector.AnimatedImageVector
+ import androidx.compose.foundation.background
+ import androidx.compose.foundation.layout.Arrangement
+ import androidx.compose.foundation.layout.Box
++import androidx.compose.foundation.layout.BoxWithConstraints
+ import androidx.compose.foundation.layout.Column
+ import androidx.compose.foundation.layout.ColumnScope
+ import androidx.compose.foundation.layout.FlowRow
++import androidx.compose.foundation.layout.FlowRowScope
+ import androidx.compose.foundation.layout.PaddingValues
+ import androidx.compose.foundation.layout.Row
+-import androidx.compose.foundation.layout.RowScope
+ import androidx.compose.foundation.layout.Spacer
+ import androidx.compose.foundation.layout.fillMaxWidth
+ import androidx.compose.foundation.layout.height
+@@ -71,6 +72,7 @@ import androidx.compose.ui.layout.ContentScale
+ import androidx.compose.ui.layout.Layout
+ import androidx.compose.ui.layout.onSizeChanged
+ import androidx.compose.ui.platform.LocalContext
++import androidx.compose.ui.platform.LocalDensity
+ import androidx.compose.ui.text.LinkAnnotation
+ import androidx.compose.ui.text.SpanStyle
+ import androidx.compose.ui.text.style.TextAlign
+@@ -198,50 +200,53 @@ fun MangaActionRow(
+         }
+     }
+ 
+-    Row(modifier = modifier.padding(start = 16.dp, top = 8.dp, end = 16.dp)) {
+-        MangaActionButton(
+-            title = if (favorite) {
+-                stringResource(MR.strings.in_library)
+-            } else {
+-                stringResource(MR.strings.add_to_library)
+-            },
+-            icon = if (favorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+-            color = if (favorite) MaterialTheme.colorScheme.primary else defaultActionButtonColor,
+-            onClick = onAddToLibraryClicked,
+-            onLongClick = onEditCategory,
+-        )
+-        MangaActionButton(
+-            title = when (nextUpdateDays) {
+-                null -> stringResource(MR.strings.not_applicable)
+-                0 -> stringResource(MR.strings.manga_interval_expected_update_soon)
+-                else -> pluralStringResource(
+-                    MR.plurals.day,
+-                    count = nextUpdateDays,
+-                    nextUpdateDays,
+-                )
+-            },
+-            icon = Icons.Default.HourglassEmpty,
+-            color = if (isUserIntervalMode) MaterialTheme.colorScheme.primary else defaultActionButtonColor,
+-            onClick = { onEditIntervalClicked?.invoke() },
+-        )
+-        MangaActionButton(
+-            title = if (trackingCount == 0) {
+-                stringResource(MR.strings.manga_tracking_tab)
+-            } else {
+-                pluralStringResource(MR.plurals.num_trackers, count = trackingCount, trackingCount)
+-            },
+-            icon = if (trackingCount == 0) Icons.Outlined.Sync else Icons.Outlined.Done,
+-            color = if (trackingCount == 0) defaultActionButtonColor else MaterialTheme.colorScheme.primary,
+-            onClick = onTrackingClicked,
+-        )
+-        if (onWebViewClicked != null) {
++    BoxWithConstraints(modifier = modifier.fillMaxWidth().padding(start = 16.dp, top = 8.dp, end = 16.dp)) {
++        val columns = if (maxWidth < 400.dp * LocalDensity.current.fontScale) 2 else 4
++        FlowRow(maxItemsInEachRow = columns) {
+             MangaActionButton(
+-                title = stringResource(MR.strings.action_web_view),
+-                icon = Icons.Outlined.Public,
+-                color = defaultActionButtonColor,
+-                onClick = onWebViewClicked,
+-                onLongClick = onWebViewLongClicked,
++                title = if (favorite) {
++                    stringResource(MR.strings.in_library)
++                } else {
++                    stringResource(MR.strings.add_to_library)
++                },
++                icon = if (favorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
++                color = if (favorite) MaterialTheme.colorScheme.primary else defaultActionButtonColor,
++                onClick = onAddToLibraryClicked,
++                onLongClick = onEditCategory,
+             )
++            MangaActionButton(
++                title = when (nextUpdateDays) {
++                    null -> stringResource(MR.strings.not_applicable)
++                    0 -> stringResource(MR.strings.manga_interval_expected_update_soon)
++                    else -> pluralStringResource(
++                        MR.plurals.day,
++                        count = nextUpdateDays,
++                        nextUpdateDays,
++                    )
++                },
++                icon = Icons.Default.HourglassEmpty,
++                color = if (isUserIntervalMode) MaterialTheme.colorScheme.primary else defaultActionButtonColor,
++                onClick = { onEditIntervalClicked?.invoke() },
++            )
++            MangaActionButton(
++                title = if (trackingCount == 0) {
++                    stringResource(MR.strings.manga_tracking_tab)
++                } else {
++                    pluralStringResource(MR.plurals.num_trackers, count = trackingCount, trackingCount)
++                },
++                icon = if (trackingCount == 0) Icons.Outlined.Sync else Icons.Outlined.Done,
++                color = if (trackingCount == 0) defaultActionButtonColor else MaterialTheme.colorScheme.primary,
++                onClick = onTrackingClicked,
++            )
++            if (onWebViewClicked != null) {
++                MangaActionButton(
++                    title = stringResource(MR.strings.action_web_view),
++                    icon = Icons.Outlined.Public,
++                    color = defaultActionButtonColor,
++                    onClick = onWebViewClicked,
++                    onLongClick = onWebViewLongClicked,
++                )
++            }
+         }
+     }
+ }
+@@ -563,7 +568,7 @@ private fun ColumnScope.MangaContentInfo(
+                     )
+                 },
+                 overflow = TextOverflow.Ellipsis,
+-                maxLines = 1,
++                maxLines = 2,
+             )
+         }
+     }
+@@ -719,7 +724,7 @@ private fun TagsChip(
+ }
+ 
+ @Composable
+-private fun RowScope.MangaActionButton(
++private fun FlowRowScope.MangaActionButton(
+     title: String,
+     icon: ImageVector,
+     color: Color,
+@@ -729,6 +734,7 @@ private fun RowScope.MangaActionButton(
+     TextButton(
+         onClick = onClick,
+         modifier = Modifier.weight(1f),
++        contentPadding = PaddingValues(horizontal = 4.dp, vertical = 8.dp),
+         onLongClick = onLongClick,
+     ) {
+         Column(horizontalAlignment = Alignment.CenterHorizontally) {
+@@ -744,6 +750,8 @@ private fun RowScope.MangaActionButton(
+                 color = color,
+                 fontSize = 12.sp,
+                 textAlign = TextAlign.Center,
++                maxLines = 2,
++                overflow = TextOverflow.Ellipsis,
+             )
+         }
+     }
+diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsBrowseScreen.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsBrowseScreen.kt
+index 0c401d8..82142a3 100644
+--- a/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsBrowseScreen.kt
++++ b/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsBrowseScreen.kt
+@@ -12,10 +12,12 @@ import cafe.adriel.voyager.navigator.currentOrThrow
+ import eu.kanade.domain.source.service.SourcePreferences
+ import eu.kanade.presentation.more.settings.Preference
+ import eu.kanade.presentation.more.settings.screen.browse.ExtensionStoresScreen
++import eu.kanade.presentation.more.settings.screen.browse.discovery.RepositoryDiscoveryScreen
+ import eu.kanade.tachiyomi.util.system.AuthenticatorUtil.authenticate
+ import mihon.domain.extension.interactor.GetExtensionStoreCountAsFlow
+ import tachiyomi.core.common.i18n.stringResource
+ import tachiyomi.i18n.MR
++import tachiyomi.i18n.at.ATMR
+ import tachiyomi.presentation.core.i18n.pluralStringResource
+ import tachiyomi.presentation.core.i18n.stringResource
+ import uy.kohesive.injekt.Injekt
+@@ -45,6 +47,10 @@ object SettingsBrowseScreen : SearchableSettings {
+                         preference = sourcePreferences.hideInLibraryItems,
+                         title = stringResource(MR.strings.pref_hide_in_library_items),
+                     ),
++                    Preference.PreferenceItem.TextPreference(
++                        title = stringResource(ATMR.strings.repository_discovery),
++                        onClick = { navigator.push(RepositoryDiscoveryScreen()) },
++                    ),
+                     Preference.PreferenceItem.TextPreference(
+                         title = stringResource(MR.strings.extensionStores),
+                         subtitle = pluralStringResource(MR.plurals.num_repos, reposCount.toInt(), reposCount),
 diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsTranslationScreen.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsTranslationScreen.kt
 index 3075333..a198c3f 100644
 --- a/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsTranslationScreen.kt
@@ -112,6 +474,429 @@ index 3075333..a198c3f 100644
              Preference.PreferenceItem.SwitchPreference(
                  preference = translationPreferences.translateSoundEffects(),
                  title = stringResource(ATMR.strings.pref_translate_sound_effects),
+diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/browse/ExtensionStoresScreen.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/browse/ExtensionStoresScreen.kt
+index a46b9dc..bb01ece 100644
+--- a/app/src/main/java/eu/kanade/presentation/more/settings/screen/browse/ExtensionStoresScreen.kt
++++ b/app/src/main/java/eu/kanade/presentation/more/settings/screen/browse/ExtensionStoresScreen.kt
+@@ -12,6 +12,7 @@ import eu.kanade.presentation.more.settings.screen.browse.components.ExtensionSt
+ import eu.kanade.presentation.more.settings.screen.browse.components.ExtensionStoreCreateDialog
+ import eu.kanade.presentation.more.settings.screen.browse.components.ExtensionStoreDeleteDialog
+ import eu.kanade.presentation.more.settings.screen.browse.components.ExtensionStoresScreen
++import eu.kanade.presentation.more.settings.screen.browse.discovery.RepositoryDiscoveryScreen
+ import eu.kanade.presentation.util.Screen
+ import eu.kanade.tachiyomi.util.system.copyToClipboard
+ import eu.kanade.tachiyomi.util.system.openInBrowser
+@@ -48,6 +49,7 @@ class ExtensionStoresScreen(
+             onOpenDiscord = { it.contact.discord?.let(context::openInBrowser) },
+             onClickDelete = { viewModel.showDialog(ExtensionStoreDialog.Delete(it)) },
+             onClickRefresh = { viewModel.refreshRepos() },
++            onClickDiscover = { navigator.push(RepositoryDiscoveryScreen()) },
+             navigateUp = navigator::pop,
+         )
+ 
+diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/browse/components/ExtensionStoresScreen.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/browse/components/ExtensionStoresScreen.kt
+index e659578..69034fc 100644
+--- a/app/src/main/java/eu/kanade/presentation/more/settings/screen/browse/components/ExtensionStoresScreen.kt
++++ b/app/src/main/java/eu/kanade/presentation/more/settings/screen/browse/components/ExtensionStoresScreen.kt
+@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.padding
+ import androidx.compose.foundation.lazy.rememberLazyListState
+ import androidx.compose.material.icons.Icons
+ import androidx.compose.material.icons.outlined.Refresh
++import androidx.compose.material.icons.outlined.Search
+ import androidx.compose.material3.Icon
+ import androidx.compose.material3.IconButton
+ import androidx.compose.material3.MaterialTheme
+@@ -15,6 +16,7 @@ import eu.kanade.presentation.components.AppBar
+ import eu.kanade.presentation.more.settings.screen.browse.ExtensionStoreScreenState
+ import mihon.domain.extension.model.ExtensionStore
+ import tachiyomi.i18n.MR
++import tachiyomi.i18n.at.ATMR
+ import tachiyomi.presentation.core.components.material.Scaffold
+ import tachiyomi.presentation.core.components.material.padding
+ import tachiyomi.presentation.core.components.material.topSmallPaddingValues
+@@ -31,6 +33,7 @@ fun ExtensionStoresScreen(
+     onOpenDiscord: (ExtensionStore) -> Unit,
+     onClickDelete: (ExtensionStore) -> Unit,
+     onClickRefresh: () -> Unit,
++    onClickDiscover: () -> Unit,
+     navigateUp: () -> Unit,
+ ) {
+     val lazyListState = rememberLazyListState()
+@@ -41,6 +44,12 @@ fun ExtensionStoresScreen(
+                 title = stringResource(MR.strings.extensionStores),
+                 scrollBehavior = scrollBehavior,
+                 actions = {
++                    IconButton(onClick = onClickDiscover) {
++                        Icon(
++                            Icons.Outlined.Search,
++                            contentDescription = stringResource(ATMR.strings.repository_discovery),
++                        )
++                    }
+                     IconButton(onClick = onClickRefresh) {
+                         Icon(
+                             imageVector = Icons.Outlined.Refresh,
+diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/browse/discovery/RepositoryCatalog.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/browse/discovery/RepositoryCatalog.kt
+new file mode 100644
+index 0000000..8b271c1
+--- /dev/null
++++ b/app/src/main/java/eu/kanade/presentation/more/settings/screen/browse/discovery/RepositoryCatalog.kt
+@@ -0,0 +1,74 @@
++package eu.kanade.presentation.more.settings.screen.browse.discovery
++
++import java.net.URI
++import java.text.Normalizer
++import java.util.Locale
++
++data class DiscoverableRepository(
++    val id: String,
++    val name: String,
++    val maintainer: String,
++    val indexUrl: String,
++    val tags: List<String>,
++)
++
++/** Bundled discovery only. Search terms are not sent to GitHub or repository servers. */
++object RepositoryCatalog {
++    val entries = listOf(
++        DiscoverableRepository(
++            "nox",
++            "Project Nox",
++            "Awerkori",
++            "https://raw.githubusercontent.com/Awerkori/extensoes/repo/index.pb",
++            listOf("PT-BR", "Português", "Brasil", "EN", "English", "Inglês", "mangá", "manhwa", "webtoon"),
++        ),
++        DiscoverableRepository(
++            "keiyoushi",
++            "Keiyoushi",
++            "Keiyoushi",
++            "https://raw.githubusercontent.com/keiyoushi/extensions/repo/index.pb",
++            listOf("PT-BR", "Português", "EN", "English", "Inglês", "multilíngue", "mangá", "manhwa", "webtoon"),
++        ),
++    )
++
++    fun search(query: String): List<DiscoverableRepository> {
++        val terms = normalized(query).split(' ').filter(String::isNotBlank)
++        return entries.filter { entry ->
++            val searchable = normalized(listOf(entry.name, entry.maintainer).plus(entry.tags).joinToString(" "))
++            terms.all(searchable::contains)
++        }
++    }
++
++    fun isAdded(entry: DiscoverableRepository, urls: Set<String>): Boolean {
++        val expected = repositoryKey(entry.indexUrl) ?: return false
++        return urls.any { repositoryKey(it) == expected }
++    }
++
++    /** Only normalize known static GitHub index aliases; branch names remain case-sensitive. */
++    fun repositoryKey(url: String): String? {
++        return runCatching {
++            val uri = URI(url.trim())
++            if (!uri.scheme.equals("https", true) || uri.userInfo != null ||
++                uri.rawQuery != null || uri.rawFragment != null || uri.port !in listOf(-1, 443)
++            ) {
++                return null
++            }
++            var host = uri.host?.lowercase(Locale.ROOT) ?: return null
++            var parts = uri.path.split('/').filter(String::isNotBlank)
++            if (host == "github.com" && parts.size >= 5 && parts[2] == "raw") {
++                host = "raw.githubusercontent.com"
++                parts = parts.take(2) + parts.drop(3)
++            }
++            if (host != "raw.githubusercontent.com" || parts.size < 3) return null
++            if (parts.last() in listOf("index.pb", "index.min.json", "repo.json")) parts = parts.dropLast(1)
++            parts = parts.mapIndexed { index, part -> if (index < 2) part.lowercase(Locale.ROOT) else part }
++            "$host/${parts.joinToString("/")}"
++        }.getOrNull()
++    }
++
++    private fun normalized(text: String): String = Normalizer.normalize(text, Normalizer.Form.NFKD)
++        .replace(Regex("\\p{M}+"), "")
++        .lowercase(Locale.ROOT)
++        .replace(Regex("[^\\p{L}\\p{N}]+"), " ")
++        .trim()
++}
+diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/browse/discovery/RepositoryDiscoveryController.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/browse/discovery/RepositoryDiscoveryController.kt
+new file mode 100644
+index 0000000..ad55f3d
+--- /dev/null
++++ b/app/src/main/java/eu/kanade/presentation/more/settings/screen/browse/discovery/RepositoryDiscoveryController.kt
+@@ -0,0 +1,76 @@
++package eu.kanade.presentation.more.settings.screen.browse.discovery
++
++import kotlinx.coroutines.CoroutineDispatcher
++import kotlinx.coroutines.CoroutineScope
++import kotlinx.coroutines.Job
++import kotlinx.coroutines.flow.Flow
++import kotlinx.coroutines.flow.MutableStateFlow
++import kotlinx.coroutines.flow.asStateFlow
++import kotlinx.coroutines.flow.catch
++import kotlinx.coroutines.flow.collectLatest
++import kotlinx.coroutines.flow.update
++import kotlinx.coroutines.launch
++import kotlin.coroutines.cancellation.CancellationException
++
++enum class DiscoveryError { LOAD, ADD, REFRESH }
++
++data class RepositoryDiscoveryState(
++    val loaded: Boolean = false,
++    val installedUrls: Set<String> = emptySet(),
++    val pendingId: String? = null,
++    val error: DiscoveryError? = null,
++)
++
++class RepositoryDiscoveryController(
++    private val observe: () -> Flow<Set<String>>,
++    private val addStore: suspend (String) -> Unit,
++    private val refresh: suspend () -> Unit,
++    private val scope: CoroutineScope,
++    private val dispatcher: CoroutineDispatcher,
++) {
++    private val mutableState = MutableStateFlow(RepositoryDiscoveryState())
++    val state = mutableState.asStateFlow()
++    private var storesJob: Job? = null
++
++    init {
++        reload()
++    }
++
++    fun reload() {
++        storesJob?.cancel()
++        mutableState.update { it.copy(loaded = false, error = null) }
++        storesJob = scope.launch(dispatcher) {
++            observe()
++                .catch { mutableState.update { it.copy(loaded = false, error = DiscoveryError.LOAD) } }
++                .collectLatest { urls -> mutableState.update { it.copy(loaded = true, installedUrls = urls) } }
++        }
++    }
++
++    fun add(id: String) {
++        val entry = RepositoryCatalog.entries.singleOrNull { it.id == id } ?: return
++        while (true) {
++            val snapshot = state.value
++            if (!snapshot.loaded || snapshot.pendingId != null ||
++                RepositoryCatalog.isAdded(entry, snapshot.installedUrls)
++            ) {
++                return
++            }
++            if (mutableState.compareAndSet(snapshot, snapshot.copy(pendingId = id, error = null))) break
++        }
++        scope.launch(dispatcher) {
++            var added = false
++            try {
++                addStore(entry.indexUrl)
++                added = true
++                mutableState.update { it.copy(installedUrls = it.installedUrls + entry.indexUrl) }
++                refresh()
++            } catch (error: CancellationException) {
++                throw error
++            } catch (_: Exception) {
++                mutableState.update { it.copy(error = if (added) DiscoveryError.REFRESH else DiscoveryError.ADD) }
++            } finally {
++                mutableState.update { it.copy(pendingId = null) }
++            }
++        }
++    }
++}
+diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/browse/discovery/RepositoryDiscoveryScreen.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/browse/discovery/RepositoryDiscoveryScreen.kt
+new file mode 100644
+index 0000000..aa3b6ae
+--- /dev/null
++++ b/app/src/main/java/eu/kanade/presentation/more/settings/screen/browse/discovery/RepositoryDiscoveryScreen.kt
+@@ -0,0 +1,160 @@
++package eu.kanade.presentation.more.settings.screen.browse.discovery
++
++import androidx.compose.foundation.layout.Arrangement
++import androidx.compose.foundation.layout.Column
++import androidx.compose.foundation.layout.Row
++import androidx.compose.foundation.layout.fillMaxWidth
++import androidx.compose.foundation.layout.padding
++import androidx.compose.foundation.layout.size
++import androidx.compose.foundation.lazy.LazyColumn
++import androidx.compose.foundation.lazy.items
++import androidx.compose.material3.Button
++import androidx.compose.material3.CircularProgressIndicator
++import androidx.compose.material3.ElevatedCard
++import androidx.compose.material3.MaterialTheme
++import androidx.compose.material3.OutlinedTextField
++import androidx.compose.material3.Text
++import androidx.compose.material3.TextButton
++import androidx.compose.runtime.Composable
++import androidx.compose.runtime.collectAsState
++import androidx.compose.runtime.getValue
++import androidx.compose.runtime.mutableStateOf
++import androidx.compose.runtime.saveable.rememberSaveable
++import androidx.compose.runtime.setValue
++import androidx.compose.ui.Alignment
++import androidx.compose.ui.Modifier
++import androidx.compose.ui.unit.dp
++import androidx.lifecycle.viewmodel.compose.viewModel
++import cafe.adriel.voyager.navigator.LocalNavigator
++import cafe.adriel.voyager.navigator.currentOrThrow
++import eu.kanade.presentation.components.AppBar
++import eu.kanade.presentation.util.Screen
++import tachiyomi.i18n.at.ATMR
++import tachiyomi.presentation.core.components.material.Scaffold
++import tachiyomi.presentation.core.i18n.stringResource
++
++class RepositoryDiscoveryScreen : Screen() {
++    @Composable
++    override fun Content() {
++        val navigator = LocalNavigator.currentOrThrow
++        val model = viewModel<RepositoryDiscoveryViewModel>()
++        val state by model.state.collectAsState()
++        var query by rememberSaveable { mutableStateOf("") }
++        val results = RepositoryCatalog.search(query)
++        Scaffold(
++            topBar = { behavior ->
++                AppBar(
++                    title = stringResource(ATMR.strings.repository_discovery),
++                    navigateUp = navigator::pop,
++                    scrollBehavior = behavior,
++                )
++            },
++        ) { padding ->
++            LazyColumn(
++                contentPadding = padding,
++                modifier = Modifier.padding(horizontal = 16.dp),
++                verticalArrangement = Arrangement.spacedBy(12.dp),
++            ) {
++                item {
++                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
++                        OutlinedTextField(
++                            value = query,
++                            onValueChange = { query = it },
++                            label = { Text(stringResource(ATMR.strings.repository_search_hint)) },
++                            singleLine = true,
++                            modifier = Modifier.fillMaxWidth(),
++                        )
++                        if (!state.loaded && state.error == null) {
++                            Text(stringResource(ATMR.strings.repository_loading))
++                        }
++                        Text(
++                            stringResource(ATMR.strings.repository_catalog_scope),
++                            style = MaterialTheme.typography.bodySmall,
++                        )
++                        Text(
++                            stringResource(ATMR.strings.repository_third_party_notice),
++                            style = MaterialTheme.typography.bodySmall,
++                        )
++                        Text(
++                            stringResource(ATMR.strings.repository_overlap_notice),
++                            style = MaterialTheme.typography.bodySmall,
++                        )
++                    }
++                }
++                state.error?.let { error ->
++                    item {
++                        Text(
++                            stringResource(
++                                when (error) {
++                                    DiscoveryError.LOAD -> ATMR.strings.repository_load_error
++                                    DiscoveryError.ADD -> ATMR.strings.repository_add_error
++                                    DiscoveryError.REFRESH -> ATMR.strings.repository_refresh_error
++                                },
++                            ),
++                            color = MaterialTheme.colorScheme.error,
++                        )
++                        if (error == DiscoveryError.LOAD) {
++                            TextButton(onClick = model::reload) { Text(stringResource(ATMR.strings.repository_retry)) }
++                        }
++                    }
++                }
++                if (results.isEmpty()) {
++                    item { Text(stringResource(ATMR.strings.repository_no_results)) }
++                }
++                items(results, key = { it.id }) { entry ->
++                    val added = RepositoryCatalog.isAdded(entry, state.installedUrls)
++                    val pending = state.pendingId == entry.id
++                    ElevatedCard(modifier = Modifier.fillMaxWidth()) {
++                        Column(
++                            modifier = Modifier.padding(16.dp),
++                            verticalArrangement = Arrangement.spacedBy(8.dp),
++                        ) {
++                            Text(entry.name, style = MaterialTheme.typography.titleMedium)
++                            Text(stringResource(ATMR.strings.repository_maintainer, entry.maintainer))
++                            Text(entry.tags.take(6).joinToString(" · "), style = MaterialTheme.typography.bodySmall)
++                            Text(entry.indexUrl, style = MaterialTheme.typography.bodySmall)
++                            Text(
++                                stringResource(ATMR.strings.repository_last_checked),
++                                style = MaterialTheme.typography.bodySmall,
++                            )
++                            Row(
++                                modifier = Modifier.fillMaxWidth(),
++                                horizontalArrangement = Arrangement.End,
++                                verticalAlignment = Alignment.CenterVertically,
++                            ) {
++                                Button(
++                                    onClick = { model.add(entry.id) },
++                                    enabled = state.loaded && state.pendingId == null && !added,
++                                ) {
++                                    if (pending) {
++                                        CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp)
++                                        Text(
++                                            stringResource(ATMR.strings.repository_adding),
++                                            modifier = Modifier.padding(start = 8.dp),
++                                        )
++                                    } else {
++                                        Text(
++                                            stringResource(
++                                                if (added) {
++                                                    ATMR.strings.repository_added
++                                                } else {
++                                                    ATMR.strings.repository_add
++                                                },
++                                            ),
++                                        )
++                                    }
++                                }
++                            }
++                        }
++                    }
++                }
++                item {
++                    Text(
++                        stringResource(ATMR.strings.repository_after_add),
++                        style = MaterialTheme.typography.bodySmall,
++                    )
++                }
++            }
++        }
++    }
++}
+diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/browse/discovery/RepositoryDiscoveryViewModel.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/browse/discovery/RepositoryDiscoveryViewModel.kt
+new file mode 100644
+index 0000000..e41ba10
+--- /dev/null
++++ b/app/src/main/java/eu/kanade/presentation/more/settings/screen/browse/discovery/RepositoryDiscoveryViewModel.kt
+@@ -0,0 +1,28 @@
++package eu.kanade.presentation.more.settings.screen.browse.discovery
++
++import androidx.lifecycle.ViewModel
++import androidx.lifecycle.viewModelScope
++import eu.kanade.tachiyomi.extension.ExtensionManager
++import kotlinx.coroutines.Dispatchers
++import kotlinx.coroutines.flow.map
++import mihon.domain.extension.interactor.AddExtensionStore
++import mihon.domain.extension.interactor.GetExtensionStores
++import uy.kohesive.injekt.Injekt
++import uy.kohesive.injekt.api.get
++
++class RepositoryDiscoveryViewModel(
++    getStores: GetExtensionStores = Injekt.get(),
++    addStore: AddExtensionStore = Injekt.get(),
++    extensions: ExtensionManager = Injekt.get(),
++) : ViewModel() {
++    private val controller = RepositoryDiscoveryController(
++        observe = { getStores.subscribe().map { stores -> stores.map { it.indexUrl }.toSet() } },
++        addStore = { addStore(it).getOrThrow() },
++        refresh = { extensions.findAvailableExtensions() },
++        scope = viewModelScope,
++        dispatcher = Dispatchers.IO,
++    )
++    val state = controller.state
++    fun reload() = controller.reload()
++    fun add(id: String) = controller.add(id)
++}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/data/download/DownloadManager.kt b/app/src/main/java/eu/kanade/tachiyomi/data/download/DownloadManager.kt
 index 921f8d0..c45a189 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/data/download/DownloadManager.kt
@@ -193,6 +978,35 @@ index 74ac77c..d56914c 100644
              }.onFailure { error ->
                  logcat(LogPriority.ERROR, error) {
                      "Download concluído, mas não foi possível enfileirar a tradução automática."
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/browse/extension/ExtensionsTab.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/browse/extension/ExtensionsTab.kt
+index 35c3579..efc3654 100644
+--- a/app/src/main/java/eu/kanade/tachiyomi/ui/browse/extension/ExtensionsTab.kt
++++ b/app/src/main/java/eu/kanade/tachiyomi/ui/browse/extension/ExtensionsTab.kt
+@@ -17,11 +17,13 @@ import eu.kanade.presentation.browse.ExtensionScreen
+ import eu.kanade.presentation.components.AppBar
+ import eu.kanade.presentation.components.TabContent
+ import eu.kanade.presentation.more.settings.screen.browse.ExtensionStoresScreen
++import eu.kanade.presentation.more.settings.screen.browse.discovery.RepositoryDiscoveryScreen
+ import eu.kanade.tachiyomi.extension.model.Extension
+ import eu.kanade.tachiyomi.ui.browse.extension.details.ExtensionDetailsScreen
+ import eu.kanade.tachiyomi.ui.webview.WebViewScreen
+ import eu.kanade.tachiyomi.util.system.isPackageInstalled
+ import tachiyomi.i18n.MR
++import tachiyomi.i18n.at.ATMR
+ import tachiyomi.presentation.core.i18n.stringResource
+ 
+ @Composable
+@@ -39,6 +41,10 @@ fun extensionsTab(
+         badgeNumber = state.updates.takeIf { it > 0 },
+         searchEnabled = true,
+         actions = listOf(
++            AppBar.OverflowAction(
++                title = stringResource(ATMR.strings.repository_discovery),
++                onClick = { navigator.push(RepositoryDiscoveryScreen()) },
++            ),
+             AppBar.OverflowAction(
+                 title = stringResource(MR.strings.action_filter),
+                 onClick = { navigator.push(ExtensionFilterScreen()) },
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/manga/MangaViewModel.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/manga/MangaViewModel.kt
 index 19de11d..be73cb2 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/ui/manga/MangaViewModel.kt
@@ -475,6 +1289,180 @@ index 0000000..607f550
 +        return (viewScale * sourceWidth / translationWidth).takeIf { it.isFinite() } ?: viewScale
 +    }
 +}
+diff --git a/app/src/test/java/eu/kanade/presentation/more/settings/screen/browse/discovery/RepositoryCatalogTest.kt b/app/src/test/java/eu/kanade/presentation/more/settings/screen/browse/discovery/RepositoryCatalogTest.kt
+new file mode 100644
+index 0000000..09a3662
+--- /dev/null
++++ b/app/src/test/java/eu/kanade/presentation/more/settings/screen/browse/discovery/RepositoryCatalogTest.kt
+@@ -0,0 +1,57 @@
++package eu.kanade.presentation.more.settings.screen.browse.discovery
++
++import org.junit.jupiter.api.Assertions.assertEquals
++import org.junit.jupiter.api.Assertions.assertFalse
++import org.junit.jupiter.api.Assertions.assertTrue
++import org.junit.jupiter.api.Test
++
++class RepositoryCatalogTest {
++    @Test
++    fun `empty search returns the initial catalog without registering anything`() {
++        assertEquals(RepositoryCatalog.entries, RepositoryCatalog.search("  "))
++        assertEquals(2, RepositoryCatalog.entries.size)
++        assertEquals(2, RepositoryCatalog.entries.map { it.id }.distinct().size)
++        assertTrue(RepositoryCatalog.entries.all { it.indexUrl.startsWith("https://") })
++    }
++
++    @Test
++    fun `search accepts accents case language and multiple terms`() {
++        assertEquals(listOf("nox"), RepositoryCatalog.search("AWERKORI português").map { it.id })
++        assertEquals(2, RepositoryCatalog.search("PT-BR inglês").size)
++        assertEquals(listOf("keiyoushi"), RepositoryCatalog.search("Keiyoushi").map { it.id })
++        assertTrue(RepositoryCatalog.search("unknown project").isEmpty())
++    }
++
++    @Test
++    fun `known legacy and redirected index URLs do not duplicate repositories`() {
++        val entry = RepositoryCatalog.entries.last()
++        assertTrue(RepositoryCatalog.isAdded(entry, setOf("https://github.com/keiyoushi/extensions/raw/repo/index.pb")))
++        assertTrue(
++            RepositoryCatalog.isAdded(
++                entry,
++                setOf("https://raw.githubusercontent.com/Keiyoushi/Extensions/repo/repo.json"),
++            ),
++        )
++        assertTrue(
++            RepositoryCatalog.isAdded(
++                entry,
++                setOf("https://raw.githubusercontent.com/keiyoushi/extensions/repo/index.min.json/"),
++            ),
++        )
++    }
++
++    @Test
++    fun `different branches hosts and unsafe URL forms are not conflated`() {
++        val entry = RepositoryCatalog.entries.last()
++        for (url in listOf(
++            "https://raw.githubusercontent.com/keiyoushi/extensions/other/index.pb",
++            "https://evil.example/keiyoushi/extensions/repo/index.pb",
++            "http://raw.githubusercontent.com/keiyoushi/extensions/repo/index.pb",
++            "https://user@raw.githubusercontent.com/keiyoushi/extensions/repo/index.pb",
++            "https://raw.githubusercontent.com/keiyoushi/extensions/repo/index.pb?token=abc",
++            "not a url",
++        )) {
++            assertFalse(RepositoryCatalog.isAdded(entry, setOf(url)), url)
++        }
++    }
++}
+diff --git a/app/src/test/java/eu/kanade/presentation/more/settings/screen/browse/discovery/RepositoryDiscoveryControllerTest.kt b/app/src/test/java/eu/kanade/presentation/more/settings/screen/browse/discovery/RepositoryDiscoveryControllerTest.kt
+new file mode 100644
+index 0000000..c9027c7
+--- /dev/null
++++ b/app/src/test/java/eu/kanade/presentation/more/settings/screen/browse/discovery/RepositoryDiscoveryControllerTest.kt
+@@ -0,0 +1,105 @@
++package eu.kanade.presentation.more.settings.screen.browse.discovery
++
++import kotlinx.coroutines.CompletableDeferred
++import kotlinx.coroutines.flow.MutableStateFlow
++import kotlinx.coroutines.flow.flow
++import kotlinx.coroutines.test.StandardTestDispatcher
++import kotlinx.coroutines.test.runCurrent
++import kotlinx.coroutines.test.runTest
++import org.junit.jupiter.api.Assertions.assertEquals
++import org.junit.jupiter.api.Assertions.assertNull
++import org.junit.jupiter.api.Assertions.assertTrue
++import org.junit.jupiter.api.Test
++
++class RepositoryDiscoveryControllerTest {
++    @Test
++    fun `one direct add registers the chosen repository and ignores repeated clicks`() = runTest {
++        val installed = MutableStateFlow(emptySet<String>())
++        val gate = CompletableDeferred<Unit>()
++        val calls = mutableListOf<String>()
++        var refreshes = 0
++        val controller = RepositoryDiscoveryController({ installed }, { url ->
++            calls += url
++            gate.await()
++            installed.value = installed.value + url
++        }, { refreshes++ }, backgroundScope, StandardTestDispatcher(testScheduler))
++        runCurrent()
++        controller.add("nox")
++        controller.add("nox")
++        controller.add("keiyoushi")
++        runCurrent()
++        assertEquals(listOf(RepositoryCatalog.entries.first().indexUrl), calls)
++        assertEquals("nox", controller.state.value.pendingId)
++        gate.complete(Unit)
++        runCurrent()
++        assertNull(controller.state.value.pendingId)
++        assertNull(controller.state.value.error)
++        assertEquals(1, refreshes)
++        controller.add("nox")
++        runCurrent()
++        assertEquals(1, calls.size)
++    }
++
++    @Test
++    fun `registration failure permits retry without claiming success`() = runTest {
++        var fail = true
++        val controller = RepositoryDiscoveryController({ MutableStateFlow(emptySet<String>()) }, {
++            if (fail) error("network failed")
++        }, {}, backgroundScope, StandardTestDispatcher(testScheduler))
++        runCurrent()
++        controller.add("nox")
++        runCurrent()
++        assertEquals(DiscoveryError.ADD, controller.state.value.error)
++        assertTrue(controller.state.value.installedUrls.isEmpty())
++        assertNull(controller.state.value.pendingId)
++        fail = false
++        controller.add("nox")
++        runCurrent()
++        assertNull(controller.state.value.error)
++        assertTrue(controller.state.value.installedUrls.isNotEmpty())
++    }
++
++    @Test
++    fun `listing refresh failure retains a successfully registered repository`() = runTest {
++        var adds = 0
++        val controller = RepositoryDiscoveryController(
++            { MutableStateFlow(emptySet<String>()) },
++            { adds++ },
++            { error("refresh failed") },
++            backgroundScope,
++            StandardTestDispatcher(testScheduler),
++        )
++        runCurrent()
++        controller.add("keiyoushi")
++        runCurrent()
++        assertEquals(DiscoveryError.REFRESH, controller.state.value.error)
++        assertTrue(RepositoryCatalog.isAdded(RepositoryCatalog.entries.last(), controller.state.value.installedUrls))
++        controller.add("keiyoushi")
++        runCurrent()
++        assertEquals(1, adds)
++    }
++
++    @Test
++    fun `database read failure blocks additions and can be retried`() = runTest {
++        var fail = true
++        var adds = 0
++        val controller = RepositoryDiscoveryController({
++            flow {
++                if (fail) error("db unavailable")
++                emit(emptySet<String>())
++            }
++        }, { adds++ }, {}, backgroundScope, StandardTestDispatcher(testScheduler))
++        runCurrent()
++        assertEquals(DiscoveryError.LOAD, controller.state.value.error)
++        controller.add("nox")
++        runCurrent()
++        assertEquals(0, adds)
++        fail = false
++        controller.reload()
++        runCurrent()
++        assertTrue(controller.state.value.loaded)
++        controller.add("unknown-id")
++        runCurrent()
++        assertEquals(0, adds)
++    }
++}
 diff --git a/app/src/test/java/eu/kanade/translation/EnglishDownloadTranslationPolicyTest.kt b/app/src/test/java/eu/kanade/translation/EnglishDownloadTranslationPolicyTest.kt
 new file mode 100644
 index 0000000..cb3a663
@@ -661,26 +1649,72 @@ index 18b804f..ee30e4b 100644
      fun autoTranslateNovels() = preferenceStore.getBoolean("auto_translate_novels", true)
      fun novelTranslationEngine() = preferenceStore.getInt("novel_translation_engine", 1)
 diff --git a/i18n-at/src/commonMain/moko-resources/base/strings.xml b/i18n-at/src/commonMain/moko-resources/base/strings.xml
-index aab8cdd..5efc511 100644
+index aab8cdd..9167d11 100644
 --- a/i18n-at/src/commonMain/moko-resources/base/strings.xml
 +++ b/i18n-at/src/commonMain/moko-resources/base/strings.xml
-@@ -54,4 +54,7 @@
+@@ -54,4 +54,30 @@
      <string name="translation_notification_text_progress">Translating the text from %1$d pages</string>
      <string name="translation_notification_chapter_progress">Chapter %1$d of %2$d</string>
      <string name="translation_notification_error">Could not finish the translation</string>
 +    <string name="manga_download_and_translate">Download and translate</string>
 +    <string name="pref_auto_translate_english_downloads">Translate downloads from English sources</string>
 +    <string name="pref_auto_translate_english_downloads_summary">Starts after download when the source is English and the target language is different. Per-work settings take priority.</string>
++    <string name="repository_discovery">Discover repositories</string>
++    <string name="repository_search_hint">Name, language or maintainer</string>
++    <string name="repository_catalog_scope">Initial catalog bundled with Polaris. Search filters this list, not the entire internet.</string>
++    <string name="repository_third_party_notice">Third-party extensions execute code. A signature identifies a publisher, not a security audit. Respect source terms and applicable rights.</string>
++    <string name="repository_overlap_notice">Repositories can offer overlapping extensions with different signatures. Choose the extension origin deliberately.</string>
++    <string name="repository_maintainer">Maintainer: %1$s</string>
++    <string name="repository_last_checked">Index checked on 2026-10-30; individual extensions are not certified.</string>
++    <string name="repository_add">Add repository</string>
++    <string name="repository_added">Added</string>
++    <string name="repository_retry">Try again</string>
++    <string name="repository_no_results">No entries match. You can still add a URL on the Repositories screen.</string>
++    <string name="repository_after_add">After adding, return to Browse → Extensions to choose what to install.</string>
++    <string name="repository_load_error">Could not read installed repositories. Try again.</string>
++    <string name="repository_add_error">Could not add this repository. Check your connection and try again.</string>
++    <string name="repository_refresh_error">Repository added, but extension listings could not be refreshed. Refresh the Extensions screen.</string>
++    <string name="chapter_group_version">Group/version: %1$s</string>
++    <string name="chapter_entries_count">%1$d chapters/versions</string>
++    <string name="chapter_versions_filter">Source groups and versions</string>
++    <string name="chapter_versions_hint">One source may list multiple groups, editions and side stories with overlapping chapter numbers. Filter groups below without deleting chapters. Labels such as official come from the source.</string>
++    <string name="source_search_separate_results">Results stay separate by source. Searching does not merge works or chapters.</string>
++    <string name="repository_loading">Reading added repositories…</string>
++    <string name="repository_adding">Adding…</string>
++    <string name="chapter_versions_shortcut">Tap to filter source groups and versions</string>
  </resources>
 diff --git a/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml b/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
-index 3a4b6eb..967e501 100644
+index 3a4b6eb..0fbefa3 100644
 --- a/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
 +++ b/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
-@@ -54,4 +54,7 @@
+@@ -54,4 +54,30 @@
      <string name="translation_notification_text_progress">Traduzindo os textos de %1$d páginas</string>
      <string name="translation_notification_chapter_progress">Capítulo %1$d de %2$d</string>
      <string name="translation_notification_error">Não foi possível concluir a tradução</string>
 +    <string name="manga_download_and_translate">Baixar e traduzir</string>
 +    <string name="pref_auto_translate_english_downloads">Traduzir downloads de fontes em inglês</string>
 +    <string name="pref_auto_translate_english_downloads_summary">Inicia após o download quando a fonte é inglesa e o idioma de destino é diferente. A configuração por obra tem prioridade.</string>
++    <string name="repository_discovery">Descobrir repositórios</string>
++    <string name="repository_search_hint">Nome, idioma ou mantenedor</string>
++    <string name="repository_catalog_scope">Catálogo inicial incluído no Polaris. A busca filtra esta lista, não toda a internet.</string>
++    <string name="repository_third_party_notice">Extensões de terceiros executam código. Assinatura identifica o publicador, não é auditoria de segurança. Respeite os termos das fontes e os direitos aplicáveis.</string>
++    <string name="repository_overlap_notice">Repositórios podem oferecer extensões sobrepostas com assinaturas diferentes. Escolha a origem da extensão.</string>
++    <string name="repository_maintainer">Mantenedor: %1$s</string>
++    <string name="repository_last_checked">Índice consultado em 30/10/2026; as extensões não são certificadas individualmente.</string>
++    <string name="repository_add">Adicionar repositório</string>
++    <string name="repository_added">Adicionado</string>
++    <string name="repository_retry">Tentar novamente</string>
++    <string name="repository_no_results">Nenhuma entrada encontrada. Você pode adicionar uma URL na tela Repositórios.</string>
++    <string name="repository_after_add">Depois de adicionar, volte a Explorar → Extensões e escolha o que instalar.</string>
++    <string name="repository_load_error">Não foi possível consultar os repositórios adicionados. Tente novamente.</string>
++    <string name="repository_add_error">Não foi possível adicionar o repositório. Confira a conexão e tente novamente.</string>
++    <string name="repository_refresh_error">Repositório adicionado, mas não foi possível atualizar as extensões. Atualize a tela Extensões.</string>
++    <string name="chapter_group_version">Grupo/versão: %1$s</string>
++    <string name="chapter_entries_count">%1$d capítulos/versões</string>
++    <string name="chapter_versions_filter">Grupos e versões da fonte</string>
++    <string name="chapter_versions_hint">Uma fonte pode listar grupos, edições e extras com números repetidos. Filtre os grupos abaixo sem apagar capítulos. Rótulos como official vêm da própria fonte.</string>
++    <string name="source_search_separate_results">Os resultados ficam separados por fonte. A busca não junta obras nem capítulos.</string>
++    <string name="repository_loading">Consultando repositórios adicionados…</string>
++    <string name="repository_adding">Adicionando…</string>
++    <string name="chapter_versions_shortcut">Toque para filtrar grupos e versões da fonte</string>
  </resources>

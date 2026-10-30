@@ -1,0 +1,37 @@
+{
+  "date": "2026-10-30",
+  "scope": "Host-side HTTPS availability and declared metadata only; no extension APK audit or Android runtime acceptance",
+  "modern_indexes": [
+    {
+      "id": "nox",
+      "url": "https://raw.githubusercontent.com/Awerkori/extensoes/repo/index.pb",
+      "http": 200,
+      "name": "Project Nox",
+      "signing_key": "144f44e865cbfae6bde110489ef7ec142f0b1681f627a093a218650e21db5dad",
+      "sha256": "c6ac537b258fffd7da8e904d4daf23ba9c740405c727906f40a63991a078ff92"
+    },
+    {
+      "id": "keiyoushi",
+      "url": "https://raw.githubusercontent.com/keiyoushi/extensions/repo/index.pb",
+      "http": 200,
+      "name": "Keiyoushi",
+      "signing_key": "9add655a78e96c4ec7a53ef89dccb557cb5d767489fac5e785d671a5a75d4da2",
+      "sha256": "ed902df5e1139dca41e40e9aedae9c3b1b0077a7704cf7ddd49edbe875d4c86a"
+    }
+  ],
+  "legacy_probe": {
+    "url": "https://raw.githubusercontent.com/keiyoushi/extensions/repo/repo.json",
+    "status": 200,
+    "bytes": 262,
+    "sha256": "5e400e546b91b3977a463205c788a8fac744c1017c7f33b2770f1be14b26968e",
+    "gzip": false,
+    "metadata": {
+      "index_v2": "https://github.com/keiyoushi/extensions/raw/repo/index.pb",
+      "meta": {
+        "name": "Keiyoushi",
+        "website": "https://keiyoushi.github.io",
+        "signingKeyFingerprint": "9add655a78e96c4ec7a53ef89dccb557cb5d767489fac5e785d671a5a75d4da2"
+      }
+    }
+  }
+}

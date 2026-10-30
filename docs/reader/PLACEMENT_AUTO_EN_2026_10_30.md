@@ -1,6 +1,6 @@
 # Translation placement and English-source auto-download — 30/10/2026
 
-User evidence: Guilty Library chapter1.3, pages2–11, Windows API35 Spike001. Portuguese overlays leave English text visible and sometimes cover neighboring art/balloons. This is not accepted as correct visual placement. The 29/10 font-fit tests did not certify geometry in an actual reader.
+User evidence: Guilty Library chapter1.3, pages2–11, Windows API35 Spike001. Portuguese overlays leave English text visible and sometimes cover neighboring art/balloons. The user subsequently confirmed the screenshots are from the old installed APK; the candidate's font-fit and placement changes have not yet been tested there. This is not accepted as correct visual placement. The 29/10 font-fit tests did not certify geometry in an actual reader.
 
 The candidate corrects layout constraint handling before scaling, uses physical absolute coordinates, and maps stored translation dimensions to the reader's source-image dimensions. The existing font-fit algorithm can then measure within the intended region. It does not claim to identify every balloon correctly or choose a new font family automatically.
 

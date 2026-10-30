@@ -37,6 +37,8 @@ Early private development.
 
 See the R001 engineering documents on the development branch for current implementation status and handoff notes.
 
+The Android candidate now includes download-and-translate actions, English-source download translation, translation layout corrections, a bundled repository catalog and clearer chapter variants. See the [reader implementation and verification](integration/reader-translation-ux/README.md) and [30 October candidate test guide](docs/reader/DISCOVERY_CHAPTER_CLARITY_2026_10_30.md). Build/unit verification does not replace the pending visual checks on the Windows test device.
+
 ## License and attribution
 
 Polaris is intended to remain compatible with the Apache-2.0 lineage of Mihon, Yomotsu and TachiyomiSY where code is reused. See `LICENSE` and `NOTICE`.
