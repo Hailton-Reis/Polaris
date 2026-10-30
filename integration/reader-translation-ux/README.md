@@ -23,3 +23,13 @@ The build driver calls this after validating the original Spike001 changes. The 
 The candidate adds real Kotlin tests for persisted explicit requests, cancellation, retry after enqueue failure, duplicate/concurrent clicks, and a nonmonotonic word-fit regression. Existing translation launch and fit suites are included in the targeted Android unit-test run. The patch application tests use fresh real pinned worktrees, including source-drift rejection and the migration gate.
 
 A successful build/unit suite does not prove the new UI on the user's Windows AVD. Existing screenshots prove the previous APK can download, translate with ML Kit, and display Portuguese pages from Guilty Library. The new candidate still needs that same single-source flow checked after an update. The separate two-source gate remains pending and does not block this reader-only candidate, per the user's new priority. No migration15, canonical translation bridge, repository catalog, backupv2 enablement or production release is included.
+
+## 2026-10-30 — placement and English-source downloads
+
+The user supplied screenshots from the updated APK showing original English text still visible, with Portuguese overlays outside the corresponding balloons. The previous font-selection change did not resolve placement.
+
+Text and cleanup now use unbounded TopStart wrapping around explicitly sized regions so Compose cannot center oversized source-space children inside viewport constraints before scaling. OCR/page coordinates use absolute offsets (independent of UI layout direction). Pager zoom also accounts for source image width versus stored translation width; a downsampled translation must map into the source image's pixel space before viewer zoom.
+
+A new default setting, **Traduzir downloads de fontes em inglês**, enables translation on completion for sources declaring English, when input is configured as English and target differs. This is source-metadata routing, not content language recognition. Portuguese, multilingual/unknown sources are not guessed. Explicit per-work choices win, including disabling automatic translation for a particular work. The work menu reflects this effective policy and updates when global settings/languages change. Existing explicit **Baixar e traduzir** requests retain priority. Already downloaded chapters are not automatically reprocessed.
+
+These changes do not switch OCR engine, font family or translation provider, and do not require DBNet/ARM64. Stored translations are retained. Placement changes affect their rendering on reopening; no retranslation is required just to compare the new layout. Actual balloon detection/OCR grouping can still be imperfect and needs visual verification on the same pages and zoom levels.

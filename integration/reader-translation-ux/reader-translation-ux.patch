@@ -96,6 +96,22 @@ index c581eef..0d5120d 100644
                      modifier = Modifier.padding(start = 4.dp),
                      translationStateProvider = translationStateProvider,
                      onClick = { onTranslationClick.invoke(it) },
+diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsTranslationScreen.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsTranslationScreen.kt
+index 3075333..a198c3f 100644
+--- a/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsTranslationScreen.kt
++++ b/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsTranslationScreen.kt
+@@ -50,6 +50,11 @@ object SettingsTranslationScreen : SearchableSettings {
+     override fun getPreferences(): List<Preference> {
+         val translationPreferences = remember { Injekt.get<TranslationPreferences>() }
+         return listOf(
++            Preference.PreferenceItem.SwitchPreference(
++                preference = translationPreferences.autoTranslateEnglishDownloads(),
++                title = stringResource(ATMR.strings.pref_auto_translate_english_downloads),
++                subtitle = stringResource(ATMR.strings.pref_auto_translate_english_downloads_summary),
++            ),
+             Preference.PreferenceItem.SwitchPreference(
+                 preference = translationPreferences.translateSoundEffects(),
+                 title = stringResource(ATMR.strings.pref_translate_sound_effects),
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/data/download/DownloadManager.kt b/app/src/main/java/eu/kanade/tachiyomi/data/download/DownloadManager.kt
 index 921f8d0..c45a189 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/data/download/DownloadManager.kt
@@ -178,10 +194,38 @@ index 74ac77c..d56914c 100644
                  logcat(LogPriority.ERROR, error) {
                      "Download concluído, mas não foi possível enfileirar a tradução automática."
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/manga/MangaViewModel.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/manga/MangaViewModel.kt
-index 19de11d..11ba990 100644
+index 19de11d..be73cb2 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/ui/manga/MangaViewModel.kt
 +++ b/app/src/main/java/eu/kanade/tachiyomi/ui/manga/MangaViewModel.kt
-@@ -796,8 +796,24 @@ class MangaViewModel(
+@@ -188,10 +188,14 @@ class MangaViewModel(
+ 
+     init {
+         viewModelScope.launchIO {
+-            autoTranslationPreference.changes()
+-                .distinctUntilChanged()
+-                .collectLatest { enabled ->
+-                    updateSuccessState { state -> state.copy(autoTranslateEnabled = enabled) }
++            combine(
++                autoTranslationPreference.changes(),
++                translationPreferences.autoTranslateEnglishDownloads().changes(),
++                translationPreferences.translateFromLanguage().changes(),
++                translationPreferences.translateToLanguage().changes(),
++            ) { _, _, _, _ -> Unit }
++                .collectLatest {
++                    updateSuccessState { state -> state.copy(autoTranslateEnabled = translationManager.isAutomaticTranslationEnabled(state.manga)) }
+                 }
+         }
+ 
+@@ -259,7 +263,7 @@ class MangaViewModel(
+                     isRefreshingData = needRefreshInfo || needRefreshChapter,
+                     dialog = null,
+                     hideMissingChapters = libraryPreferences.hideMissingChapters.get(),
+-                    autoTranslateEnabled = autoTranslationPreference.get(),
++                    autoTranslateEnabled = translationManager.isAutomaticTranslationEnabled(manga),
+                 )
+             }
+ 
+@@ -796,8 +800,24 @@ class MangaViewModel(
      ) {
          when (action) {
              ChapterTranslationAction.START -> {
@@ -207,6 +251,49 @@ index 19de11d..11ba990 100644
                  viewModelScope.launchNonCancellable {
                      translationManager.translateChapter(
                          manga,
+@@ -837,7 +857,7 @@ class MangaViewModel(
+     }
+ 
+     fun toggleAutomaticTranslation() {
+-        autoTranslationPreference.set(!autoTranslationPreference.get())
++        autoTranslationPreference.set(!(successState?.autoTranslateEnabled ?: return))
+     }
+ 
+     fun translateDownloadedChapters() {
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/reader/viewer/pager/PagerPageHolder.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/reader/viewer/pager/PagerPageHolder.kt
+index 15b320d..c6be2ae 100644
+--- a/app/src/main/java/eu/kanade/tachiyomi/ui/reader/viewer/pager/PagerPageHolder.kt
++++ b/app/src/main/java/eu/kanade/tachiyomi/ui/reader/viewer/pager/PagerPageHolder.kt
+@@ -349,7 +349,11 @@ class PagerPageHolder(
+         if (coords != null) {
+             translationsView?.viewTLState?.value = coords
+         }
+-        translationsView?.scaleState?.value = vi.scale
++        translationsView?.scaleState?.value = eu.kanade.translation.presentation.TranslationViewportScale.resolve(
++            vi.scale,
++            vi.sWidth,
++            page.translation!!.imgWidth,
++        )
+     }
+ 
+ 
+diff --git a/app/src/main/java/eu/kanade/translation/EnglishDownloadTranslationPolicy.kt b/app/src/main/java/eu/kanade/translation/EnglishDownloadTranslationPolicy.kt
+new file mode 100644
+index 0000000..e672f58
+--- /dev/null
++++ b/app/src/main/java/eu/kanade/translation/EnglishDownloadTranslationPolicy.kt
+@@ -0,0 +1,11 @@
++package eu.kanade.translation
++
++/** Source language is a routing hint, not a claim that OCR detected the chapter language. */
++object EnglishDownloadTranslationPolicy {
++    fun enabled(globalEnabled: Boolean, workOverride: Boolean?, sourceLanguage: String?, from: String, to: String): Boolean {
++        if (workOverride != null) return workOverride
++        val language = sourceLanguage?.lowercase(java.util.Locale.ROOT)?.replace('_', '-')
++        return globalEnabled && (language == "en" || language?.startsWith("en-") == true) &&
++            from == "ENGLISH" && to.isNotBlank() && to != "ENGLISH"
++    }
++}
 diff --git a/app/src/main/java/eu/kanade/translation/PendingDownloadTranslations.kt b/app/src/main/java/eu/kanade/translation/PendingDownloadTranslations.kt
 new file mode 100644
 index 0000000..f6e9da9
@@ -239,7 +326,7 @@ index 0000000..f6e9da9
 +    }
 +}
 diff --git a/app/src/main/java/eu/kanade/translation/TranslationManager.kt b/app/src/main/java/eu/kanade/translation/TranslationManager.kt
-index d2aad1f..63aa258 100644
+index d2aad1f..ec83930 100644
 --- a/app/src/main/java/eu/kanade/translation/TranslationManager.kt
 +++ b/app/src/main/java/eu/kanade/translation/TranslationManager.kt
 @@ -53,6 +53,22 @@ class TranslationManager(
@@ -265,6 +352,88 @@ index d2aad1f..63aa258 100644
      private val translator = ChapterTranslator(context, provider)
      private val editorScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
      private val translationFileMutex = Mutex()
+@@ -95,12 +111,23 @@ class TranslationManager(
+         origin: TranslationRequestOrigin,
+     ) = translateChapters(manga, listOf(chapter), origin)
+ 
++    fun isAutomaticTranslationEnabled(manga: Manga): Boolean {
++        val work = translationPreferences.autoTranslateManga(manga.id)
++        return EnglishDownloadTranslationPolicy.enabled(
++            globalEnabled = translationPreferences.autoTranslateEnglishDownloads().get(),
++            workOverride = work.get().takeIf { work.isSet() },
++            sourceLanguage = (sourceManager.get(manga.source) as? eu.kanade.tachiyomi.source.online.HttpSource)?.lang,
++            from = translationPreferences.translateFromLanguage().get(),
++            to = translationPreferences.translateToLanguage().get(),
++        )
++    }
++
+     fun translateChapters(
+         manga: Manga,
+         chapters: Iterable<Chapter>,
+         origin: TranslationRequestOrigin,
+     ) {
+-        val autoTranslateEnabled = translationPreferences.autoTranslateManga(manga.id).get()
++        val autoTranslateEnabled = isAutomaticTranslationEnabled(manga)
+         if (!TranslationLaunchPolicy.canStart(origin, autoTranslateEnabled)) return
+         chapters.forEach { chapter -> translator.queueChapter(manga, chapter) }
+         startTranslation()
+diff --git a/app/src/main/java/eu/kanade/translation/presentation/SmartTranslationBlock.kt b/app/src/main/java/eu/kanade/translation/presentation/SmartTranslationBlock.kt
+index 87bae27..5ba09d6 100644
+--- a/app/src/main/java/eu/kanade/translation/presentation/SmartTranslationBlock.kt
++++ b/app/src/main/java/eu/kanade/translation/presentation/SmartTranslationBlock.kt
+@@ -2,7 +2,8 @@ package eu.kanade.translation.presentation
+ 
+ import androidx.compose.foundation.combinedClickable
+ import androidx.compose.foundation.layout.Box
+-import androidx.compose.foundation.layout.offset
++import androidx.compose.foundation.layout.absoluteOffset
++import androidx.compose.foundation.layout.wrapContentSize
+ import androidx.compose.foundation.layout.requiredSize
+ import androidx.compose.foundation.layout.width
+ import androidx.compose.material3.LocalTextStyle
+@@ -57,7 +58,8 @@ fun SmartTranslationBlock(
+         if (onLongClick != null) {
+             Box(
+                 modifier = modifier
+-                    .offset(xPx.pxToDp(), yPx.pxToDp())
++                    .wrapContentSize(Alignment.TopStart, unbounded = true)
++            .absoluteOffset(xPx.pxToDp(), yPx.pxToDp())
+                     .requiredSize(width, height)
+             .graphicsLayer {
+                 scaleX = scaleFactor
+@@ -75,7 +77,8 @@ fun SmartTranslationBlock(
+ 
+     Box(
+         modifier = modifier
+-            .offset(xPx.pxToDp(), yPx.pxToDp())
++            .wrapContentSize(Alignment.TopStart, unbounded = true)
++            .absoluteOffset(xPx.pxToDp(), yPx.pxToDp())
+             .requiredSize(width, height)
+             .graphicsLayer {
+                 scaleX = scaleFactor
+diff --git a/app/src/main/java/eu/kanade/translation/presentation/TranslationCleanupBlock.kt b/app/src/main/java/eu/kanade/translation/presentation/TranslationCleanupBlock.kt
+index 973dea0..eb9b340 100644
+--- a/app/src/main/java/eu/kanade/translation/presentation/TranslationCleanupBlock.kt
++++ b/app/src/main/java/eu/kanade/translation/presentation/TranslationCleanupBlock.kt
+@@ -3,7 +3,7 @@ package eu.kanade.translation.presentation
+ import androidx.compose.foundation.Canvas
+ import androidx.compose.foundation.background
+ import androidx.compose.foundation.layout.Box
+-import androidx.compose.foundation.layout.offset
++import androidx.compose.foundation.layout.absoluteOffset
+ import androidx.compose.foundation.layout.requiredSize
+ import androidx.compose.foundation.layout.wrapContentSize
+ import androidx.compose.foundation.shape.RoundedCornerShape
+@@ -48,7 +48,8 @@ fun TranslationCleanupBlock(
+             }
+             Box(
+                 modifier = Modifier
+-                    .offset((adjustedX * scaleFactor).pxToDp(), (adjustedY * scaleFactor).pxToDp())
++                    .wrapContentSize(Alignment.TopStart, unbounded = true)
++            .absoluteOffset((adjustedX * scaleFactor).pxToDp(), (adjustedY * scaleFactor).pxToDp())
+                     .requiredSize(
+                         (adjustedWidth * scaleFactor).pxToDp(),
+                         (adjustedHeight * scaleFactor).pxToDp(),
 diff --git a/app/src/main/java/eu/kanade/translation/presentation/TranslationTextFit.kt b/app/src/main/java/eu/kanade/translation/presentation/TranslationTextFit.kt
 index b43aaac..ae93f81 100644
 --- a/app/src/main/java/eu/kanade/translation/presentation/TranslationTextFit.kt
@@ -291,6 +460,66 @@ index b43aaac..ae93f81 100644
      }
  
      fun keepsWords(text: String, lineEnds: List<Int>): Boolean = lineEnds.none { end ->
+diff --git a/app/src/main/java/eu/kanade/translation/presentation/TranslationViewportScale.kt b/app/src/main/java/eu/kanade/translation/presentation/TranslationViewportScale.kt
+new file mode 100644
+index 0000000..607f550
+--- /dev/null
++++ b/app/src/main/java/eu/kanade/translation/presentation/TranslationViewportScale.kt
+@@ -0,0 +1,9 @@
++package eu.kanade.translation.presentation
++
++object TranslationViewportScale {
++    fun resolve(viewScale: Float, sourceWidth: Int, translationWidth: Float): Float {
++        if (!viewScale.isFinite() || viewScale <= 0f) return 0f
++        if (sourceWidth <= 0 || !translationWidth.isFinite() || translationWidth <= 0f) return viewScale
++        return (viewScale * sourceWidth / translationWidth).takeIf { it.isFinite() } ?: viewScale
++    }
++}
+diff --git a/app/src/test/java/eu/kanade/translation/EnglishDownloadTranslationPolicyTest.kt b/app/src/test/java/eu/kanade/translation/EnglishDownloadTranslationPolicyTest.kt
+new file mode 100644
+index 0000000..cb3a663
+--- /dev/null
++++ b/app/src/test/java/eu/kanade/translation/EnglishDownloadTranslationPolicyTest.kt
+@@ -0,0 +1,39 @@
++package eu.kanade.translation
++
++import org.junit.jupiter.api.Assertions.assertFalse
++import org.junit.jupiter.api.Assertions.assertTrue
++import org.junit.jupiter.api.Test
++
++class EnglishDownloadTranslationPolicyTest {
++    private fun enabled(lang: String?, global: Boolean = true, work: Boolean? = null,
++                        from: String = "ENGLISH", to: String = "PORTUGUESE") =
++        EnglishDownloadTranslationPolicy.enabled(global, work, lang, from, to)
++
++    @Test
++    fun `English source variants are eligible`() {
++        for (lang in listOf("en", "en-US", "en_GB", "EN")) assertTrue(enabled(lang))
++    }
++
++    @Test
++    fun `Portuguese and unknown sources are not guessed as English`() {
++        for (lang in listOf("pt", "pt-BR", "all", "", "enough", null)) assertFalse(enabled(lang))
++    }
++
++    @Test
++    fun `explicit work choices take priority`() {
++        assertFalse(enabled("en", work = false))
++        assertTrue(enabled("all", global = false, work = true))
++    }
++
++    @Test
++    fun `global off disables the English default`() {
++        assertFalse(enabled("en", global = false))
++    }
++
++    @Test
++    fun `configured source and target must permit English translation`() {
++        assertFalse(enabled("en", from = "JAPANESE"))
++        assertFalse(enabled("en", to = "ENGLISH"))
++        assertFalse(enabled("en", to = ""))
++    }
++}
 diff --git a/app/src/test/java/eu/kanade/translation/PendingDownloadTranslationsTest.kt b/app/src/test/java/eu/kanade/translation/PendingDownloadTranslationsTest.kt
 new file mode 100644
 index 0000000..f9f38c4
@@ -373,8 +602,41 @@ index f26ef06..dc8cbdf 100644
 +    }
 +
  }
+diff --git a/app/src/test/java/eu/kanade/translation/presentation/TranslationViewportScaleTest.kt b/app/src/test/java/eu/kanade/translation/presentation/TranslationViewportScaleTest.kt
+new file mode 100644
+index 0000000..b1b308c
+--- /dev/null
++++ b/app/src/test/java/eu/kanade/translation/presentation/TranslationViewportScaleTest.kt
+@@ -0,0 +1,27 @@
++package eu.kanade.translation.presentation
++
++import org.junit.jupiter.api.Assertions.assertEquals
++import org.junit.jupiter.api.Test
++
++class TranslationViewportScaleTest {
++    @Test
++    fun `same pixel space preserves reader zoom`() {
++        assertEquals(0.4f, TranslationViewportScale.resolve(0.4f, 1200, 1200f), 0.0001f)
++    }
++
++    @Test
++    fun `downsampled translation coordinates are mapped to source pixels exactly once`() {
++        val scale = TranslationViewportScale.resolve(0.25f, 2400, 1200f)
++        assertEquals(0.5f, scale, 0.0001f)
++        assertEquals(100f, 200f * scale, 0.0001f)
++        assertEquals(2f, TranslationViewportScale.resolve(1f, 2400, 1200f), 0.0001f)
++    }
++
++    @Test
++    fun `invalid page metadata does not introduce NaN or infinite scale`() {
++        assertEquals(1f, TranslationViewportScale.resolve(1f, 0, 1200f))
++        assertEquals(1f, TranslationViewportScale.resolve(1f, 1200, 0f))
++        assertEquals(1f, TranslationViewportScale.resolve(1f, 1200, Float.NaN))
++        assertEquals(0f, TranslationViewportScale.resolve(Float.NaN, 1200, 1200f))
++    }
++}
 diff --git a/domain/src/main/java/tachiyomi/domain/translation/TranslationPreferences.kt b/domain/src/main/java/tachiyomi/domain/translation/TranslationPreferences.kt
-index 18b804f..1c71bb3 100644
+index 18b804f..ee30e4b 100644
 --- a/domain/src/main/java/tachiyomi/domain/translation/TranslationPreferences.kt
 +++ b/domain/src/main/java/tachiyomi/domain/translation/TranslationPreferences.kt
 @@ -1,5 +1,6 @@
@@ -384,7 +646,7 @@ index 18b804f..1c71bb3 100644
  import tachiyomi.core.common.preference.PreferenceStore
  
  enum class TranslationLlmProvider(
-@@ -21,6 +22,11 @@ class TranslationPreferences(
+@@ -21,6 +22,13 @@ class TranslationPreferences(
          preferenceStore.getString("translation_${provider.preferenceKey}_model", provider.defaultModel)
      }
  
@@ -393,26 +655,32 @@ index 18b804f..1c71bb3 100644
 +        emptySet(),
 +    )
 +
++    fun autoTranslateEnglishDownloads() = preferenceStore.getBoolean("auto_translate_english_downloads", true)
++
      fun autoTranslateAfterDownload() = preferenceStore.getBoolean("auto_translate_after_download", false)
      fun autoTranslateNovels() = preferenceStore.getBoolean("auto_translate_novels", true)
      fun novelTranslationEngine() = preferenceStore.getInt("novel_translation_engine", 1)
 diff --git a/i18n-at/src/commonMain/moko-resources/base/strings.xml b/i18n-at/src/commonMain/moko-resources/base/strings.xml
-index aab8cdd..eb7fe61 100644
+index aab8cdd..5efc511 100644
 --- a/i18n-at/src/commonMain/moko-resources/base/strings.xml
 +++ b/i18n-at/src/commonMain/moko-resources/base/strings.xml
-@@ -54,4 +54,5 @@
+@@ -54,4 +54,7 @@
      <string name="translation_notification_text_progress">Translating the text from %1$d pages</string>
      <string name="translation_notification_chapter_progress">Chapter %1$d of %2$d</string>
      <string name="translation_notification_error">Could not finish the translation</string>
 +    <string name="manga_download_and_translate">Download and translate</string>
++    <string name="pref_auto_translate_english_downloads">Translate downloads from English sources</string>
++    <string name="pref_auto_translate_english_downloads_summary">Starts after download when the source is English and the target language is different. Per-work settings take priority.</string>
  </resources>
 diff --git a/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml b/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
-index 3a4b6eb..7d6db47 100644
+index 3a4b6eb..967e501 100644
 --- a/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
 +++ b/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
-@@ -54,4 +54,5 @@
+@@ -54,4 +54,7 @@
      <string name="translation_notification_text_progress">Traduzindo os textos de %1$d páginas</string>
      <string name="translation_notification_chapter_progress">Capítulo %1$d de %2$d</string>
      <string name="translation_notification_error">Não foi possível concluir a tradução</string>
 +    <string name="manga_download_and_translate">Baixar e traduzir</string>
++    <string name="pref_auto_translate_english_downloads">Traduzir downloads de fontes em inglês</string>
++    <string name="pref_auto_translate_english_downloads_summary">Inicia após o download quando a fonte é inglesa e o idioma de destino é diferente. A configuração por obra tem prioridade.</string>
  </resources>
