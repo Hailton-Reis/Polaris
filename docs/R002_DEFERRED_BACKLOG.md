@@ -93,6 +93,26 @@ For textual chapters:
 
 Do not force manga page abstractions onto novels.
 
+## Document formats and broad discovery — requested 2026-10-31
+
+The user explicitly deferred this expansion to a later version while validating the current **Polaris P20261031.1** candidate. These are requirements, not capabilities added to that APK. This deferral does not make the separate two-source acceptance gate a prerequisite for independent reader improvements.
+
+Requested formats and uses:
+
+- PDF articles, books and comics, including image-based/scanned pages.
+- EPUB text books as well as illustrated EPUBs. The inspected upstream EPUB loader currently exposes embedded images as reader pages; that is partial EPUB support, not a complete text-book reading path.
+- DOCX documents and TXT files, alongside existing supported comic archives.
+- Reading progress, suitable text layout and translation appropriate to each document type. Native text should use text translation; image/scanned content needs OCR. Preserve figures and reading order where supported.
+
+Requested discovery:
+
+- Search by name/title, author, DOI and related bibliographic fields.
+- Combine multiple bibliographic indexes, repositories and configurable source providers; support importing local files and opening/importing direct document URLs.
+- Allow user-selected external/non-curated sources instead of restricting discovery to the initial bundled repository catalog. Identify the source of each result and keep extension trust/platform checks distinct from document compatibility.
+- A broad federated search must state which providers it queried. Do not claim exhaustive coverage of the entire internet or availability of a downloadable full text for every result.
+
+Before this expansion, the immediate user test is the installed revision in About, the same Guilty Library page in paginated and long-strip modes, and zoom/pan behavior. The current PDF/EPUB/DOCX/TXT expansion is not part of that acceptance claim.
+
 ## R002 — optional accelerator server
 
 A personal server remains optional.
