@@ -1,13 +1,13 @@
 {
-  "date": "2026-10-30",
-  "scope": "Bundled repository discovery, chapter group/version clarity and responsive work action buttons; includes previous translation UX/placement overlay",
+  "date": "2026-10-31",
+  "scope": "Paginated image/translation viewport synchronization and explicit About candidate revision; includes previous reader/discovery overlay",
   "pinned_yomotsu": "0fb80c439ef816eeb50674f1b90af39918b176d8",
-  "patch_sha256": "fee526c5537f1354261a1fd034044bed219e899305007b97d6f46fa44862029c",
+  "patch_sha256": "0e1fae7b822627e137d53a84b0be91c17790010a4d8406a47bc7ac4fb953afcd",
   "assembly": "PASS: app:assembleDebug completed; overall Gradle exit 1 from known unit failures",
   "apk_signature_verification": "PASS",
-  "apk_x86_64_sha256": "18cfaab06def1b66aa7d602585b391c6f1e5ead63b0cb1515d4b94ee4aacfcd6",
+  "apk_x86_64_sha256": "b8ec13ad95a0082ad25085f818459cf6fd6d30f89200547040089fbcaa636335",
   "selected_tests": {
-    "tests": 37,
+    "tests": 41,
     "failures": 0,
     "errors": 0,
     "skipped": 0
@@ -66,6 +66,12 @@
       "failures": 0,
       "errors": 0,
       "skipped": 0
+    },
+    "TranslationViewportTransformTest": {
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
     }
   },
   "overlay_application_tests": {
@@ -73,7 +79,7 @@
     "failed": 0,
     "crlf_simulation_included": true
   },
-  "targeted_formatting": "PASS: Spotless IDE formatter completed for the 15 Kotlin files touched in this change; not a repository-wide lint run",
+  "targeted_formatting": "PASS: Spotless IDE formatter completed for 6 Kotlin files touched by this change; not a repository-wide lint run",
   "android_unit_comparison": {
     "status": "NO_NEW_UNIT_REGRESSIONS",
     "baseline": {
@@ -83,8 +89,8 @@
       "skipped": 0
     },
     "patched": {
-      "total": 449,
-      "passed": 415,
+      "total": 453,
+      "passed": 419,
       "failed": 34,
       "skipped": 0
     },
@@ -108,10 +114,14 @@
     "android_registration_and_installation": "PENDING on Windows test device",
     "extension_apk_audit": false
   },
-  "visual_acceptance": "PENDING; includes translation balloon placement, chapter list presentation and responsive action layout",
+  "visual_acceptance": "PENDING for P20261031.1: paginated initial fit, zoom/pan and resize; geometry tests do not exercise Android rendering",
   "language_identification": "Source metadata, not chapter-content detection",
-  "installed_user_version": "User explicitly stated their screenshots remain from the old version",
+  "installed_user_version": "User believes they ran options 4 and 9, but the exact installed overlay revision is unconfirmed",
   "multi_source_runtime_acceptance": "PENDING, separate from these candidate improvements",
   "migration15_applied": false,
-  "backup_v2_enabled": false
+  "backup_v2_enabled": false,
+  "candidate_revision": "Polaris P20261031.1",
+  "embedded_revision_verification": "PASS: Polaris P20261031.1 found in assembled APK DEX",
+  "user_runtime_evidence_2026_10_31": "User reports aligned long-strip mode and displaced paginated mode, with screenshots; this does not certify the new candidate",
+  "candidate_revision_semantics": "Explicit overlay code revision; same-code rebuild retains revision and changes debug build date; not an automatic Android versionCode increment"
 }
