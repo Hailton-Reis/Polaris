@@ -14,10 +14,18 @@ py -3 tools\local-android\polaris_local.py build
 
 Full instructions: [`docs/r001/LOCAL_ANDROID_BUILD_NO_ACTIONS.md`](../../docs/r001/LOCAL_ANDROID_BUILD_NO_ACTIONS.md).
 
-Host self-tests (8 safe, offline cases):
+Host orchestration self-tests (11 cases):
 
 ```powershell
 py -3 -m unittest tools/local-android/test_polaris_local.py -v
 ```
 
 The Python tests exercise command/protection logic only. Actual Windows/SDK/Gradle APK compilation must be executed on the user's PC.
+
+## Build performance
+
+The default `auto` profile detects CPU/RAM and enables project parallelism, task caching, incremental Kotlin and daemon reuse. A 16-thread/32 GiB machine selects up to 8 workers and an 8 GiB Gradle heap. Kotlin compilation runs in-process to avoid a second large compiler heap. This is an upper bound, not a guarantee of continuous full CPU usage.
+
+Assembly and unit tests share one Gradle invocation per variant (two invocations total). Complete APK metadata, assembly completion and JUnit coverage are verified before the existing regression comparison. The build still uses isolated new worktrees. Hardware limits and per-phase times are saved in the evidence directory; no global Gradle properties are edited.
+
+Optional diagnostic fallback: `polaris_local.py build --build-profile conservative`. Existing CMD option 4 needs no extra arguments and picks `auto` by default. See the [performance notes and verification limits](../../docs/r001/LOCAL_BUILD_PERFORMANCE_2026_10_31.md).

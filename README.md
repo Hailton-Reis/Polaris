@@ -41,6 +41,8 @@ The Android candidate now includes download-and-translate actions, English-sourc
 
 The [31 October paginated-reader candidate](docs/reader/PAGER_VIEWPORT_2026_10_31.md) adds image/translation viewport synchronization and an explicit Polaris revision label. Visual acceptance on the Windows test device remains pending.
 
+Local Android builds now detect CPU/RAM, enable Gradle cache/parallelism and combine APK assembly with tests per variant. See the [build-performance profile and verification limits](docs/r001/LOCAL_BUILD_PERFORMANCE_2026_10_31.md); performance on the user’s Windows PC remains to be measured.
+
 ## License and attribution
 
 Polaris is intended to remain compatible with the Apache-2.0 lineage of Mihon, Yomotsu and TachiyomiSY where code is reused. See `LICENSE` and `NOTICE`.

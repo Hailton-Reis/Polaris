@@ -12,6 +12,14 @@ test "$(git -C "$baseline_source" rev-parse HEAD)" = "$pinned"
 test -z "$(git -C "$baseline_source" status --porcelain)"
 test ! -e "$evidence"
 mkdir -p "$evidence"
+python3 "$polaris_root/scripts/r001/gradle_build_profile.py" \
+    --profile "${POLARIS_BUILD_PROFILE:-auto}" \
+    --output "$evidence/build-profile.json" --args-file "$evidence/gradle-options.txt"
+gradle_options=()
+while IFS= read -r gradle_option; do
+    gradle_options+=("$gradle_option")
+done < "$evidence/gradle-options.txt"
+printf 'phase\telapsed_seconds\texit_code\n' > "$evidence/gradle-phase-times.tsv"
 baseline="$evidence/baseline-yomotsu"
 patched="$evidence/patched-yomotsu"
 test ! -e "$baseline"
@@ -30,10 +38,11 @@ python3 "$polaris_root/scripts/r001/check_spike001_refresh_patch.py" "$baseline"
 python3 "$polaris_root/scripts/r001/check_spike001_background_patch.py" "$baseline" --mode baseline | tee "$evidence/background-update-baseline-preflight.log"
 
 run_gradle() {
-    local tree=$1 log=$2
+    local tree=$1 log=$2 started=$SECONDS status=0
     shift 2
-    (cd "$tree" && ./gradlew "$@" -Pkotlin.incremental=false --no-build-cache --no-daemon --console=plain --stacktrace \
-        --max-workers=1 '-Dorg.gradle.jvmargs=-Xmx3g -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8') 2>&1 | tee "$evidence/$log"
+    (cd "$tree" && ./gradlew "$@" "${gradle_options[@]}") 2>&1 | tee "$evidence/$log" || status=$?
+    printf '%s\t%s\t%s\n' "$log" "$((SECONDS - started))" "$status" >> "$evidence/gradle-phase-times.tsv"
+    return "$status"
 }
 
 # Match the pinned upstream build workflow's required generated branding assets.
@@ -50,14 +59,19 @@ prepare_branding() {
 # Branding changes are confined to an evidence worktree, never the pinned checkout.
 prepare_branding "$baseline"
 test -z "$(git -C "$baseline_source" status --porcelain)"
-run_gradle "$baseline" baseline-build.log :app:assembleDebug
-printf '[OK] BASELINE_ASSEMBLE_DEBUG_PASS - APK original compilado; iniciando testes unitarios upstream.\n' | tee "$evidence/baseline-assemble-status.log"
 # Compare unmodified-upstream tests with patched tests; upstream failures are
 # not a Polaris regression, but newly failing, skipped or missing tests are.
 # --continue lets unrelated module tasks produce their JUnit reports.
 unit_test_tasks=(:domain:testDebugUnitTest :data:testDebugUnitTest :app:testDebugUnitTest)
 baseline_test_exit=0
-run_gradle "$baseline" baseline-unit-tests.log --continue "${unit_test_tasks[@]}" || baseline_test_exit=$?
+# Assemble and test in the same graph. In particular, BUILD_TIME must not change
+# between separate invocations and force recompilation before the test run.
+run_gradle "$baseline" baseline-build.log --continue :app:assembleDebug "${unit_test_tasks[@]}" || baseline_test_exit=$?
+cp "$evidence/baseline-build.log" "$evidence/baseline-unit-tests.log"
+python3 "$polaris_root/scripts/r001/verify_android_build_completion.py" "$baseline" \
+    --log "$evidence/baseline-build.log" --exit-code "$baseline_test_exit" \
+    --output "$evidence/baseline-completion.json"
+printf '[OK] BASELINE_ASSEMBLE_DEBUG_PASS - APK original e relatorios JUnit completos.\n' | tee "$evidence/baseline-assemble-status.log"
 if (( baseline_test_exit != 0 )); then
     printf '[AVISO] BASELINE_UNIT_TESTS_NONZERO exit=%s; sao testes do upstream, nao o assemble APK.\n' "$baseline_test_exit" | tee "$evidence/baseline-unit-status.log"
     printf 'Comparacao com os testes patched ainda sera obrigatoria antes de declarar PASS.\n' | tee -a "$evidence/baseline-unit-status.log"
@@ -78,11 +92,15 @@ git -C "$patched" diff --binary > "$evidence/spike001.patch"
 git -C "$patched" diff --check 2>&1 | tee "$evidence/diff-check.log"
 test ! -e "$patched/data/src/main/sqldelight/tachiyomi/migrations/15.sqm"
 prepare_branding "$patched"
-run_gradle "$patched" patched-build.log :data:generateDebugDatabaseInterface verifySqlDelightMigration :app:assembleDebug
+patched_test_exit=0
+run_gradle "$patched" patched-build.log --continue :data:generateDebugDatabaseInterface verifySqlDelightMigration \
+    :app:assembleDebug "${unit_test_tasks[@]}" || patched_test_exit=$?
+cp "$evidence/patched-build.log" "$evidence/patched-unit-tests.log"
+python3 "$polaris_root/scripts/r001/verify_android_build_completion.py" "$patched" \
+    --log "$evidence/patched-build.log" --exit-code "$patched_test_exit" \
+    --output "$evidence/patched-completion.json"
 mkdir -p "$evidence/apks/spike001"
 cp "$patched"/app/build/outputs/apk/debug/*.apk "$evidence/apks/spike001/"
-patched_test_exit=0
-run_gradle "$patched" patched-unit-tests.log --continue "${unit_test_tasks[@]}" || patched_test_exit=$?
 python3 "$polaris_root/scripts/r001/compare_android_unit_tests.py" "$baseline" "$patched" \
     --baseline-exit "$baseline_test_exit" --patched-exit "$patched_test_exit" \
     --baseline-log "$evidence/baseline-unit-tests.log" \

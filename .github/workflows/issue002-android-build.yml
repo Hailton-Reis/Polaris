@@ -61,6 +61,7 @@ jobs:
             ${{ runner.temp }}/issue002-evidence/*.txt
             ${{ runner.temp }}/issue002-evidence/*.patch
             ${{ runner.temp }}/issue002-evidence/*.json
+            ${{ runner.temp }}/issue002-evidence/*.tsv
             ${{ runner.temp }}/issue002-evidence/apks/**/*.apk
           if-no-files-found: warn
           retention-days: 14

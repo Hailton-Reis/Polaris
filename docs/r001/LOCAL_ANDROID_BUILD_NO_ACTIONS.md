@@ -32,6 +32,8 @@ py -3 tools\local-android\polaris_local.py build
 
 O comando `prepare` clona o Yomotsu **exatamente** no commit fixado `0fb80c439ef816eeb50674f1b90af39918b176d8`. O comando `build` executa o script de validação já versionado `scripts/r001/build_issue002.sh` no **Git Bash**, comparando **baseline sem patch** e **Spike-001 com migração14**. Ele não instala APK, não envia arquivos nem desbloqueia backup v2. Se a compilação falhar, os logs ficam em `~/PolarisLocal/evidence/issue002-...` (e nunca são sobrescritos).
 
+Desde 31/10/2026, o perfil padrão ajusta workers/heap à CPU e RAM, habilita cache/paralelismo/incremental/daemon e combina APK e testes na mesma chamada por variante. No 3700X/32 GB, o perfil previsto usa até 8 workers e heap de 8 GiB. A compilação em andamento mantém seus parâmetros antigos; a mudança vale para a próxima opção 4. Consulte [detalhes e limites da otimização](LOCAL_BUILD_PERFORMANCE_2026_10_31.md).
+
 O resultado esperado, **se** a compilação terminar com sucesso, é:
 
 - `evidence/.../apks/baseline/*.apk`

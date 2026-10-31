@@ -214,6 +214,9 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("action", choices=("check", "prepare", "build"), help="check = sem mudanças; prepare = baixar Yomotsu; build = compilar")
     p.add_argument("--workspace", type=Path, default=Path.home() / "PolarisLocal", help="pasta para Yomotsu e evidências")
     p.add_argument("--evidence-dir", type=Path, help="caminho novo de evidências (somente build)")
+    p.add_argument("--build-profile", choices=("auto", "conservative"),
+                   default=os.getenv("POLARIS_BUILD_PROFILE", "auto"),
+                   help="auto ajusta CPU/RAM e habilita cache; conservative usa 1 worker e sem cache")
     args = p.parse_args(argv)
     root = polaris_root()
     if args.action == "check":
@@ -244,7 +247,9 @@ def main(argv: list[str] | None = None) -> int:
         env["POLARIS_REPO"] = str(root)
         env["POLARIS_YOMOTSU"] = str(source)
         env["POLARIS_EVIDENCE"] = str(evidence)
+        env["POLARIS_BUILD_PROFILE"] = args.build_profile
         print("\nA execução fará baseline + Spike-001 + testes JUnit comparativos.")
+        print(f"Perfil de compilação: {args.build_profile}; limites e tempos serão registrados nas evidências.")
         print("Evidências (não enviar sem revisar):", evidence)
         print("Não aplica migração 15, não instala APK e não consome minutos do GitHub Actions.")
         sys.stdout.flush()
