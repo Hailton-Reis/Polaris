@@ -45,6 +45,14 @@ Para **traduzir inglês → português**, o SDK precisa preparar seus recursos d
 
 A instalação inicial, o download e o funcionamento offline dessa preparação ainda precisam da conferência nos celulares. [Entenda os componentes e o primeiro uso](docs/INGLES_E_TRADUCAO.md).
 
+## Atualizações no seu controle
+
+O candidato consulta as Releases do **Polaris** ao abrir o aplicativo, com limite de uma tentativa automática por dia por canal, e oferece verificação manual em **Sobre** e nas configurações.
+
+**Receber atualizações experimentais** começa desativado. Ative para encontrar betas e outras prévias publicadas; desligar não rebaixa a instalação. Baixar e instalar continuam sendo escolhas suas.
+
+**O repositório permanece privado e não há APK publicado.** A distribuição sem login nos celulares depende de Releases e arquivos acessíveis publicamente. O mecanismo está preparado no código; essa etapa e a atualização real no aparelho ainda estão pendentes. [Canais, compatibilidade e publicação →](docs/ATUALIZACOES.md)
+
 ## Seu arquivo, sua classificação
 
 ```text
@@ -97,7 +105,7 @@ O painel **Dados e armazenamento → Armazenamento do Polaris** ajuda a separar 
 
 ## Onde o projeto está
 
-O candidato atual é **`0.1.0-beta.2` · revisão `P20261101.2` · versionCode `103`**. A implementação está em avaliação na [branch de engenharia](https://github.com/Hailton-Reis/Polaris/tree/r001/multisource-foundation).
+O candidato atual é **`0.1.0-beta.3` · revisão `P20261101.3` · versionCode `104`**. A implementação está em avaliação na [branch de engenharia](https://github.com/Hailton-Reis/Polaris/tree/r001/multisource-foundation).
 
 **Ainda não há APK publicado nas Releases nem lançamento estável.** O pacote de teste e a compilação não equivalem a aprovação do consumo, da compatibilidade ou da qualidade em todos os idiomas.
 

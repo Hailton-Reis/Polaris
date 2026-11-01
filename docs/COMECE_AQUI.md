@@ -10,7 +10,7 @@ A apresentação do projeto fica em `main`. A implementação em avaliação est
 
 O mantenedor utiliza o [CMD de preparação do Windows](https://github.com/Hailton-Reis/Polaris/blob/r001/multisource-foundation/tools/windows-setup/00_POLARIS_TUDO_EM_UM.cmd). A opção 4 compila e pode gerar o pacote local `beta/`, com APKs ARM, exemplos e hashes. Essa geração não aprova automaticamente o armazenamento ou os testes nos aparelhos.
 
-O pacote atual usa versão `0.1.0-beta.2`, revisão `P20261101.2` e versionCode 103. Atualizações precisam manter a assinatura da instalação anterior para conservar a continuidade dos dados. Uma recompilação pode ter data, assinatura e hash diferentes; use o manifesto e `SHA256SUMS.txt` do pacote efetivamente recebido.
+O pacote atual usa versão `0.1.0-beta.3`, revisão `P20261101.3` e versionCode 104. Atualizações precisam manter a assinatura da instalação anterior para conservar a continuidade dos dados. Uma recompilação pode ter data, assinatura e hash diferentes; use o manifesto e `SHA256SUMS.txt` do pacote efetivamente recebido.
 
 Os APKs ARM64 e ARM32 destinam-se às respectivas arquiteturas do sistema Android; x86 é para ambientes de desenvolvimento compatíveis. O mínimo é Android 8. O modelo comercial do aparelho não substitui essa verificação.
 
@@ -46,3 +46,7 @@ Excluir um capítulo baixado pelo fluxo do app remove também sua tradução e f
 ## Relatar um problema
 
 Use [Issues](https://github.com/Hailton-Reis/Polaris/issues/new/choose) com revisão em Sobre, aparelho/Android e passos. Para armazenamento, informe o tipo/tamanho do arquivo e os números antes/depois. Evite incluir chaves de API ou documentos pessoais; os exemplos originais da engenharia ajudam a reproduzir o caso.
+
+## Sobre e atualização do aplicativo
+
+**Sobre** reúne descrição, versão/revisão, mantenedor, créditos, projeto, histórico, Releases, licenças e privacidade. Em **Configurações → Atualizações do aplicativo**, a busca automática começa ativada e **Receber atualizações experimentais** começa desativado. A verificação manual respeita esse canal. O repositório ainda é privado; a atualização sem login depende de Releases acessíveis e continua pendente. [Como funciona](ATUALIZACOES.md).
