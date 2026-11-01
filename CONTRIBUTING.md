@@ -19,3 +19,7 @@ Prefira os exemplos originais do projeto para reproduzir problemas. Não inclua 
 ## Notas de versão
 
 Atualize o [CHANGELOG](CHANGELOG.md) e as notas correspondentes com versão, revisão, commit e estado de validação. Notas de uma candidata podem ser preparadas antes da distribuição, desde que isso fique explícito. Rascunhos de Release não devem ser apresentados como downloads disponíveis.
+
+## Apresentação do repositório
+
+Os campos laterais Sobre exigem uma permissão de configuração diferente da escrita de arquivos. A [configuração preparada](docs/CONFIGURACAO_DO_GITHUB.md) registra os textos e o ajuste disponível ao proprietário no painel.
