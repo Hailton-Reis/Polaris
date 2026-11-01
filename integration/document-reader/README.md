@@ -1,10 +1,13 @@
-# Document reader and research candidate — P20261031.3
+# Document reader and research candidate — P20261031.4
 
 This overlay adds local document reading and discovery to the pinned Android candidate. Apply it after Spike001, the debug hook and the reader translation overlay. `scripts/r001/build_issue002.sh` now applies that sequence automatically. The original upstream checkout stays pinned at `0fb80c439ef816eeb50674f1b90af39918b176d8`.
 
 ## Behavior
 
-- **More → Documents and research** imports Android files or direct HTTP(S) document links into the existing local library. Each import gets a unique directory; existing files are not overwritten.
+- **More → Documents and research → Browse and add a file** uses the Android file picker to select a document already on the phone. It does not scan Downloads, MediaStore or the phone's other directories. The original local source still lists files intentionally placed in the app's own `local/` directory.
+- Selecting a file, opening a shared document, choosing a search result or entering a direct HTTP(S) link opens an organization form. Only **Add to library** copies/downloads the document and adds a favorite. Cancelling dismisses the selection without copying the file or changing the library. Each completed import gets a unique directory; the original phone file remains in place and existing imports are not overwritten.
+- The form offers an optional title, a content type (**Manga, Manhwas, Comics, Books, Articles or Documents**), optional format grouping, existing library categories and an optional new personal category. Local files default to Documents; their extension does not determine their content type. Bibliographic results suggest Books or Articles, which the user can change.
+- Content type and optional format use normal library categories, such as **Books** and **Format: PDF**. Matching categories are reused, including the supported Portuguese/English labels and case/accent variants. New categories inherit the library's sort flags. Membership is written only for the newly imported work. Category assignment failures are reported before the work is marked as a library favorite. Existing works are not bulk reclassified; the library's existing category editor remains available.
 - PDF pages use Android `PdfRenderer`, bounded raster dimensions, the existing page reader, reading progress and OCR translation queue. Local PDF/archive chapters can be translated without downloading them again.
 - EPUB follows its spine order and displays text and embedded local images. DOCX extracts body paragraphs, line breaks, table cell text and embedded images. TXT supports UTF-8, UTF-16 with BOM and Windows-1252 fallback.
 - Text documents have a separate native section reader, font size, contents, original/translated text and explicit completion. Section, paragraph and scroll offset are stored in the existing chapter memo, preserving unrelated memo fields. History uses the existing history table. No database migration is added.
@@ -28,6 +31,6 @@ python3 scripts/r001/apply_document_reader.py PATH_TO_PATCHED_YOMOTSU
 POLARIS_YOMOTSU_CHECKOUT=PATH_TO_PINNED_YOMOTSU python3 -m unittest discover -s scripts/r001 -p test_apply_document_reader.py -v
 ```
 
-The applier requires the pinned commit and current reader prerequisite, is idempotent, rejects source drift atomically and refuses migration15. [TEST_RESULTS.json](TEST_RESULTS.json) records final build and test evidence; [the Android test guide](../../docs/reader/DOCUMENTS_P20261031_3.md) records what still requires device acceptance. Neither assembly nor unit tests establish native Android rendering or a successful user-device import.
+The applier requires the pinned commit and current reader prerequisite, is idempotent, rejects source drift atomically and refuses migration15. [TEST_RESULTS.json](TEST_RESULTS.json) records final build and test evidence. [The organization guide](../../docs/reader/DOCUMENT_ORGANIZATION_P20261031_4.md) covers the new selective import flow; [the document reading guide](../../docs/reader/DOCUMENTS_P20261031_3.md) covers the underlying readers. The prior revision's evidence is preserved in [TEST_RESULTS_P20261031_3.json](TEST_RESULTS_P20261031_3.json). Neither assembly nor unit tests establish native Android rendering or a successful user-device import.
 
 The earlier crop-off diagnosis is confirmed by the user. Automatic crop protection and this document UI still require visual acceptance. The separate R001 two-source gate and backupv2 remain pending. This is an engineering candidate, not a production release.

@@ -36,12 +36,157 @@ index 172b28c..4de015d 100644
          <service
              android:name="eu.kanade.translation.detection.DbnetService"
              android:exported="false"
+diff --git a/app/src/main/java/eu/kanade/presentation/documents/DocumentImportDialog.kt b/app/src/main/java/eu/kanade/presentation/documents/DocumentImportDialog.kt
+new file mode 100644
+index 0000000..7d94070
+--- /dev/null
++++ b/app/src/main/java/eu/kanade/presentation/documents/DocumentImportDialog.kt
+@@ -0,0 +1,139 @@
++package eu.kanade.presentation.documents
++
++import androidx.compose.foundation.layout.Arrangement
++import androidx.compose.foundation.layout.Column
++import androidx.compose.foundation.layout.FlowRow
++import androidx.compose.foundation.layout.Row
++import androidx.compose.foundation.layout.fillMaxWidth
++import androidx.compose.foundation.layout.heightIn
++import androidx.compose.foundation.rememberScrollState
++import androidx.compose.foundation.verticalScroll
++import androidx.compose.material3.AlertDialog
++import androidx.compose.material3.Checkbox
++import androidx.compose.material3.FilterChip
++import androidx.compose.material3.MaterialTheme
++import androidx.compose.material3.OutlinedTextField
++import androidx.compose.material3.Text
++import androidx.compose.material3.TextButton
++import androidx.compose.runtime.Composable
++import androidx.compose.runtime.getValue
++import androidx.compose.runtime.mutableStateOf
++import androidx.compose.runtime.saveable.rememberSaveable
++import androidx.compose.runtime.setValue
++import androidx.compose.ui.Alignment
++import androidx.compose.ui.Modifier
++import androidx.compose.ui.unit.dp
++import eu.kanade.tachiyomi.ui.documents.DocumentImportOptions
++import eu.kanade.tachiyomi.ui.documents.DocumentKind
++import tachiyomi.domain.category.model.Category
++import tachiyomi.i18n.at.ATMR
++import tachiyomi.presentation.core.i18n.stringResource
++import java.util.Locale
++
++@Composable
++fun DocumentImportDialog(
++    request: DocumentImportRequest,
++    categories: List<Category>,
++    onDismiss: () -> Unit,
++    onInclude: (DocumentImportOptions) -> Unit,
++) {
++    var title by rememberSaveable(request.id) { mutableStateOf(request.title) }
++    var kind by rememberSaveable(request.id) { mutableStateOf(request.kind) }
++    var byFormat by rememberSaveable(request.id) { mutableStateOf(true) }
++    var selected by rememberSaveable(request.id) { mutableStateOf(emptyList<Long>()) }
++    var newCategory by rememberSaveable(request.id) { mutableStateOf("") }
++    val kindName = documentKindName(kind)
++    val formatPrefix = stringResource(ATMR.strings.document_format_category_prefix)
++
++    AlertDialog(
++        onDismissRequest = onDismiss,
++        title = { Text(stringResource(ATMR.strings.document_include_title)) },
++        text = {
++            Column(
++                Modifier.heightIn(max = 460.dp).verticalScroll(rememberScrollState()),
++                verticalArrangement = Arrangement.spacedBy(12.dp),
++            ) {
++                Text(request.name, style = MaterialTheme.typography.bodyMedium)
++                Text(
++                    stringResource(
++                        ATMR.strings.document_selected_format,
++                        request.format?.extension?.uppercase(Locale.ROOT)
++                            ?: stringResource(ATMR.strings.document_detect_format),
++                    ),
++                    style = MaterialTheme.typography.bodySmall,
++                )
++                OutlinedTextField(
++                    value = title,
++                    onValueChange = { title = it.take(180) },
++                    label = { Text(stringResource(ATMR.strings.document_library_title)) },
++                    singleLine = true,
++                    modifier = Modifier.fillMaxWidth(),
++                )
++                Text(stringResource(ATMR.strings.document_content_type))
++                FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
++                    DocumentKind.entries.forEach { option ->
++                        FilterChip(
++                            selected = kind == option,
++                            onClick = { kind = option },
++                            label = { Text(documentKindName(option)) },
++                        )
++                    }
++                }
++                Text(stringResource(ATMR.strings.document_kind_hint), style = MaterialTheme.typography.bodySmall)
++                Row(verticalAlignment = Alignment.CenterVertically) {
++                    Checkbox(checked = byFormat, onCheckedChange = { byFormat = it })
++                    Text(stringResource(ATMR.strings.document_category_by_format))
++                }
++                if (categories.isNotEmpty()) {
++                    Text(stringResource(ATMR.strings.document_existing_categories))
++                    FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
++                        categories.forEach { category ->
++                            FilterChip(selected = category.id in selected, onClick = {
++                                selected =
++                                    if (category.id in selected) selected - category.id else selected + category.id
++                            }, label = { Text(category.name) })
++                        }
++                    }
++                }
++                OutlinedTextField(
++                    value = newCategory,
++                    onValueChange = { newCategory = it.take(80) },
++                    label = { Text(stringResource(ATMR.strings.document_new_category)) },
++                    singleLine = true,
++                    modifier = Modifier.fillMaxWidth(),
++                )
++                Text(stringResource(ATMR.strings.document_category_hint), style = MaterialTheme.typography.bodySmall)
++            }
++        },
++        confirmButton = {
++            TextButton(onClick = {
++                onInclude(
++                    DocumentImportOptions(
++                        kind,
++                        kindName,
++                        byFormat,
++                        formatPrefix,
++                        selected.toSet(),
++                        newCategory,
++                        title,
++                    ),
++                )
++            }) { Text(stringResource(ATMR.strings.document_include)) }
++        },
++        dismissButton = {
++            TextButton(onClick = onDismiss) { Text(stringResource(ATMR.strings.document_cancel)) }
++        },
++    )
++}
++
++@Composable
++private fun documentKindName(kind: DocumentKind): String = stringResource(
++    when (kind) {
++        DocumentKind.MANGA -> ATMR.strings.document_kind_manga
++        DocumentKind.MANHWA -> ATMR.strings.document_kind_manhwa
++        DocumentKind.COMICS -> ATMR.strings.document_kind_comics
++        DocumentKind.BOOK -> ATMR.strings.document_books
++        DocumentKind.ARTICLE -> ATMR.strings.document_articles
++        DocumentKind.DOCUMENT -> ATMR.strings.document_kind_documents
++    },
++)
 diff --git a/app/src/main/java/eu/kanade/presentation/documents/DocumentsScreen.kt b/app/src/main/java/eu/kanade/presentation/documents/DocumentsScreen.kt
 new file mode 100644
-index 0000000..b2d3cb3
+index 0000000..8d1c2df
 --- /dev/null
 +++ b/app/src/main/java/eu/kanade/presentation/documents/DocumentsScreen.kt
-@@ -0,0 +1,325 @@
+@@ -0,0 +1,445 @@
 +package eu.kanade.presentation.documents
 +
 +import android.app.Application
@@ -83,7 +228,9 @@ index 0000000..b2d3cb3
 +import eu.kanade.presentation.components.AppBar
 +import eu.kanade.presentation.util.Screen
 +import eu.kanade.tachiyomi.network.NetworkHelper
++import eu.kanade.tachiyomi.ui.documents.DocumentImportOptions
 +import eu.kanade.tachiyomi.ui.documents.DocumentImporter
++import eu.kanade.tachiyomi.ui.documents.DocumentKind
 +import eu.kanade.tachiyomi.ui.documents.DocumentSearch
 +import eu.kanade.tachiyomi.ui.documents.DocumentSearchBatch
 +import eu.kanade.tachiyomi.ui.documents.DocumentSearchField
@@ -98,6 +245,10 @@ index 0000000..b2d3cb3
 +import kotlinx.coroutines.flow.asStateFlow
 +import kotlinx.coroutines.flow.update
 +import kotlinx.coroutines.launch
++import mihon.core.archive.DocumentFormat
++import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
++import tachiyomi.domain.category.interactor.GetCategories
++import tachiyomi.domain.category.model.Category
 +import tachiyomi.i18n.at.ATMR
 +import tachiyomi.presentation.core.components.material.Scaffold
 +import tachiyomi.presentation.core.i18n.stringResource
@@ -105,9 +256,23 @@ index 0000000..b2d3cb3
 +import uy.kohesive.injekt.api.get
 +import kotlin.coroutines.cancellation.CancellationException
 +
++data class DocumentImportRequest(
++    val id: String = java.util.UUID.randomUUID().toString(),
++    val uri: Uri? = null,
++    val url: String? = null,
++    val name: String,
++    val format: DocumentFormat? = null,
++    val title: String = "",
++    val author: String? = null,
++    val kind: DocumentKind = DocumentKind.DOCUMENT,
++)
++
 +data class DocumentsState(
 +    val searching: Boolean = false,
 +    val importing: Boolean = false,
++    val selecting: Boolean = false,
++    val pendingImport: DocumentImportRequest? = null,
++    val categories: List<Category> = emptyList(),
 +    val error: Boolean = false,
 +    val searched: Boolean = false,
 +    val batch: DocumentSearchBatch? = null,
@@ -138,13 +303,89 @@ index 0000000..b2d3cb3
 +        }
 +    }
 +
-+    fun importUri(uri: Uri) = runImport { importer.fromUri(uri) }
-+    fun importUrl(url: String, title: String? = null, document: RemoteDocument? = null, author: String? = null) =
-+        runImport { importer.fromUrl(document?.url ?: url, title, document?.format, author) }
++    init {
++        viewModelScope.launch {
++            try {
++                Injekt.get<GetCategories>().subscribe().collect { categories ->
++                    mutableState.update { it.copy(categories = categories.filterNot(Category::isSystemCategory)) }
++                }
++            } catch (cancelled: CancellationException) {
++                throw cancelled
++            } catch (_: Exception) {
++                mutableState.update { it.copy(error = true) }
++            }
++        }
++    }
++
++    fun requestUri(uri: Uri) {
++        if (state.value.importing || state.value.selecting || state.value.pendingImport != null) return
++        mutableState.update { it.copy(selecting = true, error = false) }
++        viewModelScope.launch {
++            try {
++                val file = importer.describeUri(uri)
++                mutableState.update {
++                    it.copy(
++                        selecting = false,
++                        pendingImport = DocumentImportRequest(uri = uri, name = file.name, format = file.format),
++                    )
++                }
++            } catch (cancelled: CancellationException) {
++                throw cancelled
++            } catch (_: Exception) {
++                mutableState.update { it.copy(selecting = false, error = true) }
++            }
++        }
++    }
++
++    fun requestUrl(
++        url: String,
++        title: String = "",
++        document: RemoteDocument? = null,
++        author: String? = null,
++        kind: DocumentKind = DocumentKind.DOCUMENT,
++    ) {
++        if (state.value.importing || state.value.selecting || state.value.pendingImport != null) return
++        val parsed = (document?.url ?: url).trim().toHttpUrlOrNull()
++        if (parsed == null || parsed.username.isNotEmpty() || parsed.password.isNotEmpty()) {
++            mutableState.update { it.copy(error = true) }
++            return
++        }
++        mutableState.update {
++            it.copy(
++                error = false,
++                pendingImport = DocumentImportRequest(
++                    url = parsed.toString(),
++                    name = title.ifBlank { parsed.toString() },
++                    title = title,
++                    author = author,
++                    format = document?.format,
++                    kind = kind,
++                ),
++            )
++        }
++    }
++
++    fun dismissImport() {
++        mutableState.update { it.copy(pendingImport = null) }
++    }
++
++    fun includeDocument(options: DocumentImportOptions) {
++        val request = state.value.pendingImport ?: return
++        runImport {
++            request.uri?.let { importer.fromUri(it, options) }
++                ?: importer.fromUrl(
++                    checkNotNull(request.url),
++                    request.title.ifBlank { null },
++                    request.format,
++                    request.author,
++                    options,
++                )
++        }
++    }
 +
 +    private fun runImport(action: suspend () -> Long) {
 +        if (state.value.importing) return
-+        mutableState.update { it.copy(importing = true, error = false) }
++        mutableState.update { it.copy(importing = true, error = false, pendingImport = null) }
 +        viewModelScope.launch(Dispatchers.IO) {
 +            try {
 +                val mangaId = action()
@@ -180,12 +421,12 @@ index 0000000..b2d3cb3
 +        var field by rememberSaveable { mutableStateOf(DocumentSearchField.ANY) }
 +        var importedInitial by rememberSaveable { mutableStateOf(false) }
 +        val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
-+            uri?.let(model::importUri)
++            uri?.let(model::requestUri)
 +        }
 +        LaunchedEffect(initialUri) {
 +            if (initialUri != null && !importedInitial) {
 +                importedInitial = true
-+                model.importUri(Uri.parse(initialUri))
++                model.requestUri(Uri.parse(initialUri))
 +            }
 +        }
 +        LaunchedEffect(state.importedManga) {
@@ -212,7 +453,16 @@ index 0000000..b2d3cb3
 +                            stringResource(ATMR.strings.document_supported),
 +                            style = MaterialTheme.typography.bodySmall,
 +                        )
-+                        Button(onClick = { picker.launch(arrayOf("*/*")) }, enabled = !state.importing) {
++                        Text(
++                            stringResource(ATMR.strings.document_local_selection_hint),
++                            style = MaterialTheme.typography.bodySmall,
++                        )
++                        if (state.selecting) CircularProgressIndicator()
++                        Button(
++                            onClick = { picker.launch(arrayOf("*/*")) },
++                            enabled =
++                            !state.importing && !state.selecting,
++                        ) {
 +                            Text(stringResource(ATMR.strings.document_import))
 +                        }
 +                        OutlinedTextField(
@@ -225,9 +475,9 @@ index 0000000..b2d3cb3
 +                            modifier = Modifier.fillMaxWidth(),
 +                        )
 +                        OutlinedButton(
-+                            onClick = { model.importUrl(link) },
++                            onClick = { model.requestUrl(link) },
 +                            enabled =
-+                            !state.importing && link.isNotBlank(),
++                            !state.importing && !state.selecting && link.isNotBlank(),
 +                        ) {
 +                            Text(stringResource(ATMR.strings.document_import_link))
 +                        }
@@ -345,8 +595,20 @@ index 0000000..b2d3cb3
 +                            }
 +                            hit.documents.forEach { file ->
 +                                Button(onClick = {
-+                                    model.importUrl(file.url, hit.title, file, hit.authors)
-+                                }, enabled = !state.importing) {
++                                    model.requestUrl(
++                                        file.url,
++                                        hit.title,
++                                        file,
++                                        hit.authors,
++                                        if (hit.provider == "Crossref" ||
++                                            hit.provider == "Europe PMC"
++                                        ) {
++                                            DocumentKind.ARTICLE
++                                        } else {
++                                            DocumentKind.BOOK
++                                        },
++                                    )
++                                }, enabled = !state.importing && !state.selecting) {
 +                                    Text(
 +                                        stringResource(
 +                                            ATMR.strings.document_add_format,
@@ -364,6 +626,9 @@ index 0000000..b2d3cb3
 +                    }
 +                }
 +            }
++        }
++        state.pendingImport?.let { request ->
++            DocumentImportDialog(request, state.categories, model::dismissImport, model::includeDocument)
 +        }
 +    }
 +}
@@ -440,7 +705,7 @@ index a7b7f3e..f4dcdad 100644
  
  
 diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
-index 7f411fd..58a1fa6 100644
+index 7f411fd..2b93865 100644
 --- a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
 +++ b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
 @@ -52,7 +52,7 @@ import kotlin.time.Instant
@@ -448,16 +713,16 @@ index 7f411fd..58a1fa6 100644
  
      // Identifies this overlay independently of the pinned upstream COMMIT_SHA.
 -    private const val POLARIS_READER_REVISION = "P20261031.2"
-+    private const val POLARIS_READER_REVISION = "P20261031.3"
++    private const val POLARIS_READER_REVISION = "P20261031.4"
  
      @Composable
      override fun Content() {
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentImporter.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentImporter.kt
 new file mode 100644
-index 0000000..7184311
+index 0000000..9e9e164
 --- /dev/null
 +++ b/app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentImporter.kt
-@@ -0,0 +1,186 @@
+@@ -0,0 +1,210 @@
 +package eu.kanade.tachiyomi.ui.documents
 +
 +import android.content.Context
@@ -476,6 +741,8 @@ index 0000000..7184311
 +import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 +import okhttp3.Request
 +import org.json.JSONObject
++import tachiyomi.domain.category.repository.CategoryRepository
++import tachiyomi.domain.library.service.LibraryPreferences
 +import tachiyomi.domain.manga.interactor.NetworkToLocalManga
 +import tachiyomi.domain.manga.model.MangaUpdate
 +import tachiyomi.domain.manga.repository.MangaRepository
@@ -489,16 +756,29 @@ index 0000000..7184311
 +import java.util.zip.ZipFile
 +import kotlin.coroutines.coroutineContext
 +
++data class LocalDocumentSelection(val name: String, val format: DocumentFormat)
++
 +class DocumentImporter(private val context: Context) {
-+    suspend fun fromUri(uri: Uri): Long = withContext(Dispatchers.IO) {
++    suspend fun describeUri(uri: Uri): LocalDocumentSelection = withContext(Dispatchers.IO) {
 +        require(uri.scheme == "content") { "Select a document from the Android file picker" }
 +        val name =
 +            context.contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use { cursor ->
 +                if (cursor.moveToFirst()) cursor.getString(0) else null
 +            } ?: uri.lastPathSegment.orEmpty()
 +        val type = checkNotNull(DocumentFormat.fromName(name)) { "Unsupported document format" }
++        LocalDocumentSelection(name, type)
++    }
++
++    suspend fun fromUri(uri: Uri, options: DocumentImportOptions): Long = withContext(Dispatchers.IO) {
++        val selection = describeUri(uri)
 +        checkNotNull(context.contentResolver.openInputStream(uri)).use { input ->
-+            storeDocument(input, name, type, name.substringBeforeLast('.'))
++            storeDocument(
++                input,
++                selection.name,
++                selection.format,
++                selection.name.substringBeforeLast('.'),
++                options = options,
++            )
 +        }
 +    }
 +
@@ -507,6 +787,7 @@ index 0000000..7184311
 +        title: String? = null,
 +        expected: DocumentFormat? = null,
 +        author: String? = null,
++        options: DocumentImportOptions,
 +    ): Long = withContext(
 +        Dispatchers.IO,
 +    ) {
@@ -539,6 +820,7 @@ index 0000000..7184311
 +                    type,
 +                    title ?: filename.substringBeforeLast('.'),
 +                    author.orEmpty(),
++                    options,
 +                )
 +            }
 +        }
@@ -550,6 +832,7 @@ index 0000000..7184311
 +        format: DocumentFormat,
 +        suggestedTitle: String,
 +        suggestedAuthor: String = "",
++        options: DocumentImportOptions,
 +    ): Long {
 +        val temporary = File(context.cacheDir, "import-${UUID.randomUUID()}.${format.extension}")
 +        var title = suggestedTitle.take(180).ifBlank { name }
@@ -604,6 +887,7 @@ index 0000000..7184311
 +                    require(valid) { "Link did not return a supported archive" }
 +                }
 +            }
++            if (options.title.isNotBlank()) title = options.title.trim().take(180)
 +            coroutineContext.ensureActive()
 +            val base =
 +                Injekt.get<StorageManager>().getLocalSourceDirectory()
@@ -627,9 +911,14 @@ index 0000000..7184311
 +                published = true
 +                val manga = SManga.create().apply {
 +                    this.title = title
++                    this.author = author
 +                    url = folderName
 +                }.toDomainManga(LocalSource.ID)
 +                val saved = Injekt.get<NetworkToLocalManga>()(manga)
++                DocumentOrganizer(Injekt.get<CategoryRepository>(), Injekt.get<MangaRepository>()) {
++                    val sort = Injekt.get<LibraryPreferences>().sortingMode.get()
++                    sort.type.flag or sort.direction.flag
++                }.assign(saved.id, format, options)
 +                check(
 +                    Injekt.get<MangaRepository>().update(
 +                        MangaUpdate(saved.id, favorite = true, dateAdded = System.currentTimeMillis()),
@@ -678,6 +967,83 @@ index 0000000..ca72557
 +            return
 +        }
 +        setContent { TachiyomiTheme { Navigator(DocumentsScreen(uri.toString())) } }
++    }
++}
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentOrganization.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentOrganization.kt
+new file mode 100644
+index 0000000..2915944
+--- /dev/null
++++ b/app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentOrganization.kt
+@@ -0,0 +1,71 @@
++package eu.kanade.tachiyomi.ui.documents
++
++import kotlinx.coroutines.sync.Mutex
++import kotlinx.coroutines.sync.withLock
++import mihon.core.archive.DocumentFormat
++import tachiyomi.domain.category.model.Category
++import tachiyomi.domain.category.repository.CategoryRepository
++import tachiyomi.domain.manga.repository.MangaRepository
++import java.text.Normalizer
++import java.util.Locale
++
++enum class DocumentKind(val categoryAliases: List<String>) {
++    MANGA(listOf("Mangás", "Manga")),
++    MANHWA(listOf("Manhwas", "Manhwa")),
++    COMICS(listOf("Quadrinhos", "Comics")),
++    BOOK(listOf("Livros", "Books")),
++    ARTICLE(listOf("Artigos", "Articles")),
++    DOCUMENT(listOf("Documentos", "Documents")),
++}
++
++data class DocumentImportOptions(
++    val kind: DocumentKind,
++    val kindCategoryName: String,
++    val includeFormatCategory: Boolean = true,
++    val formatCategoryPrefix: String,
++    val categoryIds: Set<Long> = emptySet(),
++    val newCategoryName: String = "",
++    val title: String = "",
++)
++
++/** Uses normal library categories, only for the document explicitly being added. */
++class DocumentOrganizer(
++    private val categories: CategoryRepository,
++    private val manga: MangaRepository,
++    private val initialFlags: () -> Long,
++) {
++    suspend fun assign(mangaId: Long, format: DocumentFormat, options: DocumentImportOptions) = lock.withLock {
++        var current = categories.getAll().filterNot { it.isSystemCategory }
++        require(options.categoryIds.all { id -> current.any { it.id == id } }) { "Category no longer exists" }
++        val selected = options.categoryIds.toMutableSet()
++
++        suspend fun resolve(name: String, aliases: List<String> = emptyList()): Long {
++            val cleanName = name.trim().replace(Regex("\\s+"), " ")
++            require(cleanName.isNotEmpty() && cleanName.length <= 80) { "Invalid category name" }
++            val accepted = (aliases + cleanName).map(::normalize).toSet()
++            current.firstOrNull { normalize(it.name) in accepted }?.let { return it.id }
++            categories.insert(Category(0, cleanName, (current.maxOfOrNull { it.order } ?: -1) + 1, initialFlags()))
++            current = categories.getAll().filterNot { it.isSystemCategory }
++            return checkNotNull(current.firstOrNull { normalize(it.name) == normalize(cleanName) }).id
++        }
++
++        selected += resolve(options.kindCategoryName, options.kind.categoryAliases)
++        if (options.includeFormatCategory) {
++            val extension = format.extension.uppercase(Locale.ROOT)
++            selected +=
++                resolve(
++                    "${options.formatCategoryPrefix}: $extension",
++                    listOf("Format: $extension", "Formato: $extension"),
++                )
++        }
++        if (options.newCategoryName.isNotBlank()) selected += resolve(options.newCategoryName)
++        // Unlike SetMangaCategories, this repository call propagates failure to the importer.
++        manga.setMangaCategories(mangaId, selected.toList())
++    }
++
++    companion object {
++        private val lock = Mutex()
++        private fun normalize(value: String): String = Normalizer.normalize(value.trim(), Normalizer.Form.NFD)
++            .replace(Regex("\\p{M}+"), "").replace(Regex("\\s+"), " ").lowercase(Locale.ROOT)
 +    }
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentReadingPosition.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentReadingPosition.kt
@@ -1779,6 +2145,134 @@ index 6830781..cae7a90 100644
  
              return Translation(source, manga, chapter)
          }
+diff --git a/app/src/test/java/eu/kanade/tachiyomi/ui/documents/DocumentOrganizationTest.kt b/app/src/test/java/eu/kanade/tachiyomi/ui/documents/DocumentOrganizationTest.kt
+new file mode 100644
+index 0000000..f89b137
+--- /dev/null
++++ b/app/src/test/java/eu/kanade/tachiyomi/ui/documents/DocumentOrganizationTest.kt
+@@ -0,0 +1,122 @@
++package eu.kanade.tachiyomi.ui.documents
++
++import io.mockk.coEvery
++import io.mockk.coVerify
++import io.mockk.mockk
++import kotlinx.coroutines.async
++import kotlinx.coroutines.awaitAll
++import kotlinx.coroutines.test.runTest
++import kotlinx.coroutines.yield
++import mihon.core.archive.DocumentFormat
++import org.junit.jupiter.api.Assertions.assertEquals
++import org.junit.jupiter.api.Assertions.assertFalse
++import org.junit.jupiter.api.Assertions.assertTrue
++import org.junit.jupiter.api.Test
++import org.junit.jupiter.api.assertThrows
++import tachiyomi.domain.category.model.Category
++import tachiyomi.domain.category.repository.CategoryRepository
++import tachiyomi.domain.manga.repository.MangaRepository
++import java.io.IOException
++
++class DocumentOrganizationTest {
++    private val categories = mockk<CategoryRepository>()
++    private val manga = mockk<MangaRepository>()
++    private val stored = mutableListOf<Category>()
++    private val memberships = mutableMapOf<Long, List<Long>>()
++    private val organizer = DocumentOrganizer(categories, manga) { 0x41L }
++
++    init {
++        coEvery { categories.getAll() } answers { stored.toList() }
++        coEvery { categories.insert(any()) } coAnswers {
++            yield()
++            stored += firstArg<Category>().copy(id = (stored.maxOfOrNull { it.id } ?: 0) + 1)
++        }
++        coEvery { manga.setMangaCategories(any(), any()) } answers {
++            memberships[firstArg()] = secondArg<List<Long>>().toList()
++        }
++    }
++
++    private fun options(kind: DocumentKind = DocumentKind.BOOK, format: Boolean = true) =
++        DocumentImportOptions(
++            kind,
++            when (kind) {
++                DocumentKind.BOOK -> "Livros"
++                DocumentKind.ARTICLE -> "Artigos"
++                else -> kind.categoryAliases.first()
++            },
++            format,
++            "Formato",
++        )
++
++    private fun names(id: Long): Set<String> = memberships[id].orEmpty()
++        .map { category -> stored.single { it.id == category }.name }.toSet()
++
++    @Test
++    fun `two pdfs keep different user chosen content types and share the format category`() = runTest {
++        memberships[900] = listOf(123)
++        organizer.assign(1, DocumentFormat.PDF, options(DocumentKind.BOOK))
++        organizer.assign(2, DocumentFormat.PDF, options(DocumentKind.ARTICLE))
++        assertEquals(setOf("Livros", "Formato: PDF"), names(1))
++        assertEquals(setOf("Artigos", "Formato: PDF"), names(2))
++        assertEquals(1, stored.count { it.name == "Formato: PDF" })
++        assertEquals(listOf(123L), memberships[900])
++        coVerify(exactly = 0) { manga.setMangaCategories(900, any()) }
++    }
++
++    @Test
++    fun `existing categories are reused across accents case and the supported interface languages`() = runTest {
++        stored += listOf(Category(10, "  MANGA  ", 2, 0), Category(11, "Format: pdf", 3, 0))
++        organizer.assign(1, DocumentFormat.PDF, options(DocumentKind.MANGA))
++        assertEquals(setOf(10L, 11L), memberships[1]?.toSet())
++        assertEquals(2, stored.size)
++        coVerify(exactly = 0) { categories.insert(any()) }
++    }
++
++    @Test
++    fun `format grouping can be disabled and a personal category can be created`() = runTest {
++        stored += Category(9, "Existing shelf", 8, 12)
++        organizer.assign(
++            1,
++            DocumentFormat.EPUB,
++            options(format = false).copy(categoryIds = setOf(9), newCategoryName = "  Research   2026  "),
++        )
++        assertEquals(setOf("Livros", "Existing shelf", "Research 2026"), names(1))
++        assertFalse(stored.any { it.name.startsWith("Formato") })
++        assertEquals(listOf(9L, 10L), stored.drop(1).map { it.order })
++        assertTrue(stored.drop(1).all { it.flags == 0x41L })
++    }
++
++    @Test
++    fun `selected and newly typed categories are deduplicated without replacing category settings`() = runTest {
++        stored += Category(9, "Ciência", 8, 12)
++        organizer.assign(1, DocumentFormat.TXT, options().copy(categoryIds = setOf(9), newCategoryName = "CIENCIA"))
++        assertEquals(3, memberships[1]?.size)
++        assertEquals(Category(9, "Ciência", 8, 12), stored.first())
++    }
++
++    @Test
++    fun `a deleted or system category is rejected before any category or membership is written`() = runTest {
++        for (id in listOf(0L, 99L)) {
++            assertThrows<IllegalArgumentException> {
++                organizer.assign(1, DocumentFormat.PDF, options().copy(categoryIds = setOf(id)))
++            }
++        }
++        assertTrue(stored.isEmpty())
++        assertTrue(memberships.isEmpty())
++    }
++
++    @Test
++    fun `membership failure is reported to the import flow`() = runTest {
++        coEvery { manga.setMangaCategories(any(), any()) } throws IOException("database unavailable")
++        assertThrows<IOException> { organizer.assign(1, DocumentFormat.PDF, options()) }
++        assertTrue(memberships.isEmpty())
++    }
++
++    @Test
++    fun `simultaneous additions reuse shared categories`() = runTest {
++        (1L..8L).map { id -> async { organizer.assign(id, DocumentFormat.PDF, options()) } }.awaitAll()
++        assertEquals(2, stored.size)
++        assertEquals(8, memberships.size)
++        assertTrue(memberships.values.all { it.toSet().size == 2 })
++    }
++}
 diff --git a/app/src/test/java/eu/kanade/tachiyomi/ui/documents/DocumentSearchTest.kt b/app/src/test/java/eu/kanade/tachiyomi/ui/documents/DocumentSearchTest.kt
 new file mode 100644
 index 0000000..839b065
@@ -1941,6 +2435,66 @@ index 0000000..839b065
 +    fun `provider metadata cannot create an unbounded result list`() {
 +        val items = (1..40).joinToString(",") { "{\"key\":\"/works/OL${it}W\",\"title\":\"Book $it\"}" }
 +        assertEquals(20, DocumentSearchParsers.openLibrary("{\"docs\":[$items]}").size)
++    }
++}
+diff --git a/app/src/test/java/eu/kanade/tachiyomi/ui/documents/DocumentSelectionTest.kt b/app/src/test/java/eu/kanade/tachiyomi/ui/documents/DocumentSelectionTest.kt
+new file mode 100644
+index 0000000..0c35436
+--- /dev/null
++++ b/app/src/test/java/eu/kanade/tachiyomi/ui/documents/DocumentSelectionTest.kt
+@@ -0,0 +1,54 @@
++package eu.kanade.tachiyomi.ui.documents
++
++import android.content.ContentResolver
++import android.content.Context
++import android.database.Cursor
++import android.net.Uri
++import io.mockk.every
++import io.mockk.justRun
++import io.mockk.mockk
++import io.mockk.verify
++import kotlinx.coroutines.test.runTest
++import mihon.core.archive.DocumentFormat
++import org.junit.jupiter.api.Assertions.assertEquals
++import org.junit.jupiter.api.Test
++import org.junit.jupiter.api.assertThrows
++
++class DocumentSelectionTest {
++    private val resolver = mockk<ContentResolver>()
++    private val context = mockk<Context> { every { contentResolver } returns resolver }
++    private val uri = mockk<Uri> { every { scheme } returns "content" }
++    private val cursor = mockk<Cursor> {
++        every { moveToFirst() } returns true
++        every { getString(0) } returns "My paper.PDF"
++        justRun { close() }
++    }
++
++    init {
++        every { resolver.query(uri, any(), any(), any(), any()) } returns cursor
++    }
++
++    @Test
++    fun `selecting a phone file reads its description without opening or copying its contents`() = runTest {
++        val selection = DocumentImporter(context).describeUri(uri)
++        assertEquals("My paper.PDF", selection.name)
++        assertEquals(DocumentFormat.PDF, selection.format)
++        verify(exactly = 0) { resolver.openInputStream(any()) }
++        verify(exactly = 0) { context.cacheDir }
++        verify(exactly = 1) { cursor.close() }
++    }
++
++    @Test
++    fun `unsupported selection is rejected before any file copy`() = runTest {
++        every { cursor.getString(0) } returns "installer.apk"
++        assertThrows<IllegalStateException> { DocumentImporter(context).describeUri(uri) }
++        verify(exactly = 0) { resolver.openInputStream(any()) }
++    }
++
++    @Test
++    fun `a raw filesystem uri is not treated as permission to scan the phone`() = runTest {
++        every { uri.scheme } returns "file"
++        assertThrows<IllegalArgumentException> { DocumentImporter(context).describeUri(uri) }
++        verify(exactly = 0) { resolver.query(any(), any(), any(), any(), any()) }
 +    }
 +}
 diff --git a/app/src/test/java/eu/kanade/tachiyomi/ui/documents/TextDocumentTest.kt b/app/src/test/java/eu/kanade/tachiyomi/ui/documents/TextDocumentTest.kt
@@ -2618,20 +3172,20 @@ index 0000000..3b292ce
 +    }
 +}
 diff --git a/i18n-at/src/commonMain/moko-resources/base/strings.xml b/i18n-at/src/commonMain/moko-resources/base/strings.xml
-index 7ed4795..8f8f524 100644
+index 7ed4795..d0101de 100644
 --- a/i18n-at/src/commonMain/moko-resources/base/strings.xml
 +++ b/i18n-at/src/commonMain/moko-resources/base/strings.xml
-@@ -81,4 +81,41 @@
+@@ -81,4 +81,59 @@
      <string name="repository_adding">Adding…</string>
      <string name="chapter_versions_shortcut">Tap to filter source groups and versions</string>
      <string name="translation_crop_borders_summary">Pages with saved translations keep their borders to align text with the original image.</string>
 +    <string name="documents_title">Documents and research</string>
 +    <string name="document_supported">PDF, EPUB, DOCX, TXT and comic archives. EPUB and DOCX use reflowable text.</string>
-+    <string name="document_import">Import file</string>
++    <string name="document_import">Browse and add a file</string>
 +    <string name="document_link">Direct document link</string>
 +    <string name="document_import_link">Import link</string>
 +    <string name="document_importing">Importing into your library…</string>
-+    <string name="document_import_error">Unable to complete this action. Check the format, connection and app storage folder.</string>
++    <string name="document_import_error">Unable to complete this action. Check the format, connection, categories and app storage folder.</string>
 +    <string name="document_articles">Articles</string>
 +    <string name="document_books">Books</string>
 +    <string name="document_any_field">All fields</string>
@@ -2662,22 +3216,40 @@ index 7ed4795..8f8f524 100644
 +    <string name="document_web_template">Search website URL</string>
 +    <string name="document_web_template_hint">Use {query} for the search terms. Opens the website inside Polaris; copy a direct document link to import it.</string>
 +    <string name="document_web_search">Search this website</string>
++    <string name="document_local_selection_hint">Browse your phone and choose each file to add. Polaris does not scan all documents on the device. It keeps a copy in its local library; the original stays in place.</string>
++    <string name="document_include_title">Organize document</string>
++    <string name="document_selected_format">File format: %1$s</string>
++    <string name="document_detect_format">Detected when opening the link</string>
++    <string name="document_library_title">Library title (optional)</string>
++    <string name="document_content_type">Content type</string>
++    <string name="document_kind_hint">Choose what you are reading. A PDF can be a book, article or comic.</string>
++    <string name="document_category_by_format">Also group by file format</string>
++    <string name="document_existing_categories">Additional library categories</string>
++    <string name="document_new_category">New category (optional)</string>
++    <string name="document_category_hint">The content type and optional format become normal library categories. Existing categories with the same name are reused. You can edit categories later from the library.</string>
++    <string name="document_include">Add to library</string>
++    <string name="document_cancel">Cancel</string>
++    <string name="document_kind_manga">Manga</string>
++    <string name="document_kind_manhwa">Manhwas</string>
++    <string name="document_kind_comics">Comics</string>
++    <string name="document_kind_documents">Documents</string>
++    <string name="document_format_category_prefix">Format</string>
  </resources>
 diff --git a/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml b/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
-index d1748bc..567ef34 100644
+index d1748bc..afb0774 100644
 --- a/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
 +++ b/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
-@@ -81,4 +81,41 @@
+@@ -81,4 +81,59 @@
      <string name="repository_adding">Adicionando…</string>
      <string name="chapter_versions_shortcut">Toque para filtrar grupos e versões da fonte</string>
      <string name="translation_crop_borders_summary">Páginas com tradução salva preservam as bordas para alinhar o texto à imagem original.</string>
 +    <string name="documents_title">Documentos e pesquisa</string>
 +    <string name="document_supported">PDF, EPUB, DOCX, TXT e quadrinhos compactados. EPUB e DOCX usam texto refluído.</string>
-+    <string name="document_import">Importar arquivo</string>
++    <string name="document_import">Explorar e adicionar arquivo</string>
 +    <string name="document_link">Link direto do documento</string>
 +    <string name="document_import_link">Importar link</string>
 +    <string name="document_importing">Importando para a biblioteca…</string>
-+    <string name="document_import_error">Não foi possível concluir. Confira o formato, a conexão e a pasta de armazenamento do app.</string>
++    <string name="document_import_error">Não foi possível concluir. Confira o formato, a conexão, as categorias e a pasta de armazenamento do app.</string>
 +    <string name="document_articles">Artigos</string>
 +    <string name="document_books">Livros</string>
 +    <string name="document_any_field">Todos</string>
@@ -2708,6 +3280,24 @@ index d1748bc..567ef34 100644
 +    <string name="document_web_template">URL do site de busca</string>
 +    <string name="document_web_template_hint">Use {query} para os termos da busca. Abre o site no Polaris; copie um link direto de documento para importar.</string>
 +    <string name="document_web_search">Buscar neste site</string>
++    <string name="document_local_selection_hint">Explore o celular e escolha cada arquivo que deseja incluir. O Polaris não varre todos os documentos do aparelho. Uma cópia fica na biblioteca local; o original permanece onde está.</string>
++    <string name="document_include_title">Organizar documento</string>
++    <string name="document_selected_format">Formato do arquivo: %1$s</string>
++    <string name="document_detect_format">Detectado ao abrir o link</string>
++    <string name="document_library_title">Título na biblioteca (opcional)</string>
++    <string name="document_content_type">Tipo de conteúdo</string>
++    <string name="document_kind_hint">Escolha o que você vai ler. Um PDF pode ser um livro, artigo ou quadrinho.</string>
++    <string name="document_category_by_format">Agrupar também pelo formato do arquivo</string>
++    <string name="document_existing_categories">Categorias adicionais da biblioteca</string>
++    <string name="document_new_category">Nova categoria (opcional)</string>
++    <string name="document_category_hint">O tipo e, se escolhido, o formato viram categorias normais da biblioteca. Categorias existentes com o mesmo nome são reutilizadas. Você pode editar as categorias depois pela biblioteca.</string>
++    <string name="document_include">Adicionar à biblioteca</string>
++    <string name="document_cancel">Cancelar</string>
++    <string name="document_kind_manga">Mangás</string>
++    <string name="document_kind_manhwa">Manhwas</string>
++    <string name="document_kind_comics">Quadrinhos</string>
++    <string name="document_kind_documents">Documentos</string>
++    <string name="document_format_category_prefix">Formato</string>
  </resources>
 diff --git a/source-local/src/main/kotlin/tachiyomi/source/local/LocalSource.kt b/source-local/src/main/kotlin/tachiyomi/source/local/LocalSource.kt
 index e5a307f..31834b3 100644

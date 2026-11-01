@@ -95,7 +95,7 @@ Do not force manga page abstractions onto novels.
 
 ## Document formats and broad discovery — requested 2026-10-31
 
-The user originally deferred this expansion while validating **Polaris P20261031.1**, then authorized advancing after confirming that disabling border crop aligned the saved translation. The initial implementation is now in the [P20261031.3 document candidate](../integration/document-reader/README.md). The requirements below remain the intended scope; implementation and device-acceptance limits are recorded there. None of these capabilities are retroactively claimed for the installed P20261031.1 APK. The separate two-source acceptance gate does not block this independent work.
+The user originally deferred this expansion while validating **Polaris P20261031.1**, then authorized advancing after confirming that disabling border crop aligned the saved translation. The initial document implementation was added in P20261031.3. The [P20261031.4 candidate](../integration/document-reader/README.md) adds explicit organization before importing a selected phone file, using content-type and optional format categories. The requirements below remain the intended scope; implementation and device-acceptance limits are recorded there. None of these capabilities are retroactively claimed for the installed P20261031.1 APK. The separate two-source acceptance gate does not block this independent work.
 
 Requested formats and uses:
 

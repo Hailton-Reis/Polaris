@@ -39,6 +39,9 @@ class DocumentOverlayTests(unittest.TestCase):
         self.assertEqual(subprocess.check_output(['git', '-C', str(self.root), 'diff', '--binary']), first)
         subprocess.run(['git', '-C', str(self.root), 'diff', '--check'], check=True)
         self.assertFalse((self.root / 'data/src/main/sqldelight/tachiyomi/migrations/15.sqm').exists())
+        about = self.root / 'app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt'
+        self.assertIn('P20261031.4', about.read_text())
+        self.assertTrue((self.root / 'app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentOrganization.kt').exists())
 
     def test_drift_is_rejected_without_partial_application(self):
         self.prepare()

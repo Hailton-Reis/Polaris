@@ -1,8 +1,8 @@
 {
   "date_utc": "2026-11-01",
-  "candidate_revision": "Polaris P20261031.3",
+  "candidate_revision": "Polaris P20261031.4",
   "pinned_yomotsu": "0fb80c439ef816eeb50674f1b90af39918b176d8",
-  "patch_sha256": "7c011d97ba0740e868b018f09496d78007031c200c419cc9849d843b3df7bb67",
+  "patch_sha256": "8ca5e618052f85471661461d34e714aa8858c5c6387adbc93a48014f68024348",
   "prerequisite_reader_overlay_sha256": "971e394a0b3b4b26223c970b63da886067f813f986decca913910aeee1fcf86b",
   "assembly": "PASS: app:assembleDebug completed; overall Gradle exit 1 from the same 34 preexisting unit failures",
   "full_build_completion": {
@@ -14,7 +14,7 @@
       "app-x86-debug.apk",
       "app-arm64-v8a-debug.apk"
     ],
-    "unit_tests": 476
+    "unit_tests": 486
   },
   "android_unit_comparison": {
     "status": "NO_NEW_UNIT_REGRESSIONS",
@@ -25,8 +25,8 @@
       "skipped": 0
     },
     "patched": {
-      "total": 476,
-      "passed": 442,
+      "total": 486,
+      "passed": 452,
       "failed": 34,
       "skipped": 0
     },
@@ -56,10 +56,22 @@
       "failures": 0,
       "errors": 0,
       "skipped": 0
+    },
+    "DocumentOrganizationTest": {
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "DocumentSelectionTest": {
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
     }
   },
   "new_document_tests": {
-    "tests": 19,
+    "tests": 29,
     "failures": 0,
     "errors": 0,
     "skipped": 0
@@ -74,13 +86,14 @@
     "migration15_rejected": true
   },
   "build_guard_tests": {
-    "passed": 15,
-    "failed": 0
+    "previously_passed": 15,
+    "rerun_this_revision": false,
+    "reason": "Build guard implementation unchanged; prior evidence retained in TEST_RESULTS_P20261031_3.json"
   },
-  "formatting": "PASS: targeted Spotless formatter on all 15 new Kotlin files; no broad formatting of preexisting files",
-  "apk_x86_64_sha256": "554d5d9cc9065a5364f76b1aaafc7634c38552823344ec8338d8944799d47494",
+  "formatting": "PASS: targeted Spotless on the 6 new or changed import/organization Kotlin files; no broad formatting of preexisting reader files",
+  "apk_x86_64_sha256": "2b0bea3df96cd4e943c92569247a7f41816ccee2d6a407911ee5f5a2d6571468",
   "apk_signature_verification": "PASS, Android APK Signature Scheme v2, one debug signer; the Windows update must use its existing local signing key",
-  "embedded_revision_verification": "PASS: P20261031.3 found in final APK DEX",
+  "embedded_revision_verification": "PASS: P20261031.4 found in final APK DEX",
   "build_profile": {
     "profile": "auto",
     "detected_cpus": 2,
@@ -122,13 +135,38 @@
       "sha256": "ad39f2eeee4d8ba53f0a53e67d9e6c158f81f31d28c2049ab2d110252fb89ef5"
     }
   },
-  "metadata_provider_checks": "PASS for four endpoint probes, Crossref/Europe PMC DOI lookups and actual Europe PMC AUTH queries; see PROVIDER_CHECKS.json",
+  "metadata_provider_checks": "Unchanged search parsers and endpoints; live metadata evidence from P20261031.3 retained in PROVIDER_CHECKS.json, not rerun in this revision",
   "user_runtime_evidence": "P20261031.1: disabling Crop borders aligned the saved paginated translation; no re-OCR needed",
-  "android_document_import_and_rendering": "PENDING: file picker, local storage publication, PDF native rendering, text UI, progress, ML Kit runtime and browser handoff need device acceptance",
+  "android_document_import_and_rendering": "PENDING: file picker, organization form, cancellation, category presentation, storage publication, PDF rendering, text UI, progress and ML Kit runtime need device acceptance",
   "automatic_crop_visual_acceptance": "PENDING: the user confirmed the workaround, not the automatic .2/.3 behavior",
   "multi_source_runtime_acceptance": "PENDING, separate R001 gate",
   "migration15_applied": false,
   "backup_v2_enabled": false,
   "production_release": false,
-  "evidence_directory": "/workspace/scratch/polaris-documents-v1"
+  "evidence_directory": "/workspace/scratch/polaris-document-organization-v1",
+  "scope": "Explicit phone-file selection and organization before inclusion; content kind and optional format categories using existing library categories",
+  "added_in_this_revision": {
+    "tests": 10,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": [
+      "DocumentOrganizationTest",
+      "DocumentSelectionTest"
+    ]
+  },
+  "selective_inclusion": {
+    "phone_scan": false,
+    "selection_operation": "Reads only the selected content URI display name and format; tests verify no input stream or cache access",
+    "library_write_trigger": "Explicit Add to library action after the organization form",
+    "cancel_behavior": "Dismisses pending selection without invoking the importer",
+    "original_file": "Copied only after inclusion; original is retained",
+    "existing_app_local_source": "Unchanged; lists files deliberately placed in the app local/ folder",
+    "content_type": "User-selected Manga, Manhwas, Comics, Books, Articles or Documents; local files default to Documents, independent of extension",
+    "format_grouping": "Optional, normal category such as Format: PDF / Formato: PDF",
+    "personal_categories": "Select existing or create a named additional category",
+    "membership_scope": "Only the imported work; no automatic reclassification of existing favorites",
+    "category_failure": "Repository failure propagates before favorite=true is written",
+    "duplicate_file_detection": false
+  }
 }
