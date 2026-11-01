@@ -41,6 +41,8 @@ The Android candidate now includes download-and-translate actions, English-sourc
 
 The [P20261031.2 reader candidate](docs/reader/PAGER_CROP_FIX_P20261031_2.md) preserves original image borders on translated pages. The user confirmed that disabling border crop aligns the prior candidate; automatic handling in the new candidate still needs Windows visual acceptance.
 
+The [P20261031.3 document candidate](integration/document-reader/README.md) adds PDF pages, reflowable EPUB/DOCX/TXT reading, local import, federated article/book search and a configurable in-app search website. See the [Android acceptance guide](docs/reader/DOCUMENTS_P20261031_3.md); native rendering, import and visual acceptance remain pending device testing.
+
 Local Android builds now detect CPU/RAM, enable Gradle cache/parallelism and combine APK assembly with tests per variant. See the [build-performance profile and verification limits](docs/r001/LOCAL_BUILD_PERFORMANCE_2026_10_31.md); performance on the user’s Windows PC remains to be measured.
 
 ## License and attribution

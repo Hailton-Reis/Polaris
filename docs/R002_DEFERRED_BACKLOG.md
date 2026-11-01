@@ -95,7 +95,7 @@ Do not force manga page abstractions onto novels.
 
 ## Document formats and broad discovery — requested 2026-10-31
 
-The user explicitly deferred this expansion to a later version while validating the current **Polaris P20261031.1** candidate. These are requirements, not capabilities added to that APK. This deferral does not make the separate two-source acceptance gate a prerequisite for independent reader improvements.
+The user originally deferred this expansion while validating **Polaris P20261031.1**, then authorized advancing after confirming that disabling border crop aligned the saved translation. The initial implementation is now in the [P20261031.3 document candidate](../integration/document-reader/README.md). The requirements below remain the intended scope; implementation and device-acceptance limits are recorded there. None of these capabilities are retroactively claimed for the installed P20261031.1 APK. The separate two-source acceptance gate does not block this independent work.
 
 Requested formats and uses:
 
@@ -111,7 +111,7 @@ Requested discovery:
 - Allow user-selected external/non-curated sources instead of restricting discovery to the initial bundled repository catalog. Identify the source of each result and keep extension trust/platform checks distinct from document compatibility.
 - A broad federated search must state which providers it queried. Do not claim exhaustive coverage of the entire internet or availability of a downloadable full text for every result.
 
-Before this expansion, the immediate user test is the installed revision in About, the same Guilty Library page in paginated and long-strip modes, and zoom/pan behavior. The current PDF/EPUB/DOCX/TXT expansion is not part of that acceptance claim.
+The crop-off diagnosis is confirmed. Automatic crop protection and the document candidate still need visual/device acceptance. This does not reopen the completed diagnostic round or require a full OCR rerun.
 
 ## R002 — optional accelerator server
 

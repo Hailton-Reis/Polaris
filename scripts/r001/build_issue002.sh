@@ -86,6 +86,7 @@ python3 "$polaris_root/scripts/r001/check_spike001_full_apply.py" "$baseline" "$
 printf '[OK] SPIKE001_FULL_APPLY_CONTRACT_PASS; iniciando preparacao do Gradle patched.\n' | tee "$evidence/full-apply-status.log"
 python3 "$polaris_root/scripts/r001/apply_debug_hook.py" "$patched" | tee "$evidence/apply-debug-hook.log"
 python3 "$polaris_root/scripts/r001/apply_reader_translation_ux.py" "$patched" | tee "$evidence/apply-reader-translation-ux.log"
+python3 "$polaris_root/scripts/r001/apply_document_reader.py" "$patched" | tee "$evidence/apply-document-reader.log"
 # Intent-to-add includes all staged new files in the reviewable diff.
 git -C "$patched" add -N .
 git -C "$patched" diff --binary > "$evidence/spike001.patch"

@@ -1,0 +1,2782 @@
+diff --git a/app/src/main/AndroidManifest.xml b/app/src/main/AndroidManifest.xml
+index 172b28c..4de015d 100644
+--- a/app/src/main/AndroidManifest.xml
++++ b/app/src/main/AndroidManifest.xml
+@@ -57,6 +57,33 @@
+         android:supportsRtl="true"
+         android:theme="@style/Theme.Tachiyomi">
+ 
++        <activity
++            android:name=".ui.documents.TextDocumentReaderActivity"
++            android:exported="false" />
++        <activity
++            android:name=".ui.documents.DocumentOpenActivity"
++            android:exported="true">
++            <intent-filter>
++                <action android:name="android.intent.action.VIEW" />
++                <category android:name="android.intent.category.DEFAULT" />
++                <data android:scheme="content" />
++                <data android:mimeType="application/pdf" />
++                <data android:mimeType="application/epub+zip" />
++                <data android:mimeType="application/vnd.openxmlformats-officedocument.wordprocessingml.document" />
++                <data android:mimeType="text/plain" />
++                <data android:mimeType="application/vnd.comicbook+zip" />
++                <data android:mimeType="application/zip" />
++            </intent-filter>
++            <intent-filter>
++                <action android:name="android.intent.action.SEND" />
++                <category android:name="android.intent.category.DEFAULT" />
++                <data android:mimeType="application/pdf" />
++                <data android:mimeType="application/epub+zip" />
++                <data android:mimeType="application/vnd.openxmlformats-officedocument.wordprocessingml.document" />
++                <data android:mimeType="text/plain" />
++            </intent-filter>
++        </activity>
++
+         <service
+             android:name="eu.kanade.translation.detection.DbnetService"
+             android:exported="false"
+diff --git a/app/src/main/java/eu/kanade/presentation/documents/DocumentsScreen.kt b/app/src/main/java/eu/kanade/presentation/documents/DocumentsScreen.kt
+new file mode 100644
+index 0000000..b2d3cb3
+--- /dev/null
++++ b/app/src/main/java/eu/kanade/presentation/documents/DocumentsScreen.kt
+@@ -0,0 +1,325 @@
++package eu.kanade.presentation.documents
++
++import android.app.Application
++import android.net.Uri
++import androidx.activity.compose.rememberLauncherForActivityResult
++import androidx.activity.result.contract.ActivityResultContracts
++import androidx.compose.foundation.layout.Arrangement
++import androidx.compose.foundation.layout.Column
++import androidx.compose.foundation.layout.Row
++import androidx.compose.foundation.layout.fillMaxWidth
++import androidx.compose.foundation.layout.padding
++import androidx.compose.foundation.lazy.LazyColumn
++import androidx.compose.foundation.lazy.items
++import androidx.compose.material3.Button
++import androidx.compose.material3.CircularProgressIndicator
++import androidx.compose.material3.ElevatedCard
++import androidx.compose.material3.FilterChip
++import androidx.compose.material3.MaterialTheme
++import androidx.compose.material3.OutlinedButton
++import androidx.compose.material3.OutlinedTextField
++import androidx.compose.material3.Text
++import androidx.compose.material3.TextButton
++import androidx.compose.runtime.Composable
++import androidx.compose.runtime.LaunchedEffect
++import androidx.compose.runtime.collectAsState
++import androidx.compose.runtime.getValue
++import androidx.compose.runtime.mutableStateOf
++import androidx.compose.runtime.remember
++import androidx.compose.runtime.saveable.rememberSaveable
++import androidx.compose.runtime.setValue
++import androidx.compose.ui.Modifier
++import androidx.compose.ui.platform.LocalContext
++import androidx.compose.ui.unit.dp
++import androidx.lifecycle.ViewModel
++import androidx.lifecycle.viewModelScope
++import androidx.lifecycle.viewmodel.compose.viewModel
++import cafe.adriel.voyager.navigator.LocalNavigator
++import cafe.adriel.voyager.navigator.currentOrThrow
++import eu.kanade.presentation.components.AppBar
++import eu.kanade.presentation.util.Screen
++import eu.kanade.tachiyomi.network.NetworkHelper
++import eu.kanade.tachiyomi.ui.documents.DocumentImporter
++import eu.kanade.tachiyomi.ui.documents.DocumentSearch
++import eu.kanade.tachiyomi.ui.documents.DocumentSearchBatch
++import eu.kanade.tachiyomi.ui.documents.DocumentSearchField
++import eu.kanade.tachiyomi.ui.documents.DocumentSearchKind
++import eu.kanade.tachiyomi.ui.documents.DocumentWebSearch
++import eu.kanade.tachiyomi.ui.documents.RemoteDocument
++import eu.kanade.tachiyomi.ui.manga.MangaScreen
++import eu.kanade.tachiyomi.ui.webview.WebViewActivity
++import kotlinx.coroutines.Dispatchers
++import kotlinx.coroutines.Job
++import kotlinx.coroutines.flow.MutableStateFlow
++import kotlinx.coroutines.flow.asStateFlow
++import kotlinx.coroutines.flow.update
++import kotlinx.coroutines.launch
++import tachiyomi.i18n.at.ATMR
++import tachiyomi.presentation.core.components.material.Scaffold
++import tachiyomi.presentation.core.i18n.stringResource
++import uy.kohesive.injekt.Injekt
++import uy.kohesive.injekt.api.get
++import kotlin.coroutines.cancellation.CancellationException
++
++data class DocumentsState(
++    val searching: Boolean = false,
++    val importing: Boolean = false,
++    val error: Boolean = false,
++    val searched: Boolean = false,
++    val batch: DocumentSearchBatch? = null,
++    val importedManga: Long? = null,
++)
++
++class DocumentsViewModel : ViewModel() {
++    private val app: Application = Injekt.get()
++    private val importer = DocumentImporter(app)
++    private val search = DocumentSearch(Injekt.get<NetworkHelper>().client)
++    private val mutableState = MutableStateFlow(DocumentsState())
++    val state = mutableState.asStateFlow()
++    private var searchJob: Job? = null
++
++    fun search(query: String, kind: DocumentSearchKind, field: DocumentSearchField) {
++        if (query.trim().length !in 2..300) return
++        searchJob?.cancel()
++        searchJob = viewModelScope.launch {
++            mutableState.update { it.copy(searching = true, error = false) }
++            try {
++                val result = search.search(query.trim(), kind, field)
++                mutableState.update { it.copy(batch = result, searched = true, searching = false) }
++            } catch (cancelled: CancellationException) {
++                throw cancelled
++            } catch (_: Exception) {
++                mutableState.update { it.copy(searching = false, error = true) }
++            }
++        }
++    }
++
++    fun importUri(uri: Uri) = runImport { importer.fromUri(uri) }
++    fun importUrl(url: String, title: String? = null, document: RemoteDocument? = null, author: String? = null) =
++        runImport { importer.fromUrl(document?.url ?: url, title, document?.format, author) }
++
++    private fun runImport(action: suspend () -> Long) {
++        if (state.value.importing) return
++        mutableState.update { it.copy(importing = true, error = false) }
++        viewModelScope.launch(Dispatchers.IO) {
++            try {
++                val mangaId = action()
++                mutableState.update { it.copy(importing = false, importedManga = mangaId) }
++            } catch (cancelled: CancellationException) {
++                throw cancelled
++            } catch (_: Exception) {
++                mutableState.update { it.copy(importing = false, error = true) }
++            }
++        }
++    }
++
++    fun consumeImport() {
++        mutableState.update { it.copy(importedManga = null) }
++    }
++}
++
++class DocumentsScreen(private val initialUri: String? = null) : Screen() {
++    @Composable
++    override fun Content() {
++        val navigator = LocalNavigator.currentOrThrow
++        val context = LocalContext.current
++        val model = viewModel<DocumentsViewModel>()
++        val state by model.state.collectAsState()
++        val preferences =
++            remember { context.getSharedPreferences("document_search", android.content.Context.MODE_PRIVATE) }
++        var webTemplate by rememberSaveable {
++            mutableStateOf(preferences.getString("web_template", DocumentWebSearch.DEFAULT).orEmpty())
++        }
++        var query by rememberSaveable { mutableStateOf("") }
++        var link by rememberSaveable { mutableStateOf("") }
++        var kind by rememberSaveable { mutableStateOf(DocumentSearchKind.ARTICLES) }
++        var field by rememberSaveable { mutableStateOf(DocumentSearchField.ANY) }
++        var importedInitial by rememberSaveable { mutableStateOf(false) }
++        val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
++            uri?.let(model::importUri)
++        }
++        LaunchedEffect(initialUri) {
++            if (initialUri != null && !importedInitial) {
++                importedInitial = true
++                model.importUri(Uri.parse(initialUri))
++            }
++        }
++        LaunchedEffect(state.importedManga) {
++            state.importedManga?.let { id ->
++                model.consumeImport()
++                navigator.push(MangaScreen(id, fromSource = true))
++            }
++        }
++        Scaffold(topBar = { behavior ->
++            AppBar(
++                title = stringResource(ATMR.strings.documents_title),
++                navigateUp = navigator::pop,
++                scrollBehavior = behavior,
++            )
++        }) { padding ->
++            LazyColumn(
++                contentPadding = padding,
++                modifier = Modifier.padding(horizontal = 16.dp),
++                verticalArrangement = Arrangement.spacedBy(12.dp),
++            ) {
++                item {
++                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
++                        Text(
++                            stringResource(ATMR.strings.document_supported),
++                            style = MaterialTheme.typography.bodySmall,
++                        )
++                        Button(onClick = { picker.launch(arrayOf("*/*")) }, enabled = !state.importing) {
++                            Text(stringResource(ATMR.strings.document_import))
++                        }
++                        OutlinedTextField(
++                            value = link,
++                            onValueChange = { link = it },
++                            singleLine = true,
++                            label = {
++                                Text(stringResource(ATMR.strings.document_link))
++                            },
++                            modifier = Modifier.fillMaxWidth(),
++                        )
++                        OutlinedButton(
++                            onClick = { model.importUrl(link) },
++                            enabled =
++                            !state.importing && link.isNotBlank(),
++                        ) {
++                            Text(stringResource(ATMR.strings.document_import_link))
++                        }
++                        if (state.importing) {
++                            CircularProgressIndicator()
++                            Text(stringResource(ATMR.strings.document_importing))
++                        }
++                        if (state.error) {
++                            Text(
++                                stringResource(ATMR.strings.document_import_error),
++                                color = MaterialTheme.colorScheme.error,
++                            )
++                        }
++                    }
++                }
++                item {
++                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
++                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
++                            FilterChip(
++                                selected = kind == DocumentSearchKind.ARTICLES,
++                                onClick = {
++                                    kind =
++                                        DocumentSearchKind.ARTICLES
++                                },
++                                label = { Text(stringResource(ATMR.strings.document_articles)) },
++                            )
++                            FilterChip(
++                                selected = kind == DocumentSearchKind.BOOKS,
++                                onClick = {
++                                    kind =
++                                        DocumentSearchKind.BOOKS
++                                },
++                                label = { Text(stringResource(ATMR.strings.document_books)) },
++                            )
++                        }
++                        androidx.compose.foundation.layout.FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
++                            DocumentSearchField.entries.forEach { option ->
++                                FilterChip(selected = field == option, onClick = { field = option }, label = {
++                                    Text(
++                                        stringResource(
++                                            when (option) {
++                                                DocumentSearchField.ANY -> ATMR.strings.document_any_field
++                                                DocumentSearchField.TITLE -> ATMR.strings.document_title_field
++                                                DocumentSearchField.AUTHOR -> ATMR.strings.document_author_field
++                                                DocumentSearchField.DOI -> ATMR.strings.document_doi_field
++                                            },
++                                        ),
++                                    )
++                                })
++                            }
++                        }
++                        OutlinedTextField(
++                            value = query,
++                            onValueChange = { query = it },
++                            singleLine = true,
++                            label = {
++                                Text(stringResource(ATMR.strings.document_query))
++                            },
++                            modifier = Modifier.fillMaxWidth(),
++                        )
++                        Button(
++                            onClick = { model.search(query, kind, field) },
++                            enabled =
++                            !state.searching && query.trim().length in 2..300,
++                        ) {
++                            Text(stringResource(ATMR.strings.document_search))
++                        }
++                        Text(
++                            stringResource(ATMR.strings.document_search_scope),
++                            style = MaterialTheme.typography.bodySmall,
++                        )
++                        OutlinedTextField(
++                            value = webTemplate,
++                            onValueChange = {
++                                webTemplate = it.take(2000)
++                                preferences.edit().putString("web_template", webTemplate).apply()
++                            },
++                            label = { Text(stringResource(ATMR.strings.document_web_template)) },
++                            supportingText = { Text(stringResource(ATMR.strings.document_web_template_hint)) },
++                            modifier = Modifier.fillMaxWidth(),
++                        )
++                        val webUrl = runCatching { DocumentWebSearch.url(webTemplate, query) }.getOrNull()
++                        OutlinedButton(onClick = {
++                            webUrl?.let { context.startActivity(WebViewActivity.newIntent(context, it)) }
++                        }, enabled = webUrl != null) { Text(stringResource(ATMR.strings.document_web_search)) }
++                        if (state.searching) CircularProgressIndicator()
++                        state.batch?.let { batch ->
++                            Text(batch.providers.joinToString(" · "), style = MaterialTheme.typography.bodySmall)
++                            if (batch.errors.isNotEmpty()) {
++                                Text(
++                                    stringResource(ATMR.strings.document_provider_error, batch.errors.joinToString()),
++                                    color = MaterialTheme.colorScheme.error,
++                                )
++                            }
++                            if (batch.hits.isEmpty() && state.searched &&
++                                !state.searching
++                            ) {
++                                Text(stringResource(ATMR.strings.document_no_results))
++                            }
++                        }
++                    }
++                }
++                items(state.batch?.hits.orEmpty(), key = { it.id }) { hit ->
++                    ElevatedCard(Modifier.fillMaxWidth()) {
++                        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
++                            Text(hit.title, style = MaterialTheme.typography.titleMedium)
++                            if (hit.authors.isNotBlank()) Text(hit.authors, style = MaterialTheme.typography.bodySmall)
++                            Text(hit.provider, style = MaterialTheme.typography.labelMedium)
++                            hit.doi?.let { Text("DOI: $it", style = MaterialTheme.typography.bodySmall) }
++                            if (hit.documents.isEmpty()) {
++                                Text(
++                                    stringResource(ATMR.strings.document_no_direct_file),
++                                    style = MaterialTheme.typography.bodySmall,
++                                )
++                            }
++                            hit.documents.forEach { file ->
++                                Button(onClick = {
++                                    model.importUrl(file.url, hit.title, file, hit.authors)
++                                }, enabled = !state.importing) {
++                                    Text(
++                                        stringResource(
++                                            ATMR.strings.document_add_format,
++                                            file.format.extension.uppercase(),
++                                        ),
++                                    )
++                                }
++                            }
++                            hit.landing?.let { url ->
++                                TextButton(onClick = {
++                                    context.startActivity(WebViewActivity.newIntent(context, url, title = hit.title))
++                                }) { Text(stringResource(ATMR.strings.document_open_source)) }
++                            }
++                        }
++                    }
++                }
++            }
++        }
++    }
++}
+diff --git a/app/src/main/java/eu/kanade/presentation/manga/MangaScreen.kt b/app/src/main/java/eu/kanade/presentation/manga/MangaScreen.kt
+index d7597c6..573a1bc 100644
+--- a/app/src/main/java/eu/kanade/presentation/manga/MangaScreen.kt
++++ b/app/src/main/java/eu/kanade/presentation/manga/MangaScreen.kt
+@@ -828,6 +828,7 @@ private fun LazyListScope.sharedChapterItems(
+                     bookmark = item.chapter.bookmark,
+                     selected = item.selected,
+                     downloadIndicatorEnabled = !isAnyChapterSelected && !manga.isLocal(),
++                    locallyAvailable = manga.isLocal(),
+                     downloadStateProvider = { item.downloadState },
+                     //TachiyomiAT
+                     translationStateProvider = { item.translationState },
+@@ -848,7 +849,9 @@ private fun LazyListScope.sharedChapterItems(
+ 
+                     },
+                     //TachiyomiAT
+-                    onTranslationClick =  if (onTranslationChapter != null) {
++                    onTranslationClick = if (onTranslationChapter != null &&
++                        !(manga.isLocal() && mihon.core.archive.DocumentFormat.fromName(item.chapter.url)?.text == true)
++                    ) {
+                         { onTranslationChapter(item, it) }
+                     } else {
+                         null
+diff --git a/app/src/main/java/eu/kanade/presentation/manga/components/MangaChapterListItem.kt b/app/src/main/java/eu/kanade/presentation/manga/components/MangaChapterListItem.kt
+index 661b4ee..c0c75bf 100644
+--- a/app/src/main/java/eu/kanade/presentation/manga/components/MangaChapterListItem.kt
++++ b/app/src/main/java/eu/kanade/presentation/manga/components/MangaChapterListItem.kt
+@@ -57,6 +57,7 @@ fun MangaChapterListItem(
+     bookmark: Boolean,
+     selected: Boolean,
+     downloadIndicatorEnabled: Boolean,
++    locallyAvailable: Boolean = false,
+     downloadStateProvider: () -> Download.State,
+     // TachiyomiAT
+     translationStateProvider: () -> Translation.State,
+@@ -180,8 +181,8 @@ fun MangaChapterListItem(
+             // TachiyomiAT
+             if (onTranslationClick != null) {
+                 ChapterTranslationIndicator(
+-                    enabled = downloadIndicatorEnabled || downloadStateProvider() == Download.State.DOWNLOADED,
+-                    downloaded = downloadStateProvider() == Download.State.DOWNLOADED,
++                    enabled = locallyAvailable || downloadIndicatorEnabled || downloadStateProvider() == Download.State.DOWNLOADED,
++                    downloaded = locallyAvailable || downloadStateProvider() == Download.State.DOWNLOADED,
+                     modifier = Modifier.padding(start = 4.dp),
+                     translationStateProvider = translationStateProvider,
+                     onClick = { onTranslationClick.invoke(it) },
+diff --git a/app/src/main/java/eu/kanade/presentation/more/MoreScreen.kt b/app/src/main/java/eu/kanade/presentation/more/MoreScreen.kt
+index a7b7f3e..f4dcdad 100644
+--- a/app/src/main/java/eu/kanade/presentation/more/MoreScreen.kt
++++ b/app/src/main/java/eu/kanade/presentation/more/MoreScreen.kt
+@@ -36,6 +36,7 @@ fun MoreScreen(
+     onClickDataAndStorage: () -> Unit,
+     onClickSettings: () -> Unit,
+     onClickAbout: () -> Unit,
++    onClickDocuments: () -> Unit,
+ ) {
+     Scaffold { contentPadding ->
+         ScrollbarLazyColumn(contentPadding = contentPadding) {
+@@ -115,6 +116,13 @@ fun MoreScreen(
+                     onPreferenceClick = onClickDataAndStorage,
+                 )
+             }
++            item {
++                TextPreferenceWidget(
++                    title = stringResource(tachiyomi.i18n.at.ATMR.strings.documents_title),
++                    icon = Icons.Outlined.Storage,
++                    onPreferenceClick = onClickDocuments,
++                )
++            }
+ 
+ 
+ 
+diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
+index 7f411fd..58a1fa6 100644
+--- a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
++++ b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
+@@ -52,7 +52,7 @@ import kotlin.time.Instant
+ object AboutScreen : Screen() {
+ 
+     // Identifies this overlay independently of the pinned upstream COMMIT_SHA.
+-    private const val POLARIS_READER_REVISION = "P20261031.2"
++    private const val POLARIS_READER_REVISION = "P20261031.3"
+ 
+     @Composable
+     override fun Content() {
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentImporter.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentImporter.kt
+new file mode 100644
+index 0000000..7184311
+--- /dev/null
++++ b/app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentImporter.kt
+@@ -0,0 +1,186 @@
++package eu.kanade.tachiyomi.ui.documents
++
++import android.content.Context
++import android.net.Uri
++import android.provider.OpenableColumns
++import eu.kanade.tachiyomi.network.NetworkHelper
++import eu.kanade.tachiyomi.source.model.SManga
++import eu.kanade.tachiyomi.util.storage.DiskUtil
++import kotlinx.coroutines.Dispatchers
++import kotlinx.coroutines.ensureActive
++import kotlinx.coroutines.withContext
++import mihon.core.archive.DocumentFormat
++import mihon.core.archive.DocumentLimits
++import mihon.core.archive.TextDocument
++import mihon.domain.manga.model.toDomainManga
++import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
++import okhttp3.Request
++import org.json.JSONObject
++import tachiyomi.domain.manga.interactor.NetworkToLocalManga
++import tachiyomi.domain.manga.model.MangaUpdate
++import tachiyomi.domain.manga.repository.MangaRepository
++import tachiyomi.domain.storage.service.StorageManager
++import tachiyomi.source.local.LocalSource
++import uy.kohesive.injekt.Injekt
++import uy.kohesive.injekt.api.get
++import java.io.File
++import java.io.InputStream
++import java.util.UUID
++import java.util.zip.ZipFile
++import kotlin.coroutines.coroutineContext
++
++class DocumentImporter(private val context: Context) {
++    suspend fun fromUri(uri: Uri): Long = withContext(Dispatchers.IO) {
++        require(uri.scheme == "content") { "Select a document from the Android file picker" }
++        val name =
++            context.contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use { cursor ->
++                if (cursor.moveToFirst()) cursor.getString(0) else null
++            } ?: uri.lastPathSegment.orEmpty()
++        val type = checkNotNull(DocumentFormat.fromName(name)) { "Unsupported document format" }
++        checkNotNull(context.contentResolver.openInputStream(uri)).use { input ->
++            storeDocument(input, name, type, name.substringBeforeLast('.'))
++        }
++    }
++
++    suspend fun fromUrl(
++        value: String,
++        title: String? = null,
++        expected: DocumentFormat? = null,
++        author: String? = null,
++    ): Long = withContext(
++        Dispatchers.IO,
++    ) {
++        val url = value.trim().toHttpUrlOrNull() ?: error("Invalid document URL")
++        require(url.username.isEmpty() && url.password.isEmpty())
++        val client = Injekt.get<NetworkHelper>().client.newBuilder().callTimeout(
++            120,
++            java.util.concurrent.TimeUnit.SECONDS,
++        ).build()
++        client.newCall(
++            Request.Builder().url(url).header("User-Agent", "Polaris-DocumentReader/1.0").build(),
++        ).execute().use { response ->
++            check(response.isSuccessful) { "Document HTTP ${response.code}" }
++            val body = checkNotNull(response.body)
++            require(body.contentLength() <= DocumentLimits.MAX_FILE_BYTES) {
++                "Document exceeds the supported size limit"
++            }
++            val disposition = response.header("Content-Disposition").orEmpty()
++            val filename =
++                Regex("filename=\"?([^\";]+)", RegexOption.IGNORE_CASE).find(disposition)?.groupValues?.get(1)
++                    ?: response.request.url.pathSegments.lastOrNull().orEmpty()
++            val mime = body.contentType()?.toString()?.substringBefore(';')
++            val type =
++                expected ?: DocumentFormat.fromName(filename) ?: DocumentFormat.entries.firstOrNull { it.mime == mime }
++                    ?: error("Link does not identify a supported document")
++            body.byteStream().use { input ->
++                storeDocument(
++                    input,
++                    filename.ifBlank { "document.${type.extension}" },
++                    type,
++                    title ?: filename.substringBeforeLast('.'),
++                    author.orEmpty(),
++                )
++            }
++        }
++    }
++
++    private suspend fun storeDocument(
++        input: InputStream,
++        name: String,
++        format: DocumentFormat,
++        suggestedTitle: String,
++        suggestedAuthor: String = "",
++    ): Long {
++        val temporary = File(context.cacheDir, "import-${UUID.randomUUID()}.${format.extension}")
++        var title = suggestedTitle.take(180).ifBlank { name }
++        var author = suggestedAuthor.take(2000)
++        try {
++            temporary.outputStream().use { output ->
++                val buffer = ByteArray(32 * 1024)
++                var total = 0L
++                while (true) {
++                    coroutineContext.ensureActive()
++                    val count = input.read(buffer)
++                    if (count < 0) break
++                    total += count
++                    require(total <= DocumentLimits.MAX_FILE_BYTES) { "Document exceeds the supported size limit" }
++                    output.write(buffer, 0, count)
++                }
++                require(total > 0) { "Empty document" }
++            }
++            when (format) {
++                DocumentFormat.PDF -> {
++                    val header = ByteArray(5).also { bytes ->
++                        temporary.inputStream().use { java.io.DataInputStream(it).readFully(bytes) }
++                    }
++                    require(header.contentEquals("%PDF-".toByteArray())) { "Link did not return a PDF" }
++                }
++                DocumentFormat.EPUB, DocumentFormat.DOCX, DocumentFormat.TXT -> TextDocument(
++                    temporary,
++                    format,
++                ).use { doc ->
++                    if (doc.title.isNotBlank()) title = doc.title.take(180)
++                    if (doc.author.isNotBlank()) author = doc.author.take(2000)
++                    doc.readSection(0)
++                }
++                DocumentFormat.ZIP, DocumentFormat.CBZ -> ZipFile(temporary).use { require(it.size() > 0) }
++                else -> {
++                    val header = temporary.inputStream().use { input ->
++                        ByteArray(512).let { bytes ->
++                            val size = input.read(bytes)
++                            bytes.copyOf(size.coerceAtLeast(0))
++                        }
++                    }
++                    val valid = when (format) {
++                        DocumentFormat.CBR, DocumentFormat.RAR -> header.take(6).toByteArray()
++                            .contentEquals(byteArrayOf(0x52, 0x61, 0x72, 0x21, 0x1a, 0x07))
++                        DocumentFormat.CB7, DocumentFormat.SEVEN_ZIP -> header.take(6).toByteArray()
++                            .contentEquals(byteArrayOf(0x37, 0x7a, 0xbc.toByte(), 0xaf.toByte(), 0x27, 0x1c))
++                        DocumentFormat.CBT, DocumentFormat.TAR ->
++                            header.size >= 265 &&
++                                header.copyOfRange(257, 262).toString(Charsets.US_ASCII) == "ustar"
++                        else -> false
++                    }
++                    require(valid) { "Link did not return a supported archive" }
++                }
++            }
++            coroutineContext.ensureActive()
++            val base =
++                Injekt.get<StorageManager>().getLocalSourceDirectory()
++                    ?: error("Choose the app storage folder in Settings")
++            val id = UUID.randomUUID().toString().take(12)
++            val safeTitle = DiskUtil.buildValidFilename(title).take(100).ifBlank { "document" }
++            val folderName = "$safeTitle-$id"
++            val staging = checkNotNull(base.createDirectory(".import-$id"))
++            var published = false
++            try {
++                val target = checkNotNull(staging.createFile("document.${format.extension}"))
++                temporary.inputStream().use { source ->
++                    target.openOutputStream().use { output -> DocumentLimits.copy(source, output) }
++                }
++                val metadata = JSONObject().put("title", title).put("author", author).toString()
++                checkNotNull(staging.createFile("details.json")).openOutputStream().use {
++                    it.write(metadata.toByteArray())
++                }
++                coroutineContext.ensureActive()
++                check(staging.renameTo(folderName)) { "Cannot publish imported document" }
++                published = true
++                val manga = SManga.create().apply {
++                    this.title = title
++                    url = folderName
++                }.toDomainManga(LocalSource.ID)
++                val saved = Injekt.get<NetworkToLocalManga>()(manga)
++                check(
++                    Injekt.get<MangaRepository>().update(
++                        MangaUpdate(saved.id, favorite = true, dateAdded = System.currentTimeMillis()),
++                    ),
++                )
++                return saved.id
++            } finally {
++                if (!published) staging.delete()
++            }
++        } finally {
++            temporary.delete()
++        }
++    }
++}
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentOpenActivity.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentOpenActivity.kt
+new file mode 100644
+index 0000000..ca72557
+--- /dev/null
++++ b/app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentOpenActivity.kt
+@@ -0,0 +1,30 @@
++package eu.kanade.tachiyomi.ui.documents
++
++import android.content.Intent
++import android.net.Uri
++import android.os.Bundle
++import androidx.activity.ComponentActivity
++import androidx.activity.compose.setContent
++import androidx.activity.enableEdgeToEdge
++import cafe.adriel.voyager.navigator.Navigator
++import eu.kanade.presentation.documents.DocumentsScreen
++import eu.kanade.presentation.theme.TachiyomiTheme
++
++class DocumentOpenActivity : ComponentActivity() {
++    override fun onCreate(savedInstanceState: Bundle?) {
++        super.onCreate(savedInstanceState)
++        enableEdgeToEdge()
++        val uri = if (intent.action ==
++            Intent.ACTION_SEND
++        ) {
++            intent.getParcelableExtra<Uri>(Intent.EXTRA_STREAM)
++        } else {
++            intent.data
++        }
++        if (uri?.scheme != "content") {
++            finish()
++            return
++        }
++        setContent { TachiyomiTheme { Navigator(DocumentsScreen(uri.toString())) } }
++    }
++}
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentReadingPosition.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentReadingPosition.kt
+new file mode 100644
+index 0000000..bd8c08f
+--- /dev/null
++++ b/app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentReadingPosition.kt
+@@ -0,0 +1,28 @@
++package eu.kanade.tachiyomi.ui.documents
++
++import kotlinx.serialization.json.JsonObject
++import kotlinx.serialization.json.JsonPrimitive
++import kotlinx.serialization.json.intOrNull
++import kotlinx.serialization.json.jsonPrimitive
++
++data class DocumentReadingPosition(val section: Int = 0, val block: Int = 0, val offset: Int = 0) {
++    fun merge(memo: JsonObject): JsonObject = JsonObject(
++        memo + mapOf(
++            "polaris_document_section" to JsonPrimitive(section.coerceAtLeast(0)),
++            "polaris_document_block" to JsonPrimitive(block.coerceAtLeast(0)),
++            "polaris_document_offset" to JsonPrimitive(offset.coerceAtLeast(0)),
++        ),
++    )
++
++    companion object {
++        fun from(memo: JsonObject): DocumentReadingPosition {
++            fun number(key: String) =
++                runCatching { memo[key]?.jsonPrimitive?.intOrNull }.getOrNull()?.coerceAtLeast(0) ?: 0
++            return DocumentReadingPosition(
++                number("polaris_document_section"),
++                number("polaris_document_block"),
++                number("polaris_document_offset"),
++            )
++        }
++    }
++}
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentSearch.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentSearch.kt
+new file mode 100644
+index 0000000..ce6e322
+--- /dev/null
++++ b/app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentSearch.kt
+@@ -0,0 +1,272 @@
++package eu.kanade.tachiyomi.ui.documents
++
++import kotlinx.coroutines.Dispatchers
++import kotlinx.coroutines.async
++import kotlinx.coroutines.awaitAll
++import kotlinx.coroutines.supervisorScope
++import kotlinx.coroutines.withContext
++import kotlinx.serialization.json.Json
++import kotlinx.serialization.json.JsonArray
++import kotlinx.serialization.json.JsonElement
++import kotlinx.serialization.json.JsonObject
++import kotlinx.serialization.json.contentOrNull
++import kotlinx.serialization.json.jsonArray
++import kotlinx.serialization.json.jsonObject
++import kotlinx.serialization.json.jsonPrimitive
++import mihon.core.archive.DocumentFormat
++import mihon.core.archive.DocumentLimits
++import okhttp3.HttpUrl.Companion.toHttpUrl
++import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
++import okhttp3.OkHttpClient
++import okhttp3.Request
++import java.io.ByteArrayOutputStream
++import java.util.concurrent.TimeUnit
++import kotlin.coroutines.cancellation.CancellationException
++
++enum class DocumentSearchField { ANY, TITLE, AUTHOR, DOI }
++enum class DocumentSearchKind { ARTICLES, BOOKS }
++data class RemoteDocument(val url: String, val format: DocumentFormat)
++data class DocumentSearchHit(
++    val id: String,
++    val title: String,
++    val authors: String,
++    val provider: String,
++    val doi: String?,
++    val landing: String?,
++    val documents: List<RemoteDocument>,
++)
++data class DocumentSearchBatch(val hits: List<DocumentSearchHit>, val errors: List<String>, val providers: List<String>)
++
++object DocumentSearchParsers {
++    private fun JsonElement?.text(): String = runCatching {
++        this?.jsonPrimitive?.contentOrNull?.take(2000)
++    }.getOrNull().orEmpty()
++    private fun JsonElement?.objects(): List<JsonObject> = (this as? JsonArray)?.mapNotNull {
++        it as? JsonObject
++    }.orEmpty()
++    private fun JsonElement?.texts(): List<String> = (this as? JsonArray)?.map { it.text() }.orEmpty()
++    private fun link(value: String): String? = value.toHttpUrlOrNull()?.takeIf {
++        it.username.isEmpty() && it.password.isEmpty()
++    }?.toString()
++
++    fun doi(query: String): String? {
++        val value = query.trim().replace(Regex("^(https?://(dx\\.)?doi\\.org/|doi:\\s*)", RegexOption.IGNORE_CASE), "")
++        return value.takeIf { Regex("10\\.\\d{4,9}/\\S+", RegexOption.IGNORE_CASE).matches(it) }
++    }
++
++    fun crossref(raw: String, single: Boolean): List<DocumentSearchHit> {
++        val message = Json.parseToJsonElement(raw).jsonObject["message"]?.jsonObject ?: return emptyList()
++        val items = if (single) listOf(message) else message["items"].objects().take(20)
++        return items.mapNotNull { item ->
++            val title = item["title"].texts().firstOrNull()?.takeIf(String::isNotBlank) ?: return@mapNotNull null
++            val doi = item["DOI"].text().takeIf(String::isNotBlank)
++            val files = item["link"].objects().mapNotNull { entry ->
++                val format = when (entry["content-type"].text().substringBefore(';')) {
++                    "application/pdf" -> DocumentFormat.PDF
++                    "application/epub+zip" -> DocumentFormat.EPUB
++                    "text/plain" -> DocumentFormat.TXT
++                    else -> return@mapNotNull null
++                }
++                link(entry["URL"].text())?.let { RemoteDocument(it, format) }
++            }.distinctBy { it.url }.take(3)
++            DocumentSearchHit(
++                "crossref:${doi ?: item["URL"].text()}:$title",
++                title,
++                item["author"].objects().take(12).joinToString {
++                    listOf(it["given"].text(), it["family"].text()).filter(String::isNotBlank).joinToString(" ")
++                },
++                "Crossref",
++                doi,
++                link(item["URL"].text()),
++                files,
++            )
++        }
++    }
++
++    fun europePmc(raw: String): List<DocumentSearchHit> {
++        val root = Json.parseToJsonElement(raw).jsonObject
++        return (root["resultList"] as? JsonObject)?.get("result").objects().take(20).mapNotNull { item ->
++            val title = item["title"].text().takeIf(String::isNotBlank) ?: return@mapNotNull null
++            val pmcid = item["pmcid"].text()
++            val doi = item["doi"].text().takeIf(String::isNotBlank)
++            val links = (item["fullTextUrlList"] as? JsonObject)?.get("fullTextUrl").objects()
++            val files = links.filter { it["documentStyle"].text().equals("pdf", true) }.mapNotNull { entry ->
++                link(entry["url"].text())?.let { RemoteDocument(it, DocumentFormat.PDF) }
++            }.toMutableList()
++            if (files.isEmpty() && pmcid.matches(Regex("PMC[0-9]+")) && item["isOpenAccess"].text() == "Y") {
++                files += RemoteDocument("https://europepmc.org/articles/$pmcid?pdf=render", DocumentFormat.PDF)
++            }
++            val landing = if (pmcid.matches(Regex("PMC[0-9]+"))) {
++                "https://europepmc.org/articles/$pmcid"
++            } else {
++                doi?.let { "https://doi.org/$it" }
++            }
++            DocumentSearchHit(
++                "europepmc:${item["source"].text()}:${item["id"].text()}",
++                title,
++                item["authorString"].text(),
++                "Europe PMC",
++                doi,
++                link(landing.orEmpty()),
++                files.distinctBy {
++                    it.url
++                }.take(3),
++            )
++        }
++    }
++
++    fun gutendex(raw: String): List<DocumentSearchHit> = Json.parseToJsonElement(
++        raw,
++    ).jsonObject["results"].objects().take(20).mapNotNull { item ->
++        val title = item["title"].text().takeIf(String::isNotBlank) ?: return@mapNotNull null
++        val id = item["id"].text()
++        val files = (item["formats"] as? JsonObject).orEmpty().mapNotNull { (mime, value) ->
++            val format = when (mime.substringBefore(';')) {
++                "application/epub+zip" -> DocumentFormat.EPUB
++                "application/pdf" -> DocumentFormat.PDF
++                "text/plain" -> DocumentFormat.TXT
++                else -> return@mapNotNull null
++            }
++            link(value.text())?.let { RemoteDocument(it, format) }
++        }.distinctBy { it.url }.take(3)
++        DocumentSearchHit(
++            "gutendex:$id",
++            title,
++            item["authors"].objects().take(12).joinToString { it["name"].text() },
++            "Project Gutenberg / Gutendex",
++            null,
++            id.toLongOrNull()?.let {
++                "https://www.gutenberg.org/ebooks/$it"
++            },
++            files,
++        )
++    }
++
++    fun openLibrary(raw: String): List<DocumentSearchHit> = Json.parseToJsonElement(
++        raw,
++    ).jsonObject["docs"].objects().take(20).mapNotNull { item ->
++        val title = item["title"].text().takeIf(String::isNotBlank) ?: return@mapNotNull null
++        val key = item["key"].text().takeIf { it.matches(Regex("/works/OL[0-9]+W")) } ?: return@mapNotNull null
++        DocumentSearchHit(
++            "openlibrary:$key",
++            title,
++            item["author_name"].texts().take(12).joinToString(),
++            "Open Library",
++            null,
++            "https://openlibrary.org$key",
++            emptyList(),
++        )
++    }
++}
++
++class DocumentSearch(client: OkHttpClient) {
++    private val client = client.newBuilder().callTimeout(25, TimeUnit.SECONDS).build()
++
++    suspend fun search(query: String, kind: DocumentSearchKind, field: DocumentSearchField): DocumentSearchBatch =
++        withContext(Dispatchers.IO) {
++            require(query.trim().length in 2..300)
++            val normalizedDoi = DocumentSearchParsers.doi(query)
++            require(field != DocumentSearchField.DOI || normalizedDoi != null) { "Invalid DOI" }
++            val providers = if (kind == DocumentSearchKind.BOOKS &&
++                field != DocumentSearchField.DOI
++            ) {
++                listOf("Gutendex", "Open Library")
++            } else {
++                listOf("Crossref", "Europe PMC")
++            }
++            val results = supervisorScope {
++                providers.map { provider ->
++                    async {
++                        try {
++                            val hits = when (provider) {
++                                "Open Library" -> {
++                                    val parameter = when (field) {
++                                        DocumentSearchField.TITLE -> "title"
++                                        DocumentSearchField.AUTHOR -> "author"
++                                        else -> "q"
++                                    }
++                                    val url = "https://openlibrary.org/search.json".toHttpUrl().newBuilder()
++                                        .addQueryParameter(parameter, query).addQueryParameter("limit", "20")
++                                        .addQueryParameter("fields", "key,title,author_name").build()
++                                    DocumentSearchParsers.openLibrary(fetch(url.toString()))
++                                }
++                                "Gutendex" -> {
++                                    val url = "https://gutendex.com/books/".toHttpUrl().newBuilder().addQueryParameter(
++                                        "search",
++                                        query,
++                                    ).build()
++                                    DocumentSearchParsers.gutendex(fetch(url.toString())).filter { hit ->
++                                        when (field) {
++                                            DocumentSearchField.TITLE -> fold(hit.title).contains(fold(query))
++                                            DocumentSearchField.AUTHOR -> fold(hit.authors).contains(fold(query))
++                                            else -> true
++                                        }
++                                    }
++                                }
++                                "Crossref" -> {
++                                    val single = normalizedDoi != null
++                                    val builder = "https://api.crossref.org/works".toHttpUrl().newBuilder()
++                                    if (single) {
++                                        builder.addPathSegment(checkNotNull(normalizedDoi))
++                                    } else {
++                                        val parameter = when (field) {
++                                            DocumentSearchField.TITLE -> "query.title"
++                                            DocumentSearchField.AUTHOR -> "query.author"
++                                            else -> "query.bibliographic"
++                                        }
++                                        builder.addQueryParameter(parameter, query).addQueryParameter("rows", "20")
++                                    }
++                                    DocumentSearchParsers.crossref(fetch(builder.build().toString()), single)
++                                }
++                                else -> {
++                                    val escaped = query.replace("\\", "\\\\").replace("\"", "\\\"")
++                                    val term = when {
++                                        normalizedDoi != null -> "DOI:\"$normalizedDoi\""
++                                        field == DocumentSearchField.TITLE -> "TITLE:\"$escaped\""
++                                        field == DocumentSearchField.AUTHOR -> "AUTH:\"$escaped\""
++                                        field == DocumentSearchField.DOI -> "DOI:\"$escaped\""
++                                        else -> query
++                                    }
++                                    val url = "https://www.ebi.ac.uk/europepmc/webservices/rest/search"
++                                        .toHttpUrl().newBuilder()
++                                        .addQueryParameter("query", term).addQueryParameter("format", "json")
++                                        .addQueryParameter(
++                                            "resultType",
++                                            "core",
++                                        ).addQueryParameter("pageSize", "20").build()
++                                    DocumentSearchParsers.europePmc(fetch(url.toString()))
++                                }
++                            }
++                            provider to Result.success(hits)
++                        } catch (cancelled: CancellationException) {
++                            throw cancelled
++                        } catch (error: Exception) {
++                            provider to Result.failure<List<DocumentSearchHit>>(error)
++                        }
++                    }
++                }.awaitAll()
++            }
++            DocumentSearchBatch(
++                results.flatMap { it.second.getOrDefault(emptyList()) }.distinctBy { it.id },
++                results.filter { it.second.isFailure }.map { it.first },
++                providers,
++            )
++        }
++
++    private fun fold(value: String): String = java.text.Normalizer.normalize(value, java.text.Normalizer.Form.NFD)
++        .replace(Regex("\\p{M}+"), "").lowercase(java.util.Locale.ROOT)
++
++    private fun fetch(url: String): String = client.newCall(
++        Request.Builder().url(url)
++            .header("User-Agent", "Polaris-DocumentReader/1.0").build(),
++    ).execute().use { response ->
++        check(response.isSuccessful) { "Search HTTP ${response.code}" }
++        val body = checkNotNull(response.body)
++        body.byteStream().use { input ->
++            ByteArrayOutputStream().use { output ->
++                DocumentLimits.copy(input, output, 4L * 1024 * 1024)
++                output.toString("UTF-8")
++            }
++        }
++    }
++}
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentTextTranslator.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentTextTranslator.kt
+new file mode 100644
+index 0000000..d207e80
+--- /dev/null
++++ b/app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentTextTranslator.kt
+@@ -0,0 +1,67 @@
++package eu.kanade.tachiyomi.ui.documents
++
++import android.content.Context
++import com.google.mlkit.common.model.DownloadConditions
++import com.google.mlkit.nl.translate.TranslateLanguage
++import com.google.mlkit.nl.translate.Translation
++import com.google.mlkit.nl.translate.TranslatorOptions
++import eu.kanade.translation.recognizer.TextRecognizerLanguage
++import eu.kanade.translation.translator.TextTranslatorLanguage
++import kotlinx.coroutines.Dispatchers
++import kotlinx.coroutines.tasks.await
++import kotlinx.coroutines.withContext
++import mihon.core.archive.DocumentBlock
++import tachiyomi.domain.translation.TranslationPreferences
++import java.io.File
++import java.security.MessageDigest
++import java.util.UUID
++
++class DocumentTextTranslator(private val context: Context, private val preferences: TranslationPreferences) {
++    suspend fun translate(blocks: List<DocumentBlock>): List<DocumentBlock> = withContext(Dispatchers.IO) {
++        val from = TextRecognizerLanguage.fromPref(preferences.translateFromLanguage()).code
++        val to =
++            TranslateLanguage.fromLanguageTag(TextTranslatorLanguage.fromPref(preferences.translateToLanguage()).code)
++                ?: error("Language is not supported by on-device translation")
++        if (from == to) return@withContext blocks
++        val translator = Translation.getClient(
++            TranslatorOptions.Builder().setSourceLanguage(from).setTargetLanguage(to).build(),
++        )
++        val cache = File(context.cacheDir, "document-translations").apply { mkdirs() }
++        var prepared = false
++        try {
++            blocks.map { block ->
++                if (block !is DocumentBlock.Text || block.value.isBlank()) return@map block
++                val key = MessageDigest.getInstance(
++                    "SHA-256",
++                ).digest("document-v1|$from|$to|${block.value}".toByteArray())
++                    .joinToString("") { "%02x".format(it) }
++                val file = File(cache, key)
++                val cached = runCatching { file.takeIf { it.isFile }?.readText() }.getOrNull()
++                val translated = if (!cached.isNullOrBlank()) {
++                    cached
++                } else {
++                    if (!prepared) {
++                        translator.downloadModelIfNeeded(DownloadConditions.Builder().build()).await()
++                        prepared = true
++                    }
++                    translator.translate(block.value).await().also { value ->
++                        if (value.isNotBlank()) {
++                            val temporary = File(cache, ".$key-${UUID.randomUUID()}")
++                            try {
++                                runCatching {
++                                    temporary.writeText(value)
++                                    temporary.renameTo(file)
++                                }
++                            } finally {
++                                temporary.delete()
++                            }
++                        }
++                    }
++                }
++                DocumentBlock.Text(translated.ifBlank { block.value }, block.heading)
++            }
++        } finally {
++            translator.close()
++        }
++    }
++}
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentWebSearch.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentWebSearch.kt
+new file mode 100644
+index 0000000..914e45c
+--- /dev/null
++++ b/app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentWebSearch.kt
+@@ -0,0 +1,19 @@
++package eu.kanade.tachiyomi.ui.documents
++
++import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
++import java.net.URLEncoder
++
++/** A user-selected website, opened in the in-app browser; it is not a metadata API. */
++object DocumentWebSearch {
++    const val DEFAULT = "https://scholar.google.com/scholar?q={query}"
++
++    fun url(template: String, query: String): String {
++        require(query.trim().length in 2..300)
++        require(template.length <= 2000 && template.contains("{query}"))
++        val encoded = URLEncoder.encode(query.trim(), "UTF-8").replace("+", "%20")
++        val base = requireNotNull(template.replace("{query}", "polaris").toHttpUrlOrNull())
++        val result = requireNotNull(template.replace("{query}", encoded).toHttpUrlOrNull())
++        require(result.host == base.host && result.username.isEmpty() && result.password.isEmpty())
++        return result.toString()
++    }
++}
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/documents/TextDocumentReaderActivity.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/documents/TextDocumentReaderActivity.kt
+new file mode 100644
+index 0000000..e488ef5
+--- /dev/null
++++ b/app/src/main/java/eu/kanade/tachiyomi/ui/documents/TextDocumentReaderActivity.kt
+@@ -0,0 +1,425 @@
++package eu.kanade.tachiyomi.ui.documents
++
++import android.content.Context
++import android.content.Intent
++import android.os.Bundle
++import androidx.activity.ComponentActivity
++import androidx.activity.compose.setContent
++import androidx.activity.enableEdgeToEdge
++import androidx.compose.foundation.layout.Arrangement
++import androidx.compose.foundation.layout.Box
++import androidx.compose.foundation.layout.Column
++import androidx.compose.foundation.layout.Row
++import androidx.compose.foundation.layout.fillMaxSize
++import androidx.compose.foundation.layout.fillMaxWidth
++import androidx.compose.foundation.layout.padding
++import androidx.compose.foundation.lazy.LazyColumn
++import androidx.compose.foundation.lazy.itemsIndexed
++import androidx.compose.foundation.lazy.rememberLazyListState
++import androidx.compose.foundation.text.selection.SelectionContainer
++import androidx.compose.material.icons.Icons
++import androidx.compose.material.icons.automirrored.outlined.ArrowBack
++import androidx.compose.material.icons.outlined.FormatSize
++import androidx.compose.material3.AlertDialog
++import androidx.compose.material3.Button
++import androidx.compose.material3.CircularProgressIndicator
++import androidx.compose.material3.HorizontalDivider
++import androidx.compose.material3.Icon
++import androidx.compose.material3.IconButton
++import androidx.compose.material3.MaterialTheme
++import androidx.compose.material3.OutlinedButton
++import androidx.compose.material3.Slider
++import androidx.compose.material3.Text
++import androidx.compose.material3.TextButton
++import androidx.compose.material3.TopAppBar
++import androidx.compose.runtime.Composable
++import androidx.compose.runtime.DisposableEffect
++import androidx.compose.runtime.LaunchedEffect
++import androidx.compose.runtime.getValue
++import androidx.compose.runtime.mutableStateOf
++import androidx.compose.runtime.produceState
++import androidx.compose.runtime.remember
++import androidx.compose.runtime.rememberCoroutineScope
++import androidx.compose.runtime.setValue
++import androidx.compose.runtime.snapshotFlow
++import androidx.compose.ui.Alignment
++import androidx.compose.ui.Modifier
++import androidx.compose.ui.platform.LocalContext
++import androidx.compose.ui.text.font.FontWeight
++import androidx.compose.ui.unit.dp
++import androidx.compose.ui.unit.sp
++import androidx.lifecycle.lifecycleScope
++import coil3.compose.AsyncImage
++import coil3.request.ImageRequest
++import eu.kanade.presentation.theme.TachiyomiTheme
++import eu.kanade.tachiyomi.source.model.SChapter
++import kotlinx.coroutines.CoroutineStart
++import kotlinx.coroutines.Dispatchers
++import kotlinx.coroutines.NonCancellable
++import kotlinx.coroutines.flow.debounce
++import kotlinx.coroutines.flow.distinctUntilChanged
++import kotlinx.coroutines.flow.onEach
++import kotlinx.coroutines.launch
++import kotlinx.coroutines.sync.Mutex
++import kotlinx.coroutines.sync.withLock
++import kotlinx.coroutines.withContext
++import mihon.core.archive.DocumentBlock
++import mihon.core.archive.DocumentFiles
++import mihon.core.archive.DocumentFormat
++import mihon.core.archive.TextDocument
++import tachiyomi.domain.chapter.interactor.GetChapter
++import tachiyomi.domain.chapter.interactor.UpdateChapter
++import tachiyomi.domain.chapter.model.Chapter
++import tachiyomi.domain.chapter.model.ChapterUpdate
++import tachiyomi.domain.history.interactor.UpsertHistory
++import tachiyomi.domain.history.model.HistoryUpdate
++import tachiyomi.domain.manga.interactor.GetManga
++import tachiyomi.domain.manga.model.Manga
++import tachiyomi.domain.source.service.SourceManager
++import tachiyomi.domain.translation.TranslationPreferences
++import tachiyomi.i18n.at.ATMR
++import tachiyomi.presentation.core.components.material.Scaffold
++import tachiyomi.presentation.core.i18n.stringResource
++import tachiyomi.source.local.LocalSource
++import uy.kohesive.injekt.Injekt
++import uy.kohesive.injekt.api.get
++import java.util.Date
++import kotlin.coroutines.cancellation.CancellationException
++
++class TextDocumentReaderActivity : ComponentActivity() {
++    private var document: TextDocument? = null
++    private var loaded by mutableStateOf<Loaded?>(null)
++    private var failed by mutableStateOf(false)
++    private var checkpoint: ChapterUpdate? = null
++    private val progressMutex = Mutex()
++
++    private data class Loaded(val manga: Manga, val chapter: Chapter, val document: TextDocument)
++
++    override fun onCreate(savedInstanceState: Bundle?) {
++        super.onCreate(savedInstanceState)
++        enableEdgeToEdge()
++        setContent {
++            TachiyomiTheme {
++                val value = loaded
++                if (value == null) {
++                    Scaffold { padding ->
++                        Box(Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
++                            if (failed) {
++                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
++                                    Text(stringResource(ATMR.strings.document_open_error))
++                                    TextButton(onClick = ::finish) { Text(stringResource(ATMR.strings.document_back)) }
++                                }
++                            } else {
++                                CircularProgressIndicator()
++                            }
++                        }
++                    }
++                } else {
++                    Reader(value)
++                }
++            }
++        }
++        lifecycleScope.launch {
++            var preparing: TextDocument? = null
++            try {
++                val result = withContext(Dispatchers.IO) {
++                    val manga = checkNotNull(Injekt.get<GetManga>().await(intent.getLongExtra("manga_id", -1)))
++                    val chapter = checkNotNull(Injekt.get<GetChapter>().await(intent.getLongExtra("chapter_id", -1)))
++                    require(chapter.mangaId == manga.id)
++                    val source =
++                        Injekt.get<SourceManager>().get(manga.source) as? LocalSource
++                            ?: error("Local document required")
++                    val format = source.getFormat(SChapter.create().apply { url = chapter.url })
++                    val file = when (format) {
++                        is tachiyomi.source.local.io.Format.Epub -> format.file
++                        is tachiyomi.source.local.io.Format.Text -> format.file
++                        else -> error("Unsupported text document")
++                    }
++                    val type = checkNotNull(DocumentFormat.fromName(file.name.orEmpty()))
++                    val reader = TextDocument(DocumentFiles.materialize(this@TextDocumentReaderActivity, file), type)
++                    preparing = reader
++                    Loaded(manga, chapter, reader)
++                }
++                document = result.document
++                loaded = result
++                preparing = null
++            } catch (error: CancellationException) {
++                throw error
++            } catch (_: Exception) {
++                failed = true
++            } finally {
++                preparing?.close()
++            }
++        }
++    }
++
++    @Composable
++    private fun Reader(value: Loaded) {
++        val reader = value.document
++        val scope = rememberCoroutineScope()
++        val prefs = remember { getSharedPreferences("document_reader", Context.MODE_PRIVATE) }
++        val initial = remember { DocumentReadingPosition.from(value.chapter.memo) }
++        var section by remember { mutableStateOf(initial.section.coerceIn(reader.sections.indices)) }
++        var content by remember { mutableStateOf<List<DocumentBlock>>(emptyList()) }
++        var translated by remember { mutableStateOf<List<DocumentBlock>?>(null) }
++        var showTranslation by remember { mutableStateOf(false) }
++        var working by remember { mutableStateOf(false) }
++        var error by remember { mutableStateOf(false) }
++        var showContents by remember { mutableStateOf(false) }
++        var showFont by remember { mutableStateOf(false) }
++        var fontSize by remember { mutableStateOf(prefs.getFloat("font_size", 18f).coerceIn(12f, 32f)) }
++        var completed by remember { mutableStateOf(value.chapter.read) }
++        val list = rememberLazyListState()
++        val translationPreferences = remember { Injekt.get<TranslationPreferences>() }
++        val translator = remember { DocumentTextTranslator(this, translationPreferences) }
++        val update = remember { Injekt.get<UpdateChapter>() }
++        val displayed = if (showTranslation) translated ?: content else content
++
++        LaunchedEffect(section) {
++            error = false
++            content = emptyList()
++            translated = null
++            showTranslation = false
++            try {
++                content = withContext(Dispatchers.IO) { reader.readSection(section) }
++                val saved = if (section == initial.section) initial else DocumentReadingPosition(section)
++                list.scrollToItem(saved.block.coerceIn(0, (content.size - 1).coerceAtLeast(0)), saved.offset)
++                Injekt.get<UpsertHistory>().await(HistoryUpdate(value.chapter.id, Date(), 0))
++            } catch (cancelled: CancellationException) {
++                throw cancelled
++            } catch (_: Exception) {
++                error = true
++            }
++        }
++
++        val boundSection = section
++        val boundContent = content
++        LaunchedEffect(boundSection, boundContent) {
++            if (content.isEmpty()) return@LaunchedEffect
++            snapshotFlow {
++                DocumentReadingPosition(boundSection, list.firstVisibleItemIndex, list.firstVisibleItemScrollOffset)
++            }
++                .distinctUntilChanged().onEach { position ->
++                    checkpoint = ChapterUpdate(value.chapter.id, memo = position.merge(value.chapter.memo))
++                }.debounce(350).collect {
++                    withContext(Dispatchers.IO) {
++                        checkpoint?.let { persistCheckpoint(it) }
++                    }
++                }
++        }
++
++        DisposableEffect(boundSection, boundContent) {
++            onDispose {
++                if (boundContent.isNotEmpty()) {
++                    val position =
++                        DocumentReadingPosition(
++                            boundSection,
++                            list.firstVisibleItemIndex,
++                            list.firstVisibleItemScrollOffset,
++                        )
++                    checkpoint = ChapterUpdate(value.chapter.id, memo = position.merge(value.chapter.memo))
++                    saveCheckpoint()
++                }
++            }
++        }
++
++        Scaffold(topBar = {
++            TopAppBar(title = { Text(value.manga.title, maxLines = 1) }, navigationIcon = {
++                IconButton(onClick = ::finish) {
++                    Icon(Icons.AutoMirrored.Outlined.ArrowBack, stringResource(ATMR.strings.document_back))
++                }
++            }, actions = {
++                IconButton(onClick = { showFont = true }) {
++                    Icon(Icons.Outlined.FormatSize, stringResource(ATMR.strings.document_font_size))
++                }
++            })
++        }) { padding ->
++            Column(Modifier.fillMaxSize().padding(padding)) {
++                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
++                    TextButton(onClick = {
++                        showContents = true
++                    }) { Text(stringResource(ATMR.strings.document_contents)) }
++                    Text(
++                        stringResource(ATMR.strings.document_section, section + 1, reader.sections.size),
++                        Modifier.padding(12.dp),
++                    )
++                }
++                Row(
++                    Modifier.fillMaxWidth().padding(horizontal = 12.dp),
++                    horizontalArrangement = Arrangement.spacedBy(8.dp),
++                ) {
++                    OutlinedButton(onClick = { showTranslation = false }, enabled = !working) {
++                        Text(stringResource(ATMR.strings.document_original))
++                    }
++                    Button(onClick = {
++                        if (translated != null) {
++                            showTranslation = true
++                        } else {
++                            working = true
++                            val expectedSection = section
++                            scope.launch {
++                                try {
++                                    val result = translator.translate(content)
++                                    if (section == expectedSection) {
++                                        translated = result
++                                        showTranslation = true
++                                    }
++                                } catch (cancelled: CancellationException) {
++                                    throw cancelled
++                                } catch (_: Exception) {
++                                    error = true
++                                } finally {
++                                    working = false
++                                }
++                            }
++                        }
++                    }, enabled = !working && content.any { it is DocumentBlock.Text }) {
++                        Text(stringResource(ATMR.strings.document_translate))
++                    }
++                }
++                if (working) Text(stringResource(ATMR.strings.document_translating), Modifier.padding(12.dp))
++                if (error) {
++                    Text(
++                        stringResource(ATMR.strings.document_read_error),
++                        color = MaterialTheme.colorScheme.error,
++                        modifier = Modifier.padding(12.dp),
++                    )
++                }
++                LazyColumn(
++                    Modifier.weight(1f).fillMaxWidth(),
++                    state = list,
++                    verticalArrangement = Arrangement.spacedBy(12.dp),
++                ) {
++                    itemsIndexed(displayed) { _, block ->
++                        when (block) {
++                            is DocumentBlock.Text -> SelectionContainer {
++                                Text(
++                                    block.value,
++                                    Modifier.fillMaxWidth().padding(horizontal = 20.dp),
++                                    fontSize = (fontSize + if (block.heading) 3f else 0f).sp,
++                                    lineHeight = (fontSize * 1.6f).sp,
++                                    fontWeight = if (block.heading) FontWeight.SemiBold else FontWeight.Normal,
++                                )
++                            }
++                            is DocumentBlock.Image -> DocumentImage(reader, block)
++                        }
++                    }
++                }
++                HorizontalDivider()
++                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
++                    TextButton(onClick = { section-- }, enabled = section > 0 && !working) {
++                        Text(stringResource(ATMR.strings.document_previous))
++                    }
++                    if (section < reader.sections.lastIndex) {
++                        TextButton(onClick = {
++                            section++
++                        }, enabled = !working) { Text(stringResource(ATMR.strings.document_next)) }
++                    } else {
++                        TextButton(onClick = {
++                            scope.launch {
++                                update.await(ChapterUpdate(value.chapter.id, read = true))
++                                completed = true
++                            }
++                        }, enabled = !completed && !working) {
++                            Text(
++                                stringResource(
++                                    if (completed) ATMR.strings.document_completed else ATMR.strings.document_complete,
++                                ),
++                            )
++                        }
++                    }
++                }
++            }
++        }
++        if (showContents) {
++            AlertDialog(
++                onDismissRequest = { showContents = false },
++                title = { Text(stringResource(ATMR.strings.document_contents)) },
++                text = {
++                    LazyColumn {
++                        itemsIndexed(reader.sections) { index, item ->
++                            TextButton(onClick = {
++                                section = index
++                                showContents = false
++                            }, enabled = !working) {
++                                Text("${index + 1}. ${item.title}")
++                            }
++                        }
++                    }
++                },
++                confirmButton = {
++                    TextButton(onClick = { showContents = false }) { Text(stringResource(ATMR.strings.document_back)) }
++                },
++            )
++        }
++        if (showFont) {
++            AlertDialog(
++                onDismissRequest = { showFont = false },
++                title = { Text(stringResource(ATMR.strings.document_font_size)) },
++                text = {
++                    Slider(
++                        value = fontSize,
++                        onValueChange = {
++                            fontSize = it
++                            prefs.edit().putFloat("font_size", it).apply()
++                        },
++                        valueRange =
++                        12f..32f,
++                    )
++                },
++                confirmButton = {
++                    TextButton(onClick = { showFont = false }) { Text(stringResource(ATMR.strings.document_back)) }
++                },
++            )
++        }
++    }
++
++    @Composable
++    private fun DocumentImage(reader: TextDocument, image: DocumentBlock.Image) {
++        val data by produceState<ByteArray?>(null, reader, image.path) {
++            value = withContext(Dispatchers.IO) { runCatching { reader.image(image.path) }.getOrNull() }
++        }
++        val context = LocalContext.current
++        data?.let { bytes ->
++            AsyncImage(
++                ImageRequest.Builder(context).data(bytes).size(1600).build(),
++                contentDescription = image.description,
++                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
++            )
++        }
++    }
++
++    override fun onDestroy() {
++        super.onDestroy()
++        document?.close()
++        document = null
++    }
++
++    override fun onStop() {
++        saveCheckpoint()
++        super.onStop()
++    }
++
++    private fun saveCheckpoint() {
++        val value = checkpoint ?: return
++        lifecycleScope.launch(start = CoroutineStart.UNDISPATCHED) {
++            withContext(NonCancellable + Dispatchers.IO) { persistCheckpoint(value) }
++        }
++    }
++
++    private suspend fun persistCheckpoint(value: ChapterUpdate) = progressMutex.withLock {
++        if (checkpoint !== value) return@withLock
++        val current = Injekt.get<GetChapter>().await(value.id) ?: return@withLock
++        val position = DocumentReadingPosition.from(checkNotNull(value.memo))
++        Injekt.get<UpdateChapter>().await(value.copy(memo = position.merge(current.memo)))
++    }
++
++    companion object {
++        fun newIntent(
++            context: Context,
++            mangaId: Long,
++            chapterId: Long,
++        ) = Intent(context, TextDocumentReaderActivity::class.java)
++            .putExtra("manga_id", mangaId).putExtra("chapter_id", chapterId)
++    }
++}
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/manga/MangaScreen.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/manga/MangaScreen.kt
+index a7c9284..0640410 100644
+--- a/app/src/main/java/eu/kanade/tachiyomi/ui/manga/MangaScreen.kt
++++ b/app/src/main/java/eu/kanade/tachiyomi/ui/manga/MangaScreen.kt
+@@ -332,7 +332,11 @@ class MangaScreen(
+         } else {
+             source
+         }
+-        if (readerSource is INovelSource) {
++        if (readerSource is tachiyomi.source.local.LocalSource &&
++            mihon.core.archive.DocumentFormat.fromName(chapter.url)?.text == true
++        ) {
++            context.startActivity(eu.kanade.tachiyomi.ui.documents.TextDocumentReaderActivity.newIntent(context, chapter.mangaId, chapter.id))
++        } else if (readerSource is INovelSource) {
+             context.startActivity(eu.kanade.tachiyomi.ui.reader.NovelReaderActivity.newIntent(context, chapter.mangaId, chapter.id))
+         } else {
+             context.startActivity(ReaderActivity.newIntent(context, chapter.mangaId, chapter.id))
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/manga/MangaViewModel.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/manga/MangaViewModel.kt
+index 54a5838..a7f25e9 100644
+--- a/app/src/main/java/eu/kanade/tachiyomi/ui/manga/MangaViewModel.kt
++++ b/app/src/main/java/eu/kanade/tachiyomi/ui/manga/MangaViewModel.kt
+@@ -830,7 +830,7 @@ class MangaViewModel(
+         when (action) {
+             ChapterTranslationAction.START -> {
+                 val manga = successState?.manga ?: return
+-                if (item.downloadState != Download.State.DOWNLOADED) {
++                if (!manga.isLocal() && item.downloadState != Download.State.DOWNLOADED) {
+                     translationManager.pendingDownloads.request(item.chapter.id)
+                     // Recheck after persisting the request to close the completion race.
+                     val downloaded = downloadManager.isChapterDownloaded(
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/more/MoreTab.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/more/MoreTab.kt
+index a6e576c..35b35ab 100644
+--- a/app/src/main/java/eu/kanade/tachiyomi/ui/more/MoreTab.kt
++++ b/app/src/main/java/eu/kanade/tachiyomi/ui/more/MoreTab.kt
+@@ -71,6 +71,7 @@ data object MoreTab : Tab {
+             onClickDataAndStorage = { navigator.push(SettingsScreen(SettingsScreen.Destination.DataAndStorage)) },
+             onClickSettings = { navigator.push(SettingsScreen()) },
+             onClickAbout = { navigator.push(SettingsScreen(SettingsScreen.Destination.About)) },
++            onClickDocuments = { navigator.push(eu.kanade.presentation.documents.DocumentsScreen()) },
+         )
+     }
+ }
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/reader/loader/ChapterLoader.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/reader/loader/ChapterLoader.kt
+index 7451a61..df9f461 100644
+--- a/app/src/main/java/eu/kanade/tachiyomi/ui/reader/loader/ChapterLoader.kt
++++ b/app/src/main/java/eu/kanade/tachiyomi/ui/reader/loader/ChapterLoader.kt
+@@ -8,6 +8,10 @@ import eu.kanade.tachiyomi.source.online.HttpSource
+ import eu.kanade.tachiyomi.ui.reader.model.ReaderChapter
+ import mihon.core.archive.archiveReader
+ import mihon.core.archive.epubReader
++import mihon.core.archive.PdfPageReader
++import eu.kanade.translation.TranslationManager
++import uy.kohesive.injekt.Injekt
++import uy.kohesive.injekt.api.get
+ import tachiyomi.core.common.i18n.stringResource
+ import tachiyomi.core.common.util.lang.withIOContext
+ import tachiyomi.core.common.util.system.logcat
+@@ -94,10 +98,16 @@ class ChapterLoader(
+                 downloadProvider,
+             )
+             source is LocalSource -> source.getFormat(chapter.chapter).let { format ->
++                val manager = Injekt.get<TranslationManager>()
++                val translations = manager.getChapterTranslation(dbChapter.name, dbChapter.scanlator, manga.title, source)
++                val canEdit = manager.isChapterTranslated(dbChapter.name, dbChapter.scanlator, manga.title, source.id)
++                val editor = { key: String -> if (canEdit) manager.createPageEditor(dbChapter.name, dbChapter.scanlator, manga.title, source, key) else null }
+                 when (format) {
+-                    is Format.Directory -> DirectoryPageLoader(format.file)
+-                    is Format.Archive -> ArchivePageLoader(format.file.archiveReader(context),emptyMap())
++                    is Format.Directory -> DirectoryPageLoader(format.file, translations, editor)
++                    is Format.Archive -> ArchivePageLoader(format.file.archiveReader(context), translations, editor)
+                     is Format.Epub -> EpubPageLoader(format.file.epubReader(context))
++                    is Format.Pdf -> PdfPageLoader(PdfPageReader(context, format.file), translations, editor)
++                    is Format.Text -> error("Open this document in the text reader")
+                 }
+             }
+             source is HttpSource -> HttpPageLoader(chapter, source)
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/reader/loader/DirectoryPageLoader.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/reader/loader/DirectoryPageLoader.kt
+index adb92c1..01eaeab 100644
+--- a/app/src/main/java/eu/kanade/tachiyomi/ui/reader/loader/DirectoryPageLoader.kt
++++ b/app/src/main/java/eu/kanade/tachiyomi/ui/reader/loader/DirectoryPageLoader.kt
+@@ -3,13 +3,19 @@ package eu.kanade.tachiyomi.ui.reader.loader
+ import com.hippo.unifile.UniFile
+ import eu.kanade.tachiyomi.source.model.Page
+ import eu.kanade.tachiyomi.ui.reader.model.ReaderPage
++import eu.kanade.translation.model.PageTranslation
++import eu.kanade.translation.model.TranslationPageEditor
+ import eu.kanade.tachiyomi.util.lang.compareToCaseInsensitiveNaturalOrder
+ import tachiyomi.core.common.util.system.ImageUtil
+ 
+ /**
+  * Loader used to load a chapter from a directory given on [file].
+  */
+-internal class DirectoryPageLoader(val file: UniFile) : PageLoader() {
++internal class DirectoryPageLoader(
++    val file: UniFile,
++    private val translations: Map<String, PageTranslation> = emptyMap(),
++    private val editorFactory: (String) -> TranslationPageEditor? = { null },
++) : PageLoader() {
+ 
+     override var isLocal: Boolean = true
+ 
+@@ -20,6 +26,8 @@ internal class DirectoryPageLoader(val file: UniFile) : PageLoader() {
+             ?.mapIndexed { i, file ->
+                 val streamFn = { file.openInputStream() }
+                 ReaderPage(i).apply {
++                    translation = translations[file.name]
++                    translationEditor = file.name?.let(editorFactory)
+                     stream = streamFn
+                     status = Page.State.Ready
+                 }
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/reader/loader/PdfPageLoader.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/reader/loader/PdfPageLoader.kt
+new file mode 100644
+index 0000000..651862b
+--- /dev/null
++++ b/app/src/main/java/eu/kanade/tachiyomi/ui/reader/loader/PdfPageLoader.kt
+@@ -0,0 +1,30 @@
++package eu.kanade.tachiyomi.ui.reader.loader
++
++import eu.kanade.tachiyomi.source.model.Page
++import eu.kanade.tachiyomi.ui.reader.model.ReaderPage
++import eu.kanade.translation.model.PageTranslation
++import eu.kanade.translation.model.TranslationPageEditor
++import mihon.core.archive.PdfPageReader
++
++internal class PdfPageLoader(
++    private val reader: PdfPageReader,
++    private val translations: Map<String, PageTranslation>,
++    private val editorFactory: (String) -> TranslationPageEditor?,
++) : PageLoader() {
++    override var isLocal = true
++
++    override suspend fun getPages(): List<ReaderPage> = (0 until reader.pageCount).map { index ->
++        val key = reader.pageKey(index)
++        ReaderPage(index).apply {
++            translation = translations[key]
++            translationEditor = editorFactory(key)
++            stream = { reader.openPage(index) }
++            status = Page.State.Ready
++        }
++    }
++
++    override fun recycle() {
++        super.recycle()
++        reader.close()
++    }
++}
+diff --git a/app/src/main/java/eu/kanade/translation/ChapterTranslator.kt b/app/src/main/java/eu/kanade/translation/ChapterTranslator.kt
+index ce9709e..ab23f68 100644
+--- a/app/src/main/java/eu/kanade/translation/ChapterTranslator.kt
++++ b/app/src/main/java/eu/kanade/translation/ChapterTranslator.kt
+@@ -53,6 +53,11 @@ import kotlinx.serialization.json.Json
+ import kotlinx.serialization.json.encodeToStream
+ import logcat.LogPriority
+ import mihon.core.archive.archiveReader
++import mihon.core.archive.epubReader
++import mihon.core.archive.PdfPageReader
++import tachiyomi.source.local.LocalSource
++import tachiyomi.source.local.io.Format
++import eu.kanade.tachiyomi.source.model.SChapter
+ import tachiyomi.core.common.util.lang.launchIO
+ import tachiyomi.core.common.util.lang.launchUI
+ import tachiyomi.core.common.util.system.ImageUtil
+@@ -228,7 +233,8 @@ class ChapterTranslator(
+     private fun cancelTranslatorJob() { translationJob?.cancel(); translationJob = null }
+ 
+     fun queueChapter(manga: Manga, chapter: Chapter) {
+-        val source = sourceManager.get(manga.source) as? HttpSource ?: return
++        val source = sourceManager.get(manga.source) ?: return
++        if (source !is HttpSource && source !is LocalSource) return
+         if (provider.findTranslationFile(chapter.name, chapter.scanlator, manga.title, source) != null) return
+         if (queueState.value.any { it.chapter.id == chapter.id }) return
+         val fromLang = TextRecognizerLanguage.fromPref(translationPreferences.translateFromLanguage())
+@@ -254,17 +260,33 @@ class ChapterTranslator(
+             val strictOcrGrouping = selectedOcrType == OcrEngineType.PADDLE_OCR
+             val translationMangaDir = provider.getMangaDir(translation.manga.title, translation.source)
+             val saveFile = provider.getTranslationFileName(translation.chapter.name, translation.chapter.scanlator)
+-            val chapterPath = downloadProvider.findChapterDir(
+-                translation.chapter.name, translation.chapter.scanlator, translation.chapter.url,
+-                translation.manga.title, translation.source,
+-            ) ?: error("O capítulo original não foi encontrado para tradução.")
+-
+             val pages = mutableMapOf<String, PageTranslation>()
+-            val tmpFile = translationMangaDir.createFile("tmp")!!
+-            val chapterPages = getChapterPages(chapterPath)
++            val chapterPages = if (translation.source is LocalSource) {
++                val format = translation.source.getFormat(SChapter.create().apply { url = translation.chapter.url })
++                when (format) {
++                    is Format.Pdf -> {
++                        val pdf = PdfPageReader(context, format.file)
++                        ChapterPages((0 until pdf.pageCount).map { index -> pdf.pageKey(index) to { pdf.openPage(index) } }, pdf)
++                    }
++                    is Format.Archive -> getChapterPages(format.file)
++                    is Format.Directory -> getChapterPages(format.file)
++                    is Format.Epub -> {
++                        val epub = format.file.epubReader(context)
++                        ChapterPages(epub.getImagesFromPages().map { key -> key to { checkNotNull(epub.getInputStream(key)) } }, epub)
++                    }
++                    is Format.Text -> error("Use document text translation in the text reader")
++                }
++            } else {
++                val chapterPath = downloadProvider.findChapterDir(
++                    translation.chapter.name, translation.chapter.scanlator, translation.chapter.url,
++                    translation.manga.title, translation.source,
++                ) ?: error("O capítulo original não foi encontrado para tradução.")
++                getChapterPages(chapterPath)
++            }
+             val totalPageCount = chapterPages.pages.size
+-            try {
+-                chapterPages.use {
++            chapterPages.use {
++                val tmpFile = checkNotNull(translationMangaDir.createFile("tmp"))
++                try {
+                     withContext(Dispatchers.IO) {
+                         chapterPages.pages.forEachIndexed { index, (fileName, streamFn) ->
+                             coroutineContext.ensureActive()
+@@ -297,8 +319,8 @@ class ChapterTranslator(
+                             )
+                         }
+                     }
+-                }
+-            } finally { tmpFile.delete() }
++                } finally { tmpFile.delete() }
++            }
+ 
+             val automaticPages = pages.mapValuesTo(mutableMapOf()) { (_, page) ->
+                 PageTranslation(page.blocks.filter(::isTranslatableBlock).toMutableList(), page.imgWidth, page.imgHeight)
+diff --git a/app/src/main/java/eu/kanade/translation/model/Translation.kt b/app/src/main/java/eu/kanade/translation/model/Translation.kt
+index 6830781..cae7a90 100644
+--- a/app/src/main/java/eu/kanade/translation/model/Translation.kt
++++ b/app/src/main/java/eu/kanade/translation/model/Translation.kt
+@@ -1,6 +1,8 @@
+ package eu.kanade.translation.model
+ 
++import eu.kanade.tachiyomi.source.Source
+ import eu.kanade.tachiyomi.source.online.HttpSource
++import tachiyomi.source.local.LocalSource
+ import eu.kanade.translation.recognizer.TextRecognizerLanguage
+ import eu.kanade.translation.translator.TextTranslatorLanguage
+ import kotlinx.coroutines.flow.MutableStateFlow
+@@ -14,7 +16,7 @@ import uy.kohesive.injekt.Injekt
+ import uy.kohesive.injekt.api.get
+ 
+ data class Translation(
+-    val source: HttpSource,
++    val source: Source,
+     val manga: Manga,
+     val chapter: Chapter,
+     val fromLang: TextRecognizerLanguage = TextRecognizerLanguage.CHINESE,
+@@ -47,7 +49,8 @@ data class Translation(
+         ): Translation? {
+             val chapter = getChapter.await(chapterId) ?: return null
+             val manga = getManga.await(chapter.mangaId) ?: return null
+-            val source = sourceManager.get(manga.source) as? HttpSource ?: return null
++            val source = sourceManager.get(manga.source) ?: return null
++            if (source !is HttpSource && source !is LocalSource) return null
+ 
+             return Translation(source, manga, chapter)
+         }
+diff --git a/app/src/test/java/eu/kanade/tachiyomi/ui/documents/DocumentSearchTest.kt b/app/src/test/java/eu/kanade/tachiyomi/ui/documents/DocumentSearchTest.kt
+new file mode 100644
+index 0000000..839b065
+--- /dev/null
++++ b/app/src/test/java/eu/kanade/tachiyomi/ui/documents/DocumentSearchTest.kt
+@@ -0,0 +1,158 @@
++@file:Suppress("ktlint:standard:max-line-length")
++
++package eu.kanade.tachiyomi.ui.documents
++
++import kotlinx.coroutines.test.runTest
++import kotlinx.serialization.json.JsonObject
++import kotlinx.serialization.json.JsonPrimitive
++import okhttp3.HttpUrl.Companion.toHttpUrl
++import okhttp3.MediaType.Companion.toMediaType
++import okhttp3.OkHttpClient
++import okhttp3.Protocol
++import okhttp3.Response
++import okhttp3.ResponseBody.Companion.toResponseBody
++import org.junit.jupiter.api.Assertions.assertEquals
++import org.junit.jupiter.api.Assertions.assertFalse
++import org.junit.jupiter.api.Assertions.assertNull
++import org.junit.jupiter.api.Assertions.assertTrue
++import org.junit.jupiter.api.Test
++import org.junit.jupiter.api.assertThrows
++import java.io.IOException
++import java.util.Collections
++
++class DocumentSearchTest {
++    private val crossref = """{"message":{"items":[{"title":["Scientific article"],"DOI":"10.1234/a(1)","author":[{"given":"Ana","family":"Silva"}],"URL":"https://doi.org/10.1234/a(1)","link":[{"content-type":"application/pdf","URL":"https://example.invalid/article.pdf"}]}]}}"""
++    private val europe = """{"resultList":{"result":[{"id":"1","source":"MED","title":"Scientific article","doi":"10.1234/a(1)","pmcid":"PMC123","isOpenAccess":"Y","authorString":"Ana Silva"}]}}"""
++
++    @Test
++    fun `doi accepts explicit prefixes and preserves meaningful parentheses`() {
++        for (query in listOf("10.1234/a(1)", "DOI: 10.1234/a(1)", "HTTPS://DOI.ORG/10.1234/a(1)")) {
++            assertEquals("10.1234/a(1)", DocumentSearchParsers.doi(query))
++        }
++        assertNull(DocumentSearchParsers.doi("an article title"))
++    }
++
++    @Test
++    fun `crossref and europepmc results retain their origins and available links`() {
++        val first = DocumentSearchParsers.crossref(crossref, false).single()
++        val second = DocumentSearchParsers.europePmc(europe).single()
++        assertEquals("Ana Silva", first.authors)
++        assertEquals("https://example.invalid/article.pdf", first.documents.single().url)
++        assertEquals("https://europepmc.org/articles/PMC123?pdf=render", second.documents.single().url)
++        assertFalse(first.id == second.id)
++        assertEquals(first.doi, second.doi)
++    }
++
++    @Test
++    fun `book metadata never fabricates a direct full text download`() {
++        val hit = DocumentSearchParsers.openLibrary(
++            """{"docs":[{"key":"/works/OL123W","title":"Book","author_name":["Author"]}]}""",
++        ).single()
++        assertEquals("https://openlibrary.org/works/OL123W", hit.landing)
++        assertTrue(hit.documents.isEmpty())
++        val books = DocumentSearchParsers.gutendex(
++            """{"results":[{"id":12,"title":"Public book","authors":[{"name":"Writer"}],"formats":{"application/epub+zip":"https://example.invalid/book.epub","application/pdf":"file:///private"}}]}""",
++        )
++        assertEquals(1, books.single().documents.size)
++    }
++
++    @Test
++    fun `one provider failure still returns the other provider results`() = runTest {
++        val client = OkHttpClient.Builder().addInterceptor { chain ->
++            if (chain.request().url.host == "api.crossref.org") throw IOException("fixture unavailable")
++            Response.Builder().request(chain.request()).protocol(Protocol.HTTP_1_1).code(200).message("OK")
++                .body(europe.toResponseBody("application/json".toMediaType())).build()
++        }.build()
++        val result = DocumentSearch(client).search("science", DocumentSearchKind.ARTICLES, DocumentSearchField.ANY)
++        assertEquals(listOf("Crossref"), result.errors)
++        assertEquals("Europe PMC", result.hits.single().provider)
++        assertEquals(2, result.providers.size)
++    }
++
++    @Test
++    fun `title author and doi queries are encoded as provider parameters`() = runTest {
++        val requests = Collections.synchronizedList(mutableListOf<okhttp3.Request>())
++        val client = OkHttpClient.Builder().addInterceptor { chain ->
++            requests += chain.request()
++            val body = if (chain.request().url.host ==
++                "api.crossref.org"
++            ) {
++                "{\"message\":{\"items\":[]}}"
++            } else {
++                "{\"resultList\":{\"result\":[]}}"
++            }
++            Response.Builder().request(chain.request()).protocol(Protocol.HTTP_1_1).code(200).message("OK")
++                .body(body.toResponseBody("application/json".toMediaType())).build()
++        }.build()
++        DocumentSearch(client).search("Ada Lovelace", DocumentSearchKind.ARTICLES, DocumentSearchField.AUTHOR)
++        assertEquals(
++            "Ada Lovelace",
++            requests.single {
++                it.url.host == "api.crossref.org"
++            }.url.queryParameter("query.author"),
++        )
++        assertEquals(
++            "AUTH:\"Ada Lovelace\"",
++            requests.single {
++                it.url.host != "api.crossref.org"
++            }.url.queryParameter("query"),
++        )
++    }
++
++    @Test
++    fun `document progress merges memo without overwriting unrelated state`() {
++        val memo = JsonObject(mapOf("bookmark_note" to JsonPrimitive("keep")))
++        val merged = DocumentReadingPosition(3, 8, 24).merge(memo)
++        assertEquals(memo["bookmark_note"], merged["bookmark_note"])
++        assertEquals(DocumentReadingPosition(3, 8, 24), DocumentReadingPosition.from(merged))
++        assertEquals(
++            DocumentReadingPosition(),
++            DocumentReadingPosition.from(JsonObject(mapOf("polaris_document_section" to JsonPrimitive("bad")))),
++        )
++    }
++
++    @Test
++    fun `custom search website encodes input and rejects invalid templates`() {
++        val url = DocumentWebSearch.url("https://example.invalid/search?q={query}", "A & B / science")
++        assertEquals("A & B / science", url.toHttpUrl().queryParameter("q"))
++        assertThrows<IllegalArgumentException> { DocumentWebSearch.url("file:///tmp/{query}", "science") }
++        assertThrows<IllegalArgumentException> { DocumentWebSearch.url("https://example.invalid", "science") }
++        assertThrows<IllegalArgumentException> {
++            DocumentWebSearch.url("https://user:password@example.invalid?q={query}", "science")
++        }
++    }
++
++    @Test
++    fun `doi lookup routes books to scholarly providers and encodes the identifier once`() = runTest {
++        val requests = Collections.synchronizedList(mutableListOf<okhttp3.Request>())
++        val client = OkHttpClient.Builder().addInterceptor { chain ->
++            requests += chain.request()
++            val body = if (chain.request().url.host ==
++                "api.crossref.org"
++            ) {
++                "{\"message\":{}}"
++            } else {
++                "{\"resultList\":{\"result\":[]}}"
++            }
++            Response.Builder().request(chain.request()).protocol(Protocol.HTTP_1_1).code(200).message("OK")
++                .body(body.toResponseBody("application/json".toMediaType())).build()
++        }.build()
++        val result = DocumentSearch(
++            client,
++        ).search("DOI: 10.1234/a(1)", DocumentSearchKind.BOOKS, DocumentSearchField.DOI)
++        assertEquals(listOf("Crossref", "Europe PMC"), result.providers)
++        assertEquals("10.1234/a(1)", requests.single { it.url.host == "api.crossref.org" }.url.pathSegments.last())
++        assertEquals(
++            "DOI:\"10.1234/a(1)\"",
++            requests.single {
++                it.url.host != "api.crossref.org"
++            }.url.queryParameter("query"),
++        )
++    }
++
++    @Test
++    fun `provider metadata cannot create an unbounded result list`() {
++        val items = (1..40).joinToString(",") { "{\"key\":\"/works/OL${it}W\",\"title\":\"Book $it\"}" }
++        assertEquals(20, DocumentSearchParsers.openLibrary("{\"docs\":[$items]}").size)
++    }
++}
+diff --git a/app/src/test/java/eu/kanade/tachiyomi/ui/documents/TextDocumentTest.kt b/app/src/test/java/eu/kanade/tachiyomi/ui/documents/TextDocumentTest.kt
+new file mode 100644
+index 0000000..a588cab
+--- /dev/null
++++ b/app/src/test/java/eu/kanade/tachiyomi/ui/documents/TextDocumentTest.kt
+@@ -0,0 +1,207 @@
++@file:Suppress("ktlint:standard:max-line-length")
++
++package eu.kanade.tachiyomi.ui.documents
++
++import mihon.core.archive.DocumentArchivePath
++import mihon.core.archive.DocumentBlock
++import mihon.core.archive.DocumentFormat
++import mihon.core.archive.DocumentLimits
++import mihon.core.archive.DocumentRenderSize
++import mihon.core.archive.DocumentTextChunks
++import mihon.core.archive.TextDocument
++import org.junit.jupiter.api.Assertions.assertEquals
++import org.junit.jupiter.api.Assertions.assertFalse
++import org.junit.jupiter.api.Assertions.assertNull
++import org.junit.jupiter.api.Assertions.assertThrows
++import org.junit.jupiter.api.Assertions.assertTrue
++import org.junit.jupiter.api.Test
++import java.io.ByteArrayInputStream
++import java.io.ByteArrayOutputStream
++import java.nio.file.Files
++import java.util.zip.ZipEntry
++import java.util.zip.ZipOutputStream
++
++class TextDocumentTest {
++    private fun zip(entries: Map<String, String>, block: (java.io.File) -> Unit) {
++        val file = Files.createTempFile("polaris-document", ".zip").toFile()
++        try {
++            ZipOutputStream(file.outputStream()).use { output ->
++                entries.forEach { (name, value) ->
++                    output.putNextEntry(ZipEntry(name))
++                    output.write(value.toByteArray())
++                    output.closeEntry()
++                }
++            }
++            block(file)
++        } finally {
++            file.delete()
++        }
++    }
++
++    private fun epub(extra: Map<String, String>) = mapOf(
++        "META-INF/container.xml" to
++            "<container><rootfiles><rootfile full-path='OPS/package.opf'/></rootfiles></container>",
++        "OPS/package.opf" to
++            """<package xmlns:dc="urn:dc"><metadata><dc:title>Ciência</dc:title><dc:creator>Ana</dc:creator></metadata><manifest><item id="second" href="chapters/two.xhtml" media-type="application/xhtml+xml"/><item id="first" href="chapters/one.xhtml" media-type="application/xhtml+xml"/></manifest><spine><itemref idref="first"/><itemref idref="second"/></spine></package>""",
++        "OPS/chapters/one.xhtml" to
++            "<html><body><h1>First</h1><p>Hello <em>reader</em>!</p><img src='../images/a%20b+1.png'/><script>never execute</script></body></html>",
++        "OPS/chapters/two.xhtml" to "<html><body><p>Second section</p></body></html>",
++        "OPS/images/a b+1.png" to "test image bytes",
++    ) + extra
++
++    @Test
++    fun `epub follows spine order and preserves metadata text and local images`() = zip(epub(emptyMap())) { file ->
++        TextDocument(file, DocumentFormat.EPUB).use { reader ->
++            assertEquals("Ciência", reader.title)
++            assertEquals("Ana", reader.author)
++            assertEquals(listOf("OPS/chapters/one.xhtml", "OPS/chapters/two.xhtml"), reader.sections.map { it.key })
++            val blocks = reader.readSection(0)
++            assertEquals(
++                listOf("First", "Hello reader!"),
++                blocks.filterIsInstance<DocumentBlock.Text>().map {
++                    it.value
++                },
++            )
++            assertTrue((blocks.first() as DocumentBlock.Text).heading)
++            assertEquals("OPS/images/a b+1.png", blocks.filterIsInstance<DocumentBlock.Image>().single().path)
++            assertEquals("test image bytes", reader.image("OPS/images/a b+1.png").toString(Charsets.UTF_8))
++        }
++    }
++
++    @Test
++    fun `epub rejects archive escape and ignores network resources`() = zip(
++        epub(
++            mapOf(
++                "OPS/chapters/one.xhtml" to
++                    "<html><body><p>Visible</p><img src='https://example.invalid/tracker.png'/><img src='../../../secret.png'/></body></html>",
++            ),
++        ),
++    ) { file ->
++        TextDocument(file, DocumentFormat.EPUB).use { reader ->
++            assertEquals(listOf(DocumentBlock.Text("Visible")), reader.readSection(0))
++        }
++    }
++
++    @Test
++    fun `docx extracts body paragraphs line breaks tables and embedded images in order`() = zip(
++        mapOf(
++            "word/document.xml" to
++                """<w:document xmlns:w="urn:word" xmlns:r="urn:rel" xmlns:a="urn:drawing"><w:body><w:p><w:r><w:t>Title</w:t></w:r></w:p><w:p><w:r><w:t>One</w:t><w:tab/><w:t>two</w:t><w:br/><w:t>three</w:t></w:r></w:p><w:p><w:r><a:blip r:embed="img1"/></w:r></w:p><w:tbl><w:tr><w:tc><w:p><w:r><w:t>Cell A</w:t></w:r></w:p></w:tc><w:tc><w:p><w:r><w:t>Cell B</w:t></w:r></w:p></w:tc></w:tr></w:tbl></w:body></w:document>""",
++            "word/_rels/document.xml.rels" to
++                "<Relationships><Relationship Id='img1' Target='media/picture.png'/><Relationship Id='external' TargetMode='External' Target='https://example.invalid/a'/></Relationships>",
++            "word/media/picture.png" to "picture",
++        ),
++    ) { file ->
++        TextDocument(file, DocumentFormat.DOCX).use { reader ->
++            val blocks = reader.readSection(0)
++            assertEquals(
++                listOf("Title", "One\ttwo\nthree", "Cell A", "Cell B"),
++                blocks.filterIsInstance<DocumentBlock.Text>().map {
++                    it.value
++                },
++            )
++            assertEquals(DocumentBlock.Image("word/media/picture.png"), blocks[2])
++        }
++    }
++
++    @Test
++    fun `zip renamed docx must contain the actual word document`() = zip(mapOf("other.txt" to "not Word")) { file ->
++        assertThrows(IllegalStateException::class.java) { TextDocument(file, DocumentFormat.DOCX) }
++    }
++
++    @Test
++    fun `txt supports utf8 utf16 bom and windows1252`() {
++        for (bytes in listOf(
++            "Hello ciência".toByteArray(),
++            "Hello ciência".toByteArray(Charsets.UTF_16),
++            "Hello ciência".toByteArray(charset("windows-1252")),
++        )) {
++            val file = Files.createTempFile("polaris-text", ".txt").toFile()
++            try {
++                file.writeBytes(bytes)
++                TextDocument(file, DocumentFormat.TXT).use {
++                    assertEquals("Hello ciência", (it.readSection(0).single() as DocumentBlock.Text).value)
++                }
++            } finally {
++                file.delete()
++            }
++        }
++    }
++
++    @Test
++    fun `long paragraphs are bounded without losing unicode or text`() {
++        val value = "A paragraph with 😀 science and symbols αβ. ".repeat(600)
++        val chunks = DocumentTextChunks.split(value)
++        assertEquals(value, chunks.joinToString(""))
++        assertTrue(chunks.all { it.length <= 3000 })
++        assertTrue(chunks.none { it.last().isHighSurrogate() || it.first().isLowSurrogate() })
++    }
++
++    @Test
++    fun `large txt has multiple navigable sections with bounded text blocks`() {
++        val file = Files.createTempFile("polaris-long-text", ".txt").toFile()
++        try {
++            file.writeText("Long paragraph. ".repeat(3000))
++            TextDocument(file, DocumentFormat.TXT).use { reader ->
++                assertTrue(reader.sections.size > 1)
++                assertTrue(
++                    reader.sections.indices.flatMap {
++                        reader.readSection(it)
++                    }.filterIsInstance<DocumentBlock.Text>().all {
++                        it.value.length <=
++                            3000
++                    },
++                )
++            }
++        } finally {
++            file.delete()
++        }
++    }
++
++    @Test
++    fun `entry resolution keeps plus signs decodes spaces and rejects remote or escaping paths`() {
++        assertEquals(
++            "OPS/images/a b+1.png",
++            DocumentArchivePath.resolve("OPS/text/a.xhtml", "../images/a%20b+1.png#fragment"),
++        )
++        for (path in listOf(
++            "../../../outside",
++            "https://example.com/x",
++            "file:///private",
++            "//example.com/x",
++            "data:image/png;base64,AAA",
++        )) {
++            assertNull(DocumentArchivePath.resolve("OPS/book.xhtml", path), path)
++        }
++    }
++
++    @Test
++    fun `oversized section is rejected before it becomes a text view`() = zip(
++        epub(
++            mapOf(
++                "OPS/chapters/one.xhtml" to "x".repeat(DocumentLimits.MAX_SECTION_BYTES + 1),
++            ),
++        ),
++    ) { file ->
++        TextDocument(file, DocumentFormat.EPUB).use { reader ->
++            assertThrows(IllegalArgumentException::class.java) { reader.readSection(0) }
++        }
++    }
++
++    @Test
++    fun `bounded copy rejects overflow and pdf rendering has a bounded pixel budget`() {
++        val output = ByteArrayOutputStream()
++        assertThrows(IllegalArgumentException::class.java) {
++            DocumentLimits.copy(ByteArrayInputStream(ByteArray(20)), output, 10)
++        }
++        assertTrue(output.size() <= 10)
++        for ((width, height) in listOf(612 to 792, 20000 to 30000, 1 to 100000, 50000 to 1)) {
++            val size = DocumentRenderSize.pixels(width, height)
++            assertTrue(size.first > 0 && size.second > 0)
++            assertTrue(size.first.toLong() * size.second <= 4_000_000)
++            assertTrue(maxOf(size.first, size.second) <= 2400)
++        }
++        assertFalse(DocumentFormat.fromName("BOOK.EPUB") == null)
++        assertNull(DocumentFormat.fromName("installer.apk"))
++    }
++}
+diff --git a/core/archive/src/main/kotlin/mihon/core/archive/DocumentFiles.kt b/core/archive/src/main/kotlin/mihon/core/archive/DocumentFiles.kt
+new file mode 100644
+index 0000000..f0a0c32
+--- /dev/null
++++ b/core/archive/src/main/kotlin/mihon/core/archive/DocumentFiles.kt
+@@ -0,0 +1,30 @@
++package mihon.core.archive
++
++import android.content.Context
++import com.hippo.unifile.UniFile
++import java.io.File
++import java.security.MessageDigest
++import java.util.UUID
++
++object DocumentFiles {
++    @Synchronized
++    fun materialize(context: Context, source: UniFile): File {
++        val identity = "${source.uri}|${source.length()}|${source.lastModified()}"
++        val key = MessageDigest.getInstance("SHA-256").digest(identity.toByteArray())
++            .joinToString("") { "%02x".format(it) }
++        val directory = File(context.cacheDir, "document-files").apply { mkdirs() }
++        val target = File(directory, key)
++        if (target.isFile && target.length() > 0) return target
++        val temporary = File(directory, ".$key-${UUID.randomUUID()}")
++        try {
++            val size = source.openInputStream().use { input ->
++                temporary.outputStream().use { output -> DocumentLimits.copy(input, output) }
++            }
++            require(size > 0) { "Empty document" }
++            check(temporary.renameTo(target)) { "Cannot prepare document" }
++            return target
++        } finally {
++            temporary.delete()
++        }
++    }
++}
+diff --git a/core/archive/src/main/kotlin/mihon/core/archive/DocumentFormat.kt b/core/archive/src/main/kotlin/mihon/core/archive/DocumentFormat.kt
+new file mode 100644
+index 0000000..fc6b8c0
+--- /dev/null
++++ b/core/archive/src/main/kotlin/mihon/core/archive/DocumentFormat.kt
+@@ -0,0 +1,103 @@
++package mihon.core.archive
++
++import java.io.InputStream
++import java.io.OutputStream
++import java.net.URI
++import java.net.URLDecoder
++import java.util.Locale
++
++enum class DocumentFormat(val extension: String, val mime: String, val text: Boolean) {
++    PDF("pdf", "application/pdf", false),
++    EPUB("epub", "application/epub+zip", true),
++    DOCX("docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", true),
++    TXT("txt", "text/plain", true),
++    CBZ("cbz", "application/vnd.comicbook+zip", false),
++    ZIP("zip", "application/zip", false),
++    CBR("cbr", "application/vnd.comicbook-rar", false),
++    RAR("rar", "application/vnd.rar", false),
++    CB7("cb7", "application/x-7z-compressed", false),
++    SEVEN_ZIP("7z", "application/x-7z-compressed", false),
++    CBT("cbt", "application/x-tar", false),
++    TAR("tar", "application/x-tar", false),
++    ;
++
++    companion object {
++        fun fromName(name: String): DocumentFormat? {
++            val extension = name.substringBefore('?').substringBefore('#').substringAfterLast('.', "")
++                .lowercase(Locale.ROOT)
++            return entries.firstOrNull { it.extension == extension }
++        }
++    }
++}
++
++object DocumentLimits {
++    const val MAX_FILE_BYTES = 256L * 1024 * 1024
++    const val MAX_TEXT_BYTES = 16 * 1024 * 1024
++    const val MAX_SECTION_BYTES = 4 * 1024 * 1024
++
++    fun copy(input: InputStream, output: OutputStream, limit: Long = MAX_FILE_BYTES): Long {
++        val buffer = ByteArray(32 * 1024)
++        var total = 0L
++        while (true) {
++            val count = input.read(buffer)
++            if (count < 0) return total
++            total += count
++            require(total <= limit) { "Document exceeds the supported size limit" }
++            output.write(buffer, 0, count)
++        }
++    }
++}
++
++/** Resolves archive references only; never maps a ZIP entry to a filesystem path. */
++object DocumentArchivePath {
++    fun resolve(baseFile: String, href: String): String? {
++        return runCatching {
++            if (href.startsWith("//") || href.contains('\u0000')) return null
++            val raw = href.substringBefore('#').substringBefore('?').replace('\\', '/')
++            if (URI(raw.replace(" ", "%20")).isAbsolute) return null
++            val decoded = URLDecoder.decode(raw.replace("+", "%2B"), "UTF-8")
++            if (decoded.contains('\u0000') || decoded.startsWith("//")) return null
++            val base = if (decoded.startsWith('/')) "" else baseFile.substringBeforeLast('/', "")
++            val parts = mutableListOf<String>()
++            for (part in "$base/$decoded".split('/')) {
++                when (part) {
++                    "", "." -> Unit
++                    ".." -> if (parts.isEmpty()) return null else parts.removeAt(parts.lastIndex)
++                    else -> parts += part
++                }
++            }
++            parts.joinToString("/").takeIf { it.isNotBlank() }
++        }.getOrNull()
++    }
++}
++
++object DocumentRenderSize {
++    fun pixels(width: Int, height: Int): Pair<Int, Int> {
++        require(width > 0 && height > 0)
++        val scale = minOf(
++            1600.0 / width,
++            2400.0 / maxOf(width, height),
++            kotlin.math.sqrt(4_000_000.0 / (width.toDouble() * height)),
++        )
++        return maxOf(1, (width * scale).toInt()) to maxOf(1, (height * scale).toInt())
++    }
++}
++
++object DocumentTextChunks {
++    fun split(value: String, maximum: Int = 3000): List<String> {
++        require(maximum >= 2)
++        val result = mutableListOf<String>()
++        var start = 0
++        while (start < value.length) {
++            var end = minOf(start + maximum, value.length)
++            if (end < value.length) {
++                val space = value.lastIndexOf(' ', end - 1)
++                if (space >= start + maximum / 2) end = space + 1
++                if (value[end - 1].isHighSurrogate() && value[end].isLowSurrogate()) end--
++            }
++            result += value.substring(start, end)
++            start = end
++        }
++        return result
++    }
++}
+diff --git a/core/archive/src/main/kotlin/mihon/core/archive/PdfPageReader.kt b/core/archive/src/main/kotlin/mihon/core/archive/PdfPageReader.kt
+new file mode 100644
+index 0000000..3555071
+--- /dev/null
++++ b/core/archive/src/main/kotlin/mihon/core/archive/PdfPageReader.kt
+@@ -0,0 +1,71 @@
++package mihon.core.archive
++
++import android.content.Context
++import android.graphics.Bitmap
++import android.graphics.Color
++import android.graphics.pdf.PdfRenderer
++import android.os.ParcelFileDescriptor
++import com.hippo.unifile.UniFile
++import java.io.Closeable
++import java.io.File
++import java.io.InputStream
++import java.util.UUID
++
++class PdfPageReader(context: Context, source: UniFile) : Closeable {
++    private val file = DocumentFiles.materialize(context, source)
++    private val descriptor = ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY)
++    private val renderer = try {
++        PdfRenderer(descriptor)
++    } catch (error: Throwable) {
++        descriptor.close()
++        throw error
++    }
++    private val cache = File(context.cacheDir, "pdf-pages/${file.name}").apply { mkdirs() }
++    private var closed = false
++
++    val pageCount: Int = try {
++        renderer.pageCount.also { require(it in 1..10000) { "Unsupported PDF page count" } }
++    } catch (error: Throwable) {
++        renderer.close()
++        throw error
++    }
++
++    fun pageKey(index: Int): String = "pdf-${index.toString().padStart(5, '0')}.png"
++
++    @Synchronized
++    fun openPage(index: Int): InputStream {
++        check(!closed)
++        require(index in 0 until pageCount)
++        val target = File(cache, pageKey(index))
++        if (!target.isFile || target.length() == 0L) {
++            val temporary = File(cache, ".$index-${UUID.randomUUID()}.png")
++            try {
++                renderer.openPage(index).use { page ->
++                    val (width, height) = DocumentRenderSize.pixels(page.width, page.height)
++                    val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
++                    try {
++                        bitmap.eraseColor(Color.WHITE)
++                        page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
++                        temporary.outputStream().use { output ->
++                            check(bitmap.compress(Bitmap.CompressFormat.PNG, 100, output))
++                        }
++                    } finally {
++                        bitmap.recycle()
++                    }
++                }
++                check(temporary.renameTo(target)) { "Cannot cache PDF page" }
++            } finally {
++                temporary.delete()
++            }
++        }
++        return target.inputStream()
++    }
++
++    @Synchronized
++    override fun close() {
++        if (!closed) {
++            closed = true
++            renderer.close()
++        }
++    }
++}
+diff --git a/core/archive/src/main/kotlin/mihon/core/archive/TextDocument.kt b/core/archive/src/main/kotlin/mihon/core/archive/TextDocument.kt
+new file mode 100644
+index 0000000..3b292ce
+--- /dev/null
++++ b/core/archive/src/main/kotlin/mihon/core/archive/TextDocument.kt
+@@ -0,0 +1,233 @@
++package mihon.core.archive
++
++import org.jsoup.Jsoup
++import org.jsoup.nodes.Element
++import org.jsoup.nodes.Node
++import org.jsoup.nodes.TextNode
++import org.jsoup.parser.Parser
++import java.io.ByteArrayOutputStream
++import java.io.Closeable
++import java.io.File
++import java.util.zip.ZipFile
++
++sealed interface DocumentBlock {
++    data class Text(val value: String, val heading: Boolean = false) : DocumentBlock
++    data class Image(val path: String, val description: String = "") : DocumentBlock
++}
++
++data class DocumentSection(val title: String, val key: String)
++
++class TextDocument(private val file: File, val format: DocumentFormat) : Closeable {
++    private val zip = if (format == DocumentFormat.EPUB || format == DocumentFormat.DOCX) ZipFile(file) else null
++    private var prepared: List<List<DocumentBlock>>? = null
++    var title: String = ""
++        private set
++    var author: String = ""
++        private set
++    val sections: List<DocumentSection>
++
++    init {
++        require(format.text)
++        try {
++            require(zip == null || zip.size() <= 20000) { "Too many archive entries" }
++            sections = when (format) {
++                DocumentFormat.EPUB -> epubSections()
++                DocumentFormat.DOCX -> {
++                    val relationships = xml("word/_rels/document.xml.rels", optional = true)
++                        ?.getElementsByTag("Relationship").orEmpty()
++                        .filter { !it.attr("TargetMode").equals("External", true) }
++                        .mapNotNull { node ->
++                            DocumentArchivePath.resolve("word/document.xml", node.attr("Target"))
++                                ?.let { node.attr("Id") to it }
++                        }.toMap()
++                    val body = checkNotNull(xml("word/document.xml"))
++                    val blocks = mutableListOf<DocumentBlock>()
++                    val buffer = StringBuilder()
++                    fun flush() {
++                        val value = buffer.toString().trim()
++                        if (value.isNotBlank()) blocks += DocumentBlock.Text(value)
++                        buffer.clear()
++                    }
++                    fun visit(node: Node) {
++                        if (node !is Element) return
++                        when (node.tagName().substringAfter(':')) {
++                            "t" -> buffer.append(node.wholeText())
++                            "tab" -> buffer.append('\t')
++                            "br", "cr" -> buffer.append('\n')
++                            "blip" -> {
++                                flush()
++                                relationships[node.attr("r:embed")]?.let { blocks += DocumentBlock.Image(it) }
++                            }
++                            else -> node.childNodes().forEach(::visit)
++                        }
++                        if (node.tagName().substringAfter(':') in setOf("p", "tr", "tc")) flush()
++                    }
++                    visit(body)
++                    flush()
++                    prepareSections(blocks)
++                }
++                DocumentFormat.TXT -> {
++                    require(file.length() <= DocumentLimits.MAX_TEXT_BYTES) { "Text document is too large" }
++                    val raw = file.readBytes()
++                    val value = when {
++                        raw.size >= 2 && raw[0] == 0xff.toByte() && raw[1] == 0xfe.toByte() -> raw.toString(
++                            Charsets.UTF_16LE,
++                        ).removePrefix("\uFEFF")
++                        raw.size >= 2 && raw[0] == 0xfe.toByte() && raw[1] == 0xff.toByte() -> raw.toString(
++                            Charsets.UTF_16BE,
++                        ).removePrefix("\uFEFF")
++                        else -> runCatching {
++                            Charsets.UTF_8.newDecoder().decode(java.nio.ByteBuffer.wrap(raw)).toString()
++                        }.getOrElse { raw.toString(charset("windows-1252")) }.removePrefix("\uFEFF")
++                    }
++                    require(!value.contains('\u0000')) { "File is not a supported text document" }
++                    prepareSections(
++                        value.replace("\r\n", "\n").split(Regex("\n\\s*\n"))
++                            .filter(String::isNotBlank).map { DocumentBlock.Text(it.trim()) },
++                    )
++                }
++                else -> error("Unsupported text document")
++            }
++            require(sections.isNotEmpty()) { "No readable sections in document" }
++        } catch (error: Throwable) {
++            zip?.close()
++            throw error
++        }
++    }
++
++    private fun prepareSections(blocks: List<DocumentBlock>): List<DocumentSection> {
++        val pages = mutableListOf<List<DocumentBlock>>()
++        var current = mutableListOf<DocumentBlock>()
++        var size = 0
++        boundedBlocks(blocks).forEach { block ->
++            if (size >= 12000 && current.isNotEmpty()) {
++                pages += current
++                current = mutableListOf()
++                size = 0
++            }
++            current += block
++            size += if (block is DocumentBlock.Text) block.value.length else 200
++        }
++        if (current.isNotEmpty()) pages += current
++        prepared = pages
++        return pages.mapIndexed { index, page ->
++            DocumentSection(
++                (page.filterIsInstance<DocumentBlock.Text>().firstOrNull()?.value ?: "${index + 1}")
++                    .take(80),
++                index.toString(),
++            )
++        }
++    }
++
++    private fun epubSections(): List<DocumentSection> {
++        val container = checkNotNull(xml("META-INF/container.xml"))
++        val packagePath = container.allElements.firstOrNull { it.tagName().substringAfter(':') == "rootfile" }
++            ?.attr("full-path")?.let { DocumentArchivePath.resolve("", it) } ?: error("EPUB package missing")
++        val packageDocument = checkNotNull(xml(packagePath))
++        title =
++            packageDocument.allElements.firstOrNull { it.tagName().substringAfter(':') == "title" }?.text().orEmpty()
++        author =
++            packageDocument.allElements.filter {
++                it.tagName().substringAfter(':') == "creator"
++            }.joinToString { it.text() }
++        val manifest = packageDocument.allElements.filter { it.tagName().substringAfter(':') == "item" }
++            .associateBy { it.attr("id") }
++        return packageDocument.allElements.filter { it.tagName().substringAfter(':') == "itemref" }
++            .mapNotNull { ref ->
++                val item = manifest[ref.attr("idref")] ?: return@mapNotNull null
++                if (item.attr("media-type") !in setOf("application/xhtml+xml", "text/html")) return@mapNotNull null
++                val path = DocumentArchivePath.resolve(packagePath, item.attr("href")) ?: return@mapNotNull null
++                if (zip?.getEntry(path) == null) return@mapNotNull null
++                DocumentSection(item.attr("id").ifBlank { path.substringAfterLast('/') }, path)
++            }
++    }
++
++    @Synchronized
++    fun readSection(index: Int): List<DocumentBlock> {
++        require(index in sections.indices)
++        prepared?.let { return it[index] }
++        val path = sections[index].key
++        val document = Jsoup.parse(readEntry(path, DocumentLimits.MAX_SECTION_BYTES).toString(Charsets.UTF_8))
++        document.select("script,style,iframe,object,embed,template").remove()
++        val result = mutableListOf<DocumentBlock>()
++        val buffer = StringBuilder()
++        var heading = false
++        fun flush() {
++            val value = buffer.toString().replace(Regex("[\\t \\x0B\\f\\r]+"), " ").trim()
++            if (value.isNotBlank()) result += DocumentBlock.Text(value, heading)
++            buffer.clear()
++        }
++        fun visit(node: Node) {
++            if (node is TextNode) {
++                buffer.append(node.wholeText)
++                return
++            }
++            if (node !is Element) return
++            val tag = node.tagName().substringAfter(':')
++            val paragraph =
++                tag in setOf("p", "div", "li", "blockquote", "pre", "tr", "h1", "h2", "h3", "h4", "h5", "h6")
++            if (paragraph) {
++                flush()
++                heading = tag.startsWith('h')
++            }
++            when (tag) {
++                "br" -> buffer.append('\n')
++                "td", "th" -> {
++                    buffer.append("  ")
++                    node.childNodes().forEach(::visit)
++                }
++                "img", "image" -> {
++                    flush()
++                    val reference = node.attr("src").ifBlank { node.attr("xlink:href") }
++                    DocumentArchivePath.resolve(path, reference)?.let { image ->
++                        if (zip?.getEntry(image) != null) result += DocumentBlock.Image(image, node.attr("alt"))
++                    }
++                }
++                else -> node.childNodes().forEach(::visit)
++            }
++            if (paragraph) {
++                flush()
++                heading = false
++            }
++        }
++        visit(document.body())
++        flush()
++        return boundedBlocks(result)
++    }
++
++    private fun boundedBlocks(blocks: List<DocumentBlock>): List<DocumentBlock> = blocks.flatMap { block ->
++        if (block is DocumentBlock.Text) {
++            DocumentTextChunks.split(block.value).map { DocumentBlock.Text(it, block.heading) }
++        } else {
++            listOf(block)
++        }
++    }
++
++    @Synchronized
++    fun image(path: String): ByteArray = readEntry(path, 12 * 1024 * 1024)
++
++    private fun xml(path: String, optional: Boolean = false): org.jsoup.nodes.Document? {
++        if (optional && zip?.getEntry(path) == null) return null
++        return Jsoup.parse(
++            readEntry(path, DocumentLimits.MAX_TEXT_BYTES).toString(Charsets.UTF_8),
++            "",
++            Parser.xmlParser(),
++        )
++    }
++
++    private fun readEntry(path: String, limit: Int): ByteArray {
++        val entry = zip?.getEntry(path) ?: error("Document entry missing: $path")
++        require(entry.size <= limit) { "Document section is too large" }
++        return checkNotNull(zip).getInputStream(entry).use { input ->
++            ByteArrayOutputStream().use { output ->
++                DocumentLimits.copy(input, output, limit.toLong())
++                output.toByteArray()
++            }
++        }
++    }
++
++    @Synchronized
++    override fun close() {
++        zip?.close()
++    }
++}
+diff --git a/i18n-at/src/commonMain/moko-resources/base/strings.xml b/i18n-at/src/commonMain/moko-resources/base/strings.xml
+index 7ed4795..8f8f524 100644
+--- a/i18n-at/src/commonMain/moko-resources/base/strings.xml
++++ b/i18n-at/src/commonMain/moko-resources/base/strings.xml
+@@ -81,4 +81,41 @@
+     <string name="repository_adding">Adding…</string>
+     <string name="chapter_versions_shortcut">Tap to filter source groups and versions</string>
+     <string name="translation_crop_borders_summary">Pages with saved translations keep their borders to align text with the original image.</string>
++    <string name="documents_title">Documents and research</string>
++    <string name="document_supported">PDF, EPUB, DOCX, TXT and comic archives. EPUB and DOCX use reflowable text.</string>
++    <string name="document_import">Import file</string>
++    <string name="document_link">Direct document link</string>
++    <string name="document_import_link">Import link</string>
++    <string name="document_importing">Importing into your library…</string>
++    <string name="document_import_error">Unable to complete this action. Check the format, connection and app storage folder.</string>
++    <string name="document_articles">Articles</string>
++    <string name="document_books">Books</string>
++    <string name="document_any_field">All fields</string>
++    <string name="document_title_field">Title</string>
++    <string name="document_author_field">Author</string>
++    <string name="document_doi_field">DOI</string>
++    <string name="document_query">Title, author or DOI</string>
++    <string name="document_search">Search</string>
++    <string name="document_search_scope">Searches Crossref and Europe PMC for articles; Open Library and Gutendex for books. Shows the first results from each provider. File availability depends on the source.</string>
++    <string name="document_provider_error">Unavailable providers: %1$s</string>
++    <string name="document_no_results">No results found. Try another title, author or DOI.</string>
++    <string name="document_no_direct_file">This result has no direct downloadable file.</string>
++    <string name="document_add_format">Add %1$s to library</string>
++    <string name="document_open_source">Open source page</string>
++    <string name="document_open_error">Unable to open this document.</string>
++    <string name="document_read_error">Unable to read or translate this section. Check the file and connection, then try again.</string>
++    <string name="document_back">Back</string>
++    <string name="document_font_size">Text size</string>
++    <string name="document_contents">Contents</string>
++    <string name="document_section">Section %1$d of %2$d</string>
++    <string name="document_original">Original</string>
++    <string name="document_translate">Translate section</string>
++    <string name="document_translating">Preparing on-device translation…</string>
++    <string name="document_previous">Previous</string>
++    <string name="document_next">Next</string>
++    <string name="document_complete">Mark as read</string>
++    <string name="document_completed">Read</string>
++    <string name="document_web_template">Search website URL</string>
++    <string name="document_web_template_hint">Use {query} for the search terms. Opens the website inside Polaris; copy a direct document link to import it.</string>
++    <string name="document_web_search">Search this website</string>
+ </resources>
+diff --git a/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml b/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
+index d1748bc..567ef34 100644
+--- a/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
++++ b/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
+@@ -81,4 +81,41 @@
+     <string name="repository_adding">Adicionando…</string>
+     <string name="chapter_versions_shortcut">Toque para filtrar grupos e versões da fonte</string>
+     <string name="translation_crop_borders_summary">Páginas com tradução salva preservam as bordas para alinhar o texto à imagem original.</string>
++    <string name="documents_title">Documentos e pesquisa</string>
++    <string name="document_supported">PDF, EPUB, DOCX, TXT e quadrinhos compactados. EPUB e DOCX usam texto refluído.</string>
++    <string name="document_import">Importar arquivo</string>
++    <string name="document_link">Link direto do documento</string>
++    <string name="document_import_link">Importar link</string>
++    <string name="document_importing">Importando para a biblioteca…</string>
++    <string name="document_import_error">Não foi possível concluir. Confira o formato, a conexão e a pasta de armazenamento do app.</string>
++    <string name="document_articles">Artigos</string>
++    <string name="document_books">Livros</string>
++    <string name="document_any_field">Todos</string>
++    <string name="document_title_field">Título</string>
++    <string name="document_author_field">Autor</string>
++    <string name="document_doi_field">DOI</string>
++    <string name="document_query">Título, autor ou DOI</string>
++    <string name="document_search">Buscar</string>
++    <string name="document_search_scope">Consulta Crossref e Europe PMC para artigos; Open Library e Gutendex para livros. Mostra os primeiros resultados de cada provedor. A disponibilidade do arquivo depende da fonte.</string>
++    <string name="document_provider_error">Provedores indisponíveis: %1$s</string>
++    <string name="document_no_results">Nenhum resultado. Tente outro título, autor ou DOI.</string>
++    <string name="document_no_direct_file">Este resultado não informa um arquivo direto para baixar.</string>
++    <string name="document_add_format">Adicionar %1$s à biblioteca</string>
++    <string name="document_open_source">Abrir página da fonte</string>
++    <string name="document_open_error">Não foi possível abrir este documento.</string>
++    <string name="document_read_error">Não foi possível ler ou traduzir esta seção. Confira o arquivo e a conexão e tente novamente.</string>
++    <string name="document_back">Voltar</string>
++    <string name="document_font_size">Tamanho do texto</string>
++    <string name="document_contents">Sumário</string>
++    <string name="document_section">Seção %1$d de %2$d</string>
++    <string name="document_original">Original</string>
++    <string name="document_translate">Traduzir seção</string>
++    <string name="document_translating">Preparando tradução no dispositivo…</string>
++    <string name="document_previous">Anterior</string>
++    <string name="document_next">Próxima</string>
++    <string name="document_complete">Marcar como lido</string>
++    <string name="document_completed">Lido</string>
++    <string name="document_web_template">URL do site de busca</string>
++    <string name="document_web_template_hint">Use {query} para os termos da busca. Abre o site no Polaris; copie um link direto de documento para importar.</string>
++    <string name="document_web_search">Buscar neste site</string>
+ </resources>
+diff --git a/source-local/src/main/kotlin/tachiyomi/source/local/LocalSource.kt b/source-local/src/main/kotlin/tachiyomi/source/local/LocalSource.kt
+index e5a307f..31834b3 100644
+--- a/source-local/src/main/kotlin/tachiyomi/source/local/LocalSource.kt
++++ b/source-local/src/main/kotlin/tachiyomi/source/local/LocalSource.kt
+@@ -19,6 +19,8 @@ import kotlinx.serialization.json.decodeFromStream
+ import logcat.LogPriority
+ import mihon.core.archive.archiveReader
+ import mihon.core.archive.epubReader
++import mihon.core.archive.DocumentFormat
++import mihon.core.archive.PdfPageReader
+ import nl.adaptivity.xmlutil.core.AndroidXmlReader
+ import nl.adaptivity.xmlutil.serialization.XML
+ import tachiyomi.core.common.i18n.stringResource
+@@ -219,6 +221,7 @@ class LocalSource(
+     }
+ 
+     private fun <T> getComicInfoForChapter(chapter: UniFile, block: (InputStream) -> T): T? {
++        if (!chapter.isDirectory && !Archive.isSupported(chapter)) return null
+         return if (chapter.isDirectory) {
+             chapter.findFile(COMIC_INFO_FILE)?.openInputStream()?.use(block)
+         } else {
+@@ -269,7 +272,7 @@ class LocalSource(
+         val chapters = fileSystem.getFilesInMangaDirectory(manga.url)
+             // Only keep supported formats
+             .filterNot { it.name.orEmpty().startsWith('.') }
+-            .filter { it.isDirectory || Archive.isSupported(it) || it.extension.equals("epub", true) }
++            .filter { it.isDirectory || Archive.isSupported(it) || DocumentFormat.fromName(it.name.orEmpty()) != null }
+             .map { chapterFile ->
+                 SChapter.create().apply {
+                     url = "${manga.url}/${chapterFile.name}"
+@@ -364,6 +367,10 @@ class LocalSource(
+                         entry?.let { coverManager.update(manga, epub.getInputStream(it)!!) }
+                     }
+                 }
++                is Format.Pdf -> PdfPageReader(context, format.file).use { pdf ->
++                    pdf.openPage(0).use { coverManager.update(manga, it) }
++                }
++                is Format.Text -> null
+             }
+         } catch (e: Throwable) {
+             logcat(LogPriority.ERROR, e) { "Error updating cover for ${manga.title}" }
+diff --git a/source-local/src/main/kotlin/tachiyomi/source/local/io/Format.kt b/source-local/src/main/kotlin/tachiyomi/source/local/io/Format.kt
+index ad53d40..5ddf27c 100644
+--- a/source-local/src/main/kotlin/tachiyomi/source/local/io/Format.kt
++++ b/source-local/src/main/kotlin/tachiyomi/source/local/io/Format.kt
+@@ -1,6 +1,7 @@
+ package tachiyomi.source.local.io
+ 
+ import com.hippo.unifile.UniFile
++import mihon.core.archive.DocumentFormat
+ import tachiyomi.core.common.storage.extension
+ import tachiyomi.source.local.io.Archive.isSupported as isArchiveSupported
+ 
+@@ -8,6 +9,8 @@ sealed interface Format {
+     data class Directory(val file: UniFile) : Format
+     data class Archive(val file: UniFile) : Format
+     data class Epub(val file: UniFile) : Format
++    data class Pdf(val file: UniFile) : Format
++    data class Text(val file: UniFile) : Format
+ 
+     class UnknownFormatException : Exception()
+ 
+@@ -16,6 +19,8 @@ sealed interface Format {
+         fun valueOf(file: UniFile) = when {
+             file.isDirectory -> Directory(file)
+             file.extension.equals("epub", true) -> Epub(file)
++            file.extension.equals("pdf", true) -> Pdf(file)
++            DocumentFormat.fromName(file.name.orEmpty())?.text == true -> Text(file)
+             isArchiveSupported(file) -> Archive(file)
+             else -> throw UnknownFormatException()
+         }
