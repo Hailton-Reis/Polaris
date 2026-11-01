@@ -1,158 +1,130 @@
 <p align="center">
-  <img src="docs/assets/polaris-header.svg" alt="Polaris — leitura, tradução e organização" width="100%">
+  <img src="docs/assets/polaris-hero.png" alt="Polaris — um livro aberto transforma suas páginas em constelações sob a estrela do norte" width="100%">
 </p>
 
 <p align="center">
-  <strong>Um leitor Android para reunir mangás, livros e documentos, com tradução e uma biblioteca organizada por você.</strong>
+  <strong>Mangás, livros e documentos. Sua biblioteca, no seu ritmo e no seu idioma.</strong><br>
+  Um leitor para Android com tradução, vocabulário consistente e organização por você.
 </p>
 
 <p align="center">
-  <img alt="Android 8 ou superior" src="https://img.shields.io/badge/Android-8%2B-3ddc84?logo=android&amp;logoColor=white">
-  <img alt="ARM64 e ARM32" src="https://img.shields.io/badge/Arquiteturas-ARM64%20%7C%20ARM32-6173b7">
-  <img alt="Candidato ao beta interno" src="https://img.shields.io/badge/Status-candidato%20ao%20beta-a78bfa">
-  <a href="LICENSE"><img alt="Licença Apache 2.0" src="https://img.shields.io/badge/Licen%C3%A7a-Apache%202.0-586276"></a>
+  <a href="docs/COMECE_AQUI.md"><strong>Comece aqui →</strong></a> &nbsp; · &nbsp;
+  <a href="CHANGELOG.md"><strong>Versões e novidades</strong></a> &nbsp; · &nbsp;
+  <a href="docs/ARMAZENAMENTO.md"><strong>Armazenamento</strong></a>
 </p>
 
-<p align="center">
-  <a href="#estado-atual">Estado atual</a> ·
-  <a href="docs/COMECE_AQUI.md">Comece aqui</a> ·
-  <a href="CHANGELOG.md">Histórico</a> ·
-  <a href="docs/ARMAZENAMENTO.md">Armazenamento</a> ·
-  <a href="docs/ROADMAP.md">Próximos passos</a> ·
-  <a href="https://github.com/Hailton-Reis/Polaris/releases">Releases</a>
-</p>
+<table>
+  <tr>
+    <td width="33%" valign="top"><strong>01 · Leia</strong><br><br>Quadrinhos, livros e artigos. Leitura por páginas ou por texto, com retomada de posição.</td>
+    <td width="33%" valign="top"><strong>02 · Traduza</strong><br><br>Inglês como prioridade. Tradução no aparelho, glossário por obra e nomes protegidos.</td>
+    <td width="33%" valign="top"><strong>03 · Organize</strong><br><br>Escolha o que entra na biblioteca. Separe conteúdo, formatos e categorias pessoais.</td>
+  </tr>
+</table>
 
-## O que é o Polaris?
+## Uma biblioteca que acompanha você
 
-O Polaris é um projeto de leitura para Android voltado a quem acompanha quadrinhos, lê livros em outros idiomas ou consulta documentos e artigos. Reúne leitura, tradução para português e organização da biblioteca, com funcionamento no próprio aparelho e provedores externos opcionais.
+O Polaris reúne a leitura de quadrinhos, livros e documentos em um aplicativo Android. Você pode acompanhar capítulos de suas fontes, adicionar um livro já baixado no celular ou encontrar um artigo por título, autor ou DOI.
 
-Você escolhe o que incluir na biblioteca. Um PDF pode ser um livro, um artigo ou um quadrinho; o formato do arquivo não determina sua classificação. A proposta é manter a leitura simples, o vocabulário consistente e o consumo de armazenamento visível.
+A leitura básica funciona no aparelho, sem exigir um servidor pessoal. Arquivos locais e capítulos baixados podem ser lidos offline. A tradução com ML Kit também pode funcionar offline depois da preparação dos recursos necessários.
 
-## Estado atual
+**Em desenvolvimento · Android 8+ · ARM64 e ARM32 · Foco em português brasileiro**
 
-**Candidato compilado: `0.1.0-beta.1` · revisão `P20261101.1` · versionCode `102`.**
+## Inglês como prioridade
 
-O projeto está em avaliação para um beta interno. **Ainda não há lançamento estável ou APK publicado nas Releases.** A geração do pacote não significa aprovação do consumo de armazenamento nem validação nos celulares.
+**O reconhecimento de texto em inglês já acompanha o APK.** O Polaris usa a biblioteca latina embarcada do ML Kit para ler o texto das imagens.
 
-| Área | Evidência atual |
-| --- | --- |
-| Inglês → português | Resultado favorável confirmado pelo mantenedor em candidato anterior |
-| Compilação e testes | 498 testes registrados: 464 passaram e 34 falhas preexistentes permaneceram; nenhuma nova regressão detectada nessa comparação |
-| Armazenamento | Medição sintética de JSON e controles implementados; consumo total e picos nos aparelhos ainda pendentes |
-| Japonês, chinês e coreano | Exemplos e testes de texto preparados; qualidade do OCR e da tradução nas imagens ainda pendente |
-| A12, S20 FE, S8+ e provável A52 | Matriz inicial de teste; instalação, Android/ABI, memória e desempenho ainda pendentes |
-| Seleção automática entre fontes | Objetivo de engenharia; aceite completo com duas fontes ainda pendente |
+Para **traduzir inglês → português**, o SDK precisa preparar seus recursos de tradução. O novo candidato acrescenta:
 
-A revisão crítica de armazenamento vem antes da recomendação de distribuição. Consulte os [pontos encontrados e critérios de verificação](docs/ARMAZENAMENTO.md#revisao-critica).
+- Verificação local dos recursos já disponíveis, inclusive offline.
+- Preparação automática ativada por padrão quando faltam recursos, em conexão sem cobrança e com a condição de espaço disponível do Android.
+- Um cartão que mostra preparação, espera, falha ou disponibilidade do par.
+- A opção **Preparar agora**, usando a conexão atual.
+- A indicação **Pronto** somente depois da conclusão do SDK e de uma tradução de verificação no aparelho.
 
-## Recursos do candidato
+**Há uma conexão inicial necessária.** Os recursos de tradução são gerenciados por download pelo SDK; eles não foram inseridos manualmente dentro do APK. A preparação não troca os idiomas de OCR e saída que você escolheu, e pode ser desativada nas configurações.
 
-### Ler
+A instalação inicial, o download e o funcionamento offline dessa preparação ainda precisam da conferência nos celulares. [Entenda os componentes e o primeiro uso](docs/INGLES_E_TRADUCAO.md).
 
-- Quadrinhos nos formatos compactados já suportados pela base do projeto.
-- **PDF** no leitor de páginas, com imagens e tradução por OCR.
-- **EPUB** textual, seguindo a ordem das seções e preservando imagens locais compatíveis.
-- **DOCX e TXT** em leitura por seções, com ajuste de fonte e retomada de posição.
-- Leitura paginada e em faixa longa para conteúdo em imagens.
-
-EPUB e DOCX usam texto refluído. Paginação do Word, tabelas complexas, fórmulas e estilos não são reproduzidos integralmente. PDF é renderizado como imagem; a tradução atual usa OCR.
-
-### Traduzir e conservar vocabulário
-
-- Tradução com **ML Kit no aparelho**, após baixar os modelos necessários.
-- Provedores externos opcionais, conforme configuração de cada pessoa.
-- Ação de baixar e traduzir capítulos e configuração automática por obra.
-- Glossário por obra, nomes protegidos e correções aprendidas.
-- Consulta do glossário também na tradução textual de documentos.
-- Exclusão conjunta do capítulo baixado e de sua tradução pelo fluxo do app, preservando o vocabulário.
-
-Fontes que declaram inglês, japonês, chinês ou coreano podem orientar a entrada do OCR. Fontes mistas, desconhecidas e documentos locais usam a entrada escolhida manualmente. Isso não detecta o idioma pela imagem. A automação global dos idiomas asiáticos começa desativada neste candidato; a escolha explícita por obra tem prioridade. PaddleOCR permanece apenas em inglês.
-
-### Incluir e organizar
+## Seu arquivo, sua classificação
 
 ```text
-Explorar o celular → escolher um arquivo → organizar → adicionar à biblioteca
+Escolha um arquivo → dê um lugar a ele → adicione à biblioteca
 ```
 
-- Inclusão manual pelo seletor Android, sem varrer todos os PDFs do aparelho.
-- Tipos como mangás, manhwas, quadrinhos, livros, artigos e documentos.
-- Agrupamento opcional por formato: PDF, EPUB, DOCX, TXT e outros suportados.
-- Reutilização das categorias existentes e criação de categorias pessoais.
-- Cópia gerenciada do arquivo selecionado, mantendo o original onde estava.
+O seletor Android permite explorar as pastas acessíveis do celular. **O Polaris inclui os arquivos que você escolher**, sem pesquisar todos os PDFs do aparelho.
 
-Cancelar a tela de organização não inclui o documento. Reimportar o mesmo conteúdo ainda pode criar outra cópia; a deduplicação está entre os pontos da revisão de armazenamento.
+Você decide se o conteúdo é mangá, manhwa, quadrinho, livro, artigo ou documento. O formato pode virar um agrupamento adicional, como **Formato: PDF**. Suas categorias existentes podem ser reutilizadas, e novas categorias pessoais podem ser criadas.
 
-### Encontrar livros e artigos
+Cancelar a organização não adiciona o arquivo. Ao incluir, o app mantém o original e guarda uma cópia gerenciada; essa escolha também tem um custo de armazenamento.
 
-| Pesquisa | Fontes iniciais |
+## Diferentes leituras, no mesmo lugar
+
+| O que você abre | Como o candidato apresenta |
 | --- | --- |
-| Artigos por título, autor ou DOI | Crossref e Europe PMC |
-| Livros por título ou autor | Gutendex e Open Library |
-| Outras pesquisas | Site configurável aberto dentro do app |
-| Arquivo já encontrado | Importação por link direto compatível |
+| Quadrinhos compactados | Leitor de imagens, paginado ou em faixa longa |
+| PDF | Páginas renderizadas, figuras e tradução por OCR |
+| EPUB | Texto por seções e imagens locais compatíveis |
+| DOCX e TXT | Texto refluído, ajuste de fonte e retomada |
 
-Cada resultado informa sua origem. A busca não cobre toda a internet e um registro bibliográfico não garante acesso ao texto completo. Fontes e extensões de terceiros mantêm seus próprios requisitos de acesso e disponibilidade.
+EPUB e DOCX não reproduzem integralmente a paginação do Word, fórmulas, estilos ou tabelas complexas. O PDF atual é traduzido por OCR, inclusive quando contém texto selecionável.
 
-## Armazenamento: parte central do projeto
+### Encontrar a próxima leitura
 
-O custo total envolve **instalação + modelos + originais + traduções + caches**. O JSON de tradução é apenas uma dessas parcelas.
+A pesquisa inicial consulta **Crossref e Europe PMC** para artigos, e **Gutendex e Open Library** para livros. Cada resultado mantém sua origem. Você também pode escolher um site de pesquisa para abrir dentro do app ou importar um link direto compatível.
 
-| Parcela | Referência disponível |
+A disponibilidade depende da fonte: um registro bibliográfico pode não oferecer o texto completo, e a busca não cobre toda a internet.
+
+### Manter o fio da tradução
+
+O glossário por obra conserva nomes e termos recorrentes. Correções aprendidas também podem ser reutilizadas. A tradução textual de documentos consulta esse mesmo vocabulário.
+
+Excluir um capítulo baixado pelo fluxo do app remove sua tradução e as frases automáticas relacionadas, preservando glossário e correções. Um novo download segue a configuração automática da obra. Remover favorito, apagar externamente um arquivo e limpar dados do app são operações diferentes.
+
+## Espaço precisa ser visível
+
+O consumo envolve **instalação, modelos, originais, cópias, traduções e caches**. O tamanho do JSON de tradução, sozinho, não representa todo esse custo.
+
+| Parcela | O que sabemos |
 | --- | --- |
-| APK ARM64 | 201,4 MB no pacote compilado; não representa todo o tamanho instalado |
-| APK ARM32 | 161,6 MB no pacote compilado; não representa todo o tamanho instalado |
-| Modelos de tradução ML Kit | Cerca de 30 MB por idioma, segundo o Google; reutilizados entre capítulos |
-| JSON de tradução | 48–53 kB em exemplo sintético de 20 páginas/200 blocos; não é uma taxa por capítulo real |
-| Cache regenerável de documentos | Meta de 256 MiB; arquivos em uso podem ultrapassá-la temporariamente |
-| Livros e quadrinhos | Originais, cópias importadas e temporários variam conforme os arquivos escolhidos |
+| Tradução salva | Ensaio sintético de 20 páginas/200 blocos: 48–53 kB; o custo real varia |
+| Modelos de tradução | Referência do Google: aproximadamente 30 MB por idioma, reutilizados entre capítulos |
+| Cache de documentos | Meta de 256 MiB; arquivos abertos podem ultrapassá-la temporariamente |
+| Importação e leitura | Podem manter original, cópia gerenciada, materialização e temporários |
 
-**256 MiB não é um limite total do Polaris.** Importar um arquivo e prepará-lo para leitura pode manter mais de uma cópia. Ainda precisamos medir os picos e o comportamento com pouco espaço livre nos aparelhos.
+O painel **Dados e armazenamento → Armazenamento do Polaris** ajuda a separar essas parcelas. A limpeza do cache regenerável preserva importados, traduções salvas dos capítulos, modelos e vocabulário; páginas e texto em cache podem precisar ser preparados novamente.
 
-O candidato acrescenta o painel **Dados e armazenamento → Armazenamento do Polaris** e uma limpeza do cache regenerável. O glossário fica separado dessa limpeza. Veja a [análise crítica completa](docs/ARMAZENAMENTO.md), incluindo duplicação, temporários, limites de medição e próximos ajustes.
+**A revisão de armazenamento continua prioritária.** A meta de cache é parcial e a importação pode duplicar documentos. O pico de espaço, as falhas com armazenamento cheio e o consumo total precisam ser verificados nos aparelhos. [Leia a análise crítica e as próximas verificações →](docs/ARMAZENAMENTO.md)
 
-## Requisitos e funcionamento offline
+## Onde o projeto está
 
-- Android **8.0 / API 26 ou superior**.
-- APK correspondente ao sistema **ARM64** ou **ARM32** do aparelho.
-- Espaço livre para instalação, modelos, documentos e preparação da leitura.
-- Conexão para buscas, fontes, downloads e instalação inicial de modelos.
+O candidato atual é **`0.1.0-beta.2` · revisão `P20261101.2` · versionCode `103`**. A implementação está em avaliação na [branch de engenharia](https://github.com/Hailton-Reis/Polaris/tree/r001/multisource-foundation).
 
-Arquivos locais e capítulos baixados podem ser lidos offline. ML Kit pode traduzir no aparelho depois de instalar os modelos correspondentes. Provedores de API continuam exigindo conexão e podem enviar texto/contexto ao serviço escolhido. Não é necessário manter um servidor pessoal.
+**Ainda não há APK publicado nas Releases nem lançamento estável.** O pacote de teste e a compilação não equivalem a aprovação do consumo, da compatibilidade ou da qualidade em todos os idiomas.
 
-O modelo comercial do celular, sozinho, não garante compatibilidade. A matriz física ainda precisa ser executada, especialmente nos aparelhos mais modestos.
+O resultado em inglês foi confirmado pelo mantenedor em um candidato anterior. Japonês, chinês simplificado/tradicional e coreano continuam com validação de OCR e tradução nas imagens pendente, incluindo japonês vertical. A automação global desses idiomas é opcional neste estágio; PaddleOCR permanece apenas em inglês.
 
-## Versões, instalação e atualizações
+A matriz inicial reúne **A12, S20 FE, S8+ e provável A52**. Android, arquitetura, instalação e desempenho ainda precisam ser confirmados em cada unidade.
 
-O [histórico de desenvolvimento](CHANGELOG.md) registra as revisões e seu nível de validação. As [Releases](https://github.com/Hailton-Reis/Polaris/releases) serão o local de distribuição quando houver um pacote aprovado para esse fim; um rascunho não equivale a lançamento publicado.
+## Acompanhe a evolução
 
-O fluxo atual de engenharia gera APKs e exemplos localmente. Atualizações que preservem os dados devem usar a mesma assinatura da instalação anterior. Não existe atualizador automático do Polaris via Releases habilitado por esta apresentação.
+- **[Histórico de versões](CHANGELOG.md)** — o que mudou e qual o estado de cada revisão.
+- **[Próximos passos](docs/ROADMAP.md)** — armazenamento, testes e evolução da leitura.
+- **[Releases](https://github.com/Hailton-Reis/Polaris/releases)** — distribuição quando houver um pacote disponível; rascunhos permanecem identificados.
+- **[Relatar um problema](https://github.com/Hailton-Reis/Polaris/issues/new/choose)** — revisão em Sobre, aparelho, passos e resultado observado.
 
-Leia o [guia inicial](docs/COMECE_AQUI.md). A versão candidata e suas evidências estão na [branch de engenharia](https://github.com/Hailton-Reis/Polaris/tree/r001/multisource-foundation).
+<details>
+<summary><strong>Base técnica e validação</strong></summary>
 
-## Próximos passos
+A base Android vem do ecossistema **Yomotsu / Mihon**, com conceitos de múltiplas fontes do **TachiyomiSY**. A integração mantém um upstream fixado e camadas revisáveis. A branch `main` apresenta o projeto; a implementação em avaliação fica em `r001/multisource-foundation`.
 
-1. Concluir a revisão de armazenamento e medir instalação, leitura, tradução, exclusão e novo download nos aparelhos.
-2. Priorizar os ajustes de cópias, espaço insuficiente e repetição de importação encontrados nessa revisão.
-3. Validar inglês e os idiomas asiáticos, incluindo japonês vertical, com páginas reais autorizadas.
-4. Conferir importação, categorias, retomada e estabilidade antes de ampliar o beta.
-5. Evoluir o trabalho de múltiplas fontes com as verificações próprias dessa camada.
+[Registros de compilação e testes](https://github.com/Hailton-Reis/Polaris/blob/r001/multisource-foundation/integration/internal-beta/TEST_RESULTS.json) distinguem testes automatizados de aceite nos aparelhos. Existem falhas preexistentes no projeto-base; uma comparação sem novas regressões não significa que todos os testes estão verdes.
 
-O [roadmap](docs/ROADMAP.md) distingue o que já está no código do que ainda precisa ser comprovado.
+Seleção inteligente entre fontes, correlação de obras e progresso canônico permanecem como objetivos sujeitos à sua própria validação. O aceite completo com duas fontes continua pendente.
 
-## Relatar um problema
+Veja [como contribuir](CONTRIBUTING.md). Para problemas de armazenamento, informe tamanhos antes/depois. Para tradução, diferencie o texto que o OCR reconheceu do resultado traduzido.
 
-Abra um [relato de problema](https://github.com/Hailton-Reis/Polaris/issues/new/choose) com revisão em **Sobre**, aparelho, Android, passos e resultado observado. Para armazenamento, registre os números antes e depois da ação. Os exemplos originais do projeto ajudam a reproduzir falhas sem compartilhar documentos pessoais.
-
-## Desenvolvimento e origem
-
-A base Android utiliza o ecossistema **Yomotsu / Mihon**, com conceitos de múltiplas fontes vindos do **TachiyomiSY**. O desenvolvimento atual mantém o upstream fixado e aplica camadas de integração revisáveis. A branch `main` apresenta o projeto; a implementação em avaliação está em `r001/multisource-foundation`.
-
-Seleção inteligente de fontes, correlação de obras e progresso canônico continuam como objetivos sujeitos aos testes de engenharia. Consulte [como contribuir](CONTRIBUTING.md) antes de enviar alterações.
-
-## Licença e créditos
-
-O repositório mantém a licença [Apache 2.0](LICENSE) e os créditos em [NOTICE](NOTICE). Bibliotecas, modelos e materiais de terceiros podem ter condições próprias. As atribuições da base são preservadas.
+</details>
 
 ---
 
-Projeto mantido por **Hailton Reis**.
+Mantido por **Hailton Reis**. Licença **[Apache 2.0](LICENSE)** · **[Créditos e atribuições](NOTICE)**.

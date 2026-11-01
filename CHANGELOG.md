@@ -2,12 +2,28 @@
 
 Este arquivo registra a evolução real do código. **Revisões de desenvolvimento não são lançamentos públicos.** As datas abaixo usam America/Fortaleza. O histórico de distribuição fica em [Releases](https://github.com/Hailton-Reis/Polaris/releases).
 
-## Em revisão — apresentação do projeto
+## Apresentação inicial do repositório — 01/11/2026
 
 - Página inicial em português, identidade visual e navegação.
 - Análise crítica de armazenamento e distinção entre medições sintéticas e consumo real.
 - Guia inicial, roadmap, modelos de relatos e organização das notas de versão.
-- Sem nova compilação do aplicativo e sem publicação de APK nesta atualização documental.
+- Atualização documental inicial, sem recompilação do aplicativo nem publicação de APK.
+
+## 0.1.0-beta.2 · P20261101.2 — 01/11/2026
+
+**Estado:** candidato compilado ao beta interno; instalação e preparação real dos modelos ainda pendentes nos aparelhos. Sem APK publicado. versionCode 103.
+
+- Preparação automática dos recursos de tradução inglês → português, via mecanismo oficial do ML Kit.
+- Espera por rede sem cobrança e condição de espaço do Android; preparação manual disponível com a conexão atual.
+- Estado visível em Documentos e pesquisa e nas configurações de tradução, com verificação antes de exibir Pronto.
+- Preservação dos idiomas de OCR/saída escolhidos pelo usuário.
+- Nova capa ilustrada e página inicial com navegação e apresentação mais claras.
+
+O OCR latino já acompanhava o APK. Os recursos de tradução continuam exigindo conexão inicial; esta versão não os empacota manualmente dentro do APK. Download, agendamento e funcionamento offline ainda precisam de conferência nos aparelhos.
+
+Sete testes novos passaram. A comparação completa terminou com 505 testes: 471 aprovações e as mesmas 34 falhas preexistentes, sem novas regressões. Isso não representa aceite Android.
+
+[Implementação](https://github.com/Hailton-Reis/Polaris/commit/3866531931c7705bd238d83467ce40c497343ba5) · [Como a preparação funciona](docs/INGLES_E_TRADUCAO.md)
 
 ## 0.1.0-beta.1 · P20261101.1 — 01/11/2026
 
