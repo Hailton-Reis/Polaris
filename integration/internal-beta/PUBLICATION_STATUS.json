@@ -1,10 +1,11 @@
 {
-  "status": "PUBLISHED_PRIVATE_PRERELEASE",
+  "status": "PUBLISHED_PUBLIC_PRERELEASE",
   "published": true,
   "draft": false,
   "prerelease": true,
   "release_id": 430906709,
   "tag": "v0.1.0-beta.3",
+  "title": "Polaris 0.1.0-beta.3 — beta público",
   "url": "https://github.com/Hailton-Reis/Polaris/releases/tag/v0.1.0-beta.3",
   "published_at": "2026-11-01T23:15:58Z",
   "target_commit": "d02e5e3292430f009767ce6427a144ee32484f4e",
@@ -46,8 +47,11 @@
       "digest": "sha256:72aba2473241df98fc5c6c63602de0bf45090f16f45fa75aef553084172d167a"
     }
   ],
-  "repository_visibility": "private",
-  "physical_test_status": "PENDING_FIRST_OWNER_TEST",
-  "original_installed_signer_match": "NOT_VERIFIED",
-  "all_six_remote_sizes_and_sha256_match": true
+  "initial_repository_visibility": "private",
+  "repository_visibility": "public",
+  "description_audience": "General public; download, installation, features and beta limitations",
+  "assets_unchanged_by_presentation_edit": true,
+  "all_six_remote_sizes_and_sha256_match": true,
+  "physical_test_status": "PENDING_DEVICE_ACCEPTANCE",
+  "original_installed_signer_match": "NOT_VERIFIED"
 }
