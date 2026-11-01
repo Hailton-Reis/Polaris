@@ -458,6 +458,34 @@ index 0c401d8..82142a3 100644
                      Preference.PreferenceItem.TextPreference(
                          title = stringResource(MR.strings.extensionStores),
                          subtitle = pluralStringResource(MR.plurals.num_repos, reposCount.toInt(), reposCount),
+diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsReaderScreen.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsReaderScreen.kt
+index bae7edc..648cd1d 100644
+--- a/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsReaderScreen.kt
++++ b/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsReaderScreen.kt
+@@ -11,6 +11,7 @@ import eu.kanade.tachiyomi.ui.reader.setting.ReaderPreferences
+ import eu.kanade.tachiyomi.ui.reader.setting.ReadingMode
+ import eu.kanade.tachiyomi.util.system.hasDisplayCutout
+ import tachiyomi.i18n.MR
++import tachiyomi.i18n.at.ATMR
+ import tachiyomi.presentation.core.i18n.pluralStringResource
+ import tachiyomi.presentation.core.i18n.stringResource
+ import tachiyomi.presentation.core.util.collectAsState
+@@ -238,6 +239,7 @@ object SettingsReaderScreen : SearchableSettings {
+                 Preference.PreferenceItem.SwitchPreference(
+                     preference = readerPreferences.cropBorders,
+                     title = stringResource(MR.strings.pref_crop_borders),
++                    subtitle = stringResource(ATMR.strings.translation_crop_borders_summary),
+                 ),
+                 Preference.PreferenceItem.SwitchPreference(
+                     preference = readerPreferences.landscapeZoom,
+@@ -338,6 +340,7 @@ object SettingsReaderScreen : SearchableSettings {
+                 Preference.PreferenceItem.SwitchPreference(
+                     preference = readerPreferences.cropBordersWebtoon,
+                     title = stringResource(MR.strings.pref_crop_borders),
++                    subtitle = stringResource(ATMR.strings.translation_crop_borders_summary),
+                 ),
+                 Preference.PreferenceItem.SwitchPreference(
+                     preference = dualPageSplitPref,
 diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsTranslationScreen.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsTranslationScreen.kt
 index 3075333..a198c3f 100644
 --- a/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsTranslationScreen.kt
@@ -475,7 +503,7 @@ index 3075333..a198c3f 100644
                  preference = translationPreferences.translateSoundEffects(),
                  title = stringResource(ATMR.strings.pref_translate_sound_effects),
 diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
-index d144e7f..9037262 100644
+index d144e7f..7f411fd 100644
 --- a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
 +++ b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
 @@ -51,6 +51,9 @@ import kotlin.time.Instant
@@ -483,7 +511,7 @@ index d144e7f..9037262 100644
  object AboutScreen : Screen() {
  
 +    // Identifies this overlay independently of the pinned upstream COMMIT_SHA.
-+    private const val POLARIS_READER_REVISION = "P20261031.1"
++    private const val POLARIS_READER_REVISION = "P20261031.2"
 +
      @Composable
      override fun Content() {
@@ -928,6 +956,51 @@ index 0000000..e41ba10
 +    fun reload() = controller.reload()
 +    fun add(id: String) = controller.add(id)
 +}
+diff --git a/app/src/main/java/eu/kanade/presentation/reader/settings/ReadingModePage.kt b/app/src/main/java/eu/kanade/presentation/reader/settings/ReadingModePage.kt
+index d6687ab..32faa11 100644
+--- a/app/src/main/java/eu/kanade/presentation/reader/settings/ReadingModePage.kt
++++ b/app/src/main/java/eu/kanade/presentation/reader/settings/ReadingModePage.kt
+@@ -1,6 +1,7 @@
+ package eu.kanade.presentation.reader.settings
+ 
+ import androidx.compose.foundation.layout.ColumnScope
++import androidx.compose.foundation.layout.padding
+ import androidx.compose.material3.FilterChip
+ import androidx.compose.material3.MaterialTheme
+ import androidx.compose.material3.Text
+@@ -8,6 +9,8 @@ import androidx.compose.runtime.Composable
+ import androidx.compose.runtime.collectAsState
+ import androidx.compose.runtime.getValue
+ import androidx.compose.runtime.remember
++import androidx.compose.ui.Modifier
++import androidx.compose.ui.unit.dp
+ import eu.kanade.domain.manga.model.readerOrientation
+ import eu.kanade.domain.manga.model.readingMode
+ import eu.kanade.tachiyomi.ui.reader.setting.ReaderOrientation
+@@ -104,6 +107,11 @@ private fun ColumnScope.PagerViewerSettings(viewModel: ReaderSettingsViewModel)
+         label = stringResource(MR.strings.pref_crop_borders),
+         pref = viewModel.preferences.cropBorders,
+     )
++    Text(
++        stringResource(ATMR.strings.translation_crop_borders_summary),
++        style = MaterialTheme.typography.bodySmall,
++        modifier = Modifier.padding(horizontal = 24.dp),
++    )
+ 
+     CheckboxItem(
+         label = stringResource(MR.strings.pref_landscape_zoom),
+@@ -189,6 +197,11 @@ private fun ColumnScope.WebtoonViewerSettings(viewModel: ReaderSettingsViewModel
+         label = stringResource(MR.strings.pref_crop_borders),
+         pref = viewModel.preferences.cropBordersWebtoon,
+     )
++    Text(
++        stringResource(ATMR.strings.translation_crop_borders_summary),
++        style = MaterialTheme.typography.bodySmall,
++        modifier = Modifier.padding(horizontal = 24.dp),
++    )
+ 
+     val dualPageSplitWebtoon by viewModel.preferences.dualPageSplitWebtoon.collectAsState()
+     CheckboxItem(
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/data/download/DownloadManager.kt b/app/src/main/java/eu/kanade/tachiyomi/data/download/DownloadManager.kt
 index 921f8d0..c45a189 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/data/download/DownloadManager.kt
@@ -1173,19 +1246,20 @@ index 6599345..d21d403 100644
                      }
                  },
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/reader/viewer/pager/PagerPageHolder.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/reader/viewer/pager/PagerPageHolder.kt
-index 15b320d..2d6650b 100644
+index 15b320d..501f41e 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/ui/reader/viewer/pager/PagerPageHolder.kt
 +++ b/app/src/main/java/eu/kanade/tachiyomi/ui/reader/viewer/pager/PagerPageHolder.kt
-@@ -18,7 +18,7 @@ import eu.kanade.tachiyomi.ui.webview.WebViewActivity
+@@ -18,7 +18,8 @@ import eu.kanade.tachiyomi.ui.webview.WebViewActivity
  import eu.kanade.tachiyomi.widget.ViewPagerAdapter
  import eu.kanade.translation.data.TranslationFont
  import eu.kanade.translation.presentation.PagerTranslationsView
 -import eu.kanade.translation.presentation.WebtoonTranslationsView
++import eu.kanade.translation.presentation.TranslationImageCrop
 +import eu.kanade.translation.presentation.TranslationViewportTransform
  import kotlinx.coroutines.Job
  import kotlinx.coroutines.MainScope
  import kotlinx.coroutines.flow.collectLatest
-@@ -46,13 +46,13 @@ class PagerPageHolder(
+@@ -46,15 +47,17 @@ class PagerPageHolder(
      readerThemedContext: Context,
      val viewer: PagerViewer,
      val page: ReaderPage,
@@ -1200,8 +1274,12 @@ index 15b320d..2d6650b 100644
 +    // TachiyomiAT
      private var showTranslations = true
      private var translationsView: PagerTranslationsView? = null
++    private val translationCrop = TranslationImageCrop()
++    private var cropReloadJob: Job? = null
  
-@@ -81,7 +81,7 @@ class PagerPageHolder(
+     /**
+      * Item that identifies this view. Needed by the adapter to not recreate views.
+@@ -81,7 +84,7 @@ class PagerPageHolder(
  
      init {
          loadJob = scope.launch { loadPageAndProcessStatus() }
@@ -1210,7 +1288,16 @@ index 15b320d..2d6650b 100644
          showTranslations = readerPreferences.showTranslations.get()
          readerPreferences.showTranslations.changes().onEach {
              showTranslations = it
-@@ -136,7 +136,7 @@ class PagerPageHolder(
+@@ -101,6 +104,8 @@ class PagerPageHolder(
+         super.onDetachedFromWindow()
+         loadJob?.cancel()
+         loadJob = null
++        cropReloadJob?.cancel()
++        cropReloadJob = null
+     }
+ 
+     private fun initProgressIndicator() {
+@@ -136,7 +141,7 @@ class PagerPageHolder(
                      }
                      Page.State.Ready -> {
                          setImage()
@@ -1219,7 +1306,24 @@ index 15b320d..2d6650b 100644
                          addTranslationsView()
                      }
                      is Page.State.Error -> setError(state.error)
-@@ -279,17 +279,17 @@ class PagerPageHolder(
+@@ -192,13 +197,15 @@ class PagerPageHolder(
+                 Triple(source, isAnimated, background)
+             }
+             withUIContext {
++                val cropBorders = translationCrop.forImage(viewer.config.imageCropBorders, page.translation != null)
++                translationCrop.recordImage(cropBorders)
+                 setImage(
+                     source,
+                     isAnimated,
+                     Config(
+                         zoomDuration = viewer.config.doubleTapAnimDuration,
+                         minimumScaleType = viewer.config.imageScaleType,
+-                        cropBorders = viewer.config.imageCropBorders,
++                        cropBorders = cropBorders,
+                         zoomStartPosition = viewer.config.imageZoomType,
+                         landscapeZoom = viewer.config.landscapeZoom,
+                     ),
+@@ -279,17 +286,17 @@ class PagerPageHolder(
      private fun setError(error: Throwable?) {
          progressIndicator?.hide()
          showErrorLayout(error)
@@ -1242,7 +1346,7 @@ index 15b320d..2d6650b 100644
      }
  
      /**
-@@ -298,7 +298,7 @@ class PagerPageHolder(
+@@ -298,7 +305,7 @@ class PagerPageHolder(
      override fun onImageLoadError(error: Throwable?) {
          super.onImageLoadError(error)
          setError(error)
@@ -1251,7 +1355,7 @@ index 15b320d..2d6650b 100644
          translationsView?.hide()
      }
  
-@@ -308,17 +308,24 @@ class PagerPageHolder(
+@@ -308,17 +315,24 @@ class PagerPageHolder(
      override fun onScaleChanged(newScale: Float) {
          super.onScaleChanged(newScale)
          viewer.activity.hideMenu()
@@ -1267,21 +1371,32 @@ index 15b320d..2d6650b 100644
          super.onCenterChanged(newCenter)
 -        updateTranslationCoords(pageView as SubsamplingScaleImageView)
 +        (pageView as? SubsamplingScaleImageView)?.let(::updateTranslationCoords)
-     }
- 
--    //TachiyomiAT
++    }
++
 +    override fun onImageDrawn() {
 +        super.onImageDrawn()
 +        // SSIV's preDraw() can change fit/center without notifying its state listener.
 +        // Read after the image draw so startup, resize and pending center changes are included.
 +        (pageView as? SubsamplingScaleImageView)?.let(::updateTranslationCoords)
-+    }
-+
+     }
+ 
+-    //TachiyomiAT
 +    // TachiyomiAT
      private fun addTranslationsView() {
          if (page.translation == null) return
          removeView(translationsView)
-@@ -342,17 +349,22 @@ class PagerPageHolder(
+@@ -338,21 +352,37 @@ class PagerPageHolder(
+         } else {
+             translationsView?.refreshContent()
+         }
++        if (translationCrop.needsOriginalImage(page.translation != null)) {
++            translationsView?.viewportState?.value = null
++            if (cropReloadJob?.isActive != true) {
++                cropReloadJob = scope.launch { setImage() }
++            }
++            return
++        }
+         (pageView as? SubsamplingScaleImageView)?.let(::updateTranslationCoords)
          if (showTranslations) translationsView?.show()
      }
  
@@ -1294,6 +1409,10 @@ index 15b320d..2d6650b 100644
 -            translationsView?.viewTLState?.value = coords
 +        val overlay = translationsView ?: return
 +        val translation = page.translation ?: return
++        if (translationCrop.needsOriginalImage(hasTranslation = true)) {
++            overlay.viewportState.value = null
++            return
++        }
 +        val origin = if (vi.isReady) vi.sourceToViewCoord(0f, 0f) else null
 +        overlay.viewportState.value = origin?.let {
 +            TranslationViewportTransform.resolve(
@@ -1311,6 +1430,111 @@ index 15b320d..2d6650b 100644
      private fun showErrorLayout(error: Throwable?): ReaderErrorBinding {
          if (errorLayout == null) {
              errorLayout = ReaderErrorBinding.inflate(LayoutInflater.from(context), this, true)
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/reader/viewer/webtoon/WebtoonPageHolder.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/reader/viewer/webtoon/WebtoonPageHolder.kt
+index ccb7013..a9a6333 100644
+--- a/app/src/main/java/eu/kanade/tachiyomi/ui/reader/viewer/webtoon/WebtoonPageHolder.kt
++++ b/app/src/main/java/eu/kanade/tachiyomi/ui/reader/viewer/webtoon/WebtoonPageHolder.kt
+@@ -21,6 +21,7 @@ import eu.kanade.tachiyomi.ui.webview.WebViewActivity
+ import eu.kanade.tachiyomi.util.system.dpToPx
+ import eu.kanade.translation.data.TranslationFont
+ import eu.kanade.translation.model.ManualTranslationPosition
++import eu.kanade.translation.presentation.TranslationImageCrop
+ import eu.kanade.translation.presentation.WebtoonTranslationsView
+ import kotlinx.coroutines.Job
+ import kotlinx.coroutines.MainScope
+@@ -53,6 +54,9 @@ class WebtoonPageHolder(
+     private var showTranslations = true
+     private var translationsView: WebtoonTranslationsView? = null
+     private var translationPageIndex: Int? = null
++    private val translationCrop = TranslationImageCrop()
++    private var cropReloadJob: Job? = null
++    private var cropReloadPage: ReaderPage? = null
+ 
+     private val progressIndicator = createProgressIndicator()
+     private lateinit var progressContainer: ViewGroup
+@@ -80,6 +84,10 @@ class WebtoonPageHolder(
+         // page before binding a new one; otherwise an old translation can remain visible
+         // while the new image/translation is loading.
+         clearTranslationsView()
++        cropReloadJob?.cancel()
++        cropReloadJob = null
++        cropReloadPage = null
++        translationCrop.reset()
+         this.page = page
+         loadJob?.cancel()
+         loadJob = scope.launch { loadPageAndProcessStatus() }
+@@ -96,6 +104,14 @@ class WebtoonPageHolder(
+         } else {
+             translationsView?.refreshContent()
+         }
++        if (translationCrop.needsOriginalImage(currentPage.translation != null)) {
++            clearTranslationsView()
++            cropReloadPage = currentPage
++            if (cropReloadJob?.isActive != true) {
++                cropReloadJob = scope.launch { setImage(currentPage) }
++            }
++            return
++        }
+         if (showTranslations) translationsView?.show()
+     }
+ 
+@@ -109,6 +125,10 @@ class WebtoonPageHolder(
+     }
+ 
+     override fun recycle() {
++        cropReloadJob?.cancel()
++        cropReloadJob = null
++        cropReloadPage = null
++        translationCrop.reset()
+         loadJob?.cancel()
+         loadJob = null
+         clearTranslationsView()
+@@ -181,13 +201,18 @@ class WebtoonPageHolder(
+             withUIContext {
+                 // The holder may have been rebound while image decoding was running.
+                 if (page !== expectedPage) return@withUIContext
++                val cropBorders = translationCrop.forImage(
++                    viewer.config.imageCropBorders,
++                    expectedPage.translation != null,
++                )
++                translationCrop.recordImage(cropBorders)
+                 frame.setImage(
+                     source,
+                     isAnimated,
+                     ReaderPageImageView.Config(
+                         zoomDuration = viewer.config.doubleTapAnimDuration,
+                         minimumScaleType = SubsamplingScaleImageView.SCALE_TYPE_FIT_WIDTH,
+-                        cropBorders = viewer.config.imageCropBorders,
++                        cropBorders = cropBorders,
+                     ),
+                 )
+                 removeErrorLayout()
+@@ -217,7 +242,9 @@ class WebtoonPageHolder(
+         return if (isDoublePage) {
+             val rotation = if (viewer.config.dualPageRotateToFitInvert) -90f else 90f
+             ImageUtil.rotateImage(imageSource, rotation)
+-        } else imageSource
++        } else {
++            imageSource
++        }
+     }
+ 
+     private fun setError(error: Throwable?) {
+@@ -229,7 +256,13 @@ class WebtoonPageHolder(
+     private fun onImageDecoded() {
+         progressContainer.isVisible = false
+         removeErrorLayout()
+-        if (translationPageIndex == page?.index) translationsView?.show()
++        val currentPage = page ?: return
++        if (translationCrop.needsOriginalImage(currentPage.translation != null)) return
++        if (cropReloadPage === currentPage) {
++            cropReloadPage = null
++            if (translationsView == null) addTranslationsView(currentPage)
++        }
++        if (showTranslations && translationPageIndex == page?.index) translationsView?.show()
+     }
+ 
+     private fun addTranslationsView(expectedPage: ReaderPage) {
 diff --git a/app/src/main/java/eu/kanade/translation/EnglishDownloadTranslationPolicy.kt b/app/src/main/java/eu/kanade/translation/EnglishDownloadTranslationPolicy.kt
 new file mode 100644
 index 0000000..e672f58
@@ -1545,6 +1769,30 @@ index 973dea0..eb9b340 100644
                      .requiredSize(
                          (adjustedWidth * scaleFactor).pxToDp(),
                          (adjustedHeight * scaleFactor).pxToDp(),
+diff --git a/app/src/main/java/eu/kanade/translation/presentation/TranslationImageCrop.kt b/app/src/main/java/eu/kanade/translation/presentation/TranslationImageCrop.kt
+new file mode 100644
+index 0000000..5bddbe5
+--- /dev/null
++++ b/app/src/main/java/eu/kanade/translation/presentation/TranslationImageCrop.kt
+@@ -0,0 +1,18 @@
++package eu.kanade.translation.presentation
++
++/** Stored OCR coordinates refer to the original file, not the decoder's border-cropped image. */
++class TranslationImageCrop {
++    private var appliedCrop: Boolean? = null
++
++    fun forImage(requested: Boolean, hasTranslation: Boolean): Boolean = requested && !hasTranslation
++
++    fun recordImage(cropped: Boolean) {
++        appliedCrop = cropped
++    }
++
++    fun needsOriginalImage(hasTranslation: Boolean): Boolean = hasTranslation && appliedCrop == true
++
++    fun reset() {
++        appliedCrop = null
++    }
++}
 diff --git a/app/src/main/java/eu/kanade/translation/presentation/TranslationTextFit.kt b/app/src/main/java/eu/kanade/translation/presentation/TranslationTextFit.kt
 index b43aaac..ae93f81 100644
 --- a/app/src/main/java/eu/kanade/translation/presentation/TranslationTextFit.kt
@@ -1900,6 +2148,59 @@ index 0000000..f9f38c4
 +        assertEquals((1L..20L).map(Long::toString).toSet(), stored)
 +    }
 +}
+diff --git a/app/src/test/java/eu/kanade/translation/presentation/TranslationImageCropTest.kt b/app/src/test/java/eu/kanade/translation/presentation/TranslationImageCropTest.kt
+new file mode 100644
+index 0000000..b8a93f0
+--- /dev/null
++++ b/app/src/test/java/eu/kanade/translation/presentation/TranslationImageCropTest.kt
+@@ -0,0 +1,47 @@
++package eu.kanade.translation.presentation
++
++import org.junit.jupiter.api.Assertions.assertFalse
++import org.junit.jupiter.api.Assertions.assertTrue
++import org.junit.jupiter.api.Test
++
++class TranslationImageCropTest {
++    @Test
++    fun `saved translation keeps the original image even when the reader requests border crop`() {
++        val policy = TranslationImageCrop()
++        val crop = policy.forImage(requested = true, hasTranslation = true)
++        assertFalse(crop)
++        policy.recordImage(crop)
++        assertFalse(policy.needsOriginalImage(hasTranslation = true))
++    }
++
++    @Test
++    fun `translation arriving on an already cropped page requires one uncropped reload`() {
++        val policy = TranslationImageCrop()
++        policy.recordImage(policy.forImage(requested = true, hasTranslation = false))
++        assertFalse(policy.needsOriginalImage(hasTranslation = false))
++        assertTrue(policy.needsOriginalImage(hasTranslation = true))
++        policy.recordImage(policy.forImage(requested = true, hasTranslation = true))
++        assertFalse(policy.needsOriginalImage(hasTranslation = true))
++        // A later edit must not trigger another image decode.
++        assertFalse(policy.needsOriginalImage(hasTranslation = true))
++    }
++
++    @Test
++    fun `untranslated pages retain the user choice and uncropped pages need no extra decode`() {
++        val policy = TranslationImageCrop()
++        assertTrue(policy.forImage(requested = true, hasTranslation = false))
++        assertFalse(policy.forImage(requested = false, hasTranslation = false))
++        policy.recordImage(cropped = false)
++        assertFalse(policy.needsOriginalImage(hasTranslation = true))
++    }
++
++    @Test
++    fun `recycled holder does not carry the prior page crop into its next binding`() {
++        val policy = TranslationImageCrop()
++        policy.recordImage(cropped = true)
++        policy.reset()
++        assertFalse(policy.needsOriginalImage(hasTranslation = true))
++        assertFalse(policy.forImage(requested = true, hasTranslation = true))
++        assertTrue(policy.forImage(requested = true, hasTranslation = false))
++    }
++}
 diff --git a/app/src/test/java/eu/kanade/translation/presentation/TranslationTextFitTest.kt b/app/src/test/java/eu/kanade/translation/presentation/TranslationTextFitTest.kt
 index f26ef06..dc8cbdf 100644
 --- a/app/src/test/java/eu/kanade/translation/presentation/TranslationTextFitTest.kt
@@ -2028,10 +2329,10 @@ index 18b804f..ee30e4b 100644
      fun autoTranslateNovels() = preferenceStore.getBoolean("auto_translate_novels", true)
      fun novelTranslationEngine() = preferenceStore.getInt("novel_translation_engine", 1)
 diff --git a/i18n-at/src/commonMain/moko-resources/base/strings.xml b/i18n-at/src/commonMain/moko-resources/base/strings.xml
-index aab8cdd..9167d11 100644
+index aab8cdd..7ed4795 100644
 --- a/i18n-at/src/commonMain/moko-resources/base/strings.xml
 +++ b/i18n-at/src/commonMain/moko-resources/base/strings.xml
-@@ -54,4 +54,30 @@
+@@ -54,4 +54,31 @@
      <string name="translation_notification_text_progress">Translating the text from %1$d pages</string>
      <string name="translation_notification_chapter_progress">Chapter %1$d of %2$d</string>
      <string name="translation_notification_error">Could not finish the translation</string>
@@ -2061,12 +2362,13 @@ index aab8cdd..9167d11 100644
 +    <string name="repository_loading">Reading added repositories…</string>
 +    <string name="repository_adding">Adding…</string>
 +    <string name="chapter_versions_shortcut">Tap to filter source groups and versions</string>
++    <string name="translation_crop_borders_summary">Pages with saved translations keep their borders to align text with the original image.</string>
  </resources>
 diff --git a/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml b/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
-index 3a4b6eb..0fbefa3 100644
+index 3a4b6eb..d1748bc 100644
 --- a/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
 +++ b/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
-@@ -54,4 +54,30 @@
+@@ -54,4 +54,31 @@
      <string name="translation_notification_text_progress">Traduzindo os textos de %1$d páginas</string>
      <string name="translation_notification_chapter_progress">Capítulo %1$d de %2$d</string>
      <string name="translation_notification_error">Não foi possível concluir a tradução</string>
@@ -2096,4 +2398,5 @@ index 3a4b6eb..0fbefa3 100644
 +    <string name="repository_loading">Consultando repositórios adicionados…</string>
 +    <string name="repository_adding">Adicionando…</string>
 +    <string name="chapter_versions_shortcut">Toque para filtrar grupos e versões da fonte</string>
++    <string name="translation_crop_borders_summary">Páginas com tradução salva preservam as bordas para alinhar o texto à imagem original.</string>
  </resources>

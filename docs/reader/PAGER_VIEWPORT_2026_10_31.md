@@ -28,3 +28,7 @@ A aceitação visual do novo paginado permanece pendente. O relato sobre tira lo
 2. Reabrir a mesma página 4 do capítulo 1.3 de Guilty Library no modo paginado, inicialmente sem tocar no zoom. Conferir a limpeza e o texto dentro dos balões.
 3. Ampliar, deslocar e voltar ao ajuste inicial. Conferir também a abertura de outra página e, se possível, uma mudança de orientação da tela.
 4. Comparar a mesma página em tira longa. Se persistir diferença, registrar os dois modos na mesma página, a identificação em Sobre e a configuração de escala/corte de bordas do leitor.
+
+## Resultado posterior da P20261031.1
+
+O usuário enviou Sobre confirmando a revisão instalada. O paginado continuou desalinhado sem zoom. Em seguida confirmou que **Cortar bordas** estava ligado e que desligar a opção alinhou a mesma tradução salva. A hipótese de sincronização isolada não resolvia esse caso de coordenadas recortadas. A correção automática e seus limites estão em [P20261031.2](PAGER_CROP_FIX_P20261031_2.md).

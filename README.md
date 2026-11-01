@@ -39,7 +39,7 @@ See the R001 engineering documents on the development branch for current impleme
 
 The Android candidate now includes download-and-translate actions, English-source download translation, translation layout corrections, a bundled repository catalog and clearer chapter variants. See the [reader implementation and verification](integration/reader-translation-ux/README.md) and [30 October candidate test guide](docs/reader/DISCOVERY_CHAPTER_CLARITY_2026_10_30.md). Build/unit verification does not replace the pending visual checks on the Windows test device.
 
-The [31 October paginated-reader candidate](docs/reader/PAGER_VIEWPORT_2026_10_31.md) adds image/translation viewport synchronization and an explicit Polaris revision label. Visual acceptance on the Windows test device remains pending.
+The [P20261031.2 reader candidate](docs/reader/PAGER_CROP_FIX_P20261031_2.md) preserves original image borders on translated pages. The user confirmed that disabling border crop aligns the prior candidate; automatic handling in the new candidate still needs Windows visual acceptance.
 
 Local Android builds now detect CPU/RAM, enable Gradle cache/parallelism and combine APK assembly with tests per variant. See the [build-performance profile and verification limits](docs/r001/LOCAL_BUILD_PERFORMANCE_2026_10_31.md); performance on the user’s Windows PC remains to be measured.
 
