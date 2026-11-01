@@ -1,9 +1,9 @@
 {
   "date_client": "2026-11-01",
-  "candidate_revision": "Polaris P20261101.1",
-  "version_name": "0.1.0-beta.1",
-  "version_code": 102,
-  "patch_sha256": "da0590784a5ae3abf7868785979146ed3b8ab1229c92f8034d5b06d3cb96ea15",
+  "candidate_revision": "Polaris P20261101.2",
+  "version_name": "0.1.0-beta.2",
+  "version_code": 103,
+  "patch_sha256": "5bb714a7e3fdba9e807dc771156d8597a4558b4a615c50d92e3a112d7aaaacf7",
   "full_build_completion": {
     "status": "ASSEMBLY_AND_UNIT_REPORTS_COMPLETE",
     "apks": [
@@ -13,7 +13,7 @@
       "app-x86-debug.apk",
       "app-arm64-v8a-debug.apk"
     ],
-    "unit_tests": 498
+    "unit_tests": 505
   },
   "android_unit_comparison": {
     "status": "NO_NEW_UNIT_REGRESSIONS",
@@ -24,8 +24,8 @@
       "skipped": 0
     },
     "patched": {
-      "total": 498,
-      "passed": 464,
+      "total": 505,
+      "passed": 471,
       "failed": 34,
       "skipped": 0
     },
@@ -43,7 +43,7 @@
     }
   },
   "added_in_this_revision": {
-    "tests": 12,
+    "tests": 7,
     "failures": 0,
     "errors": 0,
     "skipped": 0
@@ -99,15 +99,15 @@
   "beta_artifacts": [
     {
       "abi": "arm64-v8a",
-      "file": "Polaris-0.1.0-beta.1-arm64-v8a.apk",
-      "bytes": 201397112,
-      "sha256": "48b21a9957639df809a4f9af7312fe110de22ec3ea9bf5c4a023eb7f8ca211d8"
+      "file": "Polaris-0.1.0-beta.2-arm64-v8a.apk",
+      "bytes": 196146441,
+      "sha256": "826017c42d276b9f6b77d07eb48152782de8f11a03aed0d68d64a0de6abd0978"
     },
     {
       "abi": "armeabi-v7a",
-      "file": "Polaris-0.1.0-beta.1-armeabi-v7a.apk",
-      "bytes": 161599289,
-      "sha256": "ca71b36b02daed72e683708fd52512f332eda92425d2b51db9bfeaddd2083d36"
+      "file": "Polaris-0.1.0-beta.2-armeabi-v7a.apk",
+      "bytes": 156348618,
+      "sha256": "1795dcb1c6904a416f295c85b2880f9473a74af6346a08018cd75d173c1c1f29"
     }
   ],
   "storage_samples": {
@@ -158,5 +158,30 @@
   "cache_target_bytes": 268435456,
   "cache_target_semantics": "LRU target for document-files/pdf-pages/document-translations only; leases protect active files and may temporarily exceed it; originals, models and other caches are not limited by this target",
   "beta_package_status": "INTERNAL_BETA_CANDIDATE_EXPORTED; not physical-device acceptance",
-  "evidence_directory": "/workspace/scratch/polaris-beta-storage-v1"
+  "evidence_directory": "/workspace/scratch/polaris-english-bootstrap-v1",
+  "english_preparation_suites": {
+    "EnglishTranslationSetupHistoryTest": {
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "EnglishTranslationBootstrapTest": {
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "english_preparation": {
+    "ocr_english": "Bundled Latin com.google.mlkit:text-recognition already present in APK",
+    "translation_resources": "Official SDK downloadModelIfNeeded for ENGLISH to PORTUGUESE; not manually bundled into APK; initial network still required",
+    "local_verification": "translate probe without download on startup/card; current-process readiness, no trust in stale WorkInfo success",
+    "automatic": "Enabled by default; WorkManager unmetered + storage-not-low; limited retries; main process only",
+    "manual": "Current connected network, replaces queued preparation; user opt-out preserves existing models and OCR/output choices",
+    "ready_condition": "Nonempty SDK probe after resource verification; fake-session logic tests do not validate real SDK download",
+    "native_acceptance": "PENDING clean install, network constraints, opt-out, restart, removed models, offline reuse and actual model byte measurement"
+  },
+  "beta_signer_sha256": "3ae747069cc9015ca1777f94fd56b030501f45d6af380426a572ad60e94d8227",
+  "previous_revision_evidence": "TEST_RESULTS_P20261101_1.json"
 }

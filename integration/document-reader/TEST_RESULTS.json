@@ -1,8 +1,8 @@
 {
   "date_utc": "2026-11-01",
-  "candidate_revision": "Polaris P20261101.1",
+  "candidate_revision": "Polaris P20261101.2",
   "pinned_yomotsu": "0fb80c439ef816eeb50674f1b90af39918b176d8",
-  "patch_sha256": "da0590784a5ae3abf7868785979146ed3b8ab1229c92f8034d5b06d3cb96ea15",
+  "patch_sha256": "5bb714a7e3fdba9e807dc771156d8597a4558b4a615c50d92e3a112d7aaaacf7",
   "prerequisite_reader_overlay_sha256": "971e394a0b3b4b26223c970b63da886067f813f986decca913910aeee1fcf86b",
   "assembly": "PASS: app:assembleDebug completed; overall Gradle exit 1 from the same 34 preexisting unit failures",
   "full_build_completion": {
@@ -14,7 +14,7 @@
       "app-x86-debug.apk",
       "app-arm64-v8a-debug.apk"
     ],
-    "unit_tests": 498
+    "unit_tests": 505
   },
   "android_unit_comparison": {
     "status": "NO_NEW_UNIT_REGRESSIONS",
@@ -25,8 +25,8 @@
       "skipped": 0
     },
     "patched": {
-      "total": 498,
-      "passed": 464,
+      "total": 505,
+      "passed": 471,
       "failed": 34,
       "skipped": 0
     },
@@ -89,10 +89,10 @@
     "passed": 15,
     "failed": 0
   },
-  "formatting": "PASS: targeted Spotless on 17 new/changed feature Kotlin files; minified upstream pipeline files were not broadly reformatted",
-  "apk_x86_64_sha256": "93a1e5973c603900fab30a31e7fab998279bad51522a6476933b0c32c8ec2d9c",
+  "formatting": "PASS: targeted Spotless on six new/changed English preparation Kotlin files; existing minified pipeline files not broadly reformatted",
+  "apk_x86_64_sha256": "49001bebcefa28a1bec73fc7f8396e97e86e9d07df1a605f5af53679eedf7b3f",
   "apk_signature_verification": "PASS, Android APK Signature Scheme v2, one debug signer; the Windows update must use its existing local signing key",
-  "embedded_revision_verification": "PASS: P20261101.1 found in the final x86_64 and both exported ARM APK DEX files",
+  "embedded_revision_verification": "PASS: P20261101.2 found in x86_64 and both exported ARM APK DEX files",
   "build_profile": {
     "profile": "auto",
     "detected_cpus": 2,
@@ -142,10 +142,10 @@
   "migration15_applied": false,
   "backup_v2_enabled": false,
   "production_release": false,
-  "evidence_directory": "/workspace/scratch/polaris-beta-storage-v1",
-  "scope": "Internal beta candidate: storage accounting, bounded document cache, coupled download/translation cleanup with retained vocabulary, metadata language routing and authored CJK fixtures",
+  "evidence_directory": "/workspace/scratch/polaris-english-bootstrap-v1",
+  "scope": "English to Portuguese preparation via official ML Kit downloads, current local readiness verification, visible progress and manual preparation; retains storage/language/document beta. New repository hero is documentation only, excluded from APK.",
   "added_in_this_revision": {
-    "tests": 12,
+    "tests": 7,
     "failures": 0,
     "errors": 0,
     "skipped": 0
@@ -166,8 +166,8 @@
   },
   "date_client": "2026-11-01",
   "client_timezone": "America/Fortaleza",
-  "version_name": "0.1.0-beta.1",
-  "version_code": 102,
+  "version_name": "0.1.0-beta.2",
+  "version_code": 103,
   "storage_lifecycle_language_suites": {
     "DocumentCacheBudgetTest": {
       "tests": 4,
@@ -215,15 +215,15 @@
   "beta_artifacts": [
     {
       "abi": "arm64-v8a",
-      "file": "Polaris-0.1.0-beta.1-arm64-v8a.apk",
-      "bytes": 201397112,
-      "sha256": "48b21a9957639df809a4f9af7312fe110de22ec3ea9bf5c4a023eb7f8ca211d8"
+      "file": "Polaris-0.1.0-beta.2-arm64-v8a.apk",
+      "bytes": 196146441,
+      "sha256": "826017c42d276b9f6b77d07eb48152782de8f11a03aed0d68d64a0de6abd0978"
     },
     {
       "abi": "armeabi-v7a",
-      "file": "Polaris-0.1.0-beta.1-armeabi-v7a.apk",
-      "bytes": 161599289,
-      "sha256": "ca71b36b02daed72e683708fd52512f332eda92425d2b51db9bfeaddd2083d36"
+      "file": "Polaris-0.1.0-beta.2-armeabi-v7a.apk",
+      "bytes": 156348618,
+      "sha256": "1795dcb1c6904a416f295c85b2880f9473a74af6346a08018cd75d173c1c1f29"
     }
   ],
   "beta_signer_sha256": "3ae747069cc9015ca1777f94fd56b030501f45d6af380426a572ad60e94d8227",
@@ -276,5 +276,29 @@
     "authored_fixture_source_language_review": "PENDING human source-language review"
   },
   "minimum_android_api": 26,
-  "device_matrix": "A12, S20 FE, S8+, probable A52; actual OS/ABI and physical installation/performance PENDING"
+  "device_matrix": "A12, S20 FE, S8+, probable A52; actual OS/ABI and physical installation/performance PENDING",
+  "english_preparation_suites": {
+    "EnglishTranslationSetupHistoryTest": {
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "EnglishTranslationBootstrapTest": {
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "english_preparation": {
+    "ocr_english": "Bundled Latin com.google.mlkit:text-recognition already present in APK",
+    "translation_resources": "Official SDK downloadModelIfNeeded for ENGLISH to PORTUGUESE; not manually bundled into APK; initial network still required",
+    "local_verification": "translate probe without download on startup/card; current-process readiness, no trust in stale WorkInfo success",
+    "automatic": "Enabled by default; WorkManager unmetered + storage-not-low; limited retries; main process only",
+    "manual": "Current connected network, replaces queued preparation; user opt-out preserves existing models and OCR/output choices",
+    "ready_condition": "Nonempty SDK probe after resource verification; fake-session logic tests do not validate real SDK download",
+    "native_acceptance": "PENDING clean install, network constraints, opt-out, restart, removed models, offline reuse and actual model byte measurement"
+  },
+  "previous_revision_evidence": "TEST_RESULTS_P20261101_1.json"
 }

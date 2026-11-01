@@ -1,0 +1,162 @@
+{
+  "date_client": "2026-11-01",
+  "candidate_revision": "Polaris P20261101.1",
+  "version_name": "0.1.0-beta.1",
+  "version_code": 102,
+  "patch_sha256": "da0590784a5ae3abf7868785979146ed3b8ab1229c92f8034d5b06d3cb96ea15",
+  "full_build_completion": {
+    "status": "ASSEMBLY_AND_UNIT_REPORTS_COMPLETE",
+    "apks": [
+      "app-universal-debug.apk",
+      "app-armeabi-v7a-debug.apk",
+      "app-x86_64-debug.apk",
+      "app-x86-debug.apk",
+      "app-arm64-v8a-debug.apk"
+    ],
+    "unit_tests": 498
+  },
+  "android_unit_comparison": {
+    "status": "NO_NEW_UNIT_REGRESSIONS",
+    "baseline": {
+      "total": 428,
+      "passed": 394,
+      "failed": 34,
+      "skipped": 0
+    },
+    "patched": {
+      "total": 498,
+      "passed": 464,
+      "failed": 34,
+      "skipped": 0
+    },
+    "preexisting_failures_still_present": 34,
+    "missing_baseline_tests": [],
+    "new_failures_or_skips": [],
+    "android_runtime_verified": false,
+    "gradle_exit_codes": {
+      "baseline": 1,
+      "patched": 1
+    },
+    "required_module_coverage": {
+      "domain": 58,
+      "app": 370
+    }
+  },
+  "added_in_this_revision": {
+    "tests": 12,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "storage_lifecycle_language_suites": {
+    "DocumentCacheBudgetTest": {
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "TranslationDeletionGateTest": {
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "SourceTranslationLanguageTest": {
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "TranslationStorageSampleTest": {
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "TranslationIntelligenceIntegrationTest": {
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "TranslationGlossaryTest": {
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "build_guard_tests": {
+    "passed": 15,
+    "failed": 0
+  },
+  "beta_packaging_tests": {
+    "passed": 3,
+    "failed": 0,
+    "actual_arm_apks_exported_and_verified": true,
+    "existing_output_preserved": true
+  },
+  "beta_artifacts": [
+    {
+      "abi": "arm64-v8a",
+      "file": "Polaris-0.1.0-beta.1-arm64-v8a.apk",
+      "bytes": 201397112,
+      "sha256": "48b21a9957639df809a4f9af7312fe110de22ec3ea9bf5c4a023eb7f8ca211d8"
+    },
+    {
+      "abi": "armeabi-v7a",
+      "file": "Polaris-0.1.0-beta.1-armeabi-v7a.apk",
+      "bytes": 161599289,
+      "sha256": "ca71b36b02daed72e683708fd52512f332eda92425d2b51db9bfeaddd2083d36"
+    }
+  ],
+  "storage_samples": {
+    "type": "Synthetic production-code JSON serialization; not OCR or a real downloaded chapter",
+    "samples": [
+      {
+        "language": "en",
+        "bytes": 47772,
+        "pages": 20,
+        "blocks": 200
+      },
+      {
+        "language": "ja",
+        "bytes": 51172,
+        "pages": 20,
+        "blocks": 200
+      },
+      {
+        "language": "zh-CN",
+        "bytes": 48172,
+        "pages": 20,
+        "blocks": 200
+      },
+      {
+        "language": "zh-TW",
+        "bytes": 48172,
+        "pages": 20,
+        "blocks": 200
+      },
+      {
+        "language": "ko",
+        "bytes": 53172,
+        "pages": 20,
+        "blocks": 200
+      }
+    ]
+  },
+  "language_quality": {
+    "english": "User-confirmed favorable result in the previously installed candidate",
+    "japanese": "PENDING native OCR/translation acceptance",
+    "chinese_simplified": "PENDING native OCR/translation acceptance",
+    "chinese_traditional": "PENDING native OCR/translation acceptance",
+    "korean": "PENDING native OCR/translation acceptance",
+    "authored_fixture_source_language_review": "PENDING human source-language review"
+  },
+  "device_matrix": "A12, S20 FE, S8+, probable A52; actual OS/ABI and physical installation/performance PENDING",
+  "minimum_android_api": 26,
+  "cache_target_bytes": 268435456,
+  "cache_target_semantics": "LRU target for document-files/pdf-pages/document-translations only; leases protect active files and may temporarily exceed it; originals, models and other caches are not limited by this target",
+  "beta_package_status": "INTERNAL_BETA_CANDIDATE_EXPORTED; not physical-device acceptance",
+  "evidence_directory": "/workspace/scratch/polaris-beta-storage-v1"
+}

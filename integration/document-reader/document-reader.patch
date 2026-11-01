@@ -1,5 +1,5 @@
 diff --git a/app/build.gradle.kts b/app/build.gradle.kts
-index 63e2698..71a806e 100644
+index 63e2698..ca362c6 100644
 --- a/app/build.gradle.kts
 +++ b/app/build.gradle.kts
 @@ -32,8 +32,8 @@ android {
@@ -8,8 +8,8 @@ index 63e2698..71a806e 100644
  
 -        versionCode = 101
 -        versionName = "0.20.4-Y40"
-+        versionCode = 102
-+        versionName = "0.1.0-beta.1"
++        versionCode = 103
++        versionName = "0.1.0-beta.2"
  
          buildConfigField("String", "COMMIT_COUNT", "\"${getLatestCommitCount()}\"")
          buildConfigField("String", "COMMIT_SHA", "\"${getLatestCommitSha()}\"")
@@ -207,10 +207,10 @@ index 0000000..7d94070
 +)
 diff --git a/app/src/main/java/eu/kanade/presentation/documents/DocumentsScreen.kt b/app/src/main/java/eu/kanade/presentation/documents/DocumentsScreen.kt
 new file mode 100644
-index 0000000..8d1c2df
+index 0000000..c7fb353
 --- /dev/null
 +++ b/app/src/main/java/eu/kanade/presentation/documents/DocumentsScreen.kt
-@@ -0,0 +1,445 @@
+@@ -0,0 +1,446 @@
 +package eu.kanade.presentation.documents
 +
 +import android.app.Application
@@ -471,6 +471,7 @@ index 0000000..8d1c2df
 +                modifier = Modifier.padding(horizontal = 16.dp),
 +                verticalArrangement = Arrangement.spacedBy(12.dp),
 +            ) {
++                item { EnglishPreparationCard() }
 +                item {
 +                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
 +                        Text(
@@ -653,6 +654,73 @@ index 0000000..8d1c2df
 +        }
 +        state.pendingImport?.let { request ->
 +            DocumentImportDialog(request, state.categories, model::dismissImport, model::includeDocument)
++        }
++    }
++}
+diff --git a/app/src/main/java/eu/kanade/presentation/documents/EnglishPreparationCard.kt b/app/src/main/java/eu/kanade/presentation/documents/EnglishPreparationCard.kt
+new file mode 100644
+index 0000000..ce24b2b
+--- /dev/null
++++ b/app/src/main/java/eu/kanade/presentation/documents/EnglishPreparationCard.kt
+@@ -0,0 +1,61 @@
++package eu.kanade.presentation.documents
++
++import androidx.compose.foundation.layout.Arrangement
++import androidx.compose.foundation.layout.Column
++import androidx.compose.foundation.layout.fillMaxWidth
++import androidx.compose.foundation.layout.padding
++import androidx.compose.material3.ElevatedCard
++import androidx.compose.material3.MaterialTheme
++import androidx.compose.material3.Text
++import androidx.compose.material3.TextButton
++import androidx.compose.runtime.Composable
++import androidx.compose.runtime.LaunchedEffect
++import androidx.compose.runtime.collectAsState
++import androidx.compose.runtime.getValue
++import androidx.compose.runtime.remember
++import androidx.compose.ui.Modifier
++import androidx.compose.ui.platform.LocalContext
++import androidx.compose.ui.unit.dp
++import androidx.work.WorkInfo
++import androidx.work.WorkManager
++import eu.kanade.translation.EnglishTranslationSetupJob
++import tachiyomi.domain.translation.TranslationPreferences
++import tachiyomi.i18n.at.ATMR
++import tachiyomi.presentation.core.i18n.stringResource
++import uy.kohesive.injekt.Injekt
++import uy.kohesive.injekt.api.get
++
++@Composable
++fun EnglishPreparationCard() {
++    val context = LocalContext.current
++    val preference = remember { Injekt.get<TranslationPreferences>().preloadEnglishPortuguese() }
++    val automatic by remember { preference.changes() }.collectAsState(initial = preference.get())
++    val infos by remember {
++        WorkManager.getInstance(context).getWorkInfosForUniqueWorkFlow(EnglishTranslationSetupJob.NAME)
++    }.collectAsState(initial = emptyList())
++    val work = EnglishTranslationSetupJob.latest(infos)
++    val ready by EnglishTranslationSetupJob.modelsReady.collectAsState()
++    LaunchedEffect(Unit) { EnglishTranslationSetupJob.refreshLocal(context) }
++    val running = work?.state == WorkInfo.State.RUNNING
++    val status = when {
++        ready -> ATMR.strings.english_models_ready
++        running -> ATMR.strings.english_models_preparing
++        !automatic && work?.state != WorkInfo.State.ENQUEUED -> ATMR.strings.english_models_disabled
++        work?.state == WorkInfo.State.FAILED -> ATMR.strings.english_models_failed
++        else -> ATMR.strings.english_models_waiting
++    }
++    ElevatedCard(Modifier.fillMaxWidth()) {
++        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
++            Text(stringResource(ATMR.strings.english_models_title), style = MaterialTheme.typography.titleSmall)
++            Text(stringResource(status), style = MaterialTheme.typography.bodyMedium)
++            Text(stringResource(ATMR.strings.english_models_explanation), style = MaterialTheme.typography.bodySmall)
++            if (!ready) {
++                TextButton(onClick = {
++                    EnglishTranslationSetupJob.schedule(context, manual = true)
++                }, enabled = !running) {
++                    Text(stringResource(ATMR.strings.english_models_prepare_now))
++                }
++            }
 +        }
 +    }
 +}
@@ -908,13 +976,21 @@ index bf9eb40..d868d3f 100644
                      title = stringResource(MR.strings.pref_storage_usage),
                  ) {
 diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsTranslationScreen.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsTranslationScreen.kt
-index a198c3f..4861c66 100644
+index a198c3f..62cc80b 100644
 --- a/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsTranslationScreen.kt
 +++ b/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsTranslationScreen.kt
-@@ -50,6 +50,16 @@ object SettingsTranslationScreen : SearchableSettings {
+@@ -50,6 +50,24 @@ object SettingsTranslationScreen : SearchableSettings {
      override fun getPreferences(): List<Preference> {
          val translationPreferences = remember { Injekt.get<TranslationPreferences>() }
          return listOf(
++            Preference.PreferenceItem.CustomPreference(
++                title = stringResource(ATMR.strings.english_models_title),
++            ) { eu.kanade.presentation.documents.EnglishPreparationCard() },
++            Preference.PreferenceItem.SwitchPreference(
++                preference = translationPreferences.preloadEnglishPortuguese(),
++                title = stringResource(ATMR.strings.english_models_auto),
++                subtitle = stringResource(ATMR.strings.english_models_auto_summary),
++            ),
 +            Preference.PreferenceItem.SwitchPreference(
 +                preference = translationPreferences.useSourceOcrLanguage(),
 +                title = stringResource(ATMR.strings.pref_source_ocr_language),
@@ -929,7 +1005,7 @@ index a198c3f..4861c66 100644
                  preference = translationPreferences.autoTranslateEnglishDownloads(),
                  title = stringResource(ATMR.strings.pref_auto_translate_english_downloads),
 diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
-index 7f411fd..ac368b6 100644
+index 7f411fd..c3c9e25 100644
 --- a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
 +++ b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
 @@ -52,7 +52,7 @@ import kotlin.time.Instant
@@ -937,10 +1013,28 @@ index 7f411fd..ac368b6 100644
  
      // Identifies this overlay independently of the pinned upstream COMMIT_SHA.
 -    private const val POLARIS_READER_REVISION = "P20261031.2"
-+    private const val POLARIS_READER_REVISION = "P20261101.1"
++    private const val POLARIS_READER_REVISION = "P20261101.2"
  
      @Composable
      override fun Content() {
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/App.kt b/app/src/main/java/eu/kanade/tachiyomi/App.kt
+index 6707d1a..c89047c 100644
+--- a/app/src/main/java/eu/kanade/tachiyomi/App.kt
++++ b/app/src/main/java/eu/kanade/tachiyomi/App.kt
+@@ -107,6 +107,13 @@ class App : Application(), DefaultLifecycleObserver, SingletonImageLoader.Factor
+ 
+         val scope = ProcessLifecycleOwner.get().lifecycleScope
+ 
++        if (eu.kanade.translation.EnglishTranslationSetupJob.isAppProcess(this)) {
++            Injekt.get<tachiyomi.domain.translation.TranslationPreferences>().preloadEnglishPortuguese().changes()
++                .onEach { enabled ->
++                    if (!enabled) eu.kanade.translation.EnglishTranslationSetupJob.cancelAutomatic(this)
++                    eu.kanade.translation.EnglishTranslationSetupJob.refreshLocal(this, scheduleMissing = enabled)
++                }.launchIn(scope)
++        }
+         // Show notification to disable Incognito Mode when it's enabled
+         basePreferences.incognitoMode.changes()
+             .onEach { enabled ->
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/data/download/DownloadManager.kt b/app/src/main/java/eu/kanade/tachiyomi/data/download/DownloadManager.kt
 index c45a189..0cd0785 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/data/download/DownloadManager.kt
@@ -2538,6 +2632,193 @@ index ce9709e..a7213fe 100644
  
              val automaticPages = pages.mapValuesTo(mutableMapOf()) { (_, page) ->
                  PageTranslation(page.blocks.filter(::isTranslatableBlock).toMutableList(), page.imgWidth, page.imgHeight)
+diff --git a/app/src/main/java/eu/kanade/translation/EnglishTranslationBootstrap.kt b/app/src/main/java/eu/kanade/translation/EnglishTranslationBootstrap.kt
+new file mode 100644
+index 0000000..ee6316a
+--- /dev/null
++++ b/app/src/main/java/eu/kanade/translation/EnglishTranslationBootstrap.kt
+@@ -0,0 +1,26 @@
++package eu.kanade.translation
++
++import java.io.Closeable
++
++interface EnglishTranslationSession : Closeable {
++    suspend fun downloadRequiredModels()
++    suspend fun translateProbe(text: String): String
++}
++
++/** Readiness is reported only after both the official SDK download and an on-device probe succeed. */
++object EnglishTranslationBootstrap {
++    suspend fun verifyExisting(createSession: () -> EnglishTranslationSession) {
++        createSession().use { session -> verify(session) }
++    }
++
++    suspend fun prepare(createSession: () -> EnglishTranslationSession) {
++        createSession().use { session ->
++            session.downloadRequiredModels()
++            verify(session)
++        }
++    }
++
++    private suspend fun verify(session: EnglishTranslationSession) {
++        check(session.translateProbe("Hello").isNotBlank()) { "English-Portuguese model check failed" }
++    }
++}
+diff --git a/app/src/main/java/eu/kanade/translation/EnglishTranslationSetupJob.kt b/app/src/main/java/eu/kanade/translation/EnglishTranslationSetupJob.kt
+new file mode 100644
+index 0000000..99de352
+--- /dev/null
++++ b/app/src/main/java/eu/kanade/translation/EnglishTranslationSetupJob.kt
+@@ -0,0 +1,149 @@
++package eu.kanade.translation
++
++import android.app.ActivityManager
++import android.app.Application
++import android.content.Context
++import android.os.Build
++import android.os.Process
++import androidx.work.BackoffPolicy
++import androidx.work.Constraints
++import androidx.work.CoroutineWorker
++import androidx.work.ExistingWorkPolicy
++import androidx.work.NetworkType
++import androidx.work.OneTimeWorkRequestBuilder
++import androidx.work.WorkInfo
++import androidx.work.WorkManager
++import androidx.work.WorkerParameters
++import androidx.work.workDataOf
++import com.google.mlkit.common.model.DownloadConditions
++import com.google.mlkit.nl.translate.TranslateLanguage
++import com.google.mlkit.nl.translate.Translation
++import com.google.mlkit.nl.translate.TranslatorOptions
++import kotlinx.coroutines.Dispatchers
++import kotlinx.coroutines.flow.MutableStateFlow
++import kotlinx.coroutines.flow.asStateFlow
++import kotlinx.coroutines.sync.Mutex
++import kotlinx.coroutines.sync.withLock
++import kotlinx.coroutines.tasks.await
++import kotlinx.coroutines.withContext
++import tachiyomi.domain.translation.TranslationPreferences
++import uy.kohesive.injekt.Injekt
++import uy.kohesive.injekt.api.get
++import java.util.concurrent.TimeUnit
++import java.util.concurrent.atomic.AtomicLong
++import kotlin.coroutines.cancellation.CancellationException
++
++class EnglishTranslationSetupJob(context: Context, parameters: WorkerParameters) : CoroutineWorker(
++    context,
++    parameters,
++) {
++    override suspend fun doWork(): Result {
++        val manual = inputData.getBoolean(MANUAL, false)
++        if (!manual && !Injekt.get<TranslationPreferences>().preloadEnglishPortuguese().get()) {
++            return Result.success(workDataOf(READY to false))
++        }
++        return try {
++            setupMutex.withLock {
++                available.value = false
++                EnglishTranslationBootstrap.prepare(::session)
++                available.value = true
++            }
++            Result.success(workDataOf(READY to true))
++        } catch (cancelled: CancellationException) {
++            throw cancelled
++        } catch (_: Exception) {
++            if (runAttemptCount < 3) Result.retry() else Result.failure(workDataOf(READY to false))
++        }
++    }
++
++    companion object {
++        const val NAME = "polaris-english-portuguese-setup-v1"
++        const val READY = "models_ready"
++        private const val MANUAL = "manual"
++        private const val AUTO_TAG = "polaris-english-model-auto"
++        private const val ORDER_TAG = "polaris-english-model-order:"
++        private val order = AtomicLong()
++        private val setupMutex = Mutex()
++        private val available = MutableStateFlow(false)
++        val modelsReady = available.asStateFlow()
++
++        private fun session(): EnglishTranslationSession {
++            val translator = Translation.getClient(
++                TranslatorOptions.Builder()
++                    .setSourceLanguage(TranslateLanguage.ENGLISH)
++                    .setTargetLanguage(TranslateLanguage.PORTUGUESE)
++                    .build(),
++            )
++            return object : EnglishTranslationSession {
++                override suspend fun downloadRequiredModels() {
++                    translator.downloadModelIfNeeded(DownloadConditions.Builder().build()).await()
++                }
++
++                override suspend fun translateProbe(text: String): String = translator.translate(text).await()
++
++                override fun close() {
++                    translator.close()
++                }
++            }
++        }
++
++        /** Checks existing resources without initiating a download. */
++        suspend fun refreshLocal(context: Context, scheduleMissing: Boolean = false) = withContext(Dispatchers.IO) {
++            setupMutex.withLock {
++                val ready = try {
++                    EnglishTranslationBootstrap.verifyExisting(::session)
++                    true
++                } catch (cancelled: CancellationException) {
++                    throw cancelled
++                } catch (_: Exception) {
++                    false
++                }
++                available.value = ready
++                if (ready) {
++                    cancelAutomatic(context)
++                } else if (scheduleMissing && Injekt.get<TranslationPreferences>().preloadEnglishPortuguese().get()) {
++                    schedule(context)
++                }
++            }
++        }
++
++        fun isAppProcess(context: Context): Boolean {
++            val name = if (Build.VERSION.SDK_INT >= 28) {
++                Application.getProcessName()
++            } else {
++                val manager = context.getSystemService(Context.ACTIVITY_SERVICE) as? ActivityManager
++                manager?.runningAppProcesses?.firstOrNull { it.pid == Process.myPid() }?.processName
++            }
++            return name == context.packageName
++        }
++
++        fun schedule(context: Context, manual: Boolean = false) {
++            val stamp = order.updateAndGet { maxOf(it + 1, System.currentTimeMillis()) }
++            val builder = OneTimeWorkRequestBuilder<EnglishTranslationSetupJob>()
++                .setInputData(workDataOf(MANUAL to manual))
++                .setConstraints(
++                    Constraints.Builder().setRequiresStorageNotLow(true)
++                        .setRequiredNetworkType(if (manual) NetworkType.CONNECTED else NetworkType.UNMETERED).build(),
++                )
++                .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 30, TimeUnit.SECONDS)
++                .addTag(ORDER_TAG + stamp)
++            if (!manual) builder.addTag(AUTO_TAG)
++            WorkManager.getInstance(context).enqueueUniqueWork(
++                NAME,
++                if (manual) ExistingWorkPolicy.REPLACE else ExistingWorkPolicy.KEEP,
++                builder.build(),
++            )
++        }
++
++        fun cancelAutomatic(context: Context) {
++            WorkManager.getInstance(context).cancelAllWorkByTag(AUTO_TAG)
++        }
++
++        fun latest(infos: List<WorkInfo>): WorkInfo? {
++            val pending = infos.filterNot { it.state.isFinished }
++            return (pending.ifEmpty { infos }).maxByOrNull { info ->
++                info.tags.firstOrNull { it.startsWith(ORDER_TAG) }?.removePrefix(ORDER_TAG)?.toLongOrNull() ?: 0L
++            }
++        }
++    }
++}
 diff --git a/app/src/main/java/eu/kanade/translation/SourceTranslationLanguage.kt b/app/src/main/java/eu/kanade/translation/SourceTranslationLanguage.kt
 new file mode 100644
 index 0000000..fab22cc
@@ -3527,6 +3808,155 @@ index 0000000..a588cab
 +        assertNull(DocumentFormat.fromName("installer.apk"))
 +    }
 +}
+diff --git a/app/src/test/java/eu/kanade/translation/EnglishTranslationBootstrapTest.kt b/app/src/test/java/eu/kanade/translation/EnglishTranslationBootstrapTest.kt
+new file mode 100644
+index 0000000..7046d81
+--- /dev/null
++++ b/app/src/test/java/eu/kanade/translation/EnglishTranslationBootstrapTest.kt
+@@ -0,0 +1,107 @@
++package eu.kanade.translation
++
++import kotlinx.coroutines.CompletableDeferred
++import kotlinx.coroutines.async
++import kotlinx.coroutines.cancelAndJoin
++import kotlinx.coroutines.test.runTest
++import org.junit.jupiter.api.Assertions.assertEquals
++import org.junit.jupiter.api.Assertions.assertFalse
++import org.junit.jupiter.api.Test
++import org.junit.jupiter.api.assertThrows
++import java.io.IOException
++
++class EnglishTranslationBootstrapTest {
++    @Test fun `existing resources can be verified offline without requesting a download`() = runTest {
++        val events = mutableListOf<String>()
++        val session = object : EnglishTranslationSession {
++            override suspend fun downloadRequiredModels() {
++                error("Must not download during local verification")
++            }
++            override suspend fun translateProbe(text: String): String {
++                events += text
++                return "Olá"
++            }
++            override fun close() {
++                events += "close"
++            }
++        }
++        EnglishTranslationBootstrap.verifyExisting { session }
++        assertEquals(listOf("Hello", "close"), events)
++    }
++
++    @Test fun `readiness waits for models and the SDK probe before closing the session`() = runTest {
++        val downloaded = CompletableDeferred<Unit>()
++        val events = mutableListOf<String>()
++        val session = object : EnglishTranslationSession {
++            override suspend fun downloadRequiredModels() {
++                events += "download"
++                downloaded.await()
++            }
++            override suspend fun translateProbe(text: String): String {
++                events += text
++                return "Olá"
++            }
++            override fun close() {
++                events += "close"
++            }
++        }
++        val work = async { EnglishTranslationBootstrap.prepare { session } }
++        testScheduler.runCurrent()
++        assertFalse(work.isCompleted)
++        assertEquals(listOf("download"), events)
++        downloaded.complete(Unit)
++        work.await()
++        assertEquals(listOf("download", "Hello", "close"), events)
++    }
++
++    @Test fun `failed downloads close resources without probing or claiming readiness`() = runTest {
++        val events = mutableListOf<String>()
++        val session = object : EnglishTranslationSession {
++            override suspend fun downloadRequiredModels() {
++                throw IOException("offline")
++            }
++            override suspend fun translateProbe(text: String): String {
++                events += "probe"
++                return "Olá"
++            }
++            override fun close() {
++                events += "close"
++            }
++        }
++        assertThrows<IOException> { EnglishTranslationBootstrap.prepare { session } }
++        assertEquals(listOf("close"), events)
++    }
++
++    @Test fun `an empty SDK probe cannot be marked ready`() = runTest {
++        var closed = false
++        val session = object : EnglishTranslationSession {
++            override suspend fun downloadRequiredModels() {}
++            override suspend fun translateProbe(text: String): String = ""
++            override fun close() {
++                closed = true
++            }
++        }
++        assertThrows<IllegalStateException> { EnglishTranslationBootstrap.prepare { session } }
++        assertEquals(true, closed)
++    }
++
++    @Test fun `cancellation releases the translator without running the probe`() = runTest {
++        val events = mutableListOf<String>()
++        val session = object : EnglishTranslationSession {
++            override suspend fun downloadRequiredModels() {
++                CompletableDeferred<Unit>().await()
++            }
++            override suspend fun translateProbe(text: String): String {
++                events += "probe"
++                return "Olá"
++            }
++            override fun close() {
++                events += "close"
++            }
++        }
++        val work = async { EnglishTranslationBootstrap.prepare { session } }
++        testScheduler.runCurrent()
++        work.cancelAndJoin()
++        assertEquals(listOf("close"), events)
++    }
++}
+diff --git a/app/src/test/java/eu/kanade/translation/EnglishTranslationSetupHistoryTest.kt b/app/src/test/java/eu/kanade/translation/EnglishTranslationSetupHistoryTest.kt
+new file mode 100644
+index 0000000..b6da299
+--- /dev/null
++++ b/app/src/test/java/eu/kanade/translation/EnglishTranslationSetupHistoryTest.kt
+@@ -0,0 +1,30 @@
++package eu.kanade.translation
++
++import androidx.work.WorkInfo
++import io.mockk.every
++import io.mockk.mockk
++import org.junit.jupiter.api.Assertions.assertEquals
++import org.junit.jupiter.api.Assertions.assertNull
++import org.junit.jupiter.api.Test
++
++class EnglishTranslationSetupHistoryTest {
++    private fun info(state: WorkInfo.State, stamp: Long): WorkInfo {
++        val result = mockk<WorkInfo>()
++        every { result.state } returns state
++        every { result.tags } returns setOf("polaris-english-model-order:$stamp")
++        return result
++    }
++
++    @Test fun `an older success cannot hide a pending preparation`() {
++        val success = info(WorkInfo.State.SUCCEEDED, 100)
++        val pending = info(WorkInfo.State.ENQUEUED, 200)
++        assertEquals(pending, EnglishTranslationSetupJob.latest(listOf(pending, success)))
++    }
++
++    @Test fun `history uses request order instead of list order`() {
++        val older = info(WorkInfo.State.SUCCEEDED, 100)
++        val failed = info(WorkInfo.State.FAILED, 200)
++        assertEquals(failed, EnglishTranslationSetupJob.latest(listOf(failed, older)))
++        assertNull(EnglishTranslationSetupJob.latest(emptyList()))
++    }
++}
 diff --git a/app/src/test/java/eu/kanade/translation/SourceTranslationLanguageTest.kt b/app/src/test/java/eu/kanade/translation/SourceTranslationLanguageTest.kt
 new file mode 100644
 index 0000000..85244ff
@@ -4350,23 +4780,24 @@ index 0000000..ee88790
 +    }
 +}
 diff --git a/domain/src/main/java/tachiyomi/domain/translation/TranslationPreferences.kt b/domain/src/main/java/tachiyomi/domain/translation/TranslationPreferences.kt
-index ee30e4b..a293a82 100644
+index ee30e4b..1a70138 100644
 --- a/domain/src/main/java/tachiyomi/domain/translation/TranslationPreferences.kt
 +++ b/domain/src/main/java/tachiyomi/domain/translation/TranslationPreferences.kt
-@@ -28,6 +28,8 @@ class TranslationPreferences(
+@@ -28,6 +28,9 @@ class TranslationPreferences(
      )
  
      fun autoTranslateEnglishDownloads() = preferenceStore.getBoolean("auto_translate_english_downloads", true)
++    fun preloadEnglishPortuguese() = preferenceStore.getBoolean("preload_english_portuguese_models", true)
 +    fun useSourceOcrLanguage() = preferenceStore.getBoolean("use_source_ocr_language", true)
 +    fun autoTranslateAsianDownloadsBeta() = preferenceStore.getBoolean("auto_translate_asian_downloads_beta", false)
  
      fun autoTranslateAfterDownload() = preferenceStore.getBoolean("auto_translate_after_download", false)
      fun autoTranslateNovels() = preferenceStore.getBoolean("auto_translate_novels", true)
 diff --git a/i18n-at/src/commonMain/moko-resources/base/strings.xml b/i18n-at/src/commonMain/moko-resources/base/strings.xml
-index 7ed4795..e372a0c 100644
+index 7ed4795..c90238f 100644
 --- a/i18n-at/src/commonMain/moko-resources/base/strings.xml
 +++ b/i18n-at/src/commonMain/moko-resources/base/strings.xml
-@@ -81,4 +81,81 @@
+@@ -81,4 +81,91 @@
      <string name="repository_adding">Adding…</string>
      <string name="chapter_versions_shortcut">Tap to filter source groups and versions</string>
      <string name="translation_crop_borders_summary">Pages with saved translations keep their borders to align text with the original image.</string>
@@ -4447,12 +4878,22 @@ index 7ed4795..e372a0c 100644
 +    <string name="pref_auto_asian_beta">Automatically translate Asian-language downloads (beta)</string>
 +    <string name="pref_auto_asian_beta_summary">Opt-in for Japanese, Chinese and Korean sources. Quality is pending device tests. Use ML Kit OCR; PaddleOCR remains English-only. A per-work choice takes priority.</string>
 +    <string name="storage_native_libraries">Extracted native libraries</string>
++    <string name="english_models_title">English → Portuguese</string>
++    <string name="english_models_ready">Ready on this device. The required translation resources were prepared and checked.</string>
++    <string name="english_models_preparing">Preparing and checking the translation resources…</string>
++    <string name="english_models_disabled">Automatic preparation is off. You can prepare this pair now.</string>
++    <string name="english_models_failed">Preparation failed. Check your connection and storage, then try again.</string>
++    <string name="english_models_waiting">Preparation queued. Waiting for a suitable connection and available storage.</string>
++    <string name="english_models_explanation">English text recognition is included in the APK. Offline translation needs SDK-managed resources, downloaded once. Automatic preparation uses an unmetered connection; “Prepare now” uses your current connection.</string>
++    <string name="english_models_prepare_now">Prepare now with this connection</string>
++    <string name="english_models_auto">Prepare English → Portuguese automatically</string>
++    <string name="english_models_auto_summary">Prioritizes the most-used language pair after installation. Waits for an unmetered connection and Android’s available-storage condition. Keeps your chosen OCR and output languages unchanged.</string>
  </resources>
 diff --git a/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml b/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
-index d1748bc..828879e 100644
+index d1748bc..8e7eaaa 100644
 --- a/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
 +++ b/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
-@@ -81,4 +81,81 @@
+@@ -81,4 +81,91 @@
      <string name="repository_adding">Adicionando…</string>
      <string name="chapter_versions_shortcut">Toque para filtrar grupos e versões da fonte</string>
      <string name="translation_crop_borders_summary">Páginas com tradução salva preservam as bordas para alinhar o texto à imagem original.</string>
@@ -4533,6 +4974,16 @@ index d1748bc..828879e 100644
 +    <string name="pref_auto_asian_beta">Traduzir automaticamente downloads de idiomas asiáticos (beta)</string>
 +    <string name="pref_auto_asian_beta_summary">Opcional para japonês, chinês e coreano. A qualidade ainda depende dos testes nos aparelhos. Use OCR ML Kit; PaddleOCR continua apenas em inglês. A escolha por obra tem prioridade.</string>
 +    <string name="storage_native_libraries">Bibliotecas nativas extraídas</string>
++    <string name="english_models_title">Inglês → português</string>
++    <string name="english_models_ready">Pronto neste aparelho. Os recursos necessários foram preparados e verificados.</string>
++    <string name="english_models_preparing">Preparando e verificando os recursos de tradução…</string>
++    <string name="english_models_disabled">A preparação automática está desativada. Você pode preparar este par agora.</string>
++    <string name="english_models_failed">Não foi possível preparar. Confira a conexão e o espaço livre e tente novamente.</string>
++    <string name="english_models_waiting">Preparação agendada. Aguardando conexão adequada e espaço disponível.</string>
++    <string name="english_models_explanation">O reconhecimento de texto em inglês já acompanha o APK. A tradução offline usa recursos gerenciados pelo SDK, baixados uma vez. A preparação automática usa uma rede sem cobrança; “Preparar agora” usa sua conexão atual.</string>
++    <string name="english_models_prepare_now">Preparar agora com esta conexão</string>
++    <string name="english_models_auto">Preparar inglês → português automaticamente</string>
++    <string name="english_models_auto_summary">Prioriza o par mais usado após a instalação. Aguarda rede sem cobrança e a condição de espaço disponível do Android. Mantém os idiomas de OCR e de saída que você escolheu.</string>
  </resources>
 diff --git a/source-local/src/main/kotlin/tachiyomi/source/local/LocalSource.kt b/source-local/src/main/kotlin/tachiyomi/source/local/LocalSource.kt
 index e5a307f..31834b3 100644
