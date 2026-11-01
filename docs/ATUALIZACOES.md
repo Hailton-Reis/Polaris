@@ -14,11 +14,11 @@ Rascunhos são ignorados. No canal padrão, tanto a marcação `prerelease` do G
 
 ## Acesso ao GitHub
 
-O endereço consultado é `Hailton-Reis/Polaris`, sem token de acesso embutido no aplicativo. O repositório permanece **privado** neste estágio e o único registro de Release continua como rascunho, sem APK publicado.
+O endereço consultado é `Hailton-Reis/Polaris`, sem token de acesso embutido no aplicativo. O repositório permanece **privado** neste estágio e a [primeira Release beta.3](https://github.com/Hailton-Reis/Polaris/releases/tag/v0.1.0-beta.3) foi publicada como pré-lançamento para o teste inicial do mantenedor. Ela contém dois APKs, manifesto, hashes, guia e exemplos.
 
 O acesso autenticado do mantenedor ou do ambiente de desenvolvimento não é o acesso disponível aos celulares. Para a distribuição sem login funcionar, as Releases e seus arquivos precisam estar acessíveis publicamente. Isso ainda não foi habilitado. A consulta manual informa a indisponibilidade em vez de apresentar um erro de acesso como “nenhuma atualização”. Falhas de rede e limites do GitHub também são diferenciados de uma consulta concluída.
 
-A implementação não tornou o repositório público nem publicou o beta. Caso o código deva permanecer privado, uma distribuição pública separada exigirá configurar um repositório de Releases e ajustar o endereço do atualizador em outra revisão.
+A publicação do beta não tornou o repositório público. Caso o código deva permanecer privado, uma distribuição pública separada exigirá configurar um repositório de Releases e ajustar o endereço do atualizador em outra revisão.
 
 ## Critérios para oferecer um APK
 
@@ -45,7 +45,7 @@ O `application_id` e a chave de assinatura precisam permanecer os mesmos entre b
 5. Para um beta, marcar a Release como **pré-lançamento**; mantê-la em rascunho enquanto não estiver liberada. Um rascunho não vira atualização disponível no aplicativo.
 6. Somente depois de haver acesso público e uma Release liberada, conferir consulta, escolha de canal, download e atualização no celular, preservando biblioteca e vocabulário.
 
-Este guia prepara o processo; nenhuma publicação de APK foi realizada nesta revisão.
+O primeiro beta privado foi publicado pelo mantenedor em 01/11/2026; os seis anexos tiveram nomes, tamanhos e hashes SHA-256 conferidos. O acesso público e o aceite de instalação/atualização continuam pendentes.
 
 ## Espaço utilizado
 

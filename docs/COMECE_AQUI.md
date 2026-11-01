@@ -2,7 +2,7 @@
 
 ## Antes de instalar
 
-O Polaris tem um candidato compilado, mas ainda não possui lançamento estável ou APK publicado nas Releases. A revisão crítica de armazenamento está [registrada aqui](ARMAZENAMENTO.md). Instalação, consumo total e leitura nos aparelhos continuam pendentes de aceite.
+O Polaris tem seu [primeiro pré-lançamento privado publicado](https://github.com/Hailton-Reis/Polaris/releases/tag/v0.1.0-beta.3), para o mantenedor testar primeiro. Ainda não possui lançamento estável. A revisão crítica de armazenamento está [registrada aqui](ARMAZENAMENTO.md). Instalação, consumo total e leitura nos aparelhos continuam pendentes de aceite.
 
 A apresentação do projeto fica em `main`. A implementação em avaliação está em [r001/multisource-foundation](https://github.com/Hailton-Reis/Polaris/tree/r001/multisource-foundation). Não é necessário criar outro repositório para acompanhar o Polaris.
 
@@ -50,3 +50,9 @@ Use [Issues](https://github.com/Hailton-Reis/Polaris/issues/new/choose) com revi
 ## Sobre e atualização do aplicativo
 
 **Sobre** reúne descrição, versão/revisão, mantenedor, créditos, projeto, histórico, Releases, licenças e privacidade. Em **Configurações → Atualizações do aplicativo**, a busca automática começa ativada e **Receber atualizações experimentais** começa desativado. A verificação manual respeita esse canal. O repositório ainda é privado; a atualização sem login depende de Releases acessíveis e continua pendente. [Como funciona](ATUALIZACOES.md).
+
+## Por que há dois APKs?
+
+São alternativas para o mesmo aplicativo. Baixe e instale **um**: `arm64-v8a` para Android de 64 bits (196,2 MB) ou `armeabi-v7a` para Android de 32 bits (156,4 MB). A arquitetura do sistema instalado importa; ter processador de 64 bits não garante Android de 64 bits.
+
+Os arquivos separados evitam incluir ambas as arquiteturas em cada download. Um APK universal poderia reuni-las, com tamanho maior. Quando a consulta de atualizações estiver acessível, o atualizador usa os metadados do aparelho para escolher o arquivo compatível.

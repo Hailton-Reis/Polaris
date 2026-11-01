@@ -51,7 +51,7 @@ O candidato consulta as Releases do **Polaris** ao abrir o aplicativo, com limit
 
 **Receber atualizações experimentais** começa desativado. Ative para encontrar betas e outras prévias publicadas; desligar não rebaixa a instalação. Baixar e instalar continuam sendo escolhas suas.
 
-**O repositório permanece privado e não há APK publicado.** A distribuição sem login nos celulares depende de Releases e arquivos acessíveis publicamente. O mecanismo está preparado no código; essa etapa e a atualização real no aparelho ainda estão pendentes. [Canais, compatibilidade e publicação →](docs/ATUALIZACOES.md)
+**O repositório permanece privado. O [primeiro beta para teste do mantenedor](https://github.com/Hailton-Reis/Polaris/releases/tag/v0.1.0-beta.3) foi publicado**, com APKs ARM64 e ARM32. A distribuição sem login nos celulares depende de Releases e arquivos acessíveis publicamente. O mecanismo está preparado no código; essa etapa e a atualização real no aparelho ainda estão pendentes. [Canais, compatibilidade e publicação →](docs/ATUALIZACOES.md)
 
 ## Seu arquivo, sua classificação
 
@@ -107,7 +107,7 @@ O painel **Dados e armazenamento → Armazenamento do Polaris** ajuda a separar 
 
 O candidato atual é **`0.1.0-beta.3` · revisão `P20261101.3` · versionCode `104`**. A implementação está em avaliação na [branch de engenharia](https://github.com/Hailton-Reis/Polaris/tree/r001/multisource-foundation).
 
-**Ainda não há APK publicado nas Releases nem lançamento estável.** O pacote de teste e a compilação não equivalem a aprovação do consumo, da compatibilidade ou da qualidade em todos os idiomas.
+**O [primeiro pré-lançamento privado](https://github.com/Hailton-Reis/Polaris/releases/tag/v0.1.0-beta.3) está disponível; ainda não há lançamento estável.** O pacote de teste e a compilação não equivalem a aprovação do consumo, da compatibilidade ou da qualidade em todos os idiomas.
 
 O resultado em inglês foi confirmado pelo mantenedor em um candidato anterior. Japonês, chinês simplificado/tradicional e coreano continuam com validação de OCR e tradução nas imagens pendente, incluindo japonês vertical. A automação global desses idiomas é opcional neste estágio; PaddleOCR permanece apenas em inglês.
 
@@ -117,7 +117,7 @@ A matriz inicial reúne **A12, S20 FE, S8+ e provável A52**. Android, arquitetu
 
 - **[Histórico de versões](CHANGELOG.md)** — o que mudou e qual o estado de cada revisão.
 - **[Próximos passos](docs/ROADMAP.md)** — armazenamento, testes e evolução da leitura.
-- **[Releases](https://github.com/Hailton-Reis/Polaris/releases)** — distribuição quando houver um pacote disponível; rascunhos permanecem identificados.
+- **[Releases](https://github.com/Hailton-Reis/Polaris/releases)** — primeiro beta privado disponível para o teste do mantenedor; rascunhos permanecem identificados.
 - **[Relatar um problema](https://github.com/Hailton-Reis/Polaris/issues/new/choose)** — revisão em Sobre, aparelho, passos e resultado observado.
 
 <details>
