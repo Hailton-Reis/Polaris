@@ -2,7 +2,7 @@
 
 ## Antes de instalar
 
-O Polaris tem seu [primeiro pré-lançamento privado publicado](https://github.com/Hailton-Reis/Polaris/releases/tag/v0.1.0-beta.3), para o mantenedor testar primeiro. Ainda não possui lançamento estável. A revisão crítica de armazenamento está [registrada aqui](ARMAZENAMENTO.md). Instalação, consumo total e leitura nos aparelhos continuam pendentes de aceite.
+O Polaris tem seu [primeiro beta público publicado](https://github.com/Hailton-Reis/Polaris/releases/tag/v0.1.0-beta.3) para quem deseja experimentar o aplicativo. Ainda não possui lançamento estável. A revisão crítica de armazenamento está [registrada aqui](ARMAZENAMENTO.md). Instalação, consumo total e leitura nos aparelhos continuam pendentes de aceite.
 
 A apresentação do projeto fica em `main`. A implementação em avaliação está em [r001/multisource-foundation](https://github.com/Hailton-Reis/Polaris/tree/r001/multisource-foundation). Não é necessário criar outro repositório para acompanhar o Polaris.
 
@@ -49,7 +49,7 @@ Use [Issues](https://github.com/Hailton-Reis/Polaris/issues/new/choose) com revi
 
 ## Sobre e atualização do aplicativo
 
-**Sobre** reúne descrição, versão/revisão, mantenedor, créditos, projeto, histórico, Releases, licenças e privacidade. Em **Configurações → Atualizações do aplicativo**, a busca automática começa ativada e **Receber atualizações experimentais** começa desativado. A verificação manual respeita esse canal. O repositório ainda é privado; a atualização sem login depende de Releases acessíveis e continua pendente. [Como funciona](ATUALIZACOES.md).
+**Sobre** reúne descrição, versão/revisão, mantenedor, créditos, projeto, histórico, Releases, licenças e privacidade. Em **Configurações → Atualizações do aplicativo**, a busca automática começa ativada e **Receber atualizações experimentais** começa desativado. A verificação manual respeita esse canal. O repositório e a Release são públicos, com download pelo navegador sem login. A atualização pelo app ainda precisa de teste no aparelho. [Como funciona](ATUALIZACOES.md).
 
 ## Por que há dois APKs?
 

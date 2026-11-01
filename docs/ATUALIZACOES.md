@@ -14,11 +14,11 @@ Rascunhos são ignorados. No canal padrão, tanto a marcação `prerelease` do G
 
 ## Acesso ao GitHub
 
-O endereço consultado é `Hailton-Reis/Polaris`, sem token de acesso embutido no aplicativo. O repositório permanece **privado** neste estágio e a [primeira Release beta.3](https://github.com/Hailton-Reis/Polaris/releases/tag/v0.1.0-beta.3) foi publicada como pré-lançamento para o teste inicial do mantenedor. Ela contém dois APKs, manifesto, hashes, guia e exemplos.
+O endereço consultado é `Hailton-Reis/Polaris`, sem token de acesso embutido no aplicativo. O repositório e a [Release beta.3](https://github.com/Hailton-Reis/Polaris/releases/tag/v0.1.0-beta.3) agora são **públicos**. Ela contém dois APKs, manifesto, hashes, guia e exemplos. O download pelo navegador do celular não exige uma conta do GitHub.
 
-O acesso autenticado do mantenedor ou do ambiente de desenvolvimento não é o acesso disponível aos celulares. Para a distribuição sem login funcionar, as Releases e seus arquivos precisam estar acessíveis publicamente. Isso ainda não foi habilitado. A consulta manual informa a indisponibilidade em vez de apresentar um erro de acesso como “nenhuma atualização”. Falhas de rede e limites do GitHub também são diferenciados de uma consulta concluída.
+O aplicativo está configurado para consultar esse repositório. As versões beta dependem da opção **Receber atualizações experimentais**, desativada por padrão. Acesso público não equivale a validação de atualização no aparelho: consulta, download e instalação com a assinatura original ainda precisam desse teste. Instalar a própria beta.3 também não cria uma versão posterior para o atualizador oferecer.
 
-A publicação do beta não tornou o repositório público. Caso o código deva permanecer privado, uma distribuição pública separada exigirá configurar um repositório de Releases e ajustar o endereço do atualizador em outra revisão.
+Falhas de rede e limites do GitHub são diferenciados de uma consulta concluída. Uma eventual indisponibilidade ou restrição futura do repositório também deve ser informada, em vez de ser apresentada como ausência de atualização.
 
 ## Critérios para oferecer um APK
 
@@ -45,7 +45,7 @@ O `application_id` e a chave de assinatura precisam permanecer os mesmos entre b
 5. Para um beta, marcar a Release como **pré-lançamento**; mantê-la em rascunho enquanto não estiver liberada. Um rascunho não vira atualização disponível no aplicativo.
 6. Somente depois de haver acesso público e uma Release liberada, conferir consulta, escolha de canal, download e atualização no celular, preservando biblioteca e vocabulário.
 
-O primeiro beta privado foi publicado pelo mantenedor em 01/11/2026; os seis anexos tiveram nomes, tamanhos e hashes SHA-256 conferidos. O acesso público e o aceite de instalação/atualização continuam pendentes.
+O primeiro beta foi publicado em 01/11/2026 e depois aberto ao público pelo mantenedor; os seis anexos tiveram nomes, tamanhos e hashes SHA-256 conferidos. O aceite de instalação e atualização nos aparelhos continua pendente.
 
 ## Espaço utilizado
 
