@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 320" role="img" aria-labelledby="title description">
+  <title id="title">Polaris — leitura, tradução e organização</title>
+  <desc id="description">Identidade do repositório Polaris, leitor Android de mangás, livros e documentos.</desc>
+  <defs>
+    <linearGradient id="bg" x2="1" y2="1"><stop stop-color="#0c1020"/><stop offset="1" stop-color="#242044"/></linearGradient>
+    <linearGradient id="star" x2="1" y2="1"><stop stop-color="#5eead4"/><stop offset="1" stop-color="#c4b5fd"/></linearGradient>
+  </defs>
+  <rect width="1200" height="320" rx="24" fill="url(#bg)"/>
+  <g fill="#c4b5fd" opacity=".45"><circle cx="1050" cy="62" r="3"/><circle cx="1100" cy="125" r="2"/><circle cx="985" cy="185" r="3"/><circle cx="1145" cy="245" r="2"/><circle cx="900" cy="42" r="2"/></g>
+  <path d="M900 42 1050 62 1100 125 985 185 1145 245" fill="none" stroke="#a78bfa" stroke-opacity=".17"/>
+  <circle cx="145" cy="148" r="78" fill="#151c35" stroke="#a78bfa" stroke-opacity=".45"/>
+  <path d="m145 56 17 69 64 23-64 20-17 70-18-70-65-20 65-23z" fill="url(#star)"/>
+  <circle cx="145" cy="148" r="11" fill="#121a2d"/>
+  <path d="M95 237q24-12 50 0 26-12 50 0v25q-26-12-50 0-26-12-50 0zM145 237v25" fill="none" stroke="#b7c6e1" stroke-width="2"/>
+  <g font-family="Segoe UI,Arial,sans-serif">
+    <text x="275" y="81" font-size="15" letter-spacing="5" fill="#5eead4">LEITURA · TRADUÇÃO · ORGANIZAÇÃO</text>
+    <text x="270" y="166" font-size="76" font-weight="700" fill="#f6f4ff">Polaris</text>
+    <text x="275" y="213" font-size="23" fill="#c8cce2">Sua biblioteca. Seus idiomas. Seu ritmo.</text>
+    <text x="275" y="266" font-size="17" fill="#a9b3d2">Mangás, livros e documentos no Android</text>
+  </g>
+</svg>
