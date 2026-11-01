@@ -1,4 +1,4 @@
-# Document reader and research candidate — P20261031.4
+# Document reader and research candidate — P20261101.1
 
 This overlay adds local document reading and discovery to the pinned Android candidate. Apply it after Spike001, the debug hook and the reader translation overlay. `scripts/r001/build_issue002.sh` now applies that sequence automatically. The original upstream checkout stays pinned at `0fb80c439ef816eeb50674f1b90af39918b176d8`.
 
@@ -34,3 +34,7 @@ POLARIS_YOMOTSU_CHECKOUT=PATH_TO_PINNED_YOMOTSU python3 -m unittest discover -s 
 The applier requires the pinned commit and current reader prerequisite, is idempotent, rejects source drift atomically and refuses migration15. [TEST_RESULTS.json](TEST_RESULTS.json) records final build and test evidence. [The organization guide](../../docs/reader/DOCUMENT_ORGANIZATION_P20261031_4.md) covers the new selective import flow; [the document reading guide](../../docs/reader/DOCUMENTS_P20261031_3.md) covers the underlying readers. The prior revision's evidence is preserved in [TEST_RESULTS_P20261031_3.json](TEST_RESULTS_P20261031_3.json). Neither assembly nor unit tests establish native Android rendering or a successful user-device import.
 
 The earlier crop-off diagnosis is confirmed by the user. Automatic crop protection and this document UI still require visual acceptance. The separate R001 two-source gate and backupv2 remain pending. This is an engineering candidate, not a production release.
+
+## P20261101.1 — internal beta and storage
+
+The candidate now has versionName `0.1.0-beta.1` and versionCode 102. The [beta guide](../internal-beta/README.md) covers private ARM APK distribution, storage measurement, download/translation deletion, persistent vocabulary and the still-pending EN/JA/ZH/KO device matrix. [Storage implementation and measured examples](../internal-beta/STORAGE_AND_LIFECYCLE.md) distinguish chapter JSON, originals, language models and bounded regenerable document cache. Prior P20261031.4 evidence is preserved in [TEST_RESULTS_P20261031_4.json](TEST_RESULTS_P20261031_4.json).

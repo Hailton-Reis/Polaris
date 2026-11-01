@@ -1,3 +1,27 @@
+diff --git a/app/build.gradle.kts b/app/build.gradle.kts
+index 63e2698..71a806e 100644
+--- a/app/build.gradle.kts
++++ b/app/build.gradle.kts
+@@ -32,8 +32,8 @@ android {
+     defaultConfig {
+         applicationId = "app.mihon.tachiyomiat"
+ 
+-        versionCode = 101
+-        versionName = "0.20.4-Y40"
++        versionCode = 102
++        versionName = "0.1.0-beta.1"
+ 
+         buildConfigField("String", "COMMIT_COUNT", "\"${getLatestCommitCount()}\"")
+         buildConfigField("String", "COMMIT_SHA", "\"${getLatestCommitSha()}\"")
+@@ -71,7 +71,7 @@ android {
+     buildTypes {
+         val debug = getByName("debug") {
+             applicationIdSuffix = ".dev"
+-            versionNameSuffix = "-${getLatestCommitCount()}"
++            versionNameSuffix = ""
+             isPseudoLocalesEnabled = true
+         }
+         val release = getByName("release") {
 diff --git a/app/src/main/AndroidManifest.xml b/app/src/main/AndroidManifest.xml
 index 172b28c..4de015d 100644
 --- a/app/src/main/AndroidManifest.xml
@@ -632,6 +656,162 @@ index 0000000..8d1c2df
 +        }
 +    }
 +}
+diff --git a/app/src/main/java/eu/kanade/presentation/documents/PolarisStorageScreen.kt b/app/src/main/java/eu/kanade/presentation/documents/PolarisStorageScreen.kt
+new file mode 100644
+index 0000000..83b49fe
+--- /dev/null
++++ b/app/src/main/java/eu/kanade/presentation/documents/PolarisStorageScreen.kt
+@@ -0,0 +1,150 @@
++package eu.kanade.presentation.documents
++
++import android.text.format.Formatter
++import androidx.compose.foundation.layout.Arrangement
++import androidx.compose.foundation.layout.Column
++import androidx.compose.foundation.layout.padding
++import androidx.compose.foundation.lazy.LazyColumn
++import androidx.compose.material3.Button
++import androidx.compose.material3.CircularProgressIndicator
++import androidx.compose.material3.MaterialTheme
++import androidx.compose.material3.OutlinedButton
++import androidx.compose.material3.Text
++import androidx.compose.runtime.Composable
++import androidx.compose.runtime.LaunchedEffect
++import androidx.compose.runtime.getValue
++import androidx.compose.runtime.mutableStateOf
++import androidx.compose.runtime.remember
++import androidx.compose.runtime.rememberCoroutineScope
++import androidx.compose.runtime.setValue
++import androidx.compose.ui.Modifier
++import androidx.compose.ui.platform.LocalContext
++import androidx.compose.ui.unit.dp
++import cafe.adriel.voyager.navigator.LocalNavigator
++import cafe.adriel.voyager.navigator.currentOrThrow
++import com.google.mlkit.common.model.RemoteModelManager
++import com.google.mlkit.nl.translate.TranslateRemoteModel
++import eu.kanade.presentation.components.AppBar
++import eu.kanade.presentation.util.Screen
++import eu.kanade.tachiyomi.ui.documents.PolarisStorageSnapshot
++import eu.kanade.tachiyomi.ui.documents.PolarisStorageUsage
++import eu.kanade.tachiyomi.ui.documents.StorageBytes
++import kotlinx.coroutines.Dispatchers
++import kotlinx.coroutines.launch
++import kotlinx.coroutines.tasks.await
++import kotlinx.coroutines.withContext
++import mihon.core.archive.DocumentCacheBudget
++import tachiyomi.domain.storage.service.StorageManager
++import tachiyomi.i18n.at.ATMR
++import tachiyomi.presentation.core.components.material.Scaffold
++import tachiyomi.presentation.core.i18n.stringResource
++import uy.kohesive.injekt.Injekt
++import uy.kohesive.injekt.api.get
++import kotlin.coroutines.cancellation.CancellationException
++
++class PolarisStorageScreen : Screen() {
++    @Composable override fun Content() {
++        val navigator = LocalNavigator.currentOrThrow
++        val context = LocalContext.current
++        val scope = rememberCoroutineScope()
++        var refresh by remember { mutableStateOf(0) }
++        var data by remember { mutableStateOf<PolarisStorageSnapshot?>(null) }
++        var models by remember { mutableStateOf<String?>(null) }
++        var loading by remember { mutableStateOf(true) }
++        var failed by remember { mutableStateOf(false) }
++        var clearing by remember { mutableStateOf(false) }
++        LaunchedEffect(refresh) {
++            loading = true
++            failed = false
++            try {
++                data =
++                    withContext(Dispatchers.IO) {
++                        PolarisStorageUsage(context, Injekt.get<StorageManager>()).snapshot()
++                    }
++                models = runCatching {
++                    RemoteModelManager.getInstance().getDownloadedModels(TranslateRemoteModel::class.java).await()
++                        .map { it.language }.sorted().joinToString(", ").ifBlank { "—" }
++                }.getOrNull()
++            } catch (error: CancellationException) {
++                throw error
++            } catch (_: Exception) {
++                failed = true
++            } finally {
++                loading = false
++            }
++        }
++        Scaffold(topBar = { behavior ->
++            AppBar(
++                title = stringResource(ATMR.strings.storage_polaris_title),
++                navigateUp = navigator::pop,
++                scrollBehavior = behavior,
++            )
++        }) { padding ->
++            LazyColumn(
++                contentPadding = padding,
++                modifier = Modifier.padding(horizontal = 20.dp),
++                verticalArrangement = Arrangement.spacedBy(14.dp),
++            ) {
++                item {
++                    if (loading) CircularProgressIndicator()
++                    if (failed) Text(stringResource(ATMR.strings.storage_measure_failed))
++                    OutlinedButton(onClick = { refresh++ }, enabled = !loading && !clearing) {
++                        Text(stringResource(ATMR.strings.storage_refresh))
++                    }
++                }
++                data?.let { value ->
++                    item { SizeRow(stringResource(ATMR.strings.storage_original_downloads), value.downloads) }
++                    item { SizeRow(stringResource(ATMR.strings.storage_imported_copies), value.imports) }
++                    item { SizeRow(stringResource(ATMR.strings.storage_saved_translations), value.translations) }
++                    item {
++                        SizeRow(stringResource(ATMR.strings.storage_document_cache), StorageBytes(value.documentCache))
++                    }
++                    item { SizeRow(stringResource(ATMR.strings.storage_other_cache), value.otherCache) }
++                    item { SizeRow(stringResource(ATMR.strings.storage_internal_data), value.internal) }
++                    item { SizeRow(stringResource(ATMR.strings.storage_apks), StorageBytes(value.apks)) }
++                    item { SizeRow(stringResource(ATMR.strings.storage_native_libraries), value.nativeLibraries) }
++                }
++                item {
++                    Text(
++                        stringResource(
++                            ATMR.strings.storage_models,
++                            models ?: stringResource(ATMR.strings.storage_unknown),
++                        ),
++                    )
++                    Text(stringResource(ATMR.strings.storage_budget_note), style = MaterialTheme.typography.bodySmall)
++                    Button(onClick = {
++                        scope.launch {
++                            clearing = true
++                            try {
++                                withContext(Dispatchers.IO) { DocumentCacheBudget.trim(context.cacheDir, 0) }
++                                refresh++
++                            } catch (error: CancellationException) {
++                                throw error
++                            } catch (_: Exception) {
++                                failed = true
++                            } finally {
++                                clearing = false
++                            }
++                        }
++                    }, enabled = !clearing) { Text(stringResource(ATMR.strings.storage_clear_documents)) }
++                    Text(stringResource(ATMR.strings.storage_delete_policy), style = MaterialTheme.typography.bodySmall)
++                    Text(stringResource(ATMR.strings.storage_measure_note), style = MaterialTheme.typography.bodySmall)
++                }
++            }
++        }
++    }
++
++    @Composable private fun SizeRow(label: String, size: StorageBytes?) {
++        val context = LocalContext.current
++        Column {
++            Text(label, style = MaterialTheme.typography.titleSmall)
++            Text(
++                if (size == null) {
++                    stringResource(ATMR.strings.storage_unknown)
++                } else {
++                    Formatter.formatFileSize(context, size.bytes) + if (size.partial) " +" else ""
++                },
++            )
++        }
++    }
++}
 diff --git a/app/src/main/java/eu/kanade/presentation/manga/MangaScreen.kt b/app/src/main/java/eu/kanade/presentation/manga/MangaScreen.kt
 index d7597c6..573a1bc 100644
 --- a/app/src/main/java/eu/kanade/presentation/manga/MangaScreen.kt
@@ -704,8 +884,52 @@ index a7b7f3e..f4dcdad 100644
  
  
  
+diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsDataScreen.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsDataScreen.kt
+index bf9eb40..d868d3f 100644
+--- a/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsDataScreen.kt
++++ b/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsDataScreen.kt
+@@ -280,6 +280,7 @@ object SettingsDataScreen : SearchableSettings {
+         val context = LocalContext.current
+         val scope = rememberCoroutineScope()
+         val libraryPreferences = remember { Injekt.get<LibraryPreferences>() }
++        val navigator = LocalNavigator.currentOrThrow
+ 
+         val chapterCache = remember { Injekt.get<ChapterCache>() }
+         var cacheReadableSizeSema by remember { mutableIntStateOf(0) }
+@@ -288,6 +289,10 @@ object SettingsDataScreen : SearchableSettings {
+         return Preference.PreferenceGroup(
+             title = stringResource(MR.strings.pref_storage_usage),
+             preferenceItems = listOf(
++                Preference.PreferenceItem.TextPreference(
++                    title = stringResource(tachiyomi.i18n.at.ATMR.strings.storage_polaris_title),
++                    onClick = { navigator.push(eu.kanade.presentation.documents.PolarisStorageScreen()) },
++                ),
+                 Preference.PreferenceItem.CustomPreference(
+                     title = stringResource(MR.strings.pref_storage_usage),
+                 ) {
+diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsTranslationScreen.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsTranslationScreen.kt
+index a198c3f..4861c66 100644
+--- a/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsTranslationScreen.kt
++++ b/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsTranslationScreen.kt
+@@ -50,6 +50,16 @@ object SettingsTranslationScreen : SearchableSettings {
+     override fun getPreferences(): List<Preference> {
+         val translationPreferences = remember { Injekt.get<TranslationPreferences>() }
+         return listOf(
++            Preference.PreferenceItem.SwitchPreference(
++                preference = translationPreferences.useSourceOcrLanguage(),
++                title = stringResource(ATMR.strings.pref_source_ocr_language),
++                subtitle = stringResource(ATMR.strings.pref_source_ocr_language_summary),
++            ),
++            Preference.PreferenceItem.SwitchPreference(
++                preference = translationPreferences.autoTranslateAsianDownloadsBeta(),
++                title = stringResource(ATMR.strings.pref_auto_asian_beta),
++                subtitle = stringResource(ATMR.strings.pref_auto_asian_beta_summary),
++            ),
+             Preference.PreferenceItem.SwitchPreference(
+                 preference = translationPreferences.autoTranslateEnglishDownloads(),
+                 title = stringResource(ATMR.strings.pref_auto_translate_english_downloads),
 diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
-index 7f411fd..2b93865 100644
+index 7f411fd..ac368b6 100644
 --- a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
 +++ b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
 @@ -52,7 +52,7 @@ import kotlin.time.Instant
@@ -713,10 +937,50 @@ index 7f411fd..2b93865 100644
  
      // Identifies this overlay independently of the pinned upstream COMMIT_SHA.
 -    private const val POLARIS_READER_REVISION = "P20261031.2"
-+    private const val POLARIS_READER_REVISION = "P20261031.4"
++    private const val POLARIS_READER_REVISION = "P20261101.1"
  
      @Composable
      override fun Content() {
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/data/download/DownloadManager.kt b/app/src/main/java/eu/kanade/tachiyomi/data/download/DownloadManager.kt
+index c45a189..0cd0785 100644
+--- a/app/src/main/java/eu/kanade/tachiyomi/data/download/DownloadManager.kt
++++ b/app/src/main/java/eu/kanade/tachiyomi/data/download/DownloadManager.kt
+@@ -232,9 +232,16 @@ class DownloadManager(
+ 
+             removeFromDownloadQueue(filteredChapters)
+ 
+-            val (mangaDir, chapterDirs) = provider.findChapterDirs(filteredChapters, manga, source)
+-            chapterDirs.forEach { it.delete() }
+-            cache.removeChapters(filteredChapters, manga)
++            val mangaDir = provider.findMangaDir(manga.title, source)
++            for (chapter in filteredChapters) {
++                val directory = provider.findChapterDir(chapter.name, chapter.scanlator, chapter.url, manga.title, source)
++                var originalRemoved = false
++                translationManager.deleteDownloadedTranslation(chapter, manga, source) {
++                    originalRemoved = directory == null || directory.delete()
++                    originalRemoved
++                }
++                if (originalRemoved) cache.removeChapters(listOf(chapter), manga)
++            }
+ 
+             // Delete manga directory if empty
+             if (mangaDir?.listFiles()?.isEmpty() == true) {
+@@ -258,8 +265,13 @@ class DownloadManager(
+                 )
+                 downloader.removeFromQueue(manga)
+             }
+-            provider.findMangaDir(manga.title, source)?.delete()
+-            cache.removeManga(manga)
++            var originalRemoved = false
++            translationManager.deleteDownloadedMangaTranslations(manga, source) {
++                val directory = provider.findMangaDir(manga.title, source)
++                originalRemoved = directory == null || directory.delete()
++                originalRemoved
++            }
++            if (originalRemoved) cache.removeManga(manga)
+ 
+             // Delete source directory if empty
+             val sourceDir = provider.findSourceDir(source)
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentImporter.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentImporter.kt
 new file mode 100644
 index 0000000..9e9e164
@@ -1360,10 +1624,10 @@ index 0000000..ce6e322
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentTextTranslator.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentTextTranslator.kt
 new file mode 100644
-index 0000000..d207e80
+index 0000000..8d16a78
 --- /dev/null
 +++ b/app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentTextTranslator.kt
-@@ -0,0 +1,67 @@
+@@ -0,0 +1,87 @@
 +package eu.kanade.tachiyomi.ui.documents
 +
 +import android.content.Context
@@ -1371,18 +1635,26 @@ index 0000000..d207e80
 +import com.google.mlkit.nl.translate.TranslateLanguage
 +import com.google.mlkit.nl.translate.Translation
 +import com.google.mlkit.nl.translate.TranslatorOptions
++import eu.kanade.translation.memory.TranslationGlossary
++import eu.kanade.translation.memory.TranslationMemory
 +import eu.kanade.translation.recognizer.TextRecognizerLanguage
++import eu.kanade.translation.translator.ComicTranslationContext
 +import eu.kanade.translation.translator.TextTranslatorLanguage
 +import kotlinx.coroutines.Dispatchers
 +import kotlinx.coroutines.tasks.await
 +import kotlinx.coroutines.withContext
 +import mihon.core.archive.DocumentBlock
++import mihon.core.archive.DocumentCacheBudget
 +import tachiyomi.domain.translation.TranslationPreferences
 +import java.io.File
 +import java.security.MessageDigest
 +import java.util.UUID
 +
-+class DocumentTextTranslator(private val context: Context, private val preferences: TranslationPreferences) {
++class DocumentTextTranslator(
++    private val context: Context,
++    private val preferences: TranslationPreferences,
++    private val title: String,
++) {
 +    suspend fun translate(blocks: List<DocumentBlock>): List<DocumentBlock> = withContext(Dispatchers.IO) {
 +        val from = TextRecognizerLanguage.fromPref(preferences.translateFromLanguage()).code
 +        val to =
@@ -1393,36 +1665,48 @@ index 0000000..d207e80
 +            TranslatorOptions.Builder().setSourceLanguage(from).setTargetLanguage(to).build(),
 +        )
 +        val cache = File(context.cacheDir, "document-translations").apply { mkdirs() }
-+        var prepared = false
++        val work = ComicTranslationContext(title, "Document")
++        val revision = TranslationMemory.revision(work)
++        var modelReady = false
 +        try {
 +            blocks.map { block ->
 +                if (block !is DocumentBlock.Text || block.value.isBlank()) return@map block
 +                val key = MessageDigest.getInstance(
 +                    "SHA-256",
-+                ).digest("document-v1|$from|$to|${block.value}".toByteArray())
++                ).digest("document-v2|$title|$revision|$from|$to|${block.value}".toByteArray())
 +                    .joinToString("") { "%02x".format(it) }
 +                val file = File(cache, key)
-+                val cached = runCatching { file.takeIf { it.isFile }?.readText() }.getOrNull()
++                val cached = runCatching {
++                    DocumentCacheBudget.acquire(context.cacheDir, file) { check(file.isFile) }
++                        .use { it.file.readText() }
++                }.getOrNull()
 +                val translated = if (!cached.isNullOrBlank()) {
 +                    cached
 +                } else {
-+                    if (!prepared) {
++                    if (!modelReady) {
 +                        translator.downloadModelIfNeeded(DownloadConditions.Builder().build()).await()
-+                        prepared = true
++                        modelReady = true
 +                    }
-+                    translator.translate(block.value).await().also { value ->
-+                        if (value.isNotBlank()) {
-+                            val temporary = File(cache, ".$key-${UUID.randomUUID()}")
-+                            try {
-+                                runCatching {
++                    val prepared = TranslationGlossary.prepare(block.value, work)
++                    val value = TranslationGlossary.resolve(
++                        prepared,
++                        translator.translate(prepared.textForTranslation).await(),
++                        work,
++                    )
++                    if (value.isNotBlank()) {
++                        runCatching {
++                            DocumentCacheBudget.acquire(context.cacheDir, file) {
++                                val temporary = File(cache, ".$key-${UUID.randomUUID()}")
++                                try {
 +                                    temporary.writeText(value)
-+                                    temporary.renameTo(file)
++                                    check(temporary.renameTo(file))
++                                } finally {
++                                    temporary.delete()
 +                                }
-+                            } finally {
-+                                temporary.delete()
-+                            }
++                            }.close()
 +                        }
 +                    }
++                    value
 +                }
 +                DocumentBlock.Text(translated.ifBlank { block.value }, block.heading)
 +            }
@@ -1456,12 +1740,97 @@ index 0000000..914e45c
 +        return result.toString()
 +    }
 +}
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/documents/PolarisStorageUsage.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/documents/PolarisStorageUsage.kt
+new file mode 100644
+index 0000000..6449268
+--- /dev/null
++++ b/app/src/main/java/eu/kanade/tachiyomi/ui/documents/PolarisStorageUsage.kt
+@@ -0,0 +1,79 @@
++package eu.kanade.tachiyomi.ui.documents
++
++import android.content.Context
++import com.hippo.unifile.UniFile
++import kotlinx.coroutines.ensureActive
++import mihon.core.archive.DocumentCacheBudget
++import tachiyomi.domain.storage.service.StorageManager
++import java.io.File
++import java.nio.file.Files
++import kotlin.coroutines.coroutineContext
++
++data class StorageBytes(val bytes: Long, val partial: Boolean = false)
++data class PolarisStorageSnapshot(
++    val downloads: StorageBytes?,
++    val imports: StorageBytes?,
++    val translations: StorageBytes?,
++    val documentCache: Long,
++    val otherCache: StorageBytes,
++    val internal: StorageBytes,
++    val apks: Long,
++    val nativeLibraries: StorageBytes,
++)
++
++class PolarisStorageUsage(private val context: Context, private val storage: StorageManager) {
++    suspend fun snapshot(): PolarisStorageSnapshot {
++        val managed = DocumentCacheBudget.size(context.cacheDir)
++        val cache = files(context.cacheDir)
++        val codeCache = files(context.codeCacheDir)
++        return PolarisStorageSnapshot(
++            tree(storage.getDownloadsDirectory()),
++            tree(storage.getLocalSourceDirectory()),
++            tree(storage.getTranslationsDirectory()),
++            managed,
++            StorageBytes(
++                (cache.bytes + codeCache.bytes - managed).coerceAtLeast(0),
++                cache.partial || codeCache.partial,
++            ),
++            files(context.dataDir, setOf("cache", "code_cache", "lib")),
++            (listOf(context.applicationInfo.sourceDir) + context.applicationInfo.splitSourceDirs.orEmpty())
++                .distinct().sumOf { File(it).length() },
++            context.applicationInfo.nativeLibraryDir?.let { files(File(it)) } ?: StorageBytes(0),
++        )
++    }
++
++    private suspend fun tree(root: UniFile?): StorageBytes? {
++        root ?: return null
++        val pending = ArrayDeque<UniFile>()
++        pending.add(root)
++        val visited = mutableSetOf<String>()
++        var bytes = 0L
++        val deadline = System.nanoTime() + 10_000_000_000L
++        while (pending.isNotEmpty()) {
++            coroutineContext.ensureActive()
++            if (visited.size >= 20000 || System.nanoTime() > deadline) return StorageBytes(bytes, true)
++            val file = pending.removeFirst()
++            if (!visited.add(file.uri.toString())) continue
++            if (file.isDirectory) {
++                val children = file.listFiles() ?: return StorageBytes(bytes, true)
++                pending.addAll(children)
++            } else {
++                bytes += file.length().coerceAtLeast(0)
++            }
++        }
++        return StorageBytes(bytes)
++    }
++
++    private suspend fun files(root: File, excluded: Set<String> = emptySet()): StorageBytes {
++        var bytes = 0L
++        var count = 0
++        for (file in root.walkTopDown().onEnter {
++            !Files.isSymbolicLink(it.toPath()) && !(it.parentFile == root && it.name in excluded)
++        }) {
++            coroutineContext.ensureActive()
++            if (++count > 20000) return StorageBytes(bytes, true)
++            if (file.isFile && !Files.isSymbolicLink(file.toPath())) bytes += file.length()
++        }
++        return StorageBytes(bytes)
++    }
++}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/documents/TextDocumentReaderActivity.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/documents/TextDocumentReaderActivity.kt
 new file mode 100644
-index 0000000..e488ef5
+index 0000000..0932073
 --- /dev/null
 +++ b/app/src/main/java/eu/kanade/tachiyomi/ui/documents/TextDocumentReaderActivity.kt
-@@ -0,0 +1,425 @@
+@@ -0,0 +1,433 @@
 +package eu.kanade.tachiyomi.ui.documents
 +
 +import android.content.Context
@@ -1600,7 +1969,15 @@ index 0000000..e488ef5
 +                        else -> error("Unsupported text document")
 +                    }
 +                    val type = checkNotNull(DocumentFormat.fromName(file.name.orEmpty()))
-+                    val reader = TextDocument(DocumentFiles.materialize(this@TextDocumentReaderActivity, file), type)
++                    val lease = DocumentFiles.materialize(this@TextDocumentReaderActivity, file)
++                    val reader = try {
++                        TextDocument(lease.file, type, lease::close)
++                    } catch (
++                        error: Throwable,
++                    ) {
++                        lease.close()
++                        throw error
++                    }
 +                    preparing = reader
 +                    Loaded(manga, chapter, reader)
 +                }
@@ -1635,7 +2012,7 @@ index 0000000..e488ef5
 +        var completed by remember { mutableStateOf(value.chapter.read) }
 +        val list = rememberLazyListState()
 +        val translationPreferences = remember { Injekt.get<TranslationPreferences>() }
-+        val translator = remember { DocumentTextTranslator(this, translationPreferences) }
++        val translator = remember { DocumentTextTranslator(this, translationPreferences, value.manga.title) }
 +        val update = remember { Injekt.get<UpdateChapter>() }
 +        val displayed = if (showTranslation) translated ?: content else content
 +
@@ -1905,10 +2282,27 @@ index a7c9284..0640410 100644
          } else {
              context.startActivity(ReaderActivity.newIntent(context, chapter.mangaId, chapter.id))
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/manga/MangaViewModel.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/manga/MangaViewModel.kt
-index 54a5838..a7f25e9 100644
+index 54a5838..de9f434 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/ui/manga/MangaViewModel.kt
 +++ b/app/src/main/java/eu/kanade/tachiyomi/ui/manga/MangaViewModel.kt
-@@ -830,7 +830,7 @@ class MangaViewModel(
+@@ -192,12 +192,14 @@ class MangaViewModel(
+ 
+     init {
+         viewModelScope.launchIO {
+-            combine(
++            combine<Any, Unit>(listOf(
++                translationPreferences.useSourceOcrLanguage().changes(),
++                translationPreferences.autoTranslateAsianDownloadsBeta().changes(),
+                 autoTranslationPreference.changes(),
+                 translationPreferences.autoTranslateEnglishDownloads().changes(),
+                 translationPreferences.translateFromLanguage().changes(),
+                 translationPreferences.translateToLanguage().changes(),
+-            ) { _, _, _, _ -> Unit }
++            )) { Unit }
+                 .collectLatest {
+                     updateSuccessState { state -> state.copy(autoTranslateEnabled = translationManager.isAutomaticTranslationEnabled(state.manga)) }
+                 }
+@@ -830,7 +832,7 @@ class MangaViewModel(
          when (action) {
              ChapterTranslationAction.START -> {
                  val manga = successState?.manga ?: return
@@ -2034,7 +2428,7 @@ index 0000000..651862b
 +    }
 +}
 diff --git a/app/src/main/java/eu/kanade/translation/ChapterTranslator.kt b/app/src/main/java/eu/kanade/translation/ChapterTranslator.kt
-index ce9709e..ab23f68 100644
+index ce9709e..a7213fe 100644
 --- a/app/src/main/java/eu/kanade/translation/ChapterTranslator.kt
 +++ b/app/src/main/java/eu/kanade/translation/ChapterTranslator.kt
 @@ -53,6 +53,11 @@ import kotlinx.serialization.json.Json
@@ -2049,7 +2443,29 @@ index ce9709e..ab23f68 100644
  import tachiyomi.core.common.util.lang.launchIO
  import tachiyomi.core.common.util.lang.launchUI
  import tachiyomi.core.common.util.system.ImageUtil
-@@ -228,7 +233,8 @@ class ChapterTranslator(
+@@ -178,6 +183,12 @@ class ChapterTranslator(
+         isPaused = true
+     }
+ 
++    suspend fun pauseAndAwait() {
++        val running = translationJob
++        pause()
++        running?.join()
++    }
++
+     fun clearQueue() {
+         cancelTranslatorJob()
+         releaseOcrEngineAsync()
+@@ -190,7 +201,7 @@ class ChapterTranslator(
+             val activeTranslationFlow = queueState.transformLatest { queue ->
+                 while (true) {
+                     val activeTranslations = queue.asSequence().filter { it.status.value <= Translation.State.TRANSLATING.value }
+-                        .groupBy { it.source }.toList().take(5).map { (_, translations) -> translations.first() }
++                        .groupBy { it.source }.toList().take(1).map { (_, translations) -> translations.first() }
+                     emit(activeTranslations)
+                     if (activeTranslations.isEmpty()) break
+                     combine(activeTranslations.map(Translation::statusFlow)) { states -> states.contains(Translation.State.ERROR) }
+@@ -228,11 +239,16 @@ class ChapterTranslator(
      private fun cancelTranslatorJob() { translationJob?.cancel(); translationJob = null }
  
      fun queueChapter(manga: Manga, chapter: Chapter) {
@@ -2058,8 +2474,17 @@ index ce9709e..ab23f68 100644
 +        if (source !is HttpSource && source !is LocalSource) return
          if (provider.findTranslationFile(chapter.name, chapter.scanlator, manga.title, source) != null) return
          if (queueState.value.any { it.chapter.id == chapter.id }) return
-         val fromLang = TextRecognizerLanguage.fromPref(translationPreferences.translateFromLanguage())
-@@ -254,17 +260,33 @@ class ChapterTranslator(
+-        val fromLang = TextRecognizerLanguage.fromPref(translationPreferences.translateFromLanguage())
++        val fromLang = if (translationPreferences.useSourceOcrLanguage().get()) {
++            SourceTranslationLanguage.resolve((source as? HttpSource)?.lang)
++                ?: TextRecognizerLanguage.fromPref(translationPreferences.translateFromLanguage())
++        } else TextRecognizerLanguage.fromPref(translationPreferences.translateFromLanguage())
+         val toLang = TextTranslatorLanguage.fromPref(translationPreferences.translateToLanguage())
++        if (fromLang.code == toLang.code) return
+         val ocrType = OcrEngineType.fromPref(translationPreferences.ocrEngine())
+         if (!ocrType.supports(fromLang)) { launchUI { context.toast(ATMR.strings.error_paddle_ocr_english_only) }; return }
+         val engine = TextTranslators.fromPref(translationPreferences.translationEngine())
+@@ -254,17 +270,33 @@ class ChapterTranslator(
              val strictOcrGrouping = selectedOcrType == OcrEngineType.PADDLE_OCR
              val translationMangaDir = provider.getMangaDir(translation.manga.title, translation.source)
              val saveFile = provider.getTranslationFileName(translation.chapter.name, translation.chapter.scanlator)
@@ -2102,7 +2527,7 @@ index ce9709e..ab23f68 100644
                      withContext(Dispatchers.IO) {
                          chapterPages.pages.forEachIndexed { index, (fileName, streamFn) ->
                              coroutineContext.ensureActive()
-@@ -297,8 +319,8 @@ class ChapterTranslator(
+@@ -297,8 +329,8 @@ class ChapterTranslator(
                              )
                          }
                      }
@@ -2113,6 +2538,327 @@ index ce9709e..ab23f68 100644
  
              val automaticPages = pages.mapValuesTo(mutableMapOf()) { (_, page) ->
                  PageTranslation(page.blocks.filter(::isTranslatableBlock).toMutableList(), page.imgWidth, page.imgHeight)
+diff --git a/app/src/main/java/eu/kanade/translation/SourceTranslationLanguage.kt b/app/src/main/java/eu/kanade/translation/SourceTranslationLanguage.kt
+new file mode 100644
+index 0000000..fab22cc
+--- /dev/null
++++ b/app/src/main/java/eu/kanade/translation/SourceTranslationLanguage.kt
+@@ -0,0 +1,26 @@
++package eu.kanade.translation
++
++import eu.kanade.translation.recognizer.TextRecognizerLanguage
++import java.util.Locale
++
++/** Metadata routing only. Mixed/unknown sources still require the selected OCR input language. */
++object SourceTranslationLanguage {
++    fun resolve(code: String?): TextRecognizerLanguage? = when (
++        code?.lowercase(Locale.ROOT)?.replace('_', '-')?.substringBefore('-')
++    ) {
++        "en" -> TextRecognizerLanguage.ENGLISH
++        "ja" -> TextRecognizerLanguage.JAPANESE
++        "zh" -> TextRecognizerLanguage.CHINESE
++        "ko" -> TextRecognizerLanguage.KOREAN
++        else -> null
++    }
++
++    fun automatic(english: Boolean, asianBeta: Boolean, override: Boolean?, code: String?, target: String): Boolean {
++        if (target.isBlank()) return false
++        val language = resolve(code)
++        if (language?.name == target) return false
++        if (override != null) return override
++        if (language == null) return false
++        return if (language == TextRecognizerLanguage.ENGLISH) english else asianBeta
++    }
++}
+diff --git a/app/src/main/java/eu/kanade/translation/TranslationDeletionGate.kt b/app/src/main/java/eu/kanade/translation/TranslationDeletionGate.kt
+new file mode 100644
+index 0000000..0be4de6
+--- /dev/null
++++ b/app/src/main/java/eu/kanade/translation/TranslationDeletionGate.kt
+@@ -0,0 +1,46 @@
++package eu.kanade.translation
++
++import kotlinx.coroutines.sync.Mutex
++import kotlinx.coroutines.sync.withLock
++import java.util.concurrent.atomic.AtomicLong
++
++/** Wait for cancelled writers before removing files; preserve an explicit user pause. */
++class TranslationDeletionGate(
++    private val running: () -> Boolean,
++    private val pauseAndAwait: suspend () -> Unit,
++    private val restart: () -> Unit,
++) {
++    private val mutex = Mutex()
++    private val pauseRevision = AtomicLong()
++
++    @Volatile private var active = false
++
++    @Volatile private var deferredStart = false
++
++    fun deferStart(): Boolean {
++        if (!active) return false
++        deferredStart = true
++        return true
++    }
++
++    fun userPaused() {
++        pauseRevision.incrementAndGet()
++        deferredStart = false
++    }
++
++    suspend fun remove(action: suspend () -> Unit) = mutex.withLock {
++        active = true
++        val resume = running()
++        val revision = pauseRevision.get()
++        try {
++            pauseAndAwait()
++            action()
++        } finally {
++            active = false
++            if ((resume && revision == pauseRevision.get()) || deferredStart) {
++                deferredStart = false
++                restart()
++            }
++        }
++    }
++}
+diff --git a/app/src/main/java/eu/kanade/translation/TranslationManager.kt b/app/src/main/java/eu/kanade/translation/TranslationManager.kt
+index ec83930..06c948f 100644
+--- a/app/src/main/java/eu/kanade/translation/TranslationManager.kt
++++ b/app/src/main/java/eu/kanade/translation/TranslationManager.kt
+@@ -38,6 +38,10 @@ import kotlinx.serialization.decodeFromString
+ import kotlinx.serialization.encodeToString
+ import kotlinx.serialization.json.Json
+ import tachiyomi.core.common.util.lang.launchIO
++import tachiyomi.core.common.util.lang.launchUI
++import tachiyomi.core.common.util.system.logcat
++import eu.kanade.tachiyomi.util.system.toast
++import logcat.LogPriority
+ import tachiyomi.domain.chapter.model.Chapter
+ import tachiyomi.domain.manga.model.Manga
+ import tachiyomi.domain.source.service.SourceManager
+@@ -72,6 +76,13 @@ class TranslationManager(
+     private val translator = ChapterTranslator(context, provider)
+     private val editorScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+     private val translationFileMutex = Mutex()
++    private val deletingChapters = java.util.concurrent.ConcurrentHashMap.newKeySet<Long>()
++    private val deletingManga = java.util.concurrent.ConcurrentHashMap.newKeySet<Long>()
++    private val deletionGate = TranslationDeletionGate(
++        running = { translator.isRunning },
++        pauseAndAwait = { translator.pauseAndAwait() },
++        restart = { if (queueState.value.isNotEmpty()) { translator.start(); startTranslation() } },
++    )
+ 
+     val isRunning: Boolean
+         get() = translator.isRunning
+@@ -79,20 +90,23 @@ class TranslationManager(
+     val queueState
+         get() = translator.queueState
+ 
+-    fun translatorStart() = translator.start()
++    fun translatorStart() = if (deletionGate.deferStart()) false else translator.start()
+     fun translatorStop(reason: String? = null) = translator.stop(reason)
+ 
+     fun startTranslation() {
+         if (queueState.value.isEmpty()) return
++        if (deletionGate.deferStart()) return
+         TranslationJob.start(context)
+     }
+ 
+     fun pauseTranslation() {
++        deletionGate.userPaused()
+         translator.pause()
+         TranslationJob.stop(context)
+     }
+ 
+     fun clearQueue() {
++        deletionGate.userPaused()
+         translator.clearQueue()
+         TranslationJob.stop(context)
+     }
+@@ -113,6 +127,13 @@ class TranslationManager(
+ 
+     fun isAutomaticTranslationEnabled(manga: Manga): Boolean {
+         val work = translationPreferences.autoTranslateManga(manga.id)
++        if (translationPreferences.useSourceOcrLanguage().get()) return SourceTranslationLanguage.automatic(
++            english = translationPreferences.autoTranslateEnglishDownloads().get(),
++            asianBeta = translationPreferences.autoTranslateAsianDownloadsBeta().get(),
++            override = work.get().takeIf { work.isSet() },
++            code = (sourceManager.get(manga.source) as? eu.kanade.tachiyomi.source.online.HttpSource)?.lang,
++            target = translationPreferences.translateToLanguage().get(),
++        )
+         return EnglishDownloadTranslationPolicy.enabled(
+             globalEnabled = translationPreferences.autoTranslateEnglishDownloads().get(),
+             workOverride = work.get().takeIf { work.isSet() },
+@@ -129,7 +150,8 @@ class TranslationManager(
+     ) {
+         val autoTranslateEnabled = isAutomaticTranslationEnabled(manga)
+         if (!TranslationLaunchPolicy.canStart(origin, autoTranslateEnabled)) return
+-        chapters.forEach { chapter -> translator.queueChapter(manga, chapter) }
++        if (manga.id in deletingManga) return
++        chapters.filterNot { it.id in deletingChapters }.forEach { chapter -> translator.queueChapter(manga, chapter) }
+         startTranslation()
+     }
+ 
+@@ -572,24 +594,68 @@ class TranslationManager(
+     }
+ 
+     fun deleteTranslation(chapter: Chapter, manga: Manga, source: Source) {
+-        launchIO {
+-            removeFromTranslationQueue(chapter)
+-            val file = provider.findTranslationFile(chapter.name, chapter.scanlator, manga.title, source)
+-            file?.delete()
+-        }
++        launchIO { deleteDownloadedTranslation(chapter, manga, source) }
++    }
++
++    suspend fun deleteDownloadedTranslation(
++        chapter: Chapter, manga: Manga, source: Source, deleteOriginal: () -> Boolean = { true },
++    ): Boolean {
++        deletingChapters.add(chapter.id)
++        return try {
++            deletionGate.remove {
++                translator.removeFromQueue(chapter)
++                check(deleteOriginal()) { "Cannot remove original chapter" }
++                translationFileMutex.withLock {
++                    val work = ComicTranslationContext(manga.title, chapter.name)
++                    val file = provider.findTranslationFile(chapter.name, chapter.scanlator, manga.title, source)
++                    val texts = file?.let { runCatching { readStoredPages(it).values.flatMap { page ->
++                        page.blocks.map { block -> block.text }
++                    } }.getOrNull() }
++                    check(file == null || file.delete()) { "Cannot remove chapter translation" }
++                    if (texts != null) TranslationCache.removeSources(work, texts)
++                    else TranslationCache.clearMachineOutput(work)
++                }
++            }
++            true
++        } catch (error: Exception) {
++            if (error is kotlinx.coroutines.CancellationException) throw error
++            logcat(LogPriority.ERROR, error)
++            launchUI {
++                context.toast(tachiyomi.i18n.at.ATMR.strings.storage_translation_delete_failed)
++            }
++            false
++        } finally { deletingChapters.remove(chapter.id) }
+     }
+ 
+     fun deleteManga(manga: Manga, source: Source, removeQueued: Boolean = true) {
+-        launchIO {
+-            if (removeQueued) {
++        launchIO { deleteDownloadedMangaTranslations(manga, source) }
++    }
++
++    suspend fun deleteDownloadedMangaTranslations(
++        manga: Manga, source: Source, deleteOriginal: () -> Boolean = { true },
++    ): Boolean {
++        deletingManga.add(manga.id)
++        return try {
++            deletionGate.remove {
+                 translator.removeFromQueue(manga)
++                check(deleteOriginal()) { "Cannot remove original downloads" }
++                translationFileMutex.withLock {
++                    val directory = provider.findMangaDir(manga.title, source)
++                    check(directory == null || directory.delete()) { "Cannot remove work translations" }
++                    TranslationCache.clearMachineOutput(ComicTranslationContext(manga.title, ""))
++                    val sourceDir = provider.findSourceDir(source)
++                    if (sourceDir?.listFiles()?.isEmpty() == true) sourceDir.delete()
++                }
+             }
+-            provider.findMangaDir(manga.title, source)?.delete()
+-            val sourceDir = provider.findSourceDir(source)
+-            if (sourceDir?.listFiles()?.isEmpty() == true) {
+-                sourceDir.delete()
++            true
++        } catch (error: Exception) {
++            if (error is kotlinx.coroutines.CancellationException) throw error
++            logcat(LogPriority.ERROR, error)
++            launchUI {
++                context.toast(tachiyomi.i18n.at.ATMR.strings.storage_translation_delete_failed)
+             }
+-        }
++            false
++        } finally { deletingManga.remove(manga.id) }
+     }
+ 
+     fun cancelQueuedTranslation(translation: Translation) {
+diff --git a/app/src/main/java/eu/kanade/translation/memory/TranslationCache.kt b/app/src/main/java/eu/kanade/translation/memory/TranslationCache.kt
+index 3152b26..21abfad 100644
+--- a/app/src/main/java/eu/kanade/translation/memory/TranslationCache.kt
++++ b/app/src/main/java/eu/kanade/translation/memory/TranslationCache.kt
+@@ -186,6 +186,10 @@ object TranslationCache {
+             }
+     }
+ 
++    fun clearMachineOutput(context: ComicTranslationContext, preferenceStore: PreferenceStore = Injekt.get()) {
++        clearManga(TranslationMemory.normalizeMangaKey(context.mangaTitle), preferenceStore)
++    }
++
+     private fun clearManga(mangaKey: String, preferenceStore: PreferenceStore) {
+         registeredScopes(preferenceStore)
+             .filter { it.mangaKey == mangaKey }
+@@ -196,6 +200,25 @@ object TranslationCache {
+             }
+     }
+ 
++    /** Drop machine output for a deleted chapter, retaining glossary terms and learned corrections. */
++    fun removeSources(
++        context: ComicTranslationContext,
++        sources: Collection<String>,
++        preferenceStore: PreferenceStore = Injekt.get(),
++    ) {
++        val mangaKey = TranslationMemory.normalizeMangaKey(context.mangaTitle)
++        val keys = sources.map(::normalizeSource).toSet()
++        if (keys.isEmpty()) return
++        registeredScopes(preferenceStore).filter { it.mangaKey == mangaKey }.forEach { scope ->
++            val key = scopeKey(scope)
++            val memory = memoryFor(key, preferenceStore)
++            synchronized(memory) {
++                keys.forEach(memory::remove)
++                persist(key, memory, preferenceStore)
++            }
++        }
++    }
++
+     private fun memoryFor(
+         scope: String,
+         preferenceStore: PreferenceStore,
+diff --git a/app/src/main/java/eu/kanade/translation/memory/TranslationGlossary.kt b/app/src/main/java/eu/kanade/translation/memory/TranslationGlossary.kt
+index 285c7e6..77720a8 100644
+--- a/app/src/main/java/eu/kanade/translation/memory/TranslationGlossary.kt
++++ b/app/src/main/java/eu/kanade/translation/memory/TranslationGlossary.kt
+@@ -155,12 +155,12 @@ object TranslationGlossary {
+     private fun boundedRegex(term: String): Regex {
+         val cleanTerm = term.trim()
+         val escaped = Regex.escape(cleanTerm)
+-        val leftBoundary = if (cleanTerm.firstOrNull()?.isLetterOrDigit() == true) {
++        val leftBoundary = if (needsWordBoundary(cleanTerm.firstOrNull())) {
+             "(?<![\\p{L}\\p{N}])"
+         } else {
+             ""
+         }
+-        val rightBoundary = if (cleanTerm.lastOrNull()?.isLetterOrDigit() == true) {
++        val rightBoundary = if (needsWordBoundary(cleanTerm.lastOrNull())) {
+             "(?![\\p{L}\\p{N}])"
+         } else {
+             ""
+@@ -168,6 +168,17 @@ object TranslationGlossary {
+         return Regex("$leftBoundary$escaped$rightBoundary", RegexOption.IGNORE_CASE)
+     }
+ 
++    // These scripts commonly attach names to adjacent words or particles without spaces.
++    private fun needsWordBoundary(character: Char?): Boolean {
++        if (character == null || !character.isLetterOrDigit()) return false
++        return Character.UnicodeScript.of(character.code) !in setOf(
++            Character.UnicodeScript.HAN,
++            Character.UnicodeScript.HIRAGANA,
++            Character.UnicodeScript.KATAKANA,
++            Character.UnicodeScript.HANGUL,
++        )
++    }
++
+     private fun protectedToken(index: Int): String =
+         "YOMOTSUTERM${index.toString().padStart(4, '0')}ZXQ"
+ 
 diff --git a/app/src/main/java/eu/kanade/translation/model/Translation.kt b/app/src/main/java/eu/kanade/translation/model/Translation.kt
 index 6830781..cae7a90 100644
 --- a/app/src/main/java/eu/kanade/translation/model/Translation.kt
@@ -2145,6 +2891,77 @@ index 6830781..cae7a90 100644
  
              return Translation(source, manga, chapter)
          }
+diff --git a/app/src/test/java/eu/kanade/tachiyomi/ui/documents/DocumentCacheBudgetTest.kt b/app/src/test/java/eu/kanade/tachiyomi/ui/documents/DocumentCacheBudgetTest.kt
+new file mode 100644
+index 0000000..59497de
+--- /dev/null
++++ b/app/src/test/java/eu/kanade/tachiyomi/ui/documents/DocumentCacheBudgetTest.kt
+@@ -0,0 +1,65 @@
++package eu.kanade.tachiyomi.ui.documents
++
++import mihon.core.archive.DocumentCacheBudget
++import org.junit.jupiter.api.Assertions.assertEquals
++import org.junit.jupiter.api.Assertions.assertFalse
++import org.junit.jupiter.api.Assertions.assertTrue
++import org.junit.jupiter.api.Test
++import org.junit.jupiter.api.assertThrows
++import java.io.File
++import java.io.RandomAccessFile
++import java.nio.file.Files
++
++class DocumentCacheBudgetTest {
++    private fun fixture(block: (File) -> Unit) {
++        val root = Files.createTempDirectory("polaris-budget").toFile()
++        try {
++            block(root)
++        } finally {
++            root.deleteRecursively()
++        }
++    }
++    private fun file(root: File, name: String, size: Int = 30) = File(root, name).also {
++        requireNotNull(it.parentFile).mkdirs()
++        it.writeBytes(ByteArray(size))
++    }
++
++    @Test fun `evicts least recently used cache files while retaining imported originals`() = fixture { root ->
++        val original = file(root, "local/book.pdf")
++        val old = file(root, "pdf-pages/a/old.png").also { it.setLastModified(1000) }
++        val recent = file(root, "document-translations/recent").also { it.setLastModified(2000) }
++        assertEquals(30L, DocumentCacheBudget.trim(root, 30))
++        assertFalse(old.exists())
++        assertTrue(recent.exists())
++        assertTrue(original.exists())
++    }
++
++    @Test fun `open files can exceed the target until their final lease closes`() = fixture { root ->
++        val target = File(root, "document-files/large").also { requireNotNull(it.parentFile).mkdirs() }
++        val first = DocumentCacheBudget.acquire(root, target) {
++            RandomAccessFile(target, "rw").use { it.setLength(DocumentCacheBudget.LIMIT_BYTES + 1) }
++        }
++        val second = DocumentCacheBudget.acquire(root, target) {}
++        assertEquals(0L, DocumentCacheBudget.trim(root, 0))
++        first.close()
++        assertTrue(target.exists())
++        second.close()
++        assertFalse(target.exists())
++        second.close()
++    }
++
++    @Test fun `clear touches only managed directories and skips symbolic links`() = fixture { root ->
++        val original = file(root, "files/glossary")
++        file(root, "document-files/.stale-temp")
++        Files.createSymbolicLink(File(root, "document-files/link").toPath(), original.toPath())
++        DocumentCacheBudget.trim(root, 0)
++        assertTrue(original.exists())
++        assertEquals(0L, DocumentCacheBudget.size(root))
++    }
++
++    @Test fun `an arbitrary file cannot be registered as document cache`() = fixture { root ->
++        val original = file(root, "local/book.pdf")
++        assertThrows<IllegalArgumentException> { DocumentCacheBudget.acquire(root, original) {} }
++        assertTrue(original.exists())
++    }
++}
 diff --git a/app/src/test/java/eu/kanade/tachiyomi/ui/documents/DocumentOrganizationTest.kt b/app/src/test/java/eu/kanade/tachiyomi/ui/documents/DocumentOrganizationTest.kt
 new file mode 100644
 index 0000000..f89b137
@@ -2710,12 +3527,331 @@ index 0000000..a588cab
 +        assertNull(DocumentFormat.fromName("installer.apk"))
 +    }
 +}
+diff --git a/app/src/test/java/eu/kanade/translation/SourceTranslationLanguageTest.kt b/app/src/test/java/eu/kanade/translation/SourceTranslationLanguageTest.kt
+new file mode 100644
+index 0000000..85244ff
+--- /dev/null
++++ b/app/src/test/java/eu/kanade/translation/SourceTranslationLanguageTest.kt
+@@ -0,0 +1,28 @@
++package eu.kanade.translation
++
++import eu.kanade.translation.recognizer.TextRecognizerLanguage
++import org.junit.jupiter.api.Assertions.assertEquals
++import org.junit.jupiter.api.Assertions.assertFalse
++import org.junit.jupiter.api.Assertions.assertNull
++import org.junit.jupiter.api.Assertions.assertTrue
++import org.junit.jupiter.api.Test
++
++class SourceTranslationLanguageTest {
++    @Test fun `known metadata chooses the appropriate script without guessing mixed sources`() {
++        assertEquals(TextRecognizerLanguage.JAPANESE, SourceTranslationLanguage.resolve("ja-JP"))
++        assertEquals(TextRecognizerLanguage.KOREAN, SourceTranslationLanguage.resolve("ko"))
++        assertEquals(TextRecognizerLanguage.CHINESE, SourceTranslationLanguage.resolve("zh_TW"))
++        assertEquals(TextRecognizerLanguage.CHINESE, SourceTranslationLanguage.resolve("zh-CN"))
++        assertNull(SourceTranslationLanguage.resolve("all"))
++        assertNull(SourceTranslationLanguage.resolve("pt-BR"))
++    }
++
++    @Test fun `asian automation is opt in and never retranslates the selected target language`() {
++        assertFalse(SourceTranslationLanguage.automatic(true, false, null, "ja", "PORTUGUESE"))
++        assertTrue(SourceTranslationLanguage.automatic(true, true, null, "ja", "PORTUGUESE"))
++        assertFalse(SourceTranslationLanguage.automatic(true, true, null, "ja", "JAPANESE"))
++        assertFalse(SourceTranslationLanguage.automatic(true, true, true, "ja", "JAPANESE"))
++        assertFalse(SourceTranslationLanguage.automatic(true, true, false, "en", "PORTUGUESE"))
++        assertTrue(SourceTranslationLanguage.automatic(false, false, true, "all", "PORTUGUESE"))
++    }
++}
+diff --git a/app/src/test/java/eu/kanade/translation/TranslationDeletionGateTest.kt b/app/src/test/java/eu/kanade/translation/TranslationDeletionGateTest.kt
+new file mode 100644
+index 0000000..f72427c
+--- /dev/null
++++ b/app/src/test/java/eu/kanade/translation/TranslationDeletionGateTest.kt
+@@ -0,0 +1,47 @@
++package eu.kanade.translation
++
++import kotlinx.coroutines.CompletableDeferred
++import kotlinx.coroutines.async
++import kotlinx.coroutines.test.runTest
++import org.junit.jupiter.api.Assertions.assertEquals
++import org.junit.jupiter.api.Assertions.assertFalse
++import org.junit.jupiter.api.Assertions.assertTrue
++import org.junit.jupiter.api.Test
++import org.junit.jupiter.api.assertThrows
++import java.io.IOException
++
++class TranslationDeletionGateTest {
++    @Test fun `deletion waits for the old writer before removal and restart`() = runTest {
++        val stopped = CompletableDeferred<Unit>()
++        val events = mutableListOf<String>()
++        val gate = TranslationDeletionGate({ true }, {
++            stopped.await()
++            events += "joined"
++        }, { events += "restart" })
++        val job = async { gate.remove { events += "delete" } }
++        testScheduler.runCurrent()
++        assertTrue(events.isEmpty())
++        assertTrue(gate.deferStart())
++        stopped.complete(Unit)
++        job.await()
++        assertEquals(listOf("joined", "delete", "restart"), events)
++        assertFalse(gate.deferStart())
++    }
++
++    @Test fun `user pause during cleanup prevents an automatic restart`() = runTest {
++        var restarts = 0
++        val gate = TranslationDeletionGate({ true }, {}, { restarts++ })
++        gate.remove { gate.userPaused() }
++        assertEquals(0, restarts)
++    }
++
++    @Test fun `failed removal releases the gate and resumes other queued work`() = runTest {
++        var restarts = 0
++        val gate = TranslationDeletionGate({ true }, {}, { restarts++ })
++        assertThrows<IOException> { gate.remove { throw IOException("retained original") } }
++        assertFalse(gate.deferStart())
++        assertEquals(1, restarts)
++        gate.remove {}
++        assertEquals(2, restarts)
++    }
++}
+diff --git a/app/src/test/java/eu/kanade/translation/TranslationStorageSampleTest.kt b/app/src/test/java/eu/kanade/translation/TranslationStorageSampleTest.kt
+new file mode 100644
+index 0000000..e1b3940
+--- /dev/null
++++ b/app/src/test/java/eu/kanade/translation/TranslationStorageSampleTest.kt
+@@ -0,0 +1,38 @@
++package eu.kanade.translation
++
++import eu.kanade.translation.model.PageTranslation
++import eu.kanade.translation.model.TranslationBlock
++import kotlinx.serialization.decodeFromString
++import kotlinx.serialization.encodeToString
++import kotlinx.serialization.json.Json
++import org.junit.jupiter.api.Assertions.assertEquals
++import org.junit.jupiter.api.Test
++
++class TranslationStorageSampleTest {
++    @Test fun `measure actual chapter serialization with authored multilingual text`() {
++        val texts = mapOf(
++            "en" to "The library opens tomorrow. Sora will bring the blue book.",
++            "ja" to "図書館は明日開きます。ソラは青い本を持ってきます。",
++            "zh-CN" to "图书馆明天开放。小空会带来那本蓝色的书。",
++            "zh-TW" to "圖書館明天開放。小空會帶來那本藍色的書。",
++            "ko" to "도서관은 내일 문을 엽니다. 소라는 파란 책을 가져올 것입니다.",
++        )
++        for ((language, source) in texts) {
++            val pages = (1..20).associate { page ->
++                "$page.png" to PageTranslation(
++                    (1..10).map {
++                        TranslationBlock(
++                            source, "A biblioteca abre amanhã. Sora trará o livro azul.",
++                            400f, 200f, 100f, 300f, 24f, 12f, 0f,
++                        )
++                    }.toMutableList(),
++                    1600f,
++                    2400f,
++                )
++            }
++            val json = Json.encodeToString(pages)
++            assertEquals(pages, Json.decodeFromString<Map<String, PageTranslation>>(json))
++            println("POLARIS_STORAGE_SAMPLE language=$language bytes=${json.toByteArray().size} pages=20 blocks=200")
++        }
++    }
++}
+diff --git a/app/src/test/java/eu/kanade/translation/memory/TranslationGlossaryTest.kt b/app/src/test/java/eu/kanade/translation/memory/TranslationGlossaryTest.kt
+index bf211e6..5499cde 100644
+--- a/app/src/test/java/eu/kanade/translation/memory/TranslationGlossaryTest.kt
++++ b/app/src/test/java/eu/kanade/translation/memory/TranslationGlossaryTest.kt
+@@ -103,4 +103,28 @@ class TranslationGlossaryTest {
+         assertTrue(instructions.contains("[TÉCNICA] Arise => Erga-se"))
+         assertFalse(instructions.contains("A full sentence"))
+     }
++
++    @Test
++    fun `protected CJK names match attached particles while Latin words retain their boundaries`() {
++        for ((name, sentence) in listOf(
++            "ソラ" to "ソラは青い本を持ってきます。",
++            "小空" to "小空会带来蓝色的书。",
++            "小空" to "小空會帶來藍色的書。",
++            "소라" to "소라는 파란 책을 가져옵니다.",
++        )) {
++            val entries = listOf(TranslationMemoryEntry(name, "Sora", TranslationMemoryEntryType.NAME, true))
++            val prepared = TranslationGlossary.prepare(sentence, entries)
++            assertEquals(1, prepared.protectedTerms.size)
++            assertEquals(
++                "Sora trará o livro.",
++                TranslationGlossary.resolve(
++                    prepared,
++                    prepared.protectedTerms.single().token + " trará o livro.",
++                    entries,
++                ),
++            )
++        }
++        val entries = listOf(TranslationMemoryEntry("Ann", "Ana", TranslationMemoryEntryType.NAME, true))
++        assertTrue(TranslationGlossary.prepare("Annette", entries).protectedTerms.isEmpty())
++    }
+ }
+diff --git a/app/src/test/java/eu/kanade/translation/memory/TranslationIntelligenceIntegrationTest.kt b/app/src/test/java/eu/kanade/translation/memory/TranslationIntelligenceIntegrationTest.kt
+index 2cb2951..3d49959 100644
+--- a/app/src/test/java/eu/kanade/translation/memory/TranslationIntelligenceIntegrationTest.kt
++++ b/app/src/test/java/eu/kanade/translation/memory/TranslationIntelligenceIntegrationTest.kt
+@@ -106,6 +106,71 @@ class TranslationIntelligenceIntegrationTest {
+         assertEquals(1, decoded.mangas.single().memory.size)
+         assertEquals(1, decoded.mangas.single().cache.size)
+     }
++
++    @Test
++    fun `deleting machine output keeps vocabulary and corrections across source language scopes`() {
++        val preferences = MapPreferences()
++        val work = ComicTranslationContext("Retained beta glossary", "1")
++        TranslationMemory.remember(
++            work,
++            "Sora",
++            "Sora",
++            type = TranslationMemoryEntryType.NAME,
++            isProtected = true,
++            preferenceStore = preferences.store,
++        )
++        TranslationMemory.remember(
++            work,
++            "I am here",
++            "Cheguei",
++            type = TranslationMemoryEntryType.MANUAL_CORRECTION,
++            preferenceStore = preferences.store,
++        )
++        val vocabulary = TranslationMemory.entries(work, preferences.store)
++        for (language in listOf(TextRecognizerLanguage.ENGLISH, TextRecognizerLanguage.JAPANESE)) {
++            TranslationCache.put(
++                work,
++                language,
++                TextTranslatorLanguage.PORTUGUESE,
++                "This deleted line",
++                "Esta frase apagada",
++                preferences.store,
++            )
++            TranslationCache.put(
++                work,
++                language,
++                TextTranslatorLanguage.PORTUGUESE,
++                "Keep other chapter",
++                "Manter outro capítulo",
++                preferences.store,
++            )
++        }
++        TranslationCache.removeSources(work, listOf("This deleted line"), preferences.store)
++        for (language in listOf(TextRecognizerLanguage.ENGLISH, TextRecognizerLanguage.JAPANESE)) {
++            assertNull(
++                TranslationCache.get(
++                    work,
++                    language,
++                    TextTranslatorLanguage.PORTUGUESE,
++                    "This deleted line",
++                    preferences.store,
++                ),
++            )
++            assertEquals(
++                "Manter outro capítulo",
++                TranslationCache.get(
++                    work,
++                    language,
++                    TextTranslatorLanguage.PORTUGUESE,
++                    "Keep other chapter",
++                    preferences.store,
++                ),
++            )
++        }
++        TranslationCache.clearMachineOutput(work, preferences.store)
++        assertEquals(vocabulary, TranslationMemory.entries(work, preferences.store))
++        assertEquals(0, TranslationCache.snapshotEntries(work, preferences.store).size)
++    }
+ }
+ 
+ private class MapPreferences {
+diff --git a/core/archive/src/main/kotlin/mihon/core/archive/DocumentCacheBudget.kt b/core/archive/src/main/kotlin/mihon/core/archive/DocumentCacheBudget.kt
+new file mode 100644
+index 0000000..db8bea6
+--- /dev/null
++++ b/core/archive/src/main/kotlin/mihon/core/archive/DocumentCacheBudget.kt
+@@ -0,0 +1,73 @@
++package mihon.core.archive
++
++import java.io.Closeable
++import java.io.File
++import java.nio.file.Files
++
++/** Only regenerable document caches. Imported originals and models are outside these directories. */
++object DocumentCacheBudget {
++    const val LIMIT_BYTES = 256L * 1024 * 1024
++    val directories = setOf("document-files", "pdf-pages", "document-translations")
++    private val pins = mutableMapOf<String, Int>()
++
++    class Lease internal constructor(val file: File, private val release: () -> Unit) : Closeable {
++        private var closed = false
++
++        @Synchronized override fun close() {
++            if (!closed) {
++                closed = true
++                release()
++            }
++        }
++    }
++
++    @Synchronized
++    fun acquire(root: File, target: File, prepare: () -> Unit): Lease {
++        require(
++            directories.any {
++                File(root, it).canonicalFile.toPath().let { base ->
++                    target.canonicalFile.toPath().startsWith(base)
++                }
++            },
++        )
++        prepare()
++        check(target.isFile)
++        target.setLastModified(System.currentTimeMillis())
++        val key = target.canonicalPath
++        pins[key] = (pins[key] ?: 0) + 1
++        trim(root)
++        return Lease(target) {
++            synchronized(this) {
++                val count = (pins[key] ?: 1) - 1
++                if (count <= 0) pins.remove(key) else pins[key] = count
++                trim(root)
++            }
++        }
++    }
++
++    @Synchronized
++    fun size(root: File): Long = files(root).sumOf { it.length() }
++
++    @Synchronized
++    fun trim(root: File, limit: Long = LIMIT_BYTES): Long {
++        require(limit >= 0)
++        val candidates = files(root).sortedBy { it.lastModified() }
++        var total = candidates.sumOf { it.length() }
++        var deleted = 0L
++        for (file in candidates) {
++            if (total <= limit) break
++            if (pins.containsKey(file.canonicalPath)) continue
++            val bytes = file.length()
++            if (file.delete()) {
++                total -= bytes
++                deleted += bytes
++            }
++        }
++        return deleted
++    }
++
++    private fun files(root: File): List<File> = directories.flatMap { name ->
++        File(root, name).walkTopDown().onEnter { !Files.isSymbolicLink(it.toPath()) }
++            .filter { it.isFile && !Files.isSymbolicLink(it.toPath()) }.toList()
++    }
++}
 diff --git a/core/archive/src/main/kotlin/mihon/core/archive/DocumentFiles.kt b/core/archive/src/main/kotlin/mihon/core/archive/DocumentFiles.kt
 new file mode 100644
-index 0000000..f0a0c32
+index 0000000..22654f0
 --- /dev/null
 +++ b/core/archive/src/main/kotlin/mihon/core/archive/DocumentFiles.kt
-@@ -0,0 +1,30 @@
+@@ -0,0 +1,31 @@
 +package mihon.core.archive
 +
 +import android.content.Context
@@ -2726,23 +3862,24 @@ index 0000000..f0a0c32
 +
 +object DocumentFiles {
 +    @Synchronized
-+    fun materialize(context: Context, source: UniFile): File {
++    fun materialize(context: Context, source: UniFile): DocumentCacheBudget.Lease {
 +        val identity = "${source.uri}|${source.length()}|${source.lastModified()}"
 +        val key = MessageDigest.getInstance("SHA-256").digest(identity.toByteArray())
 +            .joinToString("") { "%02x".format(it) }
 +        val directory = File(context.cacheDir, "document-files").apply { mkdirs() }
 +        val target = File(directory, key)
-+        if (target.isFile && target.length() > 0) return target
-+        val temporary = File(directory, ".$key-${UUID.randomUUID()}")
-+        try {
-+            val size = source.openInputStream().use { input ->
-+                temporary.outputStream().use { output -> DocumentLimits.copy(input, output) }
++        return DocumentCacheBudget.acquire(context.cacheDir, target) {
++            if (target.isFile && target.length() > 0) return@acquire
++            val temporary = File(directory, ".$key-${UUID.randomUUID()}")
++            try {
++                val size = source.openInputStream().use { input ->
++                    temporary.outputStream().use { output -> DocumentLimits.copy(input, output) }
++                }
++                require(size > 0) { "Empty document" }
++                check(temporary.renameTo(target)) { "Cannot prepare document" }
++            } finally {
++                temporary.delete()
 +            }
-+            require(size > 0) { "Empty document" }
-+            check(temporary.renameTo(target)) { "Cannot prepare document" }
-+            return target
-+        } finally {
-+            temporary.delete()
 +        }
 +    }
 +}
@@ -2857,10 +3994,10 @@ index 0000000..fc6b8c0
 +}
 diff --git a/core/archive/src/main/kotlin/mihon/core/archive/PdfPageReader.kt b/core/archive/src/main/kotlin/mihon/core/archive/PdfPageReader.kt
 new file mode 100644
-index 0000000..3555071
+index 0000000..fb2d97f
 --- /dev/null
 +++ b/core/archive/src/main/kotlin/mihon/core/archive/PdfPageReader.kt
-@@ -0,0 +1,71 @@
+@@ -0,0 +1,100 @@
 +package mihon.core.archive
 +
 +import android.content.Context
@@ -2874,13 +4011,22 @@ index 0000000..3555071
 +import java.io.InputStream
 +import java.util.UUID
 +
-+class PdfPageReader(context: Context, source: UniFile) : Closeable {
-+    private val file = DocumentFiles.materialize(context, source)
-+    private val descriptor = ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY)
++class PdfPageReader(private val context: Context, source: UniFile) : Closeable {
++    private val lease = DocumentFiles.materialize(context, source)
++    private val file = lease.file
++    private val descriptor = try {
++        ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY)
++    } catch (
++        error: Throwable,
++    ) {
++        lease.close()
++        throw error
++    }
 +    private val renderer = try {
 +        PdfRenderer(descriptor)
 +    } catch (error: Throwable) {
 +        descriptor.close()
++        lease.close()
 +        throw error
 +    }
 +    private val cache = File(context.cacheDir, "pdf-pages/${file.name}").apply { mkdirs() }
@@ -2890,6 +4036,7 @@ index 0000000..3555071
 +        renderer.pageCount.also { require(it in 1..10000) { "Unsupported PDF page count" } }
 +    } catch (error: Throwable) {
 +        renderer.close()
++        lease.close()
 +        throw error
 +    }
 +
@@ -2900,44 +4047,63 @@ index 0000000..3555071
 +        check(!closed)
 +        require(index in 0 until pageCount)
 +        val target = File(cache, pageKey(index))
-+        if (!target.isFile || target.length() == 0L) {
-+            val temporary = File(cache, ".$index-${UUID.randomUUID()}.png")
-+            try {
-+                renderer.openPage(index).use { page ->
-+                    val (width, height) = DocumentRenderSize.pixels(page.width, page.height)
-+                    val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
-+                    try {
-+                        bitmap.eraseColor(Color.WHITE)
-+                        page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
-+                        temporary.outputStream().use { output ->
-+                            check(bitmap.compress(Bitmap.CompressFormat.PNG, 100, output))
++        val pageLease = DocumentCacheBudget.acquire(context.cacheDir, target) {
++            if (!target.isFile || target.length() == 0L) {
++                val temporary = File(cache, ".$index-${UUID.randomUUID()}.png")
++                try {
++                    renderer.openPage(index).use { page ->
++                        val (width, height) = DocumentRenderSize.pixels(page.width, page.height)
++                        val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
++                        try {
++                            bitmap.eraseColor(Color.WHITE)
++                            page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
++                            temporary.outputStream().use { output ->
++                                check(bitmap.compress(Bitmap.CompressFormat.PNG, 100, output))
++                            }
++                        } finally {
++                            bitmap.recycle()
 +                        }
-+                    } finally {
-+                        bitmap.recycle()
 +                    }
++                    check(temporary.renameTo(target)) { "Cannot cache PDF page" }
++                } finally {
++                    temporary.delete()
 +                }
-+                check(temporary.renameTo(target)) { "Cannot cache PDF page" }
-+            } finally {
-+                temporary.delete()
 +            }
 +        }
-+        return target.inputStream()
++        return try {
++            object : java.io.FilterInputStream(target.inputStream()) {
++                override fun close() {
++                    try {
++                        super.close()
++                    } finally {
++                        pageLease.close()
++                    }
++                }
++            }
++        } catch (error: Throwable) {
++            pageLease.close()
++            throw error
++        }
 +    }
 +
 +    @Synchronized
 +    override fun close() {
 +        if (!closed) {
 +            closed = true
-+            renderer.close()
++            try {
++                renderer.close()
++            } finally {
++                lease.close()
++            }
 +        }
 +    }
 +}
 diff --git a/core/archive/src/main/kotlin/mihon/core/archive/TextDocument.kt b/core/archive/src/main/kotlin/mihon/core/archive/TextDocument.kt
 new file mode 100644
-index 0000000..3b292ce
+index 0000000..ee88790
 --- /dev/null
 +++ b/core/archive/src/main/kotlin/mihon/core/archive/TextDocument.kt
-@@ -0,0 +1,233 @@
+@@ -0,0 +1,245 @@
 +package mihon.core.archive
 +
 +import org.jsoup.Jsoup
@@ -2957,7 +4123,12 @@ index 0000000..3b292ce
 +
 +data class DocumentSection(val title: String, val key: String)
 +
-+class TextDocument(private val file: File, val format: DocumentFormat) : Closeable {
++class TextDocument(
++    private val file: File,
++    val format: DocumentFormat,
++    private val onClose: () -> Unit = {},
++) : Closeable {
++    private var closed = false
 +    private val zip = if (format == DocumentFormat.EPUB || format == DocumentFormat.DOCX) ZipFile(file) else null
 +    private var prepared: List<List<DocumentBlock>>? = null
 +    var title: String = ""
@@ -3168,14 +4339,34 @@ index 0000000..3b292ce
 +
 +    @Synchronized
 +    override fun close() {
-+        zip?.close()
++        if (!closed) {
++            closed = true
++            try {
++                zip?.close()
++            } finally {
++                onClose()
++            }
++        }
 +    }
 +}
+diff --git a/domain/src/main/java/tachiyomi/domain/translation/TranslationPreferences.kt b/domain/src/main/java/tachiyomi/domain/translation/TranslationPreferences.kt
+index ee30e4b..a293a82 100644
+--- a/domain/src/main/java/tachiyomi/domain/translation/TranslationPreferences.kt
++++ b/domain/src/main/java/tachiyomi/domain/translation/TranslationPreferences.kt
+@@ -28,6 +28,8 @@ class TranslationPreferences(
+     )
+ 
+     fun autoTranslateEnglishDownloads() = preferenceStore.getBoolean("auto_translate_english_downloads", true)
++    fun useSourceOcrLanguage() = preferenceStore.getBoolean("use_source_ocr_language", true)
++    fun autoTranslateAsianDownloadsBeta() = preferenceStore.getBoolean("auto_translate_asian_downloads_beta", false)
+ 
+     fun autoTranslateAfterDownload() = preferenceStore.getBoolean("auto_translate_after_download", false)
+     fun autoTranslateNovels() = preferenceStore.getBoolean("auto_translate_novels", true)
 diff --git a/i18n-at/src/commonMain/moko-resources/base/strings.xml b/i18n-at/src/commonMain/moko-resources/base/strings.xml
-index 7ed4795..d0101de 100644
+index 7ed4795..e372a0c 100644
 --- a/i18n-at/src/commonMain/moko-resources/base/strings.xml
 +++ b/i18n-at/src/commonMain/moko-resources/base/strings.xml
-@@ -81,4 +81,59 @@
+@@ -81,4 +81,81 @@
      <string name="repository_adding">Adding…</string>
      <string name="chapter_versions_shortcut">Tap to filter source groups and versions</string>
      <string name="translation_crop_borders_summary">Pages with saved translations keep their borders to align text with the original image.</string>
@@ -3234,12 +4425,34 @@ index 7ed4795..d0101de 100644
 +    <string name="document_kind_comics">Comics</string>
 +    <string name="document_kind_documents">Documents</string>
 +    <string name="document_format_category_prefix">Format</string>
++    <string name="storage_polaris_title">Polaris storage</string>
++    <string name="storage_refresh">Refresh measurement</string>
++    <string name="storage_measure_failed">Unable to measure storage. Check the chosen app storage folder.</string>
++    <string name="storage_original_downloads">Downloaded chapters — originals</string>
++    <string name="storage_imported_copies">Imported local copies</string>
++    <string name="storage_saved_translations">Saved chapter translations</string>
++    <string name="storage_document_cache">Regenerable document cache</string>
++    <string name="storage_other_cache">Other app caches</string>
++    <string name="storage_internal_data">Internal data — models, database and glossary</string>
++    <string name="storage_apks">Installed APK files</string>
++    <string name="storage_models">Downloaded ML Kit translation languages: %1$s</string>
++    <string name="storage_unknown">Unavailable</string>
++    <string name="storage_budget_note">Document cache target: 256 MiB. Least recently used files are discarded first. Open files are protected and can temporarily exceed the target. This does not limit originals, models or other caches.</string>
++    <string name="storage_clear_documents">Clear regenerable document cache</string>
++    <string name="storage_delete_policy">Deleting a downloaded chapter also removes its saved translation and machine phrase cache. Your glossary and learned corrections remain. Downloading it again follows the work’s automatic translation settings.</string>
++    <string name="storage_measure_note">Approximate file sizes. A “+” means the scan stopped before completion. Original phone files outside Polaris and Android system overhead are not included. Clearing this cache keeps imported files, chapter translations, models and vocabulary; document text may need translation again.</string>
++    <string name="storage_translation_delete_failed">Some download or translation files could not be removed. Check storage access and try again.</string>
++    <string name="pref_source_ocr_language">Use the source’s declared OCR language</string>
++    <string name="pref_source_ocr_language_summary">Uses English, Japanese, Chinese or Korean source metadata. Unknown or mixed sources use the selected input language. Disable to override manually. This is not language detection from images.</string>
++    <string name="pref_auto_asian_beta">Automatically translate Asian-language downloads (beta)</string>
++    <string name="pref_auto_asian_beta_summary">Opt-in for Japanese, Chinese and Korean sources. Quality is pending device tests. Use ML Kit OCR; PaddleOCR remains English-only. A per-work choice takes priority.</string>
++    <string name="storage_native_libraries">Extracted native libraries</string>
  </resources>
 diff --git a/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml b/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
-index d1748bc..afb0774 100644
+index d1748bc..828879e 100644
 --- a/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
 +++ b/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
-@@ -81,4 +81,59 @@
+@@ -81,4 +81,81 @@
      <string name="repository_adding">Adicionando…</string>
      <string name="chapter_versions_shortcut">Toque para filtrar grupos e versões da fonte</string>
      <string name="translation_crop_borders_summary">Páginas com tradução salva preservam as bordas para alinhar o texto à imagem original.</string>
@@ -3298,6 +4511,28 @@ index d1748bc..afb0774 100644
 +    <string name="document_kind_comics">Quadrinhos</string>
 +    <string name="document_kind_documents">Documentos</string>
 +    <string name="document_format_category_prefix">Formato</string>
++    <string name="storage_polaris_title">Armazenamento do Polaris</string>
++    <string name="storage_refresh">Atualizar medição</string>
++    <string name="storage_measure_failed">Não foi possível medir. Confira a pasta de armazenamento escolhida para o app.</string>
++    <string name="storage_original_downloads">Capítulos baixados — originais</string>
++    <string name="storage_imported_copies">Cópias locais importadas</string>
++    <string name="storage_saved_translations">Traduções salvas dos capítulos</string>
++    <string name="storage_document_cache">Cache regenerável de documentos</string>
++    <string name="storage_other_cache">Outros caches do app</string>
++    <string name="storage_internal_data">Dados internos — modelos, banco e glossário</string>
++    <string name="storage_apks">Arquivos APK instalados</string>
++    <string name="storage_models">Idiomas de tradução ML Kit baixados: %1$s</string>
++    <string name="storage_unknown">Indisponível</string>
++    <string name="storage_budget_note">Meta do cache de documentos: 256 MiB. Os arquivos menos recentes saem primeiro. Arquivos abertos são protegidos e podem ultrapassar a meta temporariamente. Isso não limita originais, modelos nem outros caches.</string>
++    <string name="storage_clear_documents">Limpar cache regenerável de documentos</string>
++    <string name="storage_delete_policy">Excluir um capítulo baixado também remove sua tradução salva e o cache de frases automáticas. O glossário e as correções aprendidas permanecem. Ao baixar novamente, vale a configuração de tradução automática da obra.</string>
++    <string name="storage_measure_note">Tamanhos aproximados dos arquivos. Um “+” indica medição incompleta. Originais do celular fora do Polaris e custos do sistema Android não entram. A limpeza mantém importados, traduções dos capítulos, modelos e vocabulário; o texto dos documentos pode precisar de nova tradução.</string>
++    <string name="storage_translation_delete_failed">Alguns arquivos de download ou tradução não puderam ser removidos. Confira o acesso ao armazenamento e tente novamente.</string>
++    <string name="pref_source_ocr_language">Usar o idioma de OCR declarado pela fonte</string>
++    <string name="pref_source_ocr_language_summary">Usa os metadados de fontes em inglês, japonês, chinês ou coreano. Fontes mistas ou desconhecidas usam o idioma de entrada escolhido. Desative para escolher manualmente. Não detecta o idioma pela imagem.</string>
++    <string name="pref_auto_asian_beta">Traduzir automaticamente downloads de idiomas asiáticos (beta)</string>
++    <string name="pref_auto_asian_beta_summary">Opcional para japonês, chinês e coreano. A qualidade ainda depende dos testes nos aparelhos. Use OCR ML Kit; PaddleOCR continua apenas em inglês. A escolha por obra tem prioridade.</string>
++    <string name="storage_native_libraries">Bibliotecas nativas extraídas</string>
  </resources>
 diff --git a/source-local/src/main/kotlin/tachiyomi/source/local/LocalSource.kt b/source-local/src/main/kotlin/tachiyomi/source/local/LocalSource.kt
 index e5a307f..31834b3 100644

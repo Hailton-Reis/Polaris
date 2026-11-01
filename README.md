@@ -43,6 +43,8 @@ The [P20261031.2 reader candidate](docs/reader/PAGER_CROP_FIX_P20261031_2.md) pr
 
 The [P20261031.4 document candidate](integration/document-reader/README.md) adds PDF pages, reflowable EPUB/DOCX/TXT reading, selective local import, federated article/book search and a configurable in-app search website. Documents are included only after an explicit selection and organization step, with content-type and optional format categories. See the [organization guide](docs/reader/DOCUMENT_ORGANIZATION_P20261031_4.md) and [reader acceptance guide](docs/reader/DOCUMENTS_P20261031_3.md); Android import, rendering and visual acceptance remain pending device testing.
 
+The **0.1.0-beta.1 candidate (P20261101.1)** adds measured storage groups, a bounded regenerable document cache, coupled chapter/translation deletion that retains vocabulary, and language-metadata routing. The build exports verified ARM APKs plus original examples for a four-person internal beta. See the [beta guide](integration/internal-beta/README.md), [storage measurements and lifecycle](integration/internal-beta/STORAGE_AND_LIFECYCLE.md), and [pending device matrix](integration/internal-beta/TEST_MATRIX.csv). Asian-language OCR quality and physical-device acceptance remain pending.
+
 Local Android builds now detect CPU/RAM, enable Gradle cache/parallelism and combine APK assembly with tests per variant. See the [build-performance profile and verification limits](docs/r001/LOCAL_BUILD_PERFORMANCE_2026_10_31.md); performance on the user’s Windows PC remains to be measured.
 
 ## License and attribution

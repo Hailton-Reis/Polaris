@@ -115,5 +115,9 @@ python3 "$polaris_root/scripts/r001/compare_android_unit_tests.py" "$baseline" "
     sha256sum baseline/*.apk spike001/*.apk > SHA256SUMS.txt
 )
 test -s "$evidence/apks/SHA256SUMS.txt"
+python3 -m unittest discover -s "$polaris_root/scripts/beta" -p 'test_*.py' -v 2>&1 | tee "$evidence/beta-packaging-tests.log"
+python3 "$polaris_root/scripts/beta/package_internal_beta.py" \
+    --apks "$patched/app/build/outputs/apk/debug" --output "$evidence/beta" \
+    --comparison "$evidence/unit-test-comparison.json" | tee "$evidence/package-beta.log"
 test -z "$(git -C "$baseline_source" status --porcelain)"
 printf 'APK_BUILDS_PASS_NO_NEW_UNIT_REGRESSIONS\nExisting upstream unit failures may remain; see comparison JSON.\nRuntime A01/B01/B02/B03 still require device evidence.\n' | tee "$evidence/build-status.txt"
