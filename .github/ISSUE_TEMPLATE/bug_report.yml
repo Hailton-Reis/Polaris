@@ -1,0 +1,46 @@
+name: Relatar um problema
+description: Leitura, tradução, importação, armazenamento ou instalação.
+title: "[Problema]: "
+body:
+  - type: input
+    id: revision
+    attributes:
+      label: Versão e revisão em Sobre
+      placeholder: "Ex.: 0.1.0-beta.1 / P20261101.1"
+    validations:
+      required: true
+  - type: input
+    id: device
+    attributes:
+      label: Aparelho e Android
+      placeholder: "Modelo, Android e arquitetura do APK, se souber"
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Como reproduzir
+      description: "Informe passos, tipo de arquivo e configurações relevantes. Evite dados pessoais e chaves."
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Resultado esperado e observado
+    validations:
+      required: true
+  - type: textarea
+    id: storage
+    attributes:
+      label: Armazenamento, se relacionado
+      description: "Tamanho do arquivo, volume/pasta e números antes/depois; informe se apareceu + na medição."
+  - type: textarea
+    id: translation
+    attributes:
+      label: Tradução, se relacionado
+      description: "Idioma, OCR/provedor, modo do leitor e se o original foi reconhecido corretamente."
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidência adicional
+      description: "Imagens ou logs revisados, sem credenciais ou documentos pessoais."

@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Comece aqui
+    url: https://github.com/Hailton-Reis/Polaris/blob/main/docs/COMECE_AQUI.md
+    about: Estado do candidato, inclusão de arquivos e acesso aos testes internos.
+  - name: Análise de armazenamento
+    url: https://github.com/Hailton-Reis/Polaris/blob/main/docs/ARMAZENAMENTO.md
+    about: Medições existentes, limitações e pontos em revisão.
