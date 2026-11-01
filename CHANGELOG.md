@@ -11,7 +11,7 @@ Este arquivo registra a evolução real do código. **Revisões de desenvolvimen
 
 ## 0.1.0-beta.3 · P20261101.3 — 01/11/2026
 
-**Estado:** candidato compilado ao beta interno; versionCode 104. Sem APK publicado.
+**Estado:** primeiro pré-lançamento privado publicado em 01/11/2026, para o mantenedor testar primeiro; versionCode 104. Aceite nos aparelhos ainda pendente.
 
 - Sobre com descrição do aplicativo, mantenedor, créditos, versão/revisão, projeto, histórico, Releases, licenças e privacidade.
 - Atualizador direcionado ao Polaris, incluindo os builds internos, com busca ao abrir e verificação manual.
@@ -19,7 +19,9 @@ Este arquivo registra a evolução real do código. **Revisões de desenvolvimen
 - Seleção por versão SemVer, código, identificador do app, Android e arquitetura, com manifesto de atualização e SHA-256 do APK.
 - Rascunhos ignorados; desativar betas não rebaixa a instalação. A consulta não inicia o download do APK.
 
-O repositório permanece privado. A busca pública e a atualização real no celular ainda dependem de Releases acessíveis, artefatos publicados e da assinatura original. Esta revisão não alterou a visibilidade nem publicou pacotes.
+O repositório permanece privado. Os seis anexos foram publicados e seus tamanhos e hashes SHA-256 conferidos com o pacote verificado. A busca sem login e a atualização real no celular ainda dependem de acesso público e da assinatura original. A publicação preservou a visibilidade privada.
+
+[Baixar o primeiro beta](https://github.com/Hailton-Reis/Polaris/releases/tag/v0.1.0-beta.3).
 
 Os 20 testes novos passaram. A comparação completa registrou 525 testes: 491 aprovações e as mesmas 34 falhas preexistentes, sem novas regressões. Consulta, download e instalação reais ainda não têm aceite nos aparelhos.
 
