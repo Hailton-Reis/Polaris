@@ -2,6 +2,10 @@
 
 Revisão: **P20261101.3**. Android mínimo: **8.0 / API 26**. Esta é uma versão privada para experimentar e registrar problemas; a conferência nos celulares ainda está pendente.
 
+## Primeira publicação
+
+A [Release v0.1.0-beta.3](https://github.com/Hailton-Reis/Polaris/releases/tag/v0.1.0-beta.3) foi publicada como pré-lançamento privado em 01/11/2026, para o teste inicial do mantenedor. Os seis anexos tiveram tamanhos e SHA-256 conferidos. A publicação não confirma instalação nem consumo de armazenamento nos aparelhos. [Registro de publicação](PUBLICATION_STATUS.json). O relatório de compilação registra o estado anterior à publicação.
+
 ## Instalar e atualizar
 
 O pacote contém dois APKs. Use **arm64-v8a** primeiro nos aparelhos Android de 64 bits. Se o sistema do aparelho for de 32 bits, use **armeabi-v7a**. A12, S20 FE, S8+ e o provável A52 são a matriz inicial; o modelo comercial sozinho não confirma a arquitetura e a versão instalada do Android. O S8+ precisa estar no Android 8 ou superior.
@@ -26,7 +30,7 @@ Em **Configurações → Atualizações do aplicativo**, a busca automática con
 
 **Receber atualizações experimentais** começa **desativado**, inclusive neste candidato beta. Ative para incluir betas e outras prévias publicadas; desligar não rebaixa a versão instalada. Rascunhos não são distribuídos. O app só oferece um APK compatível com a versão, o Android, a arquitetura e o identificador do aplicativo, com metadados de atualização e hash SHA-256. Use sempre a assinatura original.
 
-**Limitação atual:** o repositório está privado e o app consulta sem credenciais. Por isso, a verificação nos celulares não consegue acessar essas Releases enquanto elas não estiverem acessíveis publicamente; a consulta manual informa indisponibilidade, em vez de afirmar que não há atualização. Este candidato não tornou o projeto público nem publicou APKs. O guia de publicação no repositório descreve o `manifest.json` exigido.
+**Limitação atual:** o repositório está privado e o app consulta sem credenciais. Por isso, a verificação nos celulares não consegue acessar essas Releases enquanto elas não estiverem acessíveis publicamente; a consulta manual informa indisponibilidade, em vez de afirmar que não há atualização. O beta foi publicado para download autenticado pelo mantenedor; o projeto continua privado. O guia de publicação no repositório descreve o `manifest.json` exigido.
 
 ## Espaço e glossário
 

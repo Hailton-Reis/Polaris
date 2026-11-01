@@ -1,0 +1,53 @@
+{
+  "status": "PUBLISHED_PRIVATE_PRERELEASE",
+  "published": true,
+  "draft": false,
+  "prerelease": true,
+  "release_id": 430906709,
+  "tag": "v0.1.0-beta.3",
+  "url": "https://github.com/Hailton-Reis/Polaris/releases/tag/v0.1.0-beta.3",
+  "published_at": "2026-11-01T23:15:58Z",
+  "target_commit": "d02e5e3292430f009767ce6427a144ee32484f4e",
+  "assets": [
+    {
+      "name": "manifest.json",
+      "bytes": 1369,
+      "state": "uploaded",
+      "digest": "sha256:948760e0f936dd46b332dd91e1e7b28b686388c7774b0776a805780380734748"
+    },
+    {
+      "name": "Polaris-0.1.0-beta.3-arm64-v8a.apk",
+      "bytes": 196194966,
+      "state": "uploaded",
+      "digest": "sha256:ae784ec2ec31c83d8e0373bea8f2a7f6aaa1056405368a514ae6df9c3e243e40"
+    },
+    {
+      "name": "Polaris-0.1.0-beta.3-armeabi-v7a.apk",
+      "bytes": 156397143,
+      "state": "uploaded",
+      "digest": "sha256:498d82e8e9f1efadecbf0f2b6afa19d183956430bfdfce18cda4d149b7f8c6df"
+    },
+    {
+      "name": "Polaris-exemplos-de-teste.zip",
+      "bytes": 419086,
+      "state": "uploaded",
+      "digest": "sha256:19dcb578d8413e10b271a986eec61c8947b547fbf22878d9e88b3d837154a575"
+    },
+    {
+      "name": "PRIMEIRO_TESTE.md",
+      "bytes": 2539,
+      "state": "uploaded",
+      "digest": "sha256:52bc7e1fd2125df7ab5c6c3f27c18f6bf29cb878529725b551beab4b2005255c"
+    },
+    {
+      "name": "SHA256SUMS.txt",
+      "bytes": 204,
+      "state": "uploaded",
+      "digest": "sha256:72aba2473241df98fc5c6c63602de0bf45090f16f45fa75aef553084172d167a"
+    }
+  ],
+  "repository_visibility": "private",
+  "physical_test_status": "PENDING_FIRST_OWNER_TEST",
+  "original_installed_signer_match": "NOT_VERIFIED",
+  "all_six_remote_sizes_and_sha256_match": true
+}
