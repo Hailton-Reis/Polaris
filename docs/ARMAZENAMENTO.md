@@ -121,3 +121,9 @@ Usar inicialmente os exemplos originais e depois arquivos autorizados representa
 - [Detalhamento anterior de armazenamento e ciclo de tradução](https://github.com/Hailton-Reis/Polaris/blob/617aa0b992cc5b5966a6069d6e39eb3ebd50c4e7/integration/internal-beta/STORAGE_AND_LIFECYCLE.md).
 
 Esta atualização registra os pontos encontrados. Não declara os ajustes acima como implementados nem promove o candidato a versão estável.
+
+## Atualização: preparação prioritária do inglês
+
+O candidato P20261101.2 acrescenta uma verificação local e, quando necessário, preparação automática de inglês → português. Isso pode antecipar o armazenamento dos recursos de tradução para a primeira conexão adequada, antes de o usuário traduzir um capítulo. A opção pode ser desativada; o reconhecimento latino já estava incluído no APK.
+
+A condição de armazenamento do Android usada pelo agendamento não reserva um número preciso de bytes. Ela não resolve, por si, os pontos sobre importação, temporários e consumo total identificados nesta análise. Veja [o fluxo e suas limitações](INGLES_E_TRADUCAO.md).

@@ -10,7 +10,7 @@ A apresentação do projeto fica em `main`. A implementação em avaliação est
 
 O mantenedor utiliza o [CMD de preparação do Windows](https://github.com/Hailton-Reis/Polaris/blob/r001/multisource-foundation/tools/windows-setup/00_POLARIS_TUDO_EM_UM.cmd). A opção 4 compila e pode gerar o pacote local `beta/`, com APKs ARM, exemplos e hashes. Essa geração não aprova automaticamente o armazenamento ou os testes nos aparelhos.
 
-O pacote atual usa versão `0.1.0-beta.1`, revisão `P20261101.1` e versionCode 102. Atualizações precisam manter a assinatura da instalação anterior para conservar a continuidade dos dados. Uma recompilação pode ter data, assinatura e hash diferentes; use o manifesto e `SHA256SUMS.txt` do pacote efetivamente recebido.
+O pacote atual usa versão `0.1.0-beta.2`, revisão `P20261101.2` e versionCode 103. Atualizações precisam manter a assinatura da instalação anterior para conservar a continuidade dos dados. Uma recompilação pode ter data, assinatura e hash diferentes; use o manifesto e `SHA256SUMS.txt` do pacote efetivamente recebido.
 
 Os APKs ARM64 e ARM32 destinam-se às respectivas arquiteturas do sistema Android; x86 é para ambientes de desenvolvimento compatíveis. O mínimo é Android 8. O modelo comercial do aparelho não substitui essa verificação.
 
@@ -26,7 +26,8 @@ Cancelar essa tela não inclui o arquivo. A inclusão guarda uma cópia gerencia
 
 ## Traduzir
 
-- Comece com ML Kit e os idiomas de entrada/saída desejados. Os modelos precisam ser baixados antes do uso offline.
+- O reconhecimento de texto em inglês já acompanha o APK. A preparação automática do par inglês → português é ativada por padrão, aguardando rede sem cobrança e a condição de espaço do Android. O cartão só exibe Pronto depois da preparação e verificação do SDK.
+- Ainda há uma conexão inicial necessária para os recursos de tradução. Use Preparar agora para solicitar o uso da conexão atual. [Veja a diferença entre OCR e tradução](INGLES_E_TRADUCAO.md).
 - Em fontes conhecidas, os metadados podem selecionar inglês, japonês, chinês ou coreano para o OCR. Documentos locais e fontes desconhecidas/mistas usam a entrada escolhida manualmente.
 - A tradução automática dos downloads pode ser configurada por obra. A automação global dos idiomas asiáticos é opcional nesta candidata.
 - Use o glossário no menu da obra para nomes e termos recorrentes. O vocabulário também é consultado na tradução textual de documentos.
