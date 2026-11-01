@@ -1,18 +1,25 @@
 diff --git a/app/build.gradle.kts b/app/build.gradle.kts
-index 63e2698..ca362c6 100644
+index 63e2698..4d77ce5 100644
 --- a/app/build.gradle.kts
 +++ b/app/build.gradle.kts
-@@ -32,8 +32,8 @@ android {
+@@ -32,14 +32,14 @@ android {
      defaultConfig {
          applicationId = "app.mihon.tachiyomiat"
  
 -        versionCode = 101
 -        versionName = "0.20.4-Y40"
-+        versionCode = 103
-+        versionName = "0.1.0-beta.2"
++        versionCode = 104
++        versionName = "0.1.0-beta.3"
  
          buildConfigField("String", "COMMIT_COUNT", "\"${getLatestCommitCount()}\"")
          buildConfigField("String", "COMMIT_SHA", "\"${getLatestCommitSha()}\"")
+         buildConfigField("String", "BUILD_TIME", "\"${getBuildTime(useLatestCommitTime = false)}\"")
+         buildConfigField("boolean", "TELEMETRY_INCLUDED", "${Config.includeTelemetry}")
+-        buildConfigField("boolean", "UPDATER_ENABLED", "${Config.enableUpdater}")
++        buildConfigField("boolean", "UPDATER_ENABLED", "true")
+ 
+         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+     }
 @@ -71,7 +71,7 @@ android {
      buildTypes {
          val debug = getByName("debug") {
@@ -952,6 +959,79 @@ index a7b7f3e..f4dcdad 100644
  
  
  
+diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsAppUpdatesScreen.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsAppUpdatesScreen.kt
+new file mode 100644
+index 0000000..2c690cc
+--- /dev/null
++++ b/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsAppUpdatesScreen.kt
+@@ -0,0 +1,67 @@
++package eu.kanade.presentation.more.settings.screen
++
++import androidx.compose.foundation.layout.size
++import androidx.compose.material3.CircularProgressIndicator
++import androidx.compose.runtime.Composable
++import androidx.compose.runtime.ReadOnlyComposable
++import androidx.compose.runtime.remember
++import androidx.compose.ui.Modifier
++import androidx.compose.ui.platform.LocalUriHandler
++import androidx.compose.ui.unit.dp
++import eu.kanade.presentation.more.settings.Preference
++import eu.kanade.presentation.more.settings.screen.about.rememberPolarisUpdateCheck
++import eu.kanade.tachiyomi.data.updater.PolarisUpdatePreferences
++import eu.kanade.tachiyomi.data.updater.RELEASE_URL
++import tachiyomi.core.common.preference.PreferenceStore
++import tachiyomi.i18n.MR
++import tachiyomi.i18n.at.ATMR
++import tachiyomi.presentation.core.i18n.stringResource
++import uy.kohesive.injekt.Injekt
++import uy.kohesive.injekt.api.get
++
++object SettingsAppUpdatesScreen : SearchableSettings {
++    @ReadOnlyComposable
++    @Composable
++    override fun getTitleRes() = ATMR.strings.polaris_updates_title
++
++    @Composable
++    override fun getPreferences(): List<Preference> {
++        val preferences = remember { PolarisUpdatePreferences(Injekt.get<PreferenceStore>()) }
++        val (checking, checkUpdates) = rememberPolarisUpdateCheck()
++        val uriHandler = LocalUriHandler.current
++        return listOf(
++            Preference.PreferenceItem.SwitchPreference(
++                preference = preferences.automatic(),
++                title = stringResource(ATMR.strings.polaris_updates_automatic),
++                subtitle = stringResource(ATMR.strings.polaris_updates_automatic_summary),
++                onValueChanged = {
++                    preferences.resetChecks()
++                    true
++                },
++            ),
++            Preference.PreferenceItem.SwitchPreference(
++                preference = preferences.experimental(),
++                title = stringResource(ATMR.strings.polaris_updates_experimental),
++                subtitle = stringResource(ATMR.strings.polaris_updates_experimental_summary),
++                onValueChanged = {
++                    preferences.resetChecks()
++                    true
++                },
++            ),
++            Preference.PreferenceItem.TextPreference(
++                title = stringResource(MR.strings.check_for_updates),
++                subtitle = stringResource(ATMR.strings.polaris_updates_check_hint),
++                enabled = !checking,
++                widget = {
++                    if (checking) CircularProgressIndicator(Modifier.size(28.dp), strokeWidth = 3.dp)
++                },
++                onClick = checkUpdates,
++            ),
++            Preference.PreferenceItem.TextPreference(
++                title = stringResource(ATMR.strings.polaris_about_releases),
++                subtitle = "github.com/Hailton-Reis/Polaris/releases",
++                onClick = { uriHandler.openUri(RELEASE_URL) },
++            ),
++        )
++    }
++}
 diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsDataScreen.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsDataScreen.kt
 index bf9eb40..d868d3f 100644
 --- a/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsDataScreen.kt
@@ -975,6 +1055,34 @@ index bf9eb40..d868d3f 100644
                  Preference.PreferenceItem.CustomPreference(
                      title = stringResource(MR.strings.pref_storage_usage),
                  ) {
+diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsMainScreen.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsMainScreen.kt
+index 0050b97..979f158 100644
+--- a/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsMainScreen.kt
++++ b/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsMainScreen.kt
+@@ -9,9 +9,9 @@ import androidx.compose.foundation.lazy.rememberLazyListState
+ import androidx.compose.foundation.shape.RoundedCornerShape
+ import androidx.compose.material.icons.Icons
+ import androidx.compose.material.icons.automirrored.outlined.ChromeReaderMode
++import androidx.compose.material.icons.outlined.CloudUpload
+ import androidx.compose.material.icons.outlined.Code
+ import androidx.compose.material.icons.outlined.CollectionsBookmark
+-import androidx.compose.material.icons.outlined.CloudUpload
+ import androidx.compose.material.icons.outlined.Explore
+ import androidx.compose.material.icons.outlined.GetApp
+ import androidx.compose.material.icons.outlined.Info
+@@ -240,6 +240,12 @@ object SettingsMainScreen : Screen() {
+             icon = Icons.Outlined.Code,
+             screen = SettingsAdvancedScreen,
+         ),
++        Item(
++            titleRes = ATMR.strings.polaris_updates_title,
++            subtitleRes = ATMR.strings.polaris_updates_channel_hint,
++            icon = Icons.Outlined.Sync,
++            screen = SettingsAppUpdatesScreen,
++        ),
+         Item(
+             titleRes = MR.strings.pref_category_about,
+             formatSubtitle = {
 diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsTranslationScreen.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsTranslationScreen.kt
 index a198c3f..62cc80b 100644
 --- a/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsTranslationScreen.kt
@@ -1005,18 +1113,291 @@ index a198c3f..62cc80b 100644
                  preference = translationPreferences.autoTranslateEnglishDownloads(),
                  title = stringResource(ATMR.strings.pref_auto_translate_english_downloads),
 diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
-index 7f411fd..c3c9e25 100644
+index 7f411fd..ed3ce06 100644
 --- a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
 +++ b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
-@@ -52,7 +52,7 @@ import kotlin.time.Instant
+@@ -1,16 +1,10 @@
+ package eu.kanade.presentation.more.settings.screen.about
+ 
+-import android.content.Context
+ import androidx.compose.animation.AnimatedVisibility
+ import androidx.compose.foundation.layout.PaddingValues
+ import androidx.compose.foundation.layout.size
+ import androidx.compose.material3.CircularProgressIndicator
+ import androidx.compose.runtime.Composable
+-import androidx.compose.runtime.getValue
+-import androidx.compose.runtime.mutableStateOf
+-import androidx.compose.runtime.remember
+-import androidx.compose.runtime.rememberCoroutineScope
+-import androidx.compose.runtime.setValue
+ import androidx.compose.ui.Modifier
+ import androidx.compose.ui.platform.LocalContext
+ import androidx.compose.ui.platform.LocalUriHandler
+@@ -20,28 +14,22 @@ import cafe.adriel.voyager.navigator.currentOrThrow
+ import eu.kanade.domain.ui.UiPreferences
+ import eu.kanade.presentation.components.AppBar
+ import eu.kanade.presentation.more.LogoHeader
++import eu.kanade.presentation.more.settings.screen.SettingsAppUpdatesScreen
+ import eu.kanade.presentation.more.settings.widget.TextPreferenceWidget
+ import eu.kanade.presentation.util.LocalBackPress
+ import eu.kanade.presentation.util.Screen
+ import eu.kanade.tachiyomi.BuildConfig
+-import eu.kanade.tachiyomi.data.updater.AppUpdateChecker
++import eu.kanade.tachiyomi.data.updater.POLARIS_REPOSITORY_URL
+ import eu.kanade.tachiyomi.data.updater.RELEASE_URL
+-import eu.kanade.tachiyomi.ui.more.NewUpdateScreen
+ import eu.kanade.tachiyomi.util.CrashLogUtil
+ import eu.kanade.tachiyomi.util.lang.toDateTimestampString
+ import eu.kanade.tachiyomi.util.system.copyToClipboard
+ import eu.kanade.tachiyomi.util.system.isPreviewBuildType
+-import eu.kanade.tachiyomi.util.system.toast
+ import eu.kanade.tachiyomi.util.system.updaterEnabled
+-import kotlinx.coroutines.launch
+ import kotlinx.datetime.TimeZone
+ import kotlinx.datetime.toLocalDateTime
+-import logcat.LogPriority
+-import tachiyomi.core.common.util.lang.withIOContext
+-import tachiyomi.core.common.util.lang.withUIContext
+-import tachiyomi.core.common.util.system.logcat
+-import tachiyomi.domain.release.interactor.GetApplicationRelease
+ import tachiyomi.i18n.MR
++import tachiyomi.i18n.at.ATMR
+ import tachiyomi.presentation.core.components.ScrollbarLazyColumn
+ import tachiyomi.presentation.core.components.material.Scaffold
+ import tachiyomi.presentation.core.i18n.stringResource
+@@ -52,16 +40,15 @@ import kotlin.time.Instant
  object AboutScreen : Screen() {
  
      // Identifies this overlay independently of the pinned upstream COMMIT_SHA.
 -    private const val POLARIS_READER_REVISION = "P20261031.2"
-+    private const val POLARIS_READER_REVISION = "P20261101.2"
++    private const val POLARIS_READER_REVISION = "P20261101.3"
  
      @Composable
      override fun Content() {
+-        val scope = rememberCoroutineScope()
+         val context = LocalContext.current
+         val uriHandler = LocalUriHandler.current
+         val handleBack = LocalBackPress.current
+         val navigator = LocalNavigator.currentOrThrow
+-        var isCheckingUpdates by remember { mutableStateOf(false) }
++        val (isCheckingUpdates, checkUpdates) = rememberPolarisUpdateCheck()
+ 
+         Scaffold(
+             topBar = { scrollBehavior ->
+@@ -81,6 +68,20 @@ object AboutScreen : Screen() {
+                     )
+                 }
+ 
++                item {
++                    TextPreferenceWidget(
++                        title = "Polaris",
++                        subtitle = stringResource(ATMR.strings.polaris_about_description),
++                    )
++                }
++
++                item {
++                    TextPreferenceWidget(
++                        title = stringResource(ATMR.strings.polaris_about_maintainer),
++                        subtitle = stringResource(ATMR.strings.polaris_about_credits),
++                    )
++                }
++
+                 item {
+                     TextPreferenceWidget(
+                         title = stringResource(MR.strings.version),
+@@ -104,40 +105,39 @@ object AboutScreen : Screen() {
+                                     )
+                                 }
+                             },
+-                            onPreferenceClick = {
+-                                if (!isCheckingUpdates) {
+-                                    scope.launch {
+-                                        isCheckingUpdates = true
+-
+-                                        checkVersion(
+-                                            context = context,
+-                                            onAvailableUpdate = { result ->
+-                                                val updateScreen = NewUpdateScreen(
+-                                                    versionName = result.release.version,
+-                                                    changelogInfo = result.release.info,
+-                                                    releaseLink = result.release.releaseLink,
+-                                                    downloadLink = result.release.downloadLink,
+-                                                )
+-                                                navigator.push(updateScreen)
+-                                            },
+-                                            onFinish = {
+-                                                isCheckingUpdates = false
+-                                            },
+-                                        )
+-                                    }
+-                                }
+-                            },
++                            onPreferenceClick = checkUpdates,
+                         )
+                     }
+                 }
+ 
+-                if (!BuildConfig.DEBUG) {
+-                    item {
+-                        TextPreferenceWidget(
+-                            title = stringResource(MR.strings.whats_new),
+-                            onPreferenceClick = { uriHandler.openUri(RELEASE_URL) },
+-                        )
+-                    }
++                item {
++                    TextPreferenceWidget(
++                        title = stringResource(ATMR.strings.polaris_updates_title),
++                        subtitle = stringResource(ATMR.strings.polaris_updates_channel_hint),
++                        onPreferenceClick = { navigator.push(SettingsAppUpdatesScreen) },
++                    )
++                }
++
++                item {
++                    TextPreferenceWidget(
++                        title = stringResource(ATMR.strings.polaris_about_project),
++                        subtitle = "github.com/Hailton-Reis/Polaris",
++                        onPreferenceClick = { uriHandler.openUri(POLARIS_REPOSITORY_URL) },
++                    )
++                }
++
++                item {
++                    TextPreferenceWidget(
++                        title = stringResource(MR.strings.whats_new),
++                        onPreferenceClick = { uriHandler.openUri("$POLARIS_REPOSITORY_URL/blob/main/CHANGELOG.md") },
++                    )
++                }
++
++                item {
++                    TextPreferenceWidget(
++                        title = stringResource(ATMR.strings.polaris_about_releases),
++                        onPreferenceClick = { uriHandler.openUri(RELEASE_URL) },
++                    )
+                 }
+ 
+                 item {
+@@ -151,7 +151,7 @@ object AboutScreen : Screen() {
+                     TextPreferenceWidget(
+                         title = stringResource(MR.strings.privacy_policy),
+                         onPreferenceClick = {
+-                            uriHandler.openUri("https://yomotsu-app.github.io/privacy.html")
++                            uriHandler.openUri("$POLARIS_REPOSITORY_URL/blob/main/docs/PRIVACIDADE.md")
+                         },
+                     )
+                 }
+@@ -159,37 +159,6 @@ object AboutScreen : Screen() {
+         }
+     }
+ 
+-    /**
+-     * Checks version and shows a user prompt if an update is available.
+-     */
+-    private suspend fun checkVersion(
+-        context: Context,
+-        onAvailableUpdate: (GetApplicationRelease.Result.NewUpdate) -> Unit,
+-        onFinish: () -> Unit,
+-    ) {
+-        val updateChecker = AppUpdateChecker()
+-        withUIContext {
+-            try {
+-                when (val result = withIOContext { updateChecker.checkForUpdate(forceCheck = true) }) {
+-                    is GetApplicationRelease.Result.NewUpdate -> {
+-                        onAvailableUpdate(result)
+-                    }
+-                    is GetApplicationRelease.Result.NoNewUpdate -> {
+-                        context.toast(MR.strings.update_check_no_new_updates)
+-                    }
+-                    is GetApplicationRelease.Result.OsTooOld -> {
+-                        context.toast(MR.strings.update_check_eol)
+-                    }
+-                }
+-            } catch (e: Exception) {
+-                context.toast(e.message)
+-                logcat(LogPriority.ERROR, e)
+-            } finally {
+-                onFinish()
+-            }
+-        }
+-    }
+-
+     fun getVersionName(withBuildDate: Boolean): String {
+         val upstream = when {
+             BuildConfig.DEBUG -> {
+@@ -220,7 +189,7 @@ object AboutScreen : Screen() {
+                 }
+             }
+         }
+-        return "Polaris $POLARIS_READER_REVISION · $upstream"
++        return "Polaris ${BuildConfig.VERSION_NAME} · $POLARIS_READER_REVISION · $upstream"
+     }
+ 
+     internal fun getFormattedBuildTime(): String {
+diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/PolarisUpdateCheck.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/PolarisUpdateCheck.kt
+new file mode 100644
+index 0000000..4d59c26
+--- /dev/null
++++ b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/PolarisUpdateCheck.kt
+@@ -0,0 +1,61 @@
++package eu.kanade.presentation.more.settings.screen.about
++
++import androidx.compose.runtime.Composable
++import androidx.compose.runtime.getValue
++import androidx.compose.runtime.mutableStateOf
++import androidx.compose.runtime.remember
++import androidx.compose.runtime.rememberCoroutineScope
++import androidx.compose.runtime.setValue
++import androidx.compose.ui.platform.LocalContext
++import cafe.adriel.voyager.navigator.LocalNavigator
++import cafe.adriel.voyager.navigator.currentOrThrow
++import eu.kanade.tachiyomi.data.updater.AppUpdateChecker
++import eu.kanade.tachiyomi.data.updater.PolarisUpdateAccessException
++import eu.kanade.tachiyomi.ui.more.NewUpdateScreen
++import eu.kanade.tachiyomi.util.system.toast
++import kotlinx.coroutines.CancellationException
++import kotlinx.coroutines.launch
++import tachiyomi.domain.release.interactor.GetApplicationRelease
++import tachiyomi.i18n.MR
++import tachiyomi.i18n.at.ATMR
++
++@Composable
++fun rememberPolarisUpdateCheck(): Pair<Boolean, () -> Unit> {
++    val context = LocalContext.current
++    val navigator = LocalNavigator.currentOrThrow
++    val scope = rememberCoroutineScope()
++    var checking by remember { mutableStateOf(false) }
++    val check: () -> Unit = {
++        if (!checking) {
++            checking = true
++            scope.launch {
++                try {
++                    when (val result = AppUpdateChecker().checkForUpdate(forceCheck = true)) {
++                        is GetApplicationRelease.Result.NewUpdate -> navigator.push(
++                            NewUpdateScreen(
++                                versionName = result.release.version,
++                                changelogInfo = result.release.info,
++                                releaseLink = result.release.releaseLink,
++                                downloadLink = result.release.downloadLink,
++                                sha256 = result.release.sha256,
++                            ),
++                        )
++                        GetApplicationRelease.Result.NoNewUpdate -> context.toast(
++                            MR.strings.update_check_no_new_updates,
++                        )
++                        GetApplicationRelease.Result.OsTooOld -> context.toast(MR.strings.update_check_eol)
++                    }
++                } catch (cancelled: CancellationException) {
++                    throw cancelled
++                } catch (_: PolarisUpdateAccessException) {
++                    context.toast(ATMR.strings.polaris_updates_access_error)
++                } catch (_: Exception) {
++                    context.toast(ATMR.strings.polaris_updates_failed)
++                } finally {
++                    checking = false
++                }
++            }
++        }
++    }
++    return checking to check
++}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/App.kt b/app/src/main/java/eu/kanade/tachiyomi/App.kt
 index 6707d1a..c89047c 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/App.kt
@@ -1075,6 +1456,393 @@ index c45a189..0cd0785 100644
  
              // Delete source directory if empty
              val sourceDir = provider.findSourceDir(source)
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/data/updater/AppUpdateChecker.kt b/app/src/main/java/eu/kanade/tachiyomi/data/updater/AppUpdateChecker.kt
+index 02b4af4..bf1be6d 100644
+--- a/app/src/main/java/eu/kanade/tachiyomi/data/updater/AppUpdateChecker.kt
++++ b/app/src/main/java/eu/kanade/tachiyomi/data/updater/AppUpdateChecker.kt
+@@ -1,38 +1,67 @@
+ package eu.kanade.tachiyomi.data.updater
+ 
++import android.os.Build
+ import eu.kanade.tachiyomi.BuildConfig
+-import eu.kanade.tachiyomi.util.system.isFossBuildType
+-import eu.kanade.tachiyomi.util.system.isPreviewBuildType
++import eu.kanade.tachiyomi.network.GET
++import eu.kanade.tachiyomi.network.NetworkHelper
++import eu.kanade.tachiyomi.network.await
++import eu.kanade.tachiyomi.network.parseAs
++import kotlinx.serialization.json.Json
++import tachiyomi.core.common.preference.PreferenceStore
+ import tachiyomi.core.common.util.lang.withIOContext
+ import tachiyomi.domain.release.interactor.GetApplicationRelease
+ import uy.kohesive.injekt.injectLazy
++import java.io.IOException
+ 
+-class AppUpdateChecker {
++class PolarisUpdateAccessException : IOException()
+ 
+-    private val getApplicationRelease: GetApplicationRelease by injectLazy()
++class AppUpdateChecker {
++    private val network: NetworkHelper by injectLazy()
++    private val preferenceStore: PreferenceStore by injectLazy()
++    private val json = Json { ignoreUnknownKeys = true }
+ 
+-    suspend fun checkForUpdate(forceCheck: Boolean = false): GetApplicationRelease.Result {
+-        return withIOContext {
+-            getApplicationRelease.await(
+-                GetApplicationRelease.Arguments(
+-                    isFossBuildType,
+-                    isPreviewBuildType,
+-                    BuildConfig.COMMIT_COUNT.toInt(),
+-                    BuildConfig.VERSION_NAME,
+-                    GITHUB_REPO,
+-                    forceCheck,
+-                ),
+-            )
++    suspend fun checkForUpdate(forceCheck: Boolean = false): GetApplicationRelease.Result = withIOContext {
++        val preferences = PolarisUpdatePreferences(preferenceStore)
++        val experimental = preferences.experimental().get()
++        val now = System.currentTimeMillis()
++        if (!preferences.shouldCheck(forceCheck, experimental, now)) {
++            return@withIOContext GetApplicationRelease.Result.NoNewUpdate
+         }
++        // Throttle attempts as well as successful checks; manual checks always bypass this timestamp.
++        preferences.lastCheck(experimental).set(now)
++        val client = PolarisUpdateClient(
++            fetchPage = { page ->
++                val url = "https://api.github.com/repos/$GITHUB_REPO/releases?per_page=100&page=$page"
++                network.client.newCall(GET(url))
++                    .await().use { response ->
++                        if (response.code == 404 || response.code == 401) throw PolarisUpdateAccessException()
++                        if (!response.isSuccessful) throw IOException("GitHub HTTP ${response.code}")
++                        val next = response.header("Link").orEmpty().contains("rel=\"next\"")
++                        PolarisReleasePage(with(json) { response.parseAs<List<PolarisGithubRelease>>() }, next)
++                    }
++            },
++            fetchManifest = { url ->
++                network.client.newCall(GET(url)).await().use { response ->
++                    if (!response.isSuccessful) throw IOException("GitHub HTTP ${response.code}")
++                    val source = response.body.source()
++                    source.request(65_537)
++                    if (source.buffer.size > 65_536) throw IOException("Update metadata too large")
++                    json.decodeFromString<PolarisUpdateManifest>(source.buffer.readUtf8())
++                }
++            },
++        )
++        val result = client.check(
++            currentVersion = BuildConfig.VERSION_NAME,
++            currentCode = BuildConfig.VERSION_CODE.toLong(),
++            applicationId = BuildConfig.APPLICATION_ID,
++            supportedAbis = Build.SUPPORTED_ABIS.toList(),
++            androidApi = Build.VERSION.SDK_INT,
++            experimental = experimental,
++        )
++        result
+     }
+ }
+ 
+-// Stable and preview builds must never query Mihon's release channels. Test builds
+-// may not have a matching tag, but they will stay inside the Yomotsu repository.
+-const val GITHUB_REPO = "kiritsuguxs/yomotsu"
+-
+-val RELEASE_TAG: String by lazy {
+-    "v${BuildConfig.VERSION_NAME}"
+-}
+-
+-val RELEASE_URL = "https://github.com/$GITHUB_REPO/releases/tag/$RELEASE_TAG"
++const val GITHUB_REPO = "Hailton-Reis/Polaris"
++const val POLARIS_REPOSITORY_URL = "https://github.com/$GITHUB_REPO"
++const val RELEASE_URL = "$POLARIS_REPOSITORY_URL/releases"
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/data/updater/AppUpdateDownloadJob.kt b/app/src/main/java/eu/kanade/tachiyomi/data/updater/AppUpdateDownloadJob.kt
+index ee19e89..6318525 100644
+--- a/app/src/main/java/eu/kanade/tachiyomi/data/updater/AppUpdateDownloadJob.kt
++++ b/app/src/main/java/eu/kanade/tachiyomi/data/updater/AppUpdateDownloadJob.kt
+@@ -44,7 +44,13 @@ class AppUpdateDownloadJob(private val context: Context, workerParams: WorkerPar
+ 
+         return try {
+             withIOContext { downloadApk(url) }
+-            Result.success(workDataOf(PROGRESS to 100, EXTRA_DOWNLOAD_URL to url))
++            Result.success(
++                workDataOf(
++                    PROGRESS to 100,
++                    EXTRA_DOWNLOAD_URL to url,
++                    EXTRA_SHA256 to inputData.getString(EXTRA_SHA256),
++                ),
++            )
+         } catch (e: CancellationException) {
+             throw e
+         } catch (_: Exception) {
+@@ -90,7 +96,13 @@ class AppUpdateDownloadJob(private val context: Context, workerParams: WorkerPar
+                 if (progress > savedProgress && currentTime - 200 > lastTick) {
+                     savedProgress = progress
+                     lastTick = currentTime
+-                    setProgressAsync(workDataOf(PROGRESS to progress, EXTRA_DOWNLOAD_URL to url))
++                    setProgressAsync(
++                        workDataOf(
++                            PROGRESS to progress,
++                            EXTRA_DOWNLOAD_URL to url,
++                            EXTRA_SHA256 to inputData.getString(EXTRA_SHA256),
++                        ),
++                    )
+                 }
+             }
+         }
+@@ -98,7 +110,9 @@ class AppUpdateDownloadJob(private val context: Context, workerParams: WorkerPar
+         val response = network.client.newCachelessCallWithProgress(GET(url), progressListener).awaitSuccess()
+ 
+         val apkFile = updateApk(context)
+-        response.body.source().saveTo(apkFile)
++        response.use { it.body.source().saveTo(apkFile) }
++        val expected = inputData.getString(EXTRA_SHA256)
++        if (expected != null) PolarisUpdateIntegrity.verify(apkFile, expected)
+     }
+ 
+     companion object {
+@@ -107,10 +121,11 @@ class AppUpdateDownloadJob(private val context: Context, workerParams: WorkerPar
+         const val PROGRESS = "progress"
+ 
+         const val EXTRA_DOWNLOAD_URL = "DOWNLOAD_URL"
++        const val EXTRA_SHA256 = "EXPECTED_SHA256"
+ 
+         fun updateApk(context: Context): File = File(context.externalCacheDir, "update.apk")
+ 
+-        fun start(context: Context, url: String) {
++        fun start(context: Context, url: String, sha256: String? = null) {
+             val constraints = Constraints(
+                 requiredNetworkType = NetworkType.CONNECTED,
+             )
+@@ -118,7 +133,7 @@ class AppUpdateDownloadJob(private val context: Context, workerParams: WorkerPar
+             val request = OneTimeWorkRequestBuilder<AppUpdateDownloadJob>()
+                 .setConstraints(constraints)
+                 .addTag(TAG)
+-                .setInputData(workDataOf(EXTRA_DOWNLOAD_URL to url))
++                .setInputData(workDataOf(EXTRA_DOWNLOAD_URL to url, EXTRA_SHA256 to sha256))
+                 .build()
+ 
+             context.workManager.enqueueUniqueWork(TAG, ExistingWorkPolicy.REPLACE, request)
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/data/updater/PolarisReleaseVersion.kt b/app/src/main/java/eu/kanade/tachiyomi/data/updater/PolarisReleaseVersion.kt
+new file mode 100644
+index 0000000..040c70e
+--- /dev/null
++++ b/app/src/main/java/eu/kanade/tachiyomi/data/updater/PolarisReleaseVersion.kt
+@@ -0,0 +1,42 @@
++package eu.kanade.tachiyomi.data.updater
++
++/** SemVer precedence; build metadata never creates an update. */
++data class PolarisReleaseVersion(
++    val numbers: List<Long>,
++    val prerelease: List<String>,
++) : Comparable<PolarisReleaseVersion> {
++    override fun compareTo(other: PolarisReleaseVersion): Int {
++        numbers.zip(other.numbers).forEach { (left, right) ->
++            left.compareTo(right).takeIf { it != 0 }?.let { return it }
++        }
++        if (prerelease.isEmpty() && other.prerelease.isEmpty()) return 0
++        if (prerelease.isEmpty()) return 1
++        if (other.prerelease.isEmpty()) return -1
++        prerelease.zip(other.prerelease).forEach { (left, right) ->
++            val comparison = when {
++                left.all(Char::isDigit) && right.all(Char::isDigit) ->
++                    left.length.compareTo(right.length).takeIf { it != 0 } ?: left.compareTo(right)
++                left.all(Char::isDigit) -> -1
++                right.all(Char::isDigit) -> 1
++                else -> left.compareTo(right)
++            }
++            if (comparison != 0) return comparison
++        }
++        return prerelease.size.compareTo(other.prerelease.size)
++    }
++
++    companion object {
++        private val pattern = Regex(
++            "^v?(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)" +
++                "(?:-([0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*))?(?:\\+[0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*)?$",
++        )
++
++        fun parse(value: String): PolarisReleaseVersion? {
++            val match = pattern.matchEntire(value) ?: return null
++            val numbers = (1..3).map { match.groupValues[it].toLongOrNull() ?: return null }
++            val prerelease = match.groupValues[4].takeIf(String::isNotEmpty)?.split('.') ?: emptyList()
++            if (prerelease.any { it.all(Char::isDigit) && it.length > 1 && it.startsWith('0') }) return null
++            return PolarisReleaseVersion(numbers, prerelease)
++        }
++    }
++}
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/data/updater/PolarisUpdateClient.kt b/app/src/main/java/eu/kanade/tachiyomi/data/updater/PolarisUpdateClient.kt
+new file mode 100644
+index 0000000..db48f01
+--- /dev/null
++++ b/app/src/main/java/eu/kanade/tachiyomi/data/updater/PolarisUpdateClient.kt
+@@ -0,0 +1,106 @@
++package eu.kanade.tachiyomi.data.updater
++
++import kotlinx.serialization.SerialName
++import kotlinx.serialization.Serializable
++import tachiyomi.domain.release.interactor.GetApplicationRelease
++import tachiyomi.domain.release.model.Release
++import java.io.IOException
++
++data class PolarisReleasePage(val releases: List<PolarisGithubRelease>, val hasNext: Boolean)
++
++@Serializable
++data class PolarisGithubAsset(
++    val name: String,
++    @SerialName("browser_download_url") val url: String,
++    val size: Long = 0,
++)
++
++@Serializable
++data class PolarisGithubRelease(
++    @SerialName("tag_name") val tag: String,
++    @SerialName("html_url") val url: String,
++    val body: String? = null,
++    val draft: Boolean = false,
++    val prerelease: Boolean = false,
++    val assets: List<PolarisGithubAsset> = emptyList(),
++)
++
++@Serializable
++data class PolarisUpdateArtifact(val abi: String, val file: String, val bytes: Long, val sha256: String)
++
++@Serializable
++data class PolarisUpdateManifest(
++    val version: String,
++    @SerialName("version_code") val versionCode: Long,
++    @SerialName("minimum_android_api") val minimumAndroidApi: Int,
++    @SerialName("application_id") val applicationId: String,
++    val artifacts: List<PolarisUpdateArtifact>,
++)
++
++/** Only published, compatible Polaris APKs with release metadata can become update prompts. */
++class PolarisUpdateClient(
++    private val fetchPage: suspend (page: Int) -> PolarisReleasePage,
++    private val fetchManifest: suspend (url: String) -> PolarisUpdateManifest,
++) {
++    suspend fun check(
++        currentVersion: String,
++        currentCode: Long,
++        applicationId: String,
++        supportedAbis: List<String>,
++        androidApi: Int,
++        experimental: Boolean,
++    ): GetApplicationRelease.Result {
++        val current = PolarisReleaseVersion.parse(currentVersion) ?: throw IOException("Invalid installed version")
++        val releases = mutableListOf<PolarisGithubRelease>()
++        var page = 1
++        while (true) {
++            val response = fetchPage(page)
++            releases += response.releases
++            if (!response.hasNext) break
++            if (page++ >= 10) throw IOException("Release pagination limit reached")
++        }
++        val candidates = releases.mapNotNull { release ->
++            val version = PolarisReleaseVersion.parse(release.tag) ?: return@mapNotNull null
++            if (release.draft || (!experimental && (release.prerelease || version.prerelease.isNotEmpty()))) {
++                return@mapNotNull null
++            }
++            if (version <= current || !release.url.startsWith("$POLARIS_REPOSITORY_URL/releases/tag/")) {
++                return@mapNotNull null
++            }
++            version to release
++        }.sortedByDescending { it.first }
++        var osTooOld = false
++        for ((version, release) in candidates) {
++            val metadata = release.assets.singleOrNull {
++                it.name == "manifest.json" && officialDownload(it.url)
++            } ?: continue
++            val manifest = fetchManifest(metadata.url)
++            if (PolarisReleaseVersion.parse(manifest.version) != version ||
++                manifest.versionCode <= currentCode || manifest.applicationId != applicationId
++            ) {
++                continue
++            }
++            val artifact = supportedAbis.firstNotNullOfOrNull { abi ->
++                manifest.artifacts.singleOrNull { it.abi == abi }
++            } ?: continue
++            if (!artifact.file.endsWith(".apk") || '/' in artifact.file || '\\' in artifact.file ||
++                !artifact.sha256.matches(Regex("[a-fA-F0-9]{64}")) || artifact.bytes <= 0
++            ) {
++                continue
++            }
++            val asset = release.assets.singleOrNull {
++                it.name == artifact.file && it.size == artifact.bytes && officialDownload(it.url)
++            } ?: continue
++            if (manifest.minimumAndroidApi > androidApi) {
++                osTooOld = true
++                continue
++            }
++            return GetApplicationRelease.Result.NewUpdate(
++                Release(release.tag, release.body.orEmpty(), release.url, asset.url, artifact.sha256.lowercase()),
++            )
++        }
++        return if (osTooOld) GetApplicationRelease.Result.OsTooOld else GetApplicationRelease.Result.NoNewUpdate
++    }
++
++    private fun officialDownload(url: String) = url.startsWith("$POLARIS_REPOSITORY_URL/releases/download/")
++}
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/data/updater/PolarisUpdateIntegrity.kt b/app/src/main/java/eu/kanade/tachiyomi/data/updater/PolarisUpdateIntegrity.kt
+new file mode 100644
+index 0000000..af39e5a
+--- /dev/null
++++ b/app/src/main/java/eu/kanade/tachiyomi/data/updater/PolarisUpdateIntegrity.kt
+@@ -0,0 +1,24 @@
++package eu.kanade.tachiyomi.data.updater
++
++import java.io.File
++import java.io.IOException
++import java.security.MessageDigest
++
++object PolarisUpdateIntegrity {
++    fun verify(apk: File, expected: String) {
++        val digest = MessageDigest.getInstance("SHA-256")
++        apk.inputStream().use { stream ->
++            val buffer = ByteArray(32 * 1024)
++            while (true) {
++                val count = stream.read(buffer)
++                if (count < 0) break
++                digest.update(buffer, 0, count)
++            }
++        }
++        val actual = digest.digest().joinToString("") { "%02x".format(it) }
++        if (!actual.equals(expected, ignoreCase = true)) {
++            apk.delete()
++            throw IOException("Update checksum mismatch")
++        }
++    }
++}
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/data/updater/PolarisUpdatePreferences.kt b/app/src/main/java/eu/kanade/tachiyomi/data/updater/PolarisUpdatePreferences.kt
+new file mode 100644
+index 0000000..1134341
+--- /dev/null
++++ b/app/src/main/java/eu/kanade/tachiyomi/data/updater/PolarisUpdatePreferences.kt
+@@ -0,0 +1,27 @@
++package eu.kanade.tachiyomi.data.updater
++
++import tachiyomi.core.common.preference.Preference
++import tachiyomi.core.common.preference.PreferenceStore
++
++class PolarisUpdatePreferences(store: PreferenceStore) {
++    private val automaticPreference = store.getBoolean("polaris_check_app_updates", true)
++    private val experimentalPreference = store.getBoolean("polaris_experimental_updates", false)
++    private val stableCheck = store.getLong(Preference.appStateKey("polaris_app_update_check_false"), 0)
++    private val experimentalCheck = store.getLong(Preference.appStateKey("polaris_app_update_check_true"), 0)
++    fun automatic() = automaticPreference
++    fun experimental() = experimentalPreference
++    fun lastCheck(experimental: Boolean) = if (experimental) experimentalCheck else stableCheck
++
++    fun resetChecks() {
++        lastCheck(false).set(0)
++        lastCheck(true).set(0)
++    }
++
++    fun shouldCheck(force: Boolean, experimental: Boolean, now: Long): Boolean =
++        force || (automatic().get() && isDue(experimental, now))
++
++    fun isDue(experimental: Boolean, now: Long): Boolean {
++        val last = lastCheck(experimental).get()
++        return last == 0L || now < last || now - last >= 24 * 60 * 60 * 1000L
++    }
++}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentImporter.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentImporter.kt
 new file mode 100644
 index 0000000..9e9e164
@@ -2358,6 +3126,18 @@ index 0000000..0932073
 +            .putExtra("manga_id", mangaId).putExtra("chapter_id", chapterId)
 +    }
 +}
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/main/MainActivity.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/main/MainActivity.kt
+index ffdfc30..6366765 100644
+--- a/app/src/main/java/eu/kanade/tachiyomi/ui/main/MainActivity.kt
++++ b/app/src/main/java/eu/kanade/tachiyomi/ui/main/MainActivity.kt
+@@ -318,6 +318,7 @@ class MainActivity : BaseActivity() {
+                             changelogInfo = result.release.info,
+                             releaseLink = result.release.releaseLink,
+                             downloadLink = result.release.downloadLink,
++                            sha256 = result.release.sha256,
+                         )
+                         navigator.push(updateScreen)
+                     }
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/manga/MangaScreen.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/manga/MangaScreen.kt
 index a7c9284..0640410 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/ui/manga/MangaScreen.kt
@@ -2417,6 +3197,76 @@ index a6e576c..35b35ab 100644
          )
      }
  }
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/more/NewUpdateScreen.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/more/NewUpdateScreen.kt
+index 5fa273f..e1c45c8 100644
+--- a/app/src/main/java/eu/kanade/tachiyomi/ui/more/NewUpdateScreen.kt
++++ b/app/src/main/java/eu/kanade/tachiyomi/ui/more/NewUpdateScreen.kt
+@@ -17,6 +17,7 @@ class NewUpdateScreen(
+     private val changelogInfo: String,
+     private val releaseLink: String,
+     private val downloadLink: String,
++    private val sha256: String? = null,
+ ) : Screen() {
+ 
+     @Composable
+@@ -28,6 +29,7 @@ class NewUpdateScreen(
+             extras = CreationExtras {
+                 set(NewUpdateScreenModel.CHANGELOG_INFO_KEY, changelogInfo)
+                 set(NewUpdateScreenModel.DOWNLOAD_LINK_KEY, downloadLink)
++                sha256?.let { set(NewUpdateScreenModel.SHA256_KEY, it) }
+             },
+         )
+ 
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/more/NewUpdateScreenModel.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/more/NewUpdateScreenModel.kt
+index beb77f2..f379aba 100644
+--- a/app/src/main/java/eu/kanade/tachiyomi/ui/more/NewUpdateScreenModel.kt
++++ b/app/src/main/java/eu/kanade/tachiyomi/ui/more/NewUpdateScreenModel.kt
+@@ -25,6 +25,7 @@ import uy.kohesive.injekt.api.get
+ class NewUpdateScreenModel(
+     changelogInfo: String,
+     private val downloadLink: String,
++    private val sha256: String? = null,
+     private val context: Context = Injekt.get(),
+ ) : StateViewModel<NewUpdateScreenModel.State>(State(changelogInfo = changelogInfo)) {
+ 
+@@ -43,7 +44,12 @@ class NewUpdateScreenModel(
+                     workInfo.progress.getString(AppUpdateDownloadJob.EXTRA_DOWNLOAD_URL)
+                 }
+ 
+-                if (url != downloadLink) {
++                val recordedDigest = if (workInfo.state.isFinished) {
++                    workInfo.outputData.getString(AppUpdateDownloadJob.EXTRA_SHA256)
++                } else {
++                    workInfo.progress.getString(AppUpdateDownloadJob.EXTRA_SHA256)
++                }
++                if (url != downloadLink || (sha256 != null && recordedDigest != sha256)) {
+                     return@map 0 to Stage.Available
+                 }
+ 
+@@ -75,7 +81,7 @@ class NewUpdateScreenModel(
+ 
+     fun startDownload() {
+         mutableState.update { it.copy(downloadProgress = 0, stage = Stage.Downloading) }
+-        AppUpdateDownloadJob.start(context, downloadLink)
++        AppUpdateDownloadJob.start(context, downloadLink, sha256)
+     }
+ 
+     fun installUpdate() {
+@@ -108,12 +114,14 @@ class NewUpdateScreenModel(
+     companion object {
+         val CHANGELOG_INFO_KEY = CreationExtras.Key<String>()
+         val DOWNLOAD_LINK_KEY = CreationExtras.Key<String>()
++        val SHA256_KEY = CreationExtras.Key<String>()
+ 
+         val Factory = viewModelFactory {
+             initializer {
+                 NewUpdateScreenModel(
+                     changelogInfo = get(CHANGELOG_INFO_KEY)!!,
+                     downloadLink = get(DOWNLOAD_LINK_KEY)!!,
++                    sha256 = get(SHA256_KEY),
+                 )
+             }
+         }
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/reader/loader/ChapterLoader.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/reader/loader/ChapterLoader.kt
 index 7451a61..df9f461 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/ui/reader/loader/ChapterLoader.kt
@@ -3172,6 +4022,310 @@ index 6830781..cae7a90 100644
  
              return Translation(source, manga, chapter)
          }
+diff --git a/app/src/test/java/eu/kanade/tachiyomi/data/updater/AppUpdateRepositoryTest.kt b/app/src/test/java/eu/kanade/tachiyomi/data/updater/AppUpdateRepositoryTest.kt
+index 68f36cd..fb3271f 100644
+--- a/app/src/test/java/eu/kanade/tachiyomi/data/updater/AppUpdateRepositoryTest.kt
++++ b/app/src/test/java/eu/kanade/tachiyomi/data/updater/AppUpdateRepositoryTest.kt
+@@ -7,6 +7,6 @@ class AppUpdateRepositoryTest {
+ 
+     @Test
+     fun `updates are fetched from the official repository`() {
+-        assertEquals("kiritsuguxs/yomotsu", GITHUB_REPO)
++        assertEquals("Hailton-Reis/Polaris", GITHUB_REPO)
+     }
+ }
+diff --git a/app/src/test/java/eu/kanade/tachiyomi/data/updater/PolarisReleaseVersionTest.kt b/app/src/test/java/eu/kanade/tachiyomi/data/updater/PolarisReleaseVersionTest.kt
+new file mode 100644
+index 0000000..6c9d85e
+--- /dev/null
++++ b/app/src/test/java/eu/kanade/tachiyomi/data/updater/PolarisReleaseVersionTest.kt
+@@ -0,0 +1,28 @@
++package eu.kanade.tachiyomi.data.updater
++
++import org.junit.jupiter.api.Assertions.assertEquals
++import org.junit.jupiter.api.Assertions.assertNull
++import org.junit.jupiter.api.Assertions.assertTrue
++import org.junit.jupiter.api.Test
++
++class PolarisReleaseVersionTest {
++    @Test
++    fun `semver orders numeric beta counters and stable promotion without downgrades`() {
++        val versions = listOf("0.1.0-alpha", "0.1.0-beta.2", "v0.1.0-beta.10", "0.1.0-rc.1", "0.1.0", "0.2.0", "1.0.0")
++        versions.zipWithNext().forEach { (before, after) ->
++            assertTrue(PolarisReleaseVersion.parse(before)!! < PolarisReleaseVersion.parse(after)!!)
++        }
++        assertTrue(PolarisReleaseVersion.parse("1.9.9")!! < PolarisReleaseVersion.parse("2.0.0")!!)
++    }
++
++    @Test
++    fun `build metadata and optional v prefix do not change precedence`() {
++        assertEquals(PolarisReleaseVersion.parse("v1.2.3+build.4"), PolarisReleaseVersion.parse("1.2.3+build.5"))
++    }
++
++    @Test
++    fun `malformed and overflowing versions are rejected without crashing`() {
++        listOf("r2000", "v1", "1.0", "01.0.0", "1.0.0-beta.01", "1.0.0-", "1.0.0+x..y", "9999999999999999999999.0.0")
++            .forEach { assertNull(PolarisReleaseVersion.parse(it), it) }
++    }
++}
+diff --git a/app/src/test/java/eu/kanade/tachiyomi/data/updater/PolarisUpdateClientTest.kt b/app/src/test/java/eu/kanade/tachiyomi/data/updater/PolarisUpdateClientTest.kt
+new file mode 100644
+index 0000000..e11ee4b
+--- /dev/null
++++ b/app/src/test/java/eu/kanade/tachiyomi/data/updater/PolarisUpdateClientTest.kt
+@@ -0,0 +1,172 @@
++package eu.kanade.tachiyomi.data.updater
++
++import kotlinx.coroutines.CancellationException
++import kotlinx.coroutines.test.runTest
++import kotlinx.serialization.json.Json
++import org.junit.jupiter.api.Assertions.assertEquals
++import org.junit.jupiter.api.Assertions.assertTrue
++import org.junit.jupiter.api.Test
++import org.junit.jupiter.api.assertThrows
++import tachiyomi.domain.release.interactor.GetApplicationRelease
++import java.io.IOException
++
++class PolarisUpdateClientTest {
++    private val prefix = "$POLARIS_REPOSITORY_URL/releases/download/v0.2.0/"
++    private val apk = PolarisGithubAsset("Polaris-arm64-v8a.apk", prefix + "Polaris-arm64-v8a.apk", 123)
++    private val metadata = PolarisGithubAsset("manifest.json", prefix + "manifest.json")
++    private val manifest = PolarisUpdateManifest(
++        "0.2.0",
++        200,
++        26,
++        "polaris.dev",
++        listOf(
++            PolarisUpdateArtifact("arm64-v8a", apk.name, apk.size, "a".repeat(64)),
++        ),
++    )
++    private fun release(tag: String = "v0.2.0") = PolarisGithubRelease(
++        tag,
++        "$POLARIS_REPOSITORY_URL/releases/tag/$tag",
++        "Release notes",
++        assets = listOf(metadata, apk),
++    )
++    private suspend fun check(
++        releases: List<PolarisGithubRelease> = listOf(release()),
++        metadata: PolarisUpdateManifest = manifest,
++        experimental: Boolean = false,
++        abis: List<String> = listOf("arm64-v8a", "armeabi-v7a"),
++        api: Int = 26,
++        fetch: (suspend (Int) -> PolarisReleasePage)? = null,
++        load: (suspend (String) -> PolarisUpdateManifest)? = null,
++    ) = PolarisUpdateClient(
++        fetch ?: { PolarisReleasePage(releases, false) },
++        load ?: { metadata },
++    ).check("0.1.0-beta.3", 104, "polaris.dev", abis, api, experimental)
++
++    @Test
++    fun `default channel ignores drafts and prereleases even when tag is mislabeled`() = runTest {
++        val stable = release()
++        val candidate = release("v9.0.0").copy(draft = true)
++        val beta = release("v1.0.0-beta.1")
++        val marked = release("v2.0.0").copy(prerelease = true)
++        val result = check(listOf(candidate, beta, marked, stable)) as GetApplicationRelease.Result.NewUpdate
++        assertEquals(stable.tag, result.release.version)
++        assertEquals("a".repeat(64), result.release.sha256)
++        assertEquals("Release notes", result.release.info)
++    }
++
++    @Test
++    fun `beta channel is opt in and numeric beta ten is newer than beta two`() = runTest {
++        val result = check(
++            listOf(release("v0.2.0-beta.2"), release("v0.2.0-beta.10")),
++            manifest.copy(version = "0.2.0-beta.10"),
++            experimental = true,
++        ) as GetApplicationRelease.Result.NewUpdate
++        assertEquals("v0.2.0-beta.10", result.release.version)
++        assertEquals(GetApplicationRelease.Result.NoNewUpdate, check(listOf(release("v0.2.0-beta.10"))))
++    }
++
++    @Test
++    fun `stable of the current beta can be offered when its build code is newer`() = runTest {
++        val result = check(listOf(release("v0.1.0")), manifest.copy(version = "0.1.0"))
++        assertTrue(result is GetApplicationRelease.Result.NewUpdate)
++    }
++
++    @Test
++    fun `old versions and non increasing build codes never trigger downgrade`() = runTest {
++        assertEquals(GetApplicationRelease.Result.NoNewUpdate, check(listOf(release("v0.0.9"))))
++        assertEquals(GetApplicationRelease.Result.NoNewUpdate, check(metadata = manifest.copy(versionCode = 104)))
++        assertEquals(GetApplicationRelease.Result.NoNewUpdate, check(metadata = manifest.copy(versionCode = 100)))
++    }
++
++    @Test
++    fun `package identity and matching manifest version are required`() = runTest {
++        assertEquals(
++            GetApplicationRelease.Result.NoNewUpdate,
++            check(metadata = manifest.copy(applicationId = "other.app")),
++        )
++        assertEquals(GetApplicationRelease.Result.NoNewUpdate, check(metadata = manifest.copy(version = "0.3.0")))
++        assertEquals(GetApplicationRelease.Result.NoNewUpdate, check(listOf(release().copy(assets = listOf(apk)))))
++    }
++
++    @Test
++    fun `device ABI order selects a compatible published APK`() = runTest {
++        val arm32 = apk.copy(name = "Polaris-armeabi-v7a.apk", url = prefix + "Polaris-armeabi-v7a.apk")
++        val data = manifest.copy(
++            artifacts = manifest.artifacts + manifest.artifacts.first().copy(
++                abi = "armeabi-v7a",
++                file = arm32.name,
++            ),
++        )
++        val releases = listOf(release().copy(assets = listOf(metadata, arm32, apk)))
++        val preferred = check(releases, data) as GetApplicationRelease.Result.NewUpdate
++        assertEquals(apk.url, preferred.release.downloadLink)
++        val fallback = check(releases, data, abis = listOf("armeabi-v7a")) as GetApplicationRelease.Result.NewUpdate
++        assertEquals(arm32.url, fallback.release.downloadLink)
++        assertEquals(GetApplicationRelease.Result.NoNewUpdate, check(releases, data, abis = listOf("x86")))
++    }
++
++    @Test
++    fun `unsupported Android is distinguished from no update`() = runTest {
++        assertEquals(GetApplicationRelease.Result.OsTooOld, check(metadata = manifest.copy(minimumAndroidApi = 35)))
++    }
++
++    @Test
++    fun `newest unsupported release does not hide an older compatible update`() = runTest {
++        val newest = release("v0.3.0").copy(assets = listOf(metadata.copy(url = prefix + "new-manifest.json"), apk))
++        val result = check(listOf(newest, release()), load = {
++            if (it.endsWith("new-manifest.json")) manifest.copy(version = "0.3.0", minimumAndroidApi = 35) else manifest
++        }) as GetApplicationRelease.Result.NewUpdate
++        assertEquals("v0.2.0", result.release.version)
++    }
++
++    @Test
++    fun `unsafe APK assets and invalid checksums cannot be offered`() = runTest {
++        for (artifact in listOf(
++            manifest.artifacts.first().copy(sha256 = "bad"),
++            manifest.artifacts.first().copy(file = "../bad.apk"),
++            manifest.artifacts.first().copy(bytes = 999),
++        )) {
++            assertEquals(
++                GetApplicationRelease.Result.NoNewUpdate,
++                check(metadata = manifest.copy(artifacts = listOf(artifact))),
++            )
++        }
++        val external = release().copy(assets = listOf(metadata, apk.copy(url = "https://example.com/file.apk")))
++        assertEquals(GetApplicationRelease.Result.NoNewUpdate, check(listOf(external)))
++    }
++
++    @Test
++    fun `all pages are inspected instead of trusting GitHub listing order`() = runTest {
++        val pages = mutableListOf<Int>()
++        val result = check(fetch = { page ->
++            pages += page
++            if (page == 1) {
++                PolarisReleasePage(listOf(release("v0.0.1")), true)
++            } else {
++                PolarisReleasePage(listOf(release()), false)
++            }
++        })
++        assertEquals(listOf(1, 2), pages)
++        assertTrue(result is GetApplicationRelease.Result.NewUpdate)
++    }
++
++    @Test
++    fun `network failures and cancellation are not presented as no update`() = runTest {
++        assertThrows<IOException> { check(fetch = { throw IOException("offline") }) }
++        assertThrows<CancellationException> { check(load = { throw CancellationException() }) }
++    }
++
++    @Test
++    fun `real manifest shape ignores extra packaging fields and nullable release notes`() = runTest {
++        val json = Json { ignoreUnknownKeys = true }
++        val parsed = json.decodeFromString<PolarisUpdateManifest>(
++            """{
++            "version":"0.2.0","version_code":200,"minimum_android_api":26,"application_id":"polaris.dev",
++            "artifacts":[{"abi":"arm64-v8a","file":"Polaris-arm64-v8a.apk","bytes":123,"sha256":"${"a".repeat(64)}"}],
++            "physical_device_acceptance":"PENDING","unit_comparison":{}
++        }""",
++        )
++        assertTrue(check(metadata = parsed) is GetApplicationRelease.Result.NewUpdate)
++        assertEquals(GetApplicationRelease.Result.NoNewUpdate, check(listOf(release("invalid"))))
++    }
++}
+diff --git a/app/src/test/java/eu/kanade/tachiyomi/data/updater/PolarisUpdateIntegrityTest.kt b/app/src/test/java/eu/kanade/tachiyomi/data/updater/PolarisUpdateIntegrityTest.kt
+new file mode 100644
+index 0000000..873739c
+--- /dev/null
++++ b/app/src/test/java/eu/kanade/tachiyomi/data/updater/PolarisUpdateIntegrityTest.kt
+@@ -0,0 +1,28 @@
++package eu.kanade.tachiyomi.data.updater
++
++import org.junit.jupiter.api.Assertions.assertFalse
++import org.junit.jupiter.api.Assertions.assertTrue
++import org.junit.jupiter.api.Test
++import org.junit.jupiter.api.assertThrows
++import org.junit.jupiter.api.io.TempDir
++import java.io.File
++import java.io.IOException
++
++class PolarisUpdateIntegrityTest {
++    @TempDir lateinit var directory: File
++    private val hash = "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"
++
++    @Test
++    fun `matching checksum accepts the downloaded file including uppercase digest`() {
++        val apk = File(directory, "update.apk").apply { writeText("abc") }
++        PolarisUpdateIntegrity.verify(apk, hash.uppercase())
++        assertTrue(apk.exists())
++    }
++
++    @Test
++    fun `corrupted download is removed before installation can be offered`() {
++        val apk = File(directory, "update.apk").apply { writeText("truncated or changed") }
++        assertThrows<IOException> { PolarisUpdateIntegrity.verify(apk, hash) }
++        assertFalse(apk.exists())
++    }
++}
+diff --git a/app/src/test/java/eu/kanade/tachiyomi/data/updater/PolarisUpdatePreferencesTest.kt b/app/src/test/java/eu/kanade/tachiyomi/data/updater/PolarisUpdatePreferencesTest.kt
+new file mode 100644
+index 0000000..52defe4
+--- /dev/null
++++ b/app/src/test/java/eu/kanade/tachiyomi/data/updater/PolarisUpdatePreferencesTest.kt
+@@ -0,0 +1,40 @@
++package eu.kanade.tachiyomi.data.updater
++
++import org.junit.jupiter.api.Assertions.assertFalse
++import org.junit.jupiter.api.Assertions.assertTrue
++import org.junit.jupiter.api.Test
++import tachiyomi.core.common.preference.InMemoryPreferenceStore
++
++class PolarisUpdatePreferencesTest {
++    @Test
++    fun `automatic checks default on while experimental releases require opt in`() {
++        val preferences = PolarisUpdatePreferences(InMemoryPreferenceStore())
++        assertTrue(preferences.automatic().get())
++        assertFalse(preferences.experimental().get())
++    }
++
++    @Test
++    fun `check intervals are independent by channel and handle clock rollback`() {
++        val preferences = PolarisUpdatePreferences(InMemoryPreferenceStore())
++        val now = 5 * 24 * 60 * 60 * 1000L
++        preferences.lastCheck(false).set(now)
++        assertFalse(preferences.isDue(false, now + 1000))
++        assertTrue(preferences.isDue(true, now + 1000))
++        assertTrue(preferences.isDue(false, now - 1))
++        assertTrue(preferences.isDue(false, now + 24 * 60 * 60 * 1000L))
++        preferences.resetChecks()
++        assertTrue(preferences.isDue(false, now + 1000))
++    }
++
++    @Test
++    fun `manual checks bypass disabled automation and the daily interval`() {
++        val preferences = PolarisUpdatePreferences(InMemoryPreferenceStore())
++        val now = 123_456L
++        preferences.lastCheck(false).set(now)
++        assertFalse(preferences.shouldCheck(false, false, now))
++        assertTrue(preferences.shouldCheck(true, false, now))
++        preferences.automatic().set(false)
++        assertFalse(preferences.shouldCheck(false, true, now))
++        assertTrue(preferences.shouldCheck(true, true, now))
++    }
++}
 diff --git a/app/src/test/java/eu/kanade/tachiyomi/ui/documents/DocumentCacheBudgetTest.kt b/app/src/test/java/eu/kanade/tachiyomi/ui/documents/DocumentCacheBudgetTest.kt
 new file mode 100644
 index 0000000..59497de
@@ -4779,6 +5933,16 @@ index 0000000..ee88790
 +        }
 +    }
 +}
+diff --git a/domain/src/main/java/tachiyomi/domain/release/model/Release.kt b/domain/src/main/java/tachiyomi/domain/release/model/Release.kt
+index d7001d9..0dad0f5 100644
+--- a/domain/src/main/java/tachiyomi/domain/release/model/Release.kt
++++ b/domain/src/main/java/tachiyomi/domain/release/model/Release.kt
+@@ -8,4 +8,5 @@ data class Release(
+     val info: String,
+     val releaseLink: String,
+     val downloadLink: String,
++    val sha256: String? = null,
+ )
 diff --git a/domain/src/main/java/tachiyomi/domain/translation/TranslationPreferences.kt b/domain/src/main/java/tachiyomi/domain/translation/TranslationPreferences.kt
 index ee30e4b..1a70138 100644
 --- a/domain/src/main/java/tachiyomi/domain/translation/TranslationPreferences.kt
@@ -4794,10 +5958,10 @@ index ee30e4b..1a70138 100644
      fun autoTranslateAfterDownload() = preferenceStore.getBoolean("auto_translate_after_download", false)
      fun autoTranslateNovels() = preferenceStore.getBoolean("auto_translate_novels", true)
 diff --git a/i18n-at/src/commonMain/moko-resources/base/strings.xml b/i18n-at/src/commonMain/moko-resources/base/strings.xml
-index 7ed4795..c90238f 100644
+index 7ed4795..554adca 100644
 --- a/i18n-at/src/commonMain/moko-resources/base/strings.xml
 +++ b/i18n-at/src/commonMain/moko-resources/base/strings.xml
-@@ -81,4 +81,91 @@
+@@ -81,4 +81,105 @@
      <string name="repository_adding">Adding…</string>
      <string name="chapter_versions_shortcut">Tap to filter source groups and versions</string>
      <string name="translation_crop_borders_summary">Pages with saved translations keep their borders to align text with the original image.</string>
@@ -4888,12 +6052,26 @@ index 7ed4795..c90238f 100644
 +    <string name="english_models_prepare_now">Prepare now with this connection</string>
 +    <string name="english_models_auto">Prepare English → Portuguese automatically</string>
 +    <string name="english_models_auto_summary">Prioritizes the most-used language pair after installation. Waits for an unmetered connection and Android’s available-storage condition. Keeps your chosen OCR and output languages unchanged.</string>
++    <string name="polaris_about_description">Manga, books and documents at your pace and in your language. Offline reading of available files, on-device ML Kit translation and a library organized by you.</string>
++    <string name="polaris_about_maintainer">Maintained by Hailton Reis</string>
++    <string name="polaris_about_credits">Polaris is an adaptation based on Yomotsu / Mihon, with multi-source features inspired by TachiyomiSY. Credits and licenses remain available in the project.</string>
++    <string name="polaris_about_project">Project on GitHub</string>
++    <string name="polaris_about_releases">Published releases on GitHub</string>
++    <string name="polaris_updates_title">Application updates</string>
++    <string name="polaris_updates_channel_hint">Stable releases and optional experimental updates.</string>
++    <string name="polaris_updates_automatic">Check for updates automatically</string>
++    <string name="polaris_updates_automatic_summary">Checks GitHub when opening the app, at most once a day per channel. Only notifies: downloading and installing require your choice.</string>
++    <string name="polaris_updates_experimental">Receive experimental updates</string>
++    <string name="polaris_updates_experimental_summary">Includes published beta and other prerelease versions. They may contain bugs. Off by default; switching off never downgrades or uninstalls the current version.</string>
++    <string name="polaris_updates_check_hint">Check now using your experimental release preference.</string>
++    <string name="polaris_updates_access_error">Polaris Releases are unavailable. The repository may be private or not publicly accessible. See the project page.</string>
++    <string name="polaris_updates_failed">Could not check for updates. Check your connection and try again; GitHub may be unavailable or limiting requests.</string>
  </resources>
 diff --git a/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml b/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
-index d1748bc..8e7eaaa 100644
+index d1748bc..4b92747 100644
 --- a/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
 +++ b/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
-@@ -81,4 +81,91 @@
+@@ -81,4 +81,105 @@
      <string name="repository_adding">Adicionando…</string>
      <string name="chapter_versions_shortcut">Toque para filtrar grupos e versões da fonte</string>
      <string name="translation_crop_borders_summary">Páginas com tradução salva preservam as bordas para alinhar o texto à imagem original.</string>
@@ -4984,6 +6162,20 @@ index d1748bc..8e7eaaa 100644
 +    <string name="english_models_prepare_now">Preparar agora com esta conexão</string>
 +    <string name="english_models_auto">Preparar inglês → português automaticamente</string>
 +    <string name="english_models_auto_summary">Prioriza o par mais usado após a instalação. Aguarda rede sem cobrança e a condição de espaço disponível do Android. Mantém os idiomas de OCR e de saída que você escolheu.</string>
++    <string name="polaris_about_description">Mangás, livros e documentos no seu ritmo e no seu idioma. Leitura offline de arquivos disponíveis, tradução no aparelho com ML Kit e biblioteca organizada por você.</string>
++    <string name="polaris_about_maintainer">Mantido por Hailton Reis</string>
++    <string name="polaris_about_credits">Polaris é uma adaptação baseada em Yomotsu / Mihon, com recursos de múltiplas fontes inspirados no TachiyomiSY. Créditos e licenças permanecem disponíveis no projeto.</string>
++    <string name="polaris_about_project">Projeto no GitHub</string>
++    <string name="polaris_about_releases">Versões publicadas no GitHub</string>
++    <string name="polaris_updates_title">Atualizações do aplicativo</string>
++    <string name="polaris_updates_channel_hint">Versões estáveis e opção de receber versões experimentais.</string>
++    <string name="polaris_updates_automatic">Buscar atualizações automaticamente</string>
++    <string name="polaris_updates_automatic_summary">Consulta o GitHub ao abrir o app, no máximo uma vez por dia por canal. Apenas avisa: baixar e instalar dependem da sua escolha.</string>
++    <string name="polaris_updates_experimental">Receber atualizações experimentais</string>
++    <string name="polaris_updates_experimental_summary">Inclui versões beta e outras prévias publicadas. Podem conter falhas. Desativada por padrão; não faz downgrade nem desinstala a versão atual ao desligar.</string>
++    <string name="polaris_updates_check_hint">Verifica agora, respeitando sua escolha de versões experimentais.</string>
++    <string name="polaris_updates_access_error">As Releases do Polaris estão indisponíveis. O repositório pode estar privado ou sem acesso público. Consulte a página do projeto.</string>
++    <string name="polaris_updates_failed">Não foi possível verificar atualizações. Confira a conexão e tente novamente; o GitHub pode estar indisponível ou limitar consultas.</string>
  </resources>
 diff --git a/source-local/src/main/kotlin/tachiyomi/source/local/LocalSource.kt b/source-local/src/main/kotlin/tachiyomi/source/local/LocalSource.kt
 index e5a307f..31834b3 100644

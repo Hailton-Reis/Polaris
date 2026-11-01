@@ -1,8 +1,8 @@
 {
   "date_utc": "2026-11-01",
-  "candidate_revision": "Polaris P20261101.2",
+  "candidate_revision": "Polaris P20261101.3",
   "pinned_yomotsu": "0fb80c439ef816eeb50674f1b90af39918b176d8",
-  "patch_sha256": "5bb714a7e3fdba9e807dc771156d8597a4558b4a615c50d92e3a112d7aaaacf7",
+  "patch_sha256": "9b96e842c9797332ef1f961009fbe39e80752a57cf82934d68c9686e1af80b6d",
   "prerequisite_reader_overlay_sha256": "971e394a0b3b4b26223c970b63da886067f813f986decca913910aeee1fcf86b",
   "assembly": "PASS: app:assembleDebug completed; overall Gradle exit 1 from the same 34 preexisting unit failures",
   "full_build_completion": {
@@ -14,7 +14,7 @@
       "app-x86-debug.apk",
       "app-arm64-v8a-debug.apk"
     ],
-    "unit_tests": 505
+    "unit_tests": 525
   },
   "android_unit_comparison": {
     "status": "NO_NEW_UNIT_REGRESSIONS",
@@ -25,8 +25,8 @@
       "skipped": 0
     },
     "patched": {
-      "total": 505,
-      "passed": 471,
+      "total": 525,
+      "passed": 491,
       "failed": 34,
       "skipped": 0
     },
@@ -89,10 +89,10 @@
     "passed": 15,
     "failed": 0
   },
-  "formatting": "PASS: targeted Spotless on six new/changed English preparation Kotlin files; existing minified pipeline files not broadly reformatted",
-  "apk_x86_64_sha256": "49001bebcefa28a1bec73fc7f8396e97e86e9d07df1a605f5af53679eedf7b3f",
+  "formatting": "PASS: targeted Spotless on 18 About/updater Kotlin files; inherited minified MainActivity not broadly reformatted",
+  "apk_x86_64_sha256": "cd95121d627522ea1adb593c822a4ac05fa4f244249b5e6374e992bce4a4f27d",
   "apk_signature_verification": "PASS, Android APK Signature Scheme v2, one debug signer; the Windows update must use its existing local signing key",
-  "embedded_revision_verification": "PASS: P20261101.2 found in x86_64 and both exported ARM APK DEX files",
+  "embedded_revision_verification": "PASS: P20261101.3 in final x86_64 and both exported ARM APK DEX files",
   "build_profile": {
     "profile": "auto",
     "detected_cpus": 2,
@@ -142,10 +142,10 @@
   "migration15_applied": false,
   "backup_v2_enabled": false,
   "production_release": false,
-  "evidence_directory": "/workspace/scratch/polaris-english-bootstrap-v1",
-  "scope": "English to Portuguese preparation via official ML Kit downloads, current local readiness verification, visible progress and manual preparation; retains storage/language/document beta. New repository hero is documentation only, excluded from APK.",
+  "evidence_directory": "/workspace/scratch/polaris-updates-v1",
+  "scope": "Expanded About and Polaris GitHub updater, stable default with opt-in experimentals, daily opening checks and manual check, compatible manifest selection, SHA-256 download integrity; no visibility change or APK release",
   "added_in_this_revision": {
-    "tests": 7,
+    "tests": 20,
     "failures": 0,
     "errors": 0,
     "skipped": 0
@@ -166,8 +166,8 @@
   },
   "date_client": "2026-11-01",
   "client_timezone": "America/Fortaleza",
-  "version_name": "0.1.0-beta.2",
-  "version_code": 103,
+  "version_name": "0.1.0-beta.3",
+  "version_code": 104,
   "storage_lifecycle_language_suites": {
     "DocumentCacheBudgetTest": {
       "tests": 4,
@@ -215,15 +215,15 @@
   "beta_artifacts": [
     {
       "abi": "arm64-v8a",
-      "file": "Polaris-0.1.0-beta.2-arm64-v8a.apk",
-      "bytes": 196146441,
-      "sha256": "826017c42d276b9f6b77d07eb48152782de8f11a03aed0d68d64a0de6abd0978"
+      "file": "Polaris-0.1.0-beta.3-arm64-v8a.apk",
+      "bytes": 196194966,
+      "sha256": "ae784ec2ec31c83d8e0373bea8f2a7f6aaa1056405368a514ae6df9c3e243e40"
     },
     {
       "abi": "armeabi-v7a",
-      "file": "Polaris-0.1.0-beta.2-armeabi-v7a.apk",
-      "bytes": 156348618,
-      "sha256": "1795dcb1c6904a416f295c85b2880f9473a74af6346a08018cd75d173c1c1f29"
+      "file": "Polaris-0.1.0-beta.3-armeabi-v7a.apk",
+      "bytes": 156397143,
+      "sha256": "498d82e8e9f1efadecbf0f2b6afa19d183956430bfdfce18cda4d149b7f8c6df"
     }
   ],
   "beta_signer_sha256": "3ae747069cc9015ca1777f94fd56b030501f45d6af380426a572ad60e94d8227",
@@ -300,5 +300,49 @@
     "ready_condition": "Nonempty SDK probe after resource verification; fake-session logic tests do not validate real SDK download",
     "native_acceptance": "PENDING clean install, network constraints, opt-out, restart, removed models, offline reuse and actual model byte measurement"
   },
-  "previous_revision_evidence": "TEST_RESULTS_P20261101_1.json"
+  "previous_revision_evidence": "TEST_RESULTS_P20261101_2.json",
+  "update_channel_suites": {
+    "PolarisUpdatePreferencesTest": {
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "PolarisReleaseVersionTest": {
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "PolarisUpdateIntegrityTest": {
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "PolarisUpdateClientTest": {
+      "tests": 12,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "polaris_updater": {
+    "repository": "Hailton-Reis/Polaris",
+    "enabled_in_internal_builds": true,
+    "automatic_default": true,
+    "automatic_timing": "On app opening, at most one attempt per 24 hours per channel; attempt timestamp also recorded on error; not periodic when app closed",
+    "experimental_default": false,
+    "manual": "Shared checker in About and settings; bypasses automation and daily interval; respects experimental opt-in",
+    "channel_policy": "Ignore drafts; stable channel rejects both prerelease flag and SemVer prerelease; experimental includes stable too; no downgrade or non-increasing versionCode",
+    "compatibility": "Requires matching SemVer + higher versionCode + same application_id + Android API + preferred supported ABI + published matching asset size/name",
+    "metadata": "Release manifest.json required; 64KiB maximum; official repository download URL; SHA-256 checked after download, corrupted APK deleted",
+    "download": "User initiated; cached work is reused only when URL and recorded SHA-256 match; Android installer still checks signature",
+    "current_access": "Repository remains PRIVATE; only beta.1 draft exists without assets; current environment access is not proof of unauthenticated handset access; public releases needed for login-free distribution",
+    "credentials_embedded": false,
+    "visibility_changed": false,
+    "apk_published": false,
+    "about": "Product description, maintainer/credits, visible Polaris version and revision, project/history/releases links, update settings, licenses and new privacy page",
+    "physical_acceptance": "PENDING About layout, opt-in persistence, public-network queries, real release download, original-key upgrade retaining library and vocabulary"
+  }
 }

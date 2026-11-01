@@ -37,4 +37,10 @@ The earlier crop-off diagnosis is confirmed by the user. Automatic crop protecti
 
 ## P20261101.1 — internal beta and storage
 
-The candidate now has versionName `0.1.0-beta.1` and versionCode 102. The [beta guide](../internal-beta/README.md) covers private ARM APK distribution, storage measurement, download/translation deletion, persistent vocabulary and the still-pending EN/JA/ZH/KO device matrix. [Storage implementation and measured examples](../internal-beta/STORAGE_AND_LIFECYCLE.md) distinguish chapter JSON, originals, language models and bounded regenerable document cache. Prior P20261031.4 evidence is preserved in [TEST_RESULTS_P20261031_4.json](TEST_RESULTS_P20261031_4.json).
+This revision introduced versionName `0.1.0-beta.1` and versionCode 102. The [beta guide](../internal-beta/README.md) covers private ARM APK distribution, storage measurement, download/translation deletion, persistent vocabulary and the still-pending EN/JA/ZH/KO device matrix. [Storage implementation and measured examples](../internal-beta/STORAGE_AND_LIFECYCLE.md) distinguish chapter JSON, originals, language models and bounded regenerable document cache. Prior P20261031.4 evidence is preserved in [TEST_RESULTS_P20261031_4.json](TEST_RESULTS_P20261031_4.json).
+
+## P20261101.3 — About and update channels
+
+The current candidate is `0.1.0-beta.3`, versionCode 104. It retains the P20261101.2 automatic English-to-Portuguese preparation and adds an expanded About screen, manual checks and daily opening checks against Polaris GitHub Releases. Experimental releases require an explicit opt-in, off by default even in beta builds. Published `manifest.json` metadata gates package identity, versionCode, Android and ABI; downloaded APKs must match their SHA-256 before installation is offered. Checks never start APK downloads automatically.
+
+The repository remains private and no APK is published. Login-free handset access and an actual same-signature upgrade remain pending, along with storage and language acceptance. The twenty added tests passed; the complete comparison has 491 passes and the same 34 preexisting failures. Previous English-preparation evidence is preserved in [TEST_RESULTS_P20261101_2.json](TEST_RESULTS_P20261101_2.json).

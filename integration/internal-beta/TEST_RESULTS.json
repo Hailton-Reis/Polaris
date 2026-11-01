@@ -1,9 +1,9 @@
 {
   "date_client": "2026-11-01",
-  "candidate_revision": "Polaris P20261101.2",
-  "version_name": "0.1.0-beta.2",
-  "version_code": 103,
-  "patch_sha256": "5bb714a7e3fdba9e807dc771156d8597a4558b4a615c50d92e3a112d7aaaacf7",
+  "candidate_revision": "Polaris P20261101.3",
+  "version_name": "0.1.0-beta.3",
+  "version_code": 104,
+  "patch_sha256": "9b96e842c9797332ef1f961009fbe39e80752a57cf82934d68c9686e1af80b6d",
   "full_build_completion": {
     "status": "ASSEMBLY_AND_UNIT_REPORTS_COMPLETE",
     "apks": [
@@ -13,7 +13,7 @@
       "app-x86-debug.apk",
       "app-arm64-v8a-debug.apk"
     ],
-    "unit_tests": 505
+    "unit_tests": 525
   },
   "android_unit_comparison": {
     "status": "NO_NEW_UNIT_REGRESSIONS",
@@ -24,8 +24,8 @@
       "skipped": 0
     },
     "patched": {
-      "total": 505,
-      "passed": 471,
+      "total": 525,
+      "passed": 491,
       "failed": 34,
       "skipped": 0
     },
@@ -43,7 +43,7 @@
     }
   },
   "added_in_this_revision": {
-    "tests": 7,
+    "tests": 20,
     "failures": 0,
     "errors": 0,
     "skipped": 0
@@ -99,15 +99,15 @@
   "beta_artifacts": [
     {
       "abi": "arm64-v8a",
-      "file": "Polaris-0.1.0-beta.2-arm64-v8a.apk",
-      "bytes": 196146441,
-      "sha256": "826017c42d276b9f6b77d07eb48152782de8f11a03aed0d68d64a0de6abd0978"
+      "file": "Polaris-0.1.0-beta.3-arm64-v8a.apk",
+      "bytes": 196194966,
+      "sha256": "ae784ec2ec31c83d8e0373bea8f2a7f6aaa1056405368a514ae6df9c3e243e40"
     },
     {
       "abi": "armeabi-v7a",
-      "file": "Polaris-0.1.0-beta.2-armeabi-v7a.apk",
-      "bytes": 156348618,
-      "sha256": "1795dcb1c6904a416f295c85b2880f9473a74af6346a08018cd75d173c1c1f29"
+      "file": "Polaris-0.1.0-beta.3-armeabi-v7a.apk",
+      "bytes": 156397143,
+      "sha256": "498d82e8e9f1efadecbf0f2b6afa19d183956430bfdfce18cda4d149b7f8c6df"
     }
   ],
   "storage_samples": {
@@ -158,7 +158,7 @@
   "cache_target_bytes": 268435456,
   "cache_target_semantics": "LRU target for document-files/pdf-pages/document-translations only; leases protect active files and may temporarily exceed it; originals, models and other caches are not limited by this target",
   "beta_package_status": "INTERNAL_BETA_CANDIDATE_EXPORTED; not physical-device acceptance",
-  "evidence_directory": "/workspace/scratch/polaris-english-bootstrap-v1",
+  "evidence_directory": "/workspace/scratch/polaris-updates-v1",
   "english_preparation_suites": {
     "EnglishTranslationSetupHistoryTest": {
       "tests": 2,
@@ -183,5 +183,49 @@
     "native_acceptance": "PENDING clean install, network constraints, opt-out, restart, removed models, offline reuse and actual model byte measurement"
   },
   "beta_signer_sha256": "3ae747069cc9015ca1777f94fd56b030501f45d6af380426a572ad60e94d8227",
-  "previous_revision_evidence": "TEST_RESULTS_P20261101_1.json"
+  "previous_revision_evidence": "TEST_RESULTS_P20261101_2.json",
+  "update_channel_suites": {
+    "PolarisUpdatePreferencesTest": {
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "PolarisReleaseVersionTest": {
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "PolarisUpdateIntegrityTest": {
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "PolarisUpdateClientTest": {
+      "tests": 12,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "polaris_updater": {
+    "repository": "Hailton-Reis/Polaris",
+    "enabled_in_internal_builds": true,
+    "automatic_default": true,
+    "automatic_timing": "On app opening, at most one attempt per 24 hours per channel; attempt timestamp also recorded on error; not periodic when app closed",
+    "experimental_default": false,
+    "manual": "Shared checker in About and settings; bypasses automation and daily interval; respects experimental opt-in",
+    "channel_policy": "Ignore drafts; stable channel rejects both prerelease flag and SemVer prerelease; experimental includes stable too; no downgrade or non-increasing versionCode",
+    "compatibility": "Requires matching SemVer + higher versionCode + same application_id + Android API + preferred supported ABI + published matching asset size/name",
+    "metadata": "Release manifest.json required; 64KiB maximum; official repository download URL; SHA-256 checked after download, corrupted APK deleted",
+    "download": "User initiated; cached work is reused only when URL and recorded SHA-256 match; Android installer still checks signature",
+    "current_access": "Repository remains PRIVATE; only beta.1 draft exists without assets; current environment access is not proof of unauthenticated handset access; public releases needed for login-free distribution",
+    "credentials_embedded": false,
+    "visibility_changed": false,
+    "apk_published": false,
+    "about": "Product description, maintainer/credits, visible Polaris version and revision, project/history/releases links, update settings, licenses and new privacy page",
+    "physical_acceptance": "PENDING About layout, opt-in persistence, public-network queries, real release download, original-key upgrade retaining library and vocabulary"
+  }
 }
