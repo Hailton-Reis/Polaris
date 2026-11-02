@@ -1,6 +1,19 @@
 # Histórico de versões do Polaris
 
-Este arquivo registra a evolução real do código. **Revisões de desenvolvimento não são lançamentos públicos.** As datas abaixo usam America/Fortaleza. O histórico de distribuição fica em [Releases](https://github.com/Hailton-Reis/Polaris/releases).
+Este arquivo registra a evolução real do código. **Revisões de desenvolvimento não são lançamentos públicos.** As datas abaixo usam America/Fortaleza, exceto quando houver indicação de UTC. O histórico de distribuição fica em [Releases](https://github.com/Hailton-Reis/Polaris/releases).
+
+## 0.1.0-beta.4 · P20261102.1 — 02/11/2026 (UTC)
+
+**Estado:** candidato compilado; versionCode 105. Os APKs da beta.4 ainda não foram publicados nas Releases. Conferência visual no A12 pendente.
+
+- Corrige o nome Yomotsu exibido pelo instalador e pelo Android, aplicando **Polaris**.
+- Ícone de estrela e livro no instalador, na tela inicial, na abertura e no Sobre, com ícone temático no Android 13+.
+- Preserva identificador e assinatura da beta.3 distribuída, permitindo solicitar atualização dessa instalação.
+- Acrescenta uma barreira de exportação que verifica o nome e os ícones no APK compilado.
+
+ARM32, ARM64 e x86_64 tiveram a identidade verificada. A comparação Android mantém 491 aprovações e as mesmas 34 falhas preexistentes; os seis testes do empacotador passaram.
+
+[Notas da revisão](docs/versoes/0.1.0-beta.4.md)
 
 ## Apresentação inicial do repositório — 01/11/2026
 

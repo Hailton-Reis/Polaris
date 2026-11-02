@@ -29,6 +29,8 @@ A leitura básica funciona no aparelho, sem exigir um servidor pessoal. Arquivos
 
 **Em desenvolvimento · Android 8+ · ARM64 e ARM32 · Foco em português brasileiro**
 
+**Nome e ícone no Android:** os APKs da beta.3 ainda exibem a identidade Yomotsu da base. A [correção na beta.4](docs/versoes/0.1.0-beta.4.md) já foi compilada com a identidade Polaris; a aparência após atualizar ainda aguarda conferência no aparelho. Essa candidata ainda não está publicada nas Releases.
+
 ## Inglês como prioridade
 
 **O reconhecimento de texto em inglês já acompanha o APK.** O Polaris usa a biblioteca latina embarcada do ML Kit para ler o texto das imagens.
@@ -105,7 +107,7 @@ O painel **Dados e armazenamento → Armazenamento do Polaris** ajuda a separar 
 
 ## Onde o projeto está
 
-O candidato atual é **`0.1.0-beta.3` · revisão `P20261101.3` · versionCode `104`**. A implementação está em avaliação na [branch de engenharia](https://github.com/Hailton-Reis/Polaris/tree/r001/multisource-foundation).
+O beta público disponível é **`0.1.0-beta.3` · revisão `P20261101.3` · versionCode `104`**. A próxima candidata é **`0.1.0-beta.4` · `P20261102.1` · código `105`**, com a correção de identidade. A implementação está em avaliação na [branch de engenharia](https://github.com/Hailton-Reis/Polaris/tree/r001/multisource-foundation).
 
 **O [primeiro beta público](https://github.com/Hailton-Reis/Polaris/releases/tag/v0.1.0-beta.3) está disponível; ainda não há lançamento estável.** O pacote de teste e a compilação não equivalem a aprovação do consumo, da compatibilidade ou da qualidade em todos os idiomas.
 

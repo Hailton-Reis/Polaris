@@ -14,6 +14,10 @@ O pacote atual usa versão `0.1.0-beta.3`, revisão `P20261101.3` e versionCode 
 
 Os APKs ARM64 e ARM32 destinam-se às respectivas arquiteturas do sistema Android; x86 é para ambientes de desenvolvimento compatíveis. O mínimo é Android 8. O modelo comercial do aparelho não substitui essa verificação.
 
+## Nome e ícone no Android
+
+Na beta.3 publicada, o instalador e a tela inicial ainda podem mostrar **Yomotsu**, o nome da base do Polaris. A [beta.4](versoes/0.1.0-beta.4.md) corrige a identidade para **Polaris**, incluindo abertura e Sobre. A correção exige um novo APK; ela não aparece nos arquivos antigos por uma simples atualização da página do GitHub. A beta.4 está compilada e aguarda conferência no aparelho antes da publicação de seus arquivos.
+
 ## Incluir um arquivo já baixado no celular
 
 1. Abra **Mais → Documentos e pesquisa → Explorar e adicionar arquivo**.
