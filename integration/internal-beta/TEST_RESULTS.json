@@ -1,17 +1,17 @@
 {
-  "date_client": "2026-11-01",
-  "candidate_revision": "Polaris P20261101.3",
-  "version_name": "0.1.0-beta.3",
-  "version_code": 104,
-  "patch_sha256": "9b96e842c9797332ef1f961009fbe39e80752a57cf82934d68c9686e1af80b6d",
+  "date_client": "2026-11-02",
+  "candidate_revision": "Polaris P20261102.1",
+  "version_name": "0.1.0-beta.4",
+  "version_code": 105,
+  "patch_sha256": "eba3eb90e2877fe3d194d9813b0b003062f997dbefd7aa1a901400d7696daa7c",
   "full_build_completion": {
     "status": "ASSEMBLY_AND_UNIT_REPORTS_COMPLETE",
     "apks": [
       "app-universal-debug.apk",
       "app-armeabi-v7a-debug.apk",
       "app-x86_64-debug.apk",
-      "app-x86-debug.apk",
-      "app-arm64-v8a-debug.apk"
+      "app-arm64-v8a-debug.apk",
+      "app-x86-debug.apk"
     ],
     "unit_tests": 525
   },
@@ -43,10 +43,11 @@
     }
   },
   "added_in_this_revision": {
-    "tests": 20,
+    "tests": 0,
     "failures": 0,
     "errors": 0,
-    "skipped": 0
+    "skipped": 0,
+    "scope": "No new Android logic tests for resource branding; existing 525-test suite rerun"
   },
   "storage_lifecycle_language_suites": {
     "DocumentCacheBudgetTest": {
@@ -91,23 +92,24 @@
     "failed": 0
   },
   "beta_packaging_tests": {
-    "passed": 3,
+    "passed": 6,
     "failed": 0,
     "actual_arm_apks_exported_and_verified": true,
-    "existing_output_preserved": true
+    "existing_output_preserved": true,
+    "compiled_branding_required": true
   },
   "beta_artifacts": [
     {
       "abi": "arm64-v8a",
-      "file": "Polaris-0.1.0-beta.3-arm64-v8a.apk",
-      "bytes": 196194966,
-      "sha256": "ae784ec2ec31c83d8e0373bea8f2a7f6aaa1056405368a514ae6df9c3e243e40"
+      "file": "Polaris-0.1.0-beta.4-arm64-v8a.apk",
+      "bytes": 195774041,
+      "sha256": "4dd4cffb105824a968ab1a466d960a1377f3ff0ba45e06fc10a32085e2c1bf7f"
     },
     {
       "abi": "armeabi-v7a",
-      "file": "Polaris-0.1.0-beta.3-armeabi-v7a.apk",
-      "bytes": 156397143,
-      "sha256": "498d82e8e9f1efadecbf0f2b6afa19d183956430bfdfce18cda4d149b7f8c6df"
+      "file": "Polaris-0.1.0-beta.4-armeabi-v7a.apk",
+      "bytes": 155976218,
+      "sha256": "5fac21e07a1719d8ba4e668b120ec926121b27862fa06c59cf3a8b0669656755"
     }
   ],
   "storage_samples": {
@@ -158,7 +160,7 @@
   "cache_target_bytes": 268435456,
   "cache_target_semantics": "LRU target for document-files/pdf-pages/document-translations only; leases protect active files and may temporarily exceed it; originals, models and other caches are not limited by this target",
   "beta_package_status": "INTERNAL_BETA_CANDIDATE_EXPORTED; not physical-device acceptance",
-  "evidence_directory": "/workspace/scratch/polaris-updates-v1",
+  "evidence_directory": "/workspace/scratch/polaris-branding-v1",
   "english_preparation_suites": {
     "EnglishTranslationSetupHistoryTest": {
       "tests": 2,
@@ -183,7 +185,7 @@
     "native_acceptance": "PENDING clean install, network constraints, opt-out, restart, removed models, offline reuse and actual model byte measurement"
   },
   "beta_signer_sha256": "3ae747069cc9015ca1777f94fd56b030501f45d6af380426a572ad60e94d8227",
-  "previous_revision_evidence": "TEST_RESULTS_P20261101_2.json",
+  "previous_revision_evidence": "TEST_RESULTS_P20261101_3.json",
   "update_channel_suites": {
     "PolarisUpdatePreferencesTest": {
       "tests": 3,
@@ -227,5 +229,34 @@
     "apk_published": false,
     "about": "Product description, maintainer/credits, visible Polaris version and revision, project/history/releases links, update settings, licenses and new privacy page",
     "physical_acceptance": "PENDING About layout, opt-in persistence, public-network queries, real release download, original-key upgrade retaining library and vocabulary"
+  },
+  "date_utc": "2026-11-02",
+  "client_timezone": "Etc/UTC",
+  "branding": {
+    "display_name": "Polaris",
+    "before_beta3_label": "Yomotsu",
+    "compiled_apk_checks": {
+      "arm64-v8a": {
+        "label": "Polaris",
+        "launcher": "ic_polaris_launcher",
+        "compiled_resources_verified": true
+      },
+      "armeabi-v7a": {
+        "label": "Polaris",
+        "launcher": "ic_polaris_launcher",
+        "compiled_resources_verified": true
+      },
+      "x86_64": {
+        "label": "Polaris",
+        "launcher": "ic_polaris_launcher",
+        "compiled_resources_verified": true
+      }
+    },
+    "launcher": "Dedicated Polaris star and book vector resources; adaptive API26+, monochrome API33+",
+    "in_app": "Moko app_name, About logo and launch splash updated",
+    "application_id_unchanged": true,
+    "same_signer_as_published_beta3": true,
+    "physical_a12_install_and_icon_acceptance": "PENDING",
+    "new_packaging_boundary_tests": 3
   }
 }

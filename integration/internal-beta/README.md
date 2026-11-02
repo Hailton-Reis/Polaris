@@ -1,6 +1,12 @@
-# Polaris 0.1.0-beta.3 — guia de teste do beta
+# Polaris 0.1.0-beta.4 — guia de teste do beta
 
-Revisão: **P20261101.3**. Android mínimo: **8.0 / API 26**. Esta é uma versão experimental para experimentar e registrar problemas; a conferência nos celulares ainda está pendente.
+Revisão: **P20261102.1**. Android mínimo: **8.0 / API 26**. Esta é uma versão experimental para experimentar e registrar problemas; a conferência nos celulares ainda está pendente.
+
+## Nome e ícone corrigidos
+
+A beta.4 aplica **Polaris** ao nome mostrado pelo instalador e pelo Android, além de um ícone próprio com estrela e livro. A abertura e a tela Sobre usam a mesma identidade. O ícone adaptativo atende Android 8+ e tem versão monocromática para os temas de ícones do Android 13+.
+
+O identificador do aplicativo foi preservado. O pacote de nuvem usa a mesma assinatura da beta.3 distribuída, permitindo solicitar atualização sobre essa instalação. A preservação efetiva de dados e a aparência após instalar ainda precisam de conferência no aparelho. Esta correção exige instalar a beta.4: os APKs já publicados da beta.3 continuam com a identidade antiga.
 
 ## Primeira publicação
 
@@ -12,7 +18,7 @@ O pacote contém dois APKs. Use **arm64-v8a** primeiro nos aparelhos Android de 
 
 Instale apenas um APK por aparelho. Não é necessário o APK universal nem as versões x86 do emulador. Instalações e atualizações devem vir sempre da mesma máquina/assinatura usada para esse beta. Não apague a instalação antiga para contornar um erro de assinatura: isso pode remover os dados locais. O mantenedor deve reconstruir e compartilhar o APK com a assinatura original.
 
-O mantenedor gera o pacote com a opção **4** do CMD atualizado. Ao concluir a comparação automatizada, a pasta de evidências contém **beta/**, com APKs ARM, hashes e exemplos. A opção **9** continua sendo o fluxo local de instalação já existente. Confira **P20261101.3** em **Sobre** antes de registrar resultados. O versionCode agora é **104**; o candidato anterior usava 103.
+O mantenedor gera o pacote com a opção **4** do CMD atualizado. Ao concluir a comparação automatizada, a pasta de evidências contém **beta/**, com APKs ARM, hashes e exemplos. A opção **9** continua sendo o fluxo local de instalação já existente. Confira **P20261102.1** em **Sobre** antes de registrar resultados. O versionCode agora é **105**; o candidato anterior usava 104.
 
 ## Uso inicial
 

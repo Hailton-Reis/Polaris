@@ -1,4 +1,4 @@
-"""Export verified ARM APKs and original fixtures for a small private beta; no keys or app data."""
+"""Export verified ARM beta APKs and original fixtures; no keys or app data."""
 import argparse
 import hashlib
 import json
@@ -11,7 +11,7 @@ import tempfile
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[2]
-REVISION = 'P20261101.3'
+REVISION = 'P20261102.1'
 
 
 def sha256(path):
@@ -30,6 +30,29 @@ def signer_digest(output):
     return digests.pop().lower()
 
 
+def validate_branding(badging, resources, manifest):
+    labels = re.findall(r"^application-label(?:-[^:]+)?:'([^']*)'$", badging, re.MULTILINE)
+    if not labels or any(label != 'Polaris' for label in labels):
+        raise ValueError('Compiled APK label must be Polaris in every locale')
+    resource = re.search(r'resource\s+(0x[0-9a-fA-F]+)\s+(?:\S+:)?mipmap/ic_polaris_launcher\b', resources)
+    icons = re.findall(r':(?:icon|roundIcon)\([^)]*\)=@(0x[0-9a-fA-F]+)', manifest)
+    if not resource or len(icons) != 2 or any(icon != resource.group(1) for icon in icons):
+        raise ValueError('Compiled application icon and roundIcon must use the Polaris launcher')
+    for name in ['ic_polaris_foreground', 'ic_polaris_monochrome', 'ic_polaris_logo', 'ic_polaris_splash']:
+        if not re.search(r'drawable/' + name + r'\b', resources):
+            raise ValueError('Missing compiled Polaris branding resource: ' + name)
+    return {'label': 'Polaris', 'launcher': 'ic_polaris_launcher', 'compiled_resources_verified': True}
+
+
+def verify_branding(apk, apksigner):
+    tool = apksigner.parent / ('aapt2.exe' if os.name == 'nt' else 'aapt2')
+    def dump(*arguments):
+        return subprocess.run([str(tool), 'dump', *arguments, str(apk)], check=True,
+                              capture_output=True, text=True, encoding='utf-8').stdout
+    return validate_branding(dump('badging'), dump('resources', '--no-values'),
+                             dump('xmltree', '--file', 'AndroidManifest.xml'))
+
+
 def package(apks, output, comparison, apksigner):
     if output.exists():
         raise ValueError('Choose a new beta output directory; existing files are never replaced')
@@ -44,7 +67,7 @@ def package(apks, output, comparison, apksigner):
     for abi in ['arm64-v8a', 'armeabi-v7a']:
         entry = next(e for e in metadata['elements'] if any(
             f.get('filterType') == 'ABI' and f.get('value') == abi for f in e['filters']))
-        if entry['versionCode'] != 104 or entry['versionName'] != '0.1.0-beta.3':
+        if entry['versionCode'] != 105 or entry['versionName'] != '0.1.0-beta.4':
             raise ValueError('Stale beta APK version metadata')
         name = entry['outputFile']
         if Path(name).name != name:
@@ -59,22 +82,24 @@ def package(apks, output, comparison, apksigner):
         with zipfile.ZipFile(apk) as archive:
             if not any(REVISION.encode() in archive.read(n) for n in archive.namelist() if n.endswith('.dex')):
                 raise ValueError('Beta revision missing from APK')
+        verify_branding(apk, apksigner)
         selected.append((abi, apk))
     output.parent.mkdir(parents=True, exist_ok=True)
     temporary = Path(tempfile.mkdtemp(prefix='.polaris-beta-', dir=output.parent))
     try:
         artifacts = []
         for abi, apk in selected:
-            name = f'Polaris-0.1.0-beta.3-{abi}.apk'
+            name = f'Polaris-0.1.0-beta.4-{abi}.apk'
             shutil.copy2(apk, temporary / name)
             artifacts.append({'abi': abi, 'file': name, 'bytes': apk.stat().st_size, 'sha256': sha256(apk)})
         shutil.copy2(ROOT / 'integration/internal-beta/README.md', temporary / 'COMECE_AQUI.md')
         shutil.copytree(ROOT / 'integration/internal-beta/language-fixtures', temporary / 'testes/idiomas')
         shutil.copytree(ROOT / 'integration/document-reader/fixtures', temporary / 'testes/documentos')
-        manifest = {'status': 'INTERNAL_BETA_CANDIDATE', 'version': '0.1.0-beta.3', 'version_code': 104,
+        manifest = {'status': 'INTERNAL_BETA_CANDIDATE', 'version': '0.1.0-beta.4', 'version_code': 105,
                     'revision': REVISION, 'minimum_android_api': 26,
                     'application_id': metadata['applicationId'], 'signer_sha256': signer_hash,
                     'artifacts': artifacts, 'unit_comparison': evidence,
+                    'display_name': 'Polaris', 'branding_verified': True,
                     'physical_device_acceptance': 'PENDING', 'cjk_ocr_quality': 'PENDING'}
         (temporary / 'manifest.json').write_text(json.dumps(manifest, indent=2) + '\n', encoding='utf-8')
         (temporary / 'SHA256SUMS.txt').write_text(''.join(

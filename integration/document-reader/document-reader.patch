@@ -1,5 +1,5 @@
 diff --git a/app/build.gradle.kts b/app/build.gradle.kts
-index 63e2698..4d77ce5 100644
+index 63e2698..afb67d4 100644
 --- a/app/build.gradle.kts
 +++ b/app/build.gradle.kts
 @@ -32,14 +32,14 @@ android {
@@ -8,8 +8,8 @@ index 63e2698..4d77ce5 100644
  
 -        versionCode = 101
 -        versionName = "0.20.4-Y40"
-+        versionCode = 104
-+        versionName = "0.1.0-beta.3"
++        versionCode = 105
++        versionName = "0.1.0-beta.4"
  
          buildConfigField("String", "COMMIT_COUNT", "\"${getLatestCommitCount()}\"")
          buildConfigField("String", "COMMIT_SHA", "\"${getLatestCommitSha()}\"")
@@ -30,10 +30,28 @@ index 63e2698..4d77ce5 100644
          }
          val release = getByName("release") {
 diff --git a/app/src/main/AndroidManifest.xml b/app/src/main/AndroidManifest.xml
-index 172b28c..4de015d 100644
+index 172b28c..dacc1df 100644
 --- a/app/src/main/AndroidManifest.xml
 +++ b/app/src/main/AndroidManifest.xml
-@@ -57,6 +57,33 @@
+@@ -43,20 +43,47 @@
+ 
+         android:name=".App"
+         android:allowBackup="false"
+-        tools:replace="android:allowBackup"
++        tools:replace="android:allowBackup,android:label"
+         android:enableOnBackInvokedCallback="true"
+         android:hardwareAccelerated="true"
+-        android:icon="@mipmap/ic_launcher"
+-        android:label="@string/app_name"
++        android:icon="@mipmap/ic_polaris_launcher"
++        android:label="@string/polaris_app_name"
+         android:largeHeap="true"
+         android:localeConfig="@xml/locales_config"
+         android:networkSecurityConfig="@xml/network_security_config"
+         android:preserveLegacyExternalStorage="true"
+         android:requestLegacyExternalStorage="true"
+-        android:roundIcon="@mipmap/ic_launcher"
++        android:roundIcon="@mipmap/ic_polaris_launcher"
          android:supportsRtl="true"
          android:theme="@style/Theme.Tachiyomi">
  
@@ -933,6 +951,27 @@ index 661b4ee..c0c75bf 100644
                      modifier = Modifier.padding(start = 4.dp),
                      translationStateProvider = translationStateProvider,
                      onClick = { onTranslationClick.invoke(it) },
+diff --git a/app/src/main/java/eu/kanade/presentation/more/LogoHeader.kt b/app/src/main/java/eu/kanade/presentation/more/LogoHeader.kt
+index 8bcfcbe..9dea3d0 100644
+--- a/app/src/main/java/eu/kanade/presentation/more/LogoHeader.kt
++++ b/app/src/main/java/eu/kanade/presentation/more/LogoHeader.kt
+@@ -25,7 +25,7 @@ fun LogoHeader(
+         horizontalAlignment = Alignment.CenterHorizontally,
+     ) {
+         Image(
+-            painter = painterResource(R.drawable.ic_yomotsu_logo),
++            painter = painterResource(R.drawable.ic_polaris_logo),
+             contentDescription = null,
+             contentScale = ContentScale.Crop,
+             modifier = Modifier
+@@ -33,7 +33,5 @@ fun LogoHeader(
+                 .size(72.dp)
+                 .clip(RoundedCornerShape(16.dp)),
+         )
+-
+-
+     }
+ }
 diff --git a/app/src/main/java/eu/kanade/presentation/more/MoreScreen.kt b/app/src/main/java/eu/kanade/presentation/more/MoreScreen.kt
 index a7b7f3e..f4dcdad 100644
 --- a/app/src/main/java/eu/kanade/presentation/more/MoreScreen.kt
@@ -1113,7 +1152,7 @@ index a198c3f..62cc80b 100644
                  preference = translationPreferences.autoTranslateEnglishDownloads(),
                  title = stringResource(ATMR.strings.pref_auto_translate_english_downloads),
 diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
-index 7f411fd..ed3ce06 100644
+index 7f411fd..95e37aa 100644
 --- a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
 +++ b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
 @@ -1,16 +1,10 @@
@@ -1170,7 +1209,7 @@ index 7f411fd..ed3ce06 100644
  
      // Identifies this overlay independently of the pinned upstream COMMIT_SHA.
 -    private const val POLARIS_READER_REVISION = "P20261031.2"
-+    private const val POLARIS_READER_REVISION = "P20261101.3"
++    private const val POLARIS_READER_REVISION = "P20261102.1"
  
      @Composable
      override fun Content() {
@@ -4022,6 +4061,264 @@ index 6830781..cae7a90 100644
  
              return Translation(source, manga, chapter)
          }
+diff --git a/app/src/main/res/drawable/ic_polaris_foreground.xml b/app/src/main/res/drawable/ic_polaris_foreground.xml
+new file mode 100644
+index 0000000..09cec8f
+--- /dev/null
++++ b/app/src/main/res/drawable/ic_polaris_foreground.xml
+@@ -0,0 +1,31 @@
++<?xml version="1.0" encoding="utf-8"?>
++<vector xmlns:android="http://schemas.android.com/apk/res/android"
++    android:width="108dp"
++    android:height="108dp"
++    android:viewportWidth="108"
++    android:viewportHeight="108">
++    <path
++        android:fillColor="#82E4E6"
++        android:pathData="M54,24L60,42L78,48L60,54L54,72L48,54L30,48L48,42Z" />
++    <path
++        android:fillColor="#E7FAFF"
++        android:pathData="M54,24L54,48L30,48L48,42Z" />
++    <path
++        android:fillColor="#A9B8FF"
++        android:pathData="M54,48L78,48L60,54L54,72Z" />
++    <path
++        android:fillColor="#0C1227"
++        android:pathData="M54,45.7A2.3,2.3 0,1 1,54,50.3A2.3,2.3 0,1 1,54,45.7Z" />
++    <path
++        android:fillColor="#14213A"
++        android:strokeColor="#D9EAFE"
++        android:strokeWidth="1.7"
++        android:strokeLineJoin="round"
++        android:pathData="M32,71C39,67 47,68 54,73C61,68 69,67 76,71L76,79C68,77 61,79 54,84C47,79 40,77 32,79Z" />
++    <path
++        android:fillColor="#00000000"
++        android:strokeColor="#D9EAFE"
++        android:strokeWidth="1.5"
++        android:strokeLineCap="round"
++        android:pathData="M54,73L54,83.5" />
++</vector>
+diff --git a/app/src/main/res/drawable/ic_polaris_logo.xml b/app/src/main/res/drawable/ic_polaris_logo.xml
+new file mode 100644
+index 0000000..48de613
+--- /dev/null
++++ b/app/src/main/res/drawable/ic_polaris_logo.xml
+@@ -0,0 +1,34 @@
++<?xml version="1.0" encoding="utf-8"?>
++<vector xmlns:android="http://schemas.android.com/apk/res/android"
++    android:width="108dp"
++    android:height="108dp"
++    android:viewportWidth="108"
++    android:viewportHeight="108">
++    <path
++        android:fillColor="#0C1227"
++        android:pathData="M0,0H108V108H0Z" />
++    <path
++        android:fillColor="#82E4E6"
++        android:pathData="M54,24L60,42L78,48L60,54L54,72L48,54L30,48L48,42Z" />
++    <path
++        android:fillColor="#E7FAFF"
++        android:pathData="M54,24L54,48L30,48L48,42Z" />
++    <path
++        android:fillColor="#A9B8FF"
++        android:pathData="M54,48L78,48L60,54L54,72Z" />
++    <path
++        android:fillColor="#0C1227"
++        android:pathData="M54,45.7A2.3,2.3 0,1 1,54,50.3A2.3,2.3 0,1 1,54,45.7Z" />
++    <path
++        android:fillColor="#14213A"
++        android:strokeColor="#D9EAFE"
++        android:strokeWidth="1.7"
++        android:strokeLineJoin="round"
++        android:pathData="M32,71C39,67 47,68 54,73C61,68 69,67 76,71L76,79C68,77 61,79 54,84C47,79 40,77 32,79Z" />
++    <path
++        android:fillColor="#00000000"
++        android:strokeColor="#D9EAFE"
++        android:strokeWidth="1.5"
++        android:strokeLineCap="round"
++        android:pathData="M54,73L54,83.5" />
++</vector>
+diff --git a/app/src/main/res/drawable/ic_polaris_monochrome.xml b/app/src/main/res/drawable/ic_polaris_monochrome.xml
+new file mode 100644
+index 0000000..668d8f6
+--- /dev/null
++++ b/app/src/main/res/drawable/ic_polaris_monochrome.xml
+@@ -0,0 +1,16 @@
++<?xml version="1.0" encoding="utf-8"?>
++<vector xmlns:android="http://schemas.android.com/apk/res/android"
++    android:width="108dp"
++    android:height="108dp"
++    android:viewportWidth="108"
++    android:viewportHeight="108">
++    <path
++        android:fillColor="#FFFFFF"
++        android:pathData="M54,24L60,42L78,48L60,54L54,72L48,54L30,48L48,42Z" />
++    <path
++        android:fillColor="#00000000"
++        android:strokeColor="#FFFFFF"
++        android:strokeWidth="1.8"
++        android:strokeLineJoin="round"
++        android:pathData="M32,71C39,67 47,68 54,73C61,68 69,67 76,71L76,79C68,77 61,79 54,84C47,79 40,77 32,79Z M54,73L54,83.5" />
++</vector>
+diff --git a/app/src/main/res/drawable/ic_polaris_splash.xml b/app/src/main/res/drawable/ic_polaris_splash.xml
+new file mode 100644
+index 0000000..103c7e2
+--- /dev/null
++++ b/app/src/main/res/drawable/ic_polaris_splash.xml
+@@ -0,0 +1,8 @@
++<?xml version="1.0" encoding="utf-8"?>
++<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
++    <item
++        android:width="96dp"
++        android:height="96dp"
++        android:drawable="@drawable/ic_polaris_logo"
++        android:gravity="center" />
++</layer-list>
+diff --git a/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml b/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml
+index 0db3d02..a4faeb3 100644
+--- a/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml
++++ b/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml
+@@ -1,5 +1,5 @@
+ <?xml version="1.0" encoding="utf-8"?>
+ <adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+-    <background android:drawable="@color/yomotsu_icon_bg" />
+-    <foreground android:drawable="@mipmap/ic_launcher_foreground" />
++    <background android:drawable="@color/polaris_icon_background" />
++    <foreground android:drawable="@drawable/ic_polaris_foreground" />
+ </adaptive-icon>
+diff --git a/app/src/main/res/mipmap-anydpi-v26/ic_polaris_launcher.xml b/app/src/main/res/mipmap-anydpi-v26/ic_polaris_launcher.xml
+new file mode 100644
+index 0000000..a4faeb3
+--- /dev/null
++++ b/app/src/main/res/mipmap-anydpi-v26/ic_polaris_launcher.xml
+@@ -0,0 +1,5 @@
++<?xml version="1.0" encoding="utf-8"?>
++<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
++    <background android:drawable="@color/polaris_icon_background" />
++    <foreground android:drawable="@drawable/ic_polaris_foreground" />
++</adaptive-icon>
+diff --git a/app/src/main/res/mipmap-anydpi-v33/ic_polaris_launcher.xml b/app/src/main/res/mipmap-anydpi-v33/ic_polaris_launcher.xml
+new file mode 100644
+index 0000000..726657c
+--- /dev/null
++++ b/app/src/main/res/mipmap-anydpi-v33/ic_polaris_launcher.xml
+@@ -0,0 +1,6 @@
++<?xml version="1.0" encoding="utf-8"?>
++<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
++    <background android:drawable="@color/polaris_icon_background" />
++    <foreground android:drawable="@drawable/ic_polaris_foreground" />
++    <monochrome android:drawable="@drawable/ic_polaris_monochrome" />
++</adaptive-icon>
+diff --git a/app/src/main/res/mipmap/ic_launcher.xml b/app/src/main/res/mipmap/ic_launcher.xml
+index 80faec8..48de613 100644
+--- a/app/src/main/res/mipmap/ic_launcher.xml
++++ b/app/src/main/res/mipmap/ic_launcher.xml
+@@ -1,6 +1,34 @@
+ <?xml version="1.0" encoding="utf-8"?>
+-<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+-    <background android:drawable="@drawable/ic_launcher_background"/>
+-    <foreground android:drawable="@drawable/ic_launcher_foreground"/>
+-    <monochrome android:drawable="@drawable/ic_launcher_monochrome"/>
+-</adaptive-icon>
++<vector xmlns:android="http://schemas.android.com/apk/res/android"
++    android:width="108dp"
++    android:height="108dp"
++    android:viewportWidth="108"
++    android:viewportHeight="108">
++    <path
++        android:fillColor="#0C1227"
++        android:pathData="M0,0H108V108H0Z" />
++    <path
++        android:fillColor="#82E4E6"
++        android:pathData="M54,24L60,42L78,48L60,54L54,72L48,54L30,48L48,42Z" />
++    <path
++        android:fillColor="#E7FAFF"
++        android:pathData="M54,24L54,48L30,48L48,42Z" />
++    <path
++        android:fillColor="#A9B8FF"
++        android:pathData="M54,48L78,48L60,54L54,72Z" />
++    <path
++        android:fillColor="#0C1227"
++        android:pathData="M54,45.7A2.3,2.3 0,1 1,54,50.3A2.3,2.3 0,1 1,54,45.7Z" />
++    <path
++        android:fillColor="#14213A"
++        android:strokeColor="#D9EAFE"
++        android:strokeWidth="1.7"
++        android:strokeLineJoin="round"
++        android:pathData="M32,71C39,67 47,68 54,73C61,68 69,67 76,71L76,79C68,77 61,79 54,84C47,79 40,77 32,79Z" />
++    <path
++        android:fillColor="#00000000"
++        android:strokeColor="#D9EAFE"
++        android:strokeWidth="1.5"
++        android:strokeLineCap="round"
++        android:pathData="M54,73L54,83.5" />
++</vector>
+diff --git a/app/src/main/res/mipmap/ic_polaris_launcher.xml b/app/src/main/res/mipmap/ic_polaris_launcher.xml
+new file mode 100644
+index 0000000..48de613
+--- /dev/null
++++ b/app/src/main/res/mipmap/ic_polaris_launcher.xml
+@@ -0,0 +1,34 @@
++<?xml version="1.0" encoding="utf-8"?>
++<vector xmlns:android="http://schemas.android.com/apk/res/android"
++    android:width="108dp"
++    android:height="108dp"
++    android:viewportWidth="108"
++    android:viewportHeight="108">
++    <path
++        android:fillColor="#0C1227"
++        android:pathData="M0,0H108V108H0Z" />
++    <path
++        android:fillColor="#82E4E6"
++        android:pathData="M54,24L60,42L78,48L60,54L54,72L48,54L30,48L48,42Z" />
++    <path
++        android:fillColor="#E7FAFF"
++        android:pathData="M54,24L54,48L30,48L48,42Z" />
++    <path
++        android:fillColor="#A9B8FF"
++        android:pathData="M54,48L78,48L60,54L54,72Z" />
++    <path
++        android:fillColor="#0C1227"
++        android:pathData="M54,45.7A2.3,2.3 0,1 1,54,50.3A2.3,2.3 0,1 1,54,45.7Z" />
++    <path
++        android:fillColor="#14213A"
++        android:strokeColor="#D9EAFE"
++        android:strokeWidth="1.7"
++        android:strokeLineJoin="round"
++        android:pathData="M32,71C39,67 47,68 54,73C61,68 69,67 76,71L76,79C68,77 61,79 54,84C47,79 40,77 32,79Z" />
++    <path
++        android:fillColor="#00000000"
++        android:strokeColor="#D9EAFE"
++        android:strokeWidth="1.5"
++        android:strokeLineCap="round"
++        android:pathData="M54,73L54,83.5" />
++</vector>
+diff --git a/app/src/main/res/values/polaris_branding.xml b/app/src/main/res/values/polaris_branding.xml
+new file mode 100644
+index 0000000..692384f
+--- /dev/null
++++ b/app/src/main/res/values/polaris_branding.xml
+@@ -0,0 +1,5 @@
++<?xml version="1.0" encoding="utf-8"?>
++<resources>
++    <string name="polaris_app_name" translatable="false">Polaris</string>
++    <color name="polaris_icon_background">#0C1227</color>
++</resources>
+diff --git a/app/src/main/res/values/themes.xml b/app/src/main/res/values/themes.xml
+index 34d97af..441f204 100644
+--- a/app/src/main/res/values/themes.xml
++++ b/app/src/main/res/values/themes.xml
+@@ -574,8 +574,8 @@
+ 
+     <!--== Splash Theme ==-->
+     <style name="Theme.Tachiyomi.SplashScreen" parent="Theme.SplashScreen">
+-        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_yomotsu_splash</item>
+-        <item name="windowSplashScreenBackground">@color/splash</item>
++        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_polaris_splash</item>
++        <item name="windowSplashScreenBackground">@color/polaris_icon_background</item>
+         <item name="postSplashScreenTheme">@style/Theme.Tachiyomi</item>
+         <item name="android:statusBarColor">@android:color/transparent</item>
+         <item name="android:navigationBarColor">@android:color/transparent</item>
 diff --git a/app/src/test/java/eu/kanade/tachiyomi/data/updater/AppUpdateRepositoryTest.kt b/app/src/test/java/eu/kanade/tachiyomi/data/updater/AppUpdateRepositoryTest.kt
 index 68f36cd..fb3271f 100644
 --- a/app/src/test/java/eu/kanade/tachiyomi/data/updater/AppUpdateRepositoryTest.kt
@@ -6177,6 +6474,18 @@ index d1748bc..4b92747 100644
 +    <string name="polaris_updates_access_error">As Releases do Polaris estão indisponíveis. O repositório pode estar privado ou sem acesso público. Consulte a página do projeto.</string>
 +    <string name="polaris_updates_failed">Não foi possível verificar atualizações. Confira a conexão e tente novamente; o GitHub pode estar indisponível ou limitar consultas.</string>
  </resources>
+diff --git a/i18n/src/commonMain/moko-resources/base/strings.xml b/i18n/src/commonMain/moko-resources/base/strings.xml
+index c0832ba..ebf8f48 100644
+--- a/i18n/src/commonMain/moko-resources/base/strings.xml
++++ b/i18n/src/commonMain/moko-resources/base/strings.xml
+@@ -1,6 +1,6 @@
+ <?xml version="1.0" encoding="utf-8"?>
+ <resources>
+-    <string name="app_name" translatable="false">Yomotsu</string>
++    <string name="app_name" translatable="false">Polaris</string>
+ 
+     <!-- Generic strings -->
+     <string name="on">On</string>
 diff --git a/source-local/src/main/kotlin/tachiyomi/source/local/LocalSource.kt b/source-local/src/main/kotlin/tachiyomi/source/local/LocalSource.kt
 index e5a307f..31834b3 100644
 --- a/source-local/src/main/kotlin/tachiyomi/source/local/LocalSource.kt
