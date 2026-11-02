@@ -77,3 +77,8 @@ Este candidato não foi publicado como Release. A edição das traduções come�
 Gemini não participa desta rodada; nenhuma API é necessária. O filtro preserva caracteres isolados e falas curtas com letras grandes dentro de balões detectados. O experimento **OCR por faixas em páginas longas**, em Tradução → OCR, é opcional, começa desligado e usa o ML Kit em inglês, sem outro modelo. Requer nova execução da tradução do capítulo para refazer o OCR.
 
 O emulador Polaris agora abre com Full HD automático pelas opções 9/10; a 13 é opcional. O [arquivo de controle sintético](long-strip-fixture/Polaris-faixa-longa-controle.cbz) e [a transcrição esperada](long-strip-fixture/expected.json) ajudam a conferir falas de um caractere e parágrafos nas bordas das faixas. Esse controle ainda não foi reconhecido no Android e não representa um teste de qualidade aprovado. Veja [a pesquisa com fontes e limites](../../docs/PESQUISA_OCR_MLKIT_2026_11_02.md).
+
+
+## Compatibilidade e benchmark
+
+A distribuição inclui **ARM32/ARMv7 e ARM64, Android 8+**; o A12 é somente um dos aparelhos possíveis de teste. A meta é compatibilidade ampla entre marcas, versões do Android e capacidades. A aprovação física de cada categoria ainda está pendente. O [protocolo de benchmark](../../docs/BENCHMARK_OCR_ARM32_ARM64.md) separa OCR de tradução, o Paddle existente do Tiny pesquisado e a avaliação do motor da avaliação do processamento completo. Para o primeiro teste, use apenas ML Kit padrão no trecho que apresentou o defeito.
