@@ -295,3 +295,14 @@ PowerShell lexical token errors: 0 unclosed bracket groups: 0
 # CMD options 12/13/14: long-strip comparison, FHD display, restore display.
 # No new Release or APK upload. Real chapter capture, Gemini API quality,
 # physical-device interaction and native Windows execution remain pending.
+
+
+# ML KIT / AUTOMATIC DISPLAY REVIEW - 2026-11-02
+# 55/55 local helper tests; 33/33 Windows source contract tests;
+# 4/4 overlay application/idempotence/CRLF/drift tests; 15/15 build guards;
+# 6/6 packaging unit tests. Windows/native emulator execution is pending.
+# Android beta.6 / code 107 / P20261102.3 assembled. 543 tests: 509 pass,
+# same 34 preexisting failures, no new regressions. All 12 new OCR-policy
+# and strip-planning/reconciliation tests passed. APK signatures match beta.3.
+# Startup actions 9/10 prepare FHD before Polaris launch; action 13 optional.
+# Gemini is outside current test round. No new public Release.

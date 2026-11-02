@@ -492,7 +492,7 @@ function Invoke-PolarisEmulator([string]$Stage){
     $pythonArgs=@($py.args) + @($runner,$Stage,'--workspace',$script:Workspace,'--consent')
     & $pythonExe @pythonArgs
     if($LASTEXITCODE -ne 0){throw "Teste no emulador encerrou com codigo $LASTEXITCODE. Revise PolarisDev\relatorios e PolarisDev\emulador."}
-    Say ('[OK] Teste '+$Stage+' iniciado. Confirme a tela no Android Studio; sem PASS automatico de runtime.') 'Green'
+    Say ('[OK] Teste '+$Stage+' iniciado. Polaris abre em Full HD automaticamente. Confirme a tela no Android Studio; sem PASS automatico de runtime.') 'Green'
 }
 
 function Invoke-PolarisSmoke {
@@ -586,12 +586,12 @@ function Menu {
         Write-Host '6. FAZER TUDO DO POLARIS: instalar + preparar + compilar'
         Write-Host '7. Instalar Node.js/.NET 8 OPCIONAIS (outros projetos)'
         Write-Host '8. EMULAR Yomotsu original (Android Studio / A01)'
-        Write-Host '9. EMULAR Polaris Spike-001 (AVD separado / A02)'
+        Write-Host '9. EMULAR Polaris (AVD separado / Full HD automatico)'
         Write-Host '10. COMPARAR lado a lado: Yomotsu + Polaris (2 AVDs, dados salvos)'
         Write-Host '11. TESTES AUTOMATICOS sem repositorios (sem modificar os 2 AVDs)'
         Write-Host '12. COMPARAR traducao: capturas + original + registro do capitulo aberto'
-        Write-Host '13. TELA FHD do emulador Polaris (1080x1920 / 420 dpi)'
-        Write-Host '14. RESTAURAR tela anterior do emulador Polaris'
+        Write-Host '13. REAPLICAR tela FHD manualmente (opcional; 9 e 10 ja ajustam)'
+        Write-Host '14. RESTAURAR os ajustes manuais anteriores da tela'
         Write-Host '0. Sair'
         $choice=Read-Host 'Escolha'
         if($choice -eq '0'){break}

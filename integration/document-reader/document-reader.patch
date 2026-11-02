@@ -1,5 +1,5 @@
 diff --git a/app/build.gradle.kts b/app/build.gradle.kts
-index 63e2698..e7d026e 100644
+index 63e2698..296f046 100644
 --- a/app/build.gradle.kts
 +++ b/app/build.gradle.kts
 @@ -32,14 +32,14 @@ android {
@@ -8,8 +8,8 @@ index 63e2698..e7d026e 100644
  
 -        versionCode = 101
 -        versionName = "0.20.4-Y40"
-+        versionCode = 106
-+        versionName = "0.1.0-beta.5"
++        versionCode = 107
++        versionName = "0.1.0-beta.6"
  
          buildConfigField("String", "COMMIT_COUNT", "\"${getLatestCommitCount()}\"")
          buildConfigField("String", "COMMIT_SHA", "\"${getLatestCommitSha()}\"")
@@ -29,6 +29,15 @@ index 63e2698..e7d026e 100644
              isPseudoLocalesEnabled = true
          }
          val release = getByName("release") {
+@@ -148,7 +148,7 @@ dependencies {
+     implementation(libs.quickJs)
+     implementation(libs.image.decoder); implementation(libs.material); implementation(libs.flexibleAdapter); implementation(libs.photoView)
+     implementation(libs.directionalViewPager) { exclude(group = "androidx.viewpager", module = "viewpager") }
+-    implementation(libs.composeRichEditor); implementation(libs.aboutLibraries.compose); implementation(libs.bundles.voyager); implementation(libs.composeMaterialMotion); implementation(libs.swipe); implementation(libs.composeWebview); implementation(libs.composeGrid); implementation(libs.reorderable); implementation(libs.bundles.markdown); implementation(libs.materialKolor); implementation(libs.logcat); implementation(libs.bundles.shizuku); implementation(libs.stringSimilarity); testImplementation(libs.bundles.test); testRuntimeOnly(libs.junit.platform.launcher); implementation(libs.leakCanary.plumber); testImplementation(libs.kotlinx.coroutines.test); implementation(libs.mlkit.text.recognition); implementation(libs.mlkit.text.recognition.japanese); implementation(libs.mlkit.text.recognition.korean); implementation(libs.mlkit.text.recognition.chinese); implementation(libs.mlkit.text.translate); implementation(libs.google.generativeai)
++    implementation(libs.composeRichEditor); implementation(libs.aboutLibraries.compose); implementation(libs.bundles.voyager); implementation(libs.composeMaterialMotion); implementation(libs.swipe); implementation(libs.composeWebview); implementation(libs.composeGrid); implementation(libs.reorderable); implementation(libs.bundles.markdown); implementation(libs.materialKolor); implementation(libs.logcat); implementation(libs.bundles.shizuku); implementation(libs.stringSimilarity); testImplementation(libs.bundles.test); testRuntimeOnly(libs.junit.platform.launcher); implementation(libs.leakCanary.plumber); testImplementation(libs.kotlinx.coroutines.test); implementation(libs.mlkit.text.recognition); implementation(libs.mlkit.text.recognition.japanese); implementation(libs.mlkit.text.recognition.korean); implementation(libs.mlkit.text.recognition.chinese); implementation(libs.mlkit.text.translate)
+ }
+ 
+ androidComponents {
 diff --git a/app/src/debug/AndroidManifest.xml b/app/src/debug/AndroidManifest.xml
 index aac6140..0ecf96f 100644
 --- a/app/src/debug/AndroidManifest.xml
@@ -1245,7 +1254,7 @@ index 0050b97..979f158 100644
              titleRes = MR.strings.pref_category_about,
              formatSubtitle = {
 diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsTranslationScreen.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsTranslationScreen.kt
-index a198c3f..bbac367 100644
+index a198c3f..cf5f02a 100644
 --- a/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsTranslationScreen.kt
 +++ b/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsTranslationScreen.kt
 @@ -50,6 +50,24 @@ object SettingsTranslationScreen : SearchableSettings {
@@ -1273,7 +1282,15 @@ index a198c3f..bbac367 100644
              Preference.PreferenceItem.SwitchPreference(
                  preference = translationPreferences.autoTranslateEnglishDownloads(),
                  title = stringResource(ATMR.strings.pref_auto_translate_english_downloads),
-@@ -108,12 +126,14 @@ object SettingsTranslationScreen : SearchableSettings {
+@@ -105,15 +123,22 @@ object SettingsTranslationScreen : SearchableSettings {
+                         .associate { it.preferenceValue to getOcrEngineLabel(it) }
+                         .toImmutableMap(),
+                 ),
++                Preference.PreferenceItem.SwitchPreference(
++                    preference = translationPreferences.mlKitLongPageStrips(),
++                    title = stringResource(ATMR.strings.pref_mlkit_long_page_strips),
++                    subtitle = stringResource(ATMR.strings.pref_mlkit_long_page_strips_summary),
++                ),
                  Preference.PreferenceItem.SwitchPreference(
                      preference = translationPreferences.dbnetExperimental(),
                      title = "Detector DBNet (experimental)",
@@ -1290,7 +1307,7 @@ index a198c3f..bbac367 100644
                  ),
              ),
          )
-@@ -172,6 +192,14 @@ object SettingsTranslationScreen : SearchableSettings {
+@@ -172,6 +197,14 @@ object SettingsTranslationScreen : SearchableSettings {
                          .toImmutableMap(),
                  ),
              )
@@ -1305,7 +1322,7 @@ index a198c3f..bbac367 100644
              if (TranslationEngineSetting.LLM_API_KEY in engineSettings) {
                  add(
                      Preference.PreferenceItem.EditTextPreference(
-@@ -212,6 +240,11 @@ object SettingsTranslationScreen : SearchableSettings {
+@@ -212,6 +245,11 @@ object SettingsTranslationScreen : SearchableSettings {
          return Preference.PreferenceGroup(
              title = stringResource(ATMR.strings.pref_group_advanced),
              preferenceItems = persistentListOf(
@@ -1318,7 +1335,7 @@ index a198c3f..bbac367 100644
                      preference = translationPreferences.translationEngineTemperature(),
                      title = stringResource(ATMR.strings.pref_engine_temperature),
 diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
-index 7f411fd..7f6ea43 100644
+index 7f411fd..b6bc52a 100644
 --- a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
 +++ b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
 @@ -1,16 +1,10 @@
@@ -1375,7 +1392,7 @@ index 7f411fd..7f6ea43 100644
  
      // Identifies this overlay independently of the pinned upstream COMMIT_SHA.
 -    private const val POLARIS_READER_REVISION = "P20261031.2"
-+    private const val POLARIS_READER_REVISION = "P20261102.2"
++    private const val POLARIS_READER_REVISION = "P20261102.3"
  
      @Composable
      override fun Content() {
@@ -3654,10 +3671,18 @@ index 0000000..651862b
 +    }
 +}
 diff --git a/app/src/main/java/eu/kanade/translation/ChapterTranslator.kt b/app/src/main/java/eu/kanade/translation/ChapterTranslator.kt
-index ce9709e..a7213fe 100644
+index ce9709e..6eefc71 100644
 --- a/app/src/main/java/eu/kanade/translation/ChapterTranslator.kt
 +++ b/app/src/main/java/eu/kanade/translation/ChapterTranslator.kt
-@@ -53,6 +53,11 @@ import kotlinx.serialization.json.Json
+@@ -14,6 +14,7 @@ import eu.kanade.translation.model.PageTranslation
+ import eu.kanade.translation.model.Translation
+ import eu.kanade.translation.model.TranslationBlock
+ import eu.kanade.translation.model.TranslationBlockGrouper
++import eu.kanade.translation.model.TranslationCandidatePolicy
+ import eu.kanade.translation.model.TranslationRecoveryPolicy
+ import eu.kanade.translation.model.TranslationRegion
+ import eu.kanade.translation.model.normalizeTranslationText
+@@ -53,6 +54,11 @@ import kotlinx.serialization.json.Json
  import kotlinx.serialization.json.encodeToStream
  import logcat.LogPriority
  import mihon.core.archive.archiveReader
@@ -3669,7 +3694,7 @@ index ce9709e..a7213fe 100644
  import tachiyomi.core.common.util.lang.launchIO
  import tachiyomi.core.common.util.lang.launchUI
  import tachiyomi.core.common.util.system.ImageUtil
-@@ -178,6 +183,12 @@ class ChapterTranslator(
+@@ -178,6 +184,12 @@ class ChapterTranslator(
          isPaused = true
      }
  
@@ -3682,7 +3707,7 @@ index ce9709e..a7213fe 100644
      fun clearQueue() {
          cancelTranslatorJob()
          releaseOcrEngineAsync()
-@@ -190,7 +201,7 @@ class ChapterTranslator(
+@@ -190,7 +202,7 @@ class ChapterTranslator(
              val activeTranslationFlow = queueState.transformLatest { queue ->
                  while (true) {
                      val activeTranslations = queue.asSequence().filter { it.status.value <= Translation.State.TRANSLATING.value }
@@ -3691,7 +3716,7 @@ index ce9709e..a7213fe 100644
                      emit(activeTranslations)
                      if (activeTranslations.isEmpty()) break
                      combine(activeTranslations.map(Translation::statusFlow)) { states -> states.contains(Translation.State.ERROR) }
-@@ -228,11 +239,16 @@ class ChapterTranslator(
+@@ -228,11 +240,16 @@ class ChapterTranslator(
      private fun cancelTranslatorJob() { translationJob?.cancel(); translationJob = null }
  
      fun queueChapter(manga: Manga, chapter: Chapter) {
@@ -3710,7 +3735,7 @@ index ce9709e..a7213fe 100644
          val ocrType = OcrEngineType.fromPref(translationPreferences.ocrEngine())
          if (!ocrType.supports(fromLang)) { launchUI { context.toast(ATMR.strings.error_paddle_ocr_english_only) }; return }
          val engine = TextTranslators.fromPref(translationPreferences.translationEngine())
-@@ -254,17 +270,33 @@ class ChapterTranslator(
+@@ -254,17 +271,33 @@ class ChapterTranslator(
              val strictOcrGrouping = selectedOcrType == OcrEngineType.PADDLE_OCR
              val translationMangaDir = provider.getMangaDir(translation.manga.title, translation.source)
              val saveFile = provider.getTranslationFileName(translation.chapter.name, translation.chapter.scanlator)
@@ -3753,7 +3778,16 @@ index ce9709e..a7213fe 100644
                      withContext(Dispatchers.IO) {
                          chapterPages.pages.forEachIndexed { index, (fileName, streamFn) ->
                              coroutineContext.ensureActive()
-@@ -297,8 +329,8 @@ class ChapterTranslator(
+@@ -276,7 +309,7 @@ class ChapterTranslator(
+                             accumulatedOcrTimeMs += result.metrics?.ocrTimeMs ?: 0L
+                             val blocks = result.blocks.map { block ->
+                                 block.copy(text = normalizeTranslationText(block.text))
+-                            }.filter { it.text.length > 1 }
++                            }.filter { TranslationCandidatePolicy.retainRecognizedText(it.text) }
+                             val analysisBitmap = decodeAnalysisBitmap(tmpFile, result.width, result.height)
+                             val pageTranslation = try {
+                                 convertToPageTranslation(
+@@ -297,8 +330,8 @@ class ChapterTranslator(
                              )
                          }
                      }
@@ -3764,6 +3798,22 @@ index ce9709e..a7213fe 100644
  
              val automaticPages = pages.mapValuesTo(mutableMapOf()) { (_, page) ->
                  PageTranslation(page.blocks.filter(::isTranslatableBlock).toMutableList(), page.imgWidth, page.imgHeight)
+@@ -410,13 +443,8 @@ class ChapterTranslator(
+         file.openInputStream().use { BitmapFactory.decodeStream(it, null, options) }
+     }.getOrNull()
+ 
+-    private fun isLikelySoundEffect(block: TranslationBlock, pageWidth: Int, pageHeight: Int): Boolean {
+-        val compactText = block.text.filterNot(Char::isWhitespace)
+-        if (compactText.length !in 1..12) return false
+-        val glyphWidthRatio = block.symWidth / pageWidth.coerceAtLeast(1)
+-        val glyphHeightRatio = block.symHeight / pageHeight.coerceAtLeast(1)
+-        return glyphWidthRatio >= 0.045f || glyphHeightRatio >= 0.045f
+-    }
++    private fun isLikelySoundEffect(block: TranslationBlock, pageWidth: Int, pageHeight: Int): Boolean =
++        TranslationCandidatePolicy.isLikelySoundEffect(block, pageWidth, pageHeight)
+ 
+     private fun getChapterPages(chapterPath: UniFile): ChapterPages {
+         if (chapterPath.isFile) {
 diff --git a/app/src/main/java/eu/kanade/translation/EnglishTranslationBootstrap.kt b/app/src/main/java/eu/kanade/translation/EnglishTranslationBootstrap.kt
 new file mode 100644
 index 0000000..ee6316a
@@ -4196,10 +4246,10 @@ index ec83930..06c948f 100644
      fun cancelQueuedTranslation(translation: Translation) {
 diff --git a/app/src/main/java/eu/kanade/translation/diagnostics/ReaderCaptureSession.kt b/app/src/main/java/eu/kanade/translation/diagnostics/ReaderCaptureSession.kt
 new file mode 100644
-index 0000000..9c15827
+index 0000000..89f61b3
 --- /dev/null
 +++ b/app/src/main/java/eu/kanade/translation/diagnostics/ReaderCaptureSession.kt
-@@ -0,0 +1,104 @@
+@@ -0,0 +1,105 @@
 +package eu.kanade.translation.diagnostics
 +
 +import eu.kanade.tachiyomi.BuildConfig
@@ -4268,6 +4318,7 @@ index 0000000..9c15827
 +            put("translationHash", hash)
 +            put("translationBlocks", page.translation?.blocks?.count { it.translation.isNotBlank() } ?: 0)
 +            put("configuredProvider", engine.name)
++            put("configuredMlKitLongPageStrips", preferences.mlKitLongPageStrips().get())
 +            model?.let { put("configuredModel", it) }
 +            put(
 +                "configuredOcrLanguage",
@@ -4414,6 +4465,27 @@ index 6830781..cae7a90 100644
  
              return Translation(source, manga, chapter)
          }
+diff --git a/app/src/main/java/eu/kanade/translation/model/TranslationCandidatePolicy.kt b/app/src/main/java/eu/kanade/translation/model/TranslationCandidatePolicy.kt
+new file mode 100644
+index 0000000..f2c4ba7
+--- /dev/null
++++ b/app/src/main/java/eu/kanade/translation/model/TranslationCandidatePolicy.kt
+@@ -0,0 +1,15 @@
++package eu.kanade.translation.model
++
++/** Keep short dialogue and CJK characters; geometry alone must not erase a detected balloon. */
++internal object TranslationCandidatePolicy {
++    fun retainRecognizedText(text: String) = text.isNotBlank()
++
++    fun isLikelySoundEffect(block: TranslationBlock, pageWidth: Int, pageHeight: Int): Boolean {
++        if (block.balloonDetected) return false
++        val compactText = block.text.filterNot(Char::isWhitespace)
++        if (compactText.length !in 1..12) return false
++        val glyphWidthRatio = block.symWidth / pageWidth.coerceAtLeast(1)
++        val glyphHeightRatio = block.symHeight / pageHeight.coerceAtLeast(1)
++        return glyphWidthRatio >= 0.045f || glyphHeightRatio >= 0.045f
++    }
++}
 diff --git a/app/src/main/java/eu/kanade/translation/presentation/PagerTranslationsView.kt b/app/src/main/java/eu/kanade/translation/presentation/PagerTranslationsView.kt
 index 4a1aeb5..2c52815 100644
 --- a/app/src/main/java/eu/kanade/translation/presentation/PagerTranslationsView.kt
@@ -4516,6 +4588,324 @@ index ec6041a..bf92796 100644
              val block = translation.blocks.getOrNull(blockIndex)
              val activeEditor = editor
              if (block != null && activeEditor != null) {
+diff --git a/app/src/main/java/eu/kanade/translation/recognizer/MlKitOcrEngine.kt b/app/src/main/java/eu/kanade/translation/recognizer/MlKitOcrEngine.kt
+index 6e0e8b1..2faca57 100644
+--- a/app/src/main/java/eu/kanade/translation/recognizer/MlKitOcrEngine.kt
++++ b/app/src/main/java/eu/kanade/translation/recognizer/MlKitOcrEngine.kt
+@@ -1,21 +1,32 @@
+ package eu.kanade.translation.recognizer
+ 
+ import android.content.Context
+-import kotlinx.coroutines.tasks.await
++import android.graphics.Bitmap
++import android.graphics.BitmapFactory
++import android.graphics.BitmapRegionDecoder
++import android.graphics.Rect
++import androidx.exifinterface.media.ExifInterface
+ import com.google.mlkit.vision.common.InputImage
++import com.google.mlkit.vision.text.Text
+ import com.google.mlkit.vision.text.TextRecognition
+ import com.google.mlkit.vision.text.chinese.ChineseTextRecognizerOptions
+ import com.google.mlkit.vision.text.japanese.JapaneseTextRecognizerOptions
+ import com.google.mlkit.vision.text.korean.KoreanTextRecognizerOptions
+ import com.google.mlkit.vision.text.latin.TextRecognizerOptions
+ import kotlinx.coroutines.Dispatchers
++import kotlinx.coroutines.NonCancellable
++import kotlinx.coroutines.ensureActive
++import kotlinx.coroutines.tasks.await
+ import kotlinx.coroutines.withContext
+ import logcat.LogPriority
+ import tachiyomi.core.common.util.system.logcat
++import java.io.IOException
++import kotlin.coroutines.coroutineContext
+ 
+ class MlKitOcrEngine(
+     context: Context,
+     override val language: TextRecognizerLanguage,
++    private val stripsEnabled: () -> Boolean = { false },
+ ) : OcrEngine {
+     override val type = OcrEngineType.ML_KIT
+ 
+@@ -35,20 +46,17 @@ class MlKitOcrEngine(
+     override suspend fun recognize(image: OcrImage): OcrPage = withContext(Dispatchers.IO) {
+         val pageStart = System.nanoTime()
+         try {
++            if (stripsEnabled() && language == TextRecognizerLanguage.ENGLISH) {
++                recognizeStrips(image, pageStart)?.let { return@withContext it }
++            }
+             val inputImage = InputImage.fromFilePath(appContext, image.uri)
+             val ocrStart = System.nanoTime()
+             val result = recognizer.process(inputImage).await()
+             val ocrTimeMs = elapsedMs(ocrStart)
+             val blocks = result.textBlocks.mapNotNull { block ->
+                 val bounds = block.boundingBox ?: return@mapNotNull null
+-                val firstSymbolBounds = block.lines
+-                    .firstOrNull()
+-                    ?.elements
+-                    ?.firstOrNull()
+-                    ?.symbols
+-                    ?.firstOrNull()
+-                    ?.boundingBox
+-
++                val firstSymbolBounds = block.lines.firstOrNull()?.elements?.firstOrNull()
++                    ?.symbols?.firstOrNull()?.boundingBox
+                 OcrTextBlock(
+                     text = block.text,
+                     x = bounds.left.toFloat(),
+@@ -60,23 +68,7 @@ class MlKitOcrEngine(
+                     angle = block.lines.firstOrNull()?.angle ?: 0f,
+                 )
+             }
+-            val reportedInitializationMs = if (initializationReported) 0L else initializationTimeMs
+-            initializationReported = true
+-            val totalTimeMs = elapsedMs(pageStart)
+-            logcat(LogPriority.INFO) {
+-                "OCR page engine=ML_KIT initMs=$reportedInitializationMs ocrMs=$ocrTimeMs " +
+-                    "totalMs=$totalTimeMs blocks=${blocks.size}"
+-            }
+-            OcrPage(
+-                width = inputImage.width,
+-                height = inputImage.height,
+-                blocks = blocks,
+-                metrics = OcrPerformanceMetrics(
+-                    initializationTimeMs = reportedInitializationMs,
+-                    ocrTimeMs = ocrTimeMs,
+-                    totalTimeMs = totalTimeMs,
+-                ),
+-            )
++            finishPage(inputImage.width, inputImage.height, blocks, pageStart, ocrTimeMs, 1)
+         } catch (error: Throwable) {
+             logcat(LogPriority.ERROR, error) {
+                 "OCR failure engine=ML_KIT totalMs=${elapsedMs(pageStart)} error=${error::class.simpleName}"
+@@ -85,13 +77,117 @@ class MlKitOcrEngine(
+         }
+     }
+ 
+-    override suspend fun release() {
+-        recognizer.close()
++    @Suppress("DEPRECATION")
++    private suspend fun recognizeStrips(image: OcrImage, pageStart: Long): OcrPage? {
++        val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
++        image.openInputStream().use { BitmapFactory.decodeStream(it, null, bounds) }
++        if (bounds.outWidth <= 0 || bounds.outHeight <= 0 ||
++            bounds.outMimeType !in setOf("image/jpeg", "image/png", "image/webp")
++        ) {
++            return null
++        }
++        val strips = MlKitStripPlan.create(bounds.outWidth, bounds.outHeight)
++        if (strips.isEmpty()) return null
++        // Raw-region coordinates must agree with the EXIF-corrected reader space.
++        val orientation = try {
++            image.openInputStream().use { input ->
++                ExifInterface(input).getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED)
++            }
++        } catch (_: IOException) {
++            return null
++        }
++        if (orientation !in setOf(ExifInterface.ORIENTATION_UNDEFINED, ExifInterface.ORIENTATION_NORMAL)) return null
++        val decoder = image.openInputStream().use { BitmapRegionDecoder.newInstance(it, false) }
++            ?: throw IOException("Não foi possível abrir a página para reconhecimento por faixas")
++        val lines = mutableListOf<StripOcrLine>()
++        var ocrTimeMs = 0L
++        try {
++            check(decoder.width == bounds.outWidth && decoder.height == bounds.outHeight)
++            for ((index, strip) in strips.withIndex()) {
++                coroutineContext.ensureActive()
++                val bitmap = decoder.decodeRegion(
++                    Rect(0, strip.top, bounds.outWidth, strip.bottom),
++                    BitmapFactory.Options().apply { inPreferredConfig = Bitmap.Config.ARGB_8888 },
++                ) ?: throw IOException("Não foi possível decodificar uma faixa da página")
++                try {
++                    val ocrStart = System.nanoTime()
++                    // ML Kit's Task cannot be cancelled with the coroutine. Wait for
++                    // this one region before recycling its pixels or closing the engine.
++                    val text = withContext(NonCancellable) {
++                        recognizer.process(InputImage.fromBitmap(bitmap, 0)).await()
++                    }
++                    ocrTimeMs += elapsedMs(ocrStart)
++                    coroutineContext.ensureActive()
++                    lines += text.textBlocks.flatMap { it.lines }.mapNotNull { line ->
++                        toStripLine(line, strip, index)
++                    }
++                } finally {
++                    bitmap.recycle()
++                }
++            }
++        } finally {
++            decoder.recycle()
++        }
++        return finishPage(
++            bounds.outWidth,
++            bounds.outHeight,
++            MlKitStripPlan.deduplicate(lines),
++            pageStart,
++            ocrTimeMs,
++            strips.size,
++        )
++    }
++
++    private fun toStripLine(line: Text.Line, strip: OcrStrip, index: Int): StripOcrLine? {
++        val bounds = line.boundingBox ?: return null
++        if (bounds.width() <= 0 || bounds.height() <= 0) return null
++        val symbols = line.elements.flatMap { it.symbols }.mapNotNull { it.boundingBox }
++            .filter { it.width() > 0 && it.height() > 0 }
++        val widths = symbols.map { it.width() }.sorted()
++        val heights = symbols.map { it.height() }.sorted()
++        val block = OcrTextBlock(
++            text = line.text,
++            x = bounds.left.toFloat(),
++            y = (strip.top + bounds.top).toFloat(),
++            width = bounds.width().toFloat(),
++            height = bounds.height().toFloat(),
++            symbolWidth = widths.getOrNull(widths.size / 2)?.toFloat() ?: 1f,
++            symbolHeight = heights.getOrNull(heights.size / 2)?.toFloat() ?: 1f,
++            angle = line.angle,
++        )
++        return StripOcrLine(
++            block,
++            index,
++            minOf(bounds.top, strip.bottom - strip.top - bounds.bottom).toFloat().coerceAtLeast(0f),
++        )
+     }
+ 
+-    private fun elapsedMs(startNanos: Long): Long = (System.nanoTime() - startNanos) / NANOS_PER_MILLISECOND
++    private fun finishPage(
++        width: Int,
++        height: Int,
++        blocks: List<OcrTextBlock>,
++        pageStart: Long,
++        ocrTimeMs: Long,
++        strips: Int,
++    ): OcrPage {
++        val reportedInitializationMs = if (initializationReported) 0L else initializationTimeMs
++        initializationReported = true
++        val totalTimeMs = elapsedMs(pageStart)
++        logcat(LogPriority.INFO) {
++            "OCR page engine=ML_KIT initMs=$reportedInitializationMs ocrMs=$ocrTimeMs " +
++                "totalMs=$totalTimeMs blocks=${blocks.size} strips=$strips"
++        }
++        return OcrPage(
++            width,
++            height,
++            blocks,
++            OcrPerformanceMetrics(reportedInitializationMs, ocrTimeMs, totalTimeMs),
++        )
++    }
+ 
+-    private companion object {
+-        const val NANOS_PER_MILLISECOND = 1_000_000L
++    override suspend fun release() {
++        recognizer.close()
+     }
++
++    private fun elapsedMs(startNanos: Long): Long = (System.nanoTime() - startNanos) / 1_000_000L
+ }
+diff --git a/app/src/main/java/eu/kanade/translation/recognizer/MlKitStripPlan.kt b/app/src/main/java/eu/kanade/translation/recognizer/MlKitStripPlan.kt
+new file mode 100644
+index 0000000..c7e7c03
+--- /dev/null
++++ b/app/src/main/java/eu/kanade/translation/recognizer/MlKitStripPlan.kt
+@@ -0,0 +1,74 @@
++package eu.kanade.translation.recognizer
++
++import kotlin.math.abs
++import kotlin.math.floor
++
++internal data class OcrStrip(val top: Int, val bottom: Int)
++
++internal data class StripOcrLine(
++    val block: OcrTextBlock,
++    val strip: Int,
++    val edgeDistance: Float,
++)
++
++/** Pixel-preserving sequential regions: no full-height bitmap or new model. */
++internal object MlKitStripPlan {
++    const val MAX_TILE_PIXELS = 2_097_152
++
++    fun create(width: Int, height: Int): List<OcrStrip> {
++        require(width > 0 && height > 0)
++        if (width > 4096 || height.toLong() < width.toLong() * 3 || height <= 2048) return emptyList()
++        val tileHeight = minOf(2048, MAX_TILE_PIXELS / width)
++        val overlap = minOf(384, tileHeight / 4)
++        val step = tileHeight - overlap
++        val count = 1L + (height.toLong() - tileHeight + step - 1).coerceAtLeast(0) / step
++        require(count <= 256) { "Página muito alta para o limite de 256 faixas de OCR" }
++        return buildList {
++            var top = 0
++            while (true) {
++                val bottom = minOf(top.toLong() + tileHeight, height.toLong()).toInt()
++                add(OcrStrip(top, bottom))
++                if (bottom == height) break
++                top = bottom - overlap
++            }
++        }
++    }
++
++    fun deduplicate(lines: List<StripOcrLine>): List<OcrTextBlock> {
++        val kept = mutableListOf<StripOcrLine>()
++        val rows = mutableMapOf<Int, MutableList<StripOcrLine>>()
++        // Prefer lines away from a region edge, then a more complete reading.
++        for (line in lines.sortedWith(
++            compareByDescending<StripOcrLine> { it.edgeDistance }
++                .thenByDescending { it.block.text.length },
++        )) {
++            if (line.block.text.isBlank()) continue
++            val firstRow = floor(line.block.y / 64f).toInt()
++            val lastRow = floor((line.block.y + line.block.height) / 64f).toInt()
++            val neighbors = (firstRow..lastRow).asSequence().flatMap { rows[it].orEmpty().asSequence() }
++            if (neighbors.none { existing -> existing.strip != line.strip && sameLine(existing.block, line.block) }) {
++                kept += line
++                for (row in firstRow..lastRow) rows.getOrPut(row) { mutableListOf() }.add(line)
++            }
++        }
++        return kept.map { it.block }.sortedWith(compareBy<OcrTextBlock> { it.y }.thenBy { it.x })
++    }
++
++    private fun sameLine(a: OcrTextBlock, b: OcrTextBlock): Boolean {
++        val intersectionWidth = (minOf(a.x + a.width, b.x + b.width) - maxOf(a.x, b.x)).coerceAtLeast(0f)
++        val intersectionHeight = (minOf(a.y + a.height, b.y + b.height) - maxOf(a.y, b.y)).coerceAtLeast(0f)
++        val intersection = intersectionWidth * intersectionHeight
++        val areaA = a.width * a.height
++        val areaB = b.width * b.height
++        if (minOf(areaA, areaB) <= 0f) return false
++        if (intersection / (areaA + areaB - intersection).coerceAtLeast(1f) >= 0.72f) return true
++        val first = normalized(a.text)
++        val second = normalized(b.text)
++        val containedText = first.isNotEmpty() && second.isNotEmpty() &&
++            (first.contains(second) || second.contains(first))
++        return containedText && intersection / minOf(areaA, areaB) >= 0.90f &&
++            abs((a.y + a.height / 2) - (b.y + b.height / 2)) <= minOf(a.height, b.height) * 0.25f
++    }
++
++    private fun normalized(text: String) = text.lowercase().filter(Char::isLetterOrDigit)
++}
+diff --git a/app/src/main/java/eu/kanade/translation/recognizer/OcrEngineFactory.kt b/app/src/main/java/eu/kanade/translation/recognizer/OcrEngineFactory.kt
+index de36825..c615e43 100644
+--- a/app/src/main/java/eu/kanade/translation/recognizer/OcrEngineFactory.kt
++++ b/app/src/main/java/eu/kanade/translation/recognizer/OcrEngineFactory.kt
+@@ -1,6 +1,9 @@
+ package eu.kanade.translation.recognizer
+ 
+ import android.content.Context
++import tachiyomi.domain.translation.TranslationPreferences
++import uy.kohesive.injekt.Injekt
++import uy.kohesive.injekt.api.get
+ 
+ object OcrEngineFactory {
+ 
+@@ -11,7 +14,10 @@ object OcrEngineFactory {
+     ): OcrEngine {
+         require(type.supports(language)) { "PaddleOCR requires English source text" }
+         return when (type) {
+-            OcrEngineType.ML_KIT -> MlKitOcrEngine(context, language)
++            OcrEngineType.ML_KIT -> MlKitOcrEngine(context, language) {
++                val preferences = Injekt.get<TranslationPreferences>()
++                preferences.mlKitLongPageStrips().get() && !preferences.dbnetExperimental().get()
++            }
+             OcrEngineType.PADDLE_OCR -> PaddleOcrEngine(context, language)
+         }
+     }
 diff --git a/app/src/main/java/eu/kanade/translation/translator/GeminiComicProtocol.kt b/app/src/main/java/eu/kanade/translation/translator/GeminiComicProtocol.kt
 new file mode 100644
 index 0000000..d6e4788
@@ -6369,6 +6759,140 @@ index 2cb2951..3d49959 100644
  }
  
  private class MapPreferences {
+diff --git a/app/src/test/java/eu/kanade/translation/model/TranslationCandidatePolicyTest.kt b/app/src/test/java/eu/kanade/translation/model/TranslationCandidatePolicyTest.kt
+new file mode 100644
+index 0000000..d7f8746
+--- /dev/null
++++ b/app/src/test/java/eu/kanade/translation/model/TranslationCandidatePolicyTest.kt
+@@ -0,0 +1,40 @@
++package eu.kanade.translation.model
++
++import org.junit.jupiter.api.Assertions.assertFalse
++import org.junit.jupiter.api.Assertions.assertTrue
++import org.junit.jupiter.api.Test
++
++class TranslationCandidatePolicyTest {
++    @Test
++    fun `preserves meaningful single-character dialogue across scripts`() {
++        listOf("I", "A", "好", "私", "네", "?").forEach {
++            assertTrue(TranslationCandidatePolicy.retainRecognizedText(it))
++        }
++        assertFalse(TranslationCandidatePolicy.retainRecognizedText(" \n\t"))
++    }
++
++    @Test
++    fun `large short dialogue inside a detected balloon is not removed as a sound effect`() {
++        val block = block("NO!", balloon = true)
++        assertFalse(TranslationCandidatePolicy.isLikelySoundEffect(block, 720, 12_000))
++    }
++
++    @Test
++    fun `unboxed short oversized lettering retains existing sound-effect classification`() {
++        assertTrue(TranslationCandidatePolicy.isLikelySoundEffect(block("BOOM", balloon = false), 720, 12_000))
++    }
++
++    @Test
++    fun `normal captions and long dialogue do not become sound effects`() {
++        val long = block("This is an ordinary sentence outside a balloon", balloon = false)
++        assertFalse(TranslationCandidatePolicy.isLikelySoundEffect(long, 720, 12_000))
++        assertFalse(
++            TranslationCandidatePolicy.isLikelySoundEffect(block("Yes", false).copy(symWidth = 12f), 720, 12_000),
++        )
++    }
++
++    private fun block(text: String, balloon: Boolean) = TranslationBlock(
++        text, width = 200f, height = 50f, x = 0f, y = 0f, symWidth = 50f, symHeight = 50f,
++        angle = 0f, balloonDetected = balloon,
++    )
++}
+diff --git a/app/src/test/java/eu/kanade/translation/recognizer/MlKitStripPlanTest.kt b/app/src/test/java/eu/kanade/translation/recognizer/MlKitStripPlanTest.kt
+new file mode 100644
+index 0000000..ed53cd1
+--- /dev/null
++++ b/app/src/test/java/eu/kanade/translation/recognizer/MlKitStripPlanTest.kt
+@@ -0,0 +1,82 @@
++package eu.kanade.translation.recognizer
++
++import org.junit.jupiter.api.Assertions.assertEquals
++import org.junit.jupiter.api.Assertions.assertThrows
++import org.junit.jupiter.api.Assertions.assertTrue
++import org.junit.jupiter.api.Test
++
++class MlKitStripPlanTest {
++    @Test
++    fun `regions cover entire tall pages with overlap and bounded decoded pixels`() {
++        for (width in listOf(400, 720, 1080, 2048, 4096)) {
++            for (height in listOf(12_500, 25_000, 50_000)) {
++                val strips = MlKitStripPlan.create(width, height)
++                assertEquals(0, strips.first().top)
++                assertEquals(height, strips.last().bottom)
++                assertTrue(strips.all { width.toLong() * (it.bottom - it.top) <= MlKitStripPlan.MAX_TILE_PIXELS })
++                strips.zipWithNext().forEach { (first, second) ->
++                    assertTrue(second.top > first.top)
++                    assertTrue(second.top < first.bottom)
++                    assertTrue(second.bottom > first.bottom)
++                }
++            }
++        }
++    }
++
++    @Test
++    fun `ordinary pages and unsupported very wide pages keep existing recognition path`() {
++        for ((width, height) in listOf(720 to 1280, 1080 to 1920, 4097 to 25_000)) {
++            assertTrue(MlKitStripPlan.create(width, height).isEmpty())
++        }
++    }
++
++    @Test
++    fun `invalid or pathological dimensions fail before allocating pixels`() {
++        assertThrows(IllegalArgumentException::class.java) { MlKitStripPlan.create(0, 1000) }
++        assertThrows(IllegalArgumentException::class.java) { MlKitStripPlan.create(720, Int.MAX_VALUE) }
++    }
++
++    @Test
++    fun `overlap keeps complete last line instead of the edge fragment`() {
++        val fragment = line("Keep the last", y = 1800f, width = 150f, strip = 0, edge = 0f)
++        val complete = line("Keep the last line", y = 1800f, width = 200f, strip = 1, edge = 150f)
++        val result = MlKitStripPlan.deduplicate(listOf(fragment, complete))
++        assertEquals(listOf("Keep the last line"), result.map { it.text })
++        assertEquals(1800f, result.single().y)
++    }
++
++    @Test
++    fun `identical words at different page positions are never globally deduplicated`() {
++        val result = MlKitStripPlan.deduplicate(
++            listOf(line("Yes", 100f, strip = 0), line("Yes", 300f, strip = 1)),
++        )
++        assertEquals(listOf(100f, 300f), result.map { it.y })
++    }
++
++    @Test
++    fun `same-strip detections are preserved even when text and geometry match`() {
++        val source = line("Hello", 100f, strip = 0)
++        assertEquals(2, MlKitStripPlan.deduplicate(listOf(source, source)).size)
++    }
++
++    @Test
++    fun `duplicate OCR variants prefer the region with more edge clearance`() {
++        val clipped = line("H1GH", 1700f, strip = 0, edge = 0f)
++        val centered = line("HIGH", 1700f, strip = 1, edge = 200f)
++        assertEquals(listOf("HIGH"), MlKitStripPlan.deduplicate(listOf(clipped, centered)).map { it.text })
++    }
++
++    @Test
++    fun `adjacent columns and separate lines survive overlap reconciliation`() {
++        val first = line("No", 1800f, strip = 0)
++        val column = first.copy(strip = 1, block = first.block.copy(x = 400f))
++        val next = line("No", 1840f, strip = 1)
++        assertEquals(3, MlKitStripPlan.deduplicate(listOf(first, column, next)).size)
++    }
++
++    private fun line(text: String, y: Float, width: Float = 100f, strip: Int, edge: Float = 40f) = StripOcrLine(
++        OcrTextBlock(text, 50f, y, width, 24f, 10f, 24f, 0f),
++        strip,
++        edge,
++    )
++}
 diff --git a/app/src/test/java/eu/kanade/translation/translator/GeminiComicProtocolTest.kt b/app/src/test/java/eu/kanade/translation/translator/GeminiComicProtocolTest.kt
 new file mode 100644
 index 0000000..3dd195c
@@ -7075,7 +7599,7 @@ index d7001d9..0dad0f5 100644
 +    val sha256: String? = null,
  )
 diff --git a/domain/src/main/java/tachiyomi/domain/translation/TranslationPreferences.kt b/domain/src/main/java/tachiyomi/domain/translation/TranslationPreferences.kt
-index ee30e4b..8a368e3 100644
+index ee30e4b..5a0e111 100644
 --- a/domain/src/main/java/tachiyomi/domain/translation/TranslationPreferences.kt
 +++ b/domain/src/main/java/tachiyomi/domain/translation/TranslationPreferences.kt
 @@ -7,7 +7,7 @@ enum class TranslationLlmProvider(
@@ -7097,7 +7621,7 @@ index ee30e4b..8a368e3 100644
  
      fun autoTranslateAfterDownload() = preferenceStore.getBoolean("auto_translate_after_download", false)
      fun autoTranslateNovels() = preferenceStore.getBoolean("auto_translate_novels", true)
-@@ -37,6 +40,7 @@ class TranslationPreferences(
+@@ -37,16 +40,18 @@ class TranslationPreferences(
      fun translateSoundEffects() = preferenceStore.getBoolean("translate_sound_effects", false)
      fun translateFromLanguage() = preferenceStore.getString("translate_language_from", "ENGLISH")
      fun translateToLanguage() = preferenceStore.getString("translate_language_to", "PORTUGUESE")
@@ -7105,7 +7629,11 @@ index ee30e4b..8a368e3 100644
      fun translationFont() = preferenceStore.getInt("translation_font", 0)
  
      // Stable OCR values: 0 = ML Kit, 1 = PaddleOCR.
-@@ -46,7 +50,6 @@ class TranslationPreferences(
++    fun mlKitLongPageStrips() = preferenceStore.getBoolean("mlkit_long_page_strips", false)
++
+     fun dbnetExperimental() = preferenceStore.getBoolean("dbnet_experimental", false)
+ 
+     fun inpainterAot() = preferenceStore.getBoolean("inpainter_aot", false)
  
      fun ocrEngine() = preferenceStore.getInt("ocr_engine", 0)
  
@@ -7113,11 +7641,31 @@ index ee30e4b..8a368e3 100644
      fun translationEngine() = preferenceStore.getInt("translation_engine", 0)
      fun translationFallbackEngine() = preferenceStore.getInt("translation_fallback_engine", 0)
      fun translationEngineModel() = preferenceStore.getString("translation_engine_model", "gemini-1.5-pro")
+diff --git a/gradle/libs.versions.toml b/gradle/libs.versions.toml
+index 9839272..197aec7 100644
+--- a/gradle/libs.versions.toml
++++ b/gradle/libs.versions.toml
+@@ -56,7 +56,6 @@ material = "1.12.0"
+ materialKolor = "5.0.0"
+ mlkit-text-recognition = "16.0.1"
+ mlkit-text-translate = "17.0.3"
+-google-generativeai = "0.5.0"
+ mockk = "1.14.11"
+ moko-resources = "0.26.4"
+ okhttp = "5.4.0"
+@@ -80,7 +79,6 @@ voyager = "2.2.21-1.10.3"
+ xmlutil = "1.0.1"
+ 
+ [libraries]
+-google-generativeai = { module = "com.google.genai:google-genai-kotlin", version.ref = "google-generativeai" }
+ mlkit-text-recognition = { module = "com.google.mlkit:text-recognition", version.ref = "mlkit-text-recognition" }
+ mlkit-text-recognition-chinese = { module = "com.google.mlkit:text-recognition-chinese", version.ref = "mlkit-text-recognition" }
+ mlkit-text-recognition-japanese = { module = "com.google.mlkit:text-recognition-japanese", version.ref = "mlkit-text-recognition" }
 diff --git a/i18n-at/src/commonMain/moko-resources/base/strings.xml b/i18n-at/src/commonMain/moko-resources/base/strings.xml
-index 7ed4795..4bb8eab 100644
+index 7ed4795..f67a5ec 100644
 --- a/i18n-at/src/commonMain/moko-resources/base/strings.xml
 +++ b/i18n-at/src/commonMain/moko-resources/base/strings.xml
-@@ -81,4 +81,109 @@
+@@ -81,4 +81,111 @@
      <string name="repository_adding">Adding…</string>
      <string name="chapter_versions_shortcut">Tap to filter source groups and versions</string>
      <string name="translation_crop_borders_summary">Pages with saved translations keep their borders to align text with the original image.</string>
@@ -7226,12 +7774,14 @@ index 7ed4795..4bb8eab 100644
 +    <string name="pref_advanced_translation_editing_summary">Off by default for uninterrupted reading. Enables long-press editing, translating a single phrase again and manual text placement.</string>
 +    <string name="gemini_online_title">Gemini: optional online translation</string>
 +    <string name="gemini_online_summary">Sends recognized text to Google; images are not sent by this translator. Requires internet, your API key and an available model; usage may incur charges. It does not install a large model on your phone or recover text missed by OCR. Suggested model: gemini-3.5-flash-lite. Saved chapter translations remain available offline.</string>
++    <string name="pref_mlkit_long_page_strips">Long-page OCR strips (experimental)</string>
++    <string name="pref_mlkit_long_page_strips_summary">For English ML Kit OCR on tall JPEG, PNG and WebP pages. Processes overlapping regions one at a time, preserving source pixels and limiting each decoded image to 8 MiB of ARGB pixels. No extra model or API. Off by default; disabled while DBNet is enabled. Requires retranslating the chapter to compare results.</string>
  </resources>
 diff --git a/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml b/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
-index d1748bc..c458d9f 100644
+index d1748bc..5321fe6 100644
 --- a/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
 +++ b/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
-@@ -81,4 +81,109 @@
+@@ -81,4 +81,111 @@
      <string name="repository_adding">Adicionando…</string>
      <string name="chapter_versions_shortcut">Toque para filtrar grupos e versões da fonte</string>
      <string name="translation_crop_borders_summary">Páginas com tradução salva preservam as bordas para alinhar o texto à imagem original.</string>
@@ -7340,6 +7890,8 @@ index d1748bc..c458d9f 100644
 +    <string name="pref_advanced_translation_editing_summary">Desativada por padrão para uma leitura sem interrupções. Permite editar por toque longo, retraduzir uma frase e adicionar texto manualmente.</string>
 +    <string name="gemini_online_title">Gemini: tradução online opcional</string>
 +    <string name="gemini_online_summary">Envia o texto reconhecido ao Google; este tradutor não envia imagens. Exige internet, sua chave de API e um modelo disponível; pode gerar cobrança por uso. Não instala um modelo grande no celular nem recupera texto que o OCR não reconheceu. Modelo sugerido: gemini-3.5-flash-lite. Traduções já salvas dos capítulos continuam disponíveis offline.</string>
++    <string name="pref_mlkit_long_page_strips">OCR por faixas em páginas longas (experimental)</string>
++    <string name="pref_mlkit_long_page_strips_summary">Para OCR ML Kit em inglês nas páginas altas JPEG, PNG e WebP. Processa faixas sobrepostas uma por vez, preservando os pixels e limitando cada imagem decodificada a 8 MiB de pixels ARGB. Sem modelo extra ou API. Começa desligado; não atua com DBNet habilitado. É necessário retraduzir o capítulo para comparar.</string>
  </resources>
 diff --git a/i18n/src/commonMain/moko-resources/base/strings.xml b/i18n/src/commonMain/moko-resources/base/strings.xml
 index c0832ba..ebf8f48 100644

@@ -38,6 +38,69 @@ def make_build(root, *, multi=False):
 
 
 class EmulatorSafety(unittest.TestCase):
+    def test_fhd_framebuffer_is_selected_at_startup_only_for_polaris(self):
+        for stage in ('baseline', 'spike001'):
+            with tempfile.TemporaryDirectory() as tmp:
+                root = Path(tmp)
+                avd = e.AVDS[stage]
+                folder = root / 'emulador' / 'avd' / f'{avd}.avd'
+                folder.mkdir(parents=True)
+                with patch.object(e, 'ensure_avd', return_value=(avd, folder)), \
+                        patch.object(e, 'executable', side_effect=lambda sdk, name: Path(name)), \
+                        patch.object(e, 'find_device', return_value=None), \
+                        patch.object(e.subprocess, 'Popen') as launch:
+                    e.start_avd(root, root, stage)
+                arguments = launch.call_args.args[0]
+                if stage == 'spike001':
+                    self.assertEqual(arguments[-2:], ['-skin', '1080x1920'])
+                else:
+                    self.assertNotIn('-skin', arguments)
+                self.assertNotIn('-dpi-device', arguments)
+
+    def test_existing_emulator_is_reused_without_restart(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            avd = e.AVDS['spike001']
+            with patch.object(e, 'ensure_avd', return_value=(avd, root)), \
+                    patch.object(e, 'executable', side_effect=lambda sdk, name: Path(name)), \
+                    patch.object(e, 'find_device', return_value='emulator-5554'), \
+                    patch.object(e.subprocess, 'Popen') as launch:
+                self.assertEqual(e.start_avd(root, root, 'spike001'), (avd, 'emulator-5554'))
+                launch.assert_not_called()
+
+    def test_auto_display_rejects_phone_and_unowned_targets_without_adb_writes(self):
+        with tempfile.TemporaryDirectory() as tmp, patch.object(e, 'run') as run:
+            for serial in ('phone123', 'emulator-5554'):
+                with self.assertRaises(e.EmulatorError):
+                    e.prepare_reader_display(Path('adb'), serial, e.AVDS['spike001'], 'spike001', Path(tmp))
+            run.assert_not_called()
+
+    def test_auto_display_updates_only_owned_polaris_and_preserves_first_backup(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            avd = e.AVDS['spike001']
+            (root / 'emulador' / 'avd' / f'{avd}.avd').mkdir(parents=True)
+            (root / 'emulador' / f'{avd}.owner.txt').write_text(avd + '\n')
+            def response(args, **kwargs):
+                if args[-2:] == ['wm', 'size']:
+                    return ok('Physical size: 720x1280\n')
+                if args[-2:] == ['wm', 'density']:
+                    return ok('Physical density: 320\nOverride density: 360\n')
+                return ok()
+            with patch.object(e, 'find_device', return_value='emulator-5554'), \
+                    patch.object(e, 'run', side_effect=response) as run:
+                e.prepare_reader_display(Path('adb'), 'emulator-5554', avd, 'spike001', root)
+                first = (root / 'emulador' / 'translation-display-backup.json').read_text()
+                e.prepare_reader_display(Path('adb'), 'emulator-5554', avd, 'spike001', root)
+                self.assertEqual((root / 'emulador' / 'translation-display-backup.json').read_text(), first)
+                self.assertEqual(json.loads(first), {'size': 'reset', 'density': '360'})
+                self.assertTrue(all(call.args[0][1:3] == ['-s', 'emulator-5554'] for call in run.call_args_list))
+                self.assertIn(['wm', 'size', '1080x1920'], [call.args[0][-3:] for call in run.call_args_list])
+                self.assertIn(['wm', 'density', '420'], [call.args[0][-3:] for call in run.call_args_list])
+                run.reset_mock()
+                e.prepare_reader_display(Path('adb'), 'phone123', e.AVDS['baseline'], 'baseline', root)
+                run.assert_not_called()
+
     def test_no_consent(self):
         self.assertEqual(e.main(['duo', '--workspace', '/tmp']), 3)
 
@@ -151,7 +214,9 @@ class EmulatorSafety(unittest.TestCase):
             work = Path(tmp)
             make_build(work)
             reports = []
+            prepared = []
             def write_report(_adb, _serial, avd, _apk, stage, _work, _build):
+                self.assertIn(stage, prepared)
                 report = work / 'relatorios' / stage
                 report.mkdir(parents=True)
                 reports.append((stage, avd))
@@ -161,7 +226,9 @@ class EmulatorSafety(unittest.TestCase):
                     with patch.object(e, 'start_avd', side_effect=lambda w,s,stage:(e.AVDS[stage],None)) as start:
                         with patch.object(e, 'executable', side_effect=lambda sdk, name: Path(name)):
                             with patch.object(e, 'wait_for_boot', return_value='emulator-5554'):
-                                with patch.object(e, 'install_and_launch', side_effect=write_report):
+                                with patch.object(e, 'install_and_launch', side_effect=write_report), \
+                                        patch.object(e, 'prepare_reader_display',
+                                                     side_effect=lambda adb, serial, avd, stage, workspace: prepared.append(stage)):
                                     self.assertEqual(e.main(['duo', '--workspace', tmp, '--consent']), 0)
             self.assertEqual(start.call_count, 2)
             self.assertEqual([t[0] for t in reports], ['baseline','spike001'])

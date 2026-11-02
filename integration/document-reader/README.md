@@ -59,3 +59,10 @@ Android tests remain 525 total, 491 passed and the same 34 preexisting failures.
 Candidate `0.1.0-beta.5`, versionCode 106, remains unpublished. Advanced translation editing is off by default in both pager and webtoon; manual insertion and per-block editing are available when explicitly enabled. Gemini uses bounded complete-response batches and bypasses the shared offline phrase cache; saved chapters still support offline reading. A debug-only shell-permission receiver and the Windows collector export paired screenshots, the active original page and saved post-filter text. The collector does not initiate OCR/API requests. CMD options 13/14 apply and restore a FHD emulator display.
 
 Missing last lines and text outside balloons remain unverified until an actual failing source page is captured. See [the diagnosis procedure](../../docs/REVISAO_TRADUCAO_FAIXA_LONGA.md). No emulator runtime or live Gemini quality acceptance is implied by host tests.
+
+
+## P20261102.3 — ML Kit and OCR review
+
+Candidate beta.6 / versionCode 107 keeps Gemini outside the current test round. Recognized single-character text is retained; detected balloons are protected from the oversized-short-text sound-effect filter. An opt-in, English-only long-page ML Kit path reads overlapping original-scale regions sequentially with a bounded decoded pixel budget and geometric duplicate reconciliation. It adds no model or API and remains off pending real-device/case validation. The unused direct generative SDK dependency was removed.
+
+The Windows launcher selects a FHD framebuffer on Polaris startup and applies 420 dpi before opening the app, including existing AVD sessions; baseline is unchanged. An original synthetic long-strip CBZ and expected text are included as a pending manual control. See [the research and decisions](../../docs/PESQUISA_OCR_MLKIT_2026_11_02.md).

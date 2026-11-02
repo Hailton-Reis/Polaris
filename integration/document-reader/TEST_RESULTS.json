@@ -1,22 +1,22 @@
 {
   "date_utc": "2026-11-02",
-  "candidate_revision": "Polaris P20261102.2",
-  "version_name": "0.1.0-beta.5",
-  "version_code": 106,
-  "publication": "HELD_BY_USER_NO_NEW_RELEASE_OR_APK_UPLOAD",
+  "candidate_revision": "Polaris P20261102.3",
+  "version_name": "0.1.0-beta.6",
+  "version_code": 107,
+  "publication": "HELD_BY_USER_NO_NEW_GITHUB_RELEASE; private maintainer candidate prepared",
   "pinned_yomotsu": "0fb80c439ef816eeb50674f1b90af39918b176d8",
-  "patch_sha256": "04724fa184fbe9776965399c2f97f7884bd32a7c2b52a550c6a3f9bdf85d1489",
-  "assembly": "PASS: app:assembleDebug completed; overall Gradle exit 1 is the same 34 preexisting unit failures",
+  "patch_sha256": "4e99e8d07bbf83f1bf148afed3c04485aa75b1b4c89d87700ecdb67938e50e0f",
+  "assembly": "PASS: app:assembleDebug completed; overall Gradle exit 1 is the same 34 preexisting failures",
   "full_build_completion": {
     "status": "ASSEMBLY_AND_UNIT_REPORTS_COMPLETE",
     "apks": [
       "app-universal-debug.apk",
       "app-armeabi-v7a-debug.apk",
-      "app-x86_64-debug.apk",
       "app-x86-debug.apk",
-      "app-arm64-v8a-debug.apk"
+      "app-arm64-v8a-debug.apk",
+      "app-x86_64-debug.apk"
     ],
-    "unit_tests": 531
+    "unit_tests": 543
   },
   "android_unit_comparison": {
     "status": "NO_NEW_UNIT_REGRESSIONS",
@@ -27,8 +27,8 @@
       "skipped": 0
     },
     "patched": {
-      "total": 531,
-      "passed": 497,
+      "total": 543,
+      "passed": 509,
       "failed": 34,
       "skipped": 0
     },
@@ -46,15 +46,18 @@
     }
   },
   "new_android_tests": {
-    "GeminiComicProtocolTest": {
-      "total": 6,
-      "passed": 6,
-      "failed": 0
+    "MlKitStripPlanTest": {
+      "total": 8,
+      "passed": 8
+    },
+    "translation_model_TranslationCandidatePolicyTest": {
+      "total": 4,
+      "passed": 4
     }
   },
   "host_checks": {
     "local_android_helpers": {
-      "passed": 51
+      "passed": 55
     },
     "windows_launcher_static_contract": {
       "passed": 33
@@ -69,84 +72,60 @@
       "passed": 6
     }
   },
-  "compiled_artifacts_local_only": {
-    "application_id": "app.mihon.tachiyomiat.dev",
-    "version_name": "0.1.0-beta.5",
-    "version_code": 106,
-    "artifacts": [
-      {
-        "file": "app-universal-debug.apk",
-        "bytes": 534951424,
-        "sha256": "660ec2a90377dc605ad5c37bee8086ed4d582546d2ee0ff8a88b04b90cec0f61",
-        "filters": []
-      },
-      {
-        "file": "app-armeabi-v7a-debug.apk",
-        "bytes": 155998826,
-        "sha256": "9709643b2ac3a5f55c2172f974ef4447584ac8ef35359fa4f16fe59cb4e68422",
-        "filters": [
-          {
-            "filterType": "ABI",
-            "value": "armeabi-v7a"
-          }
-        ]
-      },
-      {
-        "file": "app-x86_64-debug.apk",
-        "bytes": 231647496,
-        "sha256": "befab8d836f5b241de859c36004b479a927caf834ede8c6f9774ed905f1a7c76",
-        "filters": [
-          {
-            "filterType": "ABI",
-            "value": "x86_64"
-          }
-        ]
-      },
-      {
-        "file": "app-x86-debug.apk",
-        "bytes": 216304090,
-        "sha256": "610adcd23030515bce92a73016aeb7c43ad662ad122f7850fe2fbb602004c56b",
-        "filters": [
-          {
-            "filterType": "ABI",
-            "value": "x86"
-          }
-        ]
-      },
-      {
-        "file": "app-arm64-v8a-debug.apk",
-        "bytes": 195796649,
-        "sha256": "42228560a714ea790c9be9a2a7e32db5cecd7f84838c1533bb89258c4ceec8a1",
-        "filters": [
-          {
-            "filterType": "ABI",
-            "value": "arm64-v8a"
-          }
-        ]
-      }
-    ],
-    "debug_capture_receiver_permission": "android.permission.DUMP",
-    "label": "Polaris"
+  "source_verification": {
+    "source_build_mismatches": [],
+    "overlay_matches_source": true,
+    "patch_sha256": "4e99e8d07bbf83f1bf148afed3c04485aa75b1b4c89d87700ecdb67938e50e0f"
   },
+  "signed_internal_arm_artifacts": [
+    {
+      "abi": "arm64-v8a",
+      "file": "Polaris-0.1.0-beta.6-arm64-v8a.apk",
+      "bytes": 192813767,
+      "sha256": "1adb508700047d5665d0e0459055b1987e1a209bbaddbad9a2379ae1f53838d6"
+    },
+    {
+      "abi": "armeabi-v7a",
+      "file": "Polaris-0.1.0-beta.6-armeabi-v7a.apk",
+      "bytes": 153015944,
+      "sha256": "6f7587d1bd65b331a2da7241ff7f70ad7055f248634f19d715a3a8674e9e0a00"
+    }
+  ],
+  "signer_sha256": "3ae747069cc9015ca1777f94fd56b030501f45d6af380426a572ad60e94d8227",
+  "signature_matches_previous_beta": true,
+  "apk_size_comparison_to_beta5": [
+    {
+      "abi": "arm64-v8a",
+      "previous_apk_bytes": 195796649,
+      "current_apk_bytes": 192813767,
+      "reduction_bytes": 2982882
+    },
+    {
+      "abi": "armeabi-v7a",
+      "previous_apk_bytes": 155998826,
+      "current_apk_bytes": 153015944,
+      "reduction_bytes": 2982882
+    }
+  ],
   "changes": [
-    "Advanced translation editing defaults off for pager and webtoon; editors close when disabled; manual insertion gated",
-    "Gemini bounded batches validate STOP, exact page keys and every nonblank phrase before applying a batch",
-    "Gemini bypasses provider-agnostic machine phrase cache; saved chapter translation remains offline",
-    "Optional Gemini default model gemini-3.5-flash-lite; text-only online behavior described in settings",
-    "Debug shell-permission receiver exports only active-page source and saved post-filter translation; temporary copies cleaned",
-    "Owned-emulator-only Windows evidence capture, paired screenshots, local report and selected-frame ZIP; no automatic API calls or uploads",
-    "Reversible FHD display override with previous values preserved and rollback on apply failure"
+    "Recognized single-character text retained; only blank OCR text discarded initially",
+    "Detected balloons protected from oversized-short-lettering sound-effect removal",
+    "Opt-in English ML Kit original-scale overlapping strip recognition for tall JPEG/PNG/WebP pages; off by default",
+    "Sequential regions capped at 2097152 pixels; geometric line duplicate reconciliation; no extra model/API or permanent image cache",
+    "Unused direct generative SDK dependency removed; no new Gemini integration work",
+    "Polaris emulator startup selects a FHD framebuffer and applies 420 dpi before opening app; running AVD reused; baseline unchanged",
+    "Original synthetic 720x20000 control CBZ with 14 expected cases, not yet recognized in Android"
   ],
   "runtime_and_quality": {
     "android_emulator_runtime": "PENDING_ON_USERS_PC",
     "physical_device_acceptance": "PENDING_FOR_THIS_REVISION",
-    "live_gemini_api": "NOT_RUN_NO_TEST_KEY_CONFIGURED",
-    "reported_case": "Manhwa in long-strip mode; missing final lines and text outside speech balloons",
-    "ocr_missing_lines": "NOT_DECLARED_FIXED_NEEDS_ORIGINAL_FAILING_PAGE",
-    "cjk_quality": "PENDING_REAL_JAPANESE_CHINESE_KOREAN_CASES",
-    "evidence_limit": "Exports saved post-filter OCR, not raw OCR rerun; current configured provider does not prove provenance of old text"
+    "mlkit_strip_quality": "PENDING_REAL_CHAPTER_COMPARISON_EXPERIMENT_OFF_BY_DEFAULT",
+    "reported_missing_last_lines": "NOT_DECLARED_FIXED_NEEDS_ORIGINAL_FAILING_PAGE",
+    "cjk_quality": "PENDING_REAL_JAPANESE_CHINESE_KOREAN_CASES; strip experiment currently English-only",
+    "live_gemini_api": "OUT_OF_SCOPE_PER_USER_NO_NEW_CALLS",
+    "on_device_peak_memory_and_installed_storage": "NOT_MEASURED; decoded pixel budget and APK size are distinct metrics"
   },
-  "previous_revision_evidence": "TEST_RESULTS_P20261102_1.json",
+  "research": "docs/PESQUISA_OCR_MLKIT_2026_11_02.md",
   "procedure": "docs/REVISAO_TRADUCAO_FAIXA_LONGA.md",
-  "baseline_provenance": "Retained JUnit reports from pinned upstream; final patched build assembled and ran app/domain/source-api test tasks; reproducible baseline APK copies removed to free cloud disk"
+  "previous_revision_evidence": "TEST_RESULTS_P20261102_2.json"
 }

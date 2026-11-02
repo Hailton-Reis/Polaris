@@ -15,6 +15,8 @@ import re
 import subprocess
 import sys
 import time
+
+from polaris_emulator_display import change_display
 from datetime import datetime, timezone
 
 IMAGE = 'system-images;android-35;google_apis;x86_64'
@@ -210,7 +212,12 @@ def start_avd(workspace, sdk, stage):
     # Deliberately NOT -wipe-data, -read-only or -no-window: all app settings persist.
     # Snapshot loading is disabled for deterministic startup, but userdata persists.
     with out.open('wb') as stdout, err.open('wb') as stderr:
-        subprocess.Popen([str(emulator), '-avd', avd, '-no-snapshot-load', '-no-snapshot-save'],
+        launch = [str(emulator), '-avd', avd, '-no-snapshot-load', '-no-snapshot-save']
+        if stage == 'spike001':
+            # Numeric skins select the framebuffer at startup. -dpi-device is
+            # obsolete and ignored; apply Android density after boot instead.
+            launch += ['-skin', '1080x1920']
+        subprocess.Popen(launch,
                          stdout=stdout, stderr=stderr,
                          creationflags=(0x00000200 if os.name == 'nt' else 0))
     return avd, None
@@ -230,6 +237,28 @@ def wait_for_boot(adb, avd, *, timeout_seconds=420):
                 return serial
         time.sleep(5)
     raise EmulatorError(f'AVD {avd} nao iniciou. Confira logs em PolarisDev/emulador e WHPX.')
+
+
+def prepare_reader_display(adb, serial, avd, stage, workspace):
+    """The Polaris reader opens in FHD without a separate manual menu action."""
+    if stage != 'spike001':
+        return
+    marker = workspace / 'emulador' / f'{avd}.owner.txt'
+    if (avd != AVDS['spike001'] or not re.fullmatch(r'emulator-\d+', serial) or
+            not marker.is_file() or marker.read_text(encoding='utf-8-sig').strip() != avd or
+            not (workspace / 'emulador' / 'avd' / f'{avd}.avd').is_dir() or
+            find_device(adb, avd) != serial):
+        raise EmulatorError('Tela automatica bloqueada: o dispositivo nao e o AVD Polaris verificado.')
+
+    class DisplayBridge:
+        def shell(self, *args):
+            return require_success(run([adb, '-s', serial, 'shell', *args]), 'Configurar tela Polaris')
+
+    try:
+        change_display(DisplayBridge(), workspace / 'emulador' / 'translation-display-backup.json')
+    except (OSError, ValueError) as exc:
+        raise EmulatorError('Nao foi possivel preparar a tela FHD do Polaris: ' + str(exc)) from exc
+    print('[OK] Tela Polaris preparada automaticamente: 1080x1920, 420 dpi.', flush=True)
 
 
 def install_and_launch(adb, serial, avd, apk, stage, workspace, build):
@@ -307,6 +336,7 @@ def main(argv=None):
         records = []
         for stage in stages:
             serial = wait_for_boot(adb, avds[stage])
+            prepare_reader_display(adb, serial, avds[stage], stage, workspace)
             records.append(install_and_launch(adb, serial, avds[stage], packages[stage], stage, workspace, build))
         if args.stage == 'duo':
             create_comparison_template(workspace, records[-1])

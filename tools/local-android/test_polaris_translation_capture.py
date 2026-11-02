@@ -157,7 +157,7 @@ class TranslationCaptureTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as raw:
             backup = Path(raw) / 'display.json'
             backup.write_text('{"size":"1080x1920;other","density":"420"}')
-            with self.assertRaises(capture.EmulatorError):
+            with self.assertRaises(ValueError):
                 capture.change_display(bridge, backup, restore=True)
             self.assertEqual(bridge.commands, [])
 

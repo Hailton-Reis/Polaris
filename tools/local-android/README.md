@@ -34,3 +34,6 @@ Optional diagnostic fallback: `polaris_local.py build --build-profile conservati
 ## Long-strip translation review
 
 `polaris_translation_capture.py` supplies CMD actions 12 (paired screenshots, active source page and saved OCR/translation), 13 (FHD display) and 14 (restore display). It targets only the owned Polaris AVD, not phones or the baseline AVD. It requires the new diagnostic build and a loaded, already translated webtoon chapter. It does not start OCR/translation or upload evidence. See [the review procedure](../../docs/REVISAO_TRADUCAO_FAIXA_LONGA.md). Collection results are separate from pending quality acceptance; capture starts at the current reading position.
+
+
+Polaris startup (actions 9/10) now selects a FHD framebuffer and applies 420 dpi before launching the reader, including when reusing a running owned AVD. Action 13 is optional. Action 14 restores saved manual overrides; the next launcher invocation prepares FHD again. The baseline AVD is unchanged. Shared display logic lives in `polaris_emulator_display.py`; the SDK explicitly documents that `-dpi-device` is obsolete/ignored, so density uses ADB instead.

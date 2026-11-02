@@ -1,6 +1,6 @@
-# Polaris 0.1.0-beta.5 — guia de teste do beta
+# Polaris 0.1.0-beta.6 — guia de teste do beta
 
-Revisão: **P20261102.2**. Android mínimo: **8.0 / API 26**. Esta é uma versão experimental para experimentar e registrar problemas; a conferência nos celulares ainda está pendente.
+Revisão: **P20261102.3**. Android mínimo: **8.0 / API 26**. Esta é uma versão experimental para experimentar e registrar problemas; a conferência nos celulares ainda está pendente.
 
 ## Nome e ícone corrigidos
 
@@ -18,7 +18,7 @@ O pacote contém dois APKs. Use **arm64-v8a** primeiro nos aparelhos Android de 
 
 Instale apenas um APK por aparelho. Não é necessário o APK universal nem as versões x86 do emulador. Instalações e atualizações devem vir sempre da mesma máquina/assinatura usada para esse beta. Não apague a instalação antiga para contornar um erro de assinatura: isso pode remover os dados locais. O mantenedor deve reconstruir e compartilhar o APK com a assinatura original.
 
-O mantenedor gera o pacote com a opção **4** do CMD atualizado. Ao concluir a comparação automatizada, a pasta de evidências contém **beta/**, com APKs ARM, hashes e exemplos. A opção **9** continua sendo o fluxo local de instalação já existente. Confira **P20261102.2** em **Sobre** antes de registrar resultados. O versionCode agora é **106**; o candidato anterior usava 105.
+O mantenedor gera o pacote com a opção **4** do CMD atualizado. Ao concluir a comparação automatizada, a pasta de evidências contém **beta/**, com APKs ARM, hashes e exemplos. A opção **9** continua sendo o fluxo local de instalação já existente. Confira **P20261102.3** em **Sobre** antes de registrar resultados. O versionCode agora é **107**; o candidato anterior usava 106.
 
 ## Uso inicial
 
@@ -70,3 +70,10 @@ Para relatar problemas, informe revisão, aparelho/Android, ação, resultado es
 ## Revisão interna de tradução em faixa longa
 
 Este candidato não foi publicado como Release. A edição das traduções começa desativada; habilite-a em Tradução → Avançado somente para corrigir ou retraduzir blocos. A revisão inclui coleta local de original, tradução e registro salvo pelo CMD (opções 12–14), além de validação mais rigorosa das respostas opcionais do Gemini. O padrão continua sendo o ML Kit offline. As falhas de linhas ausentes ainda dependem da reprodução com um capítulo real; não foram declaradas corrigidas. Siga o [procedimento de comparação](../../docs/REVISAO_TRADUCAO_FAIXA_LONGA.md).
+
+
+## Foco desta rodada: OCR e ML Kit
+
+Gemini não participa desta rodada; nenhuma API é necessária. O filtro preserva caracteres isolados e falas curtas com letras grandes dentro de balões detectados. O experimento **OCR por faixas em páginas longas**, em Tradução → OCR, é opcional, começa desligado e usa o ML Kit em inglês, sem outro modelo. Requer nova execução da tradução do capítulo para refazer o OCR.
+
+O emulador Polaris agora abre com Full HD automático pelas opções 9/10; a 13 é opcional. O [arquivo de controle sintético](long-strip-fixture/Polaris-faixa-longa-controle.cbz) e [a transcrição esperada](long-strip-fixture/expected.json) ajudam a conferir falas de um caractere e parágrafos nas bordas das faixas. Esse controle ainda não foi reconhecido no Android e não representa um teste de qualidade aprovado. Veja [a pesquisa com fontes e limites](../../docs/PESQUISA_OCR_MLKIT_2026_11_02.md).

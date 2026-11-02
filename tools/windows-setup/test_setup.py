@@ -190,7 +190,7 @@ class LauncherSafety(unittest.TestCase):
         self.assertIn("polaris_emulator.py", PS)
         self.assertIn("'--workspace',$script:Workspace,'--consent'", PS)
         self.assertIn("8. EMULAR Yomotsu original", PS)
-        self.assertIn("9. EMULAR Polaris Spike-001", PS)
+        self.assertIn("9. EMULAR Polaris (AVD separado / Full HD automatico)", PS)
 
     def test_dual_avd_menu_and_explicit_consent(self):
         self.assertIn("'10' { Invoke-PolarisEmulator 'duo' }", PS)

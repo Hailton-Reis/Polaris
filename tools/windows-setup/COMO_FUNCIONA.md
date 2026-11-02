@@ -127,3 +127,10 @@ Fonte oficial para ADB e screencap: https://developer.android.com/tools/adb
 O CMD atualizado inclui **12** (comparação automática de original/tradução e registro salvo do capítulo aberto em faixa longa), **13** (1080 × 1920, 420 dpi) e **14** (restaurar a tela anterior). Essas opções atuam somente no emulador Polaris criado pelo assistente. Compile o build de diagnóstico pela opção 4 e instale pela 9 antes de usar a coleta. Abra e traduza o capítulo primeiro; a coleta não inicia tradução nem envia arquivos. O relatório e o ZIP de um quadro escolhido ficam em `PolarisDev/relatorios`.
 
 A coleta começa na posição atual e tem limite de 60 quadros; não certifica a qualidade ou cobertura integral do capítulo. Consulte [o procedimento e suas limitações](../../docs/REVISAO_TRADUCAO_FAIXA_LONGA.md). Não há nova Release publicada nesta revisão.
+
+
+### Full HD automático e foco no ML Kit
+
+As opções **9** e **10** agora preparam o emulador Polaris em 1080 × 1920 / 420 dpi automaticamente antes de abrir o leitor. A instância existente é reutilizada; não é necessário usar a opção 13. Essa opção permanece para reaplicar o ajuste manualmente. A 14 restaura os overrides salvos; uma nova abertura pelo CMD prepara novamente o padrão Full HD. O AVD original Yomotsu não é modificado por esse ajuste. A resolução da partida usa `-skin 1080x1920`; a densidade é aplicada por ADB após o boot porque `-dpi-device` é obsoleto e ignorado pelo emulador atual.
+
+Gemini fica fora da rodada atual. O teste de OCR e tradução offline não exige API. Consulte a [pesquisa sobre OCR/ML Kit](../../docs/PESQUISA_OCR_MLKIT_2026_11_02.md).

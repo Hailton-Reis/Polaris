@@ -8,7 +8,11 @@ Em **Configurações → Tradução → Avançado**, a opção **Edição avanç
 
 Ative a opção para corrigir ou retraduzir um bloco individual e para adicionar uma tradução manual pelo menu da página. Ao desligar, qualquer editor de bloco aberto é fechado. Esse controle não altera traduções ou correções já salvas.
 
-## ML Kit e Gemini
+## Prioridade atual: ML Kit e OCR offline
+
+Gemini fica fora da rodada de testes por decisão do usuário. Não é necessário configurar conta, chave de API ou serviço online para testar estas melhorias. O provedor opcional existente permanece disponível para uso futuro; não foi feito novo trabalho de integração com ele nesta rodada.
+
+## ML Kit e Gemini (referência opcional)
 
 O padrão é o ML Kit do Google: reconhecimento e tradução no aparelho, com o download inicial dos recursos de idioma. Não é o Gemini. Nenhum modelo generativo grande foi adicionado ao APK nesta revisão.
 
@@ -28,7 +32,7 @@ Nesta implementação, o Gemini recebe **texto do OCR**, não a imagem da págin
 Estas opções atuam somente no AVD Polaris criado pelo próprio assistente. Não selecionam o A12, outros celulares ou o AVD de comparação Yomotsu. Preserve o CMD antigo se desejar; baixe a cópia atualizada para obter os novos menus.
 
 1. Execute **4 — Compilar** para gerar o build de diagnóstico atualizado. Depois use **9 — Emular Polaris** para instalar esse build no emulador existente. Não use Wipe Data.
-2. Com o emulador aberto, escolha **13 — Tela FHD** para aplicar 1080 × 1920 e 420 dpi. A opção **14** restaura os valores anteriores, inclusive eventuais ajustes que você já tinha feito. Aumentar a resolução não aumenta o detalhe de uma imagem original pequena; maximizar ou ampliar a janela do Android Studio também pode ajudar a ler.
+2. As opções **9** e **10** já preparam o Polaris em **1080 × 1920 e 420 dpi** automaticamente, antes de abrir o aplicativo. Na partida de um AVD fechado, o tamanho da tela é selecionado no comando de inicialização; se o AVD já estiver aberto, o ajuste é aplicado à instância existente. A opção **13** fica apenas para reaplicar manualmente. A **14** restaura os overrides de tamanho/densidade salvos; uma nova abertura pelo CMD volta a preparar Full HD. O AVD original Yomotsu permanece com sua configuração. Aumentar a resolução não aumenta o detalhe de uma imagem original pequena; maximizar a janela do Android Studio também ajuda a ler.
 3. Abra o mesmo capítulo em **faixa longa**, traduza normalmente e posicione a leitura um pouco antes do defeito. Espere a página terminar de carregar. O coletor não busca capítulos, não inicia OCR e não chama o Gemini.
 4. Escolha **12 — Comparar tradução**. Não toque no leitor durante a coleta. Ele alterna a exibição da tradução, captura as duas telas e avança com sobreposição. O limite padrão é de 60 posições e 512 MiB por coleta. A posição de leitura avança; a visibilidade original das traduções é restaurada ao terminar ou falhar.
 5. Abra o relatório local `PolarisDev/relatorios/traducao-.../comparacao.html`. Ao terminar, informe o número do quadro com defeito para gerar um ZIP desse caso. Os arquivos ficam no PC e não são enviados automaticamente. Você pode compartilhar somente esse ZIP para análise.
@@ -55,3 +59,14 @@ Cada quadro contém as telas original/traduzida, o original integral da página 
 O registro contém o OCR **depois dos filtros existentes**, não o resultado bruto de uma nova execução. A preferência de provedor exportada é a configuração atual e não comprova qual provedor produziu uma tradução antiga. O diagnóstico não exporta chaves, preferências completas ou logs gerais do aparelho. As cópias temporárias no cache do aplicativo são removidas após cada transferência; os originais e relatórios do PC permanecem até você os excluir.
 
 Japonês, chinês e coreano ainda precisam de casos reais. Esta revisão não declara resolvidas as falhas de captura nem equivalência com tradução humana de uma scan.
+
+
+## Melhorias de OCR — P20261102.3
+
+O filtro inicial passa a preservar textos de um único caractere, incluindo falas curtas e caracteres CJK. Letras grandes dentro de um balão detectado não são removidas apenas pelo tamanho como se fossem onomatopeias. O filtro existente para efeitos fora dos balões permanece. Isso não significa que todos os textos fora de balões já possam receber sobreposição automática: o posicionamento ainda exige evidência de fundo seguro.
+
+Em **Tradução → OCR**, a opção **OCR por faixas em páginas longas (experimental)** começa desligada. Usa o mesmo ML Kit em inglês, sem baixar outro modelo. Nas páginas JPEG/PNG/WebP altas e com orientação EXIF normal, lê faixas sobrepostas sequencialmente, preservando os pixels e as coordenadas da página; reconcilia repetições apenas onde a geometria se sobrepõe. Cada faixa tem até 2.097.152 pixels ARGB, cerca de 8 MiB de pixels; esse valor não representa a memória total do aplicativo, do decodificador ou do ML Kit.
+
+O experimento não atua com DBNet habilitado, nem altera o caminho atual para japonês, chinês e coreano. Páginas normais, formatos não suportados e imagens rotacionadas continuam no caminho anterior. Há limite de 256 faixas. Para comparar, use o mesmo capítulo sem o experimento e depois com ele; remova apenas a tradução salva pelo menu de tradução do capítulo e traduza novamente, mantendo o original baixado. Retraduzir só uma frase não executa novamente o OCR. Não exclua dados do aplicativo ou o capítulo original.
+
+Os testes unitários verificam cobertura, sobreposição, orçamento de pixels e reconciliação das faixas; não medem a precisão do modelo Android. O capítulo real com defeito continua necessário. Consulte a [pesquisa e as decisões técnicas](PESQUISA_OCR_MLKIT_2026_11_02.md).
