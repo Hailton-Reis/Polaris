@@ -2,7 +2,7 @@
 # Respeita outras ferramentas/projetos: nenhum reset de repo, nenhuma remocao ou alteracao de banco de dados.
 [CmdletBinding()]
 param(
-    [ValidateSet('Menu','Check','Install','Prepare','Build','All','OtherProjects','EmulatorBaseline','EmulatorPatched','EmulatorDuo','EmulatorSmoke')]
+    [ValidateSet('Menu','Check','Install','Prepare','Build','All','OtherProjects','EmulatorBaseline','EmulatorPatched','EmulatorDuo','EmulatorSmoke','TranslationCapture','EmulatorDisplay','EmulatorDisplayRestore')]
     [string]$Action='Menu',
     [string]$Workspace=(Join-Path $env:USERPROFILE 'PolarisDev'),
     [switch]$Yes
@@ -499,6 +499,25 @@ function Invoke-PolarisSmoke {
     Say '[OK] Diagnosticos A01/A02 coletados. B01-B05 continuam aguardando fontes configuradas.' 'Green'
 }
 
+function Invoke-TranslationDiagnostic([string]$Mode){
+    Set-LocalProcessEnvironment
+    Ensure-PolarisCheckout
+    $py=Find-Python
+    if(!$py){throw 'Python indisponivel para o diagnostico de traducao.'}
+    $runner=Join-Path $script:PolarisDir 'tools\local-android\polaris_translation_capture.py'
+    if(!(Test-Path -LiteralPath $runner -PathType Leaf)){throw 'Atualize o checkout Polaris para obter o coletor de traducao.'}
+    if($Mode -eq 'capture'){
+        Say 'Abra o capitulo no emulador Polaris em faixa longa e traduza antes de continuar.' 'Yellow'
+        Say 'A coleta comeca na posicao atual. Nao toque no leitor durante as capturas.' 'Yellow'
+        Say 'Arquivos ficam no PC; nenhuma traducao ou envio de arquivos sera iniciado.' 'Cyan'
+    }
+    $pythonExe=[string]$py.run
+    $pythonArgs=@($py.args) + @($runner,$Mode,'--workspace',$script:Workspace,'--consent')
+    if($Mode -eq 'capture'){$pythonArgs+=@('--interactive')}
+    & $pythonExe @pythonArgs
+    if($LASTEXITCODE -ne 0){throw 'Diagnostico interrompido. Confira a mensagem e os relatorios locais.'}
+}
+
 function Other-Projects {
     Say '=== FERRAMENTAS RELACIONADAS A OUTROS PROJETOS (somente leitura) ===' 'Cyan'
     foreach($p in @(@('Analista/Madeira','python.exe'),@('CameraGuard','.NET'),@('Vai Quem Quer','node.exe'))){
@@ -530,6 +549,9 @@ function Run-Action([string]$Chosen){
         '9' { Invoke-PolarisEmulator 'spike001' }
         '10' { Invoke-PolarisEmulator 'duo' }
         '11' { Invoke-PolarisSmoke }
+        '12' { Invoke-TranslationDiagnostic 'capture' }
+        '13' { Invoke-TranslationDiagnostic 'display' }
+        '14' { Invoke-TranslationDiagnostic 'restore' }
         '0' { Say 'Saindo sem alterar arquivos.';return }
         default { Say '[ERRO] Opcao invalida.' 'Yellow' }
     }
@@ -537,7 +559,7 @@ function Run-Action([string]$Chosen){
 function Menu {
     do {
         Write-Host ''
-        Write-Host '===== POLARIS - CMD UNICO - R001 AUTO-SMOKE A01/A02 25/10 =====' -ForegroundColor Cyan
+        Write-Host '===== POLARIS - CMD UNICO - REVISAO DE TRADUCAO 02/11 =====' -ForegroundColor Cyan
         Write-Host '1. Verificar TUDO (somente diagnostico; salva log em PolarisDev)'
         Write-Host '2. Instalar/configurar ferramentas ausentes (winget + SDK)'
         Write-Host '3. Preparar Polaris + Yomotsu (Git)'
@@ -549,6 +571,9 @@ function Menu {
         Write-Host '9. EMULAR Polaris Spike-001 (AVD separado / A02)'
         Write-Host '10. COMPARAR lado a lado: Yomotsu + Polaris (2 AVDs, dados salvos)'
         Write-Host '11. TESTES AUTOMATICOS sem repositorios (sem modificar os 2 AVDs)'
+        Write-Host '12. COMPARAR traducao: capturas + original + registro do capitulo aberto'
+        Write-Host '13. TELA FHD do emulador Polaris (1080x1920 / 420 dpi)'
+        Write-Host '14. RESTAURAR tela anterior do emulador Polaris'
         Write-Host '0. Sair'
         $choice=Read-Host 'Escolha'
         if($choice -eq '0'){break}
@@ -574,6 +599,9 @@ try{
         EmulatorPatched { Invoke-PolarisEmulator 'spike001' }
         EmulatorDuo { Invoke-PolarisEmulator 'duo' }
         EmulatorSmoke { Invoke-PolarisSmoke }
+        TranslationCapture { Invoke-TranslationDiagnostic 'capture' }
+        EmulatorDisplay { Invoke-TranslationDiagnostic 'display' }
+        EmulatorDisplayRestore { Invoke-TranslationDiagnostic 'restore' }
     }
     Say ('Logs: '+$script:LogFile) 'Cyan'
     exit 0

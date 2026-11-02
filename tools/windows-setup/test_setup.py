@@ -199,7 +199,7 @@ class LauncherSafety(unittest.TestCase):
         self.assertIn('10. COMPARAR lado a lado', PS)
         self.assertIn('Cada Android tera fontes, biblioteca e preferencias independentes e persistentes.', PS)
         self.assertIn('Confirm-Action', PS.split("elseif($Stage -eq 'spike001')", 1)[1])
-        self.assertIn('R001 AUTO-SMOKE A01/A02 25/10', PS)
+        self.assertIn('REVISAO DE TRADUCAO 02/11', PS)
 
     def test_emulator_smoke_option_is_safe_and_opt_in(self):
         self.assertIn("'11' { Invoke-PolarisSmoke }", PS)

@@ -1,6 +1,6 @@
-# Polaris 0.1.0-beta.4 — guia de teste do beta
+# Polaris 0.1.0-beta.5 — guia de teste do beta
 
-Revisão: **P20261102.1**. Android mínimo: **8.0 / API 26**. Esta é uma versão experimental para experimentar e registrar problemas; a conferência nos celulares ainda está pendente.
+Revisão: **P20261102.2**. Android mínimo: **8.0 / API 26**. Esta é uma versão experimental para experimentar e registrar problemas; a conferência nos celulares ainda está pendente.
 
 ## Nome e ícone corrigidos
 
@@ -18,7 +18,7 @@ O pacote contém dois APKs. Use **arm64-v8a** primeiro nos aparelhos Android de 
 
 Instale apenas um APK por aparelho. Não é necessário o APK universal nem as versões x86 do emulador. Instalações e atualizações devem vir sempre da mesma máquina/assinatura usada para esse beta. Não apague a instalação antiga para contornar um erro de assinatura: isso pode remover os dados locais. O mantenedor deve reconstruir e compartilhar o APK com a assinatura original.
 
-O mantenedor gera o pacote com a opção **4** do CMD atualizado. Ao concluir a comparação automatizada, a pasta de evidências contém **beta/**, com APKs ARM, hashes e exemplos. A opção **9** continua sendo o fluxo local de instalação já existente. Confira **P20261102.1** em **Sobre** antes de registrar resultados. O versionCode agora é **105**; o candidato anterior usava 104.
+O mantenedor gera o pacote com a opção **4** do CMD atualizado. Ao concluir a comparação automatizada, a pasta de evidências contém **beta/**, com APKs ARM, hashes e exemplos. A opção **9** continua sendo o fluxo local de instalação já existente. Confira **P20261102.2** em **Sobre** antes de registrar resultados. O versionCode agora é **106**; o candidato anterior usava 105.
 
 ## Uso inicial
 
@@ -65,3 +65,8 @@ No pacote, os exemplos estão em **testes/documentos/** e **testes/idiomas/**. S
 As variantes estrangeiras ainda não têm aceite de qualidade. O bom resultado em inglês não deve ser usado para marcá-las como aprovadas. PDF, EPUB, DOCX/TXT, seletor, armazenamento e instalação também precisam de evidência nos aparelhos físicos. O beta mantém as limitações de layout refluído de DOCX/EPUB.
 
 Para relatar problemas, informe revisão, aparelho/Android, ação, resultado esperado e resultado observado. Use os exemplos originais quando possível. Não há envio automático destes relatórios, das bibliotecas ou das chaves de API pelo pacote de beta.
+
+
+## Revisão interna de tradução em faixa longa
+
+Este candidato não foi publicado como Release. A edição das traduções começa desativada; habilite-a em Tradução → Avançado somente para corrigir ou retraduzir blocos. A revisão inclui coleta local de original, tradução e registro salvo pelo CMD (opções 12–14), além de validação mais rigorosa das respostas opcionais do Gemini. O padrão continua sendo o ML Kit offline. As falhas de linhas ausentes ainda dependem da reprodução com um capítulo real; não foram declaradas corrigidas. Siga o [procedimento de comparação](../../docs/REVISAO_TRADUCAO_FAIXA_LONGA.md).

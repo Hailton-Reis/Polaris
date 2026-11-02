@@ -120,3 +120,10 @@ O relatorio fica em `%USERPROFILE%\PolarisDev\relatorios\smoke-A01-A02-<data>-<i
 Uso: abrir os dois emuladores com a opcao 10, deixar ambos na tela inicial, executar **11**. A opcao 11 NAO recompila APK, NAO instala APK, NAO reconfigura fontes. O estado do assistente de boas-vindas e preservado para que o usuario complete depois. Nao usar Wipe Data quando configurar fontes.
 
 Fonte oficial para ADB e screencap: https://developer.android.com/tools/adb
+
+
+## Revisão de tradução — 02/11/2026
+
+O CMD atualizado inclui **12** (comparação automática de original/tradução e registro salvo do capítulo aberto em faixa longa), **13** (1080 × 1920, 420 dpi) e **14** (restaurar a tela anterior). Essas opções atuam somente no emulador Polaris criado pelo assistente. Compile o build de diagnóstico pela opção 4 e instale pela 9 antes de usar a coleta. Abra e traduza o capítulo primeiro; a coleta não inicia tradução nem envia arquivos. O relatório e o ZIP de um quadro escolhido ficam em `PolarisDev/relatorios`.
+
+A coleta começa na posição atual e tem limite de 60 quadros; não certifica a qualidade ou cobertura integral do capítulo. Consulte [o procedimento e suas limitações](../../docs/REVISAO_TRADUCAO_FAIXA_LONGA.md). Não há nova Release publicada nesta revisão.

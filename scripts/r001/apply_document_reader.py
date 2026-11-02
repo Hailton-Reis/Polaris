@@ -25,7 +25,13 @@ def apply(root: Path) -> dict:
         subprocess.run(command + [str(PATCH)], check=True)
         status = 'APPLIED'
     else:
-        reverse = subprocess.run(command + ['--reverse', '--check', str(PATCH)], capture_output=True, text=True)
+        # Reverse is a read-only idempotence probe. It can restore upstream
+        # whitespace removed by formatting; do not reject that upstream text.
+        # The actual forward application above still rejects whitespace errors.
+        reverse = subprocess.run(
+            ['git', '-C', str(root), 'apply', '--whitespace=nowarn', '--reverse', '--check', str(PATCH)],
+            capture_output=True, text=True,
+        )
         if reverse.returncode != 0:
             raise ValueError('Document source differs from the reviewed overlay:\n' + check.stderr)
         status = 'ALREADY_APPLIED'

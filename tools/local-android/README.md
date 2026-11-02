@@ -29,3 +29,8 @@ The default `auto` profile detects CPU/RAM and enables project parallelism, task
 Assembly and unit tests share one Gradle invocation per variant (two invocations total). Complete APK metadata, assembly completion and JUnit coverage are verified before the existing regression comparison. The build still uses isolated new worktrees. Hardware limits and per-phase times are saved in the evidence directory; no global Gradle properties are edited.
 
 Optional diagnostic fallback: `polaris_local.py build --build-profile conservative`. Existing CMD option 4 needs no extra arguments and picks `auto` by default. See the [performance notes and verification limits](../../docs/r001/LOCAL_BUILD_PERFORMANCE_2026_10_31.md).
+
+
+## Long-strip translation review
+
+`polaris_translation_capture.py` supplies CMD actions 12 (paired screenshots, active source page and saved OCR/translation), 13 (FHD display) and 14 (restore display). It targets only the owned Polaris AVD, not phones or the baseline AVD. It requires the new diagnostic build and a loaded, already translated webtoon chapter. It does not start OCR/translation or upload evidence. See [the review procedure](../../docs/REVISAO_TRADUCAO_FAIXA_LONGA.md). Collection results are separate from pending quality acceptance; capture starts at the current reading position.

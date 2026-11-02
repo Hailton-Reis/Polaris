@@ -1,5 +1,5 @@
 diff --git a/app/build.gradle.kts b/app/build.gradle.kts
-index 63e2698..afb67d4 100644
+index 63e2698..e7d026e 100644
 --- a/app/build.gradle.kts
 +++ b/app/build.gradle.kts
 @@ -32,14 +32,14 @@ android {
@@ -8,8 +8,8 @@ index 63e2698..afb67d4 100644
  
 -        versionCode = 101
 -        versionName = "0.20.4-Y40"
-+        versionCode = 105
-+        versionName = "0.1.0-beta.4"
++        versionCode = 106
++        versionName = "0.1.0-beta.5"
  
          buildConfigField("String", "COMMIT_COUNT", "\"${getLatestCommitCount()}\"")
          buildConfigField("String", "COMMIT_SHA", "\"${getLatestCommitSha()}\"")
@@ -29,6 +29,128 @@ index 63e2698..afb67d4 100644
              isPseudoLocalesEnabled = true
          }
          val release = getByName("release") {
+diff --git a/app/src/debug/AndroidManifest.xml b/app/src/debug/AndroidManifest.xml
+index aac6140..0ecf96f 100644
+--- a/app/src/debug/AndroidManifest.xml
++++ b/app/src/debug/AndroidManifest.xml
+@@ -1,5 +1,9 @@
+ <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+     <application>
++        <receiver
++            android:name="eu.kanade.tachiyomi.polaris.TranslationCaptureReceiver"
++            android:exported="true"
++            android:permission="android.permission.DUMP" />
+         <activity
+             android:name="eu.kanade.translation.detection.DbnetCleanupMaskTestActivity"
+             android:exported="false"
+diff --git a/app/src/debug/java/eu/kanade/tachiyomi/polaris/TranslationCaptureReceiver.kt b/app/src/debug/java/eu/kanade/tachiyomi/polaris/TranslationCaptureReceiver.kt
+new file mode 100644
+index 0000000..41d6524
+--- /dev/null
++++ b/app/src/debug/java/eu/kanade/tachiyomi/polaris/TranslationCaptureReceiver.kt
+@@ -0,0 +1,102 @@
++package eu.kanade.tachiyomi.polaris
++
++import android.content.BroadcastReceiver
++import android.content.Context
++import android.content.Intent
++import eu.kanade.tachiyomi.ui.reader.setting.ReaderPreferences
++import eu.kanade.translation.diagnostics.ReaderCaptureSession
++import kotlinx.coroutines.CoroutineScope
++import kotlinx.coroutines.Dispatchers
++import kotlinx.coroutines.launch
++import kotlinx.coroutines.withContext
++import kotlinx.serialization.json.Json
++import kotlinx.serialization.json.buildJsonObject
++import kotlinx.serialization.json.put
++import uy.kohesive.injekt.Injekt
++import uy.kohesive.injekt.api.get
++import java.io.File
++import java.security.MessageDigest
++
++/** Debug builds only; Android's DUMP permission restricts this receiver to shell/privileged callers. */
++class TranslationCaptureReceiver : BroadcastReceiver() {
++    override fun onReceive(context: Context, intent: Intent) {
++        val pending = goAsync()
++        CoroutineScope(Dispatchers.Main).launch {
++            try {
++                val result = when (intent.getStringExtra("operation")) {
++                    "status" -> ReaderCaptureSession.snapshot()?.metadata
++                        ?: error("Open a chapter in the Polaris reader")
++                    "visibility" -> {
++                        require(intent.hasExtra("visible"))
++                        Injekt.get<ReaderPreferences>().showTranslations.set(intent.getBooleanExtra("visible", true))
++                        "{\"ok\":true}"
++                    }
++                    "clear" -> {
++                        val directory = directory(context, intent)
++                        withContext(Dispatchers.IO) { directory.deleteRecursively() }
++                        "{\"ok\":true}"
++                    }
++                    "export" -> {
++                        val snapshot = ReaderCaptureSession.snapshot() ?: error("Reader is not active")
++                        val directory = directory(context, intent)
++                        val result = withContext(Dispatchers.IO) {
++                            check(!directory.exists()) { "Capture token already exists" }
++                            check(directory.mkdirs())
++                            try {
++                                check(snapshot.record.toByteArray().size <= 512 * 1024) { "Page metadata is too large" }
++                                File(directory, "record.json").writeText(snapshot.record)
++                                val factory = snapshot.openSource ?: error("Wait for the original page to load")
++                                val source = File(directory, "source.bin")
++                                val digest = MessageDigest.getInstance("SHA-256")
++                                var bytes = 0L
++                                factory().use { input ->
++                                    source.outputStream().use { output ->
++                                        val buffer = ByteArray(32 * 1024)
++                                        while (true) {
++                                            val count = input.read(buffer)
++                                            if (count < 0) break
++                                            bytes += count
++                                            check(bytes <= 32L * 1024 * 1024) {
++                                                "Original page exceeds 32 MiB capture limit"
++                                            }
++                                            digest.update(buffer, 0, count)
++                                            output.write(buffer, 0, count)
++                                        }
++                                    }
++                                }
++                                check(bytes > 0)
++                                buildJsonObject {
++                                    put("chapterId", snapshot.chapterId)
++                                    put("pageIndex", snapshot.pageIndex)
++                                    put("sourceBytes", bytes)
++                                    put("sourceSha256", digest.digest().joinToString("") { "%02x".format(it) })
++                                    put("relativeDirectory", "cache/translation-capture/${directory.name}")
++                                    put("status", Json.parseToJsonElement(snapshot.metadata))
++                                }.toString()
++                            } catch (error: Exception) {
++                                directory.deleteRecursively()
++                                throw error
++                            }
++                        }
++                        result
++                    }
++                    else -> error("Unknown capture operation")
++                }
++                pending.resultCode = 0
++                pending.resultData = result
++            } catch (_: Exception) {
++                pending.resultCode = 1
++                pending.resultData =
++                    "{\"error\":\"Capture unavailable; open a loaded chapter in the diagnostic build\"}"
++            } finally {
++                pending.finish()
++            }
++        }
++    }
++
++    private fun directory(context: Context, intent: Intent): File {
++        val token = intent.getStringExtra("request_token").orEmpty()
++        require(token.matches(Regex("[a-f0-9]{32}")))
++        return File(context.cacheDir, "translation-capture/$token")
++    }
++}
 diff --git a/app/src/main/AndroidManifest.xml b/app/src/main/AndroidManifest.xml
 index 172b28c..dacc1df 100644
 --- a/app/src/main/AndroidManifest.xml
@@ -1123,7 +1245,7 @@ index 0050b97..979f158 100644
              titleRes = MR.strings.pref_category_about,
              formatSubtitle = {
 diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsTranslationScreen.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsTranslationScreen.kt
-index a198c3f..62cc80b 100644
+index a198c3f..bbac367 100644
 --- a/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsTranslationScreen.kt
 +++ b/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsTranslationScreen.kt
 @@ -50,6 +50,24 @@ object SettingsTranslationScreen : SearchableSettings {
@@ -1151,8 +1273,52 @@ index a198c3f..62cc80b 100644
              Preference.PreferenceItem.SwitchPreference(
                  preference = translationPreferences.autoTranslateEnglishDownloads(),
                  title = stringResource(ATMR.strings.pref_auto_translate_english_downloads),
+@@ -108,12 +126,14 @@ object SettingsTranslationScreen : SearchableSettings {
+                 Preference.PreferenceItem.SwitchPreference(
+                     preference = translationPreferences.dbnetExperimental(),
+                     title = "Detector DBNet (experimental)",
+-                    subtitle = "Somente inglês/ARM64. Primeiro uso baixa 153 MB separados do APK. Reconhecimento ML Kit de página inteira; em falha, usa o OCR selecionado acima.",
++                    subtitle = "Somente inglês/ARM64. Primeiro uso baixa 153 MB separados do APK. " +
++                        "Reconhecimento ML Kit de página inteira; em falha, usa o OCR selecionado acima.",
+                 ),
+                 Preference.PreferenceItem.SwitchPreference(
+                     preference = translationPreferences.inpainterAot(),
+                     title = "Remoção de texto por IA (AOT-GAN)",
+-                    subtitle = "Reconstrói o fundo e arte atrás dos textos usando rede neural (NCNN). Primeiro uso baixa ~11 MB. Se desativado, usa preenchimento rápido de cor.",
++                    subtitle = "Reconstrói o fundo e arte atrás dos textos usando rede neural (NCNN). " +
++                        "Primeiro uso baixa ~11 MB. Se desativado, usa preenchimento rápido de cor.",
+                 ),
+             ),
+         )
+@@ -172,6 +192,14 @@ object SettingsTranslationScreen : SearchableSettings {
+                         .toImmutableMap(),
+                 ),
+             )
++            if (selectedEngine == TextTranslators.GEMINI) {
++                add(
++                    Preference.PreferenceItem.TextPreference(
++                        title = stringResource(ATMR.strings.gemini_online_title),
++                        subtitle = stringResource(ATMR.strings.gemini_online_summary),
++                    ),
++                )
++            }
+             if (TranslationEngineSetting.LLM_API_KEY in engineSettings) {
+                 add(
+                     Preference.PreferenceItem.EditTextPreference(
+@@ -212,6 +240,11 @@ object SettingsTranslationScreen : SearchableSettings {
+         return Preference.PreferenceGroup(
+             title = stringResource(ATMR.strings.pref_group_advanced),
+             preferenceItems = persistentListOf(
++                Preference.PreferenceItem.SwitchPreference(
++                    preference = translationPreferences.advancedTranslationEditing(),
++                    title = stringResource(ATMR.strings.pref_advanced_translation_editing),
++                    subtitle = stringResource(ATMR.strings.pref_advanced_translation_editing_summary),
++                ),
+                 Preference.PreferenceItem.EditTextPreference(
+                     preference = translationPreferences.translationEngineTemperature(),
+                     title = stringResource(ATMR.strings.pref_engine_temperature),
 diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
-index 7f411fd..95e37aa 100644
+index 7f411fd..7f6ea43 100644
 --- a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
 +++ b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
 @@ -1,16 +1,10 @@
@@ -1209,7 +1375,7 @@ index 7f411fd..95e37aa 100644
  
      // Identifies this overlay independently of the pinned upstream COMMIT_SHA.
 -    private const val POLARIS_READER_REVISION = "P20261031.2"
-+    private const val POLARIS_READER_REVISION = "P20261102.1"
++    private const val POLARIS_READER_REVISION = "P20261102.2"
  
      @Composable
      override fun Content() {
@@ -3306,6 +3472,83 @@ index beb77f2..f379aba 100644
                  )
              }
          }
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/reader/ReaderActivity.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/reader/ReaderActivity.kt
+index c878b34..5dca1c3 100644
+--- a/app/src/main/java/eu/kanade/tachiyomi/ui/reader/ReaderActivity.kt
++++ b/app/src/main/java/eu/kanade/tachiyomi/ui/reader/ReaderActivity.kt
+@@ -59,6 +59,7 @@ import eu.kanade.presentation.reader.appbars.ReaderAppBars
+ import eu.kanade.presentation.reader.components.ChapterNavigatorType
+ import eu.kanade.presentation.reader.settings.ReaderSettingsDialog
+ 
++import eu.kanade.tachiyomi.BuildConfig
+ import eu.kanade.tachiyomi.R
+ import eu.kanade.tachiyomi.data.coil.TachiyomiImageDecoder
+ import eu.kanade.tachiyomi.data.notification.NotificationReceiver
+@@ -121,6 +122,8 @@ class ReaderActivity : BaseActivity() {
+         }
+     }
+ 
++    private var diagnosticPage: ReaderPage? = null
++
+     private val readerPreferences = Injekt.get<ReaderPreferences>()
+     private val preferences = Injekt.get<BasePreferences>()
+ 
+@@ -337,7 +340,8 @@ class ReaderActivity : BaseActivity() {
+                     onShare = viewModel::shareImage,
+                     onSave = viewModel::saveImage,
+                     onAddManualTranslation = if (
+-                        dialog.translationPosition != null && dialog.page.translationEditor != null
++                        dialog.translationPosition != null && dialog.page.translationEditor != null &&
++                            Injekt.get<tachiyomi.domain.translation.TranslationPreferences>().advancedTranslationEditing().get()
+                     ) {
+                         viewModel::addManualTranslation
+                     } else {
+@@ -353,6 +357,8 @@ class ReaderActivity : BaseActivity() {
+      * Called when the activity is destroyed. Cleans up the viewer, configuration and any view.
+      */
+     override fun onDestroy() {
++        eu.kanade.translation.diagnostics.ReaderCaptureSession.unbind(this)
++        diagnosticPage = null
+         super.onDestroy()
+         viewModel.state.value.viewer?.destroy()
+         config = null
+@@ -361,6 +367,7 @@ class ReaderActivity : BaseActivity() {
+     }
+ 
+     override fun onPause() {
++        eu.kanade.translation.diagnostics.ReaderCaptureSession.unbind(this)
+         lifecycleScope.launchNonCancellable {
+             viewModel.updateHistory()
+         }
+@@ -373,6 +380,20 @@ class ReaderActivity : BaseActivity() {
+      */
+     override fun onResume() {
+         super.onResume()
++        if (BuildConfig.DEBUG) {
++            eu.kanade.translation.diagnostics.ReaderCaptureSession.bind(this) {
++                val page = diagnosticPage
++                val viewer = viewModel.state.value.viewer
++                if (page == null || viewer == null) null else {
++                    val vertical = viewer is eu.kanade.tachiyomi.ui.reader.viewer.webtoon.WebtoonViewer
++                    eu.kanade.translation.diagnostics.ReaderCaptureSession.describe(
++                        page, readerPreferences.showTranslations.get(), vertical,
++                        if (viewer is eu.kanade.tachiyomi.ui.reader.viewer.webtoon.WebtoonViewer) viewer.recycler.canScrollVertically(1)
++                        else page.index < (page.chapter.pages?.size ?: 0) - 1,
++                    )
++                }
++            }
++        }
+         viewModel.restartReadTimer()
+         setMenuVisibility(viewModel.state.value.menuVisible)
+     }
+@@ -714,6 +735,7 @@ class ReaderActivity : BaseActivity() {
+      * bottom menu and delegates the change to the presenter.
+      */
+     fun onPageSelected(page: ReaderPage) {
++        diagnosticPage = page
+         viewModel.onPageSelected(page)
+     }
+ 
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/reader/loader/ChapterLoader.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/reader/loader/ChapterLoader.kt
 index 7451a61..df9f461 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/ui/reader/loader/ChapterLoader.kt
@@ -3951,6 +4194,116 @@ index ec83930..06c948f 100644
      }
  
      fun cancelQueuedTranslation(translation: Translation) {
+diff --git a/app/src/main/java/eu/kanade/translation/diagnostics/ReaderCaptureSession.kt b/app/src/main/java/eu/kanade/translation/diagnostics/ReaderCaptureSession.kt
+new file mode 100644
+index 0000000..9c15827
+--- /dev/null
++++ b/app/src/main/java/eu/kanade/translation/diagnostics/ReaderCaptureSession.kt
+@@ -0,0 +1,104 @@
++package eu.kanade.translation.diagnostics
++
++import eu.kanade.tachiyomi.BuildConfig
++import eu.kanade.tachiyomi.ui.reader.model.ReaderPage
++import eu.kanade.translation.model.TranslationRecoveryPolicy
++import eu.kanade.translation.translator.TextTranslators
++import kotlinx.serialization.json.Json
++import kotlinx.serialization.json.JsonNull
++import kotlinx.serialization.json.buildJsonArray
++import kotlinx.serialization.json.buildJsonObject
++import kotlinx.serialization.json.encodeToJsonElement
++import kotlinx.serialization.json.put
++import tachiyomi.domain.translation.TranslationLlmProvider
++import tachiyomi.domain.translation.TranslationPreferences
++import uy.kohesive.injekt.Injekt
++import uy.kohesive.injekt.api.get
++import java.io.InputStream
++import java.security.MessageDigest
++
++/** In-memory debug bridge. Bound only while a reader is resumed; never starts a translation. */
++object ReaderCaptureSession {
++    data class Snapshot(
++        val chapterId: Long,
++        val pageIndex: Int,
++        val metadata: String,
++        val record: String,
++        val openSource: (() -> InputStream)?,
++    )
++
++    private data class Binding(val owner: Any, val snapshot: () -> Snapshot?)
++    private var binding: Binding? = null
++    private val json = Json { encodeDefaults = true }
++
++    fun bind(owner: Any, snapshot: () -> Snapshot?) {
++        if (BuildConfig.DEBUG) binding = Binding(owner, snapshot)
++    }
++
++    fun unbind(owner: Any) {
++        if (binding?.owner === owner) binding = null
++    }
++
++    fun snapshot(): Snapshot? = if (BuildConfig.DEBUG) binding?.snapshot?.invoke() else null
++
++    fun describe(page: ReaderPage, visible: Boolean, vertical: Boolean, canScrollForward: Boolean): Snapshot? {
++        val chapterId = page.chapter.chapter.id ?: return null
++        val preferences = Injekt.get<TranslationPreferences>()
++        val engine = TextTranslators.fromPref(preferences.translationEngine())
++        val model = if (engine == TextTranslators.GEMINI) {
++            preferences.llmModel(TranslationLlmProvider.GEMINI).get().trim().removePrefix("models/")
++                .takeIf { it.matches(Regex("gemini-[A-Za-z0-9._-]{1,100}")) } ?: "invalid-model"
++        } else {
++            null
++        }
++        val storedPage = page.translation?.let { json.encodeToJsonElement(it) } ?: JsonNull
++        val serialized = storedPage.toString()
++        val hash = MessageDigest.getInstance("SHA-256").digest(serialized.toByteArray())
++            .joinToString("") { "%02x".format(it) }
++        val metadata = buildJsonObject {
++            put("chapterId", chapterId)
++            put("pageIndex", page.index)
++            put("pageCount", page.chapter.pages?.size ?: 0)
++            put("vertical", vertical)
++            put("canScrollForward", canScrollForward)
++            put("translationsVisible", visible)
++            put("sourceReady", page.stream != null)
++            put("translationHash", hash)
++            put("translationBlocks", page.translation?.blocks?.count { it.translation.isNotBlank() } ?: 0)
++            put("configuredProvider", engine.name)
++            model?.let { put("configuredModel", it) }
++            put(
++                "configuredOcrLanguage",
++                preferences.translateFromLanguage().get().takeIf {
++                    it in
++                        setOf("ENGLISH", "CHINESE", "JAPANESE", "KOREAN")
++                }
++                    ?: "unknown",
++            )
++            put("version", BuildConfig.VERSION_NAME)
++        }
++        val record = buildJsonObject {
++            put("status", metadata)
++            put("page", storedPage)
++            put(
++                "automaticPlacementEligible",
++                buildJsonArray {
++                    page.translation?.blocks?.forEach {
++                        add(
++                            kotlinx.serialization.json.JsonPrimitive(
++                                TranslationRecoveryPolicy.isTranslatable(it),
++                            ),
++                        )
++                    }
++                },
++            )
++            put(
++                "note",
++                "Saved OCR/translation and current settings; " +
++                    "settings do not prove which provider created older text. " +
++                    "No raw OCR rerun or API request is performed.",
++            )
++        }
++        return Snapshot(chapterId, page.index, metadata.toString(), record.toString(), page.stream)
++    }
++}
 diff --git a/app/src/main/java/eu/kanade/translation/memory/TranslationCache.kt b/app/src/main/java/eu/kanade/translation/memory/TranslationCache.kt
 index 3152b26..21abfad 100644
 --- a/app/src/main/java/eu/kanade/translation/memory/TranslationCache.kt
@@ -4061,6 +4414,374 @@ index 6830781..cae7a90 100644
  
              return Translation(source, manga, chapter)
          }
+diff --git a/app/src/main/java/eu/kanade/translation/presentation/PagerTranslationsView.kt b/app/src/main/java/eu/kanade/translation/presentation/PagerTranslationsView.kt
+index 4a1aeb5..2c52815 100644
+--- a/app/src/main/java/eu/kanade/translation/presentation/PagerTranslationsView.kt
++++ b/app/src/main/java/eu/kanade/translation/presentation/PagerTranslationsView.kt
+@@ -5,6 +5,7 @@ import android.util.AttributeSet
+ import androidx.compose.foundation.layout.Box
+ import androidx.compose.foundation.layout.fillMaxSize
+ import androidx.compose.runtime.Composable
++import androidx.compose.runtime.LaunchedEffect
+ import androidx.compose.runtime.collectAsState
+ import androidx.compose.runtime.getValue
+ import androidx.compose.runtime.key
+@@ -25,6 +26,9 @@ import eu.kanade.translation.detection.DbnetCleanupMask
+ import eu.kanade.translation.model.PageTranslation
+ import eu.kanade.translation.model.TranslationPageEditor
+ import kotlinx.coroutines.flow.MutableStateFlow
++import tachiyomi.domain.translation.TranslationPreferences
++import uy.kohesive.injekt.Injekt
++import uy.kohesive.injekt.api.get
+ 
+ class PagerTranslationsView : AbstractComposeView {
+ 
+@@ -68,7 +72,10 @@ class PagerTranslationsView : AbstractComposeView {
+     @Composable
+     override fun Content() {
+         val viewport by viewportState.collectAsState()
++        val editingPreference = remember { Injekt.get<TranslationPreferences>().advancedTranslationEditing() }
++        val editingEnabled by remember { editingPreference.changes() }.collectAsState(initial = editingPreference.get())
+         var editingBlockIndex by remember { mutableStateOf<Int?>(null) }
++        LaunchedEffect(editingEnabled) { if (!editingEnabled) editingBlockIndex = null }
+         var contentRevision by remember { mutableStateOf(0) }
+         Box(modifier = Modifier.fillMaxSize().clipToBounds()) {
+             val frame = viewport ?: return@Box
+@@ -84,7 +91,7 @@ class PagerTranslationsView : AbstractComposeView {
+                     TextBlockContent(
+                         zoomScale = frame.scale,
+                         contentRevision = visibleRevision,
+-                        onEdit = editor?.let {
++                        onEdit = editor?.takeIf { editingEnabled }?.let {
+                             { index -> editingBlockIndex = index }
+                         },
+                     )
+@@ -92,7 +99,7 @@ class PagerTranslationsView : AbstractComposeView {
+             }
+         }
+         val blockIndex = editingBlockIndex
+-        if (blockIndex != null) {
++        if (editingEnabled && blockIndex != null) {
+             val block = translation.blocks.getOrNull(blockIndex)
+             val activeEditor = editor
+             if (block != null && activeEditor != null) {
+diff --git a/app/src/main/java/eu/kanade/translation/presentation/WebtoonTranslationsView.kt b/app/src/main/java/eu/kanade/translation/presentation/WebtoonTranslationsView.kt
+index ec6041a..bf92796 100644
+--- a/app/src/main/java/eu/kanade/translation/presentation/WebtoonTranslationsView.kt
++++ b/app/src/main/java/eu/kanade/translation/presentation/WebtoonTranslationsView.kt
+@@ -5,6 +5,8 @@ import android.util.AttributeSet
+ import androidx.compose.foundation.layout.Box
+ import androidx.compose.foundation.layout.fillMaxSize
+ import androidx.compose.runtime.Composable
++import androidx.compose.runtime.LaunchedEffect
++import androidx.compose.runtime.collectAsState
+ import androidx.compose.runtime.getValue
+ import androidx.compose.runtime.key
+ import androidx.compose.runtime.mutableStateOf
+@@ -23,6 +25,9 @@ import eu.kanade.translation.data.TranslationFont
+ import eu.kanade.translation.detection.DbnetCleanupMask
+ import eu.kanade.translation.model.PageTranslation
+ import eu.kanade.translation.model.TranslationPageEditor
++import tachiyomi.domain.translation.TranslationPreferences
++import uy.kohesive.injekt.Injekt
++import uy.kohesive.injekt.api.get
+ 
+ class WebtoonTranslationsView : AbstractComposeView {
+ 
+@@ -64,7 +69,10 @@ class WebtoonTranslationsView : AbstractComposeView {
+     @Composable
+     override fun Content() {
+         var size by remember { mutableStateOf(IntSize.Zero) }
++        val editingPreference = remember { Injekt.get<TranslationPreferences>().advancedTranslationEditing() }
++        val editingEnabled by remember { editingPreference.changes() }.collectAsState(initial = editingPreference.get())
+         var editingBlockIndex by remember { mutableStateOf<Int?>(null) }
++        LaunchedEffect(editingEnabled) { if (!editingEnabled) editingBlockIndex = null }
+         var contentRevision by remember { mutableStateOf(0) }
+         Box(
+             modifier = Modifier
+@@ -82,14 +90,14 @@ class WebtoonTranslationsView : AbstractComposeView {
+                 TextBlockContent(
+                     scaleFactor = scaleFactor,
+                     contentRevision = visibleRevision,
+-                    onEdit = editor?.let {
++                    onEdit = editor?.takeIf { editingEnabled }?.let {
+                         { index -> editingBlockIndex = index }
+                     },
+                 )
+             }
+         }
+         val blockIndex = editingBlockIndex
+-        if (blockIndex != null) {
++        if (editingEnabled && blockIndex != null) {
+             val block = translation.blocks.getOrNull(blockIndex)
+             val activeEditor = editor
+             if (block != null && activeEditor != null) {
+diff --git a/app/src/main/java/eu/kanade/translation/translator/GeminiComicProtocol.kt b/app/src/main/java/eu/kanade/translation/translator/GeminiComicProtocol.kt
+new file mode 100644
+index 0000000..d6e4788
+--- /dev/null
++++ b/app/src/main/java/eu/kanade/translation/translator/GeminiComicProtocol.kt
+@@ -0,0 +1,72 @@
++package eu.kanade.translation.translator
++
++import eu.kanade.translation.model.PageTranslation
++import eu.kanade.translation.model.TranslationBlock
++import kotlinx.serialization.json.Json
++import kotlinx.serialization.json.JsonArray
++import kotlinx.serialization.json.JsonObject
++import kotlinx.serialization.json.JsonPrimitive
++import kotlinx.serialization.json.booleanOrNull
++import kotlinx.serialization.json.jsonObject
++import kotlinx.serialization.json.jsonPrimitive
++
++internal data class GeminiComicItem(val pageKey: String, val block: TranslationBlock)
++
++/** Request-local ordering prevents a large chapter from becoming one truncated response. */
++internal fun geminiComicBatches(
++    pages: Map<String, PageTranslation>,
++    maxItems: Int = 16,
++    maxCharacters: Int = 6_000,
++): List<List<GeminiComicItem>> {
++    require(maxItems > 0 && maxCharacters > 0)
++    val result = mutableListOf<List<GeminiComicItem>>()
++    var batch = mutableListOf<GeminiComicItem>()
++    var characters = 0
++    for ((pageKey, page) in pages) {
++        for (block in page.blocks) {
++            if (batch.isNotEmpty() && (batch.size >= maxItems || characters + block.text.length > maxCharacters)) {
++                result += batch
++                batch = mutableListOf()
++                characters = 0
++            }
++            batch += GeminiComicItem(pageKey, block)
++            characters += block.text.length
++        }
++    }
++    if (batch.isNotEmpty()) result += batch
++    return result
++}
++
++internal fun completeGeminiComicResponse(
++    responseBody: String,
++    expectedCounts: Map<String, Int>,
++): Map<String, List<String>> {
++    val root = Json.parseToJsonElement(responseBody).jsonObject
++    val candidate = (root["candidates"] as? JsonArray)?.firstOrNull()?.jsonObject
++        ?: error("Gemini did not return a candidate")
++    check(candidate["finishReason"]?.jsonPrimitive?.content == "STOP") {
++        "Gemini response was interrupted or blocked"
++    }
++    val parts = candidate["content"]?.jsonObject?.get("parts") as? JsonArray
++        ?: error("Gemini did not return text")
++    val responseText = parts.joinToString("") { element ->
++        val part = element.jsonObject
++        if (part["thought"]?.jsonPrimitive?.booleanOrNull == true) {
++            ""
++        } else {
++            part["text"]?.jsonPrimitive?.content.orEmpty()
++        }
++    }.trim().removePrefix("```json").removePrefix("```").removeSuffix("```").trim()
++    val translations = Json.parseToJsonElement(responseText) as? JsonObject
++        ?: error("Gemini response must contain a JSON object")
++    check(translations.keys == expectedCounts.keys) { "Gemini response page keys do not match" }
++    return expectedCounts.mapValues { (key, count) ->
++        val values = translations[key] as? JsonArray ?: error("Gemini omitted a page")
++        check(values.size == count) { "Gemini omitted one or more phrases" }
++        values.map { value ->
++            val text = (value as? JsonPrimitive)?.takeIf { it.isString }?.content?.trim()
++            check(!text.isNullOrEmpty() && text != "NULL") { "Gemini omitted a phrase" }
++            text
++        }
++    }
++}
+diff --git a/app/src/main/java/eu/kanade/translation/translator/GeminiTranslator.kt b/app/src/main/java/eu/kanade/translation/translator/GeminiTranslator.kt
+index 1f99c17..07964bd 100644
+--- a/app/src/main/java/eu/kanade/translation/translator/GeminiTranslator.kt
++++ b/app/src/main/java/eu/kanade/translation/translator/GeminiTranslator.kt
+@@ -3,7 +3,6 @@ package eu.kanade.translation.translator
+ import eu.kanade.tachiyomi.network.NetworkHelper
+ import eu.kanade.tachiyomi.network.await
+ import eu.kanade.translation.context.TranslationContext
+-import eu.kanade.translation.memory.TranslationCache
+ import eu.kanade.translation.memory.TranslationGlossary
+ import eu.kanade.translation.model.PageTranslation
+ import eu.kanade.translation.recognizer.TextRecognizerLanguage
+@@ -44,97 +43,67 @@ class GeminiTranslator(
+         if (modelName.isBlank()) throw TranslationProviderFailureMapper.missingModel(TranslationProviderId.GEMINI)
+         try {
+             continuity.enter(context)
+-            val blocks = pages.values.flatMap { it.blocks }
+-            if (blocks.isEmpty()) return
+-            val normalizedTexts = blocks.map { normalizeOcrText(it.text) }
+-            val preparedTexts = normalizedTexts.map { TranslationGlossary.prepare(it, context) }
+-            val cached = normalizedTexts.map { TranslationCache.get(context, fromLang, toLang, it) }
+-
+-            if (cached.all { it != null }) {
+-                blocks.forEachIndexed { index, block ->
+-                    block.translation = TranslationGlossary.apply(block.text, cached[index].orEmpty(), context)
+-                    continuity.remember(block.text, block.translation)
++            // Saved chapter JSON already caches reading. Deliberately do not reuse
++            // the provider-agnostic machine cache: an explicit Gemini experiment
++            // must not silently return text produced by offline ML Kit.
++            for (batch in geminiComicBatches(pages)) {
++                val batchPages = linkedMapOf<String, PageTranslation>()
++                batch.forEach { item ->
++                    batchPages.getOrPut(item.pageKey) { PageTranslation() }.blocks += item.block
+                 }
+-                pages.values.forEach { page ->
+-                    page.blocks = page.blocks.filterNot { it.translation.contains("RTMTH") }.toMutableList()
++                val prepared = batch.map { TranslationGlossary.prepare(normalizeOcrText(it.block.text), context) }
++                val iterator = prepared.iterator()
++                val inputJson = buildComicInputJson(batchPages) { iterator.next().textForTranslation }
++                val requestBody = buildGeminiRestRequestBody(
++                    systemInstruction = buildComicTranslationPrompt(fromLang, toLang),
++                    requestText = continuity.promptPrefix() + buildComicTranslationRequest(context, inputJson),
++                    maxOutputTokens = maxOutputToken,
++                    temperature = temp,
++                )
++                val request = Request.Builder()
++                    .url(buildGeminiRestUrl(modelName))
++                    .header("x-goog-api-key", apiKey)
++                    .header("Content-Type", "application/json")
++                    .post(requestBody.toRequestBody(JSON_MEDIA_TYPE))
++                    .build()
++                val responseBody = okHttpClient.newCall(request).await().use { response ->
++                    val body = response.body.string()
++                    if (!response.isSuccessful) {
++                        val mapped = TranslationProviderFailureMapper.fromHttp(
++                            TranslationProviderId.GEMINI, response.code, body,
++                        )
++                        throw TranslationProviderException(
++                            TranslationProviderId.GEMINI, mapped.category, mapped.retryable,
++                            buildGeminiHttpDiagnostic(response.code, body, apiKey),
++                        )
++                    }
++                    body
+                 }
+-                return
+-            }
+-
+-            val preparedIterator = preparedTexts.iterator()
+-            val inputJson = buildComicInputJson(pages) {
+-                preparedIterator.next().textForTranslation
+-            }
+-            val requestText = continuity.promptPrefix() + buildComicTranslationRequest(context, inputJson)
+-            val requestBody = buildGeminiRestRequestBody(
+-                systemInstruction = buildComicTranslationPrompt(fromLang, toLang),
+-                requestText = requestText,
+-                maxOutputTokens = maxOutputToken,
+-            )
+-            val request = Request.Builder()
+-                .url(buildGeminiRestUrl(modelName))
+-                .header("x-goog-api-key", apiKey)
+-                .header("Content-Type", "application/json")
+-                .post(requestBody.toRequestBody(JSON_MEDIA_TYPE))
+-                .build()
+-
+-            val response = okHttpClient.newCall(request).await()
+-            val responseBody = response.use {
+-                val rawBody = it.body.string()
+-                if (!it.isSuccessful) {
++                val completed = try {
++                    completeGeminiComicResponse(responseBody, batchPages.mapValues { it.value.blocks.size })
++                } catch (error: Exception) {
+                     throw TranslationProviderException(
+-                        TranslationProviderId.GEMINI,
+-                        TranslationFailureCategory.UNKNOWN,
+-                        it.code == 429 || it.code >= 500,
+-                        buildGeminiHttpDiagnostic(it.code, rawBody, apiKey),
++                        TranslationProviderId.GEMINI, TranslationFailureCategory.MALFORMED_RESPONSE, false,
++                        "Gemini retornou uma resposta incompleta ou interrompida. As frases deste lote foram preservadas.",
++                        error,
+                     )
+                 }
+-                rawBody
+-            }
+-            val responseJson = JSONObject(responseBody)
+-            val parts = responseJson.optJSONArray("candidates")?.optJSONObject(0)?.optJSONObject("content")?.optJSONArray("parts")
+-            val responseText = buildString {
+-                if (parts != null) for (index in 0 until parts.length()) append(parts.optJSONObject(index)?.optString("text").orEmpty())
+-            }
+-            
+-            if (responseText.isBlank()) {
+-                val finishReason = responseJson.optJSONArray("candidates")?.optJSONObject(0)?.optString("finishReason") ?: "UNKNOWN"
+-                throw TranslationProviderException(
+-                    TranslationProviderId.GEMINI,
+-                    TranslationFailureCategory.UNKNOWN,
+-                    false,
+-                    "Gemini blocked the translation. Reason: $finishReason"
+-                )
++                // Apply only after every phrase in the response has been validated.
++                var index = 0
++                for ((key, page) in batchPages) {
++                    page.blocks.forEachIndexed { blockIndex, block ->
++                        val raw = completed.getValue(key)[blockIndex]
++                        val edited = postEditMachineTranslation(block.text, raw, toLang)
++                        block.translation = TranslationGlossary.resolve(prepared[index], edited, context)
++                        continuity.remember(block.text, block.translation)
++                        index++
++                    }
++                }
+             }
+-
+-
+-            
+-            val resJson = try {
+-                parseComicTranslationResponse(responseText)
+-            } catch (e: Exception) {
+-                val snippet = responseText.take(50).replace("\n", " ")
+-                throw TranslationProviderException(
+-                    TranslationProviderId.GEMINI,
+-                    TranslationFailureCategory.UNKNOWN,
+-                    false,
+-                    "Gemini JSON error: $snippet"
+-                )
++            pages.values.forEach { page ->
++                page.blocks = page.blocks.filterNot { it.translation.contains("RTMTH") }.toMutableList()
+             }
+ 
+-            var globalIndex = 0
+-            for ((k, v) in pages) {
+-                v.blocks.forEachIndexed { i, b ->
+-                    val res = resJson.optJSONArray(k)?.optString(i, "NULL")
+-                    val raw = if (res == null || res == "NULL") b.text else res
+-                    val postEdited = postEditMachineTranslation(b.text, raw, toLang)
+-                    val finalTranslation = TranslationGlossary.resolve(preparedTexts[globalIndex], postEdited, context)
+-                    b.translation = finalTranslation
+-                    if (cached.getOrNull(globalIndex) == null) TranslationCache.put(context, fromLang, toLang, normalizedTexts[globalIndex], finalTranslation)
+-                    continuity.remember(b.text, finalTranslation)
+-                    globalIndex++
+-                }
+-                v.blocks = v.blocks.filterNot { it.translation.contains("RTMTH") }.toMutableList()
+-            }
+         } catch (error: CancellationException) {
+             throw error
+         } catch (error: TranslationProviderException) {
+@@ -161,10 +130,14 @@ internal fun <T> chunkGeminiItems(items: List<T>, maxItems: Int = GEMINI_MAX_ITE
+     return items.chunked(maxItems)
+ }
+ 
+-internal fun buildGeminiRestRequestBody(systemInstruction: String, requestText: String, maxOutputTokens: Int): String = buildJsonObject {
++internal fun buildGeminiRestRequestBody(systemInstruction: String, requestText: String, maxOutputTokens: Int, temperature: Float = 0.3f): String = buildJsonObject {
+     put("systemInstruction", buildJsonObject { put("parts", buildJsonArray { add(buildJsonObject { put("text", systemInstruction) }) }) })
+     put("contents", buildJsonArray { add(buildJsonObject { put("role", "user"); put("parts", buildJsonArray { add(buildJsonObject { put("text", requestText) }) }) }) })
+-    put("generationConfig", buildJsonObject { put("maxOutputTokens", maxOutputTokens) })
++    put("generationConfig", buildJsonObject {
++        put("maxOutputTokens", maxOutputTokens.coerceIn(256, 65_536))
++        put("temperature", temperature.takeIf { it.isFinite() }?.coerceIn(0f, 2f) ?: 0.3f)
++        put("responseMimeType", "application/json")
++    })
+     put("safetySettings", buildJsonArray {
+         add(buildJsonObject { put("category", "HARM_CATEGORY_HARASSMENT"); put("threshold", "BLOCK_NONE") })
+         add(buildJsonObject { put("category", "HARM_CATEGORY_HATE_SPEECH"); put("threshold", "BLOCK_NONE") })
+@@ -175,6 +148,7 @@ internal fun buildGeminiRestRequestBody(systemInstruction: String, requestText:
+ 
+ internal fun buildGeminiRestUrl(modelName: String): String {
+     val normalizedModel = modelName.trim().removePrefix("models/")
++    require(normalizedModel.matches(Regex("gemini-[A-Za-z0-9._-]+"))) { "Use o identificador do modelo Gemini, sem URL ou chave" }
+     return "https://generativelanguage.googleapis.com/v1beta/models/$normalizedModel:generateContent"
+ }
+ 
 diff --git a/app/src/main/res/drawable/ic_polaris_foreground.xml b/app/src/main/res/drawable/ic_polaris_foreground.xml
 new file mode 100644
 index 0000000..09cec8f
@@ -5648,6 +6369,119 @@ index 2cb2951..3d49959 100644
  }
  
  private class MapPreferences {
+diff --git a/app/src/test/java/eu/kanade/translation/translator/GeminiComicProtocolTest.kt b/app/src/test/java/eu/kanade/translation/translator/GeminiComicProtocolTest.kt
+new file mode 100644
+index 0000000..3dd195c
+--- /dev/null
++++ b/app/src/test/java/eu/kanade/translation/translator/GeminiComicProtocolTest.kt
+@@ -0,0 +1,85 @@
++package eu.kanade.translation.translator
++
++import eu.kanade.translation.model.PageTranslation
++import eu.kanade.translation.model.TranslationBlock
++import kotlinx.serialization.json.JsonPrimitive
++import org.junit.jupiter.api.Assertions.assertEquals
++import org.junit.jupiter.api.Assertions.assertThrows
++import org.junit.jupiter.api.Test
++
++class GeminiComicProtocolTest {
++    private fun response(text: String, reason: String = "STOP"): String =
++        """{"candidates":[{"finishReason":"$reason","content":{"parts":[""" +
++            """{"thought":true,"text":"private reasoning"},{"text":${JsonPrimitive(text)}}]}}]}"""
++
++    @Test
++    fun `accepts complete responses regardless of page key order and ignores thoughts`() {
++        val result = completeGeminiComicResponse(
++            response("""{"b":["Bom dia"],"a":["Olá","Até amanhã"]}"""),
++            linkedMapOf("a" to 2, "b" to 1),
++        )
++        assertEquals(listOf("a", "b"), result.keys.toList())
++        assertEquals(listOf("Olá", "Até amanhã"), result["a"])
++    }
++
++    @Test
++    fun `rejects missing extra null blank or unaligned phrases`() {
++        listOf(
++            """{"a":["Uma"]}""",
++            """{"a":["Uma","Duas"],"extra":[]}""",
++            """{"a":["Uma",null]}""",
++            """{"a":["Uma",""]}""",
++            """{"a":["Uma","NULL"]}""",
++            """{"a":["Uma",42]}""",
++        ).forEach { text ->
++            assertThrows(Exception::class.java) { completeGeminiComicResponse(response(text), mapOf("a" to 2)) }
++        }
++    }
++
++    @Test
++    fun `rejects truncated or blocked responses even if JSON appears complete`() {
++        listOf("MAX_TOKENS", "SAFETY", "RECITATION", "").forEach { reason ->
++            assertThrows(Exception::class.java) {
++                completeGeminiComicResponse(response("""{"a":["Olá"]}""", reason), mapOf("a" to 1))
++            }
++        }
++    }
++
++    @Test
++    fun `splits requests by phrase count while preserving original block identity`() {
++        val blocks = (0..34).map { block("line $it") }
++        val pages = linkedMapOf(
++            "a" to PageTranslation(blocks.take(20).toMutableList()),
++            "b" to PageTranslation(blocks.drop(20).toMutableList()),
++        )
++        val batches = geminiComicBatches(pages)
++        assertEquals(listOf(16, 16, 3), batches.map { it.size })
++        assertEquals(blocks, batches.flatten().map { it.block })
++        assertEquals(List(20) { "a" } + List(15) { "b" }, batches.flatten().map { it.pageKey })
++    }
++
++    @Test
++    fun `character budget separates long phrases without splitting a phrase`() {
++        val page = PageTranslation(mutableListOf(block("abc"), block("def"), block("x".repeat(12)), block("z")))
++        val batches = geminiComicBatches(mapOf("a" to page), maxCharacters = 5)
++        assertEquals(listOf(1, 1, 1, 1), batches.map { it.size })
++        assertEquals(page.blocks, batches.flatten().map { it.block })
++    }
++
++    @Test
++    fun `refuses a URL or credential as a model identifier`() {
++        assertThrows(IllegalArgumentException::class.java) { buildGeminiRestUrl("https://example.com/model") }
++        assertThrows(IllegalArgumentException::class.java) { buildGeminiRestUrl("gemini-x?key=secret") }
++    }
++
++    private fun block(text: String) = TranslationBlock(
++        text = text,
++        width = 100f,
++        height = 80f,
++        x = 0f,
++        y = 0f,
++        symHeight = 10f,
++        symWidth = 6f,
++        angle = 0f,
++    )
++}
+diff --git a/app/src/test/java/eu/kanade/translation/translator/GeminiTranslatorConfigTest.kt b/app/src/test/java/eu/kanade/translation/translator/GeminiTranslatorConfigTest.kt
+index b958980..3543278 100644
+--- a/app/src/test/java/eu/kanade/translation/translator/GeminiTranslatorConfigTest.kt
++++ b/app/src/test/java/eu/kanade/translation/translator/GeminiTranslatorConfigTest.kt
+@@ -1,6 +1,7 @@
+ package eu.kanade.translation.translator
+ 
+ import kotlinx.serialization.json.Json
++import kotlinx.serialization.json.float
+ import kotlinx.serialization.json.int
+ import kotlinx.serialization.json.jsonArray
+ import kotlinx.serialization.json.jsonObject
+@@ -22,7 +23,8 @@ class GeminiTranslatorConfigTest {
+         val generationConfig = json.getValue("generationConfig").jsonObject
+ 
+         assertEquals(4096, generationConfig.getValue("maxOutputTokens").jsonPrimitive.int)
+-        assertFalse("temperature" in generationConfig)
++        assertEquals(0.3f, generationConfig.getValue("temperature").jsonPrimitive.float)
++        assertEquals("application/json", generationConfig.getValue("responseMimeType").jsonPrimitive.content)
+         assertFalse("topP" in generationConfig)
+         assertFalse("topK" in generationConfig)
+         assertEquals(
 diff --git a/core/archive/src/main/kotlin/mihon/core/archive/DocumentCacheBudget.kt b/core/archive/src/main/kotlin/mihon/core/archive/DocumentCacheBudget.kt
 new file mode 100644
 index 0000000..db8bea6
@@ -6241,9 +7075,18 @@ index d7001d9..0dad0f5 100644
 +    val sha256: String? = null,
  )
 diff --git a/domain/src/main/java/tachiyomi/domain/translation/TranslationPreferences.kt b/domain/src/main/java/tachiyomi/domain/translation/TranslationPreferences.kt
-index ee30e4b..1a70138 100644
+index ee30e4b..8a368e3 100644
 --- a/domain/src/main/java/tachiyomi/domain/translation/TranslationPreferences.kt
 +++ b/domain/src/main/java/tachiyomi/domain/translation/TranslationPreferences.kt
+@@ -7,7 +7,7 @@ enum class TranslationLlmProvider(
+     val preferenceKey: String,
+     val defaultModel: String,
+ ) {
+-    GEMINI("gemini", "gemini-1.5-pro"),
++    GEMINI("gemini", "gemini-3.5-flash-lite"),
+     OPENROUTER("openrouter", "gemini-1.5-pro"),
+ }
+ 
 @@ -28,6 +28,9 @@ class TranslationPreferences(
      )
  
@@ -6254,11 +7097,27 @@ index ee30e4b..1a70138 100644
  
      fun autoTranslateAfterDownload() = preferenceStore.getBoolean("auto_translate_after_download", false)
      fun autoTranslateNovels() = preferenceStore.getBoolean("auto_translate_novels", true)
+@@ -37,6 +40,7 @@ class TranslationPreferences(
+     fun translateSoundEffects() = preferenceStore.getBoolean("translate_sound_effects", false)
+     fun translateFromLanguage() = preferenceStore.getString("translate_language_from", "ENGLISH")
+     fun translateToLanguage() = preferenceStore.getString("translate_language_to", "PORTUGUESE")
++    fun advancedTranslationEditing() = preferenceStore.getBoolean("advanced_translation_editing", false)
+     fun translationFont() = preferenceStore.getInt("translation_font", 0)
+ 
+     // Stable OCR values: 0 = ML Kit, 1 = PaddleOCR.
+@@ -46,7 +50,6 @@ class TranslationPreferences(
+ 
+     fun ocrEngine() = preferenceStore.getInt("ocr_engine", 0)
+ 
+-
+     fun translationEngine() = preferenceStore.getInt("translation_engine", 0)
+     fun translationFallbackEngine() = preferenceStore.getInt("translation_fallback_engine", 0)
+     fun translationEngineModel() = preferenceStore.getString("translation_engine_model", "gemini-1.5-pro")
 diff --git a/i18n-at/src/commonMain/moko-resources/base/strings.xml b/i18n-at/src/commonMain/moko-resources/base/strings.xml
-index 7ed4795..554adca 100644
+index 7ed4795..4bb8eab 100644
 --- a/i18n-at/src/commonMain/moko-resources/base/strings.xml
 +++ b/i18n-at/src/commonMain/moko-resources/base/strings.xml
-@@ -81,4 +81,105 @@
+@@ -81,4 +81,109 @@
      <string name="repository_adding">Adding…</string>
      <string name="chapter_versions_shortcut">Tap to filter source groups and versions</string>
      <string name="translation_crop_borders_summary">Pages with saved translations keep their borders to align text with the original image.</string>
@@ -6363,12 +7222,16 @@ index 7ed4795..554adca 100644
 +    <string name="polaris_updates_check_hint">Check now using your experimental release preference.</string>
 +    <string name="polaris_updates_access_error">Polaris Releases are unavailable. The repository may be private or not publicly accessible. See the project page.</string>
 +    <string name="polaris_updates_failed">Could not check for updates. Check your connection and try again; GitHub may be unavailable or limiting requests.</string>
++    <string name="pref_advanced_translation_editing">Enable advanced translation editing</string>
++    <string name="pref_advanced_translation_editing_summary">Off by default for uninterrupted reading. Enables long-press editing, translating a single phrase again and manual text placement.</string>
++    <string name="gemini_online_title">Gemini: optional online translation</string>
++    <string name="gemini_online_summary">Sends recognized text to Google; images are not sent by this translator. Requires internet, your API key and an available model; usage may incur charges. It does not install a large model on your phone or recover text missed by OCR. Suggested model: gemini-3.5-flash-lite. Saved chapter translations remain available offline.</string>
  </resources>
 diff --git a/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml b/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
-index d1748bc..4b92747 100644
+index d1748bc..c458d9f 100644
 --- a/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
 +++ b/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
-@@ -81,4 +81,105 @@
+@@ -81,4 +81,109 @@
      <string name="repository_adding">Adicionando…</string>
      <string name="chapter_versions_shortcut">Toque para filtrar grupos e versões da fonte</string>
      <string name="translation_crop_borders_summary">Páginas com tradução salva preservam as bordas para alinhar o texto à imagem original.</string>
@@ -6473,6 +7336,10 @@ index d1748bc..4b92747 100644
 +    <string name="polaris_updates_check_hint">Verifica agora, respeitando sua escolha de versões experimentais.</string>
 +    <string name="polaris_updates_access_error">As Releases do Polaris estão indisponíveis. O repositório pode estar privado ou sem acesso público. Consulte a página do projeto.</string>
 +    <string name="polaris_updates_failed">Não foi possível verificar atualizações. Confira a conexão e tente novamente; o GitHub pode estar indisponível ou limitar consultas.</string>
++    <string name="pref_advanced_translation_editing">Habilitar edição avançada das traduções</string>
++    <string name="pref_advanced_translation_editing_summary">Desativada por padrão para uma leitura sem interrupções. Permite editar por toque longo, retraduzir uma frase e adicionar texto manualmente.</string>
++    <string name="gemini_online_title">Gemini: tradução online opcional</string>
++    <string name="gemini_online_summary">Envia o texto reconhecido ao Google; este tradutor não envia imagens. Exige internet, sua chave de API e um modelo disponível; pode gerar cobrança por uso. Não instala um modelo grande no celular nem recupera texto que o OCR não reconheceu. Modelo sugerido: gemini-3.5-flash-lite. Traduções já salvas dos capítulos continuam disponíveis offline.</string>
  </resources>
 diff --git a/i18n/src/commonMain/moko-resources/base/strings.xml b/i18n/src/commonMain/moko-resources/base/strings.xml
 index c0832ba..ebf8f48 100644

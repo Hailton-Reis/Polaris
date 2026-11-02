@@ -52,3 +52,10 @@ The new candidate is `0.1.0-beta.4`, versionCode 105. The beta.3 APK still ident
 The exporter inspects the compiled APK with AAPT2 and rejects inherited names or a wrong application/round icon. Both ARM APKs and the x86_64 build passed branding verification. The package identifier and signing certificate match the distributed beta.3, allowing Android to offer an update to that installation. Actual A12 installation, icon cache refresh and data continuity still require the user's device check.
 
 Android tests remain 525 total, 491 passed and the same 34 preexisting failures. The six packaging tests include three new compiled-branding boundary tests. The previous beta.3 build evidence remains in [TEST_RESULTS_P20261101_3.json](TEST_RESULTS_P20261101_3.json). The already published beta.3 APKs are not replaced by this candidate.
+
+
+## P20261102.2 — internal long-strip translation review
+
+Candidate `0.1.0-beta.5`, versionCode 106, remains unpublished. Advanced translation editing is off by default in both pager and webtoon; manual insertion and per-block editing are available when explicitly enabled. Gemini uses bounded complete-response batches and bypasses the shared offline phrase cache; saved chapters still support offline reading. A debug-only shell-permission receiver and the Windows collector export paired screenshots, the active original page and saved post-filter text. The collector does not initiate OCR/API requests. CMD options 13/14 apply and restore a FHD emulator display.
+
+Missing last lines and text outside balloons remain unverified until an actual failing source page is captured. See [the diagnosis procedure](../../docs/REVISAO_TRADUCAO_FAIXA_LONGA.md). No emulator runtime or live Gemini quality acceptance is implied by host tests.

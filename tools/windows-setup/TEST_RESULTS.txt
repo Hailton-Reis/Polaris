@@ -283,3 +283,15 @@ PowerShell lexical token errors: 0 unclosed bracket groups: 0
 # Real Windows automatic smoke diagnostics NOT executed in this environment.
 # A01/A02 visually reached Welcome screen by user's screenshot, but functional
 # A01/A02, sources B01-B05 and backup v2 remain pending/blocked.
+
+
+# INTERNAL TRANSLATION REVIEW - 2026-11-02
+# Linux host verification: 33/33 Windows launcher static contract tests;
+# 51/51 local Android helper tests, including 12 translation capture tests;
+# 4/4 overlay application/idempotence/CRLF/drift checks; 15/15 build guards;
+# 6/6 packaging unit tests. These are not Windows runtime acceptance.
+# Android assembly completed for beta.5 / versionCode 106 / P20261102.2.
+# 531 unit tests: 497 pass, same 34 preexisting failures, no new regressions.
+# CMD options 12/13/14: long-strip comparison, FHD display, restore display.
+# No new Release or APK upload. Real chapter capture, Gemini API quality,
+# physical-device interaction and native Windows execution remain pending.
