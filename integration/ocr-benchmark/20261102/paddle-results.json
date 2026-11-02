@@ -1,0 +1,942 @@
+{
+  "paddle_small": [
+    {
+      "id": "en-sans-0",
+      "text": "1",
+      "status": "OK",
+      "elapsed_ms": 11.041346999263624,
+      "input_shape": [
+        1,
+        3,
+        48,
+        42
+      ]
+    },
+    {
+      "id": "en-sans-1",
+      "text": "NO!",
+      "status": "OK",
+      "elapsed_ms": 21.51024100021459,
+      "input_shape": [
+        1,
+        3,
+        48,
+        87
+      ]
+    },
+    {
+      "id": "en-sans-2",
+      "text": "Keep the final line.",
+      "status": "OK",
+      "elapsed_ms": 65.65865199991094,
+      "input_shape": [
+        1,
+        3,
+        48,
+        258
+      ]
+    },
+    {
+      "id": "en-sans-3",
+      "text": "Sora will bring the blue book.",
+      "status": "OK",
+      "elapsed_ms": 74.71719100067276,
+      "input_shape": [
+        1,
+        3,
+        48,
+        388
+      ]
+    },
+    {
+      "id": "en-sans-4",
+      "text": "I will return tomorrow.",
+      "status": "OK",
+      "elapsed_ms": 33.493975999590475,
+      "input_shape": [
+        1,
+        3,
+        48,
+        332
+      ]
+    },
+    {
+      "id": "en-sans-5",
+      "text": "The library opens tomorrow.",
+      "status": "OK",
+      "elapsed_ms": 36.43678400112549,
+      "input_shape": [
+        1,
+        3,
+        48,
+        374
+      ]
+    },
+    {
+      "id": "en-sans-6",
+      "text": "Do not leave the last line behind.",
+      "status": "OK",
+      "elapsed_ms": 79.37187800052925,
+      "input_shape": [
+        1,
+        3,
+        48,
+        485
+      ]
+    },
+    {
+      "id": "en-sans-7",
+      "text": "Please keep the name Sora unchanged.",
+      "status": "OK",
+      "elapsed_ms": 74.71518000056676,
+      "input_shape": [
+        1,
+        3,
+        48,
+        515
+      ]
+    },
+    {
+      "id": "en-anime-0",
+      "text": "工",
+      "status": "OK",
+      "elapsed_ms": 6.627389000641415,
+      "input_shape": [
+        1,
+        3,
+        48,
+        46
+      ]
+    },
+    {
+      "id": "en-anime-1",
+      "text": "NO!",
+      "status": "OK",
+      "elapsed_ms": 10.129203999895253,
+      "input_shape": [
+        1,
+        3,
+        48,
+        84
+      ]
+    },
+    {
+      "id": "en-anime-2",
+      "text": "KEEP THE FINAL LINE.",
+      "status": "OK",
+      "elapsed_ms": 51.652735000971006,
+      "input_shape": [
+        1,
+        3,
+        48,
+        347
+      ]
+    },
+    {
+      "id": "en-anime-3",
+      "text": "SORA WILL BRING THE BLUE BOOK.",
+      "status": "OK",
+      "elapsed_ms": 68.02841900025669,
+      "input_shape": [
+        1,
+        3,
+        48,
+        544
+      ]
+    },
+    {
+      "id": "en-anime-4",
+      "text": "I WILL RETURN TOMORROW.",
+      "status": "OK",
+      "elapsed_ms": 53.04597999929683,
+      "input_shape": [
+        1,
+        3,
+        48,
+        425
+      ]
+    },
+    {
+      "id": "en-anime-5",
+      "text": "THE LIBRARY OPENS TOMORROW.",
+      "status": "OK",
+      "elapsed_ms": 54.82415100050275,
+      "input_shape": [
+        1,
+        3,
+        48,
+        508
+      ]
+    },
+    {
+      "id": "en-anime-6",
+      "text": "DO NOT LEAVE THE LAST LINE BEHIND.",
+      "status": "OK",
+      "elapsed_ms": 745.16026099991,
+      "input_shape": [
+        1,
+        3,
+        48,
+        595
+      ]
+    },
+    {
+      "id": "en-anime-7",
+      "text": "PLEASE KEEP THE NAME SORA UNCHANGED.",
+      "status": "OK",
+      "elapsed_ms": 341.55515000020387,
+      "input_shape": [
+        1,
+        3,
+        48,
+        673
+      ]
+    },
+    {
+      "id": "en-balsamiq-0",
+      "text": "1",
+      "status": "OK",
+      "elapsed_ms": 9.965191999071976,
+      "input_shape": [
+        1,
+        3,
+        48,
+        43
+      ]
+    },
+    {
+      "id": "en-balsamiq-1",
+      "text": "NO!",
+      "status": "OK",
+      "elapsed_ms": 14.410922998649767,
+      "input_shape": [
+        1,
+        3,
+        48,
+        80
+      ]
+    },
+    {
+      "id": "en-balsamiq-2",
+      "text": "Keep the final line.",
+      "status": "OK",
+      "elapsed_ms": 43.35146000084933,
+      "input_shape": [
+        1,
+        3,
+        48,
+        236
+      ]
+    },
+    {
+      "id": "en-balsamiq-3",
+      "text": "Sora will bring the blue book.",
+      "status": "OK",
+      "elapsed_ms": 44.21361599997908,
+      "input_shape": [
+        1,
+        3,
+        48,
+        344
+      ]
+    },
+    {
+      "id": "en-balsamiq-4",
+      "text": "I will return tomorrow.",
+      "status": "OK",
+      "elapsed_ms": 36.96112000034191,
+      "input_shape": [
+        1,
+        3,
+        48,
+        291
+      ]
+    },
+    {
+      "id": "en-balsamiq-5",
+      "text": "The library opens tomorrow.",
+      "status": "OK",
+      "elapsed_ms": 45.134519999919576,
+      "input_shape": [
+        1,
+        3,
+        48,
+        332
+      ]
+    },
+    {
+      "id": "en-balsamiq-6",
+      "text": "Do not leave the last line behind.",
+      "status": "OK",
+      "elapsed_ms": 50.572632000694284,
+      "input_shape": [
+        1,
+        3,
+        48,
+        432
+      ]
+    },
+    {
+      "id": "en-balsamiq-7",
+      "text": "Please keep the name Sora unchanged.",
+      "status": "OK",
+      "elapsed_ms": 76.43748900045466,
+      "input_shape": [
+        1,
+        3,
+        48,
+        470
+      ]
+    },
+    {
+      "id": "en-panel-0",
+      "text": "The library opens tomorrow.",
+      "status": "OK",
+      "elapsed_ms": 84.96970099986356,
+      "input_shape": [
+        1,
+        3,
+        48,
+        463
+      ]
+    },
+    {
+      "id": "en-panel-1",
+      "text": "Sora will bring the blue book.",
+      "status": "OK",
+      "elapsed_ms": 53.105933000551886,
+      "input_shape": [
+        1,
+        3,
+        48,
+        469
+      ]
+    },
+    {
+      "id": "en-panel-2",
+      "text": "Please keep the name Sora unchanged.",
+      "status": "OK",
+      "elapsed_ms": 83.67655800066132,
+      "input_shape": [
+        1,
+        3,
+        48,
+        624
+      ]
+    },
+    {
+      "id": "ja-panel-0",
+      "text": "図書館は明日開きます。",
+      "status": "OK",
+      "elapsed_ms": 73.9571670001169,
+      "input_shape": [
+        1,
+        3,
+        48,
+        411
+      ]
+    },
+    {
+      "id": "ja-panel-1",
+      "text": "ソラは青い本を持ってきます。",
+      "status": "OK",
+      "elapsed_ms": 62.476756000251044,
+      "input_shape": [
+        1,
+        3,
+        48,
+        508
+      ]
+    },
+    {
+      "id": "ja-panel-2",
+      "text": "ソラという名前は変えないでください。",
+      "status": "OK",
+      "elapsed_ms": 79.4887239990203,
+      "input_shape": [
+        1,
+        3,
+        48,
+        668
+      ]
+    },
+    {
+      "id": "zh-CN-panel-0",
+      "text": "图书馆明天开放。",
+      "status": "OK",
+      "elapsed_ms": 52.21792100019229,
+      "input_shape": [
+        1,
+        3,
+        48,
+        305
+      ]
+    },
+    {
+      "id": "zh-CN-panel-1",
+      "text": "小空会带来那本蓝色的书。",
+      "status": "OK",
+      "elapsed_ms": 64.14250799934962,
+      "input_shape": [
+        1,
+        3,
+        48,
+        451
+      ]
+    },
+    {
+      "id": "zh-CN-panel-2",
+      "text": "请保留小空这个名字。",
+      "status": "OK",
+      "elapsed_ms": 44.579503999557346,
+      "input_shape": [
+        1,
+        3,
+        48,
+        371
+      ]
+    },
+    {
+      "id": "zh-TW-panel-0",
+      "text": "圖書館明天開放。",
+      "status": "OK",
+      "elapsed_ms": 31.18899899891403,
+      "input_shape": [
+        1,
+        3,
+        48,
+        305
+      ]
+    },
+    {
+      "id": "zh-TW-panel-1",
+      "text": "小空會帶來那本藍色的書。",
+      "status": "OK",
+      "elapsed_ms": 74.99377499880211,
+      "input_shape": [
+        1,
+        3,
+        48,
+        451
+      ]
+    },
+    {
+      "id": "zh-TW-panel-2",
+      "text": "請保留小空這個名字。",
+      "status": "OK",
+      "elapsed_ms": 46.41842599994561,
+      "input_shape": [
+        1,
+        3,
+        48,
+        365
+      ]
+    },
+    {
+      "id": "ko-panel-0",
+      "text": "",
+      "status": "OK",
+      "elapsed_ms": 78.1911449994368,
+      "input_shape": [
+        1,
+        3,
+        48,
+        417
+      ]
+    },
+    {
+      "id": "ko-panel-1",
+      "text": "",
+      "status": "OK",
+      "elapsed_ms": 75.14545199956046,
+      "input_shape": [
+        1,
+        3,
+        48,
+        525
+      ]
+    },
+    {
+      "id": "ko-panel-2",
+      "text": ".",
+      "status": "OK",
+      "elapsed_ms": 183.98650500057556,
+      "input_shape": [
+        1,
+        3,
+        48,
+        484
+      ]
+    }
+  ],
+  "paddle_tiny": [
+    {
+      "id": "en-sans-0",
+      "text": "1",
+      "status": "OK",
+      "elapsed_ms": 5.996800999128027,
+      "input_shape": [
+        1,
+        3,
+        48,
+        42
+      ]
+    },
+    {
+      "id": "en-sans-1",
+      "text": "NO!",
+      "status": "OK",
+      "elapsed_ms": 2.539115999752539,
+      "input_shape": [
+        1,
+        3,
+        48,
+        87
+      ]
+    },
+    {
+      "id": "en-sans-2",
+      "text": "Keep the final line.",
+      "status": "OK",
+      "elapsed_ms": 9.009515000798274,
+      "input_shape": [
+        1,
+        3,
+        48,
+        258
+      ]
+    },
+    {
+      "id": "en-sans-3",
+      "text": "Sora will bring the blue book.",
+      "status": "OK",
+      "elapsed_ms": 8.552989998861449,
+      "input_shape": [
+        1,
+        3,
+        48,
+        388
+      ]
+    },
+    {
+      "id": "en-sans-4",
+      "text": "I will return tomorrow.",
+      "status": "OK",
+      "elapsed_ms": 6.462445000579464,
+      "input_shape": [
+        1,
+        3,
+        48,
+        332
+      ]
+    },
+    {
+      "id": "en-sans-5",
+      "text": "The library opens tomorrow.",
+      "status": "OK",
+      "elapsed_ms": 11.335515999235213,
+      "input_shape": [
+        1,
+        3,
+        48,
+        374
+      ]
+    },
+    {
+      "id": "en-sans-6",
+      "text": "Do not leave the last line behind.",
+      "status": "OK",
+      "elapsed_ms": 19.611923999036662,
+      "input_shape": [
+        1,
+        3,
+        48,
+        485
+      ]
+    },
+    {
+      "id": "en-sans-7",
+      "text": "Please keep the name Sora unchanged.",
+      "status": "OK",
+      "elapsed_ms": 41.46152199973585,
+      "input_shape": [
+        1,
+        3,
+        48,
+        515
+      ]
+    },
+    {
+      "id": "en-anime-0",
+      "text": "I",
+      "status": "OK",
+      "elapsed_ms": 1.6179880003619473,
+      "input_shape": [
+        1,
+        3,
+        48,
+        46
+      ]
+    },
+    {
+      "id": "en-anime-1",
+      "text": "NO!",
+      "status": "OK",
+      "elapsed_ms": 3.5748469999816734,
+      "input_shape": [
+        1,
+        3,
+        48,
+        84
+      ]
+    },
+    {
+      "id": "en-anime-2",
+      "text": "KEEP THE FINAL LINE.",
+      "status": "OK",
+      "elapsed_ms": 7.820947001164313,
+      "input_shape": [
+        1,
+        3,
+        48,
+        347
+      ]
+    },
+    {
+      "id": "en-anime-3",
+      "text": "SORA WILL BRING THE BLLE BOOK.",
+      "status": "OK",
+      "elapsed_ms": 42.04609699991124,
+      "input_shape": [
+        1,
+        3,
+        48,
+        544
+      ]
+    },
+    {
+      "id": "en-anime-4",
+      "text": "I WILL RETURN TOMORROW.",
+      "status": "OK",
+      "elapsed_ms": 39.10381500099902,
+      "input_shape": [
+        1,
+        3,
+        48,
+        425
+      ]
+    },
+    {
+      "id": "en-anime-5",
+      "text": "THE LIBRARY OPENS TOMORROW.",
+      "status": "OK",
+      "elapsed_ms": 19.925521999539342,
+      "input_shape": [
+        1,
+        3,
+        48,
+        508
+      ]
+    },
+    {
+      "id": "en-anime-6",
+      "text": "DO NOT LEAVE THE LAST LINE BEHIND.",
+      "status": "OK",
+      "elapsed_ms": 22.203006999916397,
+      "input_shape": [
+        1,
+        3,
+        48,
+        595
+      ]
+    },
+    {
+      "id": "en-anime-7",
+      "text": "PLEASE KEEP THE NAME SORA LNCHANGED.",
+      "status": "OK",
+      "elapsed_ms": 55.350541000734665,
+      "input_shape": [
+        1,
+        3,
+        48,
+        673
+      ]
+    },
+    {
+      "id": "en-balsamiq-0",
+      "text": "1",
+      "status": "OK",
+      "elapsed_ms": 7.843985000363318,
+      "input_shape": [
+        1,
+        3,
+        48,
+        43
+      ]
+    },
+    {
+      "id": "en-balsamiq-1",
+      "text": "NO!",
+      "status": "OK",
+      "elapsed_ms": 3.2925020004768157,
+      "input_shape": [
+        1,
+        3,
+        48,
+        80
+      ]
+    },
+    {
+      "id": "en-balsamiq-2",
+      "text": "Keep the final line.",
+      "status": "OK",
+      "elapsed_ms": 16.724862000046414,
+      "input_shape": [
+        1,
+        3,
+        48,
+        236
+      ]
+    },
+    {
+      "id": "en-balsamiq-3",
+      "text": "Sora wil bring the blue book.",
+      "status": "OK",
+      "elapsed_ms": 9.849226000369526,
+      "input_shape": [
+        1,
+        3,
+        48,
+        344
+      ]
+    },
+    {
+      "id": "en-balsamiq-4",
+      "text": "I wilreturn tomorrow.",
+      "status": "OK",
+      "elapsed_ms": 27.428213999883155,
+      "input_shape": [
+        1,
+        3,
+        48,
+        291
+      ]
+    },
+    {
+      "id": "en-balsamiq-5",
+      "text": "The library opens tomorrow.",
+      "status": "OK",
+      "elapsed_ms": 9.299424998971517,
+      "input_shape": [
+        1,
+        3,
+        48,
+        332
+      ]
+    },
+    {
+      "id": "en-balsamiq-6",
+      "text": "Do not leave the last line behind.",
+      "status": "OK",
+      "elapsed_ms": 25.139631999991252,
+      "input_shape": [
+        1,
+        3,
+        48,
+        432
+      ]
+    },
+    {
+      "id": "en-balsamiq-7",
+      "text": "Please keep the name Sora unchanged.",
+      "status": "OK",
+      "elapsed_ms": 10.014326999225887,
+      "input_shape": [
+        1,
+        3,
+        48,
+        470
+      ]
+    },
+    {
+      "id": "en-panel-0",
+      "text": "The library opens tomorrow.",
+      "status": "OK",
+      "elapsed_ms": 13.859321999916574,
+      "input_shape": [
+        1,
+        3,
+        48,
+        463
+      ]
+    },
+    {
+      "id": "en-panel-1",
+      "text": "Sora will bring the blue book.",
+      "status": "OK",
+      "elapsed_ms": 17.604728000151226,
+      "input_shape": [
+        1,
+        3,
+        48,
+        469
+      ]
+    },
+    {
+      "id": "en-panel-2",
+      "text": "Please keep the name Sora unchanged.",
+      "status": "OK",
+      "elapsed_ms": 21.27728199957346,
+      "input_shape": [
+        1,
+        3,
+        48,
+        624
+      ]
+    },
+    {
+      "id": "ja-panel-0",
+      "text": "凶書館法明日開志夫寸。",
+      "status": "OK",
+      "elapsed_ms": 19.19584200004465,
+      "input_shape": [
+        1,
+        3,
+        48,
+        411
+      ]
+    },
+    {
+      "id": "ja-panel-1",
+      "text": "亏法青本左持>T走末寸。",
+      "status": "OK",
+      "elapsed_ms": 13.05970400062506,
+      "input_shape": [
+        1,
+        3,
+        48,
+        508
+      ]
+    },
+    {
+      "id": "ja-panel-2",
+      "text": "亏℃八5名前变元本\\下<尤。",
+      "status": "OK",
+      "elapsed_ms": 18.17483699960576,
+      "input_shape": [
+        1,
+        3,
+        48,
+        668
+      ]
+    },
+    {
+      "id": "zh-CN-panel-0",
+      "text": "图书馆明天开放。",
+      "status": "OK",
+      "elapsed_ms": 8.881303001544438,
+      "input_shape": [
+        1,
+        3,
+        48,
+        305
+      ]
+    },
+    {
+      "id": "zh-CN-panel-1",
+      "text": "小空会带来那本蓝色的书。",
+      "status": "OK",
+      "elapsed_ms": 11.582496999835712,
+      "input_shape": [
+        1,
+        3,
+        48,
+        451
+      ]
+    },
+    {
+      "id": "zh-CN-panel-2",
+      "text": "请保留小空这个名字。",
+      "status": "OK",
+      "elapsed_ms": 6.2977920006233035,
+      "input_shape": [
+        1,
+        3,
+        48,
+        371
+      ]
+    },
+    {
+      "id": "zh-TW-panel-0",
+      "text": "圖書館明天開放。",
+      "status": "OK",
+      "elapsed_ms": 6.983297000260791,
+      "input_shape": [
+        1,
+        3,
+        48,
+        305
+      ]
+    },
+    {
+      "id": "zh-TW-panel-1",
+      "text": "小空會帶來那本藍色的書。",
+      "status": "OK",
+      "elapsed_ms": 23.50798699990264,
+      "input_shape": [
+        1,
+        3,
+        48,
+        451
+      ]
+    },
+    {
+      "id": "zh-TW-panel-2",
+      "text": "请保留小空這個名字。",
+      "status": "OK",
+      "elapsed_ms": 8.409864998611738,
+      "input_shape": [
+        1,
+        3,
+        48,
+        365
+      ]
+    },
+    {
+      "id": "ko-panel-0",
+      "text": "E对型是唱是昌L叶.",
+      "status": "OK",
+      "elapsed_ms": 8.728138000151375,
+      "input_shape": [
+        1,
+        3,
+        48,
+        417
+      ]
+    },
+    {
+      "id": "ko-panel-1",
+      "text": "企斗乞昌外对{烈L|C.",
+      "status": "OK",
+      "elapsed_ms": 10.379212000771076,
+      "input_shape": [
+        1,
+        3,
+        48,
+        525
+      ]
+    },
+    {
+      "id": "ko-panel-2",
+      "text": "企斗2乞 0号号平对叶州8.",
+      "status": "OK",
+      "elapsed_ms": 25.071050999031286,
+      "input_shape": [
+        1,
+        3,
+        48,
+        484
+      ]
+    }
+  ]
+}

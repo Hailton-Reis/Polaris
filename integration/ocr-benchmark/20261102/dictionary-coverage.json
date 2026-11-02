@@ -1,0 +1,12 @@
+{
+  "small": {
+    "HIRAGANA": 87,
+    "KATAKANA": 153,
+    "HANGUL": 0
+  },
+  "tiny": {
+    "HIRAGANA": 0,
+    "KATAKANA": 0,
+    "HANGUL": 0
+  }
+}

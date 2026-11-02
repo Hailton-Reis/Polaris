@@ -1,0 +1,1238 @@
+{
+  "paddle_pipeline_small": [
+    {
+      "id": "en-sans-0",
+      "text": "",
+      "status": "OK",
+      "detected_regions": 0,
+      "lines": [],
+      "elapsed_ms": 6.320907999906922
+    },
+    {
+      "id": "en-sans-1",
+      "text": "NO!",
+      "status": "OK",
+      "detected_regions": 1,
+      "lines": [
+        {
+          "text": "NO!",
+          "x": 13.0,
+          "y": 11.0,
+          "width": 66.0,
+          "height": 33.0
+        }
+      ],
+      "elapsed_ms": 45.04859600274358
+    },
+    {
+      "id": "en-sans-2",
+      "text": "Keep the final line.",
+      "status": "OK",
+      "detected_regions": 1,
+      "lines": [
+        {
+          "text": "Keep the final line.",
+          "x": 13.0,
+          "y": 11.0,
+          "width": 295.0,
+          "height": 34.0
+        }
+      ],
+      "elapsed_ms": 124.4416369991086
+    },
+    {
+      "id": "en-sans-3",
+      "text": "Sora will bring the blue book.",
+      "status": "OK",
+      "detected_regions": 1,
+      "lines": [
+        {
+          "text": "Sora will bring the blue book.",
+          "x": 14.0,
+          "y": 11.0,
+          "width": 455.0,
+          "height": 34.0
+        }
+      ],
+      "elapsed_ms": 114.64277100094478
+    },
+    {
+      "id": "en-sans-4",
+      "text": "I will return tomorrow.",
+      "status": "OK",
+      "detected_regions": 1,
+      "lines": [
+        {
+          "text": "I will return tomorrow.",
+          "x": 12.0,
+          "y": 12.0,
+          "width": 337.0,
+          "height": 31.0
+        }
+      ],
+      "elapsed_ms": 79.40460900135804
+    },
+    {
+      "id": "en-sans-5",
+      "text": "The library opens tomorrow.",
+      "status": "OK",
+      "detected_regions": 1,
+      "lines": [
+        {
+          "text": "The library opens tomorrow.",
+          "x": 16.0,
+          "y": 11.0,
+          "width": 427.0,
+          "height": 35.0
+        }
+      ],
+      "elapsed_ms": 112.38575599782052
+    },
+    {
+      "id": "en-sans-6",
+      "text": "Do not leave the last line behind.",
+      "status": "OK",
+      "detected_regions": 1,
+      "lines": [
+        {
+          "text": "Do not leave the last line behind.",
+          "x": 16.0,
+          "y": 13.0,
+          "width": 510.0,
+          "height": 29.0
+        }
+      ],
+      "elapsed_ms": 111.698681001144
+    },
+    {
+      "id": "en-sans-7",
+      "text": "Please keep the name Sora unchanged.",
+      "status": "OK",
+      "detected_regions": 1,
+      "lines": [
+        {
+          "text": "Please keep the name Sora unchanged.",
+          "x": 13.0,
+          "y": 10.0,
+          "width": 614.0,
+          "height": 35.0
+        }
+      ],
+      "elapsed_ms": 146.0968020001019
+    },
+    {
+      "id": "en-anime-0",
+      "text": "I",
+      "status": "OK",
+      "detected_regions": 1,
+      "lines": [
+        {
+          "text": "I",
+          "x": 12.0,
+          "y": 11.0,
+          "width": 30.0,
+          "height": 41.0
+        }
+      ],
+      "elapsed_ms": 12.744363000820158
+    },
+    {
+      "id": "en-anime-1",
+      "text": "NO!",
+      "status": "OK",
+      "detected_regions": 1,
+      "lines": [
+        {
+          "text": "NO!",
+          "x": 10.0,
+          "y": 12.0,
+          "width": 80.0,
+          "height": 42.0
+        }
+      ],
+      "elapsed_ms": 23.203900000225985
+    },
+    {
+      "id": "en-anime-2",
+      "text": "KEEP THE FINAL LINE.",
+      "status": "OK",
+      "detected_regions": 1,
+      "lines": [
+        {
+          "text": "KEEP THE FINAL LINE.",
+          "x": 15.0,
+          "y": 13.0,
+          "width": 379.0,
+          "height": 35.0
+        }
+      ],
+      "elapsed_ms": 80.86654300132068
+    },
+    {
+      "id": "en-anime-3",
+      "text": "SORA WILL BRING THE BLUE BOOK.",
+      "status": "OK",
+      "detected_regions": 1,
+      "lines": [
+        {
+          "text": "SORA WILL BRING THE BLUE BOOK.",
+          "x": 16.0,
+          "y": 14.0,
+          "width": 621.0,
+          "height": 35.0
+        }
+      ],
+      "elapsed_ms": 164.0773260005517
+    },
+    {
+      "id": "en-anime-4",
+      "text": "I WILL RETURN TOMORROW.",
+      "status": "OK",
+      "detected_regions": 1,
+      "lines": [
+        {
+          "text": "I WILL RETURN TOMORROW.",
+          "x": 13.0,
+          "y": 15.0,
+          "width": 492.0,
+          "height": 34.0
+        }
+      ],
+      "elapsed_ms": 130.52559999778168
+    },
+    {
+      "id": "en-anime-5",
+      "text": "THE LIBRARY OPENS TOMORROW.",
+      "status": "OK",
+      "detected_regions": 1,
+      "lines": [
+        {
+          "text": "THE LIBRARY OPENS TOMORROW.",
+          "x": 15.0,
+          "y": 16.0,
+          "width": 590.0,
+          "height": 34.0
+        }
+      ],
+      "elapsed_ms": 135.29893700251705
+    },
+    {
+      "id": "en-anime-6",
+      "text": "DO NOT LEAVE THE LAST LINE BEHIND.",
+      "status": "OK",
+      "detected_regions": 1,
+      "lines": [
+        {
+          "text": "DO NOT LEAVE THE LAST LINE BEHIND.",
+          "x": 17.0,
+          "y": 14.0,
+          "width": 670.0,
+          "height": 34.0
+        }
+      ],
+      "elapsed_ms": 171.97336200115387
+    },
+    {
+      "id": "en-anime-7",
+      "text": "PLEASE KEEP THE NAME SORA UNCHANGED.",
+      "status": "OK",
+      "detected_regions": 1,
+      "lines": [
+        {
+          "text": "PLEASE KEEP THE NAME SORA UNCHANGED.",
+          "x": 15.0,
+          "y": 14.0,
+          "width": 779.0,
+          "height": 36.0
+        }
+      ],
+      "elapsed_ms": 160.48372099976405
+    },
+    {
+      "id": "en-balsamiq-0",
+      "text": "I",
+      "status": "OK",
+      "detected_regions": 1,
+      "lines": [
+        {
+          "text": "I",
+          "x": 11.0,
+          "y": 12.0,
+          "width": 27.0,
+          "height": 28.0
+        }
+      ],
+      "elapsed_ms": 28.039159999025287
+    },
+    {
+      "id": "en-balsamiq-1",
+      "text": "NO!",
+      "status": "OK",
+      "detected_regions": 1,
+      "lines": [
+        {
+          "text": "NO!",
+          "x": 13.0,
+          "y": 12.0,
+          "width": 60.0,
+          "height": 34.0
+        }
+      ],
+      "elapsed_ms": 41.58528999687405
+    },
+    {
+      "id": "en-balsamiq-2",
+      "text": "Keep the final line.",
+      "status": "OK",
+      "detected_regions": 1,
+      "lines": [
+        {
+          "text": "Keep the final line.",
+          "x": 15.0,
+          "y": 11.0,
+          "width": 256.0,
+          "height": 33.0
+        }
+      ],
+      "elapsed_ms": 101.20903099959833
+    },
+    {
+      "id": "en-balsamiq-3",
+      "text": "Sora will bring the blue book.",
+      "status": "OK",
+      "detected_regions": 1,
+      "lines": [
+        {
+          "text": "Sora will bring the blue book.",
+          "x": 14.0,
+          "y": 10.0,
+          "width": 398.0,
+          "height": 34.0
+        }
+      ],
+      "elapsed_ms": 80.52199899975676
+    },
+    {
+      "id": "en-balsamiq-4",
+      "text": "I will return tomorrow.",
+      "status": "OK",
+      "detected_regions": 1,
+      "lines": [
+        {
+          "text": "I will return tomorrow.",
+          "x": 13.0,
+          "y": 13.0,
+          "width": 293.0,
+          "height": 29.0
+        }
+      ],
+      "elapsed_ms": 72.79802999983076
+    },
+    {
+      "id": "en-balsamiq-5",
+      "text": "The library opens tomorrow.",
+      "status": "OK",
+      "detected_regions": 1,
+      "lines": [
+        {
+          "text": "The library opens tomorrow.",
+          "x": 17.0,
+          "y": 12.0,
+          "width": 375.0,
+          "height": 32.0
+        }
+      ],
+      "elapsed_ms": 118.84320999888587
+    },
+    {
+      "id": "en-balsamiq-6",
+      "text": "Do not leave the last line behind.",
+      "status": "OK",
+      "detected_regions": 1,
+      "lines": [
+        {
+          "text": "Do not leave the last line behind.",
+          "x": 16.0,
+          "y": 12.0,
+          "width": 445.0,
+          "height": 29.0
+        }
+      ],
+      "elapsed_ms": 120.08738800068386
+    },
+    {
+      "id": "en-balsamiq-7",
+      "text": "Please keep the name Sora unchanged.",
+      "status": "OK",
+      "detected_regions": 1,
+      "lines": [
+        {
+          "text": "Please keep the name Sora unchanged.",
+          "x": 14.0,
+          "y": 11.0,
+          "width": 554.0,
+          "height": 33.0
+        }
+      ],
+      "elapsed_ms": 108.84377799811773
+    },
+    {
+      "id": "en-panel-0",
+      "text": "The library opens tomorrow.",
+      "status": "OK",
+      "detected_regions": 1,
+      "lines": [
+        {
+          "text": "The library opens tomorrow.",
+          "x": 2.0,
+          "y": 4.0,
+          "width": 596.0,
+          "height": 52.0
+        }
+      ],
+      "elapsed_ms": 75.74881899927277
+    },
+    {
+      "id": "en-panel-1",
+      "text": "Sora will bring the blue book.",
+      "status": "OK",
+      "detected_regions": 1,
+      "lines": [
+        {
+          "text": "Sora will bring the blue book.",
+          "x": -0.0,
+          "y": 2.0,
+          "width": 614.0,
+          "height": 55.0
+        }
+      ],
+      "elapsed_ms": 85.5976400016516
+    },
+    {
+      "id": "en-panel-2",
+      "text": "Please keep the name Sora unchanged.",
+      "status": "OK",
+      "detected_regions": 1,
+      "lines": [
+        {
+          "text": "Please keep the name Sora unchanged.",
+          "x": 2.0,
+          "y": 3.0,
+          "width": 815.0,
+          "height": 53.0
+        }
+      ],
+      "elapsed_ms": 104.1221460000088
+    },
+    {
+      "id": "ja-panel-0",
+      "text": "図書館は明日開きます。",
+      "status": "OK",
+      "detected_regions": 1,
+      "lines": [
+        {
+          "text": "図書館は明日開きます。",
+          "x": 4.0,
+          "y": 9.0,
+          "width": 458.0,
+          "height": 44.0
+        }
+      ],
+      "elapsed_ms": 72.13451699863072
+    },
+    {
+      "id": "ja-panel-1",
+      "text": "ソラは青い本を持ってきます。",
+      "status": "OK",
+      "detected_regions": 1,
+      "lines": [
+        {
+          "text": "ソラは青い本を持ってきます。",
+          "x": 7.0,
+          "y": 8.0,
+          "width": 583.0,
+          "height": 44.0
+        }
+      ],
+      "elapsed_ms": 105.30927199943108
+    },
+    {
+      "id": "ja-panel-2",
+      "text": "ソラという名前は変えないでください。",
+      "status": "OK",
+      "detected_regions": 1,
+      "lines": [
+        {
+          "text": "ソラという名前は変えないでください。",
+          "x": 7.0,
+          "y": 7.0,
+          "width": 766.0,
+          "height": 47.0
+        }
+      ],
+      "elapsed_ms": 121.56654900172725
+    },
+    {
+      "id": "zh-CN-panel-0",
+      "text": "图书馆明天开放。",
+      "status": "OK",
+      "detected_regions": 1,
+      "lines": [
+        {
+          "text": "图书馆明天开放。",
+          "x": 4.0,
+          "y": 9.0,
+          "width": 331.0,
+          "height": 44.0
+        }
+      ],
+      "elapsed_ms": 64.40401200234191
+    },
+    {
+      "id": "zh-CN-panel-1",
+      "text": "小空会带来那本蓝色的书。",
+      "status": "OK",
+      "detected_regions": 1,
+      "lines": [
+        {
+          "text": "小空会带来那本蓝色的书。",
+          "x": 2.0,
+          "y": 9.0,
+          "width": 508.0,
+          "height": 43.0
+        }
+      ],
+      "elapsed_ms": 82.366742000886
+    },
+    {
+      "id": "zh-CN-panel-2",
+      "text": "请保留小空这个名字。",
+      "status": "OK",
+      "detected_regions": 1,
+      "lines": [
+        {
+          "text": "请保留小空这个名字。",
+          "x": 3.0,
+          "y": 11.0,
+          "width": 418.0,
+          "height": 41.0
+        }
+      ],
+      "elapsed_ms": 62.89592800021637
+    },
+    {
+      "id": "zh-TW-panel-0",
+      "text": "圖書館明天開放。",
+      "status": "OK",
+      "detected_regions": 1,
+      "lines": [
+        {
+          "text": "圖書館明天開放。",
+          "x": 3.0,
+          "y": 7.0,
+          "width": 349.0,
+          "height": 45.0
+        }
+      ],
+      "elapsed_ms": 60.76643399865134
+    },
+    {
+      "id": "zh-TW-panel-1",
+      "text": "小空會帶來那本藍色的書。",
+      "status": "OK",
+      "detected_regions": 1,
+      "lines": [
+        {
+          "text": "小空會帶來那本藍色的書。",
+          "x": 4.0,
+          "y": 9.0,
+          "width": 525.0,
+          "height": 41.0
+        }
+      ],
+      "elapsed_ms": 96.16117800032953
+    },
+    {
+      "id": "zh-TW-panel-2",
+      "text": "請保留小空這個名字。",
+      "status": "OK",
+      "detected_regions": 1,
+      "lines": [
+        {
+          "text": "請保留小空這個名字。",
+          "x": 3.0,
+          "y": 7.0,
+          "width": 436.0,
+          "height": 46.0
+        }
+      ],
+      "elapsed_ms": 70.8884460000263
+    },
+    {
+      "id": "ko-panel-0",
+      "text": "",
+      "status": "OK",
+      "detected_regions": 1,
+      "lines": [
+        {
+          "text": "",
+          "x": 4.0,
+          "y": 9.0,
+          "width": 496.0,
+          "height": 44.0
+        }
+      ],
+      "elapsed_ms": 79.66438999937964
+    },
+    {
+      "id": "ko-panel-1",
+      "text": "",
+      "status": "OK",
+      "detected_regions": 1,
+      "lines": [
+        {
+          "text": "",
+          "x": 5.0,
+          "y": 11.0,
+          "width": 625.0,
+          "height": 40.0
+        }
+      ],
+      "elapsed_ms": 105.15019699960249
+    },
+    {
+      "id": "ko-panel-2",
+      "text": ".",
+      "status": "OK",
+      "detected_regions": 1,
+      "lines": [
+        {
+          "text": ".",
+          "x": 2.0,
+          "y": 9.0,
+          "width": 580.0,
+          "height": 42.0
+        }
+      ],
+      "elapsed_ms": 90.46289199977764
+    }
+  ],
+  "paddle_pipeline_tiny": [
+    {
+      "id": "en-sans-0",
+      "text": "",
+      "status": "OK",
+      "detected_regions": 0,
+      "lines": [],
+      "elapsed_ms": 3.759457998967264
+    },
+    {
+      "id": "en-sans-1",
+      "text": "NO!",
+      "status": "OK",
+      "detected_regions": 1,
+      "lines": [
+        {
+          "text": "NO!",
+          "x": 13.0,
+          "y": 11.0,
+          "width": 66.0,
+          "height": 33.0
+        }
+      ],
+      "elapsed_ms": 10.478267999133095
+    },
+    {
+      "id": "en-sans-2",
+      "text": "Keep the final line.",
+      "status": "OK",
+      "detected_regions": 1,
+      "lines": [
+        {
+          "text": "Keep the final line.",
+          "x": 13.0,
+          "y": 11.0,
+          "width": 295.0,
+          "height": 34.0
+        }
+      ],
+      "elapsed_ms": 20.511824997811345
+    },
+    {
+      "id": "en-sans-3",
+      "text": "Sora will bring the blue book.",
+      "status": "OK",
+      "detected_regions": 1,
+      "lines": [
+        {
+          "text": "Sora will bring the blue book.",
+          "x": 14.0,
+          "y": 11.0,
+          "width": 455.0,
+          "height": 34.0
+        }
+      ],
+      "elapsed_ms": 34.9970850002137
+    },
+    {
+      "id": "en-sans-4",
+      "text": "I will return tomorrow.",
+      "status": "OK",
+      "detected_regions": 1,
+      "lines": [
+        {
+          "text": "I will return tomorrow.",
+          "x": 12.0,
+          "y": 12.0,
+          "width": 337.0,
+          "height": 31.0
+        }
+      ],
+      "elapsed_ms": 33.54748799756635
+    },
+    {
+      "id": "en-sans-5",
+      "text": "The library opens tomorrow.",
+      "status": "OK",
+      "detected_regions": 1,
+      "lines": [
+        {
+          "text": "The library opens tomorrow.",
+          "x": 16.0,
+          "y": 11.0,
+          "width": 427.0,
+          "height": 35.0
+        }
+      ],
+      "elapsed_ms": 29.26819499771227
+    },
+    {
+      "id": "en-sans-6",
+      "text": "Do not leave the last line behind.",
+      "status": "OK",
+      "detected_regions": 1,
+      "lines": [
+        {
+          "text": "Do not leave the last line behind.",
+          "x": 16.0,
+          "y": 13.0,
+          "width": 510.0,
+          "height": 29.0
+        }
+      ],
+      "elapsed_ms": 36.89251900141244
+    },
+    {
+      "id": "en-sans-7",
+      "text": "Please keep the name Sora unchanged.",
+      "status": "OK",
+      "detected_regions": 1,
+      "lines": [
+        {
+          "text": "Please keep the name Sora unchanged.",
+          "x": 13.0,
+          "y": 10.0,
+          "width": 614.0,
+          "height": 35.0
+        }
+      ],
+      "elapsed_ms": 41.807606001384556
+    },
+    {
+      "id": "en-anime-0",
+      "text": "工",
+      "status": "OK",
+      "detected_regions": 1,
+      "lines": [
+        {
+          "text": "工",
+          "x": 12.0,
+          "y": 11.0,
+          "width": 30.0,
+          "height": 41.0
+        }
+      ],
+      "elapsed_ms": 5.682783001248026
+    },
+    {
+      "id": "en-anime-1",
+      "text": "NO!",
+      "status": "OK",
+      "detected_regions": 1,
+      "lines": [
+        {
+          "text": "NO!",
+          "x": 10.0,
+          "y": 12.0,
+          "width": 80.0,
+          "height": 42.0
+        }
+      ],
+      "elapsed_ms": 6.464001002314035
+    },
+    {
+      "id": "en-anime-2",
+      "text": "KEEP THE FINAL LINE.",
+      "status": "OK",
+      "detected_regions": 1,
+      "lines": [
+        {
+          "text": "KEEP THE FINAL LINE.",
+          "x": 15.0,
+          "y": 13.0,
+          "width": 379.0,
+          "height": 35.0
+        }
+      ],
+      "elapsed_ms": 26.79934499974479
+    },
+    {
+      "id": "en-anime-3",
+      "text": "SORA WILL BRING THE BLLE BOOK.",
+      "status": "OK",
+      "detected_regions": 1,
+      "lines": [
+        {
+          "text": "SORA WILL BRING THE BLLE BOOK.",
+          "x": 16.0,
+          "y": 14.0,
+          "width": 621.0,
+          "height": 35.0
+        }
+      ],
+      "elapsed_ms": 37.47182799997972
+    },
+    {
+      "id": "en-anime-4",
+      "text": "I WILL RETLRN TOMORROW.",
+      "status": "OK",
+      "detected_regions": 1,
+      "lines": [
+        {
+          "text": "I WILL RETLRN TOMORROW.",
+          "x": 13.0,
+          "y": 15.0,
+          "width": 492.0,
+          "height": 34.0
+        }
+      ],
+      "elapsed_ms": 36.72014400217449
+    },
+    {
+      "id": "en-anime-5",
+      "text": "THE LIBRARY OPENS TOMORROW.",
+      "status": "OK",
+      "detected_regions": 1,
+      "lines": [
+        {
+          "text": "THE LIBRARY OPENS TOMORROW.",
+          "x": 15.0,
+          "y": 16.0,
+          "width": 590.0,
+          "height": 34.0
+        }
+      ],
+      "elapsed_ms": 34.16342900163727
+    },
+    {
+      "id": "en-anime-6",
+      "text": "DO NOT LEAVE THE LAST LINE BEHIND.",
+      "status": "OK",
+      "detected_regions": 1,
+      "lines": [
+        {
+          "text": "DO NOT LEAVE THE LAST LINE BEHIND.",
+          "x": 17.0,
+          "y": 14.0,
+          "width": 670.0,
+          "height": 34.0
+        }
+      ],
+      "elapsed_ms": 39.25283100033994
+    },
+    {
+      "id": "en-anime-7",
+      "text": "PLEASE KEEP THE NAME SORA LNCHANGED.",
+      "status": "OK",
+      "detected_regions": 1,
+      "lines": [
+        {
+          "text": "PLEASE KEEP THE NAME SORA LNCHANGED.",
+          "x": 15.0,
+          "y": 14.0,
+          "width": 779.0,
+          "height": 36.0
+        }
+      ],
+      "elapsed_ms": 43.56361700047273
+    },
+    {
+      "id": "en-balsamiq-0",
+      "text": "I",
+      "status": "OK",
+      "detected_regions": 1,
+      "lines": [
+        {
+          "text": "I",
+          "x": 11.0,
+          "y": 12.0,
+          "width": 27.0,
+          "height": 28.0
+        }
+      ],
+      "elapsed_ms": 4.519682002865011
+    },
+    {
+      "id": "en-balsamiq-1",
+      "text": "NO!",
+      "status": "OK",
+      "detected_regions": 1,
+      "lines": [
+        {
+          "text": "NO!",
+          "x": 13.0,
+          "y": 12.0,
+          "width": 60.0,
+          "height": 34.0
+        }
+      ],
+      "elapsed_ms": 6.709712000883883
+    },
+    {
+      "id": "en-balsamiq-2",
+      "text": "Keep the final line.",
+      "status": "OK",
+      "detected_regions": 1,
+      "lines": [
+        {
+          "text": "Keep the final line.",
+          "x": 15.0,
+          "y": 11.0,
+          "width": 256.0,
+          "height": 33.0
+        }
+      ],
+      "elapsed_ms": 13.424174001556821
+    },
+    {
+      "id": "en-balsamiq-3",
+      "text": "Sora will bring the blue book.",
+      "status": "OK",
+      "detected_regions": 1,
+      "lines": [
+        {
+          "text": "Sora will bring the blue book.",
+          "x": 14.0,
+          "y": 10.0,
+          "width": 398.0,
+          "height": 34.0
+        }
+      ],
+      "elapsed_ms": 24.325909002072876
+    },
+    {
+      "id": "en-balsamiq-4",
+      "text": "I will return tomorrow.",
+      "status": "OK",
+      "detected_regions": 1,
+      "lines": [
+        {
+          "text": "I will return tomorrow.",
+          "x": 13.0,
+          "y": 13.0,
+          "width": 293.0,
+          "height": 29.0
+        }
+      ],
+      "elapsed_ms": 20.348956000816543
+    },
+    {
+      "id": "en-balsamiq-5",
+      "text": "The library opens tomorrow.",
+      "status": "OK",
+      "detected_regions": 1,
+      "lines": [
+        {
+          "text": "The library opens tomorrow.",
+          "x": 17.0,
+          "y": 12.0,
+          "width": 375.0,
+          "height": 32.0
+        }
+      ],
+      "elapsed_ms": 25.890152999636484
+    },
+    {
+      "id": "en-balsamiq-6",
+      "text": "Do not leave the last line behind.",
+      "status": "OK",
+      "detected_regions": 1,
+      "lines": [
+        {
+          "text": "Do not leave the last line behind.",
+          "x": 16.0,
+          "y": 12.0,
+          "width": 445.0,
+          "height": 29.0
+        }
+      ],
+      "elapsed_ms": 37.31653599970741
+    },
+    {
+      "id": "en-balsamiq-7",
+      "text": "Please keep the name Sora unchanged.",
+      "status": "OK",
+      "detected_regions": 1,
+      "lines": [
+        {
+          "text": "Please keep the name Sora unchanged.",
+          "x": 14.0,
+          "y": 11.0,
+          "width": 554.0,
+          "height": 33.0
+        }
+      ],
+      "elapsed_ms": 32.966176000627456
+    },
+    {
+      "id": "en-panel-0",
+      "text": "The library opens tomorrow.",
+      "status": "OK",
+      "detected_regions": 1,
+      "lines": [
+        {
+          "text": "The library opens tomorrow.",
+          "x": 2.0,
+          "y": 4.0,
+          "width": 596.0,
+          "height": 52.0
+        }
+      ],
+      "elapsed_ms": 28.689938997558784
+    },
+    {
+      "id": "en-panel-1",
+      "text": "Sora will bring the blue book.",
+      "status": "OK",
+      "detected_regions": 1,
+      "lines": [
+        {
+          "text": "Sora will bring the blue book.",
+          "x": -0.0,
+          "y": 2.0,
+          "width": 614.0,
+          "height": 55.0
+        }
+      ],
+      "elapsed_ms": 27.994724998279708
+    },
+    {
+      "id": "en-panel-2",
+      "text": "Please keep the name Sora unchanged.",
+      "status": "OK",
+      "detected_regions": 1,
+      "lines": [
+        {
+          "text": "Please keep the name Sora unchanged.",
+          "x": 2.0,
+          "y": 3.0,
+          "width": 815.0,
+          "height": 53.0
+        }
+      ],
+      "elapsed_ms": 40.72161799922469
+    },
+    {
+      "id": "ja-panel-0",
+      "text": "凶書館志明日開寺主寸。",
+      "status": "OK",
+      "detected_regions": 1,
+      "lines": [
+        {
+          "text": "凶書館志明日開寺主寸。",
+          "x": 4.0,
+          "y": 9.0,
+          "width": 458.0,
+          "height": 44.0
+        }
+      ],
+      "elapsed_ms": 33.743983000022126
+    },
+    {
+      "id": "ja-panel-1",
+      "text": "方法青本老持⊃寺末寸。",
+      "status": "OK",
+      "detected_regions": 1,
+      "lines": [
+        {
+          "text": "方法青本老持⊃寺末寸。",
+          "x": 7.0,
+          "y": 8.0,
+          "width": 583.0,
+          "height": 44.0
+        }
+      ],
+      "elapsed_ms": 36.009368999657454
+    },
+    {
+      "id": "ja-panel-2",
+      "text": "亏℃八5名前法变元本下<尤志)。",
+      "status": "OK",
+      "detected_regions": 1,
+      "lines": [
+        {
+          "text": "亏℃八5名前法变元本下<尤志)。",
+          "x": 7.0,
+          "y": 7.0,
+          "width": 766.0,
+          "height": 47.0
+        }
+      ],
+      "elapsed_ms": 53.625804001057986
+    },
+    {
+      "id": "zh-CN-panel-0",
+      "text": "图书馆明天开放。",
+      "status": "OK",
+      "detected_regions": 1,
+      "lines": [
+        {
+          "text": "图书馆明天开放。",
+          "x": 4.0,
+          "y": 9.0,
+          "width": 331.0,
+          "height": 44.0
+        }
+      ],
+      "elapsed_ms": 36.55911000168999
+    },
+    {
+      "id": "zh-CN-panel-1",
+      "text": "小空会带来那本蓝色的书。",
+      "status": "OK",
+      "detected_regions": 1,
+      "lines": [
+        {
+          "text": "小空会带来那本蓝色的书。",
+          "x": 2.0,
+          "y": 9.0,
+          "width": 508.0,
+          "height": 43.0
+        }
+      ],
+      "elapsed_ms": 26.907024999673013
+    },
+    {
+      "id": "zh-CN-panel-2",
+      "text": "请保留小空这个名字。",
+      "status": "OK",
+      "detected_regions": 1,
+      "lines": [
+        {
+          "text": "请保留小空这个名字。",
+          "x": 3.0,
+          "y": 11.0,
+          "width": 418.0,
+          "height": 41.0
+        }
+      ],
+      "elapsed_ms": 26.887750998866977
+    },
+    {
+      "id": "zh-TW-panel-0",
+      "text": "圖書館明天開放。",
+      "status": "OK",
+      "detected_regions": 1,
+      "lines": [
+        {
+          "text": "圖書館明天開放。",
+          "x": 3.0,
+          "y": 7.0,
+          "width": 349.0,
+          "height": 45.0
+        }
+      ],
+      "elapsed_ms": 18.91953599988483
+    },
+    {
+      "id": "zh-TW-panel-1",
+      "text": "小空會帶來那本藍色的書。",
+      "status": "OK",
+      "detected_regions": 1,
+      "lines": [
+        {
+          "text": "小空會帶來那本藍色的書。",
+          "x": 4.0,
+          "y": 9.0,
+          "width": 525.0,
+          "height": 41.0
+        }
+      ],
+      "elapsed_ms": 28.233304001332726
+    },
+    {
+      "id": "zh-TW-panel-2",
+      "text": "请保留小空這個名字。",
+      "status": "OK",
+      "detected_regions": 1,
+      "lines": [
+        {
+          "text": "请保留小空這個名字。",
+          "x": 3.0,
+          "y": 7.0,
+          "width": 436.0,
+          "height": 46.0
+        }
+      ],
+      "elapsed_ms": 19.099929002550198
+    },
+    {
+      "id": "ko-panel-0",
+      "text": "E对恐芒智是音.",
+      "status": "OK",
+      "detected_regions": 1,
+      "lines": [
+        {
+          "text": "E对恐芒智是音.",
+          "x": 4.0,
+          "y": 9.0,
+          "width": 496.0,
+          "height": 44.0
+        }
+      ],
+      "elapsed_ms": 27.93190699958359
+    },
+    {
+      "id": "ko-panel-1",
+      "text": "企斗乞包赳号外含LC.",
+      "status": "OK",
+      "detected_regions": 1,
+      "lines": [
+        {
+          "text": "企斗乞包赳号外含LC.",
+          "x": 5.0,
+          "y": 11.0,
+          "width": 625.0,
+          "height": 40.0
+        }
+      ],
+      "elapsed_ms": 31.932449001033092
+    },
+    {
+      "id": "ko-panel-2",
+      "text": "企斗己乞 0言芒邮平对叶州豆.",
+      "status": "OK",
+      "detected_regions": 1,
+      "lines": [
+        {
+          "text": "企斗己乞 0言芒邮平对叶州豆.",
+          "x": 2.0,
+          "y": 9.0,
+          "width": 580.0,
+          "height": 42.0
+        }
+      ],
+      "elapsed_ms": 32.645922001393046
+    }
+  ]
+}

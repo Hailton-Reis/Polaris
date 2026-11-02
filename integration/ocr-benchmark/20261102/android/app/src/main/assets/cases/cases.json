@@ -1,0 +1,282 @@
+[
+  {
+    "id": "en-sans-0",
+    "file": "en-sans-0.png",
+    "lang": "en",
+    "kind": "line",
+    "expected": "I"
+  },
+  {
+    "id": "en-sans-1",
+    "file": "en-sans-1.png",
+    "lang": "en",
+    "kind": "line",
+    "expected": "NO!"
+  },
+  {
+    "id": "en-sans-2",
+    "file": "en-sans-2.png",
+    "lang": "en",
+    "kind": "line",
+    "expected": "Keep the final line."
+  },
+  {
+    "id": "en-sans-3",
+    "file": "en-sans-3.png",
+    "lang": "en",
+    "kind": "line",
+    "expected": "Sora will bring the blue book."
+  },
+  {
+    "id": "en-sans-4",
+    "file": "en-sans-4.png",
+    "lang": "en",
+    "kind": "line",
+    "expected": "I will return tomorrow."
+  },
+  {
+    "id": "en-sans-5",
+    "file": "en-sans-5.png",
+    "lang": "en",
+    "kind": "line",
+    "expected": "The library opens tomorrow."
+  },
+  {
+    "id": "en-sans-6",
+    "file": "en-sans-6.png",
+    "lang": "en",
+    "kind": "line",
+    "expected": "Do not leave the last line behind."
+  },
+  {
+    "id": "en-sans-7",
+    "file": "en-sans-7.png",
+    "lang": "en",
+    "kind": "line",
+    "expected": "Please keep the name Sora unchanged."
+  },
+  {
+    "id": "en-anime-0",
+    "file": "en-anime-0.png",
+    "lang": "en",
+    "kind": "line",
+    "expected": "I"
+  },
+  {
+    "id": "en-anime-1",
+    "file": "en-anime-1.png",
+    "lang": "en",
+    "kind": "line",
+    "expected": "NO!"
+  },
+  {
+    "id": "en-anime-2",
+    "file": "en-anime-2.png",
+    "lang": "en",
+    "kind": "line",
+    "expected": "Keep the final line."
+  },
+  {
+    "id": "en-anime-3",
+    "file": "en-anime-3.png",
+    "lang": "en",
+    "kind": "line",
+    "expected": "Sora will bring the blue book."
+  },
+  {
+    "id": "en-anime-4",
+    "file": "en-anime-4.png",
+    "lang": "en",
+    "kind": "line",
+    "expected": "I will return tomorrow."
+  },
+  {
+    "id": "en-anime-5",
+    "file": "en-anime-5.png",
+    "lang": "en",
+    "kind": "line",
+    "expected": "The library opens tomorrow."
+  },
+  {
+    "id": "en-anime-6",
+    "file": "en-anime-6.png",
+    "lang": "en",
+    "kind": "line",
+    "expected": "Do not leave the last line behind."
+  },
+  {
+    "id": "en-anime-7",
+    "file": "en-anime-7.png",
+    "lang": "en",
+    "kind": "line",
+    "expected": "Please keep the name Sora unchanged."
+  },
+  {
+    "id": "en-balsamiq-0",
+    "file": "en-balsamiq-0.png",
+    "lang": "en",
+    "kind": "line",
+    "expected": "I"
+  },
+  {
+    "id": "en-balsamiq-1",
+    "file": "en-balsamiq-1.png",
+    "lang": "en",
+    "kind": "line",
+    "expected": "NO!"
+  },
+  {
+    "id": "en-balsamiq-2",
+    "file": "en-balsamiq-2.png",
+    "lang": "en",
+    "kind": "line",
+    "expected": "Keep the final line."
+  },
+  {
+    "id": "en-balsamiq-3",
+    "file": "en-balsamiq-3.png",
+    "lang": "en",
+    "kind": "line",
+    "expected": "Sora will bring the blue book."
+  },
+  {
+    "id": "en-balsamiq-4",
+    "file": "en-balsamiq-4.png",
+    "lang": "en",
+    "kind": "line",
+    "expected": "I will return tomorrow."
+  },
+  {
+    "id": "en-balsamiq-5",
+    "file": "en-balsamiq-5.png",
+    "lang": "en",
+    "kind": "line",
+    "expected": "The library opens tomorrow."
+  },
+  {
+    "id": "en-balsamiq-6",
+    "file": "en-balsamiq-6.png",
+    "lang": "en",
+    "kind": "line",
+    "expected": "Do not leave the last line behind."
+  },
+  {
+    "id": "en-balsamiq-7",
+    "file": "en-balsamiq-7.png",
+    "lang": "en",
+    "kind": "line",
+    "expected": "Please keep the name Sora unchanged."
+  },
+  {
+    "id": "en-panel-0",
+    "file": "en-panel-0.png",
+    "lang": "en",
+    "kind": "panel",
+    "expected": "The library opens tomorrow."
+  },
+  {
+    "id": "en-panel-1",
+    "file": "en-panel-1.png",
+    "lang": "en",
+    "kind": "panel",
+    "expected": "Sora will bring the blue book."
+  },
+  {
+    "id": "en-panel-2",
+    "file": "en-panel-2.png",
+    "lang": "en",
+    "kind": "panel",
+    "expected": "Please keep the name Sora unchanged."
+  },
+  {
+    "id": "ja-panel-0",
+    "file": "ja-panel-0.png",
+    "lang": "ja",
+    "kind": "panel",
+    "expected": "図書館は明日開きます。"
+  },
+  {
+    "id": "ja-panel-1",
+    "file": "ja-panel-1.png",
+    "lang": "ja",
+    "kind": "panel",
+    "expected": "ソラは青い本を持ってきます。"
+  },
+  {
+    "id": "ja-panel-2",
+    "file": "ja-panel-2.png",
+    "lang": "ja",
+    "kind": "panel",
+    "expected": "ソラという名前は変えないでください。"
+  },
+  {
+    "id": "zh-CN-panel-0",
+    "file": "zh-CN-panel-0.png",
+    "lang": "zh-CN",
+    "kind": "panel",
+    "expected": "图书馆明天开放。"
+  },
+  {
+    "id": "zh-CN-panel-1",
+    "file": "zh-CN-panel-1.png",
+    "lang": "zh-CN",
+    "kind": "panel",
+    "expected": "小空会带来那本蓝色的书。"
+  },
+  {
+    "id": "zh-CN-panel-2",
+    "file": "zh-CN-panel-2.png",
+    "lang": "zh-CN",
+    "kind": "panel",
+    "expected": "请保留小空这个名字。"
+  },
+  {
+    "id": "zh-TW-panel-0",
+    "file": "zh-TW-panel-0.png",
+    "lang": "zh-TW",
+    "kind": "panel",
+    "expected": "圖書館明天開放。"
+  },
+  {
+    "id": "zh-TW-panel-1",
+    "file": "zh-TW-panel-1.png",
+    "lang": "zh-TW",
+    "kind": "panel",
+    "expected": "小空會帶來那本藍色的書。"
+  },
+  {
+    "id": "zh-TW-panel-2",
+    "file": "zh-TW-panel-2.png",
+    "lang": "zh-TW",
+    "kind": "panel",
+    "expected": "請保留小空這個名字。"
+  },
+  {
+    "id": "ko-panel-0",
+    "file": "ko-panel-0.png",
+    "lang": "ko",
+    "kind": "panel",
+    "expected": "도서관은 내일 문을 엽니다."
+  },
+  {
+    "id": "ko-panel-1",
+    "file": "ko-panel-1.png",
+    "lang": "ko",
+    "kind": "panel",
+    "expected": "소라는 파란 책을 가져올 것입니다."
+  },
+  {
+    "id": "ko-panel-2",
+    "file": "ko-panel-2.png",
+    "lang": "ko",
+    "kind": "panel",
+    "expected": "소라라는 이름은 바꾸지 마세요."
+  },
+  {
+    "id": "en-long-full",
+    "file": "long.png",
+    "lang": "en",
+    "kind": "long",
+    "expected": "POLARIS - LONG STRIP OCR\nSynthetic control, not a quality score\nI\nNO!\nA caption outside the balloons.\nScene 01 begins here.\nKeep every single word.\nThis is the final line.\nScene 02 begins here.\nKeep every single word.\nThis is the final line.\nScene 03 begins here.\nKeep every single word.\nThis is the final line.\nScene 04 begins here.\nKeep every single word.\nThis is the final line.\nScene 05 begins here.\nKeep every single word.\nThis is the final line.\nScene 06 begins here.\nKeep every single word.\nThis is the final line.\nScene 07 begins here.\nKeep every single word.\nThis is the final line.\nScene 08 begins here.\nKeep every single word.\nThis is the final line.\nScene 09 begins here.\nKeep every single word.\nThis is the final line.\nScene 10 begins here.\nKeep every single word.\nThis is the final line.\nScene 11 begins here.\nKeep every single word.\nThis is the final line."
+  }
+]

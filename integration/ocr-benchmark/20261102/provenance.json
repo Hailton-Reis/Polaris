@@ -1,0 +1,57 @@
+{
+  "date": "2026-11-02",
+  "host": "Linux-6.18.57-x86_64-with-glibc2.41",
+  "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+  "packages": {
+    "numpy": "2.3.5",
+    "Pillow": "12.3.0",
+    "onnxruntime": "1.21.1",
+    "opencv-python-headless": "5.0.0.93",
+    "PyYAML": "6.0.3"
+  },
+  "files": [
+    {
+      "path": "/workspace/polaris-documents/ppocr-sdk/src/main/assets/models/det/inference.onnx",
+      "bytes": 9880512,
+      "sha256": "d73e0058b7a8086bbd57f3d10b8bcd4ff95363f67e06e2762b5e814fe9c9410e"
+    },
+    {
+      "path": "/workspace/polaris-documents/ppocr-sdk/src/main/assets/models/rec/inference.onnx",
+      "bytes": 21159378,
+      "sha256": "5435fd747c9e0efe15a96d0b378d5bd157e9492ed8fd80edf08f30d02fa24634"
+    },
+    {
+      "path": "/workspace/polaris-documents/ppocr-sdk/src/main/assets/models/rec/inference.yml",
+      "bytes": 150579,
+      "sha256": "ab078671bb49f06228eadccd34f1bb501e157f7a047095ffb943ba81512c77d1"
+    },
+    {
+      "path": "/workspace/scratch/polaris-ocr-benchmark-v1/tiny/inference.onnx",
+      "bytes": 4462639,
+      "sha256": "9ef676d6ed3c88256a2d92c640c44f25b0c40947e111b14b8be8f594091563e6"
+    },
+    {
+      "path": "/workspace/scratch/polaris-ocr-benchmark-v1/tiny/inference.yml",
+      "bytes": 55571,
+      "sha256": "66170210bad538e83fff3c4a3867e547d6bf20b50d64b20347c4b913f3034ea1"
+    },
+    {
+      "path": "/workspace/scratch/polaris-ocr-benchmark-v1/bench-final.apk",
+      "bytes": 19339317,
+      "sha256": "000f358f156c477ed364b360d3be44d513ac848b1a8d9be5422fcfe62d706bf9"
+    }
+  ],
+  "tiny_archive": {
+    "url": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_inference_model/paddle3.0.0/PP-OCRv6_tiny_rec_onnx_infer.tar",
+    "sha256": "1e13b22717b1edd89d4cde4fda272b6c17d5b505c97c2baea99da1a3a2d54b29"
+  },
+  "android": {
+    "api": 26,
+    "abi": "x86_64",
+    "acceleration": false,
+    "package": "org.polaris.ocrbench",
+    "model_sdk": "16.0.1",
+    "source": "AOSP x86_64-26_r01.zip"
+  },
+  "product_scope": "No new models bundled into Polaris. No public Release."
+}

@@ -26,8 +26,14 @@ O Tiny não é uma versão do ML Kit nem substitui o tradutor. Para comparar a e
 
 O coletor atual exporta texto salvo **após os filtros**. Seus resultados medem o caminho completo de reconhecimento e processamento, não a precisão isolada do motor. Não chamar uma retenção pelo filtro de posicionamento de erro do OCR se o texto estiver presente no registro. Para um benchmark isolado do motor, será necessária uma coleta de resultados brutos antes dos filtros, com o mesmo pré-processamento.
 
+## Ensaio controlado já executado
+
+O [ensaio de 02/11/2026](../integration/ocr-benchmark/20261102/report/RESULTADOS.md) executou a API ML Kit real em Android 8 x86_64 e os modelos oficiais Small/Tiny em ONNX Runtime CPU/Linux. Nos 27 recortes de inglês, o pipeline Small acertou 26 textos completos, Tiny 22 e ML Kit 19. Em uma página sintética de 20.000 px, os três recuperaram as 38 linhas ao usar faixas; a página inteira perdeu quase todo ou todo o texto.
+
+O Tiny avaliado não cobre japonês/coreano e não foi incorporado ao app. As imagens, as saídas brutas e o código estão no pacote. Esses resultados avaliam controles de qualidade, não velocidade/memória ARM ou o capítulo real com falha. Não é necessário que o usuário execute esse ensaio já concluído. A comparação completa em aparelhos continua dependendo de adaptação e validação por ABI.
+
 ## Primeiro teste do usuário
 
 Agora basta uma verificação curta da beta.6: instalar o pacote da ABI correspondente como atualização, confirmar a versão em Sobre e abrir o mesmo capítulo em que houve falhas. Começar com **ML Kit e OCR por faixas desligado**, observando leitura, alinhamento e falas curtas. Não é necessário configurar Gemini ou API nem executar todo o benchmark agora.
 
-O teste comparativo completo entre ML Kit e o Tiny só começa depois que o Tiny estiver adaptado e validado para ambas as ABIs. Se compararmos o Paddle já existente antes disso, os resultados devem identificá-lo como o modelo existente, sem atribuí-los ao Tiny.
+O teste comparativo completo **em aparelhos Android ARM** entre ML Kit e o Tiny só começa depois que o Tiny estiver adaptado e validado para ambas as ABIs. Se compararmos o Paddle já existente antes disso, os resultados devem identificá-lo como o modelo existente, sem atribuí-los ao Tiny.
