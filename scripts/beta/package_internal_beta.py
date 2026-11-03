@@ -11,7 +11,7 @@ import tempfile
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[2]
-REVISION = 'P20261102.4'
+REVISION = 'P20261103.1'
 
 
 def sha256(path):
@@ -67,7 +67,7 @@ def package(apks, output, comparison, apksigner):
     for abi in ['arm64-v8a', 'armeabi-v7a']:
         entry = next(e for e in metadata['elements'] if any(
             f.get('filterType') == 'ABI' and f.get('value') == abi for f in e['filters']))
-        if entry['versionCode'] != 108 or entry['versionName'] != '0.1.0-beta.7':
+        if entry['versionCode'] != 109 or entry['versionName'] != '0.1.0-beta.8':
             raise ValueError('Stale beta APK version metadata')
         name = entry['outputFile']
         if Path(name).name != name:
@@ -89,14 +89,14 @@ def package(apks, output, comparison, apksigner):
     try:
         artifacts = []
         for abi, apk in selected:
-            name = f'Polaris-0.1.0-beta.7-{abi}.apk'
+            name = f'Polaris-0.1.0-beta.8-{abi}.apk'
             shutil.copy2(apk, temporary / name)
             artifacts.append({'abi': abi, 'file': name, 'bytes': apk.stat().st_size, 'sha256': sha256(apk)})
         shutil.copy2(ROOT / 'integration/internal-beta/README.md', temporary / 'COMECE_AQUI.md')
         shutil.copytree(ROOT / 'integration/internal-beta/language-fixtures', temporary / 'testes/idiomas')
         shutil.copytree(ROOT / 'integration/document-reader/fixtures', temporary / 'testes/documentos')
         shutil.copytree(ROOT / 'integration/internal-beta/long-strip-fixture', temporary / 'testes/faixa-longa')
-        manifest = {'status': 'INTERNAL_BETA_CANDIDATE', 'version': '0.1.0-beta.7', 'version_code': 108,
+        manifest = {'status': 'INTERNAL_BETA_CANDIDATE', 'version': '0.1.0-beta.8', 'version_code': 109,
                     'revision': REVISION, 'minimum_android_api': 26,
                     'application_id': metadata['applicationId'], 'signer_sha256': signer_hash,
                     'artifacts': artifacts, 'unit_comparison': evidence,
