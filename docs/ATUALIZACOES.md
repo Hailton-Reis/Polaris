@@ -14,9 +14,9 @@ Rascunhos são ignorados. No canal padrão, tanto a marcação `prerelease` do G
 
 ## Acesso ao GitHub
 
-O endereço consultado é `Hailton-Reis/Polaris`, sem token de acesso embutido no aplicativo. O repositório e a [Release beta.3](https://github.com/Hailton-Reis/Polaris/releases/tag/v0.1.0-beta.3) agora são **públicos**. Ela contém dois APKs, manifesto, hashes, guia e exemplos. O download pelo navegador do celular não exige uma conta do GitHub.
+O endereço consultado é `Hailton-Reis/Polaris`, sem token de acesso embutido no aplicativo. O repositório e a [Release beta.8](https://github.com/Hailton-Reis/Polaris/releases/tag/v0.1.0-beta.8) agora são **públicos**. Ela contém dois APKs completos, manifesto, hashes, roteiro e relatório de validação. O download pelo navegador do celular não exige uma conta do GitHub.
 
-O aplicativo está configurado para consultar esse repositório. As versões beta dependem da opção **Receber atualizações experimentais**, desativada por padrão. Acesso público não equivale a validação de atualização no aparelho: consulta, download e instalação com a assinatura original ainda precisam desse teste. Instalar a própria beta.3 também não cria uma versão posterior para o atualizador oferecer.
+O aplicativo está configurado para consultar esse repositório. As versões beta dependem da opção **Receber atualizações experimentais**, desativada por padrão. Acesso público não equivale a validação de atualização no aparelho: consulta, download e instalação com a assinatura original ainda precisam desse teste. Uma instalação da beta.3 pode encontrar a beta.8 ao ativar o canal experimental; instalar a própria beta.8 não cria uma versão posterior para o atualizador oferecer.
 
 Falhas de rede e limites do GitHub são diferenciados de uma consulta concluída. Uma eventual indisponibilidade ou restrição futura do repositório também deve ser informada, em vez de ser apresentada como ausência de atualização.
 
@@ -53,6 +53,8 @@ Consultar não baixa o APK. Quando o usuário aceita o download, o arquivo `upda
 
 ## Estado de validação
 
-O candidato P20261101.3 compilou com os APKs ARM verificados. Os 20 testes novos de versões, canais, seleção de APK, metadados, falhas, intervalo de consultas e integridade do arquivo passaram. A comparação completa teve 491 aprovações e as mesmas 34 falhas preexistentes, sem novas regressões. Compilar e executar esses testes não valida uma atualização real. A consulta em rede pública, o download e a instalação sobre a assinatura original permanecem pendentes nos aparelhos.
+A beta.8 / P20261103.1 foi compilada com os APKs ARM verificados. A comparação final teve 589 testes JVM: 555 aprovações e as mesmas 34 falhas preexistentes, sem novas regressões. Os testes existentes de versão, canal, seleção, metadados e integridade continuam incluídos. Os 42 testes adicionados desde beta.7 também passaram.
 
-[Evidência da revisão](https://github.com/Hailton-Reis/Polaris/blob/c54644cf396c816ebeb45bbfa5c619b570984523/integration/internal-beta/TEST_RESULTS.json).
+Os APKs mantêm a identidade e a assinatura da beta.3 distribuída. Compilação, hashes e testes JVM não validam uma atualização real. Consulta em rede pública, download e instalação com preservação da biblioteca continuam pendentes nos aparelhos.
+
+[Evidência da beta.8](https://github.com/Hailton-Reis/Polaris/blob/v0.1.0-beta.8/integration/document-reader/TEST_RESULTS.json).

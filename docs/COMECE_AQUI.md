@@ -1,22 +1,25 @@
 # Comece aqui
 
-## Antes de instalar
+## Baixar e instalar
 
-O Polaris tem seu [primeiro beta público publicado](https://github.com/Hailton-Reis/Polaris/releases/tag/v0.1.0-beta.3) para quem deseja experimentar o aplicativo. Ainda não possui lançamento estável. A revisão crítica de armazenamento está [registrada aqui](ARMAZENAMENTO.md). Instalação, consumo total e leitura nos aparelhos continuam pendentes de aceite.
+O [beta.8 público](https://github.com/Hailton-Reis/Polaris/releases/tag/v0.1.0-beta.8) está disponível para experimentar. Ainda não há lançamento estável. Instalação, continuidade dos dados e consumo nos aparelhos continuam pendentes de aceite.
 
-A apresentação do projeto fica em `main`. A implementação em avaliação está em [r001/multisource-foundation](https://github.com/Hailton-Reis/Polaris/tree/r001/multisource-foundation). Não é necessário criar outro repositório para acompanhar o Polaris.
+1. Abra a Release no navegador do celular. Não é necessário ter conta do GitHub.
+2. Baixe **um APK**: `arm64-v8a` para Android de 64 bits ou `armeabi-v7a` para Android de 32 bits/ARMv7.
+3. Abra o arquivo no Android e confirme a instalação. Se já usa o Polaris, instale como atualização.
+4. Confira **Polaris 0.1.0-beta.8 / P20261103.1** em Sobre.
 
-## Acesso atual para desenvolvimento e teste interno
+O mínimo é Android 8. A arquitetura do sistema instalado importa: ter processador de 64 bits não garante Android de 64 bits. O modelo comercial do celular não substitui essa verificação. Os APKs do GitHub são arquivos completos; não é necessário juntar partes nem executar CMD.
 
-O mantenedor utiliza o [CMD de preparação do Windows](https://github.com/Hailton-Reis/Polaris/blob/r001/multisource-foundation/tools/windows-setup/00_POLARIS_TUDO_EM_UM.cmd). A opção 4 compila e pode gerar o pacote local `beta/`, com APKs ARM, exemplos e hashes. Essa geração não aprova automaticamente o armazenamento ou os testes nos aparelhos.
+A identidade visual é Polaris. Os arquivos publicados mantêm identificador e assinatura da beta.3 distribuída; se houver conflito de assinatura, preserve a instalação e os dados para investigação. Use sempre o manifesto e os hashes do pacote efetivamente recebido: recompilações podem ter hashes e assinaturas diferentes.
 
-O pacote atual usa versão `0.1.0-beta.3`, revisão `P20261101.3` e versionCode 104. Atualizações precisam manter a assinatura da instalação anterior para conservar a continuidade dos dados. Uma recompilação pode ter data, assinatura e hash diferentes; use o manifesto e `SHA256SUMS.txt` do pacote efetivamente recebido.
+## Capítulos e fontes
 
-Os APKs ARM64 e ARM32 destinam-se às respectivas arquiteturas do sistema Android; x86 é para ambientes de desenvolvimento compatíveis. O mínimo é Android 8. O modelo comercial do aparelho não substitui essa verificação.
+A lista reúne versões do mesmo capítulo em uma posição, evitando repetir Official/Unofficial na sequência. Não confunde números decimais, partes, volumes, temporadas ou extras identificados.
 
-## Nome e ícone no Android
+Em **Opções de capítulos → Fontes desta obra**, deixe Automático ou escolha uma fonte fixa. A busca automática consulta extensões instaladas e habilitadas no mesmo idioma, confirma título/autoria/numeração e prioriza continuidade e cobertura. A descoberta pode levar até um minuto e não baixa imagens de todos os catálogos. Se a identidade da obra for ambígua, a fonte atual é mantida.
 
-Na beta.3 publicada, o instalador e a tela inicial ainda podem mostrar **Yomotsu**, o nome da base do Polaris. A [beta.4](versoes/0.1.0-beta.4.md) corrige a identidade para **Polaris**, incluindo abertura e Sobre. A correção exige um novo APK; ela não aparece nos arquivos antigos por uma simples atualização da página do GitHub. A beta.4 está compilada e aguarda conferência no aparelho antes da publicação de seus arquivos.
+Trocar a preferência preserva arquivos e histórico. Mantenha a extensão original instalada neste candidato. Verifique o resultado com fontes reais e acompanhe [o roteiro de teste](https://github.com/Hailton-Reis/Polaris/releases/download/v0.1.0-beta.8/PRIMEIRO_TESTE.md).
 
 ## Incluir um arquivo já baixado no celular
 
@@ -57,6 +60,11 @@ Use [Issues](https://github.com/Hailton-Reis/Polaris/issues/new/choose) com revi
 
 ## Por que há dois APKs?
 
-São alternativas para o mesmo aplicativo. Baixe e instale **um**: `arm64-v8a` para Android de 64 bits (196,2 MB) ou `armeabi-v7a` para Android de 32 bits (156,4 MB). A arquitetura do sistema instalado importa; ter processador de 64 bits não garante Android de 64 bits.
+São alternativas para o mesmo aplicativo. Baixe e instale **um**: `arm64-v8a` para Android de 64 bits (194,5 MB) ou `armeabi-v7a` para Android de 32 bits (154,7 MB). A arquitetura do sistema instalado importa; ter processador de 64 bits não garante Android de 64 bits.
 
 Os arquivos separados evitam incluir ambas as arquiteturas em cada download. Um APK universal poderia reuni-las, com tamanho maior. Quando a consulta de atualizações estiver acessível, o atualizador usa os metadados do aparelho para escolher o arquivo compatível.
+
+
+## Compilar para desenvolvimento
+
+A apresentação fica em `main`; o código integrado desta versão está na [tag beta.8](https://github.com/Hailton-Reis/Polaris/tree/v0.1.0-beta.8). O [CMD de preparação do Windows](https://github.com/Hailton-Reis/Polaris/blob/r001/multisource-foundation/tools/windows-setup/00_POLARIS_TUDO_EM_UM.cmd) é uma ferramenta de desenvolvimento. A opção 4 compila e pode exportar um pacote local com APKs, exemplos e hashes. Compilar não aprova automaticamente os testes físicos nem reproduz a assinatura da distribuição.

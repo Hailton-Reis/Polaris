@@ -2,6 +2,30 @@
 
 Este arquivo registra a evolução real do código. **Revisões de desenvolvimento não são lançamentos públicos.** As datas abaixo usam America/Fortaleza, exceto quando houver indicação de UTC. O histórico de distribuição fica em [Releases](https://github.com/Hailton-Reis/Polaris/releases).
 
+## 0.1.0-beta.8 · P20261103.1 — 03/11/2026
+
+**Estado:** pré-lançamento público para testes; versionCode 109; Android 8+, ARM32 e ARM64. Instalação/atualização e consumo em aparelhos físicos continuam pendentes de aceite.
+
+- Uma sequência lógica agrupa Official/Unofficial, preservando progresso e arquivos. Partes, decimais, volumes, temporadas e extras identificados permanecem separados.
+- Escolha automática entre catálogos de fontes compatíveis e fonte fixa por obra.
+- Retomada, leitor, próximos downloads, atualizações e contagens adotam a mesma identidade de capítulo.
+- Cache e traduções separados por edição; escopo do glossário mantido por obra.
+- Dedicatória escondida no Sobre e correções de identidade, leitura e OCR acumuladas desde a beta.3.
+
+589 testes JVM: 555 aprovações e as mesmas 34 falhas preexistentes, sem regressões novas. Todos os 42 testes novos passaram. APKs com a mesma assinatura da beta.3 distribuída; acréscimo de 1,60 MiB por APK versus beta.7, sem modelo novo. Descoberta foi testada com provedores simulados; fontes reais e aparelhos permanecem em validação.
+
+[Baixar beta.8](https://github.com/Hailton-Reis/Polaris/releases/tag/v0.1.0-beta.8) · [Notas e validação](docs/versoes/0.1.0-beta.8.md).
+
+## Revisões internas beta.5, beta.6 e beta.7 — 02/11/2026
+
+Estas revisões não foram publicadas como Releases. Suas mudanças integram a beta.8:
+
+- **beta.5 / P20261102.2 / código 106:** edição avançada de tradução desligada por padrão e ferramentas de diagnóstico de leitura.
+- **beta.6 / P20261102.3 / código 107:** melhorias de retenção de texto reconhecido e OCR por regiões sobrepostas em páginas longas, inicialmente com ML Kit em inglês.
+- **beta.7 / P20261102.4 / código 108:** caminho regional compartilhado por ML Kit e Paddle Small em inglês, com controles de geometria e decodificação limitada. O rascunho permaneceu sem APKs publicados.
+
+As comparações do benchmark usaram controles sintéticos; não aprovam a qualidade de todos os capítulos reais. Nenhum modelo Tiny foi adicionado ao aplicativo.
+
 ## 0.1.0-beta.4 · P20261102.1 — 02/11/2026 (UTC)
 
 **Estado:** candidato compilado; versionCode 105. Os APKs da beta.4 ainda não foram publicados nas Releases. Conferência visual no A12 pendente.
