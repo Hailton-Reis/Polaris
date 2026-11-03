@@ -66,3 +66,10 @@ Missing last lines and text outside balloons remain unverified until an actual f
 Candidate beta.6 / versionCode 107 keeps Gemini outside the current test round. Recognized single-character text is retained; detected balloons are protected from the oversized-short-text sound-effect filter. An opt-in, English-only long-page ML Kit path reads overlapping original-scale regions sequentially with a bounded decoded pixel budget and geometric duplicate reconciliation. It adds no model or API and remains off pending real-device/case validation. The unused direct generative SDK dependency was removed.
 
 The Windows launcher selects a FHD framebuffer on Polaris startup and applies 420 dpi before opening the app, including existing AVD sessions; baseline is unchanged. An original synthetic long-strip CBZ and expected text are included as a pending manual control. See [the research and decisions](../../docs/PESQUISA_OCR_MLKIT_2026_11_02.md).
+
+
+## P20261102.4 — shared regional OCR
+
+Internal candidate beta.7 / versionCode 108 applies the bounded overlapping-region path to both ML Kit and the bundled Paddle Small, in English. The setting remains off by default and preserves the beta.6 preference key. The two engines share bounds/EXIF checks, sequential decoding and geometric duplicate reconciliation. No model was added; compiled ARM APKs grew by 18,988 bytes each, with all compared assets and native libraries unchanged.
+
+The combined comparison has 547 JVM tests: 513 pass and the same 34 baseline failures. All twelve reconciliation tests pass, including recorded ML Kit/Small/Tiny geometry that preserves the 38 control lines. Two decoder component tests pass on AOSP Android 8 x86_64 with an isolated instrumentation Application: the minimal image lacks WebView, so full reader startup remains unvalidated there. This does not change the reader's Application. Actual ARM device acceptance remains pending. See [implementation, limits and validation](../../docs/OCR_FAIXAS_COMPARTILHADAS_P20261102_4.md) and [current evidence](TEST_RESULTS.json).

@@ -1,6 +1,6 @@
-# Polaris 0.1.0-beta.6 — guia de teste do beta
+# Polaris 0.1.0-beta.7 — guia de teste do beta
 
-Revisão: **P20261102.3**. Android mínimo: **8.0 / API 26**. Esta é uma versão experimental para experimentar e registrar problemas; a conferência nos celulares ainda está pendente.
+Revisão: **P20261102.4**. Android mínimo: **8.0 / API 26**. Esta é uma versão experimental para experimentar e registrar problemas; a conferência nos celulares ainda está pendente.
 
 ## Nome e ícone corrigidos
 
@@ -18,7 +18,7 @@ O pacote contém dois APKs. Use **arm64-v8a** primeiro nos aparelhos Android de 
 
 Instale apenas um APK por aparelho. Não é necessário o APK universal nem as versões x86 do emulador. Instalações e atualizações devem vir sempre da mesma máquina/assinatura usada para esse beta. Não apague a instalação antiga para contornar um erro de assinatura: isso pode remover os dados locais. O mantenedor deve reconstruir e compartilhar o APK com a assinatura original.
 
-O mantenedor gera o pacote com a opção **4** do CMD atualizado. Ao concluir a comparação automatizada, a pasta de evidências contém **beta/**, com APKs ARM, hashes e exemplos. A opção **9** continua sendo o fluxo local de instalação já existente. Confira **P20261102.3** em **Sobre** antes de registrar resultados. O versionCode agora é **107**; o candidato anterior usava 106.
+O mantenedor gera o pacote com a opção **4** do CMD atualizado. Ao concluir a comparação automatizada, a pasta de evidências contém **beta/**, com APKs ARM, hashes e exemplos. A opção **9** continua sendo o fluxo local de instalação já existente. Confira **P20261102.4** em **Sobre** antes de registrar resultados. O versionCode agora é **108**; o candidato anterior usava 107.
 
 ## Uso inicial
 
@@ -56,7 +56,7 @@ O glossário por obra já fica no menu da obra. A tradução textual de document
 
 No pacote, os exemplos estão em **testes/documentos/** e **testes/idiomas/**. São textos e páginas originais preparados para o teste.
 
-1. Confira a tela **Sobre** e as opções de atualização: experimental desligado por padrão, consulta manual, indisponibilidade do repositório privado e manutenção da versão ao desligar o beta. Consulta/download/instalação reais dependem de Releases acessíveis e da mesma assinatura; ainda estão pendentes. Em instalação limpa, confira espera sem rede, preparação automática, **Preparar agora**, opção de desativar e retomada após reiniciar. Após **Pronto**, teste inglês → português offline. O estado precisa refletir recursos reais, inclusive após remover modelos. A preparação não deve alterar seus idiomas escolhidos. Cada participante registra aparelho, Android, ABI do APK e revisão. Abra um livro, ajuste a fonte, leia, feche e retome. Confira imagem, categorias e importação seletiva.
+1. Confira a tela **Sobre** e as opções de atualização: experimental desligado por padrão, consulta manual, tratamento da falta de rede e manutenção da versão ao desligar o beta. Consulta/download/instalação reais dependem de Releases acessíveis e da mesma assinatura; ainda estão pendentes. Em instalação limpa, confira espera sem rede, preparação automática, **Preparar agora**, opção de desativar e retomada após reiniciar. Após **Pronto**, teste inglês → português offline. O estado precisa refletir recursos reais, inclusive após remover modelos. A preparação não deve alterar seus idiomas escolhidos. Cada participante registra aparelho, Android, ABI do APK e revisão. Abra um livro, ajuste a fonte, leia, feche e retome. Confira imagem, categorias e importação seletiva.
 2. Com o mesmo capítulo: meça armazenamento antes do download, depois do download, depois da tradução, depois da exclusão e depois de baixar/traduzir novamente. O glossário precisa permanecer. Faça também uma exclusão enquanto há tradução na fila para conferir cancelamento e limpeza.
 3. Confira a tradução no paginado e na faixa longa, incluindo zoom e **Cortar bordas**. A correção automática de alinhamento ainda exige esta conferência visual.
 4. Nos exemplos CBZ locais, escolha manualmente a entrada correta: EN, JA, ZH ou KO. Teste chinês simplificado e tradicional e o trecho japonês vertical. Confira OCR antes de julgar a tradução. Cadastre o nome de cada exemplo como protegido, conforme **manifest.json** dos exemplos, e confira a consistência após excluir/rebaixar o capítulo.
@@ -74,11 +74,25 @@ Este candidato não foi publicado como Release. A edição das traduções come�
 
 ## Foco desta rodada: OCR e ML Kit
 
-Gemini não participa desta rodada; nenhuma API é necessária. O filtro preserva caracteres isolados e falas curtas com letras grandes dentro de balões detectados. O experimento **OCR por faixas em páginas longas**, em Tradução → OCR, é opcional, começa desligado e usa o ML Kit em inglês, sem outro modelo. Requer nova execução da tradução do capítulo para refazer o OCR.
+Gemini não participa desta rodada; nenhuma API é necessária. O filtro preserva caracteres isolados e falas curtas com letras grandes dentro de balões detectados. O experimento **OCR por faixas em páginas longas**, em Tradução → OCR, é opcional, começa desligado e funciona com ML Kit ou PaddleOCR em inglês, sem outro modelo. Requer nova execução da tradução do capítulo para refazer o OCR.
 
-O emulador Polaris agora abre com Full HD automático pelas opções 9/10; a 13 é opcional. O [arquivo de controle sintético](long-strip-fixture/Polaris-faixa-longa-controle.cbz) e [a transcrição esperada](long-strip-fixture/expected.json) ajudam a conferir falas de um caractere e parágrafos nas bordas das faixas. Esse controle ainda não foi reconhecido no Android e não representa um teste de qualidade aprovado. Veja [a pesquisa com fontes e limites](../../docs/PESQUISA_OCR_MLKIT_2026_11_02.md).
+O emulador Polaris agora abre com Full HD automático pelas opções 9/10; a 13 é opcional. O [arquivo de controle sintético](long-strip-fixture/Polaris-faixa-longa-controle.cbz) e [a transcrição esperada](long-strip-fixture/expected.json) ajudam a conferir falas de um caractere e parágrafos nas bordas das faixas. O [benchmark controlado](../ocr-benchmark/20261102/report/RESULTADOS.md) já reconheceu esse controle pela API ML Kit em Android 8 e pelo Paddle em CPU/Linux: as faixas recuperaram as 38 linhas. Isso não representa aprovação em capítulos reais nem desempenho medido em ARM. A integração no leitor é avaliada separadamente. Veja [a pesquisa com fontes e limites](../../docs/PESQUISA_OCR_MLKIT_2026_11_02.md).
 
 
 ## Compatibilidade e benchmark
 
 A distribuição inclui **ARM32/ARMv7 e ARM64, Android 8+**; o A12 é somente um dos aparelhos possíveis de teste. A meta é compatibilidade ampla entre marcas, versões do Android e capacidades. A aprovação física de cada categoria ainda está pendente. O [protocolo de benchmark](../../docs/BENCHMARK_OCR_ARM32_ARM64.md) separa OCR de tradução, o Paddle existente do Tiny pesquisado e a avaliação do motor da avaliação do processamento completo. Para o primeiro teste, use apenas ML Kit padrão no trecho que apresentou o defeito.
+
+
+## Beta.7: faixas com os dois motores
+
+A opção **Tradução → OCR → OCR por faixas em páginas longas (experimental)** agora funciona com **ML Kit e PaddleOCR**, em inglês. Ela continua desligada inicialmente. A chave de configuração foi preservada: quem já havia ativado o experimento na beta.6 mantém a escolha.
+
+O decodificador compartilhado processa uma faixa por vez, sem carregar deliberadamente o bitmap de altura completa nesse caminho. Cada faixa tem até 2.097.152 pixels (8 MiB de pixels ARGB), até 2.048 px de altura, com sobreposição adaptada à largura. Isso **não** limita a RAM total: modelos, buffers nativos e a imagem comprimida do decodificador também consomem memória. Não há novo modelo ou API. O Tiny não foi integrado.
+
+O modo atende JPEG/PNG/WebP altos, largura até 4.096 px e até 256 faixas. Páginas comuns ou com orientação EXIF rotacionada continuam no caminho existente. A detecção experimental DBNet impede combinar as duas experiências. Há testes do reconciliador Kotlin com saídas reais do benchmark para preservar as 38 linhas sem repetição. A leitura visual, a tradução e a medição em aparelhos físicos continuam pendentes.
+
+Para comparar, use o **mesmo original**, inglês → português e o mesmo glossário. Registre ML Kit normal/faixas e Paddle normal/faixas, retraduzindo o capítulo a cada mudança: alterar o motor não refaz automaticamente o OCR já salvo. Letras perdidas, palavras repetidas e alinhamento devem ser avaliados separadamente da qualidade da tradução.
+
+
+Para garantir uma nova leitura da imagem após mudar motor ou faixas, use a ação de remover somente a tradução salva do capítulo e depois traduza o capítulo novamente. O arquivo original baixado permanece. Retraduzir uma única frase no editor usa o texto OCR já salvo e não serve para comparar motores.

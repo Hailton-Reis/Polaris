@@ -1,5 +1,5 @@
 diff --git a/app/build.gradle.kts b/app/build.gradle.kts
-index 63e2698..296f046 100644
+index 63e2698..19778ef 100644
 --- a/app/build.gradle.kts
 +++ b/app/build.gradle.kts
 @@ -32,14 +32,14 @@ android {
@@ -8,8 +8,8 @@ index 63e2698..296f046 100644
  
 -        versionCode = 101
 -        versionName = "0.20.4-Y40"
-+        versionCode = 107
-+        versionName = "0.1.0-beta.6"
++        versionCode = 108
++        versionName = "0.1.0-beta.7"
  
          buildConfigField("String", "COMMIT_COUNT", "\"${getLatestCommitCount()}\"")
          buildConfigField("String", "COMMIT_SHA", "\"${getLatestCommitSha()}\"")
@@ -38,6 +38,136 @@ index 63e2698..296f046 100644
  }
  
  androidComponents {
+diff --git a/app/src/androidTest/java/eu/kanade/translation/recognizer/OcrComponentTestRunner.kt b/app/src/androidTest/java/eu/kanade/translation/recognizer/OcrComponentTestRunner.kt
+new file mode 100644
+index 0000000..0ca716d
+--- /dev/null
++++ b/app/src/androidTest/java/eu/kanade/translation/recognizer/OcrComponentTestRunner.kt
+@@ -0,0 +1,14 @@
++package eu.kanade.translation.recognizer
++
++import android.app.Application
++import android.content.Context
++import androidx.test.runner.AndroidJUnitRunner
++
++/**
++ * Optional component-only runner for AOSP images without a WebView provider.
++ * The reader APK and the normal full-application test runner remain unchanged.
++ */
++class OcrComponentTestRunner : AndroidJUnitRunner() {
++    override fun newApplication(cl: ClassLoader, className: String, context: Context): Application =
++        super.newApplication(cl, Application::class.java.name, context)
++}
+diff --git a/app/src/androidTest/java/eu/kanade/translation/recognizer/OcrStripImageTest.kt b/app/src/androidTest/java/eu/kanade/translation/recognizer/OcrStripImageTest.kt
+new file mode 100644
+index 0000000..6b8d94e
+--- /dev/null
++++ b/app/src/androidTest/java/eu/kanade/translation/recognizer/OcrStripImageTest.kt
+@@ -0,0 +1,104 @@
++package eu.kanade.translation.recognizer
++
++import android.graphics.Bitmap
++import android.graphics.Canvas
++import android.graphics.Color
++import android.graphics.Paint
++import android.net.Uri
++import androidx.exifinterface.media.ExifInterface
++import androidx.test.ext.junit.runners.AndroidJUnit4
++import androidx.test.platform.app.InstrumentationRegistry
++import org.junit.Assert.assertEquals
++import org.junit.Assert.assertNull
++import org.junit.Assert.assertTrue
++import org.junit.Test
++import org.junit.runner.RunWith
++import java.io.ByteArrayInputStream
++import java.io.ByteArrayOutputStream
++import java.io.File
++
++@RunWith(AndroidJUnit4::class)
++class OcrStripImageTest {
++    @Test
++    fun regionsPreserveCoordinatesAndPixelBudgetAndCloseOnFailure() {
++        val bytes = bandedImage(Bitmap.CompressFormat.PNG)
++        var opened = 0
++        var closed = 0
++        val image = OcrImage(Uri.EMPTY) {
++            opened++
++            object : ByteArrayInputStream(bytes) {
++                private var wasClosed = false
++                override fun close() {
++                    if (!wasClosed) closed++
++                    wasClosed = true
++                    super.close()
++                }
++            }
++        }
++        val source = checkNotNull(OcrStripImage.open(image))
++        assertEquals(opened, closed)
++        assertEquals(64, source.width)
++        assertEquals(5000, source.height)
++        try {
++            source.use {
++                for (strip in source.strips) {
++                    val bitmap = source.decode(strip)
++                    try {
++                        assertEquals(64, bitmap.width)
++                        assertEquals(strip.bottom - strip.top, bitmap.height)
++                        assertTrue(bitmap.width * bitmap.height <= OcrStripPlan.MAX_TILE_PIXELS)
++                        val y = bitmap.height / 2
++                        assertEquals(colorAt(strip.top + y), bitmap.getPixel(32, y))
++                    } finally {
++                        bitmap.recycle()
++                    }
++                }
++                throw java.io.IOException("intentional test failure")
++            }
++        } catch (error: java.io.IOException) {
++            assertEquals("intentional test failure", error.message)
++        }
++        assertTrue(runCatching { source.decode(source.strips.first()) }.isFailure)
++        assertEquals(opened, closed)
++    }
++
++    @Test
++    fun rotatedExifDoesNotUseRawRegionCoordinates() {
++        val context = InstrumentationRegistry.getInstrumentation().targetContext
++        val file = File.createTempFile("ocr-strip-exif", ".jpg", context.cacheDir)
++        try {
++            file.writeBytes(bandedImage(Bitmap.CompressFormat.JPEG))
++            ExifInterface(file.absolutePath).apply {
++                setAttribute(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_ROTATE_90.toString())
++                saveAttributes()
++            }
++            assertNull(OcrStripImage.open(OcrImage(Uri.fromFile(file)) { file.inputStream() }))
++        } finally {
++            file.delete()
++        }
++    }
++
++    private fun bandedImage(format: Bitmap.CompressFormat): ByteArray {
++        val bitmap = Bitmap.createBitmap(64, 5000, Bitmap.Config.ARGB_8888)
++        try {
++            val canvas = Canvas(bitmap)
++            val paint = Paint()
++            for (y in 0 until 5000) {
++                paint.color = colorAt(y)
++                canvas.drawRect(0f, y.toFloat(), 64f, (y + 1).toFloat(), paint)
++            }
++            return ByteArrayOutputStream().use { output ->
++                assertTrue(bitmap.compress(format, 100, output))
++                output.toByteArray()
++            }
++        } finally {
++            bitmap.recycle()
++        }
++    }
++
++    private fun colorAt(y: Int) = when {
++        y < 1600 -> Color.BLUE
++        y < 3300 -> Color.RED
++        else -> Color.GREEN
++    }
++}
 diff --git a/app/src/debug/AndroidManifest.xml b/app/src/debug/AndroidManifest.xml
 index aac6140..0ecf96f 100644
 --- a/app/src/debug/AndroidManifest.xml
@@ -1254,7 +1384,7 @@ index 0050b97..979f158 100644
              titleRes = MR.strings.pref_category_about,
              formatSubtitle = {
 diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsTranslationScreen.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsTranslationScreen.kt
-index a198c3f..cf5f02a 100644
+index a198c3f..56b05dd 100644
 --- a/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsTranslationScreen.kt
 +++ b/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsTranslationScreen.kt
 @@ -50,6 +50,24 @@ object SettingsTranslationScreen : SearchableSettings {
@@ -1287,7 +1417,7 @@ index a198c3f..cf5f02a 100644
                          .toImmutableMap(),
                  ),
 +                Preference.PreferenceItem.SwitchPreference(
-+                    preference = translationPreferences.mlKitLongPageStrips(),
++                    preference = translationPreferences.longPageStrips(),
 +                    title = stringResource(ATMR.strings.pref_mlkit_long_page_strips),
 +                    subtitle = stringResource(ATMR.strings.pref_mlkit_long_page_strips_summary),
 +                ),
@@ -1335,7 +1465,7 @@ index a198c3f..cf5f02a 100644
                      preference = translationPreferences.translationEngineTemperature(),
                      title = stringResource(ATMR.strings.pref_engine_temperature),
 diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
-index 7f411fd..b6bc52a 100644
+index 7f411fd..1e8a4e7 100644
 --- a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
 +++ b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
 @@ -1,16 +1,10 @@
@@ -1392,7 +1522,7 @@ index 7f411fd..b6bc52a 100644
  
      // Identifies this overlay independently of the pinned upstream COMMIT_SHA.
 -    private const val POLARIS_READER_REVISION = "P20261031.2"
-+    private const val POLARIS_READER_REVISION = "P20261102.3"
++    private const val POLARIS_READER_REVISION = "P20261102.4"
  
      @Composable
      override fun Content() {
@@ -4246,7 +4376,7 @@ index ec83930..06c948f 100644
      fun cancelQueuedTranslation(translation: Translation) {
 diff --git a/app/src/main/java/eu/kanade/translation/diagnostics/ReaderCaptureSession.kt b/app/src/main/java/eu/kanade/translation/diagnostics/ReaderCaptureSession.kt
 new file mode 100644
-index 0000000..89f61b3
+index 0000000..848d732
 --- /dev/null
 +++ b/app/src/main/java/eu/kanade/translation/diagnostics/ReaderCaptureSession.kt
 @@ -0,0 +1,105 @@
@@ -4318,7 +4448,7 @@ index 0000000..89f61b3
 +            put("translationHash", hash)
 +            put("translationBlocks", page.translation?.blocks?.count { it.translation.isNotBlank() } ?: 0)
 +            put("configuredProvider", engine.name)
-+            put("configuredMlKitLongPageStrips", preferences.mlKitLongPageStrips().get())
++            put("configuredMlKitLongPageStrips", preferences.longPageStrips().get())
 +            model?.let { put("configuredModel", it) }
 +            put(
 +                "configuredOcrLanguage",
@@ -4589,19 +4719,14 @@ index ec6041a..bf92796 100644
              val activeEditor = editor
              if (block != null && activeEditor != null) {
 diff --git a/app/src/main/java/eu/kanade/translation/recognizer/MlKitOcrEngine.kt b/app/src/main/java/eu/kanade/translation/recognizer/MlKitOcrEngine.kt
-index 6e0e8b1..2faca57 100644
+index 6e0e8b1..ed823df 100644
 --- a/app/src/main/java/eu/kanade/translation/recognizer/MlKitOcrEngine.kt
 +++ b/app/src/main/java/eu/kanade/translation/recognizer/MlKitOcrEngine.kt
-@@ -1,21 +1,32 @@
+@@ -1,21 +1,26 @@
  package eu.kanade.translation.recognizer
  
  import android.content.Context
 -import kotlinx.coroutines.tasks.await
-+import android.graphics.Bitmap
-+import android.graphics.BitmapFactory
-+import android.graphics.BitmapRegionDecoder
-+import android.graphics.Rect
-+import androidx.exifinterface.media.ExifInterface
  import com.google.mlkit.vision.common.InputImage
 +import com.google.mlkit.vision.text.Text
  import com.google.mlkit.vision.text.TextRecognition
@@ -4616,7 +4741,6 @@ index 6e0e8b1..2faca57 100644
  import kotlinx.coroutines.withContext
  import logcat.LogPriority
  import tachiyomi.core.common.util.system.logcat
-+import java.io.IOException
 +import kotlin.coroutines.coroutineContext
  
  class MlKitOcrEngine(
@@ -4626,7 +4750,7 @@ index 6e0e8b1..2faca57 100644
  ) : OcrEngine {
      override val type = OcrEngineType.ML_KIT
  
-@@ -35,20 +46,17 @@ class MlKitOcrEngine(
+@@ -35,20 +40,17 @@ class MlKitOcrEngine(
      override suspend fun recognize(image: OcrImage): OcrPage = withContext(Dispatchers.IO) {
          val pageStart = System.nanoTime()
          try {
@@ -4652,7 +4776,7 @@ index 6e0e8b1..2faca57 100644
                  OcrTextBlock(
                      text = block.text,
                      x = bounds.left.toFloat(),
-@@ -60,23 +68,7 @@ class MlKitOcrEngine(
+@@ -60,23 +62,7 @@ class MlKitOcrEngine(
                      angle = block.lines.firstOrNull()?.angle ?: 0f,
                  )
              }
@@ -4677,44 +4801,20 @@ index 6e0e8b1..2faca57 100644
          } catch (error: Throwable) {
              logcat(LogPriority.ERROR, error) {
                  "OCR failure engine=ML_KIT totalMs=${elapsedMs(pageStart)} error=${error::class.simpleName}"
-@@ -85,13 +77,117 @@ class MlKitOcrEngine(
+@@ -85,13 +71,91 @@ class MlKitOcrEngine(
          }
      }
  
 -    override suspend fun release() {
 -        recognizer.close()
-+    @Suppress("DEPRECATION")
 +    private suspend fun recognizeStrips(image: OcrImage, pageStart: Long): OcrPage? {
-+        val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
-+        image.openInputStream().use { BitmapFactory.decodeStream(it, null, bounds) }
-+        if (bounds.outWidth <= 0 || bounds.outHeight <= 0 ||
-+            bounds.outMimeType !in setOf("image/jpeg", "image/png", "image/webp")
-+        ) {
-+            return null
-+        }
-+        val strips = MlKitStripPlan.create(bounds.outWidth, bounds.outHeight)
-+        if (strips.isEmpty()) return null
-+        // Raw-region coordinates must agree with the EXIF-corrected reader space.
-+        val orientation = try {
-+            image.openInputStream().use { input ->
-+                ExifInterface(input).getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED)
-+            }
-+        } catch (_: IOException) {
-+            return null
-+        }
-+        if (orientation !in setOf(ExifInterface.ORIENTATION_UNDEFINED, ExifInterface.ORIENTATION_NORMAL)) return null
-+        val decoder = image.openInputStream().use { BitmapRegionDecoder.newInstance(it, false) }
-+            ?: throw IOException("Não foi possível abrir a página para reconhecimento por faixas")
++        val source = OcrStripImage.open(image) ?: return null
 +        val lines = mutableListOf<StripOcrLine>()
 +        var ocrTimeMs = 0L
-+        try {
-+            check(decoder.width == bounds.outWidth && decoder.height == bounds.outHeight)
-+            for ((index, strip) in strips.withIndex()) {
++        source.use {
++            for ((index, strip) in source.strips.withIndex()) {
 +                coroutineContext.ensureActive()
-+                val bitmap = decoder.decodeRegion(
-+                    Rect(0, strip.top, bounds.outWidth, strip.bottom),
-+                    BitmapFactory.Options().apply { inPreferredConfig = Bitmap.Config.ARGB_8888 },
-+                ) ?: throw IOException("Não foi possível decodificar uma faixa da página")
++                val bitmap = source.decode(strip)
 +                try {
 +                    val ocrStart = System.nanoTime()
 +                    // ML Kit's Task cannot be cancelled with the coroutine. Wait for
@@ -4731,16 +4831,14 @@ index 6e0e8b1..2faca57 100644
 +                    bitmap.recycle()
 +                }
 +            }
-+        } finally {
-+            decoder.recycle()
 +        }
 +        return finishPage(
-+            bounds.outWidth,
-+            bounds.outHeight,
-+            MlKitStripPlan.deduplicate(lines),
++            source.width,
++            source.height,
++            OcrStripPlan.deduplicate(lines),
 +            pageStart,
 +            ocrTimeMs,
-+            strips.size,
++            source.strips.size,
 +        )
 +    }
 +
@@ -4800,11 +4898,120 @@ index 6e0e8b1..2faca57 100644
 +
 +    private fun elapsedMs(startNanos: Long): Long = (System.nanoTime() - startNanos) / 1_000_000L
  }
-diff --git a/app/src/main/java/eu/kanade/translation/recognizer/MlKitStripPlan.kt b/app/src/main/java/eu/kanade/translation/recognizer/MlKitStripPlan.kt
+diff --git a/app/src/main/java/eu/kanade/translation/recognizer/OcrEngineFactory.kt b/app/src/main/java/eu/kanade/translation/recognizer/OcrEngineFactory.kt
+index de36825..4c20a51 100644
+--- a/app/src/main/java/eu/kanade/translation/recognizer/OcrEngineFactory.kt
++++ b/app/src/main/java/eu/kanade/translation/recognizer/OcrEngineFactory.kt
+@@ -1,6 +1,9 @@
+ package eu.kanade.translation.recognizer
+ 
+ import android.content.Context
++import tachiyomi.domain.translation.TranslationPreferences
++import uy.kohesive.injekt.Injekt
++import uy.kohesive.injekt.api.get
+ 
+ object OcrEngineFactory {
+ 
+@@ -10,9 +13,13 @@ object OcrEngineFactory {
+         language: TextRecognizerLanguage,
+     ): OcrEngine {
+         require(type.supports(language)) { "PaddleOCR requires English source text" }
++        val stripsEnabled = {
++            val preferences = Injekt.get<TranslationPreferences>()
++            preferences.longPageStrips().get() && !preferences.dbnetExperimental().get()
++        }
+         return when (type) {
+-            OcrEngineType.ML_KIT -> MlKitOcrEngine(context, language)
+-            OcrEngineType.PADDLE_OCR -> PaddleOcrEngine(context, language)
++            OcrEngineType.ML_KIT -> MlKitOcrEngine(context, language, stripsEnabled)
++            OcrEngineType.PADDLE_OCR -> PaddleOcrEngine(context, language, stripsEnabled)
+         }
+     }
+ }
+diff --git a/app/src/main/java/eu/kanade/translation/recognizer/OcrStripImage.kt b/app/src/main/java/eu/kanade/translation/recognizer/OcrStripImage.kt
 new file mode 100644
-index 0000000..c7e7c03
+index 0000000..7a9e838
 --- /dev/null
-+++ b/app/src/main/java/eu/kanade/translation/recognizer/MlKitStripPlan.kt
++++ b/app/src/main/java/eu/kanade/translation/recognizer/OcrStripImage.kt
+@@ -0,0 +1,73 @@
++package eu.kanade.translation.recognizer
++
++import android.graphics.Bitmap
++import android.graphics.BitmapFactory
++import android.graphics.BitmapRegionDecoder
++import android.graphics.Rect
++import androidx.exifinterface.media.ExifInterface
++import java.io.Closeable
++import java.io.IOException
++
++/** Shared decoder; only one original-scale region is held by either OCR engine. */
++@Suppress("DEPRECATION")
++internal class OcrStripImage private constructor(
++    private val decoder: BitmapRegionDecoder,
++    val width: Int,
++    val height: Int,
++    val strips: List<OcrStrip>,
++) : Closeable {
++    fun decode(strip: OcrStrip): Bitmap {
++        require(strip.top >= 0 && strip.bottom <= height && strip.bottom > strip.top)
++        require(width.toLong() * (strip.bottom - strip.top) <= OcrStripPlan.MAX_TILE_PIXELS)
++        return decoder.decodeRegion(
++            Rect(0, strip.top, width, strip.bottom),
++            BitmapFactory.Options().apply {
++                inPreferredConfig = Bitmap.Config.ARGB_8888
++                inSampleSize = 1
++                inScaled = false
++            },
++        ) ?: throw IOException("Não foi possível decodificar uma faixa da página")
++    }
++
++    override fun close() {
++        decoder.recycle()
++    }
++
++    companion object {
++        fun open(image: OcrImage): OcrStripImage? {
++            val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
++            image.openInputStream().use { BitmapFactory.decodeStream(it, null, bounds) }
++            if (bounds.outWidth <= 0 || bounds.outHeight <= 0 ||
++                bounds.outMimeType !in setOf("image/jpeg", "image/png", "image/webp")
++            ) {
++                return null
++            }
++            val strips = OcrStripPlan.create(bounds.outWidth, bounds.outHeight)
++            if (strips.isEmpty()) return null
++            // Raw-region coordinates must agree with the EXIF-corrected reader.
++            val orientation = try {
++                image.openInputStream().use { input ->
++                    ExifInterface(
++                        input,
++                    ).getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED)
++                }
++            } catch (_: IOException) {
++                return null
++            }
++            if (orientation !in
++                setOf(ExifInterface.ORIENTATION_UNDEFINED, ExifInterface.ORIENTATION_NORMAL)
++            ) {
++                return null
++            }
++            val decoder = image.openInputStream().use { BitmapRegionDecoder.newInstance(it, false) }
++                ?: throw IOException("Não foi possível abrir a página para reconhecimento por faixas")
++            try {
++                check(decoder.width == bounds.outWidth && decoder.height == bounds.outHeight)
++                return OcrStripImage(decoder, bounds.outWidth, bounds.outHeight, strips)
++            } catch (error: Throwable) {
++                decoder.recycle()
++                throw error
++            }
++        }
++    }
++}
+diff --git a/app/src/main/java/eu/kanade/translation/recognizer/OcrStripPlan.kt b/app/src/main/java/eu/kanade/translation/recognizer/OcrStripPlan.kt
+new file mode 100644
+index 0000000..e5ad362
+--- /dev/null
++++ b/app/src/main/java/eu/kanade/translation/recognizer/OcrStripPlan.kt
 @@ -0,0 +1,74 @@
 +package eu.kanade.translation.recognizer
 +
@@ -4820,7 +5027,7 @@ index 0000000..c7e7c03
 +)
 +
 +/** Pixel-preserving sequential regions: no full-height bitmap or new model. */
-+internal object MlKitStripPlan {
++internal object OcrStripPlan {
 +    const val MAX_TILE_PIXELS = 2_097_152
 +
 +    fun create(width: Int, height: Int): List<OcrStrip> {
@@ -4880,32 +5087,177 @@ index 0000000..c7e7c03
 +
 +    private fun normalized(text: String) = text.lowercase().filter(Char::isLetterOrDigit)
 +}
-diff --git a/app/src/main/java/eu/kanade/translation/recognizer/OcrEngineFactory.kt b/app/src/main/java/eu/kanade/translation/recognizer/OcrEngineFactory.kt
-index de36825..c615e43 100644
---- a/app/src/main/java/eu/kanade/translation/recognizer/OcrEngineFactory.kt
-+++ b/app/src/main/java/eu/kanade/translation/recognizer/OcrEngineFactory.kt
-@@ -1,6 +1,9 @@
+diff --git a/app/src/main/java/eu/kanade/translation/recognizer/PaddleOcrEngine.kt b/app/src/main/java/eu/kanade/translation/recognizer/PaddleOcrEngine.kt
+index 3e70290..3baa3e0 100644
+--- a/app/src/main/java/eu/kanade/translation/recognizer/PaddleOcrEngine.kt
++++ b/app/src/main/java/eu/kanade/translation/recognizer/PaddleOcrEngine.kt
+@@ -1,16 +1,23 @@
  package eu.kanade.translation.recognizer
  
  import android.content.Context
-+import tachiyomi.domain.translation.TranslationPreferences
-+import uy.kohesive.injekt.Injekt
-+import uy.kohesive.injekt.api.get
++import android.graphics.BitmapFactory
+ import com.paddle.ocr.PaddleOCR
++import com.paddle.ocr.model.OCRRunResult
+ import com.paddle.ocr.util.OpenCVUtils
++import kotlinx.coroutines.NonCancellable
++import kotlinx.coroutines.ensureActive
+ import kotlinx.coroutines.sync.Mutex
+ import kotlinx.coroutines.sync.withLock
++import kotlinx.coroutines.withContext
+ import logcat.LogPriority
+ import tachiyomi.core.common.util.system.logcat
++import kotlin.coroutines.coroutineContext
  
- object OcrEngineFactory {
+ class PaddleOcrEngine(
+     context: Context,
+     override val language: TextRecognizerLanguage,
++    private val stripsEnabled: () -> Boolean = { false },
+ ) : OcrEngine {
+     override val type = OcrEngineType.PADDLE_OCR
  
-@@ -11,7 +14,10 @@ object OcrEngineFactory {
-     ): OcrEngine {
-         require(type.supports(language)) { "PaddleOCR requires English source text" }
-         return when (type) {
--            OcrEngineType.ML_KIT -> MlKitOcrEngine(context, language)
-+            OcrEngineType.ML_KIT -> MlKitOcrEngine(context, language) {
-+                val preferences = Injekt.get<TranslationPreferences>()
-+                preferences.mlKitLongPageStrips().get() && !preferences.dbnetExperimental().get()
-+            }
-             OcrEngineType.PADDLE_OCR -> PaddleOcrEngine(context, language)
+@@ -26,8 +33,9 @@ class PaddleOcrEngine(
+         val pageStart = System.nanoTime()
+         var initializationTimeMs = 0L
+         try {
+-            val bitmap = image.openInputStream().use { android.graphics.BitmapFactory.decodeStream(it) } ?: throw IllegalStateException("Unable to decode image for OCR")
+-            val engine = paddleOcr ?: run {
++            // Cache the engine before cancellation can discard newly loaded sessions.
++            // No source bitmap has been allocated if initialization fails.
++            val engine = paddleOcr ?: withContext(NonCancellable) {
+                 val initializationStart = System.nanoTime()
+                 PaddleOcrRuntime.requireOpenCv { OpenCVUtils.init(appContext) }
+                 PaddleOCR.create(appContext).also {
+@@ -35,32 +43,22 @@ class PaddleOcrEngine(
+                     initializationTimeMs = elapsedMs(initializationStart)
+                 }
+             }
+-            val result = try { engine.recognize(bitmap) } finally { bitmap.recycle() }
+-            require(result.imageWidth > 0 && result.imageHeight > 0) { "Unable to decode OCR image dimensions" }
+-            val blocks = result.results.mapNotNull { block ->
+-                PaddleTextBlockMapper.map(
+-                    text = block.text,
+-                    confidence = block.confidence,
+-                    points = block.box.points.map { point -> OcrPoint(point.x, point.y) },
+-                )
++            coroutineContext.ensureActive()
++            if (stripsEnabled()) {
++                recognizeStrips(image, engine, pageStart, initializationTimeMs)?.let { return@withLock it }
+             }
+-            val totalTimeMs = elapsedMs(pageStart)
+-            logcat(LogPriority.INFO) {
+-                "OCR page engine=PADDLE_OCR initMs=$initializationTimeMs ocrMs=${result.totalTimeMs} " +
+-                    "totalMs=$totalTimeMs blocks=${blocks.size} detMs=${result.detectionTimeMs} " +
+-                    "recMs=${result.recognitionTimeMs} detShape=${result.detInputShape.joinToString("x")}"
++            val bitmap = image.openInputStream().use { BitmapFactory.decodeStream(it) }
++                ?: throw IllegalStateException("Unable to decode image for OCR")
++            val result = try {
++                engine.recognize(bitmap)
++            } finally {
++                bitmap.recycle()
+             }
+-            OcrPage(
+-                width = result.imageWidth,
+-                height = result.imageHeight,
+-                blocks = blocks,
+-                metrics = OcrPerformanceMetrics(
+-                    initializationTimeMs = initializationTimeMs,
+-                    ocrTimeMs = result.totalTimeMs,
+-                    totalTimeMs = totalTimeMs,
+-                    detectionTimeMs = result.detectionTimeMs,
+-                    recognitionTimeMs = result.recognitionTimeMs,
+-                ),
++            require(result.imageWidth > 0 && result.imageHeight > 0) { "Unable to decode OCR image dimensions" }
++            finishPage(
++                result.imageWidth, result.imageHeight, mapBlocks(result), pageStart,
++                initializationTimeMs, result.totalTimeMs, result.detectionTimeMs, result.recognitionTimeMs,
++                strips = 1, detectionShape = result.detInputShape.joinToString("x"),
+             )
+         } catch (error: Throwable) {
+             logcat(LogPriority.ERROR, error) {
+@@ -70,6 +68,83 @@ class PaddleOcrEngine(
          }
      }
+ 
++    private suspend fun recognizeStrips(
++        image: OcrImage,
++        engine: PaddleOCR,
++        pageStart: Long,
++        initializationTimeMs: Long,
++    ): OcrPage? {
++        val source = OcrStripImage.open(image) ?: return null
++        source.use {
++            val lines = mutableListOf<StripOcrLine>()
++            var ocrTimeMs = 0L
++            var detectionTimeMs = 0L
++            var recognitionTimeMs = 0L
++            for ((index, strip) in source.strips.withIndex()) {
++                coroutineContext.ensureActive()
++                val bitmap = source.decode(strip)
++                val result = try {
++                    engine.recognize(bitmap)
++                } finally {
++                    bitmap.recycle()
++                }
++                coroutineContext.ensureActive()
++                ocrTimeMs += result.totalTimeMs
++                detectionTimeMs += result.detectionTimeMs
++                recognitionTimeMs += result.recognitionTimeMs
++                for (block in mapBlocks(result)) {
++                    lines += StripOcrLine(
++                        block = block.copy(y = block.y + strip.top),
++                        strip = index,
++                        edgeDistance = minOf(
++                            block.y,
++                            strip.bottom - strip.top - block.y - block.height,
++                        ).coerceAtLeast(0f),
++                    )
++                }
++            }
++            return finishPage(
++                source.width, source.height, OcrStripPlan.deduplicate(lines), pageStart,
++                initializationTimeMs, ocrTimeMs, detectionTimeMs, recognitionTimeMs,
++                strips = source.strips.size,
++            )
++        }
++    }
++
++    private fun mapBlocks(result: OCRRunResult): List<OcrTextBlock> = result.results.mapNotNull { block ->
++        PaddleTextBlockMapper.map(
++            text = block.text,
++            confidence = block.confidence,
++            points = block.box.points.map { point -> OcrPoint(point.x, point.y) },
++        )
++    }
++
++    private fun finishPage(
++        width: Int,
++        height: Int,
++        blocks: List<OcrTextBlock>,
++        pageStart: Long,
++        initializationTimeMs: Long,
++        ocrTimeMs: Long,
++        detectionTimeMs: Long,
++        recognitionTimeMs: Long,
++        strips: Int,
++        detectionShape: String = "regions",
++    ): OcrPage {
++        val totalTimeMs = elapsedMs(pageStart)
++        logcat(LogPriority.INFO) {
++            "OCR page engine=PADDLE_OCR initMs=$initializationTimeMs ocrMs=$ocrTimeMs " +
++                "totalMs=$totalTimeMs blocks=${blocks.size} detMs=$detectionTimeMs " +
++                "recMs=$recognitionTimeMs detShape=$detectionShape strips=$strips"
++        }
++        return OcrPage(
++            width,
++            height,
++            blocks,
++            OcrPerformanceMetrics(initializationTimeMs, ocrTimeMs, totalTimeMs, detectionTimeMs, recognitionTimeMs),
++        )
++    }
++
+     override suspend fun release() {
+         mutex.withLock {
+             try {
 diff --git a/app/src/main/java/eu/kanade/translation/translator/GeminiComicProtocol.kt b/app/src/main/java/eu/kanade/translation/translator/GeminiComicProtocol.kt
 new file mode 100644
 index 0000000..d6e4788
@@ -6805,28 +7157,34 @@ index 0000000..d7f8746
 +        angle = 0f, balloonDetected = balloon,
 +    )
 +}
-diff --git a/app/src/test/java/eu/kanade/translation/recognizer/MlKitStripPlanTest.kt b/app/src/test/java/eu/kanade/translation/recognizer/MlKitStripPlanTest.kt
+diff --git a/app/src/test/java/eu/kanade/translation/recognizer/OcrStripPlanTest.kt b/app/src/test/java/eu/kanade/translation/recognizer/OcrStripPlanTest.kt
 new file mode 100644
-index 0000000..ed53cd1
+index 0000000..5d21ecf
 --- /dev/null
-+++ b/app/src/test/java/eu/kanade/translation/recognizer/MlKitStripPlanTest.kt
-@@ -0,0 +1,82 @@
++++ b/app/src/test/java/eu/kanade/translation/recognizer/OcrStripPlanTest.kt
+@@ -0,0 +1,140 @@
 +package eu.kanade.translation.recognizer
 +
++import kotlinx.serialization.json.Json
++import kotlinx.serialization.json.float
++import kotlinx.serialization.json.int
++import kotlinx.serialization.json.jsonArray
++import kotlinx.serialization.json.jsonObject
++import kotlinx.serialization.json.jsonPrimitive
 +import org.junit.jupiter.api.Assertions.assertEquals
 +import org.junit.jupiter.api.Assertions.assertThrows
 +import org.junit.jupiter.api.Assertions.assertTrue
 +import org.junit.jupiter.api.Test
 +
-+class MlKitStripPlanTest {
++class OcrStripPlanTest {
 +    @Test
 +    fun `regions cover entire tall pages with overlap and bounded decoded pixels`() {
 +        for (width in listOf(400, 720, 1080, 2048, 4096)) {
 +            for (height in listOf(12_500, 25_000, 50_000)) {
-+                val strips = MlKitStripPlan.create(width, height)
++                val strips = OcrStripPlan.create(width, height)
 +                assertEquals(0, strips.first().top)
 +                assertEquals(height, strips.last().bottom)
-+                assertTrue(strips.all { width.toLong() * (it.bottom - it.top) <= MlKitStripPlan.MAX_TILE_PIXELS })
++                assertTrue(strips.all { width.toLong() * (it.bottom - it.top) <= OcrStripPlan.MAX_TILE_PIXELS })
 +                strips.zipWithNext().forEach { (first, second) ->
 +                    assertTrue(second.top > first.top)
 +                    assertTrue(second.top < first.bottom)
@@ -6839,28 +7197,28 @@ index 0000000..ed53cd1
 +    @Test
 +    fun `ordinary pages and unsupported very wide pages keep existing recognition path`() {
 +        for ((width, height) in listOf(720 to 1280, 1080 to 1920, 4097 to 25_000)) {
-+            assertTrue(MlKitStripPlan.create(width, height).isEmpty())
++            assertTrue(OcrStripPlan.create(width, height).isEmpty())
 +        }
 +    }
 +
 +    @Test
 +    fun `invalid or pathological dimensions fail before allocating pixels`() {
-+        assertThrows(IllegalArgumentException::class.java) { MlKitStripPlan.create(0, 1000) }
-+        assertThrows(IllegalArgumentException::class.java) { MlKitStripPlan.create(720, Int.MAX_VALUE) }
++        assertThrows(IllegalArgumentException::class.java) { OcrStripPlan.create(0, 1000) }
++        assertThrows(IllegalArgumentException::class.java) { OcrStripPlan.create(720, Int.MAX_VALUE) }
 +    }
 +
 +    @Test
 +    fun `overlap keeps complete last line instead of the edge fragment`() {
 +        val fragment = line("Keep the last", y = 1800f, width = 150f, strip = 0, edge = 0f)
 +        val complete = line("Keep the last line", y = 1800f, width = 200f, strip = 1, edge = 150f)
-+        val result = MlKitStripPlan.deduplicate(listOf(fragment, complete))
++        val result = OcrStripPlan.deduplicate(listOf(fragment, complete))
 +        assertEquals(listOf("Keep the last line"), result.map { it.text })
 +        assertEquals(1800f, result.single().y)
 +    }
 +
 +    @Test
 +    fun `identical words at different page positions are never globally deduplicated`() {
-+        val result = MlKitStripPlan.deduplicate(
++        val result = OcrStripPlan.deduplicate(
 +            listOf(line("Yes", 100f, strip = 0), line("Yes", 300f, strip = 1)),
 +        )
 +        assertEquals(listOf(100f, 300f), result.map { it.y })
@@ -6869,14 +7227,14 @@ index 0000000..ed53cd1
 +    @Test
 +    fun `same-strip detections are preserved even when text and geometry match`() {
 +        val source = line("Hello", 100f, strip = 0)
-+        assertEquals(2, MlKitStripPlan.deduplicate(listOf(source, source)).size)
++        assertEquals(2, OcrStripPlan.deduplicate(listOf(source, source)).size)
 +    }
 +
 +    @Test
 +    fun `duplicate OCR variants prefer the region with more edge clearance`() {
 +        val clipped = line("H1GH", 1700f, strip = 0, edge = 0f)
 +        val centered = line("HIGH", 1700f, strip = 1, edge = 200f)
-+        assertEquals(listOf("HIGH"), MlKitStripPlan.deduplicate(listOf(clipped, centered)).map { it.text })
++        assertEquals(listOf("HIGH"), OcrStripPlan.deduplicate(listOf(clipped, centered)).map { it.text })
 +    }
 +
 +    @Test
@@ -6884,7 +7242,59 @@ index 0000000..ed53cd1
 +        val first = line("No", 1800f, strip = 0)
 +        val column = first.copy(strip = 1, block = first.block.copy(x = 400f))
 +        val next = line("No", 1840f, strip = 1)
-+        assertEquals(3, MlKitStripPlan.deduplicate(listOf(first, column, next)).size)
++        assertEquals(3, OcrStripPlan.deduplicate(listOf(first, column, next)).size)
++    }
++
++    @Test
++    fun `measured ML Kit overlap reproduces all benchmark lines in product reconciler`() {
++        assertMeasuredLines("mlkit")
++    }
++
++    @Test
++    fun `measured Paddle Small overlap reproduces all benchmark lines in product reconciler`() {
++        assertMeasuredLines("paddle_pipeline_small")
++    }
++
++    @Test
++    fun `measured Paddle Tiny geometry preserves overlap without enabling that model`() {
++        assertMeasuredLines("paddle_pipeline_tiny")
++    }
++
++    @Test
++    fun `benchmark dimensions use the same twelve original scale regions`() {
++        val strips = OcrStripPlan.create(720, 20_000)
++        assertEquals(12, strips.size)
++        assertEquals(2048, strips.first().bottom)
++        assertEquals(1664, strips[1].top)
++        assertEquals(20_000, strips.last().bottom)
++    }
++
++    private fun assertMeasuredLines(engine: String) {
++        val input = checkNotNull(javaClass.getResourceAsStream("/ocr-strips/$engine.json"))
++        val measured = input.bufferedReader().use { Json.parseToJsonElement(it.readText()).jsonObject }
++        val lines = measured.getValue("lines").jsonArray.map { value ->
++            val line = value.jsonObject
++            fun number(key: String) = line.getValue(key).jsonPrimitive.float
++            StripOcrLine(
++                OcrTextBlock(
++                    line.getValue("text").jsonPrimitive.content,
++                    number("x"),
++                    number("y"),
++                    number("width"),
++                    number("height"),
++                    10f,
++                    24f,
++                    0f,
++                ),
++                line.getValue("region").jsonPrimitive.int,
++                number("edge"),
++            )
++        }
++        val result = OcrStripPlan.deduplicate(lines)
++        val expected = measured.getValue("expected_lines").jsonArray.map { it.jsonPrimitive.content }
++        fun normalized(text: String) = text.lowercase().filterNot(Char::isWhitespace)
++        assertEquals(38, result.size)
++        assertEquals(expected.map(::normalized), result.map { normalized(it.text) })
 +    }
 +
 +    private fun line(text: String, y: Float, width: Float = 100f, strip: Int, edge: Float = 40f) = StripOcrLine(
@@ -7006,6 +7416,1782 @@ index b958980..3543278 100644
          assertFalse("topP" in generationConfig)
          assertFalse("topK" in generationConfig)
          assertEquals(
+diff --git a/app/src/test/resources/ocr-strips/mlkit.json b/app/src/test/resources/ocr-strips/mlkit.json
+new file mode 100644
+index 0000000..345728d
+--- /dev/null
++++ b/app/src/test/resources/ocr-strips/mlkit.json
+@@ -0,0 +1,586 @@
++{
++  "source": "Measured synthetic benchmark 2026-11-02; not new Android inference",
++  "engine": "mlkit",
++  "expected_lines": [
++    "POLARIS - LONG STRIP OCR",
++    "Synthetic control, not a quality score",
++    "I",
++    "NO!",
++    "A caption outside the balloons.",
++    "Scene 01 begins here.",
++    "Keep every single word.",
++    "This is the final line.",
++    "Scene 02 begins here.",
++    "Keep every single word.",
++    "This is the final line.",
++    "Scene 03 begins here.",
++    "Keep every single word.",
++    "This is the final line.",
++    "Scene 04 begins here.",
++    "Keep every single word.",
++    "This is the final line.",
++    "Scene 05 begins here.",
++    "Keep every single word.",
++    "This is the final line.",
++    "Scene 06 begins here.",
++    "Keep every single word.",
++    "This is the final line.",
++    "Scene 07 begins here.",
++    "Keep every single word.",
++    "This is the final line.",
++    "Scene 08 begins here.",
++    "Keep every single word.",
++    "This is the final line.",
++    "Scene 09 begins here.",
++    "Keep every single word.",
++    "This is the final line.",
++    "Scene 10 begins here.",
++    "Keep every single word.",
++    "This is the final line.",
++    "Scene 11 begins here.",
++    "Keep every single word.",
++    "This is the final line."
++  ],
++  "lines": [
++    {
++      "text": "POLARIS - LONG STRIP OCR",
++      "x": 63,
++      "y": 83,
++      "width": 395,
++      "height": 28,
++      "region": 0,
++      "edge": 83
++    },
++    {
++      "text": "Synthetic control, not a quality score",
++      "x": 62,
++      "y": 130,
++      "width": 531,
++      "height": 28,
++      "region": 0,
++      "edge": 130
++    },
++    {
++      "text": "I",
++      "x": 169,
++      "y": 618,
++      "width": 17,
++      "height": 47,
++      "region": 0,
++      "edge": 618
++    },
++    {
++      "text": "NO!",
++      "x": 438,
++      "y": 984,
++      "width": 102,
++      "height": 57,
++      "region": 0,
++      "edge": 984
++    },
++    {
++      "text": "A caption outside the balloons.",
++      "x": 102,
++      "y": 1401,
++      "width": 424,
++      "height": 32,
++      "region": 0,
++      "edge": 615
++    },
++    {
++      "text": "Scene 01 begins here.",
++      "x": 112,
++      "y": 1968,
++      "width": 313,
++      "height": 28,
++      "region": 0,
++      "edge": 52
++    },
++    {
++      "text": "Keep every single word.",
++      "x": 113,
++      "y": 2022,
++      "width": 341,
++      "height": 26,
++      "region": 0,
++      "edge": 0
++    },
++    {
++      "text": "Scene 01 begins here.",
++      "x": 112,
++      "y": 1968,
++      "width": 314,
++      "height": 27,
++      "region": 1,
++      "edge": 304
++    },
++    {
++      "text": "Keep every single word.",
++      "x": 113,
++      "y": 2022,
++      "width": 341,
++      "height": 28,
++      "region": 1,
++      "edge": 358
++    },
++    {
++      "text": "This is the final line.",
++      "x": 110,
++      "y": 2076,
++      "width": 287,
++      "height": 22,
++      "region": 1,
++      "edge": 412
++    },
++    {
++      "text": "Scene 02 begins here.",
++      "x": 112,
++      "y": 3632,
++      "width": 313,
++      "height": 28,
++      "region": 1,
++      "edge": 52
++    },
++    {
++      "text": "Keep every single word.",
++      "x": 113,
++      "y": 3686,
++      "width": 341,
++      "height": 26,
++      "region": 1,
++      "edge": 0
++    },
++    {
++      "text": "Scene 02 begins here.",
++      "x": 112,
++      "y": 3632,
++      "width": 314,
++      "height": 27,
++      "region": 2,
++      "edge": 304
++    },
++    {
++      "text": "Keep every single word.",
++      "x": 113,
++      "y": 3686,
++      "width": 341,
++      "height": 28,
++      "region": 2,
++      "edge": 358
++    },
++    {
++      "text": "This is the final line.",
++      "x": 110,
++      "y": 3740,
++      "width": 287,
++      "height": 22,
++      "region": 2,
++      "edge": 412
++    },
++    {
++      "text": "Scene 03 begins here.",
++      "x": 112,
++      "y": 5296,
++      "width": 313,
++      "height": 28,
++      "region": 2,
++      "edge": 52
++    },
++    {
++      "text": "Keep every single word.",
++      "x": 113,
++      "y": 5350,
++      "width": 341,
++      "height": 26,
++      "region": 2,
++      "edge": 0
++    },
++    {
++      "text": "Scene 03 begins here.",
++      "x": 112,
++      "y": 5296,
++      "width": 313,
++      "height": 28,
++      "region": 3,
++      "edge": 304
++    },
++    {
++      "text": "Keep every single word.",
++      "x": 113,
++      "y": 5350,
++      "width": 341,
++      "height": 28,
++      "region": 3,
++      "edge": 358
++    },
++    {
++      "text": "This is the final line.",
++      "x": 110,
++      "y": 5404,
++      "width": 287,
++      "height": 22,
++      "region": 3,
++      "edge": 412
++    },
++    {
++      "text": "Scene 04 begins here.",
++      "x": 112,
++      "y": 6960,
++      "width": 313,
++      "height": 28,
++      "region": 3,
++      "edge": 52
++    },
++    {
++      "text": "Keep every single word.",
++      "x": 113,
++      "y": 7014,
++      "width": 341,
++      "height": 26,
++      "region": 3,
++      "edge": 0
++    },
++    {
++      "text": "Scene 04 begins here.",
++      "x": 112,
++      "y": 6960,
++      "width": 313,
++      "height": 28,
++      "region": 4,
++      "edge": 304
++    },
++    {
++      "text": "Keep every single word.",
++      "x": 113,
++      "y": 7014,
++      "width": 341,
++      "height": 28,
++      "region": 4,
++      "edge": 358
++    },
++    {
++      "text": "This is the final line.",
++      "x": 110,
++      "y": 7068,
++      "width": 287,
++      "height": 22,
++      "region": 4,
++      "edge": 412
++    },
++    {
++      "text": "Scene 05 begins here.",
++      "x": 112,
++      "y": 8624,
++      "width": 313,
++      "height": 28,
++      "region": 4,
++      "edge": 52
++    },
++    {
++      "text": "Keep every single word.",
++      "x": 113,
++      "y": 8678,
++      "width": 341,
++      "height": 26,
++      "region": 4,
++      "edge": 0
++    },
++    {
++      "text": "Scene 05 begins here.",
++      "x": 112,
++      "y": 8624,
++      "width": 314,
++      "height": 27,
++      "region": 5,
++      "edge": 304
++    },
++    {
++      "text": "Keep every single word.",
++      "x": 113,
++      "y": 8674,
++      "width": 340,
++      "height": 33,
++      "region": 5,
++      "edge": 354
++    },
++    {
++      "text": "This is the final line.",
++      "x": 110,
++      "y": 8732,
++      "width": 287,
++      "height": 22,
++      "region": 5,
++      "edge": 412
++    },
++    {
++      "text": "Scene 06 begins here.",
++      "x": 112,
++      "y": 10288,
++      "width": 313,
++      "height": 28,
++      "region": 5,
++      "edge": 52
++    },
++    {
++      "text": "Keep every single word.",
++      "x": 113,
++      "y": 10342,
++      "width": 341,
++      "height": 26,
++      "region": 5,
++      "edge": 0
++    },
++    {
++      "text": "Scene 06 begins here.",
++      "x": 112,
++      "y": 10288,
++      "width": 314,
++      "height": 27,
++      "region": 6,
++      "edge": 304
++    },
++    {
++      "text": "Keep every single word.",
++      "x": 113,
++      "y": 10342,
++      "width": 341,
++      "height": 28,
++      "region": 6,
++      "edge": 358
++    },
++    {
++      "text": "This is the final line.",
++      "x": 110,
++      "y": 10396,
++      "width": 287,
++      "height": 22,
++      "region": 6,
++      "edge": 412
++    },
++    {
++      "text": "Scene 07 begins here.",
++      "x": 112,
++      "y": 11952,
++      "width": 313,
++      "height": 28,
++      "region": 6,
++      "edge": 52
++    },
++    {
++      "text": "Keep every single word.",
++      "x": 113,
++      "y": 12006,
++      "width": 341,
++      "height": 25,
++      "region": 6,
++      "edge": 1
++    },
++    {
++      "text": "Scene 07 begins here.",
++      "x": 112,
++      "y": 11952,
++      "width": 314,
++      "height": 27,
++      "region": 7,
++      "edge": 304
++    },
++    {
++      "text": "Keep every single word.",
++      "x": 113,
++      "y": 12006,
++      "width": 341,
++      "height": 28,
++      "region": 7,
++      "edge": 358
++    },
++    {
++      "text": "This is the final line.",
++      "x": 110,
++      "y": 12060,
++      "width": 287,
++      "height": 22,
++      "region": 7,
++      "edge": 412
++    },
++    {
++      "text": "Scene 08 begins here.",
++      "x": 112,
++      "y": 13616,
++      "width": 314,
++      "height": 27,
++      "region": 7,
++      "edge": 53
++    },
++    {
++      "text": "Keep every single word.",
++      "x": 113,
++      "y": 13670,
++      "width": 341,
++      "height": 26,
++      "region": 7,
++      "edge": 0
++    },
++    {
++      "text": "Scene 08 begins here.",
++      "x": 112,
++      "y": 13616,
++      "width": 314,
++      "height": 27,
++      "region": 8,
++      "edge": 304
++    },
++    {
++      "text": "Keep every single word.",
++      "x": 113,
++      "y": 13670,
++      "width": 341,
++      "height": 28,
++      "region": 8,
++      "edge": 358
++    },
++    {
++      "text": "This is the final line.",
++      "x": 110,
++      "y": 13724,
++      "width": 287,
++      "height": 22,
++      "region": 8,
++      "edge": 412
++    },
++    {
++      "text": "Scene 09 begins here.",
++      "x": 112,
++      "y": 15280,
++      "width": 313,
++      "height": 28,
++      "region": 8,
++      "edge": 52
++    },
++    {
++      "text": "Keep every single word.",
++      "x": 113,
++      "y": 15334,
++      "width": 341,
++      "height": 26,
++      "region": 8,
++      "edge": 0
++    },
++    {
++      "text": "Scene 09 begins here.",
++      "x": 112,
++      "y": 15280,
++      "width": 314,
++      "height": 27,
++      "region": 9,
++      "edge": 304
++    },
++    {
++      "text": "Keep every single word.",
++      "x": 113,
++      "y": 15334,
++      "width": 341,
++      "height": 28,
++      "region": 9,
++      "edge": 358
++    },
++    {
++      "text": "This is the final line.",
++      "x": 110,
++      "y": 15388,
++      "width": 287,
++      "height": 22,
++      "region": 9,
++      "edge": 412
++    },
++    {
++      "text": "Scene 10 begins here.",
++      "x": 112,
++      "y": 16944,
++      "width": 313,
++      "height": 28,
++      "region": 9,
++      "edge": 52
++    },
++    {
++      "text": "Keep every single word.",
++      "x": 113,
++      "y": 16998,
++      "width": 341,
++      "height": 26,
++      "region": 9,
++      "edge": 0
++    },
++    {
++      "text": "Scene 10 begins here.",
++      "x": 112,
++      "y": 16944,
++      "width": 313,
++      "height": 28,
++      "region": 10,
++      "edge": 304
++    },
++    {
++      "text": "Keep every single word.",
++      "x": 113,
++      "y": 16998,
++      "width": 341,
++      "height": 28,
++      "region": 10,
++      "edge": 358
++    },
++    {
++      "text": "This is the final line.",
++      "x": 110,
++      "y": 17051,
++      "width": 287,
++      "height": 27,
++      "region": 10,
++      "edge": 411
++    },
++    {
++      "text": "Scene 11 begins here.",
++      "x": 112,
++      "y": 18608,
++      "width": 313,
++      "height": 28,
++      "region": 10,
++      "edge": 52
++    },
++    {
++      "text": "Keep every single word.",
++      "x": 113,
++      "y": 18662,
++      "width": 341,
++      "height": 26,
++      "region": 10,
++      "edge": 0
++    },
++    {
++      "text": "Scene 11 begins here.",
++      "x": 112,
++      "y": 18608,
++      "width": 314,
++      "height": 27,
++      "region": 11,
++      "edge": 304
++    },
++    {
++      "text": "Keep every single word.",
++      "x": 113,
++      "y": 18662,
++      "width": 341,
++      "height": 28,
++      "region": 11,
++      "edge": 358
++    },
++    {
++      "text": "This is the final line.",
++      "x": 110,
++      "y": 18714,
++      "width": 287,
++      "height": 27,
++      "region": 11,
++      "edge": 410
++    }
++  ]
++}
+diff --git a/app/src/test/resources/ocr-strips/paddle_pipeline_small.json b/app/src/test/resources/ocr-strips/paddle_pipeline_small.json
+new file mode 100644
+index 0000000..28737b9
+--- /dev/null
++++ b/app/src/test/resources/ocr-strips/paddle_pipeline_small.json
+@@ -0,0 +1,586 @@
++{
++  "source": "Measured synthetic benchmark 2026-11-02; not new Android inference",
++  "engine": "paddle_pipeline_small",
++  "expected_lines": [
++    "POLARIS - LONG STRIP OCR",
++    "Synthetic control, not a quality score",
++    "I",
++    "NO!",
++    "A caption outside the balloons.",
++    "Scene 01 begins here.",
++    "Keep every single word.",
++    "This is the final line.",
++    "Scene 02 begins here.",
++    "Keep every single word.",
++    "This is the final line.",
++    "Scene 03 begins here.",
++    "Keep every single word.",
++    "This is the final line.",
++    "Scene 04 begins here.",
++    "Keep every single word.",
++    "This is the final line.",
++    "Scene 05 begins here.",
++    "Keep every single word.",
++    "This is the final line.",
++    "Scene 06 begins here.",
++    "Keep every single word.",
++    "This is the final line.",
++    "Scene 07 begins here.",
++    "Keep every single word.",
++    "This is the final line.",
++    "Scene 08 begins here.",
++    "Keep every single word.",
++    "This is the final line.",
++    "Scene 09 begins here.",
++    "Keep every single word.",
++    "This is the final line.",
++    "Scene 10 begins here.",
++    "Keep every single word.",
++    "This is the final line.",
++    "Scene 11 begins here.",
++    "Keep every single word.",
++    "This is the final line."
++  ],
++  "lines": [
++    {
++      "text": "Synthetic control, not a quality score",
++      "x": 59.0,
++      "y": 125.0,
++      "width": 537.0,
++      "height": 32.0,
++      "edge": 125.0,
++      "region": 0
++    },
++    {
++      "text": "POLARIS - LONG STRIP OCR",
++      "x": 60.0,
++      "y": 82.0,
++      "width": 397.0,
++      "height": 26.0,
++      "edge": 82.0,
++      "region": 0
++    },
++    {
++      "text": "A caption outside the balloons.",
++      "x": 79.0,
++      "y": 1401.0,
++      "width": 449.0,
++      "height": 31.0,
++      "edge": 616.0,
++      "region": 0
++    },
++    {
++      "text": "Scene 01 begins here.",
++      "x": 106.0,
++      "y": 1960.0,
++      "width": 330.0,
++      "height": 37.0,
++      "edge": 51.0,
++      "region": 0
++    },
++    {
++      "text": "Keep every single word.",
++      "x": 107.0,
++      "y": 2019.0,
++      "width": 348.0,
++      "height": 26.0,
++      "edge": 3.0,
++      "region": 0
++    },
++    {
++      "text": "I",
++      "x": 155.0,
++      "y": 607.0,
++      "width": 44.0,
++      "height": 68.0,
++      "edge": 607.0,
++      "region": 0
++    },
++    {
++      "text": "NO!",
++      "x": 403.0,
++      "y": 977.0,
++      "width": 131.0,
++      "height": 64.0,
++      "edge": 977.0,
++      "region": 0
++    },
++    {
++      "text": "Keep every single word.",
++      "x": 106.0,
++      "y": 3679.0,
++      "width": 351.0,
++      "height": 32.0,
++      "edge": 1.0,
++      "region": 1
++    },
++    {
++      "text": "Scene 02 begins here.",
++      "x": 106.0,
++      "y": 3624.0,
++      "width": 328.0,
++      "height": 37.0,
++      "edge": 51.0,
++      "region": 1
++    },
++    {
++      "text": "Scene 01 begins here.",
++      "x": 106.0,
++      "y": 1960.0,
++      "width": 330.0,
++      "height": 37.0,
++      "edge": 296.0,
++      "region": 1
++    },
++    {
++      "text": "This is the final line.",
++      "x": 108.0,
++      "y": 2071.0,
++      "width": 291.0,
++      "height": 31.0,
++      "edge": 407.0,
++      "region": 1
++    },
++    {
++      "text": "Keep every single word.",
++      "x": 108.0,
++      "y": 2017.0,
++      "width": 347.0,
++      "height": 32.0,
++      "edge": 353.0,
++      "region": 1
++    },
++    {
++      "text": "Keep every single word.",
++      "x": 106.0,
++      "y": 5343.0,
++      "width": 351.0,
++      "height": 32.0,
++      "edge": 1.0,
++      "region": 2
++    },
++    {
++      "text": "Scene 03 begins here.",
++      "x": 106.0,
++      "y": 5288.0,
++      "width": 328.0,
++      "height": 37.0,
++      "edge": 51.0,
++      "region": 2
++    },
++    {
++      "text": "This is the final line.",
++      "x": 108.0,
++      "y": 3735.0,
++      "width": 291.0,
++      "height": 31.0,
++      "edge": 407.0,
++      "region": 2
++    },
++    {
++      "text": "Keep every single word.",
++      "x": 108.0,
++      "y": 3681.0,
++      "width": 347.0,
++      "height": 32.0,
++      "edge": 353.0,
++      "region": 2
++    },
++    {
++      "text": "Scene 02 begins here.",
++      "x": 108.0,
++      "y": 3624.0,
++      "width": 328.0,
++      "height": 37.0,
++      "edge": 296.0,
++      "region": 2
++    },
++    {
++      "text": "Keep every single word.",
++      "x": 106.0,
++      "y": 7007.0,
++      "width": 351.0,
++      "height": 32.0,
++      "edge": 1.0,
++      "region": 3
++    },
++    {
++      "text": "Scene 04 begins here.",
++      "x": 106.0,
++      "y": 6952.0,
++      "width": 328.0,
++      "height": 37.0,
++      "edge": 51.0,
++      "region": 3
++    },
++    {
++      "text": "This is the final line.",
++      "x": 108.0,
++      "y": 5399.0,
++      "width": 291.0,
++      "height": 31.0,
++      "edge": 407.0,
++      "region": 3
++    },
++    {
++      "text": "Keep every single word.",
++      "x": 108.0,
++      "y": 5345.0,
++      "width": 347.0,
++      "height": 32.0,
++      "edge": 353.0,
++      "region": 3
++    },
++    {
++      "text": "Scene 03 begins here.",
++      "x": 108.0,
++      "y": 5288.0,
++      "width": 328.0,
++      "height": 37.0,
++      "edge": 296.0,
++      "region": 3
++    },
++    {
++      "text": "Keep every single word.",
++      "x": 106.0,
++      "y": 8671.0,
++      "width": 351.0,
++      "height": 32.0,
++      "edge": 1.0,
++      "region": 4
++    },
++    {
++      "text": "Scene 05 begins here.",
++      "x": 106.0,
++      "y": 8616.0,
++      "width": 328.0,
++      "height": 37.0,
++      "edge": 51.0,
++      "region": 4
++    },
++    {
++      "text": "Scene 04 begins here.",
++      "x": 106.0,
++      "y": 6952.0,
++      "width": 330.0,
++      "height": 37.0,
++      "edge": 296.0,
++      "region": 4
++    },
++    {
++      "text": "This is the final line.",
++      "x": 108.0,
++      "y": 7063.0,
++      "width": 291.0,
++      "height": 31.0,
++      "edge": 407.0,
++      "region": 4
++    },
++    {
++      "text": "Keep every single word.",
++      "x": 108.0,
++      "y": 7009.0,
++      "width": 347.0,
++      "height": 32.0,
++      "edge": 353.0,
++      "region": 4
++    },
++    {
++      "text": "Keep every single word.",
++      "x": 106.0,
++      "y": 10335.0,
++      "width": 351.0,
++      "height": 32.0,
++      "edge": 1.0,
++      "region": 5
++    },
++    {
++      "text": "Scene 06 begins here.",
++      "x": 106.0,
++      "y": 10280.0,
++      "width": 328.0,
++      "height": 37.0,
++      "edge": 51.0,
++      "region": 5
++    },
++    {
++      "text": "This is the final line.",
++      "x": 108.0,
++      "y": 8727.0,
++      "width": 291.0,
++      "height": 31.0,
++      "edge": 407.0,
++      "region": 5
++    },
++    {
++      "text": "Keep every single word.",
++      "x": 108.0,
++      "y": 8673.0,
++      "width": 347.0,
++      "height": 32.0,
++      "edge": 353.0,
++      "region": 5
++    },
++    {
++      "text": "Scene 05 begins here.",
++      "x": 108.0,
++      "y": 8616.0,
++      "width": 328.0,
++      "height": 37.0,
++      "edge": 296.0,
++      "region": 5
++    },
++    {
++      "text": "Keep every single word.",
++      "x": 106.0,
++      "y": 11999.0,
++      "width": 351.0,
++      "height": 32.0,
++      "edge": 1.0,
++      "region": 6
++    },
++    {
++      "text": "Scene 07 begins here.",
++      "x": 106.0,
++      "y": 11944.0,
++      "width": 328.0,
++      "height": 37.0,
++      "edge": 51.0,
++      "region": 6
++    },
++    {
++      "text": "This is the final line.",
++      "x": 108.0,
++      "y": 10391.0,
++      "width": 291.0,
++      "height": 31.0,
++      "edge": 407.0,
++      "region": 6
++    },
++    {
++      "text": "Keep every single word.",
++      "x": 108.0,
++      "y": 10337.0,
++      "width": 347.0,
++      "height": 32.0,
++      "edge": 353.0,
++      "region": 6
++    },
++    {
++      "text": "Scene 06 begins here.",
++      "x": 108.0,
++      "y": 10280.0,
++      "width": 328.0,
++      "height": 37.0,
++      "edge": 296.0,
++      "region": 6
++    },
++    {
++      "text": "Keep every single word.",
++      "x": 106.0,
++      "y": 13663.0,
++      "width": 351.0,
++      "height": 32.0,
++      "edge": 1.0,
++      "region": 7
++    },
++    {
++      "text": "Scene 08 begins here.",
++      "x": 106.0,
++      "y": 13608.0,
++      "width": 328.0,
++      "height": 37.0,
++      "edge": 51.0,
++      "region": 7
++    },
++    {
++      "text": "This is the final line.",
++      "x": 108.0,
++      "y": 12055.0,
++      "width": 291.0,
++      "height": 31.0,
++      "edge": 407.0,
++      "region": 7
++    },
++    {
++      "text": "Keep every single word.",
++      "x": 108.0,
++      "y": 12001.0,
++      "width": 347.0,
++      "height": 32.0,
++      "edge": 353.0,
++      "region": 7
++    },
++    {
++      "text": "Scene 07 begins here.",
++      "x": 108.0,
++      "y": 11944.0,
++      "width": 328.0,
++      "height": 37.0,
++      "edge": 296.0,
++      "region": 7
++    },
++    {
++      "text": "Keep every single word.",
++      "x": 106.0,
++      "y": 15327.0,
++      "width": 351.0,
++      "height": 32.0,
++      "edge": 1.0,
++      "region": 8
++    },
++    {
++      "text": "Scene 09 begins here.",
++      "x": 106.0,
++      "y": 15272.0,
++      "width": 328.0,
++      "height": 37.0,
++      "edge": 51.0,
++      "region": 8
++    },
++    {
++      "text": "This is the final line.",
++      "x": 108.0,
++      "y": 13719.0,
++      "width": 291.0,
++      "height": 31.0,
++      "edge": 407.0,
++      "region": 8
++    },
++    {
++      "text": "Keep every single word.",
++      "x": 108.0,
++      "y": 13665.0,
++      "width": 347.0,
++      "height": 32.0,
++      "edge": 353.0,
++      "region": 8
++    },
++    {
++      "text": "Scene 08 begins here.",
++      "x": 108.0,
++      "y": 13608.0,
++      "width": 328.0,
++      "height": 37.0,
++      "edge": 296.0,
++      "region": 8
++    },
++    {
++      "text": "Keep every single word.",
++      "x": 106.0,
++      "y": 16991.0,
++      "width": 351.0,
++      "height": 32.0,
++      "edge": 1.0,
++      "region": 9
++    },
++    {
++      "text": "Scene 10 begins here.",
++      "x": 106.0,
++      "y": 16936.0,
++      "width": 328.0,
++      "height": 37.0,
++      "edge": 51.0,
++      "region": 9
++    },
++    {
++      "text": "This is the final line.",
++      "x": 108.0,
++      "y": 15383.0,
++      "width": 291.0,
++      "height": 31.0,
++      "edge": 407.0,
++      "region": 9
++    },
++    {
++      "text": "Keep every single word.",
++      "x": 108.0,
++      "y": 15329.0,
++      "width": 347.0,
++      "height": 32.0,
++      "edge": 353.0,
++      "region": 9
++    },
++    {
++      "text": "Scene 09 begins here.",
++      "x": 108.0,
++      "y": 15272.0,
++      "width": 328.0,
++      "height": 37.0,
++      "edge": 296.0,
++      "region": 9
++    },
++    {
++      "text": "Keep every single word.",
++      "x": 106.0,
++      "y": 18655.0,
++      "width": 351.0,
++      "height": 32.0,
++      "edge": 1.0,
++      "region": 10
++    },
++    {
++      "text": "Scene 11 begins here.",
++      "x": 106.0,
++      "y": 18600.0,
++      "width": 328.0,
++      "height": 37.0,
++      "edge": 51.0,
++      "region": 10
++    },
++    {
++      "text": "Scene 10 begins here.",
++      "x": 106.0,
++      "y": 16936.0,
++      "width": 330.0,
++      "height": 37.0,
++      "edge": 296.0,
++      "region": 10
++    },
++    {
++      "text": "This is the final line.",
++      "x": 108.0,
++      "y": 17047.0,
++      "width": 291.0,
++      "height": 31.0,
++      "edge": 407.0,
++      "region": 10
++    },
++    {
++      "text": "Keep every single word.",
++      "x": 108.0,
++      "y": 16993.0,
++      "width": 347.0,
++      "height": 32.0,
++      "edge": 353.0,
++      "region": 10
++    },
++    {
++      "text": "This is the final line.",
++      "x": 106.0,
++      "y": 18709.0,
++      "width": 295.0,
++      "height": 34.0,
++      "edge": 405.0,
++      "region": 11
++    },
++    {
++      "text": "Scene 11 begins here.",
++      "x": 106.0,
++      "y": 18601.0,
++      "width": 330.0,
++      "height": 35.0,
++      "edge": 297.0,
++      "region": 11
++    },
++    {
++      "text": "Keep every single word.",
++      "x": 108.0,
++      "y": 18656.0,
++      "width": 349.0,
++      "height": 34.0,
++      "edge": 352.0,
++      "region": 11
++    }
++  ]
++}
+diff --git a/app/src/test/resources/ocr-strips/paddle_pipeline_tiny.json b/app/src/test/resources/ocr-strips/paddle_pipeline_tiny.json
+new file mode 100644
+index 0000000..7dbd01e
+--- /dev/null
++++ b/app/src/test/resources/ocr-strips/paddle_pipeline_tiny.json
+@@ -0,0 +1,586 @@
++{
++  "source": "Measured synthetic benchmark 2026-11-02; not new Android inference",
++  "engine": "paddle_pipeline_tiny",
++  "expected_lines": [
++    "POLARIS - LONG STRIP OCR",
++    "Synthetic control, not a quality score",
++    "I",
++    "NO!",
++    "A caption outside the balloons.",
++    "Scene 01 begins here.",
++    "Keep every single word.",
++    "This is the final line.",
++    "Scene 02 begins here.",
++    "Keep every single word.",
++    "This is the final line.",
++    "Scene 03 begins here.",
++    "Keep every single word.",
++    "This is the final line.",
++    "Scene 04 begins here.",
++    "Keep every single word.",
++    "This is the final line.",
++    "Scene 05 begins here.",
++    "Keep every single word.",
++    "This is the final line.",
++    "Scene 06 begins here.",
++    "Keep every single word.",
++    "This is the final line.",
++    "Scene 07 begins here.",
++    "Keep every single word.",
++    "This is the final line.",
++    "Scene 08 begins here.",
++    "Keep every single word.",
++    "This is the final line.",
++    "Scene 09 begins here.",
++    "Keep every single word.",
++    "This is the final line.",
++    "Scene 10 begins here.",
++    "Keep every single word.",
++    "This is the final line.",
++    "Scene 11 begins here.",
++    "Keep every single word.",
++    "This is the final line."
++  ],
++  "lines": [
++    {
++      "text": "Synthetic control, not a quality score",
++      "x": 59.0,
++      "y": 125.0,
++      "width": 537.0,
++      "height": 32.0,
++      "edge": 125.0,
++      "region": 0
++    },
++    {
++      "text": "POLARIS - LONG STRIP OCR",
++      "x": 60.0,
++      "y": 82.0,
++      "width": 397.0,
++      "height": 26.0,
++      "edge": 82.0,
++      "region": 0
++    },
++    {
++      "text": "A caption outside the balloons.",
++      "x": 79.0,
++      "y": 1401.0,
++      "width": 449.0,
++      "height": 31.0,
++      "edge": 616.0,
++      "region": 0
++    },
++    {
++      "text": "Scene 01 begins here.",
++      "x": 106.0,
++      "y": 1960.0,
++      "width": 330.0,
++      "height": 37.0,
++      "edge": 51.0,
++      "region": 0
++    },
++    {
++      "text": "Keep every single word.",
++      "x": 107.0,
++      "y": 2019.0,
++      "width": 348.0,
++      "height": 26.0,
++      "edge": 3.0,
++      "region": 0
++    },
++    {
++      "text": "I",
++      "x": 155.0,
++      "y": 607.0,
++      "width": 44.0,
++      "height": 68.0,
++      "edge": 607.0,
++      "region": 0
++    },
++    {
++      "text": "NO!",
++      "x": 403.0,
++      "y": 977.0,
++      "width": 131.0,
++      "height": 64.0,
++      "edge": 977.0,
++      "region": 0
++    },
++    {
++      "text": "Keep every single word.",
++      "x": 106.0,
++      "y": 3679.0,
++      "width": 351.0,
++      "height": 32.0,
++      "edge": 1.0,
++      "region": 1
++    },
++    {
++      "text": "Scene 02 begins here.",
++      "x": 106.0,
++      "y": 3624.0,
++      "width": 328.0,
++      "height": 37.0,
++      "edge": 51.0,
++      "region": 1
++    },
++    {
++      "text": "Scene 01 begins here.",
++      "x": 106.0,
++      "y": 1960.0,
++      "width": 330.0,
++      "height": 37.0,
++      "edge": 296.0,
++      "region": 1
++    },
++    {
++      "text": "This is the final line.",
++      "x": 108.0,
++      "y": 2071.0,
++      "width": 291.0,
++      "height": 31.0,
++      "edge": 407.0,
++      "region": 1
++    },
++    {
++      "text": "Keep every single word.",
++      "x": 108.0,
++      "y": 2017.0,
++      "width": 347.0,
++      "height": 32.0,
++      "edge": 353.0,
++      "region": 1
++    },
++    {
++      "text": "Keep every single word.",
++      "x": 106.0,
++      "y": 5343.0,
++      "width": 351.0,
++      "height": 32.0,
++      "edge": 1.0,
++      "region": 2
++    },
++    {
++      "text": "Scene 03 begins here.",
++      "x": 106.0,
++      "y": 5288.0,
++      "width": 328.0,
++      "height": 37.0,
++      "edge": 51.0,
++      "region": 2
++    },
++    {
++      "text": "This is the final line.",
++      "x": 108.0,
++      "y": 3735.0,
++      "width": 291.0,
++      "height": 31.0,
++      "edge": 407.0,
++      "region": 2
++    },
++    {
++      "text": "Keep every single word.",
++      "x": 108.0,
++      "y": 3681.0,
++      "width": 347.0,
++      "height": 32.0,
++      "edge": 353.0,
++      "region": 2
++    },
++    {
++      "text": "Scene 02 begins here.",
++      "x": 108.0,
++      "y": 3624.0,
++      "width": 328.0,
++      "height": 37.0,
++      "edge": 296.0,
++      "region": 2
++    },
++    {
++      "text": "Keep every single word.",
++      "x": 106.0,
++      "y": 7007.0,
++      "width": 351.0,
++      "height": 32.0,
++      "edge": 1.0,
++      "region": 3
++    },
++    {
++      "text": "Scene 04 begins here.",
++      "x": 106.0,
++      "y": 6952.0,
++      "width": 328.0,
++      "height": 37.0,
++      "edge": 51.0,
++      "region": 3
++    },
++    {
++      "text": "This is the final line.",
++      "x": 108.0,
++      "y": 5399.0,
++      "width": 291.0,
++      "height": 31.0,
++      "edge": 407.0,
++      "region": 3
++    },
++    {
++      "text": "Keep every single word.",
++      "x": 108.0,
++      "y": 5345.0,
++      "width": 347.0,
++      "height": 32.0,
++      "edge": 353.0,
++      "region": 3
++    },
++    {
++      "text": "Scene 03 begins here.",
++      "x": 108.0,
++      "y": 5288.0,
++      "width": 328.0,
++      "height": 37.0,
++      "edge": 296.0,
++      "region": 3
++    },
++    {
++      "text": "Keep every single word.",
++      "x": 106.0,
++      "y": 8671.0,
++      "width": 351.0,
++      "height": 32.0,
++      "edge": 1.0,
++      "region": 4
++    },
++    {
++      "text": "Scene 05 begins here.",
++      "x": 106.0,
++      "y": 8616.0,
++      "width": 328.0,
++      "height": 37.0,
++      "edge": 51.0,
++      "region": 4
++    },
++    {
++      "text": "Scene 04 begins here.",
++      "x": 106.0,
++      "y": 6952.0,
++      "width": 330.0,
++      "height": 37.0,
++      "edge": 296.0,
++      "region": 4
++    },
++    {
++      "text": "This is the final line.",
++      "x": 108.0,
++      "y": 7063.0,
++      "width": 291.0,
++      "height": 31.0,
++      "edge": 407.0,
++      "region": 4
++    },
++    {
++      "text": "Keep every single word.",
++      "x": 108.0,
++      "y": 7009.0,
++      "width": 347.0,
++      "height": 32.0,
++      "edge": 353.0,
++      "region": 4
++    },
++    {
++      "text": "Keep every single word.",
++      "x": 106.0,
++      "y": 10335.0,
++      "width": 351.0,
++      "height": 32.0,
++      "edge": 1.0,
++      "region": 5
++    },
++    {
++      "text": "Scene 06 begins here.",
++      "x": 106.0,
++      "y": 10280.0,
++      "width": 328.0,
++      "height": 37.0,
++      "edge": 51.0,
++      "region": 5
++    },
++    {
++      "text": "This is the final line.",
++      "x": 108.0,
++      "y": 8727.0,
++      "width": 291.0,
++      "height": 31.0,
++      "edge": 407.0,
++      "region": 5
++    },
++    {
++      "text": "Keep every single word.",
++      "x": 108.0,
++      "y": 8673.0,
++      "width": 347.0,
++      "height": 32.0,
++      "edge": 353.0,
++      "region": 5
++    },
++    {
++      "text": "Scene 05 begins here.",
++      "x": 108.0,
++      "y": 8616.0,
++      "width": 328.0,
++      "height": 37.0,
++      "edge": 296.0,
++      "region": 5
++    },
++    {
++      "text": "Keep every single word.",
++      "x": 106.0,
++      "y": 11999.0,
++      "width": 351.0,
++      "height": 32.0,
++      "edge": 1.0,
++      "region": 6
++    },
++    {
++      "text": "Scene 07 begins here.",
++      "x": 106.0,
++      "y": 11944.0,
++      "width": 328.0,
++      "height": 37.0,
++      "edge": 51.0,
++      "region": 6
++    },
++    {
++      "text": "This is the final line.",
++      "x": 108.0,
++      "y": 10391.0,
++      "width": 291.0,
++      "height": 31.0,
++      "edge": 407.0,
++      "region": 6
++    },
++    {
++      "text": "Keep every single word.",
++      "x": 108.0,
++      "y": 10337.0,
++      "width": 347.0,
++      "height": 32.0,
++      "edge": 353.0,
++      "region": 6
++    },
++    {
++      "text": "Scene 06 begins here.",
++      "x": 108.0,
++      "y": 10280.0,
++      "width": 328.0,
++      "height": 37.0,
++      "edge": 296.0,
++      "region": 6
++    },
++    {
++      "text": "Keep every single word.",
++      "x": 106.0,
++      "y": 13663.0,
++      "width": 351.0,
++      "height": 32.0,
++      "edge": 1.0,
++      "region": 7
++    },
++    {
++      "text": "Scene 08 begins here.",
++      "x": 106.0,
++      "y": 13608.0,
++      "width": 328.0,
++      "height": 37.0,
++      "edge": 51.0,
++      "region": 7
++    },
++    {
++      "text": "This is the final line.",
++      "x": 108.0,
++      "y": 12055.0,
++      "width": 291.0,
++      "height": 31.0,
++      "edge": 407.0,
++      "region": 7
++    },
++    {
++      "text": "Keep every single word.",
++      "x": 108.0,
++      "y": 12001.0,
++      "width": 347.0,
++      "height": 32.0,
++      "edge": 353.0,
++      "region": 7
++    },
++    {
++      "text": "Scene 07 begins here.",
++      "x": 108.0,
++      "y": 11944.0,
++      "width": 328.0,
++      "height": 37.0,
++      "edge": 296.0,
++      "region": 7
++    },
++    {
++      "text": "Keep every single word.",
++      "x": 106.0,
++      "y": 15327.0,
++      "width": 351.0,
++      "height": 32.0,
++      "edge": 1.0,
++      "region": 8
++    },
++    {
++      "text": "Scene 09 begins here.",
++      "x": 106.0,
++      "y": 15272.0,
++      "width": 328.0,
++      "height": 37.0,
++      "edge": 51.0,
++      "region": 8
++    },
++    {
++      "text": "This is the final line.",
++      "x": 108.0,
++      "y": 13719.0,
++      "width": 291.0,
++      "height": 31.0,
++      "edge": 407.0,
++      "region": 8
++    },
++    {
++      "text": "Keep every single word.",
++      "x": 108.0,
++      "y": 13665.0,
++      "width": 347.0,
++      "height": 32.0,
++      "edge": 353.0,
++      "region": 8
++    },
++    {
++      "text": "Scene 08 begins here.",
++      "x": 108.0,
++      "y": 13608.0,
++      "width": 328.0,
++      "height": 37.0,
++      "edge": 296.0,
++      "region": 8
++    },
++    {
++      "text": "Keep every single word.",
++      "x": 106.0,
++      "y": 16991.0,
++      "width": 351.0,
++      "height": 32.0,
++      "edge": 1.0,
++      "region": 9
++    },
++    {
++      "text": "Scene 10 begins here.",
++      "x": 106.0,
++      "y": 16936.0,
++      "width": 328.0,
++      "height": 37.0,
++      "edge": 51.0,
++      "region": 9
++    },
++    {
++      "text": "This is the final line.",
++      "x": 108.0,
++      "y": 15383.0,
++      "width": 291.0,
++      "height": 31.0,
++      "edge": 407.0,
++      "region": 9
++    },
++    {
++      "text": "Keep every single word.",
++      "x": 108.0,
++      "y": 15329.0,
++      "width": 347.0,
++      "height": 32.0,
++      "edge": 353.0,
++      "region": 9
++    },
++    {
++      "text": "Scene 09 begins here.",
++      "x": 108.0,
++      "y": 15272.0,
++      "width": 328.0,
++      "height": 37.0,
++      "edge": 296.0,
++      "region": 9
++    },
++    {
++      "text": "Keep every single word.",
++      "x": 106.0,
++      "y": 18655.0,
++      "width": 351.0,
++      "height": 32.0,
++      "edge": 1.0,
++      "region": 10
++    },
++    {
++      "text": "Scene 11 begins here.",
++      "x": 106.0,
++      "y": 18600.0,
++      "width": 328.0,
++      "height": 37.0,
++      "edge": 51.0,
++      "region": 10
++    },
++    {
++      "text": "Scene 10 begins here.",
++      "x": 106.0,
++      "y": 16936.0,
++      "width": 330.0,
++      "height": 37.0,
++      "edge": 296.0,
++      "region": 10
++    },
++    {
++      "text": "This is the final line.",
++      "x": 108.0,
++      "y": 17047.0,
++      "width": 291.0,
++      "height": 31.0,
++      "edge": 407.0,
++      "region": 10
++    },
++    {
++      "text": "Keep every single word.",
++      "x": 108.0,
++      "y": 16993.0,
++      "width": 347.0,
++      "height": 32.0,
++      "edge": 353.0,
++      "region": 10
++    },
++    {
++      "text": "This is the final line.",
++      "x": 106.0,
++      "y": 18709.0,
++      "width": 295.0,
++      "height": 34.0,
++      "edge": 405.0,
++      "region": 11
++    },
++    {
++      "text": "Scene 11 begins here.",
++      "x": 106.0,
++      "y": 18601.0,
++      "width": 330.0,
++      "height": 35.0,
++      "edge": 297.0,
++      "region": 11
++    },
++    {
++      "text": "Keep every single word.",
++      "x": 108.0,
++      "y": 18656.0,
++      "width": 349.0,
++      "height": 34.0,
++      "edge": 352.0,
++      "region": 11
++    }
++  ]
++}
 diff --git a/core/archive/src/main/kotlin/mihon/core/archive/DocumentCacheBudget.kt b/core/archive/src/main/kotlin/mihon/core/archive/DocumentCacheBudget.kt
 new file mode 100644
 index 0000000..db8bea6
@@ -7599,7 +9785,7 @@ index d7001d9..0dad0f5 100644
 +    val sha256: String? = null,
  )
 diff --git a/domain/src/main/java/tachiyomi/domain/translation/TranslationPreferences.kt b/domain/src/main/java/tachiyomi/domain/translation/TranslationPreferences.kt
-index ee30e4b..5a0e111 100644
+index ee30e4b..ebf582e 100644
 --- a/domain/src/main/java/tachiyomi/domain/translation/TranslationPreferences.kt
 +++ b/domain/src/main/java/tachiyomi/domain/translation/TranslationPreferences.kt
 @@ -7,7 +7,7 @@ enum class TranslationLlmProvider(
@@ -7621,7 +9807,7 @@ index ee30e4b..5a0e111 100644
  
      fun autoTranslateAfterDownload() = preferenceStore.getBoolean("auto_translate_after_download", false)
      fun autoTranslateNovels() = preferenceStore.getBoolean("auto_translate_novels", true)
-@@ -37,16 +40,18 @@ class TranslationPreferences(
+@@ -37,16 +40,19 @@ class TranslationPreferences(
      fun translateSoundEffects() = preferenceStore.getBoolean("translate_sound_effects", false)
      fun translateFromLanguage() = preferenceStore.getString("translate_language_from", "ENGLISH")
      fun translateToLanguage() = preferenceStore.getString("translate_language_to", "PORTUGUESE")
@@ -7629,7 +9815,8 @@ index ee30e4b..5a0e111 100644
      fun translationFont() = preferenceStore.getInt("translation_font", 0)
  
      // Stable OCR values: 0 = ML Kit, 1 = PaddleOCR.
-+    fun mlKitLongPageStrips() = preferenceStore.getBoolean("mlkit_long_page_strips", false)
++    // Keep the beta.6 storage key so an existing opt-in is preserved.
++    fun longPageStrips() = preferenceStore.getBoolean("mlkit_long_page_strips", false)
 +
      fun dbnetExperimental() = preferenceStore.getBoolean("dbnet_experimental", false)
  
@@ -7662,7 +9849,7 @@ index 9839272..197aec7 100644
  mlkit-text-recognition-chinese = { module = "com.google.mlkit:text-recognition-chinese", version.ref = "mlkit-text-recognition" }
  mlkit-text-recognition-japanese = { module = "com.google.mlkit:text-recognition-japanese", version.ref = "mlkit-text-recognition" }
 diff --git a/i18n-at/src/commonMain/moko-resources/base/strings.xml b/i18n-at/src/commonMain/moko-resources/base/strings.xml
-index 7ed4795..f67a5ec 100644
+index 7ed4795..5acecd3 100644
 --- a/i18n-at/src/commonMain/moko-resources/base/strings.xml
 +++ b/i18n-at/src/commonMain/moko-resources/base/strings.xml
 @@ -81,4 +81,111 @@
@@ -7775,10 +9962,10 @@ index 7ed4795..f67a5ec 100644
 +    <string name="gemini_online_title">Gemini: optional online translation</string>
 +    <string name="gemini_online_summary">Sends recognized text to Google; images are not sent by this translator. Requires internet, your API key and an available model; usage may incur charges. It does not install a large model on your phone or recover text missed by OCR. Suggested model: gemini-3.5-flash-lite. Saved chapter translations remain available offline.</string>
 +    <string name="pref_mlkit_long_page_strips">Long-page OCR strips (experimental)</string>
-+    <string name="pref_mlkit_long_page_strips_summary">For English ML Kit OCR on tall JPEG, PNG and WebP pages. Processes overlapping regions one at a time, preserving source pixels and limiting each decoded image to 8 MiB of ARGB pixels. No extra model or API. Off by default; disabled while DBNet is enabled. Requires retranslating the chapter to compare results.</string>
++    <string name="pref_mlkit_long_page_strips_summary">For very tall English pages with ML Kit or PaddleOCR. Reads overlapping regions one at a time to preserve text size. May take longer; retranslate the chapter to apply. Off by default and unavailable with experimental text detection enabled.</string>
  </resources>
 diff --git a/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml b/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
-index d1748bc..5321fe6 100644
+index d1748bc..e7c87d9 100644
 --- a/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
 +++ b/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
 @@ -81,4 +81,111 @@
@@ -7891,7 +10078,7 @@ index d1748bc..5321fe6 100644
 +    <string name="gemini_online_title">Gemini: tradução online opcional</string>
 +    <string name="gemini_online_summary">Envia o texto reconhecido ao Google; este tradutor não envia imagens. Exige internet, sua chave de API e um modelo disponível; pode gerar cobrança por uso. Não instala um modelo grande no celular nem recupera texto que o OCR não reconheceu. Modelo sugerido: gemini-3.5-flash-lite. Traduções já salvas dos capítulos continuam disponíveis offline.</string>
 +    <string name="pref_mlkit_long_page_strips">OCR por faixas em páginas longas (experimental)</string>
-+    <string name="pref_mlkit_long_page_strips_summary">Para OCR ML Kit em inglês nas páginas altas JPEG, PNG e WebP. Processa faixas sobrepostas uma por vez, preservando os pixels e limitando cada imagem decodificada a 8 MiB de pixels ARGB. Sem modelo extra ou API. Começa desligado; não atua com DBNet habilitado. É necessário retraduzir o capítulo para comparar.</string>
++    <string name="pref_mlkit_long_page_strips_summary">Para páginas muito altas em inglês, com ML Kit ou PaddleOCR. Lê faixas sobrepostas uma por vez para preservar o tamanho do texto. Pode levar mais tempo; retraduza o capítulo para aplicar. Começa desligado e não atua com a detecção experimental de texto habilitada.</string>
  </resources>
 diff --git a/i18n/src/commonMain/moko-resources/base/strings.xml b/i18n/src/commonMain/moko-resources/base/strings.xml
 index c0832ba..ebf8f48 100644

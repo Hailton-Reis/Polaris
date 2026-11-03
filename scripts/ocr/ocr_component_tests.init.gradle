@@ -1,0 +1,13 @@
+// Optional component tests only. This substitutes the instrumentation Application,
+// never the Application, provider configuration or startup behavior in reader APKs.
+// Use for OCR decoder/SDK tests on minimal AOSP images without WebView; it does not
+// validate full application startup, UI, dependency injection or chapter workflows.
+gradle.beforeProject { p ->
+    p.plugins.withId('com.android.application') {
+        if (p.path == ':app') {
+            p.extensions.getByName('androidComponents').finalizeDsl { dsl ->
+                dsl.defaultConfig.testInstrumentationRunner = 'eu.kanade.translation.recognizer.OcrComponentTestRunner'
+            }
+        }
+    }
+}

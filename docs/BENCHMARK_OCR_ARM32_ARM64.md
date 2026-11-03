@@ -1,6 +1,6 @@
 # Comparação de OCR e compatibilidade ARM32/ARM64
 
-A meta do Polaris é atender aparelhos de diferentes marcas e capacidades com **Android 8.0 ou superior**, em **ARM32/ARMv7 (`armeabi-v7a`) e ARM64 (`arm64-v8a`)**. Os dois APKs da beta.6 foram compilados, verificados e assinados com o mesmo certificado. A arquitetura do Android instalado, além da versão do sistema, define qual pacote pode ser instalado. Compilar para uma ABI não comprova funcionamento em todo aparelho: a aceitação em dispositivos físicos continua pendente.
+A meta do Polaris é atender aparelhos de diferentes marcas e capacidades com **Android 8.0 ou superior**, em **ARM32/ARMv7 (`armeabi-v7a`) e ARM64 (`arm64-v8a`)**. Os dois APKs da beta.7 foram compilados, verificados e assinados com o mesmo certificado. A arquitetura do Android instalado, além da versão do sistema, define qual pacote pode ser instalado. Compilar para uma ABI não comprova funcionamento em todo aparelho: a aceitação em dispositivos físicos continua pendente.
 
 O A12 é um possível aparelho de teste, não o requisito que define o produto. A matriz deve cobrir aparelhos de entrada, intermediários, antigos e recentes, com diferentes quantidades de RAM e versões do Android, incluindo as duas ABIs. Nenhuma dessas categorias é marcada como aprovada sem execução real.
 
@@ -10,7 +10,7 @@ O A12 é um possível aparelho de teste, não o requisito que define o produto. 
 | --- | --- | --- |
 | ML Kit Text Recognition | Lê letras das imagens: OCR | Atual padrão do Polaris |
 | ML Kit Translation | Traduz o texto reconhecido | Tradutor offline mantido na comparação |
-| ML Kit por faixas | Mesmo OCR, com entrada dividida em regiões sobrepostas | Experimental, desligado por padrão, inglês |
+| OCR por faixas | ML Kit ou Paddle com entrada dividida em regiões sobrepostas | Experimental, desligado por padrão, inglês (beta.7) |
 | PaddleOCR existente no app | Outra família de reconhecimento de texto | Caminho atual limitado a inglês; não é o Tiny pesquisado |
 | PP-OCRv6 tiny pesquisado | Outro modelo da família PaddleOCR | Ainda não integrado nem validado no Android |
 
@@ -34,6 +34,6 @@ O Tiny avaliado não cobre japonês/coreano e não foi incorporado ao app. As im
 
 ## Primeiro teste do usuário
 
-Agora basta uma verificação curta da beta.6: instalar o pacote da ABI correspondente como atualização, confirmar a versão em Sobre e abrir o mesmo capítulo em que houve falhas. Começar com **ML Kit e OCR por faixas desligado**, observando leitura, alinhamento e falas curtas. Não é necessário configurar Gemini ou API nem executar todo o benchmark agora.
+Agora basta uma verificação curta da beta.7: instalar o pacote da ABI correspondente como atualização, confirmar a versão em Sobre e abrir o mesmo capítulo em que houve falhas. Começar com **ML Kit e OCR por faixas desligado**, observando leitura, alinhamento e falas curtas. Não é necessário configurar Gemini ou API nem executar todo o benchmark agora.
 
 O teste comparativo completo **em aparelhos Android ARM** entre ML Kit e o Tiny só começa depois que o Tiny estiver adaptado e validado para ambas as ABIs. Se compararmos o Paddle já existente antes disso, os resultados devem identificá-lo como o modelo existente, sem atribuí-los ao Tiny.
