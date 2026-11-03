@@ -1,6 +1,6 @@
 # Sequência de capítulos, fontes por obra e dedicatória
 
-Candidato interno: **0.1.0-beta.8 / versionCode 109 / P20261103.1**. A publicação está suspensa a pedido do mantenedor. O rascunho beta.7 continua sem APKs; esta revisão não publica nem substitui releases.
+**0.1.0-beta.8 / versionCode 109 / P20261103.1**. Em 3 de novembro de 2026, o mantenedor autorizou preparar e publicar esta versão como pré-lançamento público. A publicação não representa aceite dos aparelhos físicos nem versão estável. As betas intermediárias continuam identificadas como revisões internas.
 
 ## Comportamento
 
