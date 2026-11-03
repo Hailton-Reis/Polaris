@@ -1,0 +1,71 @@
+name: Upload reviewed beta assets
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Reviewed release plan
+        required: true
+        type: choice
+        options: [v0.1.0-beta.8]
+      transport_commit:
+        description: Full SHA of the temporary binary transport checkout
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: upload-reviewed-${{ inputs.version }}
+  cancel-in-progress: false
+
+jobs:
+  upload-draft:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: write
+    steps:
+      - name: Validate transport reference
+        env:
+          TRANSPORT_COMMIT: ${{ inputs.transport_commit }}
+        run: |
+          python3 - <<'PY'
+          import os, re
+          if not re.fullmatch(r'[0-9a-f]{40}', os.environ['TRANSPORT_COMMIT']):
+              raise SystemExit('A full transport commit SHA is required')
+          PY
+      - name: Checkout reviewed publisher
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: ${{ github.sha }}
+          path: publisher
+          persist-credentials: false
+          sparse-checkout: |
+            scripts/release
+            .github/releases
+      - name: Verify publisher safety checks
+        run: python3 -B -m unittest discover -s publisher/scripts/release -p 'test_*.py' -v
+      - name: Checkout transport bytes
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: ${{ inputs.transport_commit }}
+          path: payload
+          persist-credentials: false
+          fetch-depth: 1
+      - name: Assemble and verify exact reviewed bytes
+        env:
+          RELEASE_VERSION: ${{ inputs.version }}
+        run: |
+          python3 publisher/scripts/release/prepare_assets.py --plan "publisher/.github/releases/$RELEASE_VERSION.json" --payload payload --output "$RUNNER_TEMP/release-assets"
+      - name: Upload and verify draft assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_VERSION: ${{ inputs.version }}
+        run: |
+          python3 publisher/scripts/release/upload_assets.py --repository "$GITHUB_REPOSITORY" --plan "publisher/.github/releases/$RELEASE_VERSION.json" --assets "$RUNNER_TEMP/release-assets"
+      - name: Record result
+        run: |
+          echo 'Reviewed APKs and supporting files uploaded to the existing draft. This workflow does not publish releases.' >> "$GITHUB_STEP_SUMMARY"
