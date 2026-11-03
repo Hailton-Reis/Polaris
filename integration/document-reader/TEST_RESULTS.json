@@ -4,7 +4,7 @@
   "candidate_revision": "Polaris P20261103.1",
   "version_name": "0.1.0-beta.8",
   "version_code": 109,
-  "publication": "PUBLIC_PRERELEASE_AUTHORIZED_BY_MAINTAINER_2026_11_03; upload and publication in progress; physical acceptance still pending",
+  "publication": "PUBLISHED_PUBLIC_PRERELEASE",
   "pinned_yomotsu": "0fb80c439ef816eeb50674f1b90af39918b176d8",
   "patch_sha256": "5aa7991f2621f0e7c522046442d06b67683857ea05a5b1b1cbf3ebef00547ea9",
   "assembly": "PASS: ARM32/ARM64 and the other configured debug APKs assembled; the only failed Gradle task is app:testDebugUnitTest with the same 34 baseline failures",
@@ -239,6 +239,9 @@
     "timezone": "America/Fortaleza",
     "tag": "v0.1.0-beta.8",
     "verified_implementation_commit": "929121df753af8db069777bd2a4249aa72e5ebf7",
-    "status": "PREPARING_PUBLIC_PRERELEASE"
-  }
+    "status": "PUBLISHED",
+    "url": "https://github.com/Hailton-Reis/Polaris/releases/tag/v0.1.0-beta.8",
+    "published_at_utc": "2026-11-03T14:17:47Z"
+  },
+  "publication_evidence": "../public-releases/0.1.0-beta.8/PUBLICATION.json"
 }
