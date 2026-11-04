@@ -173,6 +173,188 @@ index 0000000..c09bfa7
 +        }
 +    }
 +}
+diff --git a/app/src/androidTest/java/eu/kanade/translation/recognizer/ChapterBenchmarkTest.kt b/app/src/androidTest/java/eu/kanade/translation/recognizer/ChapterBenchmarkTest.kt
+new file mode 100644
+index 0000000..812688e
+--- /dev/null
++++ b/app/src/androidTest/java/eu/kanade/translation/recognizer/ChapterBenchmarkTest.kt
+@@ -0,0 +1,176 @@
++package eu.kanade.translation.recognizer
++
++import android.content.Context
++import android.graphics.BitmapFactory
++import android.net.Uri
++import androidx.test.ext.junit.runners.AndroidJUnit4
++import androidx.test.platform.app.InstrumentationRegistry
++import com.google.mlkit.common.model.DownloadConditions
++import com.google.mlkit.nl.translate.TranslateLanguage
++import com.google.mlkit.nl.translate.Translation
++import com.google.mlkit.nl.translate.TranslatorOptions
++import eu.kanade.translation.model.PageTranslation
++import eu.kanade.translation.model.TranslationBlock
++import eu.kanade.translation.translator.ComicTranslationContext
++import eu.kanade.translation.translator.MLKitTranslator
++import eu.kanade.translation.translator.TextTranslatorLanguage
++import kotlinx.coroutines.runBlocking
++import kotlinx.coroutines.tasks.await
++import kotlinx.coroutines.withTimeout
++import kotlinx.serialization.json.Json
++import org.json.JSONArray
++import org.json.JSONObject
++import org.junit.Assert.assertTrue
++import org.junit.Assume.assumeTrue
++import org.junit.Test
++import org.junit.runner.RunWith
++import tachiyomi.core.common.preference.AndroidPreferenceStore
++import tachiyomi.core.common.preference.PreferenceStore
++import uy.kohesive.injekt.Injekt
++import uy.kohesive.injekt.api.InjektModule
++import uy.kohesive.injekt.api.InjektRegistrar
++import uy.kohesive.injekt.api.addSingleton
++import java.io.File
++
++/** Explicit local-input benchmark. No library access, chapter fetching, keys or external reports. */
++@RunWith(AndroidJUnit4::class)
++class ChapterBenchmarkTest {
++    @Test fun measurePreparedChapter() = runBlocking {
++        val instrumentation = InstrumentationRegistry.getInstrumentation()
++        val context = instrumentation.targetContext
++        val directory = File(context.getExternalFilesDir(null), "chapter-benchmark")
++        val request = File(directory, "request.json")
++        assumeTrue("Supply local originals and request.json to run this opt-in benchmark", request.isFile)
++        val configuration = JSONObject(request.readText())
++        val inputs = configuration.getJSONArray("pages")
++        val modes = configuration.optJSONArray("modes") ?: JSONArray(listOf("full", "strips"))
++        val selected = configuration.optString("selected_pages", "").split(',').mapNotNull(String::toIntOrNull).toSet()
++        val rows = JSONArray()
++        val resultFile = File(directory, "mlkit-results.json")
++        var errors = 0
++        for (modeIndex in 0 until modes.length()) {
++            val mode = modes.getString(modeIndex)
++            require(mode in listOf("full", "strips"))
++            val strips = mode == "strips"
++            val engine = MlKitOcrEngine(context, TextRecognizerLanguage.ENGLISH) { strips }
++            try {
++                for (index in 0 until inputs.length()) {
++                    val input = inputs.getJSONObject(index)
++                    val page = input.getInt("page")
++                    if (selected.isNotEmpty() && page !in selected) continue
++                    val filename = input.getString("file")
++                    require(File(filename).name == filename)
++                    val file = File(directory, filename)
++                    val row = JSONObject().put("page", page).put("mode", if (strips) "strips" else "full")
++                    try {
++                        val result = withTimeout(180_000) {
++                            engine.recognize(OcrImage(Uri.fromFile(file), file::inputStream))
++                        }
++                        row.put("status", "OK").put("width", result.width).put("height", result.height)
++                            .put("elapsed_ms", result.metrics?.totalTimeMs)
++                            .put("ocr_ms", result.metrics?.ocrTimeMs)
++                            .put("init_ms", result.metrics?.initializationTimeMs)
++                        val blocks = JSONArray()
++                        for (block in result.blocks) {
++                            blocks.put(
++                                JSONObject().put("text", block.text).put("x", block.x).put("y", block.y)
++                                    .put("width", block.width).put("height", block.height)
++                                    .put("symbol_width", block.symbolWidth).put("symbol_height", block.symbolHeight),
++                            )
++                        }
++                        row.put("lines", blocks)
++                    } catch (error: Exception) {
++                        errors++
++                        row.put("status", "ERROR").put("error", "${error.javaClass.simpleName}: ${error.message}")
++                    }
++                    rows.put(row)
++                    resultFile.writeText(
++                        JSONObject().put("runtime", "Production MlKitOcrEngine on Android")
++                            .put("rows", rows).toString(2),
++                    )
++                }
++            } finally {
++                engine.release()
++            }
++        }
++        File(directory, "ocr-done.txt").writeText("done")
++        if (configuration.optBoolean("translate", false)) {
++            val preparation = JSONObject()
++            val preparationStart = System.nanoTime()
++            val sdk = Translation.getClient(
++                TranslatorOptions.Builder().setSourceLanguage(TranslateLanguage.ENGLISH)
++                    .setTargetLanguage(TranslateLanguage.PORTUGUESE).build(),
++            )
++            try {
++                withTimeout(configuration.optLong("model_timeout_ms", 180_000)) {
++                    sdk.downloadModelIfNeeded(DownloadConditions.Builder().build()).await()
++                }
++                preparation.put("status", "READY")
++            } catch (error: Exception) {
++                preparation.put("status", "ERROR")
++                    .put("error", "${error.javaClass.simpleName}: ${error.message}")
++            } finally {
++                sdk.close()
++                preparation.put("elapsed_ms", (System.nanoTime() - preparationStart) / 1_000_000)
++                File(directory, "translation-preparation.json").writeText(preparation.toString(2))
++            }
++            if (preparation.getString("status") != "READY") {
++                File(directory, "done.txt").writeText("done; translation model unavailable")
++                assertTrue("All requested OCR cases must finish without SDK errors", errors == 0)
++                return@runBlocking
++            }
++            val preferences = context.getSharedPreferences("chapter_benchmark_only", Context.MODE_PRIVATE)
++            preferences.edit().clear().commit()
++            Injekt.importModule(object : InjektModule {
++                override fun InjektRegistrar.registerInjectables() {
++                    addSingleton<PreferenceStore>(AndroidPreferenceStore(context, preferences))
++                }
++            })
++            val translator = MLKitTranslator(TextRecognizerLanguage.ENGLISH, TextTranslatorLanguage.PORTUGUESE)
++            val translations = JSONArray()
++            try {
++                val prepared = File(directory, "translation-input.json")
++                if (prepared.isFile) {
++                    val items = JSONArray(prepared.readText())
++                    for (index in 0 until items.length()) {
++                        val item = items.getJSONObject(index)
++                        val block = TranslationBlock(
++                            text = item.getString("text"),
++                            width = 200f,
++                            height = 200f,
++                            x = 0f,
++                            y = 0f,
++                            symWidth = 10f,
++                            symHeight = 20f,
++                            angle = 0f,
++                        )
++                        val page = PageTranslation(mutableListOf(block), 200f, 200f)
++                        val start = System.nanoTime()
++                        val row = JSONObject().put("id", item.getString("id"))
++                        try {
++                            withTimeout(120_000) {
++                                translator.translate(
++                                    mutableMapOf("case" to page),
++                                    ComicTranslationContext("Polaris isolated chapter benchmark $index", "benchmark"),
++                                )
++                            }
++                            row.put("status", "OK").put("translation", block.translation)
++                        } catch (error: Exception) {
++                            row.put("status", "ERROR").put("error", "${error.javaClass.simpleName}: ${error.message}")
++                        }
++                        row.put("elapsed_ms", (System.nanoTime() - start) / 1_000_000)
++                        translations.put(row)
++                        File(directory, "translation-results.json").writeText(translations.toString(2))
++                        // An unavailable model is a preparation failure, not translation quality evidence.
++                        if (row.getString("status") == "ERROR") break
++                    }
++                }
++            } finally {
++                translator.close()
++                preferences.edit().clear().commit()
++            }
++        }
++        File(directory, "done.txt").writeText("done")
++        assertTrue("All requested OCR cases must finish without SDK errors", errors == 0)
++    }
++}
 diff --git a/app/src/androidTest/java/eu/kanade/translation/recognizer/OcrComponentTestRunner.kt b/app/src/androidTest/java/eu/kanade/translation/recognizer/OcrComponentTestRunner.kt
 new file mode 100644
 index 0000000..0ca716d
@@ -2078,18 +2260,20 @@ index 0050b97..979f158 100644
              titleRes = MR.strings.pref_category_about,
              formatSubtitle = {
 diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsTranslationScreen.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsTranslationScreen.kt
-index a198c3f..3ad9348 100644
+index a198c3f..5376248 100644
 --- a/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsTranslationScreen.kt
 +++ b/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsTranslationScreen.kt
-@@ -1,6 +1,7 @@
+@@ -1,6 +1,9 @@
  package eu.kanade.presentation.more.settings.screen
  
++import android.os.Build
++import android.os.Process
  import androidx.compose.runtime.Composable
 +import androidx.compose.runtime.LaunchedEffect
  import androidx.compose.runtime.ReadOnlyComposable
  import androidx.compose.runtime.getValue
  import androidx.compose.runtime.remember
-@@ -50,6 +51,24 @@ object SettingsTranslationScreen : SearchableSettings {
+@@ -50,6 +53,24 @@ object SettingsTranslationScreen : SearchableSettings {
      override fun getPreferences(): List<Preference> {
          val translationPreferences = remember { Injekt.get<TranslationPreferences>() }
          return listOf(
@@ -2114,11 +2298,17 @@ index a198c3f..3ad9348 100644
              Preference.PreferenceItem.SwitchPreference(
                  preference = translationPreferences.autoTranslateEnglishDownloads(),
                  title = stringResource(ATMR.strings.pref_auto_translate_english_downloads),
-@@ -95,26 +114,32 @@ object SettingsTranslationScreen : SearchableSettings {
+@@ -95,25 +116,41 @@ object SettingsTranslationScreen : SearchableSettings {
      private fun getOcrEngineGroup(
          translationPreferences: TranslationPreferences,
      ): Preference.PreferenceGroup {
-+        LaunchedEffect(translationPreferences) { translationPreferences.reconcileOcrExperiments() }
++        val fromLanguage by translationPreferences.translateFromLanguage().collectAsState()
++        val sourceLanguageEnabled by translationPreferences.useSourceOcrLanguage().collectAsState()
++        val englishPossible = sourceLanguageEnabled || fromLanguage == TextRecognizerLanguage.ENGLISH.name
++        val dbnetDeviceSupported = remember { Process.is64Bit() && "arm64-v8a" in Build.SUPPORTED_ABIS }
++        LaunchedEffect(translationPreferences, englishPossible, dbnetDeviceSupported) {
++            translationPreferences.reconcileOcrExperiments(englishPossible, dbnetDeviceSupported)
++        }
          return Preference.PreferenceGroup(
              title = stringResource(ATMR.strings.pref_group_ocr),
              preferenceItems = persistentListOf(
@@ -2130,30 +2320,32 @@ index a198c3f..3ad9348 100644
                          .associate { it.preferenceValue to getOcrEngineLabel(it) }
                          .toImmutableMap(),
                  ),
-                 Preference.PreferenceItem.SwitchPreference(
--                    preference = translationPreferences.dbnetExperimental(),
--                    title = "Detector DBNet (experimental)",
--                    subtitle = "Somente inglês/ARM64. Primeiro uso baixa 153 MB separados do APK. Reconhecimento ML Kit de página inteira; em falha, usa o OCR selecionado acima.",
++                Preference.PreferenceItem.SwitchPreference(
 +                    preference = translationPreferences.longPageStrips(),
 +                    title = stringResource(ATMR.strings.pref_mlkit_long_page_strips),
 +                    subtitle = stringResource(ATMR.strings.pref_mlkit_long_page_strips_summary),
++                    enabled = englishPossible,
 +                    onValueChanged = translationPreferences::enableLongPageStrips,
-                 ),
++                ),
                  Preference.PreferenceItem.SwitchPreference(
+                     preference = translationPreferences.dbnetExperimental(),
+                     title = "Detector DBNet (experimental)",
+-                    subtitle = "Somente inglês/ARM64. Primeiro uso baixa 153 MB separados do APK. Reconhecimento ML Kit de página inteira; em falha, usa o OCR selecionado acima.",
++                    subtitle = "Somente inglês/ARM64. Primeiro uso baixa 153 MB separados do APK. " +
++                        "Usa ML Kit; em falha, usa o OCR selecionado. Ativar desliga o OCR por faixas.",
++                    enabled = englishPossible && dbnetDeviceSupported,
++                    onValueChanged = translationPreferences::enableDbnetExperimental,
+                 ),
+-                Preference.PreferenceItem.SwitchPreference(
 -                    preference = translationPreferences.inpainterAot(),
 -                    title = "Remoção de texto por IA (AOT-GAN)",
 -                    subtitle = "Reconstrói o fundo e arte atrás dos textos usando rede neural (NCNN). Primeiro uso baixa ~11 MB. Se desativado, usa preenchimento rápido de cor.",
-+                    preference = translationPreferences.dbnetExperimental(),
-+                    title = "Detector DBNet (experimental)",
-+                    subtitle = "Somente inglês/ARM64. Primeiro uso baixa 153 MB separados do APK. " +
-+                        "Usa ML Kit; em falha, usa o OCR selecionado. Ativar desliga o OCR por faixas.",
-+                    onValueChanged = translationPreferences::enableDbnetExperimental,
++                Preference.PreferenceItem.InfoPreference(
++                    title = stringResource(ATMR.strings.pref_ocr_dependencies_hint),
                  ),
-+
              ),
          )
-     }
-@@ -172,6 +197,14 @@ object SettingsTranslationScreen : SearchableSettings {
+@@ -172,6 +209,14 @@ object SettingsTranslationScreen : SearchableSettings {
                          .toImmutableMap(),
                  ),
              )
@@ -2168,7 +2360,7 @@ index a198c3f..3ad9348 100644
              if (TranslationEngineSetting.LLM_API_KEY in engineSettings) {
                  add(
                      Preference.PreferenceItem.EditTextPreference(
-@@ -212,6 +245,11 @@ object SettingsTranslationScreen : SearchableSettings {
+@@ -212,6 +257,11 @@ object SettingsTranslationScreen : SearchableSettings {
          return Preference.PreferenceGroup(
              title = stringResource(ATMR.strings.pref_group_advanced),
              preferenceItems = persistentListOf(
@@ -8148,10 +8340,10 @@ index 0000000..7a9e838
 +}
 diff --git a/app/src/main/java/eu/kanade/translation/recognizer/OcrStripPlan.kt b/app/src/main/java/eu/kanade/translation/recognizer/OcrStripPlan.kt
 new file mode 100644
-index 0000000..e5ad362
+index 0000000..5182065
 --- /dev/null
 +++ b/app/src/main/java/eu/kanade/translation/recognizer/OcrStripPlan.kt
-@@ -0,0 +1,74 @@
+@@ -0,0 +1,84 @@
 +package eu.kanade.translation.recognizer
 +
 +import kotlin.math.abs
@@ -8218,6 +8410,16 @@ index 0000000..e5ad362
 +        if (intersection / (areaA + areaB - intersection).coerceAtLeast(1f) >= 0.72f) return true
 +        val first = normalized(a.text)
 +        val second = normalized(b.text)
++        // A strip can clip the top/bottom of the same line while recognizing its
++        // full text. Use the larger line's center tolerance only for equal text,
++        // nearly contained geometry and bounded height variation.
++        val heightRatio = maxOf(a.height, b.height) / minOf(a.height, b.height)
++        if (first.isNotEmpty() && first == second && heightRatio <= 2f &&
++            intersection / minOf(areaA, areaB) >= 0.90f &&
++            abs((a.y + a.height / 2) - (b.y + b.height / 2)) <= maxOf(a.height, b.height) * 0.25f
++        ) {
++            return true
++        }
 +        val containedText = first.isNotEmpty() && second.isNotEmpty() &&
 +            (first.contains(second) || second.contains(first))
 +        return containedText && intersection / minOf(areaA, areaB) >= 0.90f &&
@@ -11371,10 +11573,10 @@ index 0000000..a733d65
 +}
 diff --git a/app/src/test/java/eu/kanade/translation/recognizer/OcrStripPlanTest.kt b/app/src/test/java/eu/kanade/translation/recognizer/OcrStripPlanTest.kt
 new file mode 100644
-index 0000000..5d21ecf
+index 0000000..0687a99
 --- /dev/null
 +++ b/app/src/test/java/eu/kanade/translation/recognizer/OcrStripPlanTest.kt
-@@ -0,0 +1,140 @@
+@@ -0,0 +1,169 @@
 +package eu.kanade.translation.recognizer
 +
 +import kotlinx.serialization.json.Json
@@ -11479,6 +11681,35 @@ index 0000000..5d21ecf
 +        assertEquals(2048, strips.first().bottom)
 +        assertEquals(1664, strips[1].top)
 +        assertEquals(20_000, strips.last().bottom)
++    }
++
++    @Test fun `recorded chapter boundary with shorter OCR box retains the text once`() {
++        // Geometry measured on a real chapter; use authored wording in the fixture.
++        val full = line("REPEATED LINE", 4981f, 214f, 2, 120f)
++            .let { it.copy(block = it.block.copy(x = 397f, height = 31f)) }
++        val clipped = line("REPEATED LINE", 4992f, 208f, 3, 5f)
++            .let { it.copy(block = it.block.copy(x = 400f, height = 21f)) }
++        assertEquals(listOf(full.block), OcrStripPlan.deduplicate(listOf(full, clipped)))
++    }
++
++    @Test fun `recorded narrow height disagreement does not repeat a recognized line`() {
++        val full = line("ANOTHER LINE", 8679f, 290f, 5, 160f)
++            .let { it.copy(block = it.block.copy(x = 255f, height = 41f)) }
++        val clipped = line("ANOTHER LINE", 8677f, 290f, 4, 4f)
++            .let { it.copy(block = it.block.copy(x = 255f, height = 26f)) }
++        assertEquals(listOf(full.block), OcrStripPlan.deduplicate(listOf(full, clipped)))
++    }
++
++    @Test fun `equal text in adjacent lines survives the larger height tolerance`() {
++        val first = line("NO", 100f, 80f, 0).let { it.copy(block = it.block.copy(height = 41f)) }
++        val second = line("NO", 142f, 80f, 1).let { it.copy(block = it.block.copy(height = 26f)) }
++        assertEquals(2, OcrStripPlan.deduplicate(listOf(first, second)).size)
++    }
++
++    @Test fun `large enclosing detections cannot suppress a distinct repeated line`() {
++        val first = line("NO", 100f, 80f, 0).let { it.copy(block = it.block.copy(height = 300f)) }
++        val second = line("NO", 200f, 80f, 1).let { it.copy(block = it.block.copy(height = 24f)) }
++        assertEquals(2, OcrStripPlan.deduplicate(listOf(first, second)).size)
 +    }
 +
 +    private fun assertMeasuredLines(engine: String) {
@@ -14888,7 +15119,7 @@ index d7001d9..0dad0f5 100644
 +    val sha256: String? = null,
  )
 diff --git a/domain/src/main/java/tachiyomi/domain/translation/TranslationPreferences.kt b/domain/src/main/java/tachiyomi/domain/translation/TranslationPreferences.kt
-index ee30e4b..2c4dbb9 100644
+index ee30e4b..8e079bd 100644
 --- a/domain/src/main/java/tachiyomi/domain/translation/TranslationPreferences.kt
 +++ b/domain/src/main/java/tachiyomi/domain/translation/TranslationPreferences.kt
 @@ -7,7 +7,7 @@ enum class TranslationLlmProvider(
@@ -14910,7 +15141,7 @@ index ee30e4b..2c4dbb9 100644
  
      fun autoTranslateAfterDownload() = preferenceStore.getBoolean("auto_translate_after_download", false)
      fun autoTranslateNovels() = preferenceStore.getBoolean("auto_translate_novels", true)
-@@ -37,16 +40,34 @@ class TranslationPreferences(
+@@ -37,16 +40,37 @@ class TranslationPreferences(
      fun translateSoundEffects() = preferenceStore.getBoolean("translate_sound_effects", false)
      fun translateFromLanguage() = preferenceStore.getString("translate_language_from", "ENGLISH")
      fun translateToLanguage() = preferenceStore.getString("translate_language_to", "PORTUGUESE")
@@ -14924,8 +15155,11 @@ index ee30e4b..2c4dbb9 100644
      fun dbnetExperimental() = preferenceStore.getBoolean("dbnet_experimental", false)
  
 +    /** Recover the old "everything enabled" state without changing the selected OCR engine. */
-+    fun reconcileOcrExperiments() {
-+        if (longPageStrips().get() && dbnetExperimental().get()) dbnetExperimental().set(false)
++    fun reconcileOcrExperiments(englishPossible: Boolean = true, dbnetDeviceSupported: Boolean = true) {
++        if (!englishPossible && longPageStrips().get()) longPageStrips().set(false)
++        if (dbnetExperimental().get() && (!englishPossible || !dbnetDeviceSupported || longPageStrips().get())) {
++            dbnetExperimental().set(false)
++        }
 +    }
 +
 +    fun enableLongPageStrips(enabled: Boolean): Boolean {
@@ -15249,10 +15483,10 @@ index 0000000..378a85b
 +}
 diff --git a/domain/src/test/java/tachiyomi/domain/translation/OcrExperimentPreferencesTest.kt b/domain/src/test/java/tachiyomi/domain/translation/OcrExperimentPreferencesTest.kt
 new file mode 100644
-index 0000000..dafa6f5
+index 0000000..c62d0ce
 --- /dev/null
 +++ b/domain/src/test/java/tachiyomi/domain/translation/OcrExperimentPreferencesTest.kt
-@@ -0,0 +1,85 @@
+@@ -0,0 +1,123 @@
 +package tachiyomi.domain.translation
 +
 +import io.mockk.every
@@ -15337,6 +15571,44 @@ index 0000000..dafa6f5
 +        assertTrue(prefs.dbnetExperimental().get())
 +        assertFalse(prefs.longPageStrips().get())
 +    }
++
++    @Test fun `removing the English prerequisite turns off both dependent experiments`() {
++        val prefs = preferences()
++        prefs.longPageStrips().set(true)
++        prefs.dbnetExperimental().set(true)
++        prefs.reconcileOcrExperiments(englishPossible = false)
++        assertFalse(prefs.longPageStrips().get())
++        assertFalse(prefs.dbnetExperimental().get())
++    }
++
++    @Test fun `unsupported DBNet architecture preserves the selected OCR and strips`() {
++        val prefs = preferences()
++        prefs.ocrEngine().set(1)
++        prefs.longPageStrips().set(true)
++        prefs.dbnetExperimental().set(true)
++        prefs.reconcileOcrExperiments(dbnetDeviceSupported = false)
++        assertFalse(prefs.dbnetExperimental().get())
++        assertTrue(prefs.longPageStrips().get())
++        assertEquals(1, prefs.ocrEngine().get())
++    }
++
++    @Test fun `restoring a prerequisite does not silently reenable a child`() {
++        val prefs = preferences()
++        prefs.dbnetExperimental().set(true)
++        prefs.reconcileOcrExperiments(englishPossible = false)
++        prefs.reconcileOcrExperiments(englishPossible = true)
++        assertFalse(prefs.longPageStrips().get())
++        assertFalse(prefs.dbnetExperimental().get())
++    }
++
++    @Test fun `prerequisite reconciliation never changes translation or language choices`() {
++        val prefs = preferences()
++        prefs.translateFromLanguage().set("JAPANESE")
++        prefs.translationEngine().set(0)
++        prefs.reconcileOcrExperiments(englishPossible = false, dbnetDeviceSupported = false)
++        assertEquals("JAPANESE", prefs.translateFromLanguage().get())
++        assertEquals(0, prefs.translationEngine().get())
++    }
 +}
 diff --git a/gradle/libs.versions.toml b/gradle/libs.versions.toml
 index 9839272..197aec7 100644
@@ -15359,10 +15631,10 @@ index 9839272..197aec7 100644
  mlkit-text-recognition-chinese = { module = "com.google.mlkit:text-recognition-chinese", version.ref = "mlkit-text-recognition" }
  mlkit-text-recognition-japanese = { module = "com.google.mlkit:text-recognition-japanese", version.ref = "mlkit-text-recognition" }
 diff --git a/i18n-at/src/commonMain/moko-resources/base/strings.xml b/i18n-at/src/commonMain/moko-resources/base/strings.xml
-index 7ed4795..dd7633e 100644
+index 7ed4795..6a6798e 100644
 --- a/i18n-at/src/commonMain/moko-resources/base/strings.xml
 +++ b/i18n-at/src/commonMain/moko-resources/base/strings.xml
-@@ -73,12 +73,132 @@
+@@ -73,12 +73,133 @@
      <string name="repository_add_error">Could not add this repository. Check your connection and try again.</string>
      <string name="repository_refresh_error">Repository added, but extension listings could not be refreshed. Refresh the Extensions screen.</string>
      <string name="chapter_group_version">Group/version: %1$s</string>
@@ -15496,12 +15768,13 @@ index 7ed4795..dd7633e 100644
 +    <string name="polaris_update_download_failed">The download could not finish. Check your connection and available storage, then tap Retry. The received portion is kept when possible.</string>
 +    <string name="polaris_update_ready">Polaris update ready</string>
 +    <string name="polaris_update_install_hint">Tap to open the Android installer.</string>
++    <string name="pref_ocr_dependencies_hint">Strips require English input or automatic source language. DBNet also requires a 64-bit ARM Android system. Unavailable options are turned off; restoring a prerequisite does not turn experiments on automatically.</string>
  </resources>
 diff --git a/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml b/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
-index d1748bc..4710e2f 100644
+index d1748bc..1817ea6 100644
 --- a/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
 +++ b/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
-@@ -73,12 +73,132 @@
+@@ -73,12 +73,133 @@
      <string name="repository_add_error">Não foi possível adicionar o repositório. Confira a conexão e tente novamente.</string>
      <string name="repository_refresh_error">Repositório adicionado, mas não foi possível atualizar as extensões. Atualize a tela Extensões.</string>
      <string name="chapter_group_version">Grupo/versão: %1$s</string>
@@ -15635,6 +15908,7 @@ index d1748bc..4710e2f 100644
 +    <string name="polaris_update_download_failed">O download não terminou. Confira a conexão e o espaço disponível e toque em Tentar novamente. A parte recebida é preservada quando possível.</string>
 +    <string name="polaris_update_ready">Atualização do Polaris pronta</string>
 +    <string name="polaris_update_install_hint">Toque para abrir o instalador do Android.</string>
++    <string name="pref_ocr_dependencies_hint">Faixas exigem entrada em inglês ou idioma automático pela fonte. DBNet também exige Android ARM de 64 bits. Opções indisponíveis são desligadas; restaurar o requisito não liga os experimentos sozinho.</string>
  </resources>
 diff --git a/i18n/src/commonMain/moko-resources/base/strings.xml b/i18n/src/commonMain/moko-resources/base/strings.xml
 index c0832ba..ebf8f48 100644

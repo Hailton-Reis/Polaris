@@ -101,6 +101,12 @@ Para garantir uma nova leitura da imagem após mudar motor ou faixas, use a aç�
 
 O candidato limita legendas ao fundo medido e separa áreas de escrita sobrepostas. Faixas e DBNet passam a ser escolhas exclusivas; configurações antigas com ambos ligados conservam faixas e o OCR selecionado. A opção AOT-GAN foi retirada porque sua preferência não era usada pelo processamento. Texto ausente e balões conectados ainda exigem comparação com o original; estas correções não garantem qualidade de scan.
 
+As opções por faixas e DBNet ficam indisponíveis quando não há entrada em inglês nem idioma automático pela fonte. DBNet também fica desativado em Android ARM32 e em outras arquiteturas que não sejam ARM64. Ao remover o requisito, o dependente é desligado; restaurar o requisito permite escolhê-lo novamente, sem ligá-lo sozinho.
+
+Para a comparação atual em inglês: **OCR PaddleOCR**, **OCR por faixas ligado**, **DBNet desligado**, **tradutor ML Kit no dispositivo**, saída **Português (Brasil)**, efeitos sonoros e edição avançada desligados. Depois compare o **OCR ML Kit** com as demais escolhas iguais. O tradutor permanece ML Kit nos dois testes. Remova somente a tradução salva antes de refazer o OCR. As faixas só atuam quando a imagem individual é suficientemente alta; um leitor vertical pode empilhar várias imagens pequenas.
+
 O download da atualização continua ao sair da tela. Quedas de rede têm novas tentativas automáticas e retomada do parcial quando o servidor permite, com verificação do APK completo antes de instalar. Ao terminar, a tela e a notificação oferecem abrir o instalador do Android. Cada versão continua baixando um APK completo; a retomada evita repetir a parte já recebida do mesmo arquivo.
 
 Essa correção exige instalar a beta.9 uma vez: não modifica o atualizador da beta.8 já instalada. A distribuição deste candidato ainda está pendente. Veja [comportamento, diagnóstico e limites](../../docs/CORRECOES_LEITURA_ATUALIZACAO_P20261104_1.md).
+
+O [ensaio real do capítulo 40](../ocr-benchmark/20261104-chapter40/README.md) compara11 recortes difíceis. Paddle teve 9 textos exatos e2 erros de caracteres; ML Kit 7 e 10, em 465 caracteres. Os controles brancos passaram nos dois. O benchmark não mede desempenho ARM nem valida tradução editorial do capítulo inteiro.

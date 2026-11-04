@@ -25,6 +25,10 @@ DBNet usa reconhecimento ML Kit de página inteira. O motor selecionado funciona
 
 Agora, habilitar um desses experimentos desliga o outro. Ao encontrar as duas opções antigas ligadas, o app conserva faixas com o motor escolhido e desliga DBNet. O mesmo ajuste é aplicado ao criar o OCR e ao abrir as configurações.
 
+Nas configurações, as opções dependentes ficam indisponíveis sem entrada em inglês ou idioma automático pela fonte. DBNet também exige processo/Android ARM64. Remover o requisito desliga o dependente; restaurá-lo não ativa uma experiência automaticamente.
+
+Uma revisão com o capítulo 40 encontrou outro caso de repetição nas bordas das faixas: o mesmo texto vinha com alturas de caixa diferentes. A reconciliação agora aceita essa variação limitada para textos iguais com geometria quase contida, preservando linhas em posições distintas. Dois testes reproduziram a falha antes da correção; os 16 testes do reconciliador passam depois dela.
+
 A opção AOT-GAN foi retirada da tela: sua preferência não era consultada pelo processamento de tradução. Sua marcação não comprovava remoção neural de texto. O código experimental e a chave antiga permanecem compatíveis, mas não são apresentados como recurso ativo.
 
 Alterar o motor ou as faixas não refaz a tradução salva. Para comparar o mesmo capítulo, use o **ícone de tradução → Excluir**, que remove somente a tradução; depois traduza novamente. Preserve o capítulo baixado. Retraduzir uma frase pelo editor usa o texto já reconhecido e não compara OCRs.
@@ -55,7 +59,7 @@ Os testes HTTP locais exercitam o código do downloader com conexões reais, inc
 
 Os controles de imagem verificam fundos escuros em três escalas, caixas coloridas, balões brancos e separação de títulos. O ensaio Android usa uma Application isolada porque a imagem AOSP de teste não tem WebView; ele não valida a abertura completa do leitor. O resultado final de compilação, comparação de testes, execução Android e hashes fica em [TEST_RESULTS.json](../integration/document-reader/TEST_RESULTS.json).
 
-A comparação completa executou **616 testes JVM: 599 aprovações e 17 falhas preexistentes**, sem novos erros, testes ausentes ou ignorados. Todos os 27 casos acrescentados passaram. Os **sete testes Android de componentes** também passaram; quatro verificam renderização, dois o decodificador e um a máscara de limpeza. A execução de renderização ocorreu antes das mudanças do atualizador; os arquivos de renderização/decodificação permanecem iguais no pacote final.
+A comparação completa atual executou **624 testes JVM: 607 aprovações e 17 falhas preexistentes**, sem novos erros, testes ausentes ou ignorados. Todos os 35 casos acrescentados desde a beta.8 passaram. Os **sete testes Android de componentes** anteriores passaram; quatro verificam renderização, dois o decodificador e um a máscara de limpeza. A execução de renderização ocorreu antes das mudanças do atualizador; os arquivos do renderizador e do decodificador regional permanecem iguais. A mudança do reconciliador de texto é verificada separadamente pelos testes JVM e pelo ensaio de capítulo.
 
 Exemplo autoral de legenda escura renderizada no Android, com ampliação de 2× e fonte padrão:
 
@@ -65,6 +69,8 @@ Controle autoral de balão branco:
 
 ![Controle de balão branco](../integration/document-reader/caption-layout-controls/white-1.0-true.png)
 
-Os APKs finais ARM32/ARM64 têm assinatura e identidade verificadas. Uma nova embalagem ZIP removeu espaço não utilizado deixado pelas compilações incrementais; cada APK ficou 1.562.260 bytes menor que o da beta.8 pública. Todos os arquivos de aplicação dentro dos APKs conferem byte a byte com os da compilação de testes; modelos e bibliotecas nativas não mudaram.
+Os APKs finais ARM32/ARM64 têm assinatura e identidade verificadas. Uma nova embalagem ZIP removeu espaço não utilizado deixado pelas compilações incrementais; cada APK ficou 1.560.120 bytes menor que o da beta.8 pública. Todos os arquivos de aplicação dentro dos APKs conferem byte a byte com os da compilação de testes; modelos e bibliotecas nativas não mudaram.
 
 Ainda precisam de aceite no aparelho: retomada ao alternar rede, sair/voltar à tela, notificação e instalação sobre a versão anterior, biblioteca preservada e comparação das páginas reais nos dois leitores. O mecanismo de tradução continua sendo o ML Kit escolhido pela pessoa; Gemini permanece fora desta rodada.
+
+A [revisão do capítulo 40](../integration/ocr-benchmark/20261104-chapter40/README.md) acrescenta a comparação de11 recortes reais (465 caracteres): Paddle 9/11 exatos, ML Kit 7/11, e a correção de seis repetições na sobreposição. A preparação do tradutor no emulador atingiu o limite; nenhuma nota de qualidade de tradução foi atribuída.

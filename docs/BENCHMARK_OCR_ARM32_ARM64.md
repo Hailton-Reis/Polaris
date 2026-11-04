@@ -34,6 +34,10 @@ O Tiny avaliado não cobre japonês/coreano e não foi incorporado ao app. As im
 
 ## Primeiro teste do usuário
 
-Agora basta uma verificação curta da beta.7: instalar o pacote da ABI correspondente como atualização, confirmar a versão em Sobre e abrir o mesmo capítulo em que houve falhas. Começar com **ML Kit e OCR por faixas desligado**, observando leitura, alinhamento e falas curtas. Não é necessário configurar Gemini ou API nem executar todo o benchmark agora.
+Na revisão atual da beta.9, o primeiro comparativo em **inglês** prioriza **PaddleOCR com faixas ligadas**, DBNet desligado e **ML Kit como tradutor**, inglês → português. Depois repita com **OCR ML Kit**, mantendo o mesmo tradutor, original, idioma e glossário. Isso não estabelece um vencedor universal. O Tiny não foi incorporado.
+
+Faixas atuam em imagens individuais com altura maior que 2.048 px e pelo menos três vezes a largura, com largura máxima de 4.096 px e até 256 regiões. Estar lendo em faixa longa não garante que esses requisitos se apliquem a cada arquivo da fonte.
+
+Em uma beta.8 já instalada, desligue DBNet e AOT-GAN manualmente antes de comparar. Na beta.9, faixas e DBNet se excluem, e opções sem os requisitos de idioma/arquitetura ficam indisponíveis. AOT-GAN foi retirado da tela porque sua preferência não era usada pelo processamento.
 
 O teste comparativo completo **em aparelhos Android ARM** entre ML Kit e o Tiny só começa depois que o Tiny estiver adaptado e validado para ambas as ABIs. Se compararmos o Paddle já existente antes disso, os resultados devem identificá-lo como o modelo existente, sem atribuí-los ao Tiny.

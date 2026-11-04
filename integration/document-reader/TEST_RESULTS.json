@@ -7,11 +7,11 @@
   "publication": "UNPUBLISHED_INTERNAL_CANDIDATE",
   "current_public_release": "v0.1.0-beta.8",
   "pinned_yomotsu": "0fb80c439ef816eeb50674f1b90af39918b176d8",
-  "patch_sha256": "4cbb476ccc7b8490c1432b0acc45cc1acc0a02a6c6d6e83c8d3273cf71fbea3a",
+  "patch_sha256": "41c41bed47942b276d55bd61eab13d52d331014248414623cedd599fb61573c3",
   "assembly": "PASS: all configured debug APKs assembled. Full native build exits 1 solely for app:testDebugUnitTest with 17 preexisting failures. Packaging-only rerun succeeds.",
   "full_build_completion": {
     "status": "ASSEMBLY_AND_UNIT_REPORTS_COMPLETE",
-    "unit_tests": 616,
+    "unit_tests": 624,
     "unit_gradle_exit": 1,
     "packaging_only_exit": 0
   },
@@ -24,8 +24,8 @@
       "skipped": 0
     },
     "patched": {
-      "total": 616,
-      "passed": 599,
+      "total": 624,
+      "passed": 607,
       "failed": 17,
       "skipped": 0
     },
@@ -43,7 +43,7 @@
     }
   },
   "new_tests_vs_beta8": {
-    "total": 27,
+    "total": 35,
     "failed": 0,
     "skipped": 0,
     "classes": [
@@ -68,7 +68,14 @@
       {
         "module": "domain",
         "classname": "tachiyomi.domain.translation.OcrExperimentPreferencesTest",
+        "tests": 8,
+        "status": "PASS"
+      },
+      {
+        "module": "app",
+        "classname": "eu.kanade.translation.recognizer.OcrStripPlanTest",
         "tests": 4,
+        "total_in_class": 16,
         "status": "PASS"
       }
     ]
@@ -85,25 +92,29 @@
     "packager": {
       "tests": 6,
       "status": "PASS"
+    },
+    "chapter_scoring_guards": {
+      "tests": 5,
+      "status": "PASS"
     }
   },
   "source_to_build_verification": {
     "status": "BYTE_IDENTICAL",
-    "files_checked": 173,
+    "files_checked": 174,
     "mismatches": []
   },
   "apk_artifacts": [
     {
       "abi": "arm64-v8a",
       "file": "Polaris-0.1.0-beta.9-arm64-v8a.apk",
-      "bytes": 192946683,
-      "sha256": "a1c49b2b4a72a92bb0e25d82b6b9351d1f7c1fa94b18f6c5a390d36f7176fce2"
+      "bytes": 192948823,
+      "sha256": "cdf6f2a14e5505adb8f5d51175775b76cb7ddf000815f49528a950653c51b3a2"
     },
     {
       "abi": "armeabi-v7a",
       "file": "Polaris-0.1.0-beta.9-armeabi-v7a.apk",
-      "bytes": 153148860,
-      "sha256": "c324bac0f68def75a947de4886cbb49033112bb981ee17f52d43b59c5c620884"
+      "bytes": 153151000,
+      "sha256": "4df8f2dc46ff61ecd572fffa005359754efabef51b0dbf229f833646acbdfbd5"
     }
   ],
   "signer_sha256": "3ae747069cc9015ca1777f94fd56b030501f45d6af380426a572ad60e94d8227",
@@ -112,16 +123,16 @@
     {
       "abi": "arm64-v8a",
       "old_bytes": 194508943,
-      "new_bytes": 192946683,
-      "delta_bytes": -1562260,
+      "new_bytes": 192948823,
+      "delta_bytes": -1560120,
       "unchanged_asset_and_native_library_files": 78,
       "changed_payload_files": []
     },
     {
       "abi": "armeabi-v7a",
       "old_bytes": 154711120,
-      "new_bytes": 153148860,
-      "delta_bytes": -1562260,
+      "new_bytes": 153151000,
+      "delta_bytes": -1560120,
       "unchanged_asset_and_native_library_files": 77,
       "changed_payload_files": []
     }
@@ -131,33 +142,33 @@
     "apks": [
       {
         "file": "app-universal-debug.apk",
-        "before_bytes": 537835551,
-        "after_bytes": 532101458,
-        "byte_identical_unsigned_entries": 2209
+        "before_bytes": 532502854,
+        "after_bytes": 532103598,
+        "unsigned_entries_equal": 2209
       },
       {
         "file": "app-armeabi-v7a-debug.apk",
-        "before_bytes": 158882953,
-        "after_bytes": 153148860,
-        "byte_identical_unsigned_entries": 2166
+        "before_bytes": 153550256,
+        "after_bytes": 153151000,
+        "unsigned_entries_equal": 2166
       },
       {
         "file": "app-arm64-v8a-debug.apk",
-        "before_bytes": 198680776,
-        "after_bytes": 192946683,
-        "byte_identical_unsigned_entries": 2167
+        "before_bytes": 193348079,
+        "after_bytes": 192948823,
+        "unsigned_entries_equal": 2167
       },
       {
         "file": "app-x86_64-debug.apk",
-        "before_bytes": 234531623,
-        "after_bytes": 228797530,
-        "byte_identical_unsigned_entries": 2166
+        "before_bytes": 229198926,
+        "after_bytes": 228799670,
+        "unsigned_entries_equal": 2166
       },
       {
         "file": "app-x86-debug.apk",
-        "before_bytes": 219188217,
-        "after_bytes": 213454124,
-        "byte_identical_unsigned_entries": 2166
+        "before_bytes": 213855520,
+        "after_bytes": 213456264,
+        "unsigned_entries_equal": 2166
       }
     ]
   },
@@ -175,7 +186,7 @@
     "images": "caption-layout-controls/",
     "font": "FontFamily.Default; not Anime Ace",
     "installed_renderer_build_sha256": "a9cffcfd319c40acfb1dc6dc50a0f9eb7cd6f6cd68d69a7c0249556b56fc64fb",
-    "scope": "Renderer/decoder fixture build before updater changes. Renderer and decoder source unchanged in the final candidate. Does not exercise full application startup, WorkManager, APK install flow, ARM inference or source manga pages."
+    "scope": "Prior7 renderer/region-decoder/mask controls. Renderer and region decoder unchanged. Text reconciler modified and separately tested with16 JVM cases; actual MLKit API crop benchmark records11 successful cases. No full app/ARM/UI acceptance."
   },
   "updater": {
     "artifact": "FULL_APK",
@@ -196,15 +207,40 @@
     "old_conflicting_flags": "Keep strips and selected OCR, disable DBNet",
     "aot_gan_checkbox": "Removed: its stored preference was never read by translation processing",
     "new_models": false,
-    "new_apis": false
+    "new_apis": false,
+    "prerequisites": "UI clears/disables non-English experiments when no English input/source-language possibility; DBNet additionally requires ARM64. Restoring prerequisites never auto-enables experiments.",
+    "overlap_reconciliation": "Equal text with almost-contained bounded-height boxes uses larger-height center tolerance; 2 regressions failed before/16 tests pass after; six extra real-chapter repetitions removed in replay."
   },
   "physical_device_acceptance": "PENDING",
-  "real_page_ocr_quality": "PENDING",
+  "real_page_ocr_quality": "Scoped11-region real-source OCR benchmark complete; full reader/physical quality acceptance pending",
   "known_limits": [
-    "User screenshots are translated previews; original pages and saved OCR payload are unavailable.",
+    "MangaCloud original files and saved user OCR payload unavailable; public Asura originals used for scoped real-source benchmarking with different segmentation.",
     "Missing lines, connected balloon occupancy and decorative panel reconstruction are not declared fixed.",
     "Full application startup unvalidated on minimal AOSP image without WebView.",
     "17 existing JVM failures remain. No new failures, skips or missing baseline cases.",
     "The installed beta.8 updater is not patched remotely; one manual installation may be needed when beta.9 is distributed."
-  ]
+  ],
+  "real_chapter_benchmark": {
+    "report": "../ocr-benchmark/20261104-chapter40/README.md",
+    "chapter": "Solo Leveling Ragnarok40",
+    "requested_source": "MangaCloud EN",
+    "measured_source": "Public Asura15images; same scenes/different segmentation, file identity to MangaCloud not verified",
+    "region_count": 11,
+    "normalized_characters": 465,
+    "paddle_exact": 9,
+    "paddle_character_errors": 2,
+    "mlkit_exact": 7,
+    "mlkit_character_errors": 10,
+    "runtimes": "Desktop Paddle port vs real Android MLKit API; no speed/ARM ranking",
+    "native_full_page_images": 15,
+    "native_regional": "PARTIAL: one high image complete, two180s timeouts, no character penalty assigned",
+    "translation": {
+      "status": "NOT_VALIDATED_MODEL_PREPARATION_TIMEOUT",
+      "model_preparation_error_type": "TimeoutCancellationException",
+      "model_preparation_elapsed_ms": 182722,
+      "translation_quality_score": null,
+      "successful_translation_cases": 0,
+      "scope": "First120s task timeout; explicit model-preparation retry180s timeout on minimal software AOSP emulator. No alternative translator substituted and no accuracy penalty assigned."
+    }
+  }
 }
