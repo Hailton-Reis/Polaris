@@ -1,0 +1,62 @@
+{
+  "version": "0.1.0-beta.9",
+  "version_code": 110,
+  "revision": "P20261104.2",
+  "minimum_android_api": 26,
+  "application_id": "app.mihon.tachiyomiat.dev",
+  "signer_sha256": "3ae747069cc9015ca1777f94fd56b030501f45d6af380426a572ad60e94d8227",
+  "artifacts": [
+    {
+      "abi": "arm64-v8a",
+      "file": "Polaris-0.1.0-beta.9-arm64-v8a.apk",
+      "bytes": 192966287,
+      "sha256": "426853254bae47d91972af5262e1f6c3ed1a1075e84da3a0b7e08dbece22dd3e"
+    },
+    {
+      "abi": "armeabi-v7a",
+      "file": "Polaris-0.1.0-beta.9-armeabi-v7a.apk",
+      "bytes": 153168464,
+      "sha256": "d65c73e228e55e65b3a7bdcd1d8f195dde0cbe38f795174229021c46c3a544f7"
+    }
+  ],
+  "status": "PRERELEASE_CANDIDATE",
+  "source_commit": "e6bab4bc4fade68e3aa74e2677500ea762d34d29",
+  "verified_implementation_commit": "e6bab4bc4fade68e3aa74e2677500ea762d34d29",
+  "display_name": "Polaris",
+  "branding_verified": true,
+  "physical_device_acceptance": "PENDING",
+  "cjk_ocr_quality": "PENDING",
+  "unit_comparison": {
+    "status": "NO_NEW_UNIT_REGRESSIONS",
+    "baseline": {
+      "total": 624,
+      "passed": 607,
+      "failed": 17,
+      "skipped": 0
+    },
+    "patched": {
+      "total": 635,
+      "passed": 618,
+      "failed": 17,
+      "skipped": 0
+    },
+    "preexisting_failures_still_present": 17,
+    "missing_baseline_tests": [],
+    "new_failures_or_skips": [],
+    "android_runtime_verified": false,
+    "gradle_exit_codes": {
+      "baseline": 1,
+      "patched": 1
+    },
+    "required_module_coverage": {
+      "app": 539,
+      "domain": 85
+    }
+  },
+  "android_component_verification": {
+    "selected_cases": 16,
+    "status": "PASS",
+    "full_app_acceptance": "PENDING",
+    "report": "https://github.com/Hailton-Reis/Polaris/blob/e6bab4bc4fade68e3aa74e2677500ea762d34d29/integration/typography/20261104/README.md"
+  }
+}

@@ -116,3 +116,7 @@ O [ensaio real do capítulo 40](../ocr-benchmark/20261104-chapter40/README.md) c
 A Anime Ace incluída não tinha Ç/ç; o candidato complementa essas letras com a Bubble Sans já disponível, com altura compatível. A medição usa o mesmo texto estilizado do desenho, o espaço entre linhas considera os acentos, e a busca compara os espaços seguros para evitar reduzir a letra antes do necessário. Os arquivos das fontes permanecem intactos.
 
 **Fonte das traduções** aplica a família escolhida ao texto traduzido; tamanho e quebras são automáticos para cada região. Não há identificação automática da fonte original. Reabra o leitor para conferir traduções salvas com a correção; não é necessário refazer o OCR somente por causa da fonte. Veja [diagnóstico e limites](../../docs/TIPOGRAFIA_PT_P20261104_2.md).
+
+## Rascunho beta.9 no GitHub
+
+O [rascunho de Release beta.9](https://github.com/Hailton-Reis/Polaris/releases/tag/untagged-e498da151b0296209fe2) contém os APKs ARM32/ARM64 e cinco anexos de metadados, roteiro, notas e validação, com tamanhos e hashes remotos conferidos. Continua sem publicação; não aparece no atualizador nem oferece download anônimo. A beta.8 permanece como prévia pública. Veja [o registro de preparação e as pendências de CI](../release-candidates/0.1.0-beta.9/README.md).
