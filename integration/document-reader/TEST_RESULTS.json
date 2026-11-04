@@ -1,39 +1,35 @@
 {
-  "date_local": "2026-11-03",
-  "timezone": "America/Fortaleza",
-  "candidate_revision": "Polaris P20261103.1",
-  "version_name": "0.1.0-beta.8",
-  "version_code": 109,
-  "publication": "PUBLISHED_PUBLIC_PRERELEASE",
+  "date_utc": "2026-11-04",
+  "timezone": "UTC",
+  "candidate_revision": "Polaris P20261104.1",
+  "version_name": "0.1.0-beta.9",
+  "version_code": 110,
+  "publication": "UNPUBLISHED_INTERNAL_CANDIDATE",
+  "current_public_release": "v0.1.0-beta.8",
   "pinned_yomotsu": "0fb80c439ef816eeb50674f1b90af39918b176d8",
-  "patch_sha256": "5aa7991f2621f0e7c522046442d06b67683857ea05a5b1b1cbf3ebef00547ea9",
-  "assembly": "PASS: ARM32/ARM64 and the other configured debug APKs assembled; the only failed Gradle task is app:testDebugUnitTest with the same 34 baseline failures",
+  "patch_sha256": "4cbb476ccc7b8490c1432b0acc45cc1acc0a02a6c6d6e83c8d3273cf71fbea3a",
+  "assembly": "PASS: all configured debug APKs assembled. Full native build exits 1 solely for app:testDebugUnitTest with 17 preexisting failures. Packaging-only rerun succeeds.",
   "full_build_completion": {
     "status": "ASSEMBLY_AND_UNIT_REPORTS_COMPLETE",
-    "apks": [
-      "app-universal-debug.apk",
-      "app-armeabi-v7a-debug.apk",
-      "app-x86_64-debug.apk",
-      "app-x86-debug.apk",
-      "app-arm64-v8a-debug.apk"
-    ],
-    "unit_tests": 589
+    "unit_tests": 616,
+    "unit_gradle_exit": 1,
+    "packaging_only_exit": 0
   },
   "android_unit_comparison": {
     "status": "NO_NEW_UNIT_REGRESSIONS",
     "baseline": {
-      "total": 428,
-      "passed": 394,
-      "failed": 34,
-      "skipped": 0
-    },
-    "patched": {
       "total": 589,
       "passed": 555,
       "failed": 34,
       "skipped": 0
     },
-    "preexisting_failures_still_present": 34,
+    "patched": {
+      "total": 616,
+      "passed": 599,
+      "failed": 17,
+      "skipped": 0
+    },
+    "preexisting_failures_still_present": 17,
     "missing_baseline_tests": [],
     "new_failures_or_skips": [],
     "android_runtime_verified": false,
@@ -42,75 +38,44 @@
       "patched": 1
     },
     "required_module_coverage": {
-      "domain": 58,
-      "app": 370
+      "app": 512,
+      "domain": 77
     }
   },
-  "new_tests_vs_beta7": {
-    "total": 42,
+  "new_tests_vs_beta8": {
+    "total": 27,
     "failed": 0,
+    "skipped": 0,
     "classes": [
       {
-        "class": "eu.kanade.domain.chapter.model.ChapterRoutingTest",
         "module": "app",
-        "tests": 2,
+        "classname": "eu.kanade.tachiyomi.data.updater.PolarisApkDownloaderTest",
+        "tests": 12,
         "status": "PASS"
       },
       {
-        "class": "eu.kanade.presentation.more.settings.screen.about.PolarisDedicationTriggerTest",
         "module": "app",
+        "classname": "eu.kanade.translation.model.TranslationPageLayoutTest",
+        "tests": 8,
+        "status": "PASS"
+      },
+      {
+        "module": "app",
+        "classname": "eu.kanade.translation.recognizer.CaptionSurfaceRegressionTest",
         "tests": 3,
         "status": "PASS"
       },
       {
-        "class": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
-        "module": "app",
-        "tests": 8,
-        "status": "PASS"
-      },
-      {
-        "class": "eu.kanade.tachiyomi.source.selection.SourceMatchingTest",
-        "module": "app",
-        "tests": 6,
-        "status": "PASS"
-      },
-      {
-        "class": "eu.kanade.translation.data.TranslationFileIdentityTest",
-        "module": "app",
-        "tests": 2,
-        "status": "PASS"
-      },
-      {
-        "class": "mihon.domain.source.interactor.UpdateMangaFromRemoteTest",
-        "module": "app",
-        "tests": 2,
-        "status": "PASS"
-      },
-      {
-        "class": "tachiyomi.domain.chapter.model.ChapterOriginTest",
         "module": "domain",
-        "tests": 5,
-        "status": "PASS"
-      },
-      {
-        "class": "tachiyomi.domain.chapter.model.ChapterVersionsTest",
-        "module": "domain",
-        "tests": 8,
-        "status": "PASS"
-      },
-      {
-        "class": "tachiyomi.domain.chapter.model.LogicalChapterCountsTest",
-        "module": "domain",
-        "tests": 2,
-        "status": "PASS"
-      },
-      {
-        "class": "tachiyomi.domain.history.interactor.GetNextChaptersTest",
-        "module": "domain",
+        "classname": "tachiyomi.domain.translation.OcrExperimentPreferencesTest",
         "tests": 4,
         "status": "PASS"
       }
     ]
+  },
+  "repaired_preexisting_tests": {
+    "count": 17,
+    "reason": "Bitmap fixtures now implement production bulk getPixels, not only getPixel. All baseline cases remain present. Pure equivalent ARGB math avoids excessive MockK call recording."
   },
   "host_checks_current_run": {
     "overlay_application_idempotence_crlf_and_drift": {
@@ -122,126 +87,124 @@
       "status": "PASS"
     }
   },
-  "unchanged_prior_host_checks": {
-    "candidate": "beta.7",
-    "windows_launcher_static_contract": 33,
-    "unit_comparator": 16,
-    "build_completion_guards": 7
-  },
   "source_to_build_verification": {
     "status": "BYTE_IDENTICAL",
-    "files_checked": 153,
+    "files_checked": 173,
     "mismatches": []
   },
   "apk_artifacts": [
     {
       "abi": "arm64-v8a",
-      "file": "Polaris-0.1.0-beta.8-arm64-v8a.apk",
-      "bytes": 194508943,
-      "sha256": "7a5b60ae1c86b4435ea801ca90fffd81c23e57773dba18ef082c14e7ec37077c"
+      "file": "Polaris-0.1.0-beta.9-arm64-v8a.apk",
+      "bytes": 192946683,
+      "sha256": "a1c49b2b4a72a92bb0e25d82b6b9351d1f7c1fa94b18f6c5a390d36f7176fce2"
     },
     {
       "abi": "armeabi-v7a",
-      "file": "Polaris-0.1.0-beta.8-armeabi-v7a.apk",
-      "bytes": 154711120,
-      "sha256": "629f1f60badfb751c5205cdb244dc472c1cb0a9b78e2e0d8fedfb67749877669"
+      "file": "Polaris-0.1.0-beta.9-armeabi-v7a.apk",
+      "bytes": 153148860,
+      "sha256": "c324bac0f68def75a947de4886cbb49033112bb981ee17f52d43b59c5c620884"
     }
   ],
   "signer_sha256": "3ae747069cc9015ca1777f94fd56b030501f45d6af380426a572ad60e94d8227",
+  "branding_verified": true,
   "apk_payload_and_size_comparison": [
     {
       "abi": "arm64-v8a",
-      "old_bytes": 192832755,
-      "new_bytes": 194508943,
-      "delta_bytes": 1676188,
+      "old_bytes": 194508943,
+      "new_bytes": 192946683,
+      "delta_bytes": -1562260,
       "unchanged_asset_and_native_library_files": 78,
-      "sha256": "7a5b60ae1c86b4435ea801ca90fffd81c23e57773dba18ef082c14e7ec37077c"
+      "changed_payload_files": []
     },
     {
       "abi": "armeabi-v7a",
-      "old_bytes": 153034932,
-      "new_bytes": 154711120,
-      "delta_bytes": 1676188,
+      "old_bytes": 154711120,
+      "new_bytes": 153148860,
+      "delta_bytes": -1562260,
       "unchanged_asset_and_native_library_files": 77,
-      "sha256": "629f1f60badfb751c5205cdb244dc472c1cb0a9b78e2e0d8fedfb67749877669"
+      "changed_payload_files": []
     }
   ],
-  "storage": {
-    "extra_models_added": false,
-    "discovery_downloads_images": false,
-    "catalog_metadata_is_preserved": true,
-    "active_catalogs_per_work": 4,
-    "entries_per_catalog_auto_comparison_limit": 20000,
-    "database_quota": null,
-    "estimate_report": "source-storage-estimate_P20261103_1.json",
-    "estimate_is_database_measurement": false
+  "apk_repackaging": {
+    "reason": "Removed unused space left by incremental ZIP packaging. Every unsigned APK entry matches the APKs from the full test build byte for byte.",
+    "apks": [
+      {
+        "file": "app-universal-debug.apk",
+        "before_bytes": 537835551,
+        "after_bytes": 532101458,
+        "byte_identical_unsigned_entries": 2209
+      },
+      {
+        "file": "app-armeabi-v7a-debug.apk",
+        "before_bytes": 158882953,
+        "after_bytes": 153148860,
+        "byte_identical_unsigned_entries": 2166
+      },
+      {
+        "file": "app-arm64-v8a-debug.apk",
+        "before_bytes": 198680776,
+        "after_bytes": 192946683,
+        "byte_identical_unsigned_entries": 2167
+      },
+      {
+        "file": "app-x86_64-debug.apk",
+        "before_bytes": 234531623,
+        "after_bytes": 228797530,
+        "byte_identical_unsigned_entries": 2166
+      },
+      {
+        "file": "app-x86-debug.apk",
+        "before_bytes": 219188217,
+        "after_bytes": 213454124,
+        "byte_identical_unsigned_entries": 2166
+      }
+    ]
   },
-  "prior_ocr_component_evidence": {
-    "candidate": "beta.7",
-    "decoder": {
-      "status": "PASS",
-      "tests": 2,
-      "api": 26,
-      "abi": "x86_64",
-      "isolated_application": true,
-      "full_app_startup": "Not validated: minimal AOSP image has no WebView provider",
-      "scope": "Product Android region decoder, stream/bitmap cleanup and EXIF gate. No Paddle/ML Kit inference or physical ARM validation."
-    },
-    "paddle_sdk_smoke": {
-      "status": "NOT_COMPLETED",
-      "reason": "600-second software-emulator deadline",
-      "api": 26,
-      "abi": "x86_64"
-    },
-    "full_app_startup": {
-      "status": "NOT_VALIDATED",
-      "cause": "Minimal AOSP API26 image has no configured WebView provider. The normal Application crashed before component tests; component-only runner uses android.app.Application. Reader APK startup behavior remains unchanged."
-    },
-    "note": "Not rerun on beta.8. Decoder/model code unchanged; this is not full app or ARM acceptance for beta.8."
+  "android_component_verification": {
+    "status": "PASS",
+    "tests": 7,
+    "api": 26,
+    "abi": "x86_64",
+    "isolated_application": true,
+    "hardware_acceleration": false,
+    "renderer_controls": 4,
+    "decoder_controls": 2,
+    "dbnet_cleanup_mask_control": 1,
+    "log": "caption-layout-controls/instrumentation.txt",
+    "images": "caption-layout-controls/",
+    "font": "FontFamily.Default; not Anime Ace",
+    "installed_renderer_build_sha256": "a9cffcfd319c40acfb1dc6dc50a0f9eb7cd6f6cd68d69a7c0249556b56fc64fb",
+    "scope": "Renderer/decoder fixture build before updater changes. Renderer and decoder source unchanged in the final candidate. Does not exercise full application startup, WorkManager, APK install flow, ARM inference or source manga pages."
   },
-  "regional_ocr": {
-    "engines": [
-      "ML_KIT",
-      "PADDLE_OCR"
+  "updater": {
+    "artifact": "FULL_APK",
+    "partial_downloads": "Digest-and-URL scoped .part files in internal cache",
+    "resume": "HTTP Range with 206 validation; 200 restarts; 416 verifies or restarts",
+    "integrity": "SHA-256 before atomic promotion; legacy requests without hash do not resume",
+    "automatic_retries": 5,
+    "background": "No longer cancelled on update screen disposal; WorkManager network constraints and exponential backoff",
+    "installation": "User initiated Android installer from screen or ready notification",
+    "tests": "12 real localhost HTTP/stream tests; Android WorkManager/notification/install acceptance remains pending",
+    "delta_patching": false
+  },
+  "ocr_configuration": {
+    "mutually_exclusive_experiments": [
+      "long_page_strips",
+      "dbnet"
     ],
-    "language": "ENGLISH",
-    "default_enabled": false,
-    "preference_storage_key_preserved": "mlkit_long_page_strips",
-    "blocked_with_dbnet": true,
-    "max_tile_pixels": 2097152,
-    "max_argb_pixel_bytes_per_tile": 8388608,
-    "max_regions": 256,
-    "max_width": 4096,
-    "extra_models_added": false,
-    "new_image_files_written": false,
-    "memory_scope": "Pixel budget only. Native/model buffers, compressed-image decoder storage and total process peak not measured."
+    "old_conflicting_flags": "Keep strips and selected OCR, disable DBNet",
+    "aot_gan_checkbox": "Removed: its stored preference was never read by translation processing",
+    "new_models": false,
+    "new_apis": false
   },
-  "internal_drive": {
-    "folder_id": "1jWASog1I0ICs7LnsPFaNi9ySBUhAHSGN",
-    "url": "https://drive.google.com/drive/folders/1jWASog1I0ICs7LnsPFaNi9ySBUhAHSGN",
-    "arm32_folder": "1gLVXA8In9F7Vs2fJATKM_5TQxP9pgDy8",
-    "arm64_folder": "1IMyfjbWXZObUOrbzkaw06aSNkJi9vvxr",
-    "visibility": "PRIVATE",
-    "uploaded_apk_parts_and_cmds": 6,
-    "readback_verified_parent_size_and_private_state": true,
-    "joined_local_sha256_verified": true
-  },
-  "pending": [
-    "Physical ARM32/ARM64 installation and same-signature update with data continuity",
-    "Physical RAM/storage/speed measurements",
-    "Full reader startup, chapter workflow and overlay alignment on target phones",
-    "OCR and translation acceptance on real chapters, including Japanese/Chinese/Korean and vertical reading",
-    "Real extension matching, per-work pin and canonical sequence workflow in the full Android app; providers in JVM tests are simulated",
-    "SQLite page/WAL overhead and total installed storage on ARM phones"
-  ],
-  "publication_authorization": {
-    "date_local": "2026-11-03",
-    "timezone": "America/Fortaleza",
-    "tag": "v0.1.0-beta.8",
-    "verified_implementation_commit": "929121df753af8db069777bd2a4249aa72e5ebf7",
-    "status": "PUBLISHED",
-    "url": "https://github.com/Hailton-Reis/Polaris/releases/tag/v0.1.0-beta.8",
-    "published_at_utc": "2026-11-03T14:17:47Z"
-  },
-  "publication_evidence": "../public-releases/0.1.0-beta.8/PUBLICATION.json"
+  "physical_device_acceptance": "PENDING",
+  "real_page_ocr_quality": "PENDING",
+  "known_limits": [
+    "User screenshots are translated previews; original pages and saved OCR payload are unavailable.",
+    "Missing lines, connected balloon occupancy and decorative panel reconstruction are not declared fixed.",
+    "Full application startup unvalidated on minimal AOSP image without WebView.",
+    "17 existing JVM failures remain. No new failures, skips or missing baseline cases.",
+    "The installed beta.8 updater is not patched remotely; one manual installation may be needed when beta.9 is distributed."
+  ]
 }

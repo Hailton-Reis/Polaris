@@ -1,6 +1,6 @@
-# Polaris 0.1.0-beta.7 — guia de teste do beta
+# Polaris 0.1.0-beta.9 — candidato interno para teste
 
-Revisão: **P20261102.4**. Android mínimo: **8.0 / API 26**. Esta é uma versão experimental para experimentar e registrar problemas; a conferência nos celulares ainda está pendente.
+Revisão: **P20261104.1**. Android mínimo: **8.0 / API 26**. Este candidato ainda não foi publicado como Release. A beta.8 continua sendo a prévia pública. A conferência nos celulares ainda está pendente.
 
 ## Nome e ícone corrigidos
 
@@ -18,7 +18,7 @@ O pacote contém dois APKs. Use **arm64-v8a** primeiro nos aparelhos Android de 
 
 Instale apenas um APK por aparelho. Não é necessário o APK universal nem as versões x86 do emulador. Instalações e atualizações devem vir sempre da mesma máquina/assinatura usada para esse beta. Não apague a instalação antiga para contornar um erro de assinatura: isso pode remover os dados locais. O mantenedor deve reconstruir e compartilhar o APK com a assinatura original.
 
-O mantenedor gera o pacote com a opção **4** do CMD atualizado. Ao concluir a comparação automatizada, a pasta de evidências contém **beta/**, com APKs ARM, hashes e exemplos. A opção **9** continua sendo o fluxo local de instalação já existente. Confira **P20261102.4** em **Sobre** antes de registrar resultados. O versionCode agora é **108**; o candidato anterior usava 107.
+O mantenedor gera o pacote com a opção **4** do CMD atualizado. Ao concluir a comparação automatizada, a pasta de evidências contém **beta/**, com APKs ARM, hashes e exemplos. A opção **9** continua sendo o fluxo local de instalação já existente. Confira **P20261104.1** em **Sobre** antes de registrar resultados. O versionCode agora é **110**; a beta.8 pública usa 109.
 
 ## Uso inicial
 
@@ -96,3 +96,11 @@ Para comparar, use o **mesmo original**, inglês → português e o mesmo gloss�
 
 
 Para garantir uma nova leitura da imagem após mudar motor ou faixas, use a ação de remover somente a tradução salva do capítulo e depois traduza o capítulo novamente. O arquivo original baixado permanece. Retraduzir uma única frase no editor usa o texto OCR já salvo e não serve para comparar motores.
+
+## Beta.9: leitura e download recuperável
+
+O candidato limita legendas ao fundo medido e separa áreas de escrita sobrepostas. Faixas e DBNet passam a ser escolhas exclusivas; configurações antigas com ambos ligados conservam faixas e o OCR selecionado. A opção AOT-GAN foi retirada porque sua preferência não era usada pelo processamento. Texto ausente e balões conectados ainda exigem comparação com o original; estas correções não garantem qualidade de scan.
+
+O download da atualização continua ao sair da tela. Quedas de rede têm novas tentativas automáticas e retomada do parcial quando o servidor permite, com verificação do APK completo antes de instalar. Ao terminar, a tela e a notificação oferecem abrir o instalador do Android. Cada versão continua baixando um APK completo; a retomada evita repetir a parte já recebida do mesmo arquivo.
+
+Essa correção exige instalar a beta.9 uma vez: não modifica o atualizador da beta.8 já instalada. A distribuição deste candidato ainda está pendente. Veja [comportamento, diagnóstico e limites](../../docs/CORRECOES_LEITURA_ATUALIZACAO_P20261104_1.md).

@@ -1,5 +1,5 @@
 diff --git a/app/build.gradle.kts b/app/build.gradle.kts
-index 63e2698..f29c36d 100644
+index 63e2698..71f41e9 100644
 --- a/app/build.gradle.kts
 +++ b/app/build.gradle.kts
 @@ -32,14 +32,14 @@ android {
@@ -8,8 +8,8 @@ index 63e2698..f29c36d 100644
  
 -        versionCode = 101
 -        versionName = "0.20.4-Y40"
-+        versionCode = 109
-+        versionName = "0.1.0-beta.8"
++        versionCode = 110
++        versionName = "0.1.0-beta.9"
  
          buildConfigField("String", "COMMIT_COUNT", "\"${getLatestCommitCount()}\"")
          buildConfigField("String", "COMMIT_SHA", "\"${getLatestCommitSha()}\"")
@@ -38,6 +38,141 @@ index 63e2698..f29c36d 100644
  }
  
  androidComponents {
+diff --git a/app/src/androidTest/java/eu/kanade/translation/presentation/TranslationSurfaceLayoutTest.kt b/app/src/androidTest/java/eu/kanade/translation/presentation/TranslationSurfaceLayoutTest.kt
+new file mode 100644
+index 0000000..c09bfa7
+--- /dev/null
++++ b/app/src/androidTest/java/eu/kanade/translation/presentation/TranslationSurfaceLayoutTest.kt
+@@ -0,0 +1,129 @@
++package eu.kanade.translation.presentation
++
++import android.content.Intent
++import android.graphics.Bitmap
++import android.graphics.Canvas
++import androidx.test.ext.junit.runners.AndroidJUnit4
++import androidx.test.platform.app.InstrumentationRegistry
++import org.junit.Assert.assertEquals
++import org.junit.Assert.assertTrue
++import org.junit.Test
++import org.junit.runner.RunWith
++
++@RunWith(AndroidJUnit4::class)
++class TranslationSurfaceLayoutTest {
++    @Test fun darkCaptionTextAndCleanupStayInsideThePanelAtTwoZoomLevels() {
++        for (scale in listOf(1f, 2f)) {
++            val original = render("caption", scale, false)
++            val translated = render("caption", scale, true)
++            var white = 0
++            for (y in 0 until translated.height) {
++                for (x in 0 until translated.width) {
++                    val inside = x >= 20 * scale && x < 180 * scale && y >= 40 * scale && y < 120 * scale
++                    if (!inside) {
++                        assertEquals(
++                            "Outside caption at $x,$y scale=$scale",
++                            original.getPixel(x, y),
++                            translated.getPixel(x, y),
++                        )
++                    } else if (translated.getPixel(x, y) == -1) {
++                        white++
++                    }
++                }
++            }
++            assertTrue("Translation must remain visible", white > 10)
++            original.recycle()
++            translated.recycle()
++        }
++    }
++
++    @Test fun whiteBalloonContourAndArtworkRemainUntouched() {
++        val original = render("white", 1f, false)
++        val translated = render("white", 1f, true)
++        for (y in 0 until translated.height) {
++            for (x in 0 until translated.width) {
++                val dx = (x - 100f) / 80f
++                val dy = (y - 85f) / 60f
++                if (dx * dx + dy * dy >
++                    1.04f
++                ) {
++                    assertEquals("Outside balloon at $x,$y", original.getPixel(x, y), translated.getPixel(x, y))
++                }
++            }
++        }
++        original.recycle()
++        translated.recycle()
++    }
++
++    @Test fun legacyCleanupDoesNotAddPaddingOutsideItsMeasuredBounds() {
++        for (scale in listOf(1f, 2f)) {
++            val image = render("patch", scale, true)
++            assertEquals(
++                TranslationSurfaceTestActivity.ART,
++                image.getPixel((10 * scale).toInt() - 1, (11 * scale).toInt()),
++            )
++            assertEquals(-1, image.getPixel((11 * scale).toInt(), (11 * scale).toInt()))
++            assertEquals(TranslationSurfaceTestActivity.ART, image.getPixel((14 * scale).toInt(), (11 * scale).toInt()))
++            image.recycle()
++        }
++    }
++
++    @Test fun mixedSizeTitleTranslationsHaveSeparateRenderedWritingAreas() {
++        val image = render("titles", 1f, true)
++        var red = 0
++        var blue = 0
++        for (y in 0 until image.height) {
++            for (x in 0 until image.width) {
++                val color = image.getPixel(x, y)
++                if (color ==
++                    TranslationSurfaceTestActivity.RED
++                ) {
++                    assertTrue("Red title crossed its separator", y < 77.5f)
++                    red++
++                }
++                if (color ==
++                    TranslationSurfaceTestActivity.BLUE
++                ) {
++                    assertTrue("Blue title crossed its separator", y >= 77.5f)
++                    blue++
++                }
++            }
++        }
++        assertTrue(red > 10)
++        assertTrue(blue > 10)
++        image.recycle()
++    }
++
++    private fun render(scene: String, scale: Float, overlays: Boolean): Bitmap {
++        val instrumentation = InstrumentationRegistry.getInstrumentation()
++        val intent = Intent(instrumentation.targetContext, TranslationSurfaceTestActivity::class.java).apply {
++            putExtra("scene", scene)
++            putExtra("scale", scale)
++            putExtra("overlays", overlays)
++            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
++        }
++        val activity = instrumentation.startActivitySync(intent) as TranslationSurfaceTestActivity
++        try {
++            instrumentation.waitForIdleSync()
++            lateinit var result: Bitmap
++            instrumentation.runOnMainSync {
++                assertEquals(TranslationSurfaceTestActivity.VIEWPORT_SIZE, activity.composeView.width)
++                result =
++                    Bitmap.createBitmap(
++                        activity.composeView.width,
++                        activity.composeView.height,
++                        Bitmap.Config.ARGB_8888,
++                    )
++                activity.composeView.draw(Canvas(result))
++            }
++            val folder = instrumentation.targetContext.getExternalFilesDir("caption-layout-checks")!!
++            java.io.File(folder, "$scene-$scale-$overlays.png").outputStream().use {
++                result.compress(Bitmap.CompressFormat.PNG, 100, it)
++            }
++            return result
++        } finally {
++            instrumentation.runOnMainSync(activity::finish)
++            instrumentation.waitForIdleSync()
++        }
++    }
++}
 diff --git a/app/src/androidTest/java/eu/kanade/translation/recognizer/OcrComponentTestRunner.kt b/app/src/androidTest/java/eu/kanade/translation/recognizer/OcrComponentTestRunner.kt
 new file mode 100644
 index 0000000..0ca716d
@@ -169,12 +304,16 @@ index 0000000..6b8d94e
 +    }
 +}
 diff --git a/app/src/debug/AndroidManifest.xml b/app/src/debug/AndroidManifest.xml
-index aac6140..0ecf96f 100644
+index aac6140..eb518bd 100644
 --- a/app/src/debug/AndroidManifest.xml
 +++ b/app/src/debug/AndroidManifest.xml
-@@ -1,5 +1,9 @@
+@@ -1,5 +1,13 @@
  <manifest xmlns:android="http://schemas.android.com/apk/res/android">
      <application>
++        <activity
++            android:name="eu.kanade.translation.presentation.TranslationSurfaceTestActivity"
++            android:exported="false"
++            android:theme="@android:style/Theme.Material.Light.NoActionBar" />
 +        <receiver
 +            android:name="eu.kanade.tachiyomi.polaris.TranslationCaptureReceiver"
 +            android:exported="true"
@@ -288,6 +427,164 @@ index 0000000..41d6524
 +        val token = intent.getStringExtra("request_token").orEmpty()
 +        require(token.matches(Regex("[a-f0-9]{32}")))
 +        return File(context.cacheDir, "translation-capture/$token")
++    }
++}
+diff --git a/app/src/debug/java/eu/kanade/translation/presentation/TranslationSurfaceTestActivity.kt b/app/src/debug/java/eu/kanade/translation/presentation/TranslationSurfaceTestActivity.kt
+new file mode 100644
+index 0000000..1ea9919
+--- /dev/null
++++ b/app/src/debug/java/eu/kanade/translation/presentation/TranslationSurfaceTestActivity.kt
+@@ -0,0 +1,152 @@
++package eu.kanade.translation.presentation
++
++import android.os.Bundle
++import android.widget.FrameLayout
++import androidx.activity.ComponentActivity
++import androidx.compose.foundation.Canvas
++import androidx.compose.foundation.background
++import androidx.compose.foundation.layout.Box
++import androidx.compose.foundation.layout.fillMaxSize
++import androidx.compose.runtime.CompositionLocalProvider
++import androidx.compose.ui.Modifier
++import androidx.compose.ui.geometry.Offset
++import androidx.compose.ui.geometry.Size
++import androidx.compose.ui.graphics.Color
++import androidx.compose.ui.graphics.nativeCanvas
++import androidx.compose.ui.platform.ComposeView
++import androidx.compose.ui.platform.LocalDensity
++import androidx.compose.ui.platform.ViewCompositionStrategy
++import androidx.compose.ui.text.font.FontFamily
++import androidx.compose.ui.unit.Density
++import eu.kanade.translation.model.TranslationBlock
++import eu.kanade.translation.model.TranslationPageLayout
++import eu.kanade.translation.model.TranslationRegion
++import android.graphics.Paint as AndroidPaint
++
++/** Isolated, non-exported renderer fixture; never used by the reader or production Application. */
++class TranslationSurfaceTestActivity : ComponentActivity() {
++    lateinit var composeView: ComposeView
++        private set
++    lateinit var layouts: List<TranslationRegion>
++        private set
++
++    override fun onCreate(savedInstanceState: Bundle?) {
++        super.onCreate(savedInstanceState)
++        val scene = intent.getStringExtra("scene") ?: "caption"
++        val scale = intent.getFloatExtra("scale", 1f)
++        val drawOverlays = intent.getBooleanExtra("overlays", true)
++        val blocks = when (scene) {
++            "patch" -> listOf(
++                block(
++                    10f,
++                    10f,
++                    4f,
++                    4f,
++                    "X",
++                ).copy(cleanupRegion = TranslationRegion(10f, 10f, 4f, 4f), backgroundColor = WHITE),
++            )
++            "white" -> listOf(
++                block(55f, 65f, 90f, 36f, "UM TEXTO DENTRO DO BALÃO BRANCO.").copy(
++                    cleanupRegion = TranslationRegion(50f, 60f, 100f, 50f),
++                    layoutRegion = TranslationRegion(45f, 48f, 110f, 70f),
++                    backgroundColor = WHITE,
++                    balloonDetected = true,
++                ),
++            )
++            "titles" -> listOf(
++                block(
++                    30f,
++                    40f,
++                    140f,
++                    48f,
++                    "TÍTULO GRANDE EM DUAS LINHAS",
++                ).copy(layoutRegion = TranslationRegion(15f, 30f, 170f, 80f), foregroundColor = RED),
++                block(
++                    50f,
++                    80f,
++                    100f,
++                    22f,
++                    "CAPÍTULO QUARENTA",
++                ).copy(layoutRegion = TranslationRegion(35f, 65f, 130f, 70f), foregroundColor = BLUE),
++            )
++            else -> listOf(
++                block(30f, 50f, 140f, 60f, "MINHAS ESTATÍSTICAS E HABILIDADES. PRECISO DE OUTRA COISA.").copy(
++                    cleanupRegion = TranslationRegion(25f, 45f, 150f, 70f),
++                    layoutRegion = TranslationRegion(10f, 20f, 180f, 120f),
++                    backgroundColor = PANEL,
++                    foregroundColor = WHITE,
++                ),
++            )
++        }
++        layouts = TranslationPageLayout.resolve(blocks, PAGE_SIZE, PAGE_SIZE)
++        composeView = ComposeView(this).apply {
++            layoutParams = FrameLayout.LayoutParams(VIEWPORT_SIZE, VIEWPORT_SIZE)
++            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
++            setContent {
++                CompositionLocalProvider(LocalDensity provides Density(1f)) {
++                    Box(Modifier.fillMaxSize().background(Color(ART))) {
++                        Canvas(Modifier.fillMaxSize()) {
++                            if (scene == "caption") {
++                                drawRect(
++                                    Color(PANEL),
++                                    Offset(20f * scale, 40f * scale),
++                                    Size(160f * scale, 80f * scale),
++                                )
++                            } else if (scene == "white") {
++                                drawOval(
++                                    Color.White,
++                                    Offset(20f * scale, 25f * scale),
++                                    Size(160f * scale, 120f * scale),
++                                )
++                            }
++                            if (scene == "caption" || scene == "white") {
++                                val paint = AndroidPaint(AndroidPaint.ANTI_ALIAS_FLAG).apply {
++                                    color = if (scene == "caption") WHITE else BLACK
++                                    textSize = 8f * scale
++                                }
++                                drawContext.canvas.nativeCanvas.drawText(
++                                    "ORIGINAL SOURCE",
++                                    60f * scale,
++                                    82f * scale,
++                                    paint,
++                                )
++                            }
++                        }
++                        if (drawOverlays) {
++                            blocks.forEach { b -> TranslationCleanupBlock(b, scale, PAGE_SIZE, PAGE_SIZE) }
++                            if (scene != "patch") {
++                                blocks.forEachIndexed { index, b ->
++                                    SmartTranslationBlock(
++                                        block = b,
++                                        scaleFactor = scale,
++                                        pageWidth = PAGE_SIZE,
++                                        pageHeight = PAGE_SIZE,
++                                        fontFamily = FontFamily.Default,
++                                        layoutRegion = layouts[index],
++                                    )
++                                }
++                            }
++                        }
++                    }
++                }
++            }
++        }
++        setContentView(FrameLayout(this).apply { addView(composeView) })
++    }
++
++    private fun block(x: Float, y: Float, width: Float, height: Float, translation: String) = TranslationBlock(
++        text = "Original source", translation = translation, x = x, y = y, width = width, height = height,
++        symWidth = 6f, symHeight = 12f, angle = 0f, geometryVersion = 2,
++    )
++
++    companion object {
++        const val VIEWPORT_SIZE = 480
++        const val PAGE_SIZE = 200f
++        const val PANEL = 0xFF303044.toInt()
++        const val ART = 0xFFA0B5C5.toInt()
++        const val WHITE = -1
++        const val BLACK = 0xFF000000.toInt()
++        const val RED = 0xFFFF0000.toInt()
++        const val BLUE = 0xFF0000FF.toInt()
 +    }
 +}
 diff --git a/app/src/main/AndroidManifest.xml b/app/src/main/AndroidManifest.xml
@@ -1613,6 +1910,49 @@ index a7b7f3e..f4dcdad 100644
  
  
  
+diff --git a/app/src/main/java/eu/kanade/presentation/more/NewUpdateScreen.kt b/app/src/main/java/eu/kanade/presentation/more/NewUpdateScreen.kt
+index 9dcac9e..01e8e68 100644
+--- a/app/src/main/java/eu/kanade/presentation/more/NewUpdateScreen.kt
++++ b/app/src/main/java/eu/kanade/presentation/more/NewUpdateScreen.kt
+@@ -21,6 +21,7 @@ import eu.kanade.presentation.theme.TachiyomiPreviewTheme
+ import eu.kanade.tachiyomi.ui.more.NewUpdateScreenModel
+ import org.intellij.markdown.flavours.gfm.GFMFlavourDescriptor
+ import tachiyomi.i18n.MR
++import tachiyomi.i18n.at.ATMR
+ import tachiyomi.presentation.core.components.material.padding
+ import tachiyomi.presentation.core.i18n.stringResource
+ import tachiyomi.presentation.core.screens.InfoScreen
+@@ -45,11 +46,12 @@ fun NewUpdateScreen(
+                 MR.strings.downloading_with_progress,
+                 downloadProgress(),
+             )
++            NewUpdateScreenModel.Stage.Waiting -> stringResource(ATMR.strings.polaris_update_waiting)
+             NewUpdateScreenModel.Stage.Downloaded -> stringResource(MR.strings.action_install)
+             NewUpdateScreenModel.Stage.Failed -> stringResource(MR.strings.action_retry)
+         },
+         onAcceptClick = onAcceptUpdate,
+-        canAccept = stage != NewUpdateScreenModel.Stage.Downloading,
++        canAccept = stage !in listOf(NewUpdateScreenModel.Stage.Downloading, NewUpdateScreenModel.Stage.Waiting),
+         rejectText = stringResource(MR.strings.action_not_now),
+         onRejectClick = onRejectUpdate,
+     ) {
+@@ -58,6 +60,16 @@ fun NewUpdateScreen(
+                 .fillMaxWidth()
+                 .padding(vertical = MaterialTheme.padding.large),
+         ) {
++            Text(
++                text = stringResource(
++                    if (stage == NewUpdateScreenModel.Stage.Failed) {
++                        ATMR.strings.polaris_update_download_failed
++                    } else {
++                        ATMR.strings.polaris_update_download_hint
++                    },
++                ),
++                modifier = Modifier.padding(bottom = MaterialTheme.padding.medium),
++            )
+             MarkdownRender(
+                 content = changelogInfo,
+                 flavour = remember { GFMFlavourDescriptor() },
 diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsAppUpdatesScreen.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsAppUpdatesScreen.kt
 new file mode 100644
 index 0000000..2c690cc
@@ -1738,10 +2078,18 @@ index 0050b97..979f158 100644
              titleRes = MR.strings.pref_category_about,
              formatSubtitle = {
 diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsTranslationScreen.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsTranslationScreen.kt
-index a198c3f..56b05dd 100644
+index a198c3f..3ad9348 100644
 --- a/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsTranslationScreen.kt
 +++ b/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsTranslationScreen.kt
-@@ -50,6 +50,24 @@ object SettingsTranslationScreen : SearchableSettings {
+@@ -1,6 +1,7 @@
+ package eu.kanade.presentation.more.settings.screen
+ 
+ import androidx.compose.runtime.Composable
++import androidx.compose.runtime.LaunchedEffect
+ import androidx.compose.runtime.ReadOnlyComposable
+ import androidx.compose.runtime.getValue
+ import androidx.compose.runtime.remember
+@@ -50,6 +51,24 @@ object SettingsTranslationScreen : SearchableSettings {
      override fun getPreferences(): List<Preference> {
          val translationPreferences = remember { Injekt.get<TranslationPreferences>() }
          return listOf(
@@ -1766,31 +2114,45 @@ index a198c3f..56b05dd 100644
              Preference.PreferenceItem.SwitchPreference(
                  preference = translationPreferences.autoTranslateEnglishDownloads(),
                  title = stringResource(ATMR.strings.pref_auto_translate_english_downloads),
-@@ -105,15 +123,22 @@ object SettingsTranslationScreen : SearchableSettings {
+@@ -95,26 +114,32 @@ object SettingsTranslationScreen : SearchableSettings {
+     private fun getOcrEngineGroup(
+         translationPreferences: TranslationPreferences,
+     ): Preference.PreferenceGroup {
++        LaunchedEffect(translationPreferences) { translationPreferences.reconcileOcrExperiments() }
+         return Preference.PreferenceGroup(
+             title = stringResource(ATMR.strings.pref_group_ocr),
+             preferenceItems = persistentListOf(
+                 Preference.PreferenceItem.ListPreference(
+                     preference = translationPreferences.ocrEngine(),
+                     title = stringResource(ATMR.strings.pref_ocr_engine),
++                    subtitle = stringResource(ATMR.strings.pref_ocr_engine_saved_hint),
+                     entries = OcrEngineType.entries
                          .associate { it.preferenceValue to getOcrEngineLabel(it) }
                          .toImmutableMap(),
                  ),
-+                Preference.PreferenceItem.SwitchPreference(
+                 Preference.PreferenceItem.SwitchPreference(
+-                    preference = translationPreferences.dbnetExperimental(),
+-                    title = "Detector DBNet (experimental)",
+-                    subtitle = "Somente inglês/ARM64. Primeiro uso baixa 153 MB separados do APK. Reconhecimento ML Kit de página inteira; em falha, usa o OCR selecionado acima.",
 +                    preference = translationPreferences.longPageStrips(),
 +                    title = stringResource(ATMR.strings.pref_mlkit_long_page_strips),
 +                    subtitle = stringResource(ATMR.strings.pref_mlkit_long_page_strips_summary),
-+                ),
-                 Preference.PreferenceItem.SwitchPreference(
-                     preference = translationPreferences.dbnetExperimental(),
-                     title = "Detector DBNet (experimental)",
--                    subtitle = "Somente inglês/ARM64. Primeiro uso baixa 153 MB separados do APK. Reconhecimento ML Kit de página inteira; em falha, usa o OCR selecionado acima.",
-+                    subtitle = "Somente inglês/ARM64. Primeiro uso baixa 153 MB separados do APK. " +
-+                        "Reconhecimento ML Kit de página inteira; em falha, usa o OCR selecionado acima.",
++                    onValueChanged = translationPreferences::enableLongPageStrips,
                  ),
                  Preference.PreferenceItem.SwitchPreference(
-                     preference = translationPreferences.inpainterAot(),
-                     title = "Remoção de texto por IA (AOT-GAN)",
+-                    preference = translationPreferences.inpainterAot(),
+-                    title = "Remoção de texto por IA (AOT-GAN)",
 -                    subtitle = "Reconstrói o fundo e arte atrás dos textos usando rede neural (NCNN). Primeiro uso baixa ~11 MB. Se desativado, usa preenchimento rápido de cor.",
-+                    subtitle = "Reconstrói o fundo e arte atrás dos textos usando rede neural (NCNN). " +
-+                        "Primeiro uso baixa ~11 MB. Se desativado, usa preenchimento rápido de cor.",
++                    preference = translationPreferences.dbnetExperimental(),
++                    title = "Detector DBNet (experimental)",
++                    subtitle = "Somente inglês/ARM64. Primeiro uso baixa 153 MB separados do APK. " +
++                        "Usa ML Kit; em falha, usa o OCR selecionado. Ativar desliga o OCR por faixas.",
++                    onValueChanged = translationPreferences::enableDbnetExperimental,
                  ),
++
              ),
          )
+     }
 @@ -172,6 +197,14 @@ object SettingsTranslationScreen : SearchableSettings {
                          .toImmutableMap(),
                  ),
@@ -1819,7 +2181,7 @@ index a198c3f..56b05dd 100644
                      preference = translationPreferences.translationEngineTemperature(),
                      title = stringResource(ATMR.strings.pref_engine_temperature),
 diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
-index 7f411fd..09c3f9e 100644
+index 7f411fd..373e0ba 100644
 --- a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
 +++ b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
 @@ -1,15 +1,18 @@
@@ -1880,7 +2242,7 @@ index 7f411fd..09c3f9e 100644
  
      // Identifies this overlay independently of the pinned upstream COMMIT_SHA.
 -    private const val POLARIS_READER_REVISION = "P20261031.2"
-+    private const val POLARIS_READER_REVISION = "P20261103.1"
++    private const val POLARIS_READER_REVISION = "P20261104.1"
  
      @Composable
      override fun Content() {
@@ -2363,6 +2725,18 @@ index d56914c..3373a69 100644
          )
  
          // Remove the old file
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/data/notification/Notifications.kt b/app/src/main/java/eu/kanade/tachiyomi/data/notification/Notifications.kt
+index 729fd63..82c2131 100644
+--- a/app/src/main/java/eu/kanade/tachiyomi/data/notification/Notifications.kt
++++ b/app/src/main/java/eu/kanade/tachiyomi/data/notification/Notifications.kt
+@@ -80,6 +80,7 @@ object Notifications {
+     private const val GROUP_APK_UPDATES = "group_apk_updates"
+     const val CHANNEL_APP_UPDATE = "app_apk_update_channel"
+     const val ID_APP_UPDATER = 1
++    const val ID_APP_UPDATE_READY = 2
+     const val CHANNEL_EXTENSIONS_UPDATE = "ext_apk_update_channel"
+     const val ID_UPDATES_TO_EXTS = -401
+     const val ID_EXTENSION_INSTALLER = -402
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/data/updater/AppUpdateChecker.kt b/app/src/main/java/eu/kanade/tachiyomi/data/updater/AppUpdateChecker.kt
 index 02b4af4..bf1be6d 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/data/updater/AppUpdateChecker.kt
@@ -2461,14 +2835,60 @@ index 02b4af4..bf1be6d 100644
 +const val POLARIS_REPOSITORY_URL = "https://github.com/$GITHUB_REPO"
 +const val RELEASE_URL = "$POLARIS_REPOSITORY_URL/releases"
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/data/updater/AppUpdateDownloadJob.kt b/app/src/main/java/eu/kanade/tachiyomi/data/updater/AppUpdateDownloadJob.kt
-index ee19e89..6318525 100644
+index ee19e89..4b24b0b 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/data/updater/AppUpdateDownloadJob.kt
 +++ b/app/src/main/java/eu/kanade/tachiyomi/data/updater/AppUpdateDownloadJob.kt
-@@ -44,7 +44,13 @@ class AppUpdateDownloadJob(private val context: Context, workerParams: WorkerPar
+@@ -1,8 +1,11 @@
+ package eu.kanade.tachiyomi.data.updater
+ 
++import android.app.PendingIntent
+ import android.content.Context
++import android.content.Intent
+ import android.content.pm.ServiceInfo
+ import android.os.Build
++import androidx.work.BackoffPolicy
+ import androidx.work.Constraints
+ import androidx.work.CoroutineWorker
+ import androidx.work.ExistingWorkPolicy
+@@ -12,21 +15,27 @@ import androidx.work.OneTimeWorkRequestBuilder
+ import androidx.work.WorkerParameters
+ import androidx.work.workDataOf
+ import eu.kanade.tachiyomi.data.notification.Notifications
+-import eu.kanade.tachiyomi.network.GET
++import eu.kanade.tachiyomi.extension.util.ExtensionInstaller
+ import eu.kanade.tachiyomi.network.NetworkHelper
+-import eu.kanade.tachiyomi.network.ProgressListener
+-import eu.kanade.tachiyomi.network.awaitSuccess
+-import eu.kanade.tachiyomi.network.newCachelessCallWithProgress
+-import eu.kanade.tachiyomi.util.storage.saveTo
++import eu.kanade.tachiyomi.util.storage.getUriCompat
++import eu.kanade.tachiyomi.util.system.cancelNotification
+ import eu.kanade.tachiyomi.util.system.notificationBuilder
++import eu.kanade.tachiyomi.util.system.notify
+ import eu.kanade.tachiyomi.util.system.setForegroundSafely
+ import eu.kanade.tachiyomi.util.system.workManager
+ import kotlinx.coroutines.CancellationException
++import kotlinx.coroutines.currentCoroutineContext
++import kotlinx.coroutines.ensureActive
++import logcat.LogPriority
+ import tachiyomi.core.common.i18n.stringResource
+ import tachiyomi.core.common.util.lang.withIOContext
++import tachiyomi.core.common.util.system.logcat
+ import tachiyomi.i18n.MR
++import tachiyomi.i18n.at.ATMR
+ import uy.kohesive.injekt.injectLazy
+ import java.io.File
++import java.io.IOException
++import java.util.concurrent.TimeUnit
+ 
+ class AppUpdateDownloadJob(private val context: Context, workerParams: WorkerParameters) :
+     CoroutineWorker(context, workerParams) {
+@@ -44,11 +53,48 @@ class AppUpdateDownloadJob(private val context: Context, workerParams: WorkerPar
  
          return try {
              withIOContext { downloadApk(url) }
 -            Result.success(workDataOf(PROGRESS to 100, EXTRA_DOWNLOAD_URL to url))
++            runCatching { notifyReady() }.onFailure { logcat(LogPriority.WARN, it) }
 +            Result.success(
 +                workDataOf(
 +                    PROGRESS to 100,
@@ -2478,55 +2898,280 @@ index ee19e89..6318525 100644
 +            )
          } catch (e: CancellationException) {
              throw e
-         } catch (_: Exception) {
-@@ -90,7 +96,13 @@ class AppUpdateDownloadJob(private val context: Context, workerParams: WorkerPar
-                 if (progress > savedProgress && currentTime - 200 > lastTick) {
-                     savedProgress = progress
-                     lastTick = currentTime
+-        } catch (_: Exception) {
+-            Result.failure()
++        } catch (e: IOException) {
++            currentCoroutineContext().ensureActive()
++            logcat(LogPriority.WARN, e)
++            val retryable = e !is UpdateResponseException && (e !is UpdateHttpException || e.retryable)
++            if (retryable && runAttemptCount < 5) Result.retry() else failure(url)
++        } catch (e: Exception) {
++            logcat(LogPriority.ERROR, e)
++            failure(url)
++        }
++    }
++
++    private fun failure(url: String) = Result.failure(
++        workDataOf(EXTRA_DOWNLOAD_URL to url, EXTRA_SHA256 to inputData.getString(EXTRA_SHA256)),
++    )
++
++    private fun notifyReady() {
++        val intent = Intent(Intent.ACTION_VIEW).apply {
++            setDataAndType(updateApk(context).getUriCompat(context), ExtensionInstaller.APK_MIME)
++            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION
++        }
++        val pendingIntent = PendingIntent.getActivity(
++            context,
++            Notifications.ID_APP_UPDATE_READY,
++            intent,
++            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
++        )
++        context.notify(Notifications.ID_APP_UPDATE_READY, Notifications.CHANNEL_APP_UPDATE) {
++            setContentTitle(context.stringResource(ATMR.strings.polaris_update_ready))
++            setContentText(context.stringResource(ATMR.strings.polaris_update_install_hint))
++            setSmallIcon(android.R.drawable.stat_sys_download_done)
++            setContentIntent(pendingIntent)
++            setAutoCancel(true)
+         }
+     }
+ 
+@@ -77,28 +123,31 @@ class AppUpdateDownloadJob(private val context: Context, workerParams: WorkerPar
+      * @param url url location of file
+      */
+     private suspend fun downloadApk(url: String) {
+-        val progressListener = object : ProgressListener {
+-            // Progress of the download
+-            var savedProgress = 0
+-
+-            // Keep track of the last notification sent to avoid posting too many.
+-            var lastTick = 0L
+-
+-            override fun update(bytesRead: Long, contentLength: Long, done: Boolean) {
+-                val progress = (100 * (bytesRead.toFloat() / contentLength)).toInt()
+-                val currentTime = System.currentTimeMillis()
+-                if (progress > savedProgress && currentTime - 200 > lastTick) {
+-                    savedProgress = progress
+-                    lastTick = currentTime
 -                    setProgressAsync(workDataOf(PROGRESS to progress, EXTRA_DOWNLOAD_URL to url))
-+                    setProgressAsync(
-+                        workDataOf(
-+                            PROGRESS to progress,
-+                            EXTRA_DOWNLOAD_URL to url,
-+                            EXTRA_SHA256 to inputData.getString(EXTRA_SHA256),
-+                        ),
-+                    )
-                 }
+-                }
++        val client = network.client.newBuilder().cache(null)
++            .readTimeout(45, TimeUnit.SECONDS)
++            .callTimeout(0, TimeUnit.SECONDS)
++            .build()
++        var savedProgress = -1
++        var lastTick = 0L
++        PolarisApkDownloader(updateDirectory(context), client).download(url, inputData.getString(EXTRA_SHA256)) {
++                bytes,
++                total,
++            ->
++            // Keep 100% for verified success; an unknown length must not cause division by zero.
++            val progress = if (total > 0) (bytes.toDouble() * 100 / total).toInt().coerceIn(0, 99) else 0
++            val now = android.os.SystemClock.elapsedRealtime()
++            if (savedProgress < 0 || (progress != savedProgress && now - lastTick >= 200)) {
++                savedProgress = progress
++                lastTick = now
++                setProgressAsync(
++                    workDataOf(
++                        PROGRESS to progress,
++                        EXTRA_DOWNLOAD_URL to url,
++                        EXTRA_SHA256 to inputData.getString(EXTRA_SHA256),
++                    ),
++                )
              }
          }
-@@ -98,7 +110,9 @@ class AppUpdateDownloadJob(private val context: Context, workerParams: WorkerPar
-         val response = network.client.newCachelessCallWithProgress(GET(url), progressListener).awaitSuccess()
- 
-         val apkFile = updateApk(context)
+-
+-        val response = network.client.newCachelessCallWithProgress(GET(url), progressListener).awaitSuccess()
+-
+-        val apkFile = updateApk(context)
 -        response.body.source().saveTo(apkFile)
-+        response.use { it.body.source().saveTo(apkFile) }
-+        val expected = inputData.getString(EXTRA_SHA256)
-+        if (expected != null) PolarisUpdateIntegrity.verify(apkFile, expected)
      }
  
      companion object {
-@@ -107,10 +121,11 @@ class AppUpdateDownloadJob(private val context: Context, workerParams: WorkerPar
+@@ -107,21 +156,29 @@ class AppUpdateDownloadJob(private val context: Context, workerParams: WorkerPar
          const val PROGRESS = "progress"
  
          const val EXTRA_DOWNLOAD_URL = "DOWNLOAD_URL"
 +        const val EXTRA_SHA256 = "EXPECTED_SHA256"
++
++        private fun updateDirectory(context: Context): File = File(context.cacheDir, "updates")
++
++        fun updateApk(context: Context): File = File(updateDirectory(context), "update.apk")
  
-         fun updateApk(context: Context): File = File(context.externalCacheDir, "update.apk")
+-        fun updateApk(context: Context): File = File(context.externalCacheDir, "update.apk")
++        fun updateTag(url: String, sha256: String?): String = "update-${PolarisApkDownloader.identity(url, sha256)}"
  
 -        fun start(context: Context, url: String) {
 +        fun start(context: Context, url: String, sha256: String? = null) {
++            context.cancelNotification(Notifications.ID_APP_UPDATE_READY)
              val constraints = Constraints(
                  requiredNetworkType = NetworkType.CONNECTED,
              )
-@@ -118,7 +133,7 @@ class AppUpdateDownloadJob(private val context: Context, workerParams: WorkerPar
+ 
              val request = OneTimeWorkRequestBuilder<AppUpdateDownloadJob>()
                  .setConstraints(constraints)
++                .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 10, TimeUnit.SECONDS)
                  .addTag(TAG)
 -                .setInputData(workDataOf(EXTRA_DOWNLOAD_URL to url))
++                .addTag(updateTag(url, sha256))
 +                .setInputData(workDataOf(EXTRA_DOWNLOAD_URL to url, EXTRA_SHA256 to sha256))
                  .build()
  
-             context.workManager.enqueueUniqueWork(TAG, ExistingWorkPolicy.REPLACE, request)
+-            context.workManager.enqueueUniqueWork(TAG, ExistingWorkPolicy.REPLACE, request)
++            context.workManager.enqueueUniqueWork(TAG, ExistingWorkPolicy.KEEP, request)
+         }
+ 
+         fun stop(context: Context) {
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/data/updater/PolarisApkDownloader.kt b/app/src/main/java/eu/kanade/tachiyomi/data/updater/PolarisApkDownloader.kt
+new file mode 100644
+index 0000000..0f13d7d
+--- /dev/null
++++ b/app/src/main/java/eu/kanade/tachiyomi/data/updater/PolarisApkDownloader.kt
+@@ -0,0 +1,145 @@
++package eu.kanade.tachiyomi.data.updater
++
++import eu.kanade.tachiyomi.network.await
++import kotlinx.coroutines.currentCoroutineContext
++import kotlinx.coroutines.ensureActive
++import kotlinx.coroutines.sync.Mutex
++import kotlinx.coroutines.sync.withLock
++import okhttp3.OkHttpClient
++import okhttp3.Request
++import java.io.EOFException
++import java.io.File
++import java.io.FileOutputStream
++import java.io.IOException
++import java.nio.file.Files
++import java.nio.file.StandardCopyOption
++import java.security.MessageDigest
++
++/** Keeps interrupted bytes separate from the APK offered to Android's installer. */
++internal class PolarisApkDownloader(
++    private val directory: File,
++    private val client: OkHttpClient,
++) {
++    suspend fun download(
++        url: String,
++        sha256: String?,
++        progress: (Long, Long) -> Unit = { _, _ -> },
++    ): File = lock.withLock {
++        if (!directory.isDirectory && !directory.mkdirs()) throw IOException("Cannot create update cache")
++        val apk = File(directory, "update.apk")
++        if (sha256 != null && apk.isFile) {
++            if (runCatching { PolarisUpdateIntegrity.verify(apk, sha256) }.isSuccess) {
++                progress(apk.length(), apk.length())
++                return@withLock apk
++            }
++        }
++
++        val part = File(directory, "update-${identity(url, sha256)}.part")
++        // This directory belongs exclusively to the updater. Retain only this release's partial download.
++        directory.listFiles()?.filter { it.name.startsWith("update-") && it.extension == "part" && it != part }
++            ?.forEach { it.delete() }
++        // Resuming without a pinned digest could combine bytes from two different APKs.
++        if (sha256 == null) part.delete()
++        var offset = part.length()
++        progress(offset, -1)
++
++        while (true) {
++            currentCoroutineContext().ensureActive()
++            val request = Request.Builder().url(url)
++                .header("Accept-Encoding", "identity")
++                .apply { if (offset > 0) header("Range", "bytes=$offset-") }
++                .build()
++            client.newCall(request).await().use { response ->
++                if (response.code == 416 && offset > 0) {
++                    // The connection may have died after writing the final byte, before promotion.
++                    if (sha256 != null && runCatching { PolarisUpdateIntegrity.verify(part, sha256) }.isSuccess) {
++                        return@withLock promote(part, apk, progress)
++                    }
++                    part.delete()
++                    offset = 0
++                    return@use
++                }
++                if (response.code != 200 && response.code != 206) {
++                    throw UpdateHttpException(response.code)
++                }
++                if (response.header("Content-Encoding")?.equals("identity", ignoreCase = true) == false) {
++                    part.delete()
++                    throw UpdateResponseException("Encoded APK response")
++                }
++                val length = response.body.contentLength()
++                val total: Long
++                val responseLength: Long
++                if (response.code == 206) {
++                    val range = response.header("Content-Range")?.let { RANGE.matchEntire(it) }
++                    val start = range?.groupValues?.get(1)?.toLongOrNull()
++                    val end = range?.groupValues?.get(2)?.toLongOrNull()
++                    val size = range?.groupValues?.get(3)?.toLongOrNull()
++                    if (offset <= 0 || start != offset || end == null || size == null ||
++                        end < offset || end >= size || (length >= 0 && length != end - offset + 1)
++                    ) {
++                        part.delete()
++                        throw UpdateResponseException("Invalid APK Content-Range")
++                    }
++                    total = size
++                    responseLength = end - offset + 1
++                } else {
++                    // A server may ignore Range. Truncate, never append a full response to old bytes.
++                    offset = 0
++                    total = length
++                    responseLength = length
++                }
++                var received = 0L
++                response.body.byteStream().use { input ->
++                    FileOutputStream(part, offset > 0).use { output ->
++                        progress(offset, total)
++                        val buffer = ByteArray(64 * 1024)
++                        while (true) {
++                            currentCoroutineContext().ensureActive()
++                            val count = input.read(buffer)
++                            if (count < 0) break
++                            received += count
++                            if (responseLength >= 0 && received > responseLength) {
++                                part.delete()
++                                throw UpdateResponseException("Oversized APK response")
++                            }
++                            output.write(buffer, 0, count)
++                            progress(offset + received, total)
++                        }
++                        output.fd.sync()
++                    }
++                }
++                if ((responseLength >= 0 && received != responseLength) ||
++                    (total >= 0 && part.length() != total)
++                ) {
++                    throw EOFException("Incomplete APK download")
++                }
++                currentCoroutineContext().ensureActive()
++                if (sha256 != null) PolarisUpdateIntegrity.verify(part, sha256)
++                return@withLock promote(part, apk, progress)
++            }
++        }
++        @Suppress("UNREACHABLE_CODE")
++        error("Unreachable")
++    }
++
++    private fun promote(part: File, apk: File, progress: (Long, Long) -> Unit): File {
++        Files.move(part.toPath(), apk.toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE)
++        progress(apk.length(), apk.length())
++        return apk
++    }
++
++    companion object {
++        private val lock = Mutex()
++        private val RANGE = Regex("bytes (\\d+)-(\\d+)/(\\d+)")
++
++        fun identity(url: String, sha256: String?): String = MessageDigest.getInstance("SHA-256")
++            .digest("$url\n${sha256?.lowercase().orEmpty()}".toByteArray())
++            .joinToString("") { "%02x".format(it) }
++    }
++}
++
++internal class UpdateHttpException(val status: Int) : IOException("APK HTTP $status") {
++    val retryable: Boolean get() = status == 408 || status == 429 || status in 500..599
++}
++
++internal class UpdateResponseException(message: String) : IOException(message)
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/data/updater/PolarisReleaseVersion.kt b/app/src/main/java/eu/kanade/tachiyomi/data/updater/PolarisReleaseVersion.kt
 new file mode 100644
 index 0000000..040c70e
@@ -4862,10 +5507,18 @@ index 5fa273f..e1c45c8 100644
          )
  
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/more/NewUpdateScreenModel.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/more/NewUpdateScreenModel.kt
-index beb77f2..f379aba 100644
+index beb77f2..5097a32 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/ui/more/NewUpdateScreenModel.kt
 +++ b/app/src/main/java/eu/kanade/tachiyomi/ui/more/NewUpdateScreenModel.kt
-@@ -25,6 +25,7 @@ import uy.kohesive.injekt.api.get
+@@ -15,7 +15,6 @@ import eu.kanade.tachiyomi.util.system.workManager
+ import kotlinx.coroutines.flow.distinctUntilChanged
+ import kotlinx.coroutines.flow.launchIn
+ import kotlinx.coroutines.flow.map
+-import kotlinx.coroutines.flow.mapNotNull
+ import kotlinx.coroutines.flow.onEach
+ import kotlinx.coroutines.flow.update
+ import mihon.core.viewmodel.StateViewModel
+@@ -25,38 +24,33 @@ import uy.kohesive.injekt.api.get
  class NewUpdateScreenModel(
      changelogInfo: String,
      private val downloadLink: String,
@@ -4873,21 +5526,48 @@ index beb77f2..f379aba 100644
      private val context: Context = Injekt.get(),
  ) : StateViewModel<NewUpdateScreenModel.State>(State(changelogInfo = changelogInfo)) {
  
-@@ -43,7 +44,12 @@ class NewUpdateScreenModel(
-                     workInfo.progress.getString(AppUpdateDownloadJob.EXTRA_DOWNLOAD_URL)
-                 }
- 
--                if (url != downloadLink) {
-+                val recordedDigest = if (workInfo.state.isFinished) {
-+                    workInfo.outputData.getString(AppUpdateDownloadJob.EXTRA_SHA256)
-+                } else {
-+                    workInfo.progress.getString(AppUpdateDownloadJob.EXTRA_SHA256)
+     init {
+-        context.workManager.getWorkInfosByTagFlow(AppUpdateDownloadJob.TAG)
+-            .mapNotNull { it.firstOrNull() }
+-            .map { workInfo ->
++        context.workManager.getWorkInfosForUniqueWorkFlow(AppUpdateDownloadJob.TAG)
++            .map { workInfos ->
++                val workInfo = workInfos.firstOrNull { !it.state.isFinished } ?: workInfos.firstOrNull()
++                if (workInfo == null || AppUpdateDownloadJob.updateTag(downloadLink, sha256) !in workInfo.tags) {
++                    return@map 0 to Stage.Available
 +                }
-+                if (url != downloadLink || (sha256 != null && recordedDigest != sha256)) {
-                     return@map 0 to Stage.Available
+                 val progress = if (workInfo.state.isFinished) {
+                     workInfo.outputData.getInt(AppUpdateDownloadJob.PROGRESS, 0)
+                 } else {
+                     workInfo.progress.getInt(AppUpdateDownloadJob.PROGRESS, 0)
                  }
- 
-@@ -75,7 +81,7 @@ class NewUpdateScreenModel(
+-                val url = if (workInfo.state.isFinished) {
+-                    workInfo.outputData.getString(AppUpdateDownloadJob.EXTRA_DOWNLOAD_URL)
+-                } else {
+-                    workInfo.progress.getString(AppUpdateDownloadJob.EXTRA_DOWNLOAD_URL)
+-                }
+-
+-                if (url != downloadLink) {
+-                    return@map 0 to Stage.Available
+-                }
+-
+                 val stage = when {
+                     workInfo.state == WorkInfo.State.FAILED -> Stage.Failed
+-                    workInfo.state.isFinished && progress == 100 -> {
++                    workInfo.state == WorkInfo.State.SUCCEEDED && progress == 100 -> {
+                         if (AppUpdateDownloadJob.updateApk(context).exists()) {
+                             Stage.Downloaded
+                         } else {
+                             Stage.Available
+                         }
+                     }
+-                    workInfo.state in listOf(WorkInfo.State.ENQUEUED, WorkInfo.State.RUNNING) -> Stage.Downloading
++                    workInfo.state == WorkInfo.State.RUNNING -> Stage.Downloading
++                    workInfo.state in listOf(WorkInfo.State.ENQUEUED, WorkInfo.State.BLOCKED) -> Stage.Waiting
+                     else -> Stage.Available
+                 }
+                 progress to stage
+@@ -75,7 +69,7 @@ class NewUpdateScreenModel(
  
      fun startDownload() {
          mutableState.update { it.copy(downloadProgress = 0, stage = Stage.Downloading) }
@@ -4896,7 +5576,26 @@ index beb77f2..f379aba 100644
      }
  
      fun installUpdate() {
-@@ -108,12 +114,14 @@ class NewUpdateScreenModel(
+@@ -87,10 +81,6 @@ class NewUpdateScreenModel(
+         context.startActivity(intent)
+     }
+ 
+-    override fun onCleared() {
+-        AppUpdateDownloadJob.stop(context)
+-    }
+-
+     @Immutable
+     data class State(
+         val changelogInfo: String,
+@@ -101,6 +91,7 @@ class NewUpdateScreenModel(
+     enum class Stage {
+         Available,
+         Downloading,
++        Waiting,
+         Downloaded,
+         Failed,
+     }
+@@ -108,12 +99,14 @@ class NewUpdateScreenModel(
      companion object {
          val CHANGELOG_INFO_KEY = CreationExtras.Key<String>()
          val DOWNLOAD_LINK_KEY = CreationExtras.Key<String>()
@@ -6839,8 +7538,98 @@ index 0000000..f2c4ba7
 +        return glyphWidthRatio >= 0.045f || glyphHeightRatio >= 0.045f
 +    }
 +}
+diff --git a/app/src/main/java/eu/kanade/translation/model/TranslationPageLayout.kt b/app/src/main/java/eu/kanade/translation/model/TranslationPageLayout.kt
+new file mode 100644
+index 0000000..6254529
+--- /dev/null
++++ b/app/src/main/java/eu/kanade/translation/model/TranslationPageLayout.kt
+@@ -0,0 +1,84 @@
++package eu.kanade.translation.model
++
++import kotlin.math.abs
++
++/** Allocate source-anchored space before drawing; never change OCR text or cleanup ownership. */
++object TranslationPageLayout {
++    fun resolve(blocks: List<TranslationBlock>, pageWidth: Float, pageHeight: Float): List<TranslationRegion> {
++        val regions = blocks.map { block ->
++            val layout = block.resolvedLayoutRegion(pageWidth, pageHeight)
++            // A colored caption with no measured container must stay inside the
++            // bounded eraser. This also protects previously saved geometry.
++            if (!block.balloonDetected && block.backgroundColor != null && block.dbnetCleanupMask == null) {
++                block.cleanupRegion?.clamped(pageWidth, pageHeight)?.let { intersection(layout, it) } ?: layout
++            } else {
++                layout
++            }
++        }.toMutableList()
++        val sources = blocks.map { it.sourceRegion().clamped(pageWidth, pageHeight) }
++        val order = regions.indices.sortedBy { regions[it].y }
++        val original = regions.toList()
++        for ((position, i) in order.withIndex()) {
++            for (next in position + 1 until order.size) {
++                val j = order[next]
++                if (original[j].y >= original[i].y + original[i].height) break
++                // Permission-clipped experimental masks keep their own geometry contract.
++                if (blocks[i].dbnetCleanupMask != null || blocks[j].dbnetCleanupMask != null) continue
++                val a = regions[i]
++                val b = regions[j]
++                if (a.overlapFraction(b) <= 0f) continue
++                val sa = sources[i]
++                val sb = sources[j]
++                val ax = sa.x + sa.width / 2f
++                val ay = sa.y + sa.height / 2f
++                val bx = sb.x + sb.width / 2f
++                val by = sb.y + sb.height / 2f
++                val gapY = maxOf(sb.y - sa.y - sa.height, sa.y - sb.y - sb.height)
++                val gapX = maxOf(sb.x - sa.x - sa.width, sa.x - sb.x - sb.width)
++                val vertical = when {
++                    gapY >= 0f -> true
++                    gapX >= 0f -> false
++                    else -> abs(ay - by) / minOf(sa.height, sb.height) >= abs(ax - bx) / minOf(sa.width, sb.width)
++                }
++                // Coincident detections cannot be assigned a meaningful reading
++                // order from geometry alone; leave them for OCR/grouping review.
++                if (if (vertical) abs(ay - by) < 1f else abs(ax - bx) < 1f) continue
++                val first = if (if (vertical) ay < by else ax < bx) i else j
++                val second = if (first == i) j else i
++                val fs = sources[first]
++                val ss = sources[second]
++                val f = regions[first]
++                val s = regions[second]
++                val sourceEnd = if (vertical) fs.y + fs.height else fs.x + fs.width
++                val sourceStart = if (vertical) ss.y else ss.x
++                val center = if (vertical) (ay + by) / 2f else (ax + bx) / 2f
++                val boundary = if (sourceEnd <= sourceStart) (sourceEnd + sourceStart) / 2f else center
++                val low = maxOf(if (vertical) f.y else f.x, if (vertical) s.y else s.x) + 1f
++                val high = minOf(
++                    if (vertical) f.y + f.height else f.x + f.width,
++                    if (vertical) s.y + s.height else s.x + s.width,
++                ) - 1f
++                if (low > high) continue
++                val split = boundary.coerceIn(low, high)
++                if (vertical) {
++                    regions[first] = f.copy(height = (split - f.y).coerceAtLeast(1f))
++                    val bottom = s.y + s.height
++                    regions[second] = s.copy(y = split, height = (bottom - split).coerceAtLeast(1f))
++                } else {
++                    regions[first] = f.copy(width = (split - f.x).coerceAtLeast(1f))
++                    val right = s.x + s.width
++                    regions[second] = s.copy(x = split, width = (right - split).coerceAtLeast(1f))
++                }
++            }
++        }
++        return regions
++    }
++
++    private fun intersection(a: TranslationRegion, b: TranslationRegion): TranslationRegion {
++        val left = maxOf(a.x, b.x)
++        val top = maxOf(a.y, b.y)
++        val right = minOf(a.x + a.width, b.x + b.width)
++        val bottom = minOf(a.y + a.height, b.y + b.height)
++        return if (right > left && bottom > top) TranslationRegion(left, top, right - left, bottom - top) else b
++    }
++}
 diff --git a/app/src/main/java/eu/kanade/translation/presentation/PagerTranslationsView.kt b/app/src/main/java/eu/kanade/translation/presentation/PagerTranslationsView.kt
-index 4a1aeb5..2c52815 100644
+index 4a1aeb5..aa85842 100644
 --- a/app/src/main/java/eu/kanade/translation/presentation/PagerTranslationsView.kt
 +++ b/app/src/main/java/eu/kanade/translation/presentation/PagerTranslationsView.kt
 @@ -5,6 +5,7 @@ import android.util.AttributeSet
@@ -6851,9 +7640,11 @@ index 4a1aeb5..2c52815 100644
  import androidx.compose.runtime.collectAsState
  import androidx.compose.runtime.getValue
  import androidx.compose.runtime.key
-@@ -25,6 +26,9 @@ import eu.kanade.translation.detection.DbnetCleanupMask
+@@ -24,7 +25,11 @@ import eu.kanade.translation.data.TranslationFont
+ import eu.kanade.translation.detection.DbnetCleanupMask
  import eu.kanade.translation.model.PageTranslation
  import eu.kanade.translation.model.TranslationPageEditor
++import eu.kanade.translation.model.TranslationPageLayout
  import kotlinx.coroutines.flow.MutableStateFlow
 +import tachiyomi.domain.translation.TranslationPreferences
 +import uy.kohesive.injekt.Injekt
@@ -6861,7 +7652,7 @@ index 4a1aeb5..2c52815 100644
  
  class PagerTranslationsView : AbstractComposeView {
  
-@@ -68,7 +72,10 @@ class PagerTranslationsView : AbstractComposeView {
+@@ -68,7 +73,10 @@ class PagerTranslationsView : AbstractComposeView {
      @Composable
      override fun Content() {
          val viewport by viewportState.collectAsState()
@@ -6872,7 +7663,7 @@ index 4a1aeb5..2c52815 100644
          var contentRevision by remember { mutableStateOf(0) }
          Box(modifier = Modifier.fillMaxSize().clipToBounds()) {
              val frame = viewport ?: return@Box
-@@ -84,7 +91,7 @@ class PagerTranslationsView : AbstractComposeView {
+@@ -84,7 +92,7 @@ class PagerTranslationsView : AbstractComposeView {
                      TextBlockContent(
                          zoomScale = frame.scale,
                          contentRevision = visibleRevision,
@@ -6881,7 +7672,7 @@ index 4a1aeb5..2c52815 100644
                              { index -> editingBlockIndex = index }
                          },
                      )
-@@ -92,7 +99,7 @@ class PagerTranslationsView : AbstractComposeView {
+@@ -92,7 +100,7 @@ class PagerTranslationsView : AbstractComposeView {
              }
          }
          val blockIndex = editingBlockIndex
@@ -6890,8 +7681,117 @@ index 4a1aeb5..2c52815 100644
              val block = translation.blocks.getOrNull(blockIndex)
              val activeEditor = editor
              if (block != null && activeEditor != null) {
+@@ -135,9 +143,13 @@ class PagerTranslationsView : AbstractComposeView {
+         onEdit: ((Int) -> Unit)?,
+     ) {
+         key(contentRevision) {
++            val layouts = remember(translation, contentRevision) {
++                TranslationPageLayout.resolve(translation.blocks, translation.imgWidth, translation.imgHeight)
++            }
+             translation.blocks.forEachIndexed { index, block ->
+                 SmartTranslationBlock(
+                     block = block,
++                    layoutRegion = layouts[index],
+                     scaleFactor = zoomScale,
+                     pageWidth = translation.imgWidth,
+                     pageHeight = translation.imgHeight,
+diff --git a/app/src/main/java/eu/kanade/translation/presentation/SmartTranslationBlock.kt b/app/src/main/java/eu/kanade/translation/presentation/SmartTranslationBlock.kt
+index 5ba09d6..b94b27b 100644
+--- a/app/src/main/java/eu/kanade/translation/presentation/SmartTranslationBlock.kt
++++ b/app/src/main/java/eu/kanade/translation/presentation/SmartTranslationBlock.kt
+@@ -3,9 +3,9 @@ package eu.kanade.translation.presentation
+ import androidx.compose.foundation.combinedClickable
+ import androidx.compose.foundation.layout.Box
+ import androidx.compose.foundation.layout.absoluteOffset
+-import androidx.compose.foundation.layout.wrapContentSize
+ import androidx.compose.foundation.layout.requiredSize
+ import androidx.compose.foundation.layout.width
++import androidx.compose.foundation.layout.wrapContentSize
+ import androidx.compose.material3.LocalTextStyle
+ import androidx.compose.material3.Text
+ import androidx.compose.runtime.Composable
+@@ -14,8 +14,8 @@ import androidx.compose.ui.Modifier
+ import androidx.compose.ui.draw.clipToBounds
+ import androidx.compose.ui.draw.rotate
+ import androidx.compose.ui.graphics.Color
+-import androidx.compose.ui.graphics.graphicsLayer
+ import androidx.compose.ui.graphics.TransformOrigin
++import androidx.compose.ui.graphics.graphicsLayer
+ import androidx.compose.ui.layout.SubcomposeLayout
+ import androidx.compose.ui.platform.LocalDensity
+ import androidx.compose.ui.text.TextStyle
+@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.Constraints
+ import androidx.compose.ui.unit.Dp
+ import androidx.compose.ui.unit.sp
+ import eu.kanade.translation.model.TranslationBlock
++import eu.kanade.translation.model.TranslationRegion
+ import eu.kanade.translation.model.normalizeTranslationText
+ import eu.kanade.translation.model.resolvedLayoutRegion
+ import eu.kanade.translation.model.withReliableSourceMetrics
+@@ -44,8 +45,9 @@ fun SmartTranslationBlock(
+     pageHeight: Float,
+     fontFamily: FontFamily,
+     onLongClick: (() -> Unit)? = null,
++    layoutRegion: TranslationRegion? = null,
+ ) {
+-    val region = block.resolvedLayoutRegion(pageWidth, pageHeight)
++    val region = layoutRegion ?: block.resolvedLayoutRegion(pageWidth, pageHeight)
+     val xPx = region.x * scaleFactor
+     val yPx = region.y * scaleFactor
+     val width = region.width.pxToDp()
+@@ -59,13 +61,13 @@ fun SmartTranslationBlock(
+             Box(
+                 modifier = modifier
+                     .wrapContentSize(Alignment.TopStart, unbounded = true)
+-            .absoluteOffset(xPx.pxToDp(), yPx.pxToDp())
++                    .absoluteOffset(xPx.pxToDp(), yPx.pxToDp())
+                     .requiredSize(width, height)
+-            .graphicsLayer {
+-                scaleX = scaleFactor
+-                scaleY = scaleFactor
+-                transformOrigin = androidx.compose.ui.graphics.TransformOrigin(0f, 0f)
+-            }
++                    .graphicsLayer {
++                        scaleX = scaleFactor
++                        scaleY = scaleFactor
++                        transformOrigin = androidx.compose.ui.graphics.TransformOrigin(0f, 0f)
++                    }
+                     .combinedClickable(
+                         onClick = {},
+                         onLongClick = onLongClick,
+diff --git a/app/src/main/java/eu/kanade/translation/presentation/TranslationCleanupBlock.kt b/app/src/main/java/eu/kanade/translation/presentation/TranslationCleanupBlock.kt
+index eb9b340..0edb198 100644
+--- a/app/src/main/java/eu/kanade/translation/presentation/TranslationCleanupBlock.kt
++++ b/app/src/main/java/eu/kanade/translation/presentation/TranslationCleanupBlock.kt
+@@ -30,11 +30,12 @@ fun TranslationCleanupBlock(
+     when (val cleanup = block.resolveCleanup(pageWidth, pageHeight, experimentalMaskPageValid)) {
+         is LegacyCleanup -> cleanup.patches.forEach { patch ->
+             val region = patch.region
+-            val padding = (pageWidth * 0.003f).coerceAtLeast(2f)
+-            val adjustedX = region.x - padding
+-            val adjustedY = region.y - padding
+-            val adjustedWidth = region.width + padding * 2
+-            val adjustedHeight = region.height + padding * 2
++            // Geometry already includes measured glyph padding. Adding more here
++            // would paint across the contour which the analyzer just protected.
++            val adjustedX = region.x
++            val adjustedY = region.y
++            val adjustedWidth = region.width
++            val adjustedHeight = region.height
+             val color = block.backgroundColor?.let { Color(it) } ?: Color.White
+             val cleanupShape = if (block.balloonDetected || (!block.balloonDetected && block.backgroundColor == null)) {
+                 // Manual fallback blocks deliberately avoid reopening the page bitmap.
+@@ -49,7 +50,7 @@ fun TranslationCleanupBlock(
+             Box(
+                 modifier = Modifier
+                     .wrapContentSize(Alignment.TopStart, unbounded = true)
+-            .absoluteOffset((adjustedX * scaleFactor).pxToDp(), (adjustedY * scaleFactor).pxToDp())
++                    .absoluteOffset((adjustedX * scaleFactor).pxToDp(), (adjustedY * scaleFactor).pxToDp())
+                     .requiredSize(
+                         (adjustedWidth * scaleFactor).pxToDp(),
+                         (adjustedHeight * scaleFactor).pxToDp(),
 diff --git a/app/src/main/java/eu/kanade/translation/presentation/WebtoonTranslationsView.kt b/app/src/main/java/eu/kanade/translation/presentation/WebtoonTranslationsView.kt
-index ec6041a..bf92796 100644
+index ec6041a..2f068b5 100644
 --- a/app/src/main/java/eu/kanade/translation/presentation/WebtoonTranslationsView.kt
 +++ b/app/src/main/java/eu/kanade/translation/presentation/WebtoonTranslationsView.kt
 @@ -5,6 +5,8 @@ import android.util.AttributeSet
@@ -6903,17 +7803,18 @@ index ec6041a..bf92796 100644
  import androidx.compose.runtime.getValue
  import androidx.compose.runtime.key
  import androidx.compose.runtime.mutableStateOf
-@@ -23,6 +25,9 @@ import eu.kanade.translation.data.TranslationFont
+@@ -23,6 +25,10 @@ import eu.kanade.translation.data.TranslationFont
  import eu.kanade.translation.detection.DbnetCleanupMask
  import eu.kanade.translation.model.PageTranslation
  import eu.kanade.translation.model.TranslationPageEditor
++import eu.kanade.translation.model.TranslationPageLayout
 +import tachiyomi.domain.translation.TranslationPreferences
 +import uy.kohesive.injekt.Injekt
 +import uy.kohesive.injekt.api.get
  
  class WebtoonTranslationsView : AbstractComposeView {
  
-@@ -64,7 +69,10 @@ class WebtoonTranslationsView : AbstractComposeView {
+@@ -64,7 +70,10 @@ class WebtoonTranslationsView : AbstractComposeView {
      @Composable
      override fun Content() {
          var size by remember { mutableStateOf(IntSize.Zero) }
@@ -6924,7 +7825,7 @@ index ec6041a..bf92796 100644
          var contentRevision by remember { mutableStateOf(0) }
          Box(
              modifier = Modifier
-@@ -82,14 +90,14 @@ class WebtoonTranslationsView : AbstractComposeView {
+@@ -82,14 +91,14 @@ class WebtoonTranslationsView : AbstractComposeView {
                  TextBlockContent(
                      scaleFactor = scaleFactor,
                      contentRevision = visibleRevision,
@@ -6941,6 +7842,20 @@ index ec6041a..bf92796 100644
              val block = translation.blocks.getOrNull(blockIndex)
              val activeEditor = editor
              if (block != null && activeEditor != null) {
+@@ -132,9 +141,13 @@ class WebtoonTranslationsView : AbstractComposeView {
+         onEdit: ((Int) -> Unit)?,
+     ) {
+         key(contentRevision) {
++            val layouts = remember(translation, contentRevision) {
++                TranslationPageLayout.resolve(translation.blocks, translation.imgWidth, translation.imgHeight)
++            }
+             translation.blocks.forEachIndexed { index, block ->
+                 SmartTranslationBlock(
+                     block = block,
++                    layoutRegion = layouts[index],
+                     scaleFactor = scaleFactor,
+                     pageWidth = translation.imgWidth,
+                     pageHeight = translation.imgHeight,
 diff --git a/app/src/main/java/eu/kanade/translation/recognizer/MlKitOcrEngine.kt b/app/src/main/java/eu/kanade/translation/recognizer/MlKitOcrEngine.kt
 index 6e0e8b1..ed823df 100644
 --- a/app/src/main/java/eu/kanade/translation/recognizer/MlKitOcrEngine.kt
@@ -7122,7 +8037,7 @@ index 6e0e8b1..ed823df 100644
 +    private fun elapsedMs(startNanos: Long): Long = (System.nanoTime() - startNanos) / 1_000_000L
  }
 diff --git a/app/src/main/java/eu/kanade/translation/recognizer/OcrEngineFactory.kt b/app/src/main/java/eu/kanade/translation/recognizer/OcrEngineFactory.kt
-index de36825..4c20a51 100644
+index de36825..7b712af 100644
 --- a/app/src/main/java/eu/kanade/translation/recognizer/OcrEngineFactory.kt
 +++ b/app/src/main/java/eu/kanade/translation/recognizer/OcrEngineFactory.kt
 @@ -1,6 +1,9 @@
@@ -7135,12 +8050,13 @@ index de36825..4c20a51 100644
  
  object OcrEngineFactory {
  
-@@ -10,9 +13,13 @@ object OcrEngineFactory {
+@@ -10,9 +13,14 @@ object OcrEngineFactory {
          language: TextRecognizerLanguage,
      ): OcrEngine {
          require(type.supports(language)) { "PaddleOCR requires English source text" }
++        val preferences = Injekt.get<TranslationPreferences>()
++        preferences.reconcileOcrExperiments()
 +        val stripsEnabled = {
-+            val preferences = Injekt.get<TranslationPreferences>()
 +            preferences.longPageStrips().get() && !preferences.dbnetExperimental().get()
 +        }
          return when (type) {
@@ -7481,6 +8397,97 @@ index 3e70290..3baa3e0 100644
      override suspend fun release() {
          mutex.withLock {
              try {
+diff --git a/app/src/main/java/eu/kanade/translation/recognizer/SpeechBubbleAnalyzer.kt b/app/src/main/java/eu/kanade/translation/recognizer/SpeechBubbleAnalyzer.kt
+index 121eb4e..3685f42 100644
+--- a/app/src/main/java/eu/kanade/translation/recognizer/SpeechBubbleAnalyzer.kt
++++ b/app/src/main/java/eu/kanade/translation/recognizer/SpeechBubbleAnalyzer.kt
+@@ -1,7 +1,6 @@
+ package eu.kanade.translation.recognizer
+ 
+ import android.graphics.Bitmap
+-import android.graphics.Color
+ import eu.kanade.translation.model.TranslationBlock
+ import eu.kanade.translation.model.TranslationColors
+ import eu.kanade.translation.model.TranslationRegion
+@@ -47,13 +46,21 @@ class SpeechBubbleAnalyzer(
+         val backgroundSample = sampleBackgroundColor(block)
+         val detectedLayout = backgroundSample?.takeIf { it.confidence >= MIN_DETECTION_CONFIDENCE }?.let { detectBalloonInterior(block, it.color) }
+         val overlayColor = backgroundSample?.takeIf { it.confidence >= MIN_OVERLAY_CONFIDENCE }?.color
++        val boundedLayout = detectedLayout ?: overlayColor?.let {
++            constrainToVisibleBoundary(
++                fallbackLayout,
++                block.sourceRegion(),
++                it,
++                block.sourceRegions.ifEmpty { listOf(block.sourceRegion()) },
++            )
++        } ?: fallbackLayout
+         return SpeechBubbleAnalysis(
+             cleanupRegion = overlayColor?.let {
+                 constrainToVisibleBoundary(cleanup, block.sourceRegion(), it, containSource = true)
+             } ?: cleanup,
+-            layoutRegion = (detectedLayout ?: fallbackLayout).clamped(pageWidth.toFloat(), pageHeight.toFloat()),
++            layoutRegion = boundedLayout.clamped(pageWidth.toFloat(), pageHeight.toFloat()),
+             backgroundColor = overlayColor,
+-            foregroundColor = overlayColor?.let(TranslationColors::contrastingForeground) ?: Color.BLACK,
++            foregroundColor = overlayColor?.let(TranslationColors::contrastingForeground) ?: PixelColor.BLACK,
+             balloonDetected = detectedLayout != null,
+         )
+     }
+@@ -108,10 +115,10 @@ class SpeechBubbleAnalyzer(
+         if (samples.size < MIN_COLOR_SAMPLES) return null
+         val dominantBucket = samples.groupBy(::colorBucket).maxByOrNull { it.value.size }?.value.orEmpty()
+         if (dominantBucket.size < MIN_DOMINANT_SAMPLES) return null
+-        val seed = Color.rgb(dominantBucket.map { Color.red(it) }.median(), dominantBucket.map { Color.green(it) }.median(), dominantBucket.map { Color.blue(it) }.median())
++        val seed = PixelColor.rgb(dominantBucket.map { PixelColor.red(it) }.median(), dominantBucket.map { PixelColor.green(it) }.median(), dominantBucket.map { PixelColor.blue(it) }.median())
+         val backgroundSamples = samples.filter { colorDistanceSquared(it, seed) <= MAX_CLUSTER_DISTANCE_SQUARED }
+         if (backgroundSamples.size < MIN_DOMINANT_SAMPLES) return null
+-        val color = Color.rgb(backgroundSamples.map { Color.red(it) }.median(), backgroundSamples.map { Color.green(it) }.median(), backgroundSamples.map { Color.blue(it) }.median())
++        val color = PixelColor.rgb(backgroundSamples.map { PixelColor.red(it) }.median(), backgroundSamples.map { PixelColor.green(it) }.median(), backgroundSamples.map { PixelColor.blue(it) }.median())
+         return BackgroundSample(color, backgroundSamples.size / samples.size.toFloat())
+     }
+ 
+@@ -305,20 +312,20 @@ class SpeechBubbleAnalyzer(
+         }
+         return true
+     }
+-    private fun colorsMatch(pixel: Int, reference: Int): Boolean { if (Color.alpha(pixel) < MIN_ALPHA) return false; val r=Color.red(pixel)-Color.red(reference); val g=Color.green(pixel)-Color.green(reference); val b=Color.blue(pixel)-Color.blue(reference); return r*r+g*g+b*b <= MAX_COLOR_DISTANCE_SQUARED && abs(luminance(pixel)-luminance(reference)) <= MAX_LUMINANCE_DELTA }
+-    private fun colorBucket(color: Int) = ((Color.red(color)/COLOR_BUCKET_SIZE) shl 8) or ((Color.green(color)/COLOR_BUCKET_SIZE) shl 4) or (Color.blue(color)/COLOR_BUCKET_SIZE)
+-    private fun colorDistanceSquared(first:Int, second:Int):Int { val r=Color.red(first)-Color.red(second); val g=Color.green(first)-Color.green(second); val b=Color.blue(first)-Color.blue(second); return r*r+g*g+b*b }
++    private fun colorsMatch(pixel: Int, reference: Int): Boolean { if (PixelColor.alpha(pixel) < MIN_ALPHA) return false; val r=PixelColor.red(pixel)-PixelColor.red(reference); val g=PixelColor.green(pixel)-PixelColor.green(reference); val b=PixelColor.blue(pixel)-PixelColor.blue(reference); return r*r+g*g+b*b <= MAX_COLOR_DISTANCE_SQUARED && abs(luminance(pixel)-luminance(reference)) <= MAX_LUMINANCE_DELTA }
++    private fun colorBucket(color: Int) = ((PixelColor.red(color)/COLOR_BUCKET_SIZE) shl 8) or ((PixelColor.green(color)/COLOR_BUCKET_SIZE) shl 4) or (PixelColor.blue(color)/COLOR_BUCKET_SIZE)
++    private fun colorDistanceSquared(first:Int, second:Int):Int { val r=PixelColor.red(first)-PixelColor.red(second); val g=PixelColor.green(first)-PixelColor.green(second); val b=PixelColor.blue(first)-PixelColor.blue(second); return r*r+g*g+b*b }
+     private fun addPixel(target: MutableList<Int>, x: Int, y: Int): Int? {
+         if (x !in 0 until bitmap.width || y !in 0 until bitmap.height || isTextPixel(x, y)) return null
+         val pixel = pixels[y * bitmap.width + x]
+-        if (Color.alpha(pixel) < MIN_ALPHA) return null
++        if (PixelColor.alpha(pixel) < MIN_ALPHA) return null
+         target += pixel
+         return pixel
+     }
+     private fun getPixel(x:Int,y:Int)=pixels[y.coerceIn(0,bitmap.height-1) * bitmap.width + x.coerceIn(0,bitmap.width-1)]
+     private fun toBitmapX(value:Float)=(value*scaleX).roundToInt().coerceIn(0,bitmap.width-1); private fun toBitmapY(value:Float)=(value*scaleY).roundToInt().coerceIn(0,bitmap.height-1)
+     private fun fromBitmapX(value:Int)=value/scaleX.coerceAtLeast(0.0001f); private fun fromBitmapY(value:Int)=value/scaleY.coerceAtLeast(0.0001f)
+-    private fun luminance(color:Int)=(Color.red(color)*0.299f+Color.green(color)*0.587f+Color.blue(color)*0.114f).roundToInt()
++    private fun luminance(color:Int)=(PixelColor.red(color)*0.299f+PixelColor.green(color)*0.587f+PixelColor.blue(color)*0.114f).roundToInt()
+     private fun List<Int>.median()=sorted()[size/2]; private fun lerp(start:Int,end:Int,fraction:Float)=(start+(end-start)*fraction).roundToInt()
+     private data class ScanResult(val lastMatch:Int,val foundBoundary:Boolean); private data class BackgroundSample(val color:Int,val confidence:Float)
+     private companion object {
+@@ -334,3 +341,15 @@ internal object SpeechBubbleSizePolicy {
+     fun accepts(sourceWidth:Float,sourceHeight:Float,detectedWidth:Float,detectedHeight:Float):Boolean { val sourceArea=(sourceWidth*sourceHeight).coerceAtLeast(1f); val detectedArea=detectedWidth*detectedHeight; if(detectedArea<=sourceArea*STANDARD_MAX_AREA_RATIO)return true; val aspectRatio=detectedWidth/detectedHeight.coerceAtLeast(1f); val resemblesRoundBalloon=aspectRatio in ROUND_BALLOON_MIN_ASPECT_RATIO..ROUND_BALLOON_MAX_ASPECT_RATIO; return resemblesRoundBalloon && detectedArea<=sourceArea*LARGE_ROUND_BALLOON_MAX_AREA_RATIO }
+     private const val STANDARD_MAX_AREA_RATIO=14f; private const val LARGE_ROUND_BALLOON_MAX_AREA_RATIO=140f; private const val ROUND_BALLOON_MIN_ASPECT_RATIO=0.45f; private const val ROUND_BALLOON_MAX_ASPECT_RATIO=2.2f
+ }
++
++
++/** Android ARGB component operations kept pure in the analysis hot path. */
++private object PixelColor {
++    const val BLACK: Int = -0x1000000
++    fun alpha(color: Int): Int = color ushr 24
++    fun red(color: Int): Int = color ushr 16 and 0xff
++    fun green(color: Int): Int = color ushr 8 and 0xff
++    fun blue(color: Int): Int = color and 0xff
++    fun rgb(red: Int, green: Int, blue: Int): Int =
++        BLACK or (red shl 16) or (green shl 8) or blue
++}
 diff --git a/app/src/main/java/eu/kanade/translation/translator/GeminiComicProtocol.kt b/app/src/main/java/eu/kanade/translation/translator/GeminiComicProtocol.kt
 new file mode 100644
 index 0000000..d6e4788
@@ -8239,6 +9246,229 @@ index 68f36cd..fb3271f 100644
 +        assertEquals("Hailton-Reis/Polaris", GITHUB_REPO)
      }
  }
+diff --git a/app/src/test/java/eu/kanade/tachiyomi/data/updater/PolarisApkDownloaderTest.kt b/app/src/test/java/eu/kanade/tachiyomi/data/updater/PolarisApkDownloaderTest.kt
+new file mode 100644
+index 0000000..a17f91f
+--- /dev/null
++++ b/app/src/test/java/eu/kanade/tachiyomi/data/updater/PolarisApkDownloaderTest.kt
+@@ -0,0 +1,217 @@
++package eu.kanade.tachiyomi.data.updater
++
++import com.sun.net.httpserver.HttpExchange
++import com.sun.net.httpserver.HttpServer
++import kotlinx.coroutines.CancellationException
++import kotlinx.coroutines.test.runTest
++import okhttp3.OkHttpClient
++import org.junit.jupiter.api.AfterEach
++import org.junit.jupiter.api.Assertions.assertArrayEquals
++import org.junit.jupiter.api.Assertions.assertEquals
++import org.junit.jupiter.api.Assertions.assertFalse
++import org.junit.jupiter.api.Assertions.assertTrue
++import org.junit.jupiter.api.Test
++import org.junit.jupiter.api.assertThrows
++import org.junit.jupiter.api.io.TempDir
++import java.io.File
++import java.io.IOException
++import java.net.InetSocketAddress
++import java.security.MessageDigest
++import java.util.Collections
++import java.util.concurrent.Executors
++import java.util.concurrent.TimeUnit
++import java.util.concurrent.atomic.AtomicInteger
++
++/** Real HTTP/stream tests: no Android, mocked transport, new SDK or remote server required. */
++class PolarisApkDownloaderTest {
++    @TempDir lateinit var directory: File
++    private val bytes = ByteArray(192 * 1024) { ((it * 31 + it / 11) % 251).toByte() }
++    private val hash get() = digest(bytes)
++    private val client = OkHttpClient.Builder().retryOnConnectionFailure(false)
++        .readTimeout(3, TimeUnit.SECONDS).build()
++    private val requests = Collections.synchronizedList(mutableListOf<String?>())
++    private val executor = Executors.newCachedThreadPool { task -> Thread(task).apply { isDaemon = true } }
++    private var server: HttpServer? = null
++    private val apk get() = File(directory, "update.apk")
++    private fun downloader() = PolarisApkDownloader(directory, client)
++
++    @AfterEach fun close() {
++        server?.stop(0)
++        executor.shutdownNow()
++        client.dispatcher.executorService.shutdownNow()
++        client.connectionPool.evictAll()
++    }
++
++    @Test fun `interrupted transfer resumes with a new downloader instance and verifies the entire APK`() = runTest {
++        val prefix = 70_000
++        val url = serve { exchange, count ->
++            if (count == 1) interrupt(exchange, prefix) else remaining(exchange, prefix)
++        }
++        assertThrows<IOException> { downloader().download(url, hash) }
++        assertFalse(apk.exists())
++        assertEquals(prefix.toLong(), partial(url).length())
++        val progress = mutableListOf<Long>()
++        val result = downloader().download(url, hash) { received, _ -> progress += received }
++        assertArrayEquals(bytes, result.readBytes())
++        assertEquals(listOf(null, "bytes=$prefix-"), requests)
++        assertTrue(progress.first() >= prefix)
++        assertEquals(bytes.size.toLong(), progress.last())
++        assertFalse(partial(url).exists())
++    }
++
++    @Test fun `server ignoring Range restarts cleanly without appending a second full APK`() = runTest {
++        val url = serve { exchange, count ->
++            if (count == 1) interrupt(exchange, 30_000) else full(exchange)
++        }
++        assertThrows<IOException> { downloader().download(url, hash) }
++        assertArrayEquals(bytes, downloader().download(url, hash).readBytes())
++        assertEquals("bytes=30000-", requests.last())
++    }
++
++    @Test fun `incorrect partial response is never appended or offered for installation`() = runTest {
++        val url = serve { exchange, _ -> remaining(exchange, 123) }
++        partial(url).writeBytes(bytes.copyOf(100))
++        assertThrows<UpdateResponseException> { downloader().download(url, hash) }
++        assertFalse(apk.exists())
++        assertFalse(partial(url).exists())
++    }
++
++    @Test fun `416 after receiving the final byte promotes only a matching digest`() = runTest {
++        val url = serve { exchange, _ ->
++            exchange.sendResponseHeaders(416, -1)
++            exchange.close()
++        }
++        partial(url).writeBytes(bytes)
++        assertArrayEquals(bytes, downloader().download(url, hash).readBytes())
++        assertEquals(listOf("bytes=${bytes.size}-"), requests)
++    }
++
++    @Test fun `416 with a corrupt partial discards it and requests the full file`() = runTest {
++        val url = serve { exchange, count ->
++            if (count == 1) {
++                exchange.sendResponseHeaders(416, -1)
++                exchange.close()
++            } else {
++                full(exchange)
++            }
++        }
++        partial(url).writeText("wrong bytes")
++        assertArrayEquals(bytes, downloader().download(url, hash).readBytes())
++        assertEquals(listOf("bytes=11-", null), requests)
++    }
++
++    @Test fun `checksum mismatch removes the candidate and leaves no installable APK`() = runTest {
++        val url = serve { exchange, _ -> full(exchange) }
++        assertThrows<IOException> { downloader().download(url, "0".repeat(64)) }
++        assertFalse(apk.exists())
++        assertTrue(directory.listFiles()!!.none { it.extension == "part" })
++    }
++
++    @Test fun `cancellation retains written bytes and the next attempt resumes them`() = runTest {
++        val url = serve { exchange, _ ->
++            val offset = exchange.requestHeaders.getFirst("Range")?.substringAfter('=')?.substringBefore('-')?.toInt()
++            if (offset == null) full(exchange) else remaining(exchange, offset)
++        }
++        assertThrows<CancellationException> {
++            downloader().download(url, hash) { received, _ ->
++                if (received > 0) throw CancellationException("Simulated worker interruption")
++            }
++        }
++        val saved = partial(url).length()
++        assertTrue(saved > 0)
++        assertFalse(apk.exists())
++        assertArrayEquals(bytes, downloader().download(url, hash).readBytes())
++        assertEquals("bytes=$saved-", requests.last())
++    }
++
++    @Test fun `verified APK is reused when the install screen is reopened`() = runTest {
++        val url = serve { exchange, _ -> full(exchange) }
++        downloader().download(url, hash)
++        assertArrayEquals(bytes, downloader().download(url, hash.uppercase()).readBytes())
++        assertEquals(1, requests.size)
++    }
++
++    @Test fun `another release cannot reuse stale partial bytes`() = runTest {
++        val url = serve { exchange, _ -> full(exchange) }
++        val old = partial("$url/old")
++        old.writeText("old release")
++        assertArrayEquals(bytes, downloader().download(url, hash).readBytes())
++        assertFalse(old.exists())
++        assertEquals(listOf<String?>(null), requests)
++    }
++
++    @Test fun `legacy requests without a digest restart rather than merging unpinned bytes`() = runTest {
++        val url = serve { exchange, count ->
++            if (count == 1) interrupt(exchange, 30_000) else full(exchange)
++        }
++        assertThrows<IOException> { downloader().download(url, null) }
++        assertArrayEquals(bytes, downloader().download(url, null).readBytes())
++        assertEquals(listOf(null, null), requests)
++    }
++
++    @Test fun `retryable HTTP error preserves a partial for the next worker attempt`() = runTest {
++        val url = serve { exchange, count ->
++            if (count == 1) {
++                exchange.sendResponseHeaders(503, -1)
++                exchange.close()
++            } else {
++                remaining(exchange, 500)
++            }
++        }
++        partial(url).writeBytes(bytes.copyOf(500))
++        val failure = assertThrows<UpdateHttpException> { downloader().download(url, hash) }
++        assertTrue(failure.retryable)
++        assertFalse(UpdateHttpException(404).retryable)
++        assertEquals(500, partial(url).length())
++        assertArrayEquals(bytes, downloader().download(url, hash).readBytes())
++    }
++
++    @Test fun `encoded response is rejected before it changes the partial`() = runTest {
++        val url = serve { exchange, _ ->
++            exchange.responseHeaders.set("Content-Encoding", "gzip")
++            full(exchange)
++        }
++        assertThrows<UpdateResponseException> { downloader().download(url, hash) }
++        assertFalse(apk.exists())
++    }
++
++    private fun partial(url: String) = File(directory, "update-${PolarisApkDownloader.identity(url, hash)}.part")
++
++    private fun serve(handler: (HttpExchange, Int) -> Unit): String {
++        val count = AtomicInteger()
++        val instance = HttpServer.create(InetSocketAddress("127.0.0.1", 0), 0)
++        instance.executor = executor
++        instance.createContext("/apk") { exchange ->
++            requests += exchange.requestHeaders.getFirst("Range")
++            try {
++                handler(exchange, count.incrementAndGet())
++            } finally {
++                exchange.close()
++            }
++        }
++        instance.start()
++        server = instance
++        return "http://127.0.0.1:${instance.address.port}/apk"
++    }
++
++    private fun full(exchange: HttpExchange) {
++        exchange.sendResponseHeaders(200, bytes.size.toLong())
++        exchange.responseBody.use { it.write(bytes) }
++    }
++
++    private fun interrupt(exchange: HttpExchange, prefix: Int) {
++        exchange.sendResponseHeaders(200, bytes.size.toLong())
++        exchange.responseBody.write(bytes, 0, prefix)
++        exchange.responseBody.flush()
++        // Closing before the declared Content-Length simulates a lost connection.
++    }
++
++    private fun remaining(exchange: HttpExchange, offset: Int) {
++        exchange.responseHeaders.set("Content-Range", "bytes $offset-${bytes.lastIndex}/${bytes.size}")
++        exchange.sendResponseHeaders(206, (bytes.size - offset).toLong())
++        exchange.responseBody.use { it.write(bytes, offset, bytes.size - offset) }
++    }
++
++    private fun digest(value: ByteArray) = MessageDigest.getInstance("SHA-256").digest(value)
++        .joinToString("") { "%02x".format(it) }
++}
 diff --git a/app/src/test/java/eu/kanade/tachiyomi/data/updater/PolarisReleaseVersionTest.kt b/app/src/test/java/eu/kanade/tachiyomi/data/updater/PolarisReleaseVersionTest.kt
 new file mode 100644
 index 0000000..6c9d85e
@@ -9904,6 +11134,241 @@ index 0000000..d7f8746
 +        angle = 0f, balloonDetected = balloon,
 +    )
 +}
+diff --git a/app/src/test/java/eu/kanade/translation/model/TranslationPageLayoutTest.kt b/app/src/test/java/eu/kanade/translation/model/TranslationPageLayoutTest.kt
+new file mode 100644
+index 0000000..35ee144
+--- /dev/null
++++ b/app/src/test/java/eu/kanade/translation/model/TranslationPageLayoutTest.kt
+@@ -0,0 +1,87 @@
++package eu.kanade.translation.model
++
++import org.junit.jupiter.api.Assertions.assertEquals
++import org.junit.jupiter.api.Assertions.assertTrue
++import org.junit.jupiter.api.Test
++
++class TranslationPageLayoutTest {
++    private fun block(x: Float, y: Float, width: Float = 100f, height: Float = 30f) = TranslationBlock(
++        text = "Source paragraph", translation = "Um parágrafo traduzido",
++        x = x, y = y, width = width, height = height, symWidth = 8f, symHeight = 18f, angle = 0f,
++        layoutRegion = TranslationRegion(x - 30, y - 30, width + 60, height + 60),
++        geometryVersion = CURRENT_TRANSLATION_GEOMETRY_VERSION,
++    )
++
++    @Test fun `saved dark caption cannot draw its translation outside the bounded eraser`() {
++        val caption = block(60f, 100f, 200f, 70f).copy(
++            backgroundColor = 0xff303044.toInt(),
++            cleanupRegion = TranslationRegion(50f, 90f, 220f, 90f),
++        )
++        val resolved = TranslationPageLayout.resolve(listOf(caption), 400f, 600f).single()
++        assertEquals(TranslationRegion(50f, 90f, 220f, 90f), resolved)
++        assertEquals(1f, resolved.overlapFraction(caption.cleanupRegion!!))
++    }
++
++    @Test fun `measured white balloon keeps its established larger writing area`() {
++        val white = block(100f, 100f).copy(
++            balloonDetected = true,
++            backgroundColor = -1,
++            cleanupRegion = TranslationRegion(95f, 95f, 110f, 40f),
++        )
++        assertEquals(white.layoutRegion, TranslationPageLayout.resolve(listOf(white), 400f, 600f).single())
++    }
++
++    @Test fun `stacked title fragments cannot share expanded vertical space`() {
++        val a = block(80f, 100f, 220f, 60f)
++        val b = block(100f, 170f, 180f, 30f)
++        val result = TranslationPageLayout.resolve(listOf(a, b), 400f, 600f)
++        assertEquals(0f, result[0].overlapFraction(result[1]))
++        assertTrue(result[0].y + result[0].height <= result[1].y)
++        assertTrue(result[0].overlapFraction(a.layoutRegion!!) > 0.99f)
++        assertTrue(result[1].overlapFraction(b.layoutRegion!!) > 0.99f)
++    }
++
++    @Test fun `adjacent columns reserve horizontal space without covering the other source`() {
++        val a = block(40f, 100f)
++        val b = block(150f, 100f)
++        val result = TranslationPageLayout.resolve(listOf(a, b), 400f, 600f)
++        assertEquals(0f, result[0].overlapFraction(result[1]))
++        assertTrue(result[0].x + result[0].width <= result[1].x)
++    }
++
++    @Test fun `mixed size OCR title boxes that overlap are partitioned by their source centers`() {
++        val a = block(60f, 200f, 270f, 120f)
++        val b = block(100f, 290f, 190f, 40f)
++        val result = TranslationPageLayout.resolve(listOf(a, b), 400f, 600f)
++        assertEquals(0f, result[0].overlapFraction(result[1]))
++        assertEquals("Source paragraph", a.text)
++        assertEquals("Um parágrafo traduzido", b.translation)
++    }
++
++    @Test fun `three fragments remain non overlapping after all pairwise allocations`() {
++        val blocks = listOf(block(70f, 100f), block(70f, 140f), block(70f, 180f))
++        val result = TranslationPageLayout.resolve(blocks, 400f, 600f)
++        for (i in result.indices) {
++            for (j in i + 1 until result.size) {
++                assertEquals(
++                    0f,
++                    result[i].overlapFraction(result[j]),
++                )
++            }
++        }
++    }
++
++    @Test fun `untranslated neighbor reserves original text instead of having another overlay placed over it`() {
++        val blocks = listOf(block(70f, 100f), block(70f, 145f).copy(translation = ""))
++        val result = TranslationPageLayout.resolve(blocks, 400f, 600f)
++        assertTrue(result[0].y + result[0].height <= blocks[1].y)
++        assertTrue(blocks[1].translation.isEmpty())
++    }
++
++    @Test fun `unrelated layouts and cleanup ownership remain unchanged`() {
++        val blocks = listOf(block(40f, 100f), block(230f, 300f))
++        val before = blocks.map { it.copy() }
++        assertEquals(blocks.map { it.layoutRegion }, TranslationPageLayout.resolve(blocks, 400f, 600f))
++        assertEquals(before, blocks)
++    }
++}
+diff --git a/app/src/test/java/eu/kanade/translation/recognizer/BitmapFixture.kt b/app/src/test/java/eu/kanade/translation/recognizer/BitmapFixture.kt
+new file mode 100644
+index 0000000..7452ed1
+--- /dev/null
++++ b/app/src/test/java/eu/kanade/translation/recognizer/BitmapFixture.kt
+@@ -0,0 +1,35 @@
++package eu.kanade.translation.recognizer
++
++import android.graphics.Bitmap
++import io.mockk.every
++import io.mockk.excludeRecords
++import io.mockk.mockk
++
++/** Authored pixels shared by single-pixel and bulk reads, as on a real Android bitmap. */
++internal fun bitmapFixture(imageWidth: Int, imageHeight: Int, pixel: (Int, Int) -> Int): Bitmap {
++    val values = IntArray(imageWidth * imageHeight) { pixel(it % imageWidth, it / imageWidth) }
++    return mockk<Bitmap> {
++        every { width } returns imageWidth
++        every { height } returns imageHeight
++        every { getPixel(any(), any()) } answers { values[secondArg<Int>() * imageWidth + firstArg<Int>()] }
++        every { getPixels(any(), any(), any(), any(), any(), any(), any()) } answers {
++            val output = firstArg<IntArray>()
++            val offset = secondArg<Int>()
++            val stride = thirdArg<Int>()
++            val x = arg<Int>(3)
++            val y = arg<Int>(4)
++            val copyWidth = arg<Int>(5)
++            val copyHeight = arg<Int>(6)
++            repeat(copyHeight) { row ->
++                System.arraycopy(values, (y + row) * imageWidth + x, output, offset + row * stride, copyWidth)
++            }
++        }
++    }.also { bitmap ->
++        excludeRecords {
++            bitmap.getPixel(any(), any())
++            bitmap.getPixels(any(), any(), any(), any(), any(), any(), any())
++            bitmap.width
++            bitmap.height
++        }
++    }
++}
+diff --git a/app/src/test/java/eu/kanade/translation/recognizer/CaptionSurfaceRegressionTest.kt b/app/src/test/java/eu/kanade/translation/recognizer/CaptionSurfaceRegressionTest.kt
+new file mode 100644
+index 0000000..a733d65
+--- /dev/null
++++ b/app/src/test/java/eu/kanade/translation/recognizer/CaptionSurfaceRegressionTest.kt
+@@ -0,0 +1,95 @@
++package eu.kanade.translation.recognizer
++
++import android.graphics.Color
++import eu.kanade.translation.model.TranslationBlock
++import eu.kanade.translation.model.TranslationPageLayout
++import eu.kanade.translation.model.overlapFraction
++import eu.kanade.translation.model.sourceRegion
++import io.mockk.every
++import io.mockk.mockkStatic
++import io.mockk.unmockkStatic
++import org.junit.jupiter.api.AfterEach
++import org.junit.jupiter.api.Assertions.assertEquals
++import org.junit.jupiter.api.Assertions.assertTrue
++import org.junit.jupiter.api.BeforeEach
++import org.junit.jupiter.api.Test
++
++class CaptionSurfaceRegressionTest {
++    @BeforeEach fun colors() {
++        mockkStatic(Color::class)
++        every { Color.alpha(any()) } answers { firstArg<Int>() ushr 24 and 0xff }
++        every { Color.red(any()) } answers { firstArg<Int>() ushr 16 and 0xff }
++        every { Color.green(any()) } answers { firstArg<Int>() ushr 8 and 0xff }
++        every { Color.blue(any()) } answers { firstArg<Int>() and 0xff }
++        every { Color.rgb(any<Int>(), any<Int>(), any<Int>()) } answers {
++            0xff000000.toInt() or (firstArg<Int>() shl 16) or (secondArg<Int>() shl 8) or thirdArg<Int>()
++        }
++    }
++
++    @AfterEach fun cleanup() = unmockkStatic(Color::class)
++
++    @Test fun `open dark or colored panels constrain the fallback when only two sides are detected`() {
++        for (color in listOf(0xff303044.toInt(), 0xff000000.toInt(), 0xffecd9ad.toInt())) {
++            for (scale in listOf(1, 2, 4)) {
++                val source = block(scale)
++                val image = bitmapFixture(400, 400) { x, y ->
++                    val letter = x in 85..240 && y in 100..120 && x % 10 < 5 && y % 10 < 6
++                    if (letter) {
++                        0xff777777.toInt()
++                    } else if (x in 80..250) {
++                        color
++                    } else {
++                        0xffa0b5c5.toInt()
++                    }
++                }
++                val analysis = SpeechBubbleAnalyzer(
++                    image,
++                    400 * scale,
++                    400 * scale,
++                    listOf(source.sourceRegion()),
++                ).analyze(source)
++                assertEquals(color, analysis.backgroundColor)
++                assertTrue(analysis.layoutRegion.x >= 80f * scale)
++                assertTrue(analysis.layoutRegion.x + analysis.layoutRegion.width <= 251f * scale)
++                assertTrue(source.sourceRegion().overlapFraction(analysis.layoutRegion) > 0.99f)
++            }
++        }
++    }
++
++    @Test fun `closed blue caption keeps a white foreground and writing inside its panel`() {
++        val source = block(1).copy(x = 100f, y = 125f, width = 200f, height = 20f)
++        val panel = 0xff303044.toInt()
++        val image = bitmapFixture(400, 400) { x, y -> if (x in 50..350 && y in 100..175) panel else 0xffc0c0c0.toInt() }
++        val analysis = SpeechBubbleAnalyzer(image, 400, 400, listOf(source.sourceRegion())).analyze(source)
++        assertEquals(panel, analysis.backgroundColor)
++        assertEquals(-1, analysis.foregroundColor)
++        assertTrue(analysis.layoutRegion.y >= 100f)
++        assertTrue(analysis.layoutRegion.y + analysis.layoutRegion.height <= 176f)
++    }
++
++    @Test fun `white oval remains detected and retains its established useful layout`() {
++        val source = block(1).copy(x = 145f, y = 170f, width = 110f, height = 20f)
++        val image = bitmapFixture(400, 400) { x, y ->
++            val dx = (x - 200f) / 118f
++            val dy = (y - 180f) / 88f
++            if (dx * dx + dy * dy <= 1f) -1 else 0xff000000.toInt()
++        }
++        val analysis = SpeechBubbleAnalyzer(image, 400, 400, listOf(source.sourceRegion())).analyze(source)
++        assertTrue(analysis.balloonDetected)
++        assertEquals(-1, analysis.backgroundColor)
++        val block = source.copy(
++            layoutRegion = analysis.layoutRegion,
++            cleanupRegion = analysis.cleanupRegion,
++            backgroundColor = analysis.backgroundColor,
++            balloonDetected = true,
++            geometryVersion = 2,
++        )
++        assertEquals(analysis.layoutRegion, TranslationPageLayout.resolve(listOf(block), 400f, 400f).single())
++    }
++
++    private fun block(scale: Int) = TranslationBlock(
++        text = "MY SKILLS AND STATS", translation = "MINHAS HABILIDADES E ESTATÍSTICAS",
++        x = 85f * scale, y = 100f * scale, width = 155f * scale, height = 20f * scale,
++        symWidth = 10f * scale, symHeight = 12f * scale, angle = 0f,
++    )
++}
 diff --git a/app/src/test/java/eu/kanade/translation/recognizer/OcrStripPlanTest.kt b/app/src/test/java/eu/kanade/translation/recognizer/OcrStripPlanTest.kt
 new file mode 100644
 index 0000000..5d21ecf
@@ -10050,6 +11515,143 @@ index 0000000..5d21ecf
 +        edge,
 +    )
 +}
+diff --git a/app/src/test/java/eu/kanade/translation/recognizer/SpeechBubbleBackgroundRegressionTest.kt b/app/src/test/java/eu/kanade/translation/recognizer/SpeechBubbleBackgroundRegressionTest.kt
+index d53cceb..9ab7fcc 100644
+--- a/app/src/test/java/eu/kanade/translation/recognizer/SpeechBubbleBackgroundRegressionTest.kt
++++ b/app/src/test/java/eu/kanade/translation/recognizer/SpeechBubbleBackgroundRegressionTest.kt
+@@ -152,11 +152,7 @@ class SpeechBubbleBackgroundRegressionTest {
+         if (dx * dx + dy * dy <= 1f && !ink) background else outside
+     }
+ 
+-    private fun bitmap(pixel: (Int, Int) -> Int): Bitmap = mockk<Bitmap> {
+-        every { width } returns 400
+-        every { height } returns 400
+-        every { getPixel(any(), any()) } answers { pixel(firstArg(), secondArg()) }
+-    }.also {
++    private fun bitmap(pixel: (Int, Int) -> Int): Bitmap = bitmapFixture(400, 400) { x, y -> pixel(x, y) }.also {
+         bitmaps += it
+         excludeRecords { it.width; it.height; it.getPixel(any(), any()) }
+     }
+diff --git a/app/src/test/java/eu/kanade/translation/recognizer/SpeechBubbleCornerBoundaryRegressionTest.kt b/app/src/test/java/eu/kanade/translation/recognizer/SpeechBubbleCornerBoundaryRegressionTest.kt
+index ef27a06..73e7cc0 100644
+--- a/app/src/test/java/eu/kanade/translation/recognizer/SpeechBubbleCornerBoundaryRegressionTest.kt
++++ b/app/src/test/java/eu/kanade/translation/recognizer/SpeechBubbleCornerBoundaryRegressionTest.kt
+@@ -83,18 +83,12 @@ class SpeechBubbleCornerBoundaryRegressionTest {
+         assertTrue(r.x + r.width + r.y + r.height <= 381f)
+     }
+ 
+-    private fun pageBitmap(cutCorner: Boolean, cornerCut: Int = 382): Bitmap = mockk<Bitmap> {
+-        every { width } returns 400
+-        every { height } returns 400
+-        every { getPixel(any(), any()) } answers {
+-            val x = firstArg<Int>()
+-            val y = secondArg<Int>()
++    private fun pageBitmap(cutCorner: Boolean, cornerCut: Int = 382): Bitmap = bitmapFixture(400, 400) { x, y ->
+             val first = x in 30..300 && y in 30..120 && (!cutCorner || x + y <= cornerCut)
+             val neighbor = cutCorner && x in 230..340 && y in 80..200 && x + y >= cornerCut + 4
+             val sourceInk = x in 110..210 && y in 68..81 && x % 9 < 4
+             if ((first || neighbor) && !sourceInk) 0xffffffff.toInt() else 0xff000000.toInt()
+-        }
+-    }.also { bitmap ->
++        }.also { bitmap ->
+         bitmaps += bitmap
+         excludeRecords { bitmap.getPixel(any(), any()); bitmap.width; bitmap.height }
+     }
+diff --git a/app/src/test/java/eu/kanade/translation/recognizer/SpeechBubbleOvalLayoutRegressionTest.kt b/app/src/test/java/eu/kanade/translation/recognizer/SpeechBubbleOvalLayoutRegressionTest.kt
+index d283602..e1ae9cd 100644
+--- a/app/src/test/java/eu/kanade/translation/recognizer/SpeechBubbleOvalLayoutRegressionTest.kt
++++ b/app/src/test/java/eu/kanade/translation/recognizer/SpeechBubbleOvalLayoutRegressionTest.kt
+@@ -31,17 +31,11 @@ class SpeechBubbleOvalLayoutRegressionTest {
+ 
+     @Test
+     fun `narrow oval balloon keeps detected layout inside curved shoulders`() {
+-        val bitmap: Bitmap = mockk {
+-            every { width } returns PAGE_SIZE
+-            every { height } returns PAGE_SIZE
+-            every { getPixel(any(), any()) } answers {
+-                val x = firstArg<Int>()
+-                val y = secondArg<Int>()
++        val bitmap: Bitmap = bitmapFixture(PAGE_SIZE, PAGE_SIZE) { x, y ->
+                 val dx = (x - CENTER_X) / RADIUS_X.toFloat()
+                 val dy = (y - CENTER_Y) / RADIUS_Y.toFloat()
+                 if (dx * dx + dy * dy <= 1f) 0xffffffff.toInt() else 0xff000000.toInt()
+             }
+-        }
+         val block = TranslationBlock(
+             text = "EXCUSE ME",
+             translation = "...COM LICENÇA",
+diff --git a/app/src/test/java/eu/kanade/translation/recognizer/SpeechBubbleParagraphGroupingTest.kt b/app/src/test/java/eu/kanade/translation/recognizer/SpeechBubbleParagraphGroupingTest.kt
+index 5cdbeb8..a852c16 100644
+--- a/app/src/test/java/eu/kanade/translation/recognizer/SpeechBubbleParagraphGroupingTest.kt
++++ b/app/src/test/java/eu/kanade/translation/recognizer/SpeechBubbleParagraphGroupingTest.kt
+@@ -52,19 +52,13 @@ class SpeechBubbleParagraphGroupingTest {
+         assertEquals("ESTA CERTO. E ASSIM QUE DEVE SER.", result.single().text)
+     }
+ 
+-    private fun largeWhiteBalloonBitmap(): Bitmap = mockk {
+-        every { width } returns PAGE_SIZE
+-        every { height } returns PAGE_SIZE
+-        every { getPixel(any(), any()) } answers {
+-            val x = firstArg<Int>()
+-            val y = secondArg<Int>()
++    private fun largeWhiteBalloonBitmap(): Bitmap = bitmapFixture(PAGE_SIZE, PAGE_SIZE) { x, y ->
+             if (x in BALLOON_START..BALLOON_END && y in BALLOON_START..BALLOON_END) {
+                 0xffffffff.toInt()
+             } else {
+                 0xff000000.toInt()
+             }
+         }
+-    }
+ 
+     private fun block(text: String, y: Float, height: Float) = TranslationBlock(
+         text = text,
+diff --git a/app/src/test/java/eu/kanade/translation/recognizer/SpeechBubblePrintedParagraphRegressionTest.kt b/app/src/test/java/eu/kanade/translation/recognizer/SpeechBubblePrintedParagraphRegressionTest.kt
+index d4abd6e..64fbe3d 100644
+--- a/app/src/test/java/eu/kanade/translation/recognizer/SpeechBubblePrintedParagraphRegressionTest.kt
++++ b/app/src/test/java/eu/kanade/translation/recognizer/SpeechBubblePrintedParagraphRegressionTest.kt
+@@ -207,17 +207,11 @@ class SpeechBubblePrintedParagraphRegressionTest {
+         val dx = (x - 200f) / 118f
+         val dy = (y - 180f) / 88f
+         dx * dx + dy * dy <= 1f
+-    }): Bitmap = mockk<Bitmap> {
+-        every { width } returns 400
+-        every { height } returns 400
+-        every { getPixel(any(), any()) } answers {
+-            val x = firstArg<Int>()
+-            val y = secondArg<Int>()
++    }): Bitmap = bitmapFixture(400, 400) { x, y ->
+             val letter = ink.any { x >= it.x && x <= it.x + it.width && y >= it.y && y <= it.y + it.height } &&
+                 x % 12 < 8 && y % 14 < 10
+             if (insideBalloon(x, y) && !letter) 0xffffffff.toInt() else 0xff000000.toInt()
+-        }
+-    }.also {
++        }.also {
+         bitmaps += it
+         excludeRecords { it.width; it.height; it.getPixel(any(), any()) }
+     }
+diff --git a/app/src/test/java/eu/kanade/translation/recognizer/SpeechBubbleSeparationRegressionTest.kt b/app/src/test/java/eu/kanade/translation/recognizer/SpeechBubbleSeparationRegressionTest.kt
+index c652d06..0b90577 100644
+--- a/app/src/test/java/eu/kanade/translation/recognizer/SpeechBubbleSeparationRegressionTest.kt
++++ b/app/src/test/java/eu/kanade/translation/recognizer/SpeechBubbleSeparationRegressionTest.kt
+@@ -34,17 +34,11 @@ class SpeechBubbleSeparationRegressionTest {
+ 
+     @Test
+     fun `nearby white balloons keep non overlapping layout regions`() {
+-        val bitmap: Bitmap = mockk {
+-            every { width } returns 240
+-            every { height } returns 240
+-            every { getPixel(any(), any()) } answers {
+-                val x = firstArg<Int>()
+-                val y = secondArg<Int>()
++        val bitmap: Bitmap = bitmapFixture(240, 240) { x, y ->
+                 val firstBalloon = x in 45..195 && y in 25..105
+                 val secondBalloon = x in 45..195 && y in 115..205
+                 if (firstBalloon || secondBalloon) 0xffffffff.toInt() else 0xff000000.toInt()
+             }
+-        }
+         val analyzer = SpeechBubbleAnalyzer(bitmap, 240, 240)
+         val first = block(y = 70f, text = "OBRIGADO POR ME TRAZER ATE AQUI.")
+         val second = block(y = 145f, text = "TA TUDO BEM! VOCE VEIO DE TAO LONGE!")
 diff --git a/app/src/test/java/eu/kanade/translation/translator/GeminiComicProtocolTest.kt b/app/src/test/java/eu/kanade/translation/translator/GeminiComicProtocolTest.kt
 new file mode 100644
 index 0000000..3dd195c
@@ -13286,7 +14888,7 @@ index d7001d9..0dad0f5 100644
 +    val sha256: String? = null,
  )
 diff --git a/domain/src/main/java/tachiyomi/domain/translation/TranslationPreferences.kt b/domain/src/main/java/tachiyomi/domain/translation/TranslationPreferences.kt
-index ee30e4b..ebf582e 100644
+index ee30e4b..2c4dbb9 100644
 --- a/domain/src/main/java/tachiyomi/domain/translation/TranslationPreferences.kt
 +++ b/domain/src/main/java/tachiyomi/domain/translation/TranslationPreferences.kt
 @@ -7,7 +7,7 @@ enum class TranslationLlmProvider(
@@ -13308,7 +14910,7 @@ index ee30e4b..ebf582e 100644
  
      fun autoTranslateAfterDownload() = preferenceStore.getBoolean("auto_translate_after_download", false)
      fun autoTranslateNovels() = preferenceStore.getBoolean("auto_translate_novels", true)
-@@ -37,16 +40,19 @@ class TranslationPreferences(
+@@ -37,16 +40,34 @@ class TranslationPreferences(
      fun translateSoundEffects() = preferenceStore.getBoolean("translate_sound_effects", false)
      fun translateFromLanguage() = preferenceStore.getString("translate_language_from", "ENGLISH")
      fun translateToLanguage() = preferenceStore.getString("translate_language_to", "PORTUGUESE")
@@ -13321,6 +14923,21 @@ index ee30e4b..ebf582e 100644
 +
      fun dbnetExperimental() = preferenceStore.getBoolean("dbnet_experimental", false)
  
++    /** Recover the old "everything enabled" state without changing the selected OCR engine. */
++    fun reconcileOcrExperiments() {
++        if (longPageStrips().get() && dbnetExperimental().get()) dbnetExperimental().set(false)
++    }
++
++    fun enableLongPageStrips(enabled: Boolean): Boolean {
++        if (enabled) dbnetExperimental().set(false)
++        return true
++    }
++
++    fun enableDbnetExperimental(enabled: Boolean): Boolean {
++        if (enabled) longPageStrips().set(false)
++        return true
++    }
++
      fun inpainterAot() = preferenceStore.getBoolean("inpainter_aot", false)
  
      fun ocrEngine() = preferenceStore.getInt("ocr_engine", 0)
@@ -13630,6 +15247,97 @@ index 0000000..378a85b
 +        assertEquals(emptyList<Chapter>(), interactor(listOf(chapter(1, 1, true))).await(10, 999, true))
 +    }
 +}
+diff --git a/domain/src/test/java/tachiyomi/domain/translation/OcrExperimentPreferencesTest.kt b/domain/src/test/java/tachiyomi/domain/translation/OcrExperimentPreferencesTest.kt
+new file mode 100644
+index 0000000..dafa6f5
+--- /dev/null
++++ b/domain/src/test/java/tachiyomi/domain/translation/OcrExperimentPreferencesTest.kt
+@@ -0,0 +1,85 @@
++package tachiyomi.domain.translation
++
++import io.mockk.every
++import io.mockk.mockk
++import org.junit.jupiter.api.Assertions.assertEquals
++import org.junit.jupiter.api.Assertions.assertFalse
++import org.junit.jupiter.api.Assertions.assertTrue
++import org.junit.jupiter.api.Test
++import tachiyomi.core.common.preference.InMemoryPreferenceStore
++import tachiyomi.core.common.preference.Preference
++import tachiyomi.core.common.preference.PreferenceStore
++
++class OcrExperimentPreferencesTest {
++    private fun preferences(): TranslationPreferences {
++        // The preview InMemoryPreferenceStore returns independent local copies;
++        // use key-stable handles to model Android persisted preference behavior.
++        val values = mutableMapOf<String, Preference<*>>()
++        val store = mockk<PreferenceStore>()
++        every { store.getBoolean(any(), any()) } answers {
++            @Suppress("UNCHECKED_CAST")
++            (
++                values.getOrPut(firstArg()) {
++                    InMemoryPreferenceStore.InMemoryPreference(firstArg(), null, secondArg<Boolean>())
++                } as Preference<Boolean>
++                )
++        }
++        every { store.getInt(any(), any()) } answers {
++            @Suppress("UNCHECKED_CAST")
++            (
++                values.getOrPut(firstArg()) {
++                    InMemoryPreferenceStore.InMemoryPreference(firstArg(), null, secondArg<Int>())
++                } as Preference<Int>
++                )
++        }
++        every { store.getString(any(), any()) } answers {
++            @Suppress("UNCHECKED_CAST")
++            (
++                values.getOrPut(firstArg()) {
++                    InMemoryPreferenceStore.InMemoryPreference(firstArg(), null, secondArg<String>())
++                } as Preference<String>
++                )
++        }
++        return TranslationPreferences(store)
++    }
++
++    @Test fun `legacy everything enabled preserves the chosen OCR and long page opt in`() {
++        val prefs = preferences()
++        prefs.ocrEngine().set(1)
++        prefs.longPageStrips().set(true)
++        prefs.dbnetExperimental().set(true)
++        prefs.reconcileOcrExperiments()
++        assertTrue(prefs.longPageStrips().get())
++        assertFalse(prefs.dbnetExperimental().get())
++        assertEquals(1, prefs.ocrEngine().get())
++    }
++
++    @Test fun `choosing DBNet and strips are mutually exclusive through their preference callbacks`() {
++        val prefs = preferences()
++        prefs.longPageStrips().set(true)
++        assertTrue(prefs.enableDbnetExperimental(true))
++        prefs.dbnetExperimental().set(true)
++        assertFalse(prefs.longPageStrips().get())
++        assertTrue(prefs.dbnetExperimental().get())
++        assertTrue(prefs.enableLongPageStrips(true))
++        prefs.longPageStrips().set(true)
++        assertFalse(prefs.dbnetExperimental().get())
++        assertTrue(prefs.longPageStrips().get())
++    }
++
++    @Test fun `turning off an experiment does not enable another one`() {
++        val prefs = preferences()
++        prefs.enableDbnetExperimental(false)
++        prefs.enableLongPageStrips(false)
++        assertFalse(prefs.longPageStrips().get())
++        assertFalse(prefs.dbnetExperimental().get())
++    }
++
++    @Test fun `DBNet alone remains a deliberate opt in`() {
++        val prefs = preferences()
++        prefs.dbnetExperimental().set(true)
++        prefs.reconcileOcrExperiments()
++        assertTrue(prefs.dbnetExperimental().get())
++        assertFalse(prefs.longPageStrips().get())
++    }
++}
 diff --git a/gradle/libs.versions.toml b/gradle/libs.versions.toml
 index 9839272..197aec7 100644
 --- a/gradle/libs.versions.toml
@@ -13651,10 +15359,10 @@ index 9839272..197aec7 100644
  mlkit-text-recognition-chinese = { module = "com.google.mlkit:text-recognition-chinese", version.ref = "mlkit-text-recognition" }
  mlkit-text-recognition-japanese = { module = "com.google.mlkit:text-recognition-japanese", version.ref = "mlkit-text-recognition" }
 diff --git a/i18n-at/src/commonMain/moko-resources/base/strings.xml b/i18n-at/src/commonMain/moko-resources/base/strings.xml
-index 7ed4795..ac8901d 100644
+index 7ed4795..dd7633e 100644
 --- a/i18n-at/src/commonMain/moko-resources/base/strings.xml
 +++ b/i18n-at/src/commonMain/moko-resources/base/strings.xml
-@@ -73,12 +73,126 @@
+@@ -73,12 +73,132 @@
      <string name="repository_add_error">Could not add this repository. Check your connection and try again.</string>
      <string name="repository_refresh_error">Repository added, but extension listings could not be refreshed. Refresh the Extensions screen.</string>
      <string name="chapter_group_version">Group/version: %1$s</string>
@@ -13774,7 +15482,7 @@ index 7ed4795..ac8901d 100644
 +    <string name="gemini_online_title">Gemini: optional online translation</string>
 +    <string name="gemini_online_summary">Sends recognized text to Google; images are not sent by this translator. Requires internet, your API key and an available model; usage may incur charges. It does not install a large model on your phone or recover text missed by OCR. Suggested model: gemini-3.5-flash-lite. Saved chapter translations remain available offline.</string>
 +    <string name="pref_mlkit_long_page_strips">Long-page OCR strips (experimental)</string>
-+    <string name="pref_mlkit_long_page_strips_summary">For very tall English pages with ML Kit or PaddleOCR. Reads overlapping regions one at a time to preserve text size. May take longer; retranslate the chapter to apply. Off by default and unavailable with experimental text detection enabled.</string>
++    <string name="pref_mlkit_long_page_strips_summary">Reads overlapping regions in long English pages with the selected OCR. Enabling this turns off experimental DBNet. Retranslate the chapter to refresh saved OCR.</string>
 +    <string name="polaris_dedication_title">With gratitude</string>
 +    <string name="polaris_dedication_body">To God, for life, wisdom and strength at every step.\n\nTo my wife, for her love, patience and support.\n\nTo my sister, for her companionship, encouragement and care.\n\nPolaris carries a little of this gratitude on every page.</string>
 +    <string name="polaris_dedication_close">Close</string>
@@ -13782,12 +15490,18 @@ index 7ed4795..ac8901d 100644
 +    <string name="polaris_work_source_description">Automatic selection compares enabled extensions in the same language and keeps one reading sequence. Choosing a source applies only to this work.</string>
 +    <string name="polaris_work_source_automatic">Automatic</string>
 +    <string name="polaris_work_source_search">Search sources</string>
++    <string name="pref_ocr_engine_saved_hint">Used for new translations. To compare engines, delete only the saved chapter translation and translate again.</string>
++    <string name="polaris_update_waiting">Waiting to resume…</string>
++    <string name="polaris_update_download_hint">You can leave this screen while downloading. If the connection drops, Polaris retries automatically and keeps the received portion when the server supports resuming. Once ready, tap Install here or in the notification.</string>
++    <string name="polaris_update_download_failed">The download could not finish. Check your connection and available storage, then tap Retry. The received portion is kept when possible.</string>
++    <string name="polaris_update_ready">Polaris update ready</string>
++    <string name="polaris_update_install_hint">Tap to open the Android installer.</string>
  </resources>
 diff --git a/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml b/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
-index d1748bc..c54b903 100644
+index d1748bc..4710e2f 100644
 --- a/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
 +++ b/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
-@@ -73,12 +73,126 @@
+@@ -73,12 +73,132 @@
      <string name="repository_add_error">Não foi possível adicionar o repositório. Confira a conexão e tente novamente.</string>
      <string name="repository_refresh_error">Repositório adicionado, mas não foi possível atualizar as extensões. Atualize a tela Extensões.</string>
      <string name="chapter_group_version">Grupo/versão: %1$s</string>
@@ -13907,7 +15621,7 @@ index d1748bc..c54b903 100644
 +    <string name="gemini_online_title">Gemini: tradução online opcional</string>
 +    <string name="gemini_online_summary">Envia o texto reconhecido ao Google; este tradutor não envia imagens. Exige internet, sua chave de API e um modelo disponível; pode gerar cobrança por uso. Não instala um modelo grande no celular nem recupera texto que o OCR não reconheceu. Modelo sugerido: gemini-3.5-flash-lite. Traduções já salvas dos capítulos continuam disponíveis offline.</string>
 +    <string name="pref_mlkit_long_page_strips">OCR por faixas em páginas longas (experimental)</string>
-+    <string name="pref_mlkit_long_page_strips_summary">Para páginas muito altas em inglês, com ML Kit ou PaddleOCR. Lê faixas sobrepostas uma por vez para preservar o tamanho do texto. Pode levar mais tempo; retraduza o capítulo para aplicar. Começa desligado e não atua com a detecção experimental de texto habilitada.</string>
++    <string name="pref_mlkit_long_page_strips_summary">Lê regiões sobrepostas em páginas longas em inglês com o OCR selecionado. Ativar desliga o DBNet experimental. Traduza o capítulo novamente para refazer o OCR salvo.</string>
 +    <string name="polaris_dedication_title">Com gratidão</string>
 +    <string name="polaris_dedication_body">A Deus, pela vida, pela sabedoria e pela força em cada etapa.\n\nÀ minha esposa, pelo amor, pela paciência e pelo apoio.\n\nÀ minha irmã, pela parceria, pelo incentivo e pelo carinho.\n\nO Polaris leva um pouco dessa gratidão em cada página.</string>
 +    <string name="polaris_dedication_close">Fechar</string>
@@ -13915,6 +15629,12 @@ index d1748bc..c54b903 100644
 +    <string name="polaris_work_source_description">A seleção automática compara extensões habilitadas no mesmo idioma e mantém uma sequência de leitura. A escolha de uma fonte vale apenas para esta obra.</string>
 +    <string name="polaris_work_source_automatic">Automático</string>
 +    <string name="polaris_work_source_search">Buscar fontes</string>
++    <string name="pref_ocr_engine_saved_hint">Usado nas novas traduções. Para comparar motores, exclua apenas a tradução salva do capítulo e traduza novamente.</string>
++    <string name="polaris_update_waiting">Aguardando para retomar…</string>
++    <string name="polaris_update_download_hint">Você pode sair desta tela durante o download. Se a conexão cair, o Polaris tenta novamente e preserva a parte recebida quando o servidor permite retomar. Ao terminar, toque em Instalar aqui ou na notificação.</string>
++    <string name="polaris_update_download_failed">O download não terminou. Confira a conexão e o espaço disponível e toque em Tentar novamente. A parte recebida é preservada quando possível.</string>
++    <string name="polaris_update_ready">Atualização do Polaris pronta</string>
++    <string name="polaris_update_install_hint">Toque para abrir o instalador do Android.</string>
  </resources>
 diff --git a/i18n/src/commonMain/moko-resources/base/strings.xml b/i18n/src/commonMain/moko-resources/base/strings.xml
 index c0832ba..ebf8f48 100644
