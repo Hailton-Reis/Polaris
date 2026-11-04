@@ -1,17 +1,17 @@
 {
   "date_utc": "2026-11-04",
   "timezone": "UTC",
-  "candidate_revision": "Polaris P20261104.2",
+  "candidate_revision": "Polaris P20261104.3",
   "version_name": "0.1.0-beta.9",
   "version_code": 110,
   "publication": "UNPUBLISHED_INTERNAL_CANDIDATE",
   "current_public_release": "v0.1.0-beta.8",
   "pinned_yomotsu": "0fb80c439ef816eeb50674f1b90af39918b176d8",
-  "patch_sha256": "34a520719e858e59b4b0e30cfdc508b10fd3a9fb190a5e27d840088426750ba1",
+  "patch_sha256": "ea14786b1446695258f9a226ea5776bf63e9797d0640ab7c87ebc21154079c0a",
   "assembly": "PASS: all configured debug APKs and instrumentation APK assembled. Native build exits1 solely for17 preexisting app unit failures.",
   "full_build_completion": {
     "status": "ASSEMBLY_AND_UNIT_REPORTS_COMPLETE",
-    "unit_tests": 635,
+    "unit_tests": 673,
     "unit_gradle_exit": 1,
     "packaging_only_exit": null,
     "note": "All configured debug APKs and test APK assembled in the full run; only failed task app:testDebugUnitTest with17 preexisting failures."
@@ -19,14 +19,14 @@
   "android_unit_comparison": {
     "status": "NO_NEW_UNIT_REGRESSIONS",
     "baseline": {
-      "total": 624,
-      "passed": 607,
+      "total": 635,
+      "passed": 618,
       "failed": 17,
       "skipped": 0
     },
     "patched": {
-      "total": 635,
-      "passed": 618,
+      "total": 673,
+      "passed": 656,
       "failed": 17,
       "skipped": 0
     },
@@ -39,7 +39,7 @@
       "patched": 1
     },
     "required_module_coverage": {
-      "app": 539,
+      "app": 550,
       "domain": 85
     }
   },
@@ -355,5 +355,14 @@
     "reader_behavior": "User-selected family; size and line breaks adapt to each region; no identification of original typeface.",
     "saved_translations": "Reopen reader; no OCR rerun required for display-only fixes.",
     "android_component_result": "PASS:16 selected actual cases across two invocations; command-package initialization error recorded separately."
+  },
+  "safe_storage": {
+    "report": "../safe-storage/20261104/README.md",
+    "storage_unit_tests": 32,
+    "backup_codec_tests": 6,
+    "counterfactual_old_implementation_failures": 3,
+    "host_guard_tests": 10,
+    "android_runtime": "NOT_VALIDATED_INSTALLATION_DID_NOT_COMPLETE",
+    "format_changed": false
   }
 }

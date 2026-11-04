@@ -38,6 +38,109 @@ index 63e2698..71f41e9 100644
  }
  
  androidComponents {
+diff --git a/app/src/androidTest/java/eu/kanade/tachiyomi/storage/SafeStorageAndroidTest.kt b/app/src/androidTest/java/eu/kanade/tachiyomi/storage/SafeStorageAndroidTest.kt
+new file mode 100644
+index 0000000..7db9177
+--- /dev/null
++++ b/app/src/androidTest/java/eu/kanade/tachiyomi/storage/SafeStorageAndroidTest.kt
+@@ -0,0 +1,97 @@
++package eu.kanade.tachiyomi.storage
++
++import androidx.test.ext.junit.runners.AndroidJUnit4
++import androidx.test.platform.app.InstrumentationRegistry
++import com.hippo.unifile.UniFile
++import eu.kanade.tachiyomi.data.backup.BackupDecoder
++import eu.kanade.tachiyomi.data.backup.create.BackupArchiveWriter
++import eu.kanade.tachiyomi.data.backup.create.BackupReadbackUnavailable
++import eu.kanade.tachiyomi.data.backup.models.Backup
++import eu.kanade.tachiyomi.data.backup.models.BackupManga
++import eu.kanade.tachiyomi.extension.util.PrivateExtensionFiles
++import kotlinx.coroutines.CancellationException
++import kotlinx.serialization.protobuf.ProtoBuf
++import org.junit.After
++import org.junit.Assert.assertArrayEquals
++import org.junit.Assert.assertEquals
++import org.junit.Assert.assertFalse
++import org.junit.Assert.assertThrows
++import org.junit.Assert.assertTrue
++import org.junit.Test
++import org.junit.runner.RunWith
++import java.io.File
++import java.io.IOException
++import java.nio.file.Files
++
++/** Local Android filesystem/codec controls; no real extension code, remote provider or full-app acceptance. */
++@RunWith(AndroidJUnit4::class)
++class SafeStorageAndroidTest {
++    private val context = InstrumentationRegistry.getInstrumentation().targetContext
++    private val folder = Files.createTempDirectory(context.cacheDir.toPath(), "polaris-storage-").toFile()
++
++    @After fun cleanup() {
++        folder.walkBottomUp().forEach {
++            it.setWritable(true)
++            it.delete()
++        }
++    }
++
++    @Test fun atomicReplacementKeepsTheWorkingFileUntilValidationAndPublishesReadOnlyBytes() {
++        val target = File(folder, "source.ext").apply { writeText("working") }
++        val source = File(folder, "download.apk").apply { writeText("replacement") }
++        PrivateExtensionFiles.replace(source, target) { staged ->
++            assertEquals("working", target.readText())
++            assertEquals("replacement", staged.readText())
++            assertFalse(staged.canWrite())
++        }
++        assertEquals("replacement", target.readText())
++        assertFalse(target.canWrite())
++        assertTrue(folder.listFiles()!!.none { it.name.endsWith(".pending") })
++    }
++
++    @Test fun rejectedOrCancelledCopiesPreserveTheExistingExtension() {
++        val target = File(folder, "source.ext").apply { writeText("working") }
++        val source = File(folder, "download.apk").apply { writeBytes(ByteArray(180_000)) }
++        assertThrows(IOException::class.java) {
++            PrivateExtensionFiles.replace(source, target) { throw IOException("Rejected staged package") }
++        }
++        assertEquals("working", target.readText())
++        var checks = 0
++        assertThrows(CancellationException::class.java) {
++            PrivateExtensionFiles.replace(source, target, { if (++checks == 3) throw CancellationException() }) {}
++        }
++        assertEquals("working", target.readText())
++        assertTrue(folder.listFiles()!!.none { it.name.endsWith(".pending") })
++    }
++
++    @Test fun verifiedBackupSurvivesUniFileRenameAndDecodesFromTheFinalUri() {
++        val encoded = ProtoBuf.encodeToByteArray(
++            Backup.serializer(),
++            Backup(listOf(BackupManga(1234567890123L, "/test", "Ação preservada"))),
++        )
++        val pending = File(folder, "backup.tachibk.pending").apply { createNewFile() }
++        val document = checkNotNull(UniFile.fromFile(pending))
++        BackupArchiveWriter.writeVerified(encoded, { document.openOutputStream() }, { document.openInputStream() })
++        assertTrue(document.renameTo("backup.tachibk"))
++        BackupArchiveWriter.verify(encoded, { context.contentResolver.openInputStream(document.uri) })
++        val decoded = BackupDecoder(context, ProtoBuf).decode(document.uri)
++        assertEquals(1234567890123L, decoded.backupManga.single().source)
++        assertEquals("Ação preservada", decoded.backupManga.single().title)
++        assertFalse(pending.exists())
++    }
++
++    @Test fun unreadableDestinationCannotBeReportedAsVerified() {
++        val old = File(folder, "old.tachibk").apply { writeText("previous") }
++        val fresh = File(folder, "new.tachibk")
++        assertThrows(BackupReadbackUnavailable::class.java) {
++            BackupArchiveWriter.writeVerified(
++                "encoded input".encodeToByteArray(),
++                {
++                    fresh.outputStream()
++                },
++                { throw SecurityException("Read denied") },
++            )
++        }
++        assertArrayEquals("previous".encodeToByteArray(), old.readBytes())
++    }
++}
 diff --git a/app/src/androidTest/java/eu/kanade/translation/presentation/PortugueseRealPageTypographyTest.kt b/app/src/androidTest/java/eu/kanade/translation/presentation/PortugueseRealPageTypographyTest.kt
 new file mode 100644
 index 0000000..e696dab
@@ -2721,7 +2824,7 @@ index a198c3f..9a3e84f 100644
                      preference = translationPreferences.translationEngineTemperature(),
                      title = stringResource(ATMR.strings.pref_engine_temperature),
 diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
-index 7f411fd..882be7e 100644
+index 7f411fd..76dfb49 100644
 --- a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
 +++ b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
 @@ -1,15 +1,18 @@
@@ -2782,7 +2885,7 @@ index 7f411fd..882be7e 100644
  
      // Identifies this overlay independently of the pinned upstream COMMIT_SHA.
 -    private const val POLARIS_READER_REVISION = "P20261031.2"
-+    private const val POLARIS_READER_REVISION = "P20261104.2"
++    private const val POLARIS_READER_REVISION = "P20261104.3"
  
      @Composable
      override fun Content() {
@@ -3069,6 +3172,425 @@ index 6707d1a..c89047c 100644
          // Show notification to disable Incognito Mode when it's enabled
          basePreferences.incognitoMode.changes()
              .onEach { enabled ->
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/data/backup/create/BackupArchiveWriter.kt b/app/src/main/java/eu/kanade/tachiyomi/data/backup/create/BackupArchiveWriter.kt
+new file mode 100644
+index 0000000..f03f32b
+--- /dev/null
++++ b/app/src/main/java/eu/kanade/tachiyomi/data/backup/create/BackupArchiveWriter.kt
+@@ -0,0 +1,80 @@
++package eu.kanade.tachiyomi.data.backup.create
++
++import kotlinx.coroutines.CancellationException
++import okio.buffer
++import okio.gzip
++import okio.source
++import java.io.IOException
++import java.io.InputStream
++import java.io.OutputStream
++import java.util.zip.GZIPOutputStream
++
++internal class BackupReadbackUnavailable(cause: Throwable? = null) : IOException("Cannot read back the backup", cause)
++internal class BackupReadbackMismatch(cause: Throwable? = null) : IOException("Backup verification failed", cause)
++
++/** Caller supplies valid encoded protobuf. Verify gzip CRC and exact decompressed bytes before success. */
++internal object BackupArchiveWriter {
++    fun writeVerified(
++        payload: ByteArray,
++        openOutput: () -> OutputStream,
++        openInput: () -> InputStream?,
++        checkCancelled: () -> Unit = {},
++    ) {
++        checkCancelled()
++        val raw = openOutput()
++        val compressed = try {
++            GZIPOutputStream(raw)
++        } catch (error: Throwable) {
++            runCatching { raw.close() }.exceptionOrNull()?.let(error::addSuppressed)
++            throw error
++        }
++        compressed.use { output ->
++            var offset = 0
++            while (offset < payload.size) {
++                checkCancelled()
++                val count = minOf(64 * 1024, payload.size - offset)
++                output.write(payload, offset, count)
++                offset += count
++            }
++        }
++        verify(payload, openInput, checkCancelled)
++    }
++
++    fun verify(payload: ByteArray, openInput: () -> InputStream?, checkCancelled: () -> Unit = {}) {
++        checkCancelled()
++        val input = try {
++            openInput() ?: throw BackupReadbackUnavailable()
++        } catch (error: CancellationException) {
++            throw error
++        } catch (error: BackupReadbackUnavailable) {
++            throw error
++        } catch (error: Exception) {
++            throw BackupReadbackUnavailable(error)
++        }
++        try {
++            // Use the same strict gzip reader as BackupDecoder, including trailing-byte rejection.
++            input.source().gzip().buffer().use { decoded ->
++                val buffer = ByteArray(64 * 1024)
++                var offset = 0
++                while (true) {
++                    checkCancelled()
++                    val count = decoded.read(buffer)
++                    if (count < 0) break
++                    if (offset + count > payload.size) throw BackupReadbackMismatch()
++                    for (index in 0 until count) {
++                        if (buffer[index] != payload[offset + index]) throw BackupReadbackMismatch()
++                    }
++                    offset += count
++                }
++                if (offset != payload.size) throw BackupReadbackMismatch()
++            }
++        } catch (error: CancellationException) {
++            throw error
++        } catch (error: BackupReadbackMismatch) {
++            throw error
++        } catch (error: Exception) {
++            throw BackupReadbackMismatch(error)
++        }
++        checkCancelled()
++    }
++}
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/data/backup/create/BackupCreateJob.kt b/app/src/main/java/eu/kanade/tachiyomi/data/backup/create/BackupCreateJob.kt
+index 2f7ed91..0c80060 100644
+--- a/app/src/main/java/eu/kanade/tachiyomi/data/backup/create/BackupCreateJob.kt
++++ b/app/src/main/java/eu/kanade/tachiyomi/data/backup/create/BackupCreateJob.kt
+@@ -23,6 +23,7 @@ import eu.kanade.tachiyomi.util.system.cancelNotification
+ import eu.kanade.tachiyomi.util.system.isRunning
+ import eu.kanade.tachiyomi.util.system.setForegroundSafely
+ import eu.kanade.tachiyomi.util.system.workManager
++import kotlinx.coroutines.CancellationException
+ import logcat.LogPriority
+ import tachiyomi.core.common.util.system.logcat
+ import tachiyomi.domain.backup.service.BackupPreferences
+@@ -58,6 +59,8 @@ class BackupCreateJob(private val context: Context, workerParams: WorkerParamete
+                 }
+             }
+             Result.success()
++        } catch (error: CancellationException) {
++            throw error
+         } catch (e: Exception) {
+             logcat(LogPriority.ERROR, e)
+             if (!isAutoBackup) notifier.showBackupError(e.message)
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/data/backup/create/BackupCreator.kt b/app/src/main/java/eu/kanade/tachiyomi/data/backup/create/BackupCreator.kt
+index 98036c0..5de6761 100644
+--- a/app/src/main/java/eu/kanade/tachiyomi/data/backup/create/BackupCreator.kt
++++ b/app/src/main/java/eu/kanade/tachiyomi/data/backup/create/BackupCreator.kt
+@@ -4,7 +4,7 @@ import android.content.Context
+ import android.net.Uri
+ import com.hippo.unifile.UniFile
+ import eu.kanade.tachiyomi.BuildConfig
+-import eu.kanade.tachiyomi.data.backup.BackupFileValidator
++import eu.kanade.tachiyomi.data.backup.BackupDecoder
+ import eu.kanade.tachiyomi.data.backup.create.creators.CategoriesBackupCreator
+ import eu.kanade.tachiyomi.data.backup.create.creators.ExtensionStoresBackupCreator
+ import eu.kanade.tachiyomi.data.backup.create.creators.MangaBackupCreator
+@@ -17,11 +17,15 @@ import eu.kanade.tachiyomi.data.backup.models.BackupManga
+ import eu.kanade.tachiyomi.data.backup.models.BackupPreference
+ import eu.kanade.tachiyomi.data.backup.models.BackupSource
+ import eu.kanade.tachiyomi.data.backup.models.BackupSourcePreferences
++import kotlinx.coroutines.CancellationException
++import kotlinx.coroutines.Dispatchers
++import kotlinx.coroutines.currentCoroutineContext
++import kotlinx.coroutines.ensureActive
++import kotlinx.coroutines.sync.Mutex
++import kotlinx.coroutines.sync.withLock
++import kotlinx.coroutines.withContext
+ import kotlinx.serialization.protobuf.ProtoBuf
+ import logcat.LogPriority
+-import okio.buffer
+-import okio.gzip
+-import okio.sink
+ import tachiyomi.core.common.i18n.stringResource
+ import tachiyomi.core.common.util.system.logcat
+ import tachiyomi.domain.backup.service.BackupPreferences
+@@ -29,12 +33,10 @@ import tachiyomi.domain.manga.interactor.GetFavorites
+ import tachiyomi.domain.manga.model.Manga
+ import tachiyomi.domain.manga.repository.MangaRepository
+ import tachiyomi.i18n.MR
++import tachiyomi.i18n.at.ATMR
+ import uy.kohesive.injekt.Injekt
+ import uy.kohesive.injekt.api.get
+-import java.io.FileOutputStream
+-import java.text.SimpleDateFormat
+-import java.util.Date
+-import java.util.Locale
++import java.io.IOException
+ import kotlin.time.Clock
+ 
+ class BackupCreator(
+@@ -51,40 +53,25 @@ class BackupCreator(
+     private val preferenceBackupCreator: PreferenceBackupCreator = PreferenceBackupCreator(),
+     private val extensionStoresBackupCreator: ExtensionStoresBackupCreator = ExtensionStoresBackupCreator(),
+     private val sourcesBackupCreator: SourcesBackupCreator = SourcesBackupCreator(),
++    private val resolveFile: (Uri) -> UniFile? = { UniFile.fromUri(context, it) },
+ ) {
+ 
+-    suspend fun backup(uri: Uri, options: BackupOptions): String {
++    suspend fun backup(uri: Uri, options: BackupOptions): String = withContext(Dispatchers.IO) {
++        backupMutex.withLock {
++            createVerifiedBackup(uri, options)
++        }
++    }
++
++    private suspend fun createVerifiedBackup(uri: Uri, options: BackupOptions): String {
+         var file: UniFile? = null
++        var cleanupOnFailure = false
++        var verified = false
+         try {
+-            file = if (isAutoBackup) {
+-                // Get dir of file and create
+-                val dir = UniFile.fromUri(context, uri)
+-
+-                // Delete older backups
+-                dir?.listFiles { _, filename -> FILENAME_REGEX.matches(filename) }
+-                    .orEmpty()
+-                    .sortedByDescending { it.name }
+-                    .drop(MAX_AUTO_BACKUPS - 1)
+-                    .forEach { it.delete() }
+-
+-                // Create new file to place backup
+-                dir?.createFile(getFilename())
+-            } else {
+-                val target = UniFile.fromUri(context, uri)
+-                if (target != null && target.isDirectory) {
+-                    target.createFile(getFilename())
+-                } else {
+-                    target
+-                }
+-            }
+-
+-            if (file == null || file.isDirectory) {
+-                throw IllegalStateException(context.stringResource(MR.strings.create_backup_file_error))
+-            }
+-
++            val coroutineContext = currentCoroutineContext()
++            val checkCancelled = { coroutineContext.ensureActive() }
++            checkCancelled()
+             val nonFavoriteManga = if (options.readEntries) mangaRepository.getReadMangaNotInLibrary() else emptyList()
+             val backupManga = backupMangas(getFavorites.await() + nonFavoriteManga, options)
+-
+             val backup = Backup(
+                 backupManga = backupManga,
+                 backupCategories = backupCategories(options),
+@@ -93,38 +80,134 @@ class BackupCreator(
+                 backupExtensionStores = backupExtensionStores(options),
+                 backupSourcePreferences = backupSourcePreferences(options),
+             )
+-
+             val byteArray = parser.encodeToByteArray(Backup.serializer(), backup)
+             if (byteArray.isEmpty()) {
+                 throw IllegalStateException(context.stringResource(MR.strings.empty_backup_error))
+             }
+-
+-            val outputStream = file.openOutputStream()
+-                ?: runCatching { context.contentResolver.openOutputStream(file.uri, "wt") }.getOrNull()
++            checkCancelled()
++            val target = resolveFile(uri)
+                 ?: throw IllegalStateException(context.stringResource(MR.strings.create_backup_file_error))
+-
+-            outputStream.sink().gzip().buffer().use {
+-                it.write(byteArray)
+-                it.flush()
++            val directory = target.takeIf { it.isDirectory }
++            if (isAutoBackup && directory == null) throw IOException("Automatic backup requires a directory")
++            val finalName = getFilename()
++            val pendingName = "$finalName.pending"
++            file = if (directory != null) directory.createFile(pendingName) else target
++            val destination = file
++                ?: throw IllegalStateException(context.stringResource(MR.strings.create_backup_file_error))
++            if (destination.isDirectory || destination.length() > 0) {
++                throw BackupTargetNotEmpty()
+             }
+-            val fileUri = file.uri
+-
+-            // Make sure it's a valid backup file (only if readable)
+-            runCatching {
+-                BackupFileValidator(context).validate(fileUri)
+-            }.onFailure { e ->
+-                logcat(LogPriority.WARN, e) { "Validação de backup ignorada: ${e.message}" }
++            if (directory != null) {
++                // Never treat a provider returning a different existing document as ours to overwrite/delete.
++                if (destination.name != pendingName) throw BackupTargetNotEmpty()
++            } else {
++                // An explicit file may already contain data even if the provider reports unknown length as0.
++                val input = try {
++                    destination.openInputStream() ?: context.contentResolver.openInputStream(destination.uri)
++                } catch (error: CancellationException) {
++                    throw error
++                } catch (error: Exception) {
++                    throw BackupReadbackUnavailable(error)
++                } ?: throw BackupReadbackUnavailable()
++                if (input.use { it.read() != -1 }) throw BackupTargetNotEmpty()
+             }
+-
++            cleanupOnFailure = true
++            BackupArchiveWriter.writeVerified(
++                payload = byteArray,
++                openOutput = {
++                    destination.openOutputStream()
++                        ?: context.contentResolver.openOutputStream(destination.uri, "wt")
++                        ?: throw IOException("Cannot open backup destination")
++                },
++                openInput = {
++                    destination.openInputStream() ?: context.contentResolver.openInputStream(destination.uri)
++                },
++                checkCancelled = checkCancelled,
++            )
++            if (directory != null) {
++                checkCancelled()
++                if (!destination.renameTo(finalName)) {
++                    throw IOException(context.stringResource(ATMR.strings.backup_finalize_failed))
++                }
++                // Providers may change document URIs on rename; verify the final document too.
++                BackupArchiveWriter.verify(
++                    byteArray,
++                    { destination.openInputStream() ?: context.contentResolver.openInputStream(destination.uri) },
++                    checkCancelled,
++                )
++            }
++            verified = true
+             if (isAutoBackup) {
+                 backupPreferences.lastAutoBackupTimestamp.set(Clock.System.now().toEpochMilliseconds())
++                pruneVerifiedBackups(requireNotNull(directory), destination)
++            }
++            return destination.uri.toString()
++        } catch (error: CancellationException) {
++            if (cleanupOnFailure && !verified) cleanupFailedBackup(file)
++            throw error
++        } catch (error: Exception) {
++            if (cleanupOnFailure && !verified) cleanupFailedBackup(file)
++            logcat(LogPriority.ERROR, error)
++            throw when (error) {
++                is BackupReadbackUnavailable -> IOException(
++                    context.stringResource(ATMR.strings.backup_verify_unavailable),
++                    error,
++                )
++                is BackupReadbackMismatch -> IOException(
++                    context.stringResource(ATMR.strings.backup_verify_failed),
++                    error,
++                )
++                is BackupTargetNotEmpty -> IOException(
++                    context.stringResource(ATMR.strings.backup_target_not_empty),
++                    error,
++                )
++                else -> error
+             }
++        }
++    }
+ 
+-            return fileUri.toString()
+-        } catch (e: Exception) {
+-            logcat(LogPriority.ERROR, e)
+-            file?.delete()
+-            throw e
++    private fun cleanupFailedBackup(file: UniFile?) {
++        runCatching { file?.delete() }.onFailure { error ->
++            logcat(LogPriority.WARN, error) { "Could not remove incomplete backup" }
++        }
++    }
++
++    private suspend fun pruneVerifiedBackups(directory: UniFile, current: UniFile) {
++        try {
++            val currentId = current.uri.toString()
++            val files = directory.listFiles().orEmpty()
++                .filter { BackupRetention.isManaged(BuildConfig.APPLICATION_ID, it.name.orEmpty()) }
++                .associateBy { it.uri.toString() }
++            val entries = files.map { (id, candidate) ->
++                currentCoroutineContext().ensureActive()
++                val readable = if (id == currentId) {
++                    true
++                } else {
++                    try {
++                        val decoded = BackupDecoder(context, parser).decode(candidate.uri)
++                        // Unknown-only protobufs can decode as empty; they must not displace useful copies.
++                        decoded.backupManga.isNotEmpty() || decoded.backupCategories.isNotEmpty() ||
++                            decoded.backupSources.isNotEmpty() || decoded.backupPreferences.isNotEmpty() ||
++                            decoded.backupSourcePreferences.isNotEmpty() || decoded.backupExtensionStores.isNotEmpty()
++                    } catch (error: CancellationException) {
++                        throw error
++                    } catch (error: Exception) {
++                        logcat(LogPriority.WARN, error) { "Unverified old backup preserved" }
++                        false
++                    }
++                }
++                BackupRetention.Entry(id, candidate.name.orEmpty(), readable)
++            }
++            BackupRetention.deletions(BuildConfig.APPLICATION_ID, currentId, entries, MAX_AUTO_BACKUPS)
++                .forEach { id ->
++                    currentCoroutineContext().ensureActive()
++                    if (files[id]?.delete() != true) logcat(LogPriority.WARN) { "Could not remove an old backup" }
++                }
++        } catch (error: CancellationException) {
++            throw error
++        } catch (error: Exception) {
++            // A retention failure must not destroy the verified new copy or turn it into a failed write.
++            logcat(LogPriority.WARN, error) { "Backup verified; old copies retained after cleanup failure" }
+         }
+     }
+ 
+@@ -162,13 +245,12 @@ class BackupCreator(
+         return preferenceBackupCreator.createSource(includePrivatePreferences = options.privateSettings)
+     }
+ 
++    private class BackupTargetNotEmpty : IOException("Backup destination contains existing data")
++
+     companion object {
++        private val backupMutex = Mutex()
+         private const val MAX_AUTO_BACKUPS: Int = 4
+-        private val FILENAME_REGEX = """${BuildConfig.APPLICATION_ID}_\d{4}-\d{2}-\d{2}_\d{2}-\d{2}.tachibk""".toRegex()
+ 
+-        fun getFilename(): String {
+-            val date = SimpleDateFormat("yyyy-MM-dd_HH-mm", Locale.ENGLISH).format(Date())
+-            return "${BuildConfig.APPLICATION_ID}_$date.tachibk"
+-        }
++        fun getFilename(): String = BackupRetention.filename(BuildConfig.APPLICATION_ID)
+     }
+ }
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/data/backup/create/BackupRetention.kt b/app/src/main/java/eu/kanade/tachiyomi/data/backup/create/BackupRetention.kt
+new file mode 100644
+index 0000000..f1ee4f9
+--- /dev/null
++++ b/app/src/main/java/eu/kanade/tachiyomi/data/backup/create/BackupRetention.kt
+@@ -0,0 +1,31 @@
++package eu.kanade.tachiyomi.data.backup.create
++
++import java.text.SimpleDateFormat
++import java.util.Date
++import java.util.Locale
++import java.util.UUID
++
++internal object BackupRetention {
++    data class Entry(val id: String, val name: String, val verified: Boolean)
++
++    fun filename(applicationId: String, now: Date = Date()): String {
++        val date = SimpleDateFormat("yyyy-MM-dd_HH-mm-ss-SSS", Locale.ENGLISH).format(now)
++        return "${applicationId}_${date}_${UUID.randomUUID().toString().replace("-", "")}.tachibk"
++    }
++
++    fun isManaged(applicationId: String, name: String): Boolean = Regex(
++        "${Regex.escape(applicationId)}_\\d{4}-\\d{2}-\\d{2}_\\d{2}-\\d{2}" +
++            "(?:-\\d{2}-\\d{3}_[a-f0-9]{32})?\\.tachibk",
++    ).matches(name)
++
++    /** Incomplete/unreadable copies never displace a known valid copy in the retention count. */
++    fun deletions(applicationId: String, currentId: String, entries: List<Entry>, maximum: Int = 4): List<String> {
++        require(maximum > 0)
++        require(entries.any { it.id == currentId && it.verified && isManaged(applicationId, it.name) })
++        return entries.distinctBy { it.id }
++            .filter { it.id != currentId && it.verified && isManaged(applicationId, it.name) }
++            .sortedByDescending { it.name }
++            .drop(maximum - 1)
++            .map { it.id }
++    }
++}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/data/download/DownloadManager.kt b/app/src/main/java/eu/kanade/tachiyomi/data/download/DownloadManager.kt
 index c45a189..0cd0785 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/data/download/DownloadManager.kt
@@ -3934,6 +4456,402 @@ index 0000000..1134341
 +        val last = lastCheck(experimental).get()
 +        return last == 0L || now < last || now - last >= 24 * 60 * 60 * 1000L
 +    }
++}
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/extension/util/ExtensionInstaller.kt b/app/src/main/java/eu/kanade/tachiyomi/extension/util/ExtensionInstaller.kt
+index 4d9493f..1e98ed6 100644
+--- a/app/src/main/java/eu/kanade/tachiyomi/extension/util/ExtensionInstaller.kt
++++ b/app/src/main/java/eu/kanade/tachiyomi/extension/util/ExtensionInstaller.kt
+@@ -9,23 +9,33 @@ import eu.kanade.tachiyomi.extension.installer.Installer
+ import eu.kanade.tachiyomi.extension.model.Extension
+ import eu.kanade.tachiyomi.extension.model.InstallStep
+ import eu.kanade.tachiyomi.network.NetworkHelper
++import eu.kanade.tachiyomi.network.awaitSuccess
+ import eu.kanade.tachiyomi.util.storage.getUriCompat
+ import eu.kanade.tachiyomi.util.system.isPackageInstalled
++import kotlinx.coroutines.CancellationException
+ import kotlinx.coroutines.CoroutineScope
++import kotlinx.coroutines.CoroutineStart
+ import kotlinx.coroutines.Dispatchers
+ import kotlinx.coroutines.Job
++import kotlinx.coroutines.currentCoroutineContext
++import kotlinx.coroutines.ensureActive
+ import kotlinx.coroutines.flow.Flow
+ import kotlinx.coroutines.flow.MutableStateFlow
+ import kotlinx.coroutines.flow.asStateFlow
+ import kotlinx.coroutines.flow.onCompletion
++import kotlinx.coroutines.flow.transformWhile
++import kotlinx.coroutines.job
+ import kotlinx.coroutines.launch
+ import logcat.LogPriority
+ import okhttp3.OkHttpClient
+ import okhttp3.Request
++import tachiyomi.core.common.preference.Preference
+ import tachiyomi.core.common.util.system.logcat
+ import uy.kohesive.injekt.Injekt
+ import uy.kohesive.injekt.api.get
+ import java.io.File
++import java.util.concurrent.ConcurrentHashMap
++import java.util.concurrent.atomic.AtomicLong
+ 
+ /**
+  * The installer which installs, updates and uninstalls the extensions.
+@@ -34,14 +44,15 @@ import java.io.File
+  */
+ internal class ExtensionInstaller(
+     private val context: Context,
++    private val extensionInstaller: Preference<BasePreferences.ExtensionInstaller> =
++        Injekt.get<BasePreferences>().extensionInstaller,
++    private val httpClient: OkHttpClient = Injekt.get<NetworkHelper>().client,
+ ) {
+ 
+     private val scope = CoroutineScope(Dispatchers.IO)
+-    private val activeJobs = mutableMapOf<String, Job>()
+-    private val activeSteps = mutableMapOf<Long, MutableStateFlow<InstallStep>>()
+-    private val extensionInstaller = Injekt.get<BasePreferences>().extensionInstaller
+-
+-    private val httpClient: OkHttpClient = Injekt.get<NetworkHelper>().client
++    private val activeJobs = ConcurrentHashMap<String, Job>()
++    private val activeSteps = ConcurrentHashMap<Long, MutableStateFlow<InstallStep>>()
++    private val activeIds = ConcurrentHashMap<String, Long>()
+ 
+     /**
+      * Adds the given extension to the downloads queue and returns an observable containing its
+@@ -51,51 +62,77 @@ internal class ExtensionInstaller(
+      * @param extension The extension to install.
+      * @param isUpdateForPrivatelyInstalled If this is an update for a privately installed extension
+      */
++    @Synchronized
+     fun downloadAndInstall(
+         url: String,
+         extension: Extension,
+         isUpdateForPrivatelyInstalled: Boolean = false,
+     ): Flow<InstallStep> {
+-        val downloadId = extension.pkgName.hashCode().toLong()
+         cancelInstall(extension.pkgName)
++        val downloadId = nextDownloadId.incrementAndGet()
++        activeIds[extension.pkgName] = downloadId
+ 
+         val step = MutableStateFlow(InstallStep.Pending)
+         activeSteps[downloadId] = step
+ 
+-        val job = scope.launch {
+-            val tmpFile = File(context.cacheDir, "extension_${extension.pkgName}.apk")
++        val job = scope.launch(start = CoroutineStart.LAZY) {
++            var tmpFile: File? = null
++            var handedToInstaller = false
+             try {
++                val download = File.createTempFile("extension_${extension.pkgName}_", ".apk", context.cacheDir)
++                tmpFile = download
+                 step.value = InstallStep.Downloading
+                 val request = Request.Builder().url(url).build()
+-                val response = httpClient.newCall(request).execute()
+-
+-                if (!response.isSuccessful) {
+-                    throw Exception("Failed to download extension")
+-                }
+-                response.body.byteStream().use { input ->
+-                    tmpFile.outputStream().use { output ->
+-                        input.copyTo(output)
++                val call = httpClient.newCall(request)
++                val cancellation = currentCoroutineContext().job.invokeOnCompletion(
++                    onCancelling = true,
++                    invokeImmediately = true,
++                ) { cause -> if (cause != null) call.cancel() }
++                try {
++                    call.awaitSuccess().use { response ->
++                        response.body.byteStream().use { input ->
++                            download.outputStream().use { output ->
++                                val buffer = ByteArray(64 * 1024)
++                                while (true) {
++                                    currentCoroutineContext().ensureActive()
++                                    val count = input.read(buffer)
++                                    if (count < 0) break
++                                    output.write(buffer, 0, count)
++                                }
++                            }
++                        }
+                     }
++                } finally {
++                    cancellation.dispose()
+                 }
+-
++                currentCoroutineContext().ensureActive()
+                 step.value = InstallStep.Installing
+-                installApk(downloadId, tmpFile, isUpdateForPrivatelyInstalled)
+-            } catch (e: Exception) {
+-                if (e is InterruptedException) {
+-                    // Canceled
+-                } else {
+-                    logcat(LogPriority.ERROR, e)
+-                    step.value = InstallStep.Error
+-                }
++                installApk(downloadId, download, isUpdateForPrivatelyInstalled)
++                handedToInstaller = true
++            } catch (error: CancellationException) {
++                throw error
++            } catch (error: Exception) {
++                currentCoroutineContext().ensureActive()
++                logcat(LogPriority.ERROR, error)
++                step.value = InstallStep.Error
++            } finally {
++                // System installer handoff still needs its URI. Private installs consume/delete the download.
++                if (!handedToInstaller) tmpFile?.delete()
+             }
+         }
+ 
+         activeJobs[extension.pkgName] = job
++        job.start()
+ 
+         return step.asStateFlow()
++            .transformWhile { value ->
++                emit(value)
++                !value.isCompleted()
++            }
+             .onCompletion {
+-                activeJobs.remove(extension.pkgName)
+-                activeSteps.remove(downloadId)
++                activeJobs.remove(extension.pkgName, job)
++                activeIds.remove(extension.pkgName, downloadId)
++                activeSteps.remove(downloadId, step)
+                 job.cancel()
+             }
+     }
+@@ -106,7 +143,7 @@ internal class ExtensionInstaller(
+      * @param tempFile The file of the extension to install. Delete after use.
+      * @param isUpdateForPrivatelyInstalled If this install is an update for a privately installed extension
+      */
+-    private fun installApk(downloadId: Long, tempFile: File, isUpdateForPrivatelyInstalled: Boolean = false) {
++    private suspend fun installApk(downloadId: Long, tempFile: File, isUpdateForPrivatelyInstalled: Boolean = false) {
+         if (isUpdateForPrivatelyInstalled) {
+             installApkPrivately(downloadId, tempFile)
+             return
+@@ -138,13 +175,16 @@ internal class ExtensionInstaller(
+         }
+     }
+ 
+-    private fun installApkPrivately(downloadId: Long, tempFile: File) {
++    private suspend fun installApkPrivately(downloadId: Long, tempFile: File) {
+         try {
+-            if (ExtensionLoader.installPrivateExtensionFile(context, tempFile)) {
++            val coroutineContext = currentCoroutineContext()
++            if (ExtensionLoader.installPrivateExtensionFile(context, tempFile) { coroutineContext.ensureActive() }) {
+                 updateInstallStep(downloadId, InstallStep.Installed)
+             } else {
+                 updateInstallStep(downloadId, InstallStep.Error)
+             }
++        } catch (error: CancellationException) {
++            throw error
+         } catch (e: Exception) {
+             logcat(LogPriority.ERROR, e) { "Failed to read downloaded extension file." }
+             updateInstallStep(downloadId, InstallStep.Error)
+@@ -156,9 +196,16 @@ internal class ExtensionInstaller(
+     /**
+      * Cancels extension install and remove from download manager and installer.
+      */
++    @Synchronized
+     fun cancelInstall(pkgName: String) {
++        val id = activeIds.remove(pkgName)
+         activeJobs.remove(pkgName)?.cancel()
+-        Installer.cancelInstallQueue(context, pkgName.hashCode().toLong())
++        if (id != null) {
++            activeSteps[id]?.let { step ->
++                if (!step.value.isCompleted()) step.value = InstallStep.Idle
++            }
++            Installer.cancelInstallQueue(context, id)
++        }
+     }
+ 
+     /**
+@@ -167,14 +214,14 @@ internal class ExtensionInstaller(
+      * @param pkgName The package name of the extension to uninstall
+      */
+     fun uninstallApk(pkgName: String) {
++        cancelInstall(pkgName)
+         if (context.isPackageInstalled(pkgName)) {
+             @Suppress("DEPRECATION")
+             val intent = Intent(Intent.ACTION_UNINSTALL_PACKAGE, "package:$pkgName".toUri())
+                 .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+             context.startActivity(intent)
+         } else {
+-            ExtensionLoader.uninstallPrivateExtension(context, pkgName)
+-            ExtensionInstallReceiver.notifyRemoved(context, pkgName)
++            scope.launch { ExtensionLoader.uninstallPrivateExtension(context, pkgName) }
+         }
+     }
+ 
+@@ -189,6 +236,7 @@ internal class ExtensionInstaller(
+     }
+ 
+     companion object {
++        private val nextDownloadId = AtomicLong(System.currentTimeMillis())
+         const val APK_MIME = "application/vnd.android.package-archive"
+         const val EXTRA_DOWNLOAD_ID = "ExtensionInstaller.extra.DOWNLOAD_ID"
+     }
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/extension/util/ExtensionLoader.kt b/app/src/main/java/eu/kanade/tachiyomi/extension/util/ExtensionLoader.kt
+index 962fafa..7a715f9 100644
+--- a/app/src/main/java/eu/kanade/tachiyomi/extension/util/ExtensionLoader.kt
++++ b/app/src/main/java/eu/kanade/tachiyomi/extension/util/ExtensionLoader.kt
+@@ -13,8 +13,8 @@ import eu.kanade.tachiyomi.extension.model.LoadResult
+ import eu.kanade.tachiyomi.source.Source
+ import eu.kanade.tachiyomi.source.SourceFactory
+ import eu.kanade.tachiyomi.util.lang.Hash
+-import eu.kanade.tachiyomi.util.storage.copyAndSetReadOnlyTo
+ import eu.kanade.tachiyomi.util.system.ChildFirstPathClassLoader
++import kotlinx.coroutines.CancellationException
+ import kotlinx.coroutines.async
+ import kotlinx.coroutines.awaitAll
+ import kotlinx.coroutines.runBlocking
+@@ -22,6 +22,7 @@ import logcat.LogPriority
+ import tachiyomi.core.common.util.system.logcat
+ import uy.kohesive.injekt.injectLazy
+ import java.io.File
++import java.io.IOException
+ 
+ /**
+  * Class that handles the loading of the extensions. Supports two kinds of extensions:
+@@ -66,50 +67,54 @@ internal object ExtensionLoader {
+ 
+     private fun getPrivateExtensionDir(context: Context) = File(context.filesDir, "exts")
+ 
+-    fun installPrivateExtensionFile(context: Context, file: File): Boolean {
+-        val extension = context.packageManager.getPackageArchiveInfo(file.absolutePath, PACKAGE_FLAGS)
++    @Synchronized
++    fun installPrivateExtensionFile(context: Context, file: File, checkCancelled: () -> Unit = {}): Boolean {
++        val candidate = context.packageManager.getPackageArchiveInfo(file.absolutePath, PACKAGE_FLAGS)
+             ?.takeIf { isPackageAnExtension(it) } ?: return false
+-        val currentExtension = getExtensionPackageInfoFromPkgName(context, extension.packageName)
+-
+-        if (currentExtension != null) {
+-            if (PackageInfoCompat.getLongVersionCode(extension) <
+-                PackageInfoCompat.getLongVersionCode(currentExtension)
+-            ) {
+-                logcat(LogPriority.ERROR) { "Installed extension version is higher. Downgrading is not allowed." }
+-                return false
+-            }
+-
+-            val extensionSignatures = getSignatures(extension)
+-            if (extensionSignatures.isNullOrEmpty()) {
+-                logcat(LogPriority.ERROR) { "Extension to be installed is not signed." }
+-                return false
+-            }
+-
+-            if (!extensionSignatures.containsAll(getSignatures(currentExtension)!!)) {
+-                logcat(LogPriority.ERROR) { "Installed extension signature is not matched." }
+-                return false
+-            }
+-        }
+-
+-        val target = File(getPrivateExtensionDir(context), "${extension.packageName}.$PRIVATE_EXTENSION_EXTENSION")
++        val target = File(getPrivateExtensionDir(context), "${candidate.packageName}.$PRIVATE_EXTENSION_EXTENSION")
+         return try {
+-            target.delete()
+-            file.copyAndSetReadOnlyTo(target, overwrite = true)
+-            if (currentExtension != null) {
+-                ExtensionInstallReceiver.notifyReplaced(context, extension.packageName)
++            var replacing = false
++            PrivateExtensionFiles.replace(file, target, checkCancelled) { staged ->
++                // Verify the bytes actually staged, before replacing the working package.
++                val extension = context.packageManager.getPackageArchiveInfo(staged.absolutePath, PACKAGE_FLAGS)
++                    ?.takeIf { isPackageAnExtension(it) && it.packageName == candidate.packageName }
++                    ?: throw IOException("Invalid staged extension")
++                val signatures = getSignatures(extension).orEmpty()
++                if (signatures.isEmpty()) throw IOException("Extension is not signed")
++                val current = getExtensionPackageInfoFromPkgName(context, extension.packageName)
++                replacing = current != null
++                if (current != null) {
++                    if (PackageInfoCompat.getLongVersionCode(extension) <
++                        PackageInfoCompat.getLongVersionCode(current)
++                    ) {
++                        throw IOException("Extension downgrade is not allowed")
++                    }
++                    val previousSignatures = getSignatures(current).orEmpty()
++                    if (previousSignatures.isEmpty() || !signatures.containsAll(previousSignatures)) {
++                        throw IOException("Extension signature does not match")
++                    }
++                }
++            }
++            if (replacing) {
++                ExtensionInstallReceiver.notifyReplaced(context, candidate.packageName)
+             } else {
+-                ExtensionInstallReceiver.notifyAdded(context, extension.packageName)
++                ExtensionInstallReceiver.notifyAdded(context, candidate.packageName)
+             }
+             true
+-        } catch (e: Exception) {
+-            logcat(LogPriority.ERROR, e) { "Failed to copy extension file." }
+-            target.delete()
++        } catch (error: CancellationException) {
++            throw error
++        } catch (error: Exception) {
++            logcat(LogPriority.ERROR, error) { "Failed to replace private extension; previous file preserved." }
+             false
+         }
+     }
+ 
++    @Synchronized
+     fun uninstallPrivateExtension(context: Context, pkgName: String) {
+-        File(getPrivateExtensionDir(context), "$pkgName.$PRIVATE_EXTENSION_EXTENSION").delete()
++        val target = File(getPrivateExtensionDir(context), "$pkgName.$PRIVATE_EXTENSION_EXTENSION")
++        if (PrivateExtensionFiles.delete(target) || !target.exists()) {
++            ExtensionInstallReceiver.notifyRemoved(context, pkgName)
++        }
+     }
+ 
+     /**
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/extension/util/PrivateExtensionFiles.kt b/app/src/main/java/eu/kanade/tachiyomi/extension/util/PrivateExtensionFiles.kt
+new file mode 100644
+index 0000000..736f4b9
+--- /dev/null
++++ b/app/src/main/java/eu/kanade/tachiyomi/extension/util/PrivateExtensionFiles.kt
+@@ -0,0 +1,49 @@
++package eu.kanade.tachiyomi.extension.util
++
++import java.io.File
++import java.io.FileOutputStream
++import java.io.IOException
++import java.nio.file.Files
++import java.nio.file.StandardCopyOption
++
++/** Same-directory staging: never delete the working extension before a validated atomic replacement. */
++internal object PrivateExtensionFiles {
++    @Synchronized
++    fun replace(source: File, target: File, checkCancelled: () -> Unit = {}, validate: (File) -> Unit) {
++        checkCancelled()
++        require(source.isFile) { "Extension download is missing" }
++        val folder = requireNotNull(target.parentFile)
++        check(folder.isDirectory || folder.mkdirs()) { "Cannot create private extension directory" }
++        val staged = File.createTempFile(".${target.name}.", ".pending", folder)
++        try {
++            source.inputStream().use { input ->
++                FileOutputStream(staged).use { output ->
++                    // Android14 requires dynamically loaded code to be read-only before writing.
++                    if (!staged.setReadOnly()) throw IOException("Cannot protect staged extension")
++                    val buffer = ByteArray(64 * 1024)
++                    while (true) {
++                        checkCancelled()
++                        val count = input.read(buffer)
++                        if (count < 0) break
++                        output.write(buffer, 0, count)
++                    }
++                    output.fd.sync()
++                }
++            }
++            checkCancelled()
++            validate(staged)
++            checkCancelled()
++            Files.move(
++                staged.toPath(),
++                target.toPath(),
++                StandardCopyOption.ATOMIC_MOVE,
++                StandardCopyOption.REPLACE_EXISTING,
++            )
++        } finally {
++            staged.delete()
++        }
++    }
++
++    @Synchronized
++    fun delete(target: File): Boolean = target.delete()
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalog.kt b/app/src/main/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalog.kt
 new file mode 100644
@@ -10227,6 +11145,427 @@ index 0000000..4d5291f
 +        roundTrip("mihon")
 +    }
 +}
+diff --git a/app/src/test/java/eu/kanade/tachiyomi/data/backup/create/BackupArchiveWriterTest.kt b/app/src/test/java/eu/kanade/tachiyomi/data/backup/create/BackupArchiveWriterTest.kt
+new file mode 100644
+index 0000000..33b9649
+--- /dev/null
++++ b/app/src/test/java/eu/kanade/tachiyomi/data/backup/create/BackupArchiveWriterTest.kt
+@@ -0,0 +1,127 @@
++package eu.kanade.tachiyomi.data.backup.create
++
++import kotlinx.coroutines.CancellationException
++import org.junit.jupiter.api.Assertions.assertArrayEquals
++import org.junit.jupiter.api.Assertions.assertEquals
++import org.junit.jupiter.api.Assertions.assertTrue
++import org.junit.jupiter.api.Test
++import org.junit.jupiter.api.assertThrows
++import java.io.ByteArrayInputStream
++import java.io.ByteArrayOutputStream
++import java.io.IOException
++import java.io.OutputStream
++import java.util.zip.GZIPInputStream
++import java.util.zip.GZIPOutputStream
++
++class BackupArchiveWriterTest {
++    private val payload = ByteArray(170_000) { ((it * 13 + it / 7) % 251).toByte() }
++    private fun gzip(bytes: ByteArray): ByteArray = ByteArrayOutputStream().also { buffer ->
++        GZIPOutputStream(buffer).use { it.write(bytes) }
++    }.toByteArray()
++
++    @Test fun `successful result requires closed output and exact verified payload`() {
++        var closed = false
++        val output = object : ByteArrayOutputStream() {
++            override fun close() {
++                closed = true
++                super.close()
++            }
++        }
++        BackupArchiveWriter.writeVerified(payload, { output }, {
++            assertTrue(closed)
++            ByteArrayInputStream(output.toByteArray())
++        })
++        assertArrayEquals(payload, GZIPInputStream(ByteArrayInputStream(output.toByteArray())).readBytes())
++    }
++
++    @Test fun `write failure closes the stream and cannot proceed to verification`() {
++        var closed = false
++        var reads = 0
++        val output = object : OutputStream() {
++            override fun write(value: Int) {
++                throw IOException("Disk full")
++            }
++            override fun close() {
++                closed = true
++            }
++        }
++        assertThrows<IOException> {
++            BackupArchiveWriter.writeVerified(payload, { output }, {
++                reads++
++                null
++            })
++        }
++        assertTrue(closed)
++        assertEquals(0, reads)
++    }
++
++    @Test fun `failed output close cannot be reported as verified`() {
++        var reads = 0
++        val output = object : ByteArrayOutputStream() {
++            override fun close() {
++                throw IOException("Provider failed to commit")
++            }
++        }
++        assertThrows<IOException> {
++            BackupArchiveWriter.writeVerified(payload, { output }, {
++                reads++
++                ByteArrayInputStream(output.toByteArray())
++            })
++        }
++        assertEquals(0, reads)
++    }
++
++    @Test fun `write only destination is explicitly unverifiable`() {
++        assertThrows<BackupReadbackUnavailable> {
++            BackupArchiveWriter.writeVerified(payload, { ByteArrayOutputStream() }, { throw SecurityException() })
++        }
++    }
++
++    @Test fun `trailing garbage or another gzip member is rejected like the actual backup decoder`() {
++        for (suffix in listOf(byteArrayOf(1, 2, 3), gzip(byteArrayOf()))) {
++            assertThrows<BackupReadbackMismatch> {
++                BackupArchiveWriter.verify(payload, { ByteArrayInputStream(gzip(payload) + suffix) })
++            }
++        }
++    }
++
++    @Test fun `truncated gzip fails verification`() {
++        val compressed = gzip(payload)
++        assertThrows<BackupReadbackMismatch> {
++            BackupArchiveWriter.verify(payload, { ByteArrayInputStream(compressed.copyOf(compressed.size - 5)) })
++        }
++    }
++
++    @Test fun `valid gzip carrying different bytes cannot be reported as success`() {
++        val changed = payload.copyOf().also { it[9] = (it[9] + 1).toByte() }
++        assertThrows<BackupReadbackMismatch> {
++            BackupArchiveWriter.verify(payload, { ByteArrayInputStream(gzip(changed)) })
++        }
++    }
++
++    @Test fun `extra or missing decompressed bytes fail verification`() {
++        for (bytes in listOf(payload.copyOf(payload.size - 1), payload + byteArrayOf(1))) {
++            assertThrows<BackupReadbackMismatch> {
++                BackupArchiveWriter.verify(payload, { ByteArrayInputStream(gzip(bytes)) })
++            }
++        }
++    }
++
++    @Test fun `cancellation during copy or read back stays cancellation`() {
++        var checks = 0
++        assertThrows<CancellationException> {
++            BackupArchiveWriter.writeVerified(payload, { ByteArrayOutputStream() }, { null }) {
++                if (++checks == 3) throw CancellationException()
++            }
++        }
++        checks = 0
++        assertThrows<CancellationException> {
++            BackupArchiveWriter.verify(payload, { ByteArrayInputStream(gzip(payload)) }) {
++                if (++checks == 3) throw CancellationException()
++            }
++        }
++        assertThrows<CancellationException> {
++            BackupArchiveWriter.verify(payload, { throw CancellationException() })
++        }
++    }
++}
+diff --git a/app/src/test/java/eu/kanade/tachiyomi/data/backup/create/BackupCreatorTransactionTest.kt b/app/src/test/java/eu/kanade/tachiyomi/data/backup/create/BackupCreatorTransactionTest.kt
+new file mode 100644
+index 0000000..57e51f4
+--- /dev/null
++++ b/app/src/test/java/eu/kanade/tachiyomi/data/backup/create/BackupCreatorTransactionTest.kt
+@@ -0,0 +1,282 @@
++package eu.kanade.tachiyomi.data.backup.create
++
++import android.content.ContentResolver
++import android.content.Context
++import android.net.Uri
++import com.hippo.unifile.FilenameFilter
++import com.hippo.unifile.UniFile
++import dev.icerock.moko.resources.StringResource
++import eu.kanade.tachiyomi.BuildConfig
++import eu.kanade.tachiyomi.data.backup.BackupDecoder
++import eu.kanade.tachiyomi.data.backup.create.creators.CategoriesBackupCreator
++import eu.kanade.tachiyomi.data.backup.create.creators.ExtensionStoresBackupCreator
++import eu.kanade.tachiyomi.data.backup.create.creators.MangaBackupCreator
++import eu.kanade.tachiyomi.data.backup.create.creators.PreferenceBackupCreator
++import eu.kanade.tachiyomi.data.backup.create.creators.SourcesBackupCreator
++import eu.kanade.tachiyomi.data.backup.models.Backup
++import eu.kanade.tachiyomi.data.backup.models.BackupManga
++import eu.kanade.tachiyomi.data.backup.models.BackupPreference
++import eu.kanade.tachiyomi.data.backup.models.StringPreferenceValue
++import io.mockk.coEvery
++import io.mockk.every
++import io.mockk.mockk
++import io.mockk.mockkStatic
++import io.mockk.unmockkStatic
++import io.mockk.verify
++import kotlinx.coroutines.CancellationException
++import kotlinx.coroutines.async
++import kotlinx.coroutines.test.runTest
++import kotlinx.serialization.protobuf.ProtoBuf
++import org.junit.jupiter.api.AfterEach
++import org.junit.jupiter.api.Assertions.assertArrayEquals
++import org.junit.jupiter.api.Assertions.assertEquals
++import org.junit.jupiter.api.Assertions.assertFalse
++import org.junit.jupiter.api.Assertions.assertTrue
++import org.junit.jupiter.api.BeforeEach
++import org.junit.jupiter.api.Test
++import org.junit.jupiter.api.assertThrows
++import org.junit.jupiter.api.io.TempDir
++import tachiyomi.core.common.i18n.stringResource
++import tachiyomi.core.common.preference.Preference
++import tachiyomi.domain.backup.service.BackupPreferences
++import tachiyomi.domain.manga.interactor.GetFavorites
++import tachiyomi.domain.manga.repository.MangaRepository
++import java.io.ByteArrayInputStream
++import java.io.ByteArrayOutputStream
++import java.io.File
++import java.io.IOException
++import java.io.OutputStream
++import java.nio.file.Files
++import java.util.Date
++import java.util.concurrent.ConcurrentHashMap
++import java.util.zip.GZIPOutputStream
++
++/** Actual creator and real gzip/protobuf/files; UniFile adapter simulates document provider failures. */
++class BackupCreatorTransactionTest {
++    @TempDir lateinit var folder: File
++    private val context = mockk<Context>()
++    private val resolver = mockk<ContentResolver>()
++    private val timestamp = mockk<Preference<Long>>(relaxed = true)
++    private val preferences = mockk<BackupPreferences>()
++    private val favorites = mockk<GetFavorites>()
++    private val sourceCreator = mockk<SourcesBackupCreator>()
++    private val preferenceCreator = mockk<PreferenceBackupCreator>()
++    private val options = BackupOptions(
++        libraryEntries = false,
++        categories = false,
++        readEntries = false,
++        appSettings = true,
++        sourceSettings = false,
++        extensionStores = false,
++    )
++    private val events = mutableListOf<String>()
++    private val uriFiles = ConcurrentHashMap<Uri, File>()
++    private val fileUris = ConcurrentHashMap<String, Uri>()
++    private var failWrite = false
++    private var corruptRead = false
++    private var denyRead = false
++    private var failRename = false
++    private var cancelWrite = false
++    private var unknownLength = false
++
++    @BeforeEach fun setup() {
++        mockkStatic("tachiyomi.core.common.i18n.LocalizeKt")
++        every { context.stringResource(any<StringResource>()) } returns "backup-operation-failed"
++        every { context.contentResolver } returns resolver
++        every { resolver.openInputStream(any()) } answers { uriFiles.getValue(firstArg()).inputStream() }
++        every { preferences.lastAutoBackupTimestamp } returns timestamp
++        coEvery { favorites.await() } returns emptyList()
++        every { sourceCreator(any()) } returns emptyList()
++        every { preferenceCreator.createApp(false) } returns listOf(
++            BackupPreference("sample", StringPreferenceValue("ação")),
++        )
++    }
++
++    @AfterEach fun teardown() = unmockkStatic("tachiyomi.core.common.i18n.LocalizeKt")
++
++    private fun uri(file: File): Uri = fileUris.getOrPut(file.path) {
++        mockk<Uri>().also { value ->
++            every { value.toString() } returns file.path
++            uriFiles[value] = file
++        }
++    }
++
++    private fun document(initial: File, created: Boolean = false): UniFile {
++        var file = initial
++        val node = mockk<UniFile>()
++        every { node.uri } answers { uri(file) }
++        every { node.name } answers { file.name }
++        every { node.isDirectory } answers { file.isDirectory }
++        every { node.length() } answers { if (unknownLength) 0 else file.length() }
++        every { node.listFiles() } answers { file.listFiles().orEmpty().map { document(it) }.toTypedArray() }
++        every { node.listFiles(any<FilenameFilter>()) } answers {
++            val filter = firstArg<FilenameFilter>()
++            file.listFiles().orEmpty().filter { filter.accept(node, it.name) }.map { document(it) }.toTypedArray()
++        }
++        every { node.createFile(any()) } answers {
++            val child = File(file, firstArg<String>())
++            check(child.createNewFile())
++            events += "create:${child.name}"
++            document(child, true)
++        }
++        every { node.openOutputStream() } answers {
++            events += "write:${file.name}"
++            if (created && (failWrite || cancelWrite)) {
++                object : OutputStream() {
++                    override fun write(value: Int) {
++                        if (cancelWrite) throw CancellationException("Cancelled")
++                        throw IOException("Disk full")
++                    }
++                }
++            } else {
++                file.outputStream()
++            }
++        }
++        every { node.openInputStream() } answers {
++            events += "read:${file.name}"
++            if (created && denyRead) throw SecurityException("Write-only provider")
++            if (created && corruptRead) ByteArrayInputStream(byteArrayOf(1, 2, 3)) else file.inputStream()
++        }
++        every { node.renameTo(any()) } answers {
++            events += "rename:${file.name}"
++            if (failRename) {
++                false
++            } else {
++                val destination = File(file.parentFile, firstArg<String>())
++                Files.move(file.toPath(), destination.toPath())
++                file = destination
++                true
++            }
++        }
++        every { node.delete() } answers {
++            events += "delete:${file.name}"
++            file.delete()
++        }
++        return node
++    }
++
++    private fun creator(target: UniFile = document(folder), automatic: Boolean = true) = BackupCreator(
++        context, automatic, ProtoBuf, favorites, preferences, mockk<MangaRepository>(),
++        mockk<CategoriesBackupCreator>(), mockk<MangaBackupCreator>(), preferenceCreator,
++        mockk<ExtensionStoresBackupCreator>(), sourceCreator, { target },
++    )
++
++    private fun oldCopies(): Map<String, ByteArray> {
++        val payload = ProtoBuf.encodeToByteArray(Backup.serializer(), Backup(listOf(BackupManga(10, "/old", "Old"))))
++        val bytes = ByteArrayOutputStream().also { buffer ->
++            GZIPOutputStream(buffer).use { it.write(payload) }
++        }.toByteArray()
++        return (0..3).associate { minute ->
++            val name = "${BuildConfig.APPLICATION_ID}_2026-01-01_00-0$minute.tachibk"
++            File(folder, name).writeBytes(bytes)
++            name to bytes
++        }
++    }
++
++    private fun assertPreserved(copies: Map<String, ByteArray>) {
++        copies.forEach { (name, bytes) -> assertArrayEquals(bytes, File(folder, name).readBytes()) }
++        assertEquals(copies.size, folder.listFiles()!!.size)
++        verify(exactly = 0) { timestamp.set(any()) }
++    }
++
++    @Test fun `failed write preserves all four earlier copies and success timestamp`() = runTest {
++        val copies = oldCopies()
++        failWrite = true
++        assertThrows<IOException> { creator().backup(uri(folder), options) }
++        assertPreserved(copies)
++    }
++
++    @Test fun `corrupt read back never prunes copies or records success`() = runTest {
++        val copies = oldCopies()
++        corruptRead = true
++        val error = assertThrows<IOException> { creator().backup(uri(folder), options) }
++        assertTrue(generateSequence<Throwable>(error) { it.cause }.any { it is BackupReadbackMismatch })
++        assertPreserved(copies)
++    }
++
++    @Test fun `write only destination reports verification unavailable and preserves old copies`() = runTest {
++        val copies = oldCopies()
++        denyRead = true
++        val error = assertThrows<IOException> { creator().backup(uri(folder), options) }
++        assertTrue(generateSequence<Throwable>(error) { it.cause }.any { it is BackupReadbackUnavailable })
++        assertPreserved(copies)
++    }
++
++    @Test fun `cancelled creation preserves prior backups and cancellation identity`() = runTest {
++        val copies = oldCopies()
++        cancelWrite = true
++        assertThrows<CancellationException> { creator().backup(uri(folder), options) }
++        assertPreserved(copies)
++    }
++
++    @Test fun `provider refusing final rename cannot trigger retention`() = runTest {
++        val copies = oldCopies()
++        failRename = true
++        assertThrows<IOException> { creator().backup(uri(folder), options) }
++        assertPreserved(copies)
++    }
++
++    @Test fun `only a verified final document allows pruning the oldest copy`() = runTest {
++        val copies = oldCopies()
++        val location = creator().backup(uri(folder), options)
++        assertFalse(location.endsWith(".pending"))
++        val parsed = BackupDecoder(context, ProtoBuf).decode(fileUris.getValue(location))
++        assertEquals("ação", (parsed.backupPreferences.single().value as StringPreferenceValue).value)
++        assertEquals(4, folder.listFiles()!!.size)
++        assertFalse(File(folder, copies.keys.min()).exists())
++        copies.filterKeys { it != copies.keys.min() }.forEach { (name, bytes) ->
++            assertArrayEquals(bytes, File(folder, name).readBytes())
++        }
++        val firstDeletion = events.indexOfFirst { it.startsWith("delete:") }
++        val finalRead = events.indexOf("read:${File(location).name}")
++        assertTrue(finalRead >= 0 && firstDeletion > finalRead)
++        verify(exactly = 1) { timestamp.set(any()) }
++    }
++
++    @Test fun `unreadable old files never displace valid backup copies`() = runTest {
++        oldCopies()
++        val broken = File(folder, "${BuildConfig.APPLICATION_ID}_2026-11-01_00-00.tachibk")
++        broken.writeText("incomplete")
++        creator().backup(uri(folder), options)
++        assertEquals("incomplete", broken.readText())
++        assertEquals(5, folder.listFiles()!!.size)
++    }
++
++    @Test fun `manual export never truncates or deletes a nonempty selected document`() = runTest {
++        val file = File(folder, "selected.tachibk").apply { writeText("precious existing data") }
++        assertThrows<IOException> { creator(document(file), false).backup(uri(file), options) }
++        assertEquals("precious existing data", file.readText())
++        assertTrue(events.none { it.startsWith("write:") || it.startsWith("delete:") })
++    }
++
++    @Test fun `unknown provider length cannot cause an existing document to be overwritten`() = runTest {
++        val file = File(folder, "selected.tachibk").apply { writeText("existing data") }
++        unknownLength = true
++        assertThrows<IOException> { creator(document(file), false).backup(uri(file), options) }
++        assertEquals("existing data", file.readText())
++        assertTrue(events.none { it.startsWith("write:") || it.startsWith("delete:") })
++    }
++
++    @Test fun `backups with same timestamp have distinct names and other app namespaces are unmanaged`() {
++        val first = BackupRetention.filename(BuildConfig.APPLICATION_ID, Date(0))
++        val second = BackupRetention.filename(BuildConfig.APPLICATION_ID, Date(0))
++        assertTrue(first != second)
++        assertTrue(BackupRetention.isManaged(BuildConfig.APPLICATION_ID, first))
++        assertFalse(BackupRetention.isManaged(BuildConfig.APPLICATION_ID, first + ".pending"))
++        val otherNamespace = first.replace(BuildConfig.APPLICATION_ID, BuildConfig.APPLICATION_ID.replace('.', 'X'))
++        assertFalse(BackupRetention.isManaged(BuildConfig.APPLICATION_ID, otherNamespace))
++    }
++
++    @Test fun `two creator instances serialize writing and retain four complete archives`() = runTest {
++        oldCopies()
++        val first = creator()
++        val second = creator()
++        val a = async { first.backup(uri(folder), options) }
++        val b = async { second.backup(uri(folder), options) }
++        val locations = setOf(a.await(), b.await())
++        assertEquals(2, locations.size)
++        assertEquals(4, folder.listFiles()!!.size)
++        assertTrue(folder.listFiles()!!.none { it.name.endsWith(".pending") })
++        verify(exactly = 2) { timestamp.set(any()) }
++    }
++}
 diff --git a/app/src/test/java/eu/kanade/tachiyomi/data/updater/AppUpdateRepositoryTest.kt b/app/src/test/java/eu/kanade/tachiyomi/data/updater/AppUpdateRepositoryTest.kt
 index 68f36cd..fb3271f 100644
 --- a/app/src/test/java/eu/kanade/tachiyomi/data/updater/AppUpdateRepositoryTest.kt
@@ -10752,6 +12091,343 @@ index 0000000..52defe4
 +        preferences.automatic().set(false)
 +        assertFalse(preferences.shouldCheck(false, true, now))
 +        assertTrue(preferences.shouldCheck(true, true, now))
++    }
++}
+diff --git a/app/src/test/java/eu/kanade/tachiyomi/extension/util/ExtensionInstallerDownloadTest.kt b/app/src/test/java/eu/kanade/tachiyomi/extension/util/ExtensionInstallerDownloadTest.kt
+new file mode 100644
+index 0000000..0bb4014
+--- /dev/null
++++ b/app/src/test/java/eu/kanade/tachiyomi/extension/util/ExtensionInstallerDownloadTest.kt
+@@ -0,0 +1,191 @@
++package eu.kanade.tachiyomi.extension.util
++
++import android.content.Context
++import com.sun.net.httpserver.HttpServer
++import eu.kanade.domain.base.BasePreferences
++import eu.kanade.tachiyomi.extension.installer.Installer
++import eu.kanade.tachiyomi.extension.model.Extension
++import eu.kanade.tachiyomi.extension.model.InstallStep
++import io.mockk.every
++import io.mockk.justRun
++import io.mockk.mockk
++import io.mockk.mockkObject
++import io.mockk.unmockkObject
++import io.mockk.verify
++import kotlinx.coroutines.CompletableDeferred
++import kotlinx.coroutines.Dispatchers
++import kotlinx.coroutines.async
++import kotlinx.coroutines.delay
++import kotlinx.coroutines.flow.onEach
++import kotlinx.coroutines.flow.toList
++import kotlinx.coroutines.runBlocking
++import kotlinx.coroutines.withContext
++import kotlinx.coroutines.withTimeout
++import okhttp3.OkHttpClient
++import org.junit.jupiter.api.AfterEach
++import org.junit.jupiter.api.Assertions.assertArrayEquals
++import org.junit.jupiter.api.Assertions.assertEquals
++import org.junit.jupiter.api.Assertions.assertTrue
++import org.junit.jupiter.api.BeforeEach
++import org.junit.jupiter.api.Test
++import org.junit.jupiter.api.io.TempDir
++import tachiyomi.core.common.preference.Preference
++import java.io.File
++import java.io.IOException
++import java.net.InetSocketAddress
++import java.util.concurrent.CountDownLatch
++import java.util.concurrent.Executors
++import java.util.concurrent.TimeUnit
++import java.util.concurrent.atomic.AtomicInteger
++
++/** Real localhost HTTP and file pipeline. Android package parsing/notifications are the mocked boundary. */
++class ExtensionInstallerDownloadTest {
++    @TempDir lateinit var folder: File
++    private val context = mockk<Context>()
++    private val preference = mockk<Preference<BasePreferences.ExtensionInstaller>>()
++    private val client = OkHttpClient.Builder().readTimeout(10, TimeUnit.SECONDS).build()
++    private val extension = Extension.Installed(
++        "Test", "test.source", "1", 1, 1.4, "en", false, null, emptyList(), null, isShared = false,
++    )
++    private val bytes = ByteArray(150_000) { (it % 251).toByte() }
++    private val started = arrayOf(CountDownLatch(1), CountDownLatch(1))
++    private val release = CountDownLatch(1)
++    private val requests = AtomicInteger()
++    private val threads = Executors.newCachedThreadPool { task -> Thread(task).apply { isDaemon = true } }
++    private var server: HttpServer? = null
++    private lateinit var installer: ExtensionInstaller
++    private val cache get() = File(folder, "cache")
++    private val target get() = File(folder, "source.ext")
++
++    @BeforeEach fun setup() {
++        cache.mkdirs()
++        every { context.cacheDir } returns cache
++        every { preference.get() } returns BasePreferences.ExtensionInstaller.PRIVATE
++        mockkObject(ExtensionLoader, Installer.Companion)
++        justRun { Installer.cancelInstallQueue(context, any()) }
++        every { ExtensionLoader.installPrivateExtensionFile(context, any(), any()) } answers {
++            PrivateExtensionFiles.replace(secondArg(), target, thirdArg()) { staged ->
++                assertArrayEquals(bytes, staged.readBytes())
++            }
++            true
++        }
++        installer = ExtensionInstaller(context, preference, client)
++    }
++
++    @AfterEach fun cleanup() {
++        listOf(extension.pkgName, "test.Aa", "test.BB").forEach(installer::cancelInstall)
++        release.countDown()
++        client.dispatcher.cancelAll()
++        server?.stop(0)
++        threads.shutdownNow()
++        runBlocking {
++            withTimeout(5000) { while (cache.listFiles().orEmpty().isNotEmpty()) delay(10) }
++        }
++        unmockkObject(ExtensionLoader, Installer.Companion)
++        client.dispatcher.executorService.shutdownNow()
++        client.connectionPool.evictAll()
++        folder.walk().forEach { it.setWritable(true) }
++    }
++
++    private fun serve(partial: Boolean = false, status: Int = 200): String {
++        val instance = HttpServer.create(InetSocketAddress("127.0.0.1", 0), 0)
++        instance.executor = threads
++        instance.createContext("/extension.apk") { exchange ->
++            val index = requests.getAndIncrement()
++            try {
++                if (status != 200) {
++                    exchange.sendResponseHeaders(status, -1)
++                } else {
++                    exchange.sendResponseHeaders(200, bytes.size.toLong())
++                    if (partial) {
++                        exchange.responseBody.write(bytes, 0, 128)
++                        exchange.responseBody.flush()
++                        started[index.coerceAtMost(1)].countDown()
++                        release.await(5, TimeUnit.SECONDS)
++                        exchange.responseBody.write(bytes, 128, bytes.size - 128)
++                    } else {
++                        exchange.responseBody.write(bytes)
++                    }
++                }
++            } catch (_: IOException) {
++                // A cancelled client closes its socket while the server still holds its response.
++            } catch (_: InterruptedException) {
++                Thread.currentThread().interrupt()
++            } finally {
++                exchange.close()
++            }
++        }
++        instance.start()
++        server = instance
++        return "http://127.0.0.1:${instance.address.port}/extension.apk"
++    }
++
++    private suspend fun awaitStart(index: Int) {
++        assertTrue(withContext(Dispatchers.IO) { started[index].await(5, TimeUnit.SECONDS) })
++    }
++
++    @Test fun `private download emits a terminal success and removes the consumed APK`() = runBlocking {
++        val steps = withTimeout(5000) { installer.downloadAndInstall(serve(), extension).toList() }
++        assertEquals(InstallStep.Installed, steps.last())
++        assertArrayEquals(bytes, target.readBytes())
++        withTimeout(5000) { while (cache.listFiles().orEmpty().isNotEmpty()) delay(10) }
++    }
++
++    @Test fun `HTTP failure completes the flow with error and cleans its download`() = runBlocking {
++        val steps = withTimeout(5000) { installer.downloadAndInstall(serve(status = 503), extension).toList() }
++        assertEquals(InstallStep.Error, steps.last())
++        verify(exactly = 0) { ExtensionLoader.installPrivateExtensionFile(context, any(), any()) }
++    }
++
++    @Test fun `cancellation interrupts a stalled response without replacing the working extension`() = runBlocking {
++        val original = "working".encodeToByteArray()
++        target.writeBytes(original)
++        val url = serve(partial = true)
++        val collecting = async { installer.downloadAndInstall(url, extension).toList() }
++        awaitStart(0)
++        installer.cancelInstall(extension.pkgName)
++        val steps = withTimeout(5000) { collecting.await() }
++        assertEquals(InstallStep.Idle, steps.last())
++        assertArrayEquals(original, target.readBytes())
++        verify(exactly = 0) { ExtensionLoader.installPrivateExtensionFile(context, any(), any()) }
++    }
++
++    @Test fun `different package names with the same hash cannot cancel each other`() = runBlocking {
++        val firstExtension = extension.copy(pkgName = "test.Aa")
++        val secondExtension = extension.copy(pkgName = "test.BB")
++        assertEquals(firstExtension.pkgName.hashCode(), secondExtension.pkgName.hashCode())
++        val url = serve(partial = true)
++        val first = async { installer.downloadAndInstall(url, firstExtension).toList() }
++        awaitStart(0)
++        val second = async { installer.downloadAndInstall(url, secondExtension).toList() }
++        awaitStart(1)
++        installer.cancelInstall(firstExtension.pkgName)
++        assertEquals(InstallStep.Idle, withTimeout(5000) { first.await() }.last())
++        release.countDown()
++        assertEquals(InstallStep.Installed, withTimeout(5000) { second.await() }.last())
++        assertArrayEquals(bytes, target.readBytes())
++    }
++
++    @Test fun `completion of a cancelled attempt cannot remove the retry from active jobs`() = runBlocking {
++        val url = serve(partial = true)
++        val oldAtIdle = CompletableDeferred<Unit>()
++        val releaseOldCollector = CompletableDeferred<Unit>()
++        val first = async {
++            installer.downloadAndInstall(url, extension).onEach {
++                if (it == InstallStep.Idle) {
++                    oldAtIdle.complete(Unit)
++                    releaseOldCollector.await()
++                }
++            }.toList()
++        }
++        awaitStart(0)
++        val second = async { installer.downloadAndInstall(url, extension).toList() }
++        withTimeout(5000) { oldAtIdle.await() }
++        awaitStart(1)
++        releaseOldCollector.complete(Unit)
++        withTimeout(5000) { first.await() }
++        installer.cancelInstall(extension.pkgName)
++        assertEquals(InstallStep.Idle, withTimeout(5000) { second.await() }.last())
++        verify(exactly = 0) { ExtensionLoader.installPrivateExtensionFile(context, any(), any()) }
++    }
++}
+diff --git a/app/src/test/java/eu/kanade/tachiyomi/extension/util/PrivateExtensionFilesTest.kt b/app/src/test/java/eu/kanade/tachiyomi/extension/util/PrivateExtensionFilesTest.kt
+new file mode 100644
+index 0000000..5b8194d
+--- /dev/null
++++ b/app/src/test/java/eu/kanade/tachiyomi/extension/util/PrivateExtensionFilesTest.kt
+@@ -0,0 +1,134 @@
++package eu.kanade.tachiyomi.extension.util
++
++import kotlinx.coroutines.CancellationException
++import org.junit.jupiter.api.AfterEach
++import org.junit.jupiter.api.Assertions.assertArrayEquals
++import org.junit.jupiter.api.Assertions.assertEquals
++import org.junit.jupiter.api.Assertions.assertFalse
++import org.junit.jupiter.api.Assertions.assertTrue
++import org.junit.jupiter.api.Test
++import org.junit.jupiter.api.assertThrows
++import org.junit.jupiter.api.io.TempDir
++import java.io.File
++import java.io.IOException
++import java.nio.file.Files
++import java.nio.file.attribute.DosFileAttributes
++import java.nio.file.attribute.PosixFilePermission
++import java.util.concurrent.CountDownLatch
++import java.util.concurrent.ExecutionException
++import java.util.concurrent.Executors
++import java.util.concurrent.TimeUnit
++
++class PrivateExtensionFilesTest {
++    @TempDir lateinit var folder: File
++
++    @AfterEach fun unprotectTestFiles() {
++        folder.walk().forEach { it.setWritable(true) }
++    }
++    private val original = "working extension".encodeToByteArray()
++    private val replacement = ByteArray(180_000) { (it % 251).toByte() }
++    private fun target() = File(folder, "source.ext").apply { writeBytes(original) }
++    private fun source() = File(folder, "download.apk").apply { writeBytes(replacement) }
++    private fun noPending() = assertTrue(folder.listFiles()!!.none { it.name.endsWith(".pending") })
++
++    private fun assertReadOnly(file: File) {
++        if (Files.getFileStore(file.toPath()).supportsFileAttributeView("posix")) {
++            assertFalse(PosixFilePermission.OWNER_WRITE in Files.getPosixFilePermissions(file.toPath()))
++        } else {
++            assertTrue(Files.readAttributes(file.toPath(), DosFileAttributes::class.java).isReadOnly)
++        }
++    }
++
++    @Test fun `old bytes remain visible through validation and successful replacement is read only`() {
++        val target = target()
++        PrivateExtensionFiles.replace(source(), target) { staged ->
++            assertArrayEquals(original, target.readBytes())
++            assertArrayEquals(replacement, staged.readBytes())
++            assertEquals(folder, staged.parentFile)
++            assertReadOnly(staged)
++        }
++        assertArrayEquals(replacement, target.readBytes())
++        assertReadOnly(target)
++        noPending()
++    }
++
++    @Test fun `cancelled copy preserves the old file and cleans the staged file`() {
++        val target = target()
++        var checks = 0
++        assertThrows<CancellationException> {
++            PrivateExtensionFiles.replace(source(), target, { if (++checks == 3) throw CancellationException() }) {}
++        }
++        assertArrayEquals(original, target.readBytes())
++        noPending()
++    }
++
++    @Test fun `invalid staged package never replaces the old extension`() {
++        val target = target()
++        assertThrows<IOException> {
++            PrivateExtensionFiles.replace(source(), target) { throw IOException("Signature validation failed") }
++        }
++        assertArrayEquals(original, target.readBytes())
++        noPending()
++    }
++
++    @Test fun `failed atomic move preserves the old destination`() {
++        val target = target()
++        assertThrows<IOException> {
++            PrivateExtensionFiles.replace(source(), target) { staged -> assertTrue(staged.delete()) }
++        }
++        assertArrayEquals(original, target.readBytes())
++        noPending()
++    }
++
++    @Test fun `missing download cannot erase an installed extension`() {
++        val target = target()
++        assertThrows<IllegalArgumentException> {
++            PrivateExtensionFiles.replace(File(folder, "missing.apk"), target) {}
++        }
++        assertArrayEquals(original, target.readBytes())
++        noPending()
++    }
++
++    @Test fun `failed initial installation leaves no loadable target`() {
++        val target = File(folder, "new.ext")
++        assertThrows<IOException> {
++            PrivateExtensionFiles.replace(source(), target) { throw IOException("Invalid package") }
++        }
++        assertFalse(target.exists())
++        noPending()
++    }
++
++    @Test fun `deletion waits for an ongoing replacement and cannot be undone by that copy`() {
++        val executor = Executors.newFixedThreadPool(2)
++        val entered = CountDownLatch(1)
++        val release = CountDownLatch(1)
++        val deletionRequested = CountDownLatch(1)
++        val target = target()
++        val source = source()
++        try {
++            val copy = executor.submit {
++                PrivateExtensionFiles.replace(source, target) {
++                    entered.countDown()
++                    assertTrue(release.await(5, TimeUnit.SECONDS))
++                    throw CancellationException("Uninstall cancelled the in-flight copy")
++                }
++            }
++            assertTrue(entered.await(5, TimeUnit.SECONDS))
++            val deletion = executor.submit<Boolean> {
++                deletionRequested.countDown()
++                PrivateExtensionFiles.delete(target)
++            }
++            assertTrue(deletionRequested.await(5, TimeUnit.SECONDS))
++            assertFalse(deletion.isDone)
++            release.countDown()
++            val error = assertThrows<ExecutionException> { copy.get(5, TimeUnit.SECONDS) }
++            assertTrue(error.cause is CancellationException)
++            assertTrue(deletion.get(5, TimeUnit.SECONDS))
++            assertFalse(target.exists())
++            noPending()
++        } finally {
++            release.countDown()
++            executor.shutdownNow()
++        }
 +    }
 +}
 diff --git a/app/src/test/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalogTest.kt b/app/src/test/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalogTest.kt
@@ -16698,7 +18374,7 @@ index 9839272..197aec7 100644
  mlkit-text-recognition-chinese = { module = "com.google.mlkit:text-recognition-chinese", version.ref = "mlkit-text-recognition" }
  mlkit-text-recognition-japanese = { module = "com.google.mlkit:text-recognition-japanese", version.ref = "mlkit-text-recognition" }
 diff --git a/i18n-at/src/commonMain/moko-resources/base/strings.xml b/i18n-at/src/commonMain/moko-resources/base/strings.xml
-index 7ed4795..02b6891 100644
+index 7ed4795..b127937 100644
 --- a/i18n-at/src/commonMain/moko-resources/base/strings.xml
 +++ b/i18n-at/src/commonMain/moko-resources/base/strings.xml
 @@ -10,7 +10,7 @@
@@ -16710,7 +18386,7 @@ index 7ed4795..02b6891 100644
      <string name="pref_group_setup">Translation Setup</string>
      <string name="pref_translate_from">Translate From</string>
      <string name="pref_translate_to">Translate To</string>
-@@ -73,12 +73,134 @@
+@@ -73,12 +73,139 @@
      <string name="repository_add_error">Could not add this repository. Check your connection and try again.</string>
      <string name="repository_refresh_error">Repository added, but extension listings could not be refreshed. Refresh the Extensions screen.</string>
      <string name="chapter_group_version">Group/version: %1$s</string>
@@ -16846,9 +18522,14 @@ index 7ed4795..02b6891 100644
 +    <string name="polaris_update_install_hint">Tap to open the Android installer.</string>
 +    <string name="pref_ocr_dependencies_hint">Strips require English input or automatic source language. DBNet also requires a 64-bit ARM Android system. Unavailable options are turned off; restoring a prerequisite does not turn experiments on automatically.</string>
 +    <string name="pref_reader_font_summary">%s. Applies to translated text; its size is fitted to each balloon.</string>
++
++    <string name="backup_verify_unavailable">The backup could not be read back for verification. Choose a location with read and write access.</string>
++    <string name="backup_verify_failed">The written backup failed verification. Previous backups were preserved.</string>
++    <string name="backup_target_not_empty">Choose a new file for the backup. The existing file was preserved.</string>
++    <string name="backup_finalize_failed">The backup could not be finalized in this location. Previous backups were preserved.</string>
  </resources>
 diff --git a/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml b/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
-index d1748bc..6785bf4 100644
+index d1748bc..ce075c3 100644
 --- a/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
 +++ b/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
 @@ -10,7 +10,7 @@
@@ -16860,7 +18541,7 @@ index d1748bc..6785bf4 100644
      <string name="pref_group_setup">Configuração da tradução</string>
      <string name="pref_translate_from">Traduzir de</string>
      <string name="pref_translate_to">Traduzir para</string>
-@@ -73,12 +73,134 @@
+@@ -73,12 +73,139 @@
      <string name="repository_add_error">Não foi possível adicionar o repositório. Confira a conexão e tente novamente.</string>
      <string name="repository_refresh_error">Repositório adicionado, mas não foi possível atualizar as extensões. Atualize a tela Extensões.</string>
      <string name="chapter_group_version">Grupo/versão: %1$s</string>
@@ -16996,6 +18677,11 @@ index d1748bc..6785bf4 100644
 +    <string name="polaris_update_install_hint">Toque para abrir o instalador do Android.</string>
 +    <string name="pref_ocr_dependencies_hint">Faixas exigem entrada em inglês ou idioma automático pela fonte. DBNet também exige Android ARM de 64 bits. Opções indisponíveis são desligadas; restaurar o requisito não liga os experimentos sozinho.</string>
 +    <string name="pref_reader_font_summary">%s. Aplica-se ao texto traduzido; o tamanho se adapta a cada balão.</string>
++
++    <string name="backup_verify_unavailable">Não foi possível reler o backup para conferi-lo. Escolha um local com acesso de leitura e escrita.</string>
++    <string name="backup_verify_failed">O backup gravado não passou pela verificação. Os backups anteriores foram preservados.</string>
++    <string name="backup_target_not_empty">Escolha um arquivo novo para o backup. O arquivo existente foi preservado.</string>
++    <string name="backup_finalize_failed">Não foi possível concluir o backup neste local. Os backups anteriores foram preservados.</string>
  </resources>
 diff --git a/i18n/src/commonMain/moko-resources/base/strings.xml b/i18n/src/commonMain/moko-resources/base/strings.xml
 index c0832ba..ebf8f48 100644

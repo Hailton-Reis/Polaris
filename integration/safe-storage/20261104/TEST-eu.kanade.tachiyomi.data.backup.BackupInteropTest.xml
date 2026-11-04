@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.tachiyomi.data.backup.BackupInteropTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-11-04T19:50:01.849Z" hostname="081e2fea02e9" time="4.685">
+  <properties/>
+  <testcase name="Mihon pinned raw protobuf imports notes memo and repository signing identity()" classname="eu.kanade.tachiyomi.data.backup.BackupInteropTest" time="4.544"/>
+  <testcase name="Tachiyomi 0153 raw protobuf imports with empty repository defaults()" classname="eu.kanade.tachiyomi.data.backup.BackupInteropTest" time="0.021"/>
+  <testcase name="Mihon pinned gzip imports common fields without installed sources()" classname="eu.kanade.tachiyomi.data.backup.BackupInteropTest" time="0.021"/>
+  <testcase name="Tachiyomi 0153 gzip imports common fields without installed sources()" classname="eu.kanade.tachiyomi.data.backup.BackupInteropTest" time="0.014"/>
+  <testcase name="Polaris reexports imported Mihon data using the real protobuf codec()" classname="eu.kanade.tachiyomi.data.backup.BackupInteropTest" time="0.022"/>
+  <testcase name="Polaris reexports imported Tachiyomi data using the real protobuf codec()" classname="eu.kanade.tachiyomi.data.backup.BackupInteropTest" time="0.049"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[WARNING: A Java agent has been loaded dynamically (/workspace/polaris-cloud-tools/gradle/caches/modules-2/files-2.1/net.bytebuddy/byte-buddy-agent/1.18.2/62f38a6faf7f069d661b79a07d566f504b0b20c4/byte-buddy-agent-1.18.2.jar)
+WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+WARNING: Dynamic loading of agents will be disallowed by default in a future release
+]]></system-err>
+</testsuite>

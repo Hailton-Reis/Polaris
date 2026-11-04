@@ -1,0 +1,18 @@
+{
+  "status": "NOT_VALIDATED_INSTALLATION_DID_NOT_COMPLETE",
+  "api": 26,
+  "abi": "x86_64",
+  "acceleration": "SOFTWARE_TCG",
+  "planned_cases": 4,
+  "executed_cases": 0,
+  "passed": 0,
+  "failed": 0,
+  "instrumentation_result_observed": false,
+  "reason": "Target APK installation did not return completion after approximately10 minutes; instrumentation returned no test results. Attempt stopped without automatic retry.",
+  "limits": [
+    "Not a product test failure or a device PASS",
+    "Physical ARM and Android14+ remain pending",
+    "SAF providers not tested"
+  ],
+  "command": "adb shell am instrument -w -r -e class eu.kanade.tachiyomi.storage.SafeStorageAndroidTest app.mihon.tachiyomiat.dev.test/eu.kanade.translation.recognizer.OcrComponentTestRunner"
+}
