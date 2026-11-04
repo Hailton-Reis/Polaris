@@ -1,0 +1,14 @@
+[
+  {
+    "abi": "arm64-v8a",
+    "unchanged_font_asset_and_native_library_files": 83,
+    "changed_payload_files": [],
+    "added_payload_files": []
+  },
+  {
+    "abi": "armeabi-v7a",
+    "unchanged_font_asset_and_native_library_files": 82,
+    "changed_payload_files": [],
+    "added_payload_files": []
+  }
+]

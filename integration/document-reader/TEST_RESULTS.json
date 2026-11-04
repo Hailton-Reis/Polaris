@@ -1,31 +1,32 @@
 {
   "date_utc": "2026-11-04",
   "timezone": "UTC",
-  "candidate_revision": "Polaris P20261104.1",
+  "candidate_revision": "Polaris P20261104.2",
   "version_name": "0.1.0-beta.9",
   "version_code": 110,
   "publication": "UNPUBLISHED_INTERNAL_CANDIDATE",
   "current_public_release": "v0.1.0-beta.8",
   "pinned_yomotsu": "0fb80c439ef816eeb50674f1b90af39918b176d8",
-  "patch_sha256": "41c41bed47942b276d55bd61eab13d52d331014248414623cedd599fb61573c3",
-  "assembly": "PASS: all configured debug APKs assembled. Full native build exits 1 solely for app:testDebugUnitTest with 17 preexisting failures. Packaging-only rerun succeeds.",
+  "patch_sha256": "34a520719e858e59b4b0e30cfdc508b10fd3a9fb190a5e27d840088426750ba1",
+  "assembly": "PASS: all configured debug APKs and instrumentation APK assembled. Native build exits1 solely for17 preexisting app unit failures.",
   "full_build_completion": {
     "status": "ASSEMBLY_AND_UNIT_REPORTS_COMPLETE",
-    "unit_tests": 624,
+    "unit_tests": 635,
     "unit_gradle_exit": 1,
-    "packaging_only_exit": 0
+    "packaging_only_exit": null,
+    "note": "All configured debug APKs and test APK assembled in the full run; only failed task app:testDebugUnitTest with17 preexisting failures."
   },
   "android_unit_comparison": {
     "status": "NO_NEW_UNIT_REGRESSIONS",
     "baseline": {
-      "total": 589,
-      "passed": 555,
-      "failed": 34,
+      "total": 624,
+      "passed": 607,
+      "failed": 17,
       "skipped": 0
     },
     "patched": {
-      "total": 624,
-      "passed": 607,
+      "total": 635,
+      "passed": 618,
       "failed": 17,
       "skipped": 0
     },
@@ -38,12 +39,12 @@
       "patched": 1
     },
     "required_module_coverage": {
-      "app": 512,
-      "domain": 77
+      "app": 539,
+      "domain": 85
     }
   },
   "new_tests_vs_beta8": {
-    "total": 35,
+    "total": 46,
     "failed": 0,
     "skipped": 0,
     "classes": [
@@ -77,6 +78,25 @@
         "tests": 4,
         "total_in_class": 16,
         "status": "PASS"
+      },
+      {
+        "module": "app",
+        "classname": "eu.kanade.translation.model.PortugueseTextNormalizationTest",
+        "tests": 3,
+        "status": "PASS"
+      },
+      {
+        "module": "app",
+        "classname": "eu.kanade.translation.presentation.TranslationTypographyTest",
+        "tests": 3,
+        "status": "PASS"
+      },
+      {
+        "module": "app",
+        "classname": "eu.kanade.translation.presentation.TranslationTextFitTest",
+        "tests": 5,
+        "status": "PASS",
+        "note": "Five additional cases for safe-envelope selection."
       }
     ]
   },
@@ -92,29 +112,25 @@
     "packager": {
       "tests": 6,
       "status": "PASS"
-    },
-    "chapter_scoring_guards": {
-      "tests": 5,
-      "status": "PASS"
     }
   },
   "source_to_build_verification": {
     "status": "BYTE_IDENTICAL",
-    "files_checked": 174,
+    "files_checked": 182,
     "mismatches": []
   },
   "apk_artifacts": [
     {
       "abi": "arm64-v8a",
       "file": "Polaris-0.1.0-beta.9-arm64-v8a.apk",
-      "bytes": 192948823,
-      "sha256": "cdf6f2a14e5505adb8f5d51175775b76cb7ddf000815f49528a950653c51b3a2"
+      "bytes": 192966287,
+      "sha256": "426853254bae47d91972af5262e1f6c3ed1a1075e84da3a0b7e08dbece22dd3e"
     },
     {
       "abi": "armeabi-v7a",
       "file": "Polaris-0.1.0-beta.9-armeabi-v7a.apk",
-      "bytes": 153151000,
-      "sha256": "4df8f2dc46ff61ecd572fffa005359754efabef51b0dbf229f833646acbdfbd5"
+      "bytes": 153168464,
+      "sha256": "d65c73e228e55e65b3a7bdcd1d8f195dde0cbe38f795174229021c46c3a544f7"
     }
   ],
   "signer_sha256": "3ae747069cc9015ca1777f94fd56b030501f45d6af380426a572ad60e94d8227",
@@ -122,71 +138,149 @@
   "apk_payload_and_size_comparison": [
     {
       "abi": "arm64-v8a",
-      "old_bytes": 194508943,
-      "new_bytes": 192948823,
-      "delta_bytes": -1560120,
-      "unchanged_asset_and_native_library_files": 78,
-      "changed_payload_files": []
+      "unchanged_font_asset_and_native_library_files": 83,
+      "changed_payload_files": [],
+      "added_payload_files": [],
+      "comparison_revision": "P20261104.1",
+      "old_bytes": 192948823,
+      "new_bytes": 192966287,
+      "delta_bytes": 17464
     },
     {
       "abi": "armeabi-v7a",
-      "old_bytes": 154711120,
-      "new_bytes": 153151000,
-      "delta_bytes": -1560120,
-      "unchanged_asset_and_native_library_files": 77,
-      "changed_payload_files": []
+      "unchanged_font_asset_and_native_library_files": 82,
+      "changed_payload_files": [],
+      "added_payload_files": [],
+      "comparison_revision": "P20261104.1",
+      "old_bytes": 153151000,
+      "new_bytes": 153168464,
+      "delta_bytes": 17464
     }
   ],
-  "apk_repackaging": {
-    "reason": "Removed unused space left by incremental ZIP packaging. Every unsigned APK entry matches the APKs from the full test build byte for byte.",
-    "apks": [
-      {
-        "file": "app-universal-debug.apk",
-        "before_bytes": 532502854,
-        "after_bytes": 532103598,
-        "unsigned_entries_equal": 2209
-      },
-      {
-        "file": "app-armeabi-v7a-debug.apk",
-        "before_bytes": 153550256,
-        "after_bytes": 153151000,
-        "unsigned_entries_equal": 2166
-      },
-      {
-        "file": "app-arm64-v8a-debug.apk",
-        "before_bytes": 193348079,
-        "after_bytes": 192948823,
-        "unsigned_entries_equal": 2167
-      },
-      {
-        "file": "app-x86_64-debug.apk",
-        "before_bytes": 229198926,
-        "after_bytes": 228799670,
-        "unsigned_entries_equal": 2166
-      },
-      {
-        "file": "app-x86-debug.apk",
-        "before_bytes": 213855520,
-        "after_bytes": 213456264,
-        "unsigned_entries_equal": 2166
-      }
-    ]
-  },
   "android_component_verification": {
-    "status": "PASS",
-    "tests": 7,
+    "status": "PASS_16_SELECTED_COMPONENT_CASES",
     "api": 26,
     "abi": "x86_64",
-    "isolated_application": true,
     "hardware_acceleration": false,
-    "renderer_controls": 4,
-    "decoder_controls": 2,
-    "dbnet_cleanup_mask_control": 1,
-    "log": "caption-layout-controls/instrumentation.txt",
-    "images": "caption-layout-controls/",
-    "font": "FontFamily.Default; not Anime Ace",
-    "installed_renderer_build_sha256": "a9cffcfd319c40acfb1dc6dc50a0f9eb7cd6f6cd68d69a7c0249556b56fc64fb",
-    "scope": "Prior7 renderer/region-decoder/mask controls. Renderer and region decoder unchanged. Text reconciler modified and separately tested with16 JVM cases; actual MLKit API crop benchmark records11 successful cases. No full app/ARM/UI acceptance."
+    "isolated_application": true,
+    "installed_renderer_apk_sha256": "04dae311a7439f8ade99889cd20961b01005485ef3266635aab5b56b1445e958",
+    "font": "Anime Ace with Bubble Sans cedilla supplement; all5 bundled fonts checked; original authored controls also use Default.",
+    "case_groups": {
+      "glyphs_and_measured_paragraphs": 3,
+      "opt_in_original_with_authored_portuguese": 1,
+      "shaped_text_fitting": 3,
+      "authored_reader_surfaces": 6,
+      "region_decoder": 2,
+      "cleanup_mask": 1
+    },
+    "runs": [
+      {
+        "log": "instrumentation-first-run.txt",
+        "successful_actual_cases": 15,
+        "initialization_errors": [
+          {
+            "test": "initializationError",
+            "class": "eu.kanade.translation.recognizer.DbnetCleanupMaskLayoutTest",
+            "code": -2
+          }
+        ],
+        "note": "Invocation used the wrong package for the mask class. All15 actual selected cases passed."
+      },
+      {
+        "log": "instrumentation-mask-correct-package.txt",
+        "successful_actual_cases": 1,
+        "initialization_errors": [],
+        "note": "Only the previously unexecuted mask class rerun under its actual detection package; no code changes."
+      }
+    ],
+    "successful_cases": [
+      {
+        "test": "widerSafeEnvelopesCanIncreaseReadablePortugueseWithoutClipping",
+        "class": "eu.kanade.translation.presentation.PortugueseTypographyAndroidTest",
+        "code": 0
+      },
+      {
+        "test": "cedillasMatchTheSelectedComicCapHeightInsteadOfTheSystemLowercase",
+        "class": "eu.kanade.translation.presentation.PortugueseTypographyAndroidTest",
+        "code": 0
+      },
+      {
+        "test": "portugueseAccentsStayInsideTheMeasuredParagraphWithEveryBundledFont",
+        "class": "eu.kanade.translation.presentation.PortugueseTypographyAndroidTest",
+        "code": 0
+      },
+      {
+        "test": "drawComicPortugueseOnTheReportedTextOnArtworkCase",
+        "class": "eu.kanade.translation.presentation.PortugueseRealPageTypographyTest",
+        "code": 0
+      },
+      {
+        "test": "crowdedAndRotatedTextStaysInsideTheOriginalEnvelope",
+        "class": "eu.kanade.translation.presentation.TranslationTextFitAndroidTest",
+        "code": 0
+      },
+      {
+        "test": "growsOnlyInsideTheExistingSafeEnvelope",
+        "class": "eu.kanade.translation.presentation.TranslationTextFitAndroidTest",
+        "code": 0
+      },
+      {
+        "test": "arrependimentosStaysWholeWithEveryBundledFont",
+        "class": "eu.kanade.translation.presentation.TranslationTextFitAndroidTest",
+        "code": 0
+      },
+      {
+        "test": "portugueseComicTextPreservesTheDarkCaptionAtTwoZoomLevels",
+        "class": "eu.kanade.translation.presentation.TranslationSurfaceLayoutTest",
+        "code": 0
+      },
+      {
+        "test": "whiteBalloonContourAndArtworkRemainUntouched",
+        "class": "eu.kanade.translation.presentation.TranslationSurfaceLayoutTest",
+        "code": 0
+      },
+      {
+        "test": "darkCaptionTextAndCleanupStayInsideThePanelAtTwoZoomLevels",
+        "class": "eu.kanade.translation.presentation.TranslationSurfaceLayoutTest",
+        "code": 0
+      },
+      {
+        "test": "legacyCleanupDoesNotAddPaddingOutsideItsMeasuredBounds",
+        "class": "eu.kanade.translation.presentation.TranslationSurfaceLayoutTest",
+        "code": 0
+      },
+      {
+        "test": "mixedSizeTitleTranslationsHaveSeparateRenderedWritingAreas",
+        "class": "eu.kanade.translation.presentation.TranslationSurfaceLayoutTest",
+        "code": 0
+      },
+      {
+        "test": "portugueseComicTextPreservesTheWhiteBalloonContour",
+        "class": "eu.kanade.translation.presentation.TranslationSurfaceLayoutTest",
+        "code": 0
+      },
+      {
+        "test": "rotatedExifDoesNotUseRawRegionCoordinates",
+        "class": "eu.kanade.translation.recognizer.OcrStripImageTest",
+        "code": 0
+      },
+      {
+        "test": "regionsPreserveCoordinatesAndPixelBudgetAndCloseOnFailure",
+        "class": "eu.kanade.translation.recognizer.OcrStripImageTest",
+        "code": 0
+      },
+      {
+        "test": "oversizedCleanupMaskKeepsPageOriginAtViewportTopLeft",
+        "class": "eu.kanade.translation.detection.DbnetCleanupMaskLayoutTest",
+        "code": 0
+      }
+    ],
+    "visual_review": [
+      "Actual Android C Ç ç before/after: comic height/style retained instead of Android system fallback.",
+      "Accented Anime Ace paragraph and dark/white authored regions viewed.",
+      "Private original stats artwork with manually authored Portuguese viewed; original/derived capture not uploaded."
+    ],
+    "scope": "Component rendering/fit/decoding only. No full application startup, physical ARM performance, update/install acceptance or automatic translation-quality score."
   },
   "updater": {
     "artifact": "FULL_APK",
@@ -242,5 +336,24 @@
       "successful_translation_cases": 0,
       "scope": "First120s task timeout; explicit model-preparation retry180s timeout on minimal software AOSP emulator. No alternative translator substituted and no accuracy penalty assigned."
     }
+  },
+  "new_typography_unit_tests": {
+    "total": 11,
+    "failed": 0,
+    "skipped": 0,
+    "normalization": 3,
+    "glyph_spans": 3,
+    "fit_candidate_selection": 5
+  },
+  "typography": {
+    "report": "../typography/20261104/README.md",
+    "font_files_modified": false,
+    "new_models": false,
+    "new_apis": false,
+    "diagnosis": "Bundled Anime Ace lacks Ç and ç; prior Android system fallback differed in style/size.",
+    "fix": "Existing Bubble Sans supplement for Ç/ç only at1.125 cap-height scale; NFC; same styled text for measure/draw; natural font leading; consider all existing safe envelopes.",
+    "reader_behavior": "User-selected family; size and line breaks adapt to each region; no identification of original typeface.",
+    "saved_translations": "Reopen reader; no OCR rerun required for display-only fixes.",
+    "android_component_result": "PASS:16 selected actual cases across two invocations; command-package initialization error recorded separately."
   }
 }

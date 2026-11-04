@@ -1,6 +1,6 @@
 # Polaris 0.1.0-beta.9 — candidato interno para teste
 
-Revisão: **P20261104.1**. Android mínimo: **8.0 / API 26**. Este candidato ainda não foi publicado como Release. A beta.8 continua sendo a prévia pública. A conferência nos celulares ainda está pendente.
+Revisão: **P20261104.2**. Android mínimo: **8.0 / API 26**. Este candidato ainda não foi publicado como Release. A beta.8 continua sendo a prévia pública. A conferência nos celulares ainda está pendente.
 
 ## Nome e ícone corrigidos
 
@@ -18,7 +18,7 @@ O pacote contém dois APKs. Use **arm64-v8a** primeiro nos aparelhos Android de 
 
 Instale apenas um APK por aparelho. Não é necessário o APK universal nem as versões x86 do emulador. Instalações e atualizações devem vir sempre da mesma máquina/assinatura usada para esse beta. Não apague a instalação antiga para contornar um erro de assinatura: isso pode remover os dados locais. O mantenedor deve reconstruir e compartilhar o APK com a assinatura original.
 
-O mantenedor gera o pacote com a opção **4** do CMD atualizado. Ao concluir a comparação automatizada, a pasta de evidências contém **beta/**, com APKs ARM, hashes e exemplos. A opção **9** continua sendo o fluxo local de instalação já existente. Confira **P20261104.1** em **Sobre** antes de registrar resultados. O versionCode agora é **110**; a beta.8 pública usa 109.
+O mantenedor gera o pacote com a opção **4** do CMD atualizado. Ao concluir a comparação automatizada, a pasta de evidências contém **beta/**, com APKs ARM, hashes e exemplos. A opção **9** continua sendo o fluxo local de instalação já existente. Confira **P20261104.2** em **Sobre** antes de registrar resultados. O versionCode agora é **110**; a beta.8 pública usa 109.
 
 ## Uso inicial
 
@@ -110,3 +110,9 @@ O download da atualização continua ao sair da tela. Quedas de rede têm novas 
 Essa correção exige instalar a beta.9 uma vez: não modifica o atualizador da beta.8 já instalada. A distribuição deste candidato ainda está pendente. Veja [comportamento, diagnóstico e limites](../../docs/CORRECOES_LEITURA_ATUALIZACAO_P20261104_1.md).
 
 O [ensaio real do capítulo 40](../ocr-benchmark/20261104-chapter40/README.md) compara11 recortes difíceis. Paddle teve 9 textos exatos e2 erros de caracteres; ML Kit 7 e 10, em 465 caracteres. Os controles brancos passaram nos dois. O benchmark não mede desempenho ARM nem valida tradução editorial do capítulo inteiro.
+
+## Cedilha, fonte e encaixe em português
+
+A Anime Ace incluída não tinha Ç/ç; o candidato complementa essas letras com a Bubble Sans já disponível, com altura compatível. A medição usa o mesmo texto estilizado do desenho, o espaço entre linhas considera os acentos, e a busca compara os espaços seguros para evitar reduzir a letra antes do necessário. Os arquivos das fontes permanecem intactos.
+
+**Fonte das traduções** aplica a família escolhida ao texto traduzido; tamanho e quebras são automáticos para cada região. Não há identificação automática da fonte original. Reabra o leitor para conferir traduções salvas com a correção; não é necessário refazer o OCR somente por causa da fonte. Veja [diagnóstico e limites](../../docs/TIPOGRAFIA_PT_P20261104_2.md).

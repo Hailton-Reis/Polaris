@@ -1,0 +1,125 @@
+{
+  "status": "PASS_16_SELECTED_COMPONENT_CASES",
+  "api": 26,
+  "abi": "x86_64",
+  "hardware_acceleration": false,
+  "isolated_application": true,
+  "installed_renderer_apk_sha256": "04dae311a7439f8ade99889cd20961b01005485ef3266635aab5b56b1445e958",
+  "font": "Anime Ace with Bubble Sans cedilla supplement; all5 bundled fonts checked; original authored controls also use Default.",
+  "case_groups": {
+    "glyphs_and_measured_paragraphs": 3,
+    "opt_in_original_with_authored_portuguese": 1,
+    "shaped_text_fitting": 3,
+    "authored_reader_surfaces": 6,
+    "region_decoder": 2,
+    "cleanup_mask": 1
+  },
+  "runs": [
+    {
+      "log": "instrumentation-first-run.txt",
+      "successful_actual_cases": 15,
+      "initialization_errors": [
+        {
+          "test": "initializationError",
+          "class": "eu.kanade.translation.recognizer.DbnetCleanupMaskLayoutTest",
+          "code": -2
+        }
+      ],
+      "note": "Invocation used the wrong package for the mask class. All15 actual selected cases passed."
+    },
+    {
+      "log": "instrumentation-mask-correct-package.txt",
+      "successful_actual_cases": 1,
+      "initialization_errors": [],
+      "note": "Only the previously unexecuted mask class rerun under its actual detection package; no code changes."
+    }
+  ],
+  "successful_cases": [
+    {
+      "test": "widerSafeEnvelopesCanIncreaseReadablePortugueseWithoutClipping",
+      "class": "eu.kanade.translation.presentation.PortugueseTypographyAndroidTest",
+      "code": 0
+    },
+    {
+      "test": "cedillasMatchTheSelectedComicCapHeightInsteadOfTheSystemLowercase",
+      "class": "eu.kanade.translation.presentation.PortugueseTypographyAndroidTest",
+      "code": 0
+    },
+    {
+      "test": "portugueseAccentsStayInsideTheMeasuredParagraphWithEveryBundledFont",
+      "class": "eu.kanade.translation.presentation.PortugueseTypographyAndroidTest",
+      "code": 0
+    },
+    {
+      "test": "drawComicPortugueseOnTheReportedTextOnArtworkCase",
+      "class": "eu.kanade.translation.presentation.PortugueseRealPageTypographyTest",
+      "code": 0
+    },
+    {
+      "test": "crowdedAndRotatedTextStaysInsideTheOriginalEnvelope",
+      "class": "eu.kanade.translation.presentation.TranslationTextFitAndroidTest",
+      "code": 0
+    },
+    {
+      "test": "growsOnlyInsideTheExistingSafeEnvelope",
+      "class": "eu.kanade.translation.presentation.TranslationTextFitAndroidTest",
+      "code": 0
+    },
+    {
+      "test": "arrependimentosStaysWholeWithEveryBundledFont",
+      "class": "eu.kanade.translation.presentation.TranslationTextFitAndroidTest",
+      "code": 0
+    },
+    {
+      "test": "portugueseComicTextPreservesTheDarkCaptionAtTwoZoomLevels",
+      "class": "eu.kanade.translation.presentation.TranslationSurfaceLayoutTest",
+      "code": 0
+    },
+    {
+      "test": "whiteBalloonContourAndArtworkRemainUntouched",
+      "class": "eu.kanade.translation.presentation.TranslationSurfaceLayoutTest",
+      "code": 0
+    },
+    {
+      "test": "darkCaptionTextAndCleanupStayInsideThePanelAtTwoZoomLevels",
+      "class": "eu.kanade.translation.presentation.TranslationSurfaceLayoutTest",
+      "code": 0
+    },
+    {
+      "test": "legacyCleanupDoesNotAddPaddingOutsideItsMeasuredBounds",
+      "class": "eu.kanade.translation.presentation.TranslationSurfaceLayoutTest",
+      "code": 0
+    },
+    {
+      "test": "mixedSizeTitleTranslationsHaveSeparateRenderedWritingAreas",
+      "class": "eu.kanade.translation.presentation.TranslationSurfaceLayoutTest",
+      "code": 0
+    },
+    {
+      "test": "portugueseComicTextPreservesTheWhiteBalloonContour",
+      "class": "eu.kanade.translation.presentation.TranslationSurfaceLayoutTest",
+      "code": 0
+    },
+    {
+      "test": "rotatedExifDoesNotUseRawRegionCoordinates",
+      "class": "eu.kanade.translation.recognizer.OcrStripImageTest",
+      "code": 0
+    },
+    {
+      "test": "regionsPreserveCoordinatesAndPixelBudgetAndCloseOnFailure",
+      "class": "eu.kanade.translation.recognizer.OcrStripImageTest",
+      "code": 0
+    },
+    {
+      "test": "oversizedCleanupMaskKeepsPageOriginAtViewportTopLeft",
+      "class": "eu.kanade.translation.detection.DbnetCleanupMaskLayoutTest",
+      "code": 0
+    }
+  ],
+  "visual_review": [
+    "Actual Android C Ç ç before/after: comic height/style retained instead of Android system fallback.",
+    "Accented Anime Ace paragraph and dark/white authored regions viewed.",
+    "Private original stats artwork with manually authored Portuguese viewed; original/derived capture not uploaded."
+  ],
+  "scope": "Component rendering/fit/decoding only. No full application startup, physical ARM performance, update/install acceptance or automatic translation-quality score."
+}
