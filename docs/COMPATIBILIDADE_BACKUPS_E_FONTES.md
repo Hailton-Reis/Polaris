@@ -33,3 +33,7 @@ Backups de biblioteca e preferências não devem ser apresentados como cópias d
 - Preservar a extensão anterior quando uma atualização privada falhar. O instalador atual precisa de substituição segura antes da instalação em massa: hoje remove o arquivo de destino antes de concluir a cópia do novo.
 
 A compatibilidade ampla é uma meta com matriz de versões e resultados, não uma garantia para qualquer backup de qualquer fork. Os ensaios de layout/OCR já realizados não substituem esta aceitação.
+
+## Primeira evidência pelo codec
+
+A [rodada de interoperabilidade de 04/11/2026](../integration/backup-interop/20261104/README.md) passou em seis testes do decodificador e mapeamentos reais do Polaris, com arquivos sintéticos dos DTOs fixados de Tachiyomi v0.15.3 e Mihon. Os dois leitores de referência aceitaram as reexportações e conferiram os valores comuns. A rodada identifica explicitamente campos não preservados e formatos não ensaiados; a restauração em banco e a preparação de fontes privadas continuam pendentes. Não houve mudança no formato de produção nem publicação da beta.9.

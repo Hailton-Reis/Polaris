@@ -1,0 +1,182 @@
+[
+  {
+    "reference": "mihon",
+    "file": "Backup.kt",
+    "repository": "mihonapp/mihon",
+    "commit": "8794e89a866a3de578c02cefac1e609bcff5f092",
+    "git_blob_sha": "0c021d34a8426dc0bd5844b4e00f9c13767610bf",
+    "url": "https://github.com/mihonapp/mihon/blob/8794e89a866a3de578c02cefac1e609bcff5f092/app/src/main/java/eu/kanade/tachiyomi/data/backup/models/Backup.kt",
+    "sha256": "d0e7aaf6016c06cee0f901a50423b23c2e20c9b4f5e4c151d43e7029032dc66c"
+  },
+  {
+    "reference": "mihon",
+    "file": "BackupManga.kt",
+    "repository": "mihonapp/mihon",
+    "commit": "8794e89a866a3de578c02cefac1e609bcff5f092",
+    "git_blob_sha": "74a27fa017dfc84e2826470c37e8102fe92a782d",
+    "url": "https://github.com/mihonapp/mihon/blob/8794e89a866a3de578c02cefac1e609bcff5f092/app/src/main/java/eu/kanade/tachiyomi/data/backup/models/BackupManga.kt",
+    "sha256": "3ed554d40e44889a157b43fd18f298ef5750070924ec1f03fbfc0c5e0f5694b8"
+  },
+  {
+    "reference": "mihon",
+    "file": "BackupChapter.kt",
+    "repository": "mihonapp/mihon",
+    "commit": "8794e89a866a3de578c02cefac1e609bcff5f092",
+    "git_blob_sha": "9b026ca30faae1ad334ab7fcccebaa667515ed77",
+    "url": "https://github.com/mihonapp/mihon/blob/8794e89a866a3de578c02cefac1e609bcff5f092/app/src/main/java/eu/kanade/tachiyomi/data/backup/models/BackupChapter.kt",
+    "sha256": "078ec6faa435053ae97754ee11a4483932df803452ab825c1b8699ea53cb0a31"
+  },
+  {
+    "reference": "mihon",
+    "file": "BackupCategory.kt",
+    "repository": "mihonapp/mihon",
+    "commit": "8794e89a866a3de578c02cefac1e609bcff5f092",
+    "git_blob_sha": "2600e22a45ca8c693f99860d378672c57347a1fb",
+    "url": "https://github.com/mihonapp/mihon/blob/8794e89a866a3de578c02cefac1e609bcff5f092/app/src/main/java/eu/kanade/tachiyomi/data/backup/models/BackupCategory.kt",
+    "sha256": "f13dd4c9b49bcf9e914add0990e164812a50201403a663bf3b27356f76e9a94b"
+  },
+  {
+    "reference": "mihon",
+    "file": "BackupHistory.kt",
+    "repository": "mihonapp/mihon",
+    "commit": "8794e89a866a3de578c02cefac1e609bcff5f092",
+    "git_blob_sha": "aed3f24a29abd781e6913af9b02b5a44e3203436",
+    "url": "https://github.com/mihonapp/mihon/blob/8794e89a866a3de578c02cefac1e609bcff5f092/app/src/main/java/eu/kanade/tachiyomi/data/backup/models/BackupHistory.kt",
+    "sha256": "61e9be2c6638ad53299f5b7dfaa4e1c4e7b66e7e558da0cb5788cc00f212e728"
+  },
+  {
+    "reference": "mihon",
+    "file": "BackupSource.kt",
+    "repository": "mihonapp/mihon",
+    "commit": "8794e89a866a3de578c02cefac1e609bcff5f092",
+    "git_blob_sha": "92ee2dca94bb8005ba8b2aec1d90464f28fbf806",
+    "url": "https://github.com/mihonapp/mihon/blob/8794e89a866a3de578c02cefac1e609bcff5f092/app/src/main/java/eu/kanade/tachiyomi/data/backup/models/BackupSource.kt",
+    "sha256": "6bfe980f5e07fbf7148185dd0959b42bc9fb0acfd0ca57246988c5839de3881f"
+  },
+  {
+    "reference": "mihon",
+    "file": "BackupTracking.kt",
+    "repository": "mihonapp/mihon",
+    "commit": "8794e89a866a3de578c02cefac1e609bcff5f092",
+    "git_blob_sha": "7b66f1457970619e3934a944c0e59fb9e28c733a",
+    "url": "https://github.com/mihonapp/mihon/blob/8794e89a866a3de578c02cefac1e609bcff5f092/app/src/main/java/eu/kanade/tachiyomi/data/backup/models/BackupTracking.kt",
+    "sha256": "aeb35510c13e54fd85ba0b61038d4a26481e7dd674078b8a182aba3ceebb3fdf"
+  },
+  {
+    "reference": "mihon",
+    "file": "BackupPreference.kt",
+    "repository": "mihonapp/mihon",
+    "commit": "8794e89a866a3de578c02cefac1e609bcff5f092",
+    "git_blob_sha": "3884f37e3f99b032597e734b0517bd2fea970125",
+    "url": "https://github.com/mihonapp/mihon/blob/8794e89a866a3de578c02cefac1e609bcff5f092/app/src/main/java/eu/kanade/tachiyomi/data/backup/models/BackupPreference.kt",
+    "sha256": "99ad107ed933b381e147262321b12c3dbb5b08bfff9d46659cc2de40d8972087"
+  },
+  {
+    "reference": "mihon",
+    "file": "BackupExtensionStore.kt",
+    "repository": "mihonapp/mihon",
+    "commit": "8794e89a866a3de578c02cefac1e609bcff5f092",
+    "git_blob_sha": "93ec1a6a7dc64d762c35d1729ce8443ca87ca4ac",
+    "url": "https://github.com/mihonapp/mihon/blob/8794e89a866a3de578c02cefac1e609bcff5f092/app/src/main/java/eu/kanade/tachiyomi/data/backup/models/BackupExtensionStore.kt",
+    "sha256": "3781b2e4fa273b4f3ebadb50cf15d4d51be46d0bfc1a017628ea08399492115d"
+  },
+  {
+    "reference": "tachiyomi",
+    "file": "Backup.kt",
+    "repository": "mihonapp/mihon",
+    "commit": "49991d38d97e21746dcc9e5f2c177bccb94c93b3",
+    "git_blob_sha": "cdc5c4ad2e83be31c11cd5215c67db1029e780a0",
+    "url": "https://github.com/mihonapp/mihon/blob/49991d38d97e21746dcc9e5f2c177bccb94c93b3/app/src/main/java/eu/kanade/tachiyomi/data/backup/models/Backup.kt",
+    "sha256": "10bb4e24c0fcafdc8fbfe85e27bdb4ce7d6d548b2bf6d6eb0641491d33373bb2"
+  },
+  {
+    "reference": "tachiyomi",
+    "file": "BackupManga.kt",
+    "repository": "mihonapp/mihon",
+    "commit": "49991d38d97e21746dcc9e5f2c177bccb94c93b3",
+    "git_blob_sha": "43a8a906c9f7f916b66b6a6e3e67f86afdfca38a",
+    "url": "https://github.com/mihonapp/mihon/blob/49991d38d97e21746dcc9e5f2c177bccb94c93b3/app/src/main/java/eu/kanade/tachiyomi/data/backup/models/BackupManga.kt",
+    "sha256": "eb3c9b4aa178fd38869975c0ef135fc2b40408685e5ff56a6c442bcdc218fc9f"
+  },
+  {
+    "reference": "tachiyomi",
+    "file": "BackupChapter.kt",
+    "repository": "mihonapp/mihon",
+    "commit": "49991d38d97e21746dcc9e5f2c177bccb94c93b3",
+    "git_blob_sha": "567ca372cd1bff2a55554cf40e3a063ef425f661",
+    "url": "https://github.com/mihonapp/mihon/blob/49991d38d97e21746dcc9e5f2c177bccb94c93b3/app/src/main/java/eu/kanade/tachiyomi/data/backup/models/BackupChapter.kt",
+    "sha256": "3586f39be0fe263d678b16130549d057750cc7e67381c461e16ce8c3b4d7de22"
+  },
+  {
+    "reference": "tachiyomi",
+    "file": "BackupCategory.kt",
+    "repository": "mihonapp/mihon",
+    "commit": "49991d38d97e21746dcc9e5f2c177bccb94c93b3",
+    "git_blob_sha": "df517e8edab00a4c92eea868551aafe32a9598d7",
+    "url": "https://github.com/mihonapp/mihon/blob/49991d38d97e21746dcc9e5f2c177bccb94c93b3/app/src/main/java/eu/kanade/tachiyomi/data/backup/models/BackupCategory.kt",
+    "sha256": "5c23f40dd32393f5f9360cecccf76d7b407900c4352ea7a994e36cecaa4b9bd8"
+  },
+  {
+    "reference": "tachiyomi",
+    "file": "BackupHistory.kt",
+    "repository": "mihonapp/mihon",
+    "commit": "49991d38d97e21746dcc9e5f2c177bccb94c93b3",
+    "git_blob_sha": "1108a376e7f2875c32bffe1b96c0dbf10f619950",
+    "url": "https://github.com/mihonapp/mihon/blob/49991d38d97e21746dcc9e5f2c177bccb94c93b3/app/src/main/java/eu/kanade/tachiyomi/data/backup/models/BackupHistory.kt",
+    "sha256": "6cfc1a76de048696b7962ed615f7490edda7d6e944b66f38a53afa5059b541b4"
+  },
+  {
+    "reference": "tachiyomi",
+    "file": "BackupSource.kt",
+    "repository": "mihonapp/mihon",
+    "commit": "49991d38d97e21746dcc9e5f2c177bccb94c93b3",
+    "git_blob_sha": "bfd2c93bf403ed05ea7194e06c2ec75f6aeed6be",
+    "url": "https://github.com/mihonapp/mihon/blob/49991d38d97e21746dcc9e5f2c177bccb94c93b3/app/src/main/java/eu/kanade/tachiyomi/data/backup/models/BackupSource.kt",
+    "sha256": "35a1febbed8d8dbeea98d8b2930e402c48c1a8dbb269cf0bec1d354ac65a6291"
+  },
+  {
+    "reference": "tachiyomi",
+    "file": "BackupTracking.kt",
+    "repository": "mihonapp/mihon",
+    "commit": "49991d38d97e21746dcc9e5f2c177bccb94c93b3",
+    "git_blob_sha": "910a8adac0936ce63b454698351d1fd4d86ab027",
+    "url": "https://github.com/mihonapp/mihon/blob/49991d38d97e21746dcc9e5f2c177bccb94c93b3/app/src/main/java/eu/kanade/tachiyomi/data/backup/models/BackupTracking.kt",
+    "sha256": "9edd2cd9c62f73c1303e9e92d8b08fb8128178bac70b77bfd17f1c9bf48d4c2f"
+  },
+  {
+    "reference": "tachiyomi",
+    "file": "BackupPreference.kt",
+    "repository": "mihonapp/mihon",
+    "commit": "49991d38d97e21746dcc9e5f2c177bccb94c93b3",
+    "git_blob_sha": "3884f37e3f99b032597e734b0517bd2fea970125",
+    "url": "https://github.com/mihonapp/mihon/blob/49991d38d97e21746dcc9e5f2c177bccb94c93b3/app/src/main/java/eu/kanade/tachiyomi/data/backup/models/BackupPreference.kt",
+    "sha256": "99ad107ed933b381e147262321b12c3dbb5b08bfff9d46659cc2de40d8972087"
+  },
+  {
+    "reference": "mihon",
+    "file": "UpdateStrategy.kt",
+    "repository": "mihonapp/mihon",
+    "commit": "8794e89a866a3de578c02cefac1e609bcff5f092",
+    "git_blob_sha": "d76a7dd008b0f03f3e110a13e75cdb8566c03a31",
+    "sha256": "dcdf5b3a60108c7cc1ffc8f2954fc21ac9bacc5ca066c40037533cf17b03b3eb",
+    "url": "https://github.com/mihonapp/mihon/blob/8794e89a866a3de578c02cefac1e609bcff5f092/source-api/src/main/kotlin/eu/kanade/tachiyomi/source/model/UpdateStrategy.kt"
+  },
+  {
+    "reference": "mihon",
+    "file": "JsonObject.kt",
+    "repository": "mihonapp/mihon",
+    "commit": "8794e89a866a3de578c02cefac1e609bcff5f092",
+    "git_blob_sha": "1fc7998f3c7cc92ede43d922a15cda3a5f8f264d",
+    "sha256": "76d4f485cd35d0a526435b8562485db7acb1226e549d1eeb5073afdfd8b5ea38",
+    "url": "https://github.com/mihonapp/mihon/blob/8794e89a866a3de578c02cefac1e609bcff5f092/core/common/src/main/kotlin/mihon/core/common/extensions/JsonObject.kt"
+  },
+  {
+    "reference": "tachiyomi",
+    "file": "UpdateStrategy.kt",
+    "repository": "mihonapp/mihon",
+    "commit": "49991d38d97e21746dcc9e5f2c177bccb94c93b3",
+    "git_blob_sha": "d76a7dd008b0f03f3e110a13e75cdb8566c03a31",
+    "sha256": "dcdf5b3a60108c7cc1ffc8f2954fc21ac9bacc5ca066c40037533cf17b03b3eb",
+    "url": "https://github.com/mihonapp/mihon/blob/49991d38d97e21746dcc9e5f2c177bccb94c93b3/source-api/src/commonMain/kotlin/eu/kanade/tachiyomi/source/model/UpdateStrategy.kt"
+  }
+]

@@ -10078,6 +10078,155 @@ index 0000000..249ef72
 +        assertFalse(gesture.tap(1))
 +    }
 +}
+diff --git a/app/src/test/java/eu/kanade/tachiyomi/data/backup/BackupInteropTest.kt b/app/src/test/java/eu/kanade/tachiyomi/data/backup/BackupInteropTest.kt
+new file mode 100644
+index 0000000..4d5291f
+--- /dev/null
++++ b/app/src/test/java/eu/kanade/tachiyomi/data/backup/BackupInteropTest.kt
+@@ -0,0 +1,143 @@
++package eu.kanade.tachiyomi.data.backup
++
++import android.content.ContentResolver
++import android.content.Context
++import android.net.Uri
++import eu.kanade.tachiyomi.data.backup.models.Backup
++import eu.kanade.tachiyomi.data.backup.models.BooleanPreferenceValue
++import eu.kanade.tachiyomi.data.backup.models.FloatPreferenceValue
++import eu.kanade.tachiyomi.data.backup.models.IntPreferenceValue
++import eu.kanade.tachiyomi.data.backup.models.LongPreferenceValue
++import eu.kanade.tachiyomi.data.backup.models.StringPreferenceValue
++import eu.kanade.tachiyomi.data.backup.models.StringSetPreferenceValue
++import io.mockk.every
++import io.mockk.mockk
++import kotlinx.serialization.protobuf.ProtoBuf
++import org.junit.jupiter.api.Assertions.assertEquals
++import org.junit.jupiter.api.Assertions.assertTrue
++import org.junit.jupiter.api.Test
++import java.io.ByteArrayInputStream
++import java.io.ByteArrayOutputStream
++import java.io.File
++import java.util.zip.GZIPOutputStream
++
++/** Real product decoder/serializers; synthetic archives emitted by separately compiled pinned upstream DTOs. */
++class BackupInteropTest {
++    private val codec = ProtoBuf
++
++    private fun imported(name: String, gzip: Boolean): Backup {
++        val extension = if (gzip) "tachibk" else "proto"
++        val bytes = checkNotNull(javaClass.getResourceAsStream("/backup-interop/$name.$extension")).use {
++            it.readBytes()
++        }
++        return decode(bytes)
++    }
++
++    private fun decode(bytes: ByteArray): Backup {
++        val context = mockk<Context>()
++        val resolver = mockk<ContentResolver>()
++        val uri = mockk<Uri>()
++        every { context.contentResolver } returns resolver
++        every { resolver.openInputStream(uri) } answers { ByteArrayInputStream(bytes) }
++        return BackupDecoder(context, codec).decode(uri)
++    }
++
++    private fun assertCommon(backup: Backup) {
++        val manga = backup.backupManga.single()
++        assertEquals(8787213233662904706L, manga.source)
++        assertEquals("/work", manga.url)
++        val mappedManga = manga.getMangaImpl()
++        assertEquals(8787213233662904706L, mappedManga.source)
++        assertEquals("/work", mappedManga.url)
++        assertTrue(mappedManga.favorite)
++        assertEquals("Obra de teste — ação", manga.title)
++        assertEquals("Artista", manga.artist)
++        assertEquals("Autor", manga.author)
++        assertEquals(listOf("Aventura"), manga.genre)
++        assertEquals(1700000000000L, manga.dateAdded)
++        assertTrue(manga.favorite)
++        assertEquals(13, manga.chapterFlags)
++        assertEquals(5, manga.viewer_flags)
++        assertEquals(listOf(7L), manga.categories)
++        val chapter = manga.chapters.single()
++        assertEquals("/work/ch-40", chapter.url)
++        assertEquals(40f, chapter.chapterNumber)
++        assertTrue(chapter.read)
++        assertTrue(chapter.bookmark)
++        assertEquals(17L, chapter.lastPageRead)
++        val mappedChapter = chapter.toChapterImpl()
++        assertEquals("/work/ch-40", mappedChapter.url)
++        assertEquals(17L, mappedChapter.lastPageRead.toLong())
++        assertTrue(mappedChapter.read)
++        assertTrue(mappedChapter.bookmark)
++        assertEquals(3L, chapter.sourceOrder)
++        assertEquals(12345L, manga.history.single().readDuration)
++        assertEquals(1700000000300L, manga.history.single().lastRead)
++        assertEquals(chapter.url, manga.history.single().url)
++        assertEquals(456L, manga.tracking.single().mediaId)
++        assertEquals(39.5f, manga.tracking.single().lastChapterRead)
++        assertEquals(7L, backup.backupCategories.single().order)
++        assertEquals("Favoritos", backup.backupCategories.single().name)
++        assertEquals(manga.source, backup.backupSources.single().sourceId)
++        assertEquals("Fonte ausente", backup.backupSources.single().name)
++        val preferences = backup.backupPreferences.associateBy { it.key }
++        assertEquals(42, (preferences.getValue("sample.int").value as IntPreferenceValue).value)
++        assertEquals(5000000000L, (preferences.getValue("sample.long").value as LongPreferenceValue).value)
++        assertEquals(1.25f, (preferences.getValue("sample.float").value as FloatPreferenceValue).value)
++        assertTrue((preferences.getValue("sample.bool").value as BooleanPreferenceValue).value)
++        assertEquals("ação", (preferences.getValue("sample.string").value as StringPreferenceValue).value)
++        assertEquals(setOf("pt", "en"), (preferences.getValue("sample.set").value as StringSetPreferenceValue).value)
++        val sourceSettings = backup.backupSourcePreferences.single()
++        assertEquals("source-${manga.source}", sourceSettings.sourceKey)
++        assertEquals("synthetic", (sourceSettings.prefs.single().value as StringPreferenceValue).value)
++    }
++
++    @Test fun `Tachiyomi 0153 gzip imports common fields without installed sources`() {
++        assertCommon(imported("tachiyomi", true))
++    }
++
++    @Test fun `Tachiyomi 0153 raw protobuf imports with empty repository defaults`() {
++        val backup = imported("tachiyomi", false)
++        assertCommon(backup)
++        assertTrue(backup.backupExtensionStores.isEmpty())
++        assertEquals(0L, backup.backupCategories.single().id)
++    }
++
++    @Test fun `Mihon pinned gzip imports common fields without installed sources`() {
++        assertCommon(imported("mihon", true))
++    }
++
++    @Test fun `Mihon pinned raw protobuf imports notes memo and repository signing identity`() {
++        val backup = imported("mihon", false)
++        assertCommon(backup)
++        assertEquals(23L, backup.backupCategories.single().id)
++        assertEquals("Nota preservada", backup.backupManga.single().notes)
++        assertTrue(backup.backupManga.single().initialized)
++        assertEquals("{\"sample\":true}", backup.backupManga.single().memo.decodeToString())
++        val store = backup.backupExtensionStores.single()
++        assertEquals("https://example.invalid/repo/index.pb", store.indexUrl)
++        assertEquals("a".repeat(64), store.signingKey)
++        assertEquals(false, store.isLegacy)
++    }
++
++    private fun roundTrip(name: String) {
++        val backup = imported(name, true)
++        val encoded = codec.encodeToByteArray(Backup.serializer(), backup)
++        val output = ByteArrayOutputStream()
++        GZIPOutputStream(output).use { it.write(encoded) }
++        assertCommon(decode(output.toByteArray()))
++        // Optional external reference-reader exchange. Default unit runs stay self-contained.
++        System.getProperty("polaris.backup.exchange")?.let { directory ->
++            File(directory).mkdirs()
++            File(directory, "$name-polaris.tachibk").writeBytes(output.toByteArray())
++        }
++    }
++
++    @Test fun `Polaris reexports imported Tachiyomi data using the real protobuf codec`() {
++        roundTrip("tachiyomi")
++    }
++
++    @Test fun `Polaris reexports imported Mihon data using the real protobuf codec`() {
++        roundTrip("mihon")
++    }
++}
 diff --git a/app/src/test/java/eu/kanade/tachiyomi/data/updater/AppUpdateRepositoryTest.kt b/app/src/test/java/eu/kanade/tachiyomi/data/updater/AppUpdateRepositoryTest.kt
 index 68f36cd..fb3271f 100644
 --- a/app/src/test/java/eu/kanade/tachiyomi/data/updater/AppUpdateRepositoryTest.kt
@@ -12941,6 +13090,91 @@ index 0000000..f064a3c
 +        coVerify(exactly = 0) { f.sync.await(any(), any(), any(), any(), any()) }
 +    }
 +}
+diff --git a/app/src/test/resources/backup-interop/mihon.proto b/app/src/test/resources/backup-interop/mihon.proto
+new file mode 100644
+index 0000000000000000000000000000000000000000..618b0d4e307f86754751ac7ef1ea1d482855ec49
+GIT binary patch
+literal 1192
+zcmbu8&ubGw6vuZ{GTBZIjdMxcgRB8T0^Lp1G)<$Drqxo>YH5lfcyN-PHcK}<%gk(S
+zEkfw2SAXF}q2NI+-n=MyN-jkZt6l_erGJ2k2L(ZQ(;sN05b2y|nD_mB-+MC;z6~fV
+zcRzo*{qy0EB^1<eP`1$5bGgW{Y7kWrE{M8SyQkvDlg48j3+0(Gxxn#Y-W8N3dkeHe
+zY%j*Z2IVR@ZP9op%o62UC13S!T!u#j<=W=`U#|yN<Q(j3I_RZxe=33Cco{o_Fg2Cv
+z>ntqUqD(xkDxZ`SM>E?^&FIE^Upgg8>ezJ0svNo_k1KLyId;4(gu}DCP8M;+v502c
+zRcx7tE*LH?=&7M}T$%N^raeC-Nyo-A#yLq+@{{r!*ywl)!Y@Iv4x)c06nXx^H|u$I
+zeFMm!KyB;YI`|5@FHwP2hY?O#6&v_FkXJ(8%Q4>cjb#OM$*tAUw~xLSA=o*AtCX37
+z@<^yBx(4KR&<n#8)Nd1Zx!<nHe#`4%3c?+dSAjq|I6_=)0o&Lhn!u&9xkM|bW?+G}
+zqF0UUXccM@i)-g?G0n&vVZ<(xE7)=g3Mlb9D8Q~=o<;3>bQWgY1YY#QTZuraZ9mvV
+zbubH$>{90}iiL+g)h2erk8kA$!;-X?tAm;SWQ&wqXdIqtlRD;w6KuC~1BzS+S7CTJ
+zS1y?M{Ad!MZWCK*3R<ZO1UvuVXYaihCjwo7x&Hze$UmJ>V89VDK<qc*ChX(XWhK&|
+z8O{tR2L_XagXwf~B#|0Uq|vqgs;DDOYJ28~tEvlj^1Ye+03ONk#6cs)h(mSLHprsp
+d6j5}>J91MrUNDpXG4k<Ie8?4x9*{vs`VBtAs#gF2
+
+literal 0
+HcmV?d00001
+
+diff --git a/app/src/test/resources/backup-interop/mihon.tachibk b/app/src/test/resources/backup-interop/mihon.tachibk
+new file mode 100644
+index 0000000000000000000000000000000000000000..4b5fb252d3bf0663df844d8008e2429d45242955
+GIT binary patch
+literal 664
+zcmV;J0%!dniwFP!00000|D}`9YZE~f$9GdQ*-j0Odr8}atN}p+-A&UpO{0>g)l$)F
+zX^J3taFU%iLpM9i%xr8eLg=Yif8j-;;6W|kyeN1|E=3S)y$HRP{sAH$6a?LkZPAuO
+zq;r`W=Dp8*@B8M#_W@<;{^pmvKOg^CP=m%T%I12yt`-^6Osoma1=hA|4>Z(x)_6)|
+zp*$0W3ltCLT|rs0yFe@0_H0aKQm%1gi^dB<N|a}neARn#85$0hYwHhxz3p3)bFiZs
+z!6=n`QwbH0mXRYc(^83^_QHZK%GmSO<kNEEcxJolGracE-zFqU8<}idmP7aCQALg{
+z#!i-naCp`*@I0zG7S@SfMHVp)!BA<=NDZXp%CvtZ_UwQpofyfO7bHo^kIO4yt?fAo
+zzXriNi2jpM<mHARtn1CqH6VWmwXF}U;4A37LIu(shB;<cWTNjtUJ7+C#&|PsEGw9c
+z?<|MDee!)(6}FF|DrH1a9tm|tSAe_<x?y;X`Z6Jx`*KD0B(H-B2>EUWLe0S;?CNvK
+zMkdw;DwW9stq|Qr0_jDs8rRV))WjCoFWO>~;Tg=ZUBcIp<zh9U#Ot5{J9c;$wP)4y
+zFxw*VvS+@Z2$b6Pqjj|ors1(2>WoE^@UUlE#E$v)`?<leB(3D?U}`VfBBho(3eUAj
+z9r4UDvJWaC*THod-hpz#y!NZ(@NA3NLepVCRe|8o|M%Iu-QrlNmtgL{zy*9j2?Yim
+z0Rz~62X4b2PF+^Qy_vzxV6v}2+25Z|Cx;TL!9-fUu~!v!1fjMU{Ag8mz;?bna~t4^
+y3{M?4QVcuPAhwC;b*HFCr@SjCqVb9m`q#+EhtUyNEP6-=8R<7haO7dA1ONcV*+laI
+
+literal 0
+HcmV?d00001
+
+diff --git a/app/src/test/resources/backup-interop/tachiyomi.proto b/app/src/test/resources/backup-interop/tachiyomi.proto
+new file mode 100644
+index 0000000000000000000000000000000000000000..feacabc8b67582cdc34fad401c21f58c1eb0faf8
+GIT binary patch
+literal 982
+zcmbu8PiqrF7{+(EWV)Fch<mZkLDrrm(A_jilQb%65)BnC7E=VF2PfHScgbdF*_n+-
+zFQF%|{=<t%z=K-+01BQqm*B<fN$^(s0lW%=?#3iwyhOYW%=`S_=Xu{5_*@Y8AASAy
+z;K#G?9Vw*VCQdWHaINkjS;I2JlwtX(`&dT(m;D!HX};tzgEEu|m0U)g)MAaau;tfi
+zNF!9HhQ<1?nb9D$AeP$xjq9LwLGK<u`T2fjpD)75u!GvrmorHTR&-=D?8up9JY4Ho
+zOvk=f=FjrUllkMJW_|D}kZy9ET;7_y&(A;PD<U7ew{%8l%%%lZ#dlE4HnCz@ZDbmn
+z${f^as+rYnLfj6HhPAiKai`09?Gnd{r47CZ26L}K^eqT^;M5<6VsAbN%@*F>8UX$a
+z=pKDM08$KwtEf#JgAp2=?*aY*EW&7&1gVirgY>b<1U;|`AsriHQW36US7{;(X;@*X
+zp&K32G87Flq||+LuC26)hE1wmw%C?~cd>)52EKtz7fXVe@IVblMm&>Pd(uT%m=So@
+zFP|m?v3vaVQ1ZYwJTao~nglT)du~Q-HK?EFhN2wTD|+Di#B7}qQ>wrVGg8ZbIY!nr
+zR}gs*+=S7QSIQiJo6-h6KO?p_6iib^2!223fIZ$8#Z0;ai~j_!;lCy!LcwNGz}5$F
+v7se@Zod#ac=kmGKN;;KJXS1obWG0u)N;{KO#AXJu{O13cDgwiF{Dpo2huvDA
+
+literal 0
+HcmV?d00001
+
+diff --git a/app/src/test/resources/backup-interop/tachiyomi.tachibk b/app/src/test/resources/backup-interop/tachiyomi.tachibk
+new file mode 100644
+index 0000000000000000000000000000000000000000..361639843c15c36b5d9e2df153ca59610f9014fc
+GIT binary patch
+literal 579
+zcmV-J0=)eniwFP!00000|D}^pYZE~j#&=UP*-Q+?z1Zd;YflpBZknV?8kIDOhKd%8
+zDT3g^$?mkfWV5sE%toV^(34mH;YFn2K`nj&1y7qx@M85Ocq{z?UIjsSV-hgEL_E#F
+zJn!#)o_A*8i;%GU_}lk~KcD~TiecpraazgwYfT498kQKQ3`>W-Clczv>c1q5k&43%
+z%1|m?aT#$k3k}l7maox}MyNy$i}l|yLnX8%R672N>!7ue-aB~u>%;OcUxu+^2SwGF
+za%mCPbYwH^NV#+}+UQzL$9}EEpXJjhi$}wnwZZ3L+2A;-x;giNk38aQ0-w0Qct&T;
+zrX@wecTw9mv20i!WEz^n9Hh3C+)6$rYz14x+F9Ya)77GOiQ|OII==@7bFV@C9SD2i
+z)L(`YZ@&c1=HK5Q0RAiJ9e&yeVgg3%s6!ls5t@kX0e&AWz<8YmsgX;A^ohv?J+J{G
+z9UEd|8LnbiZXpY4SY}AojV@^$vW6Ivo4z^MmfJ+bCY3K+Y}3Kp*uj>HZy?jfVn|4N
+zpaEkeo=L17@ggkE2)ydcr-?x59X&e`J+K8&jHuftLCnXVn-N<N^wZpMoa6S&9=JX+
+z+a$ykYw*I1)T%GX$T~g&-UBybd<3P;@o!UHhv#R+HiiY$Q~`oN&pBX^Z;N6kUV-I*
+z0yprnNeD1xGZ@0wM{o}&DRCVYFBJ>LLS{Le$!7EU%xXGUNaw{{lT^fJ2C@9+|CcHT
+Rqjda*egm~QHfh!a001#;6^j4>
+
+literal 0
+HcmV?d00001
+
 diff --git a/app/src/test/resources/ocr-strips/mlkit.json b/app/src/test/resources/ocr-strips/mlkit.json
 new file mode 100644
 index 0000000..345728d
