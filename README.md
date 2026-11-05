@@ -8,7 +8,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/Hailton-Reis/Polaris/releases/tag/v0.1.0-beta.8"><strong>Baixar beta.8 →</strong></a> &nbsp; · &nbsp;
+  <a href="https://github.com/Hailton-Reis/Polaris/releases/tag/v0.1.0-beta.9"><strong>Baixar beta.9 →</strong></a> &nbsp; · &nbsp;
   <a href="docs/COMECE_AQUI.md"><strong>Comece aqui</strong></a> &nbsp; · &nbsp;
   <a href="CHANGELOG.md"><strong>Versões e novidades</strong></a> &nbsp; · &nbsp;
   <a href="docs/ARMAZENAMENTO.md"><strong>Armazenamento</strong></a>
@@ -30,11 +30,11 @@ A leitura básica funciona no aparelho, sem exigir um servidor pessoal. Arquivos
 
 **Em desenvolvimento · Android 8+ · ARM64 e ARM32 · Foco em português brasileiro**
 
-**Beta público atual: [0.1.0-beta.8 · P20261103.1](https://github.com/Hailton-Reis/Polaris/releases/tag/v0.1.0-beta.8).** Nome e ícones Polaris, capítulos únicos e fontes por obra. A versão é um pré-lançamento para testes; ainda não há versão estável.
+**Beta público atual: [0.1.0-beta.9 · P20261104.4](https://github.com/Hailton-Reis/Polaris/releases/tag/v0.1.0-beta.9).** Assistente de repositórios e extensões internas em lote, correções de OCR/tipografia e downloads de atualização recuperáveis. A versão é um pré-lançamento para testes; ainda não há versão estável.
 
 ## Inglês como prioridade
 
-**O reconhecimento de texto em inglês já acompanha o APK.** O Polaris usa a biblioteca latina embarcada do ML Kit para ler o texto das imagens.
+**O reconhecimento de texto em inglês já acompanha o APK.** O Polaris inclui OCR ML Kit e PaddleOCR para inglês; os demais idiomas suportados usam ML Kit. OCR lê a imagem; o mecanismo de tradução trabalha com o texto reconhecido.
 
 Para **traduzir inglês → português**, o SDK precisa preparar seus recursos de tradução. O novo candidato acrescenta:
 
@@ -54,7 +54,15 @@ O candidato consulta as Releases do **Polaris** ao abrir o aplicativo, com limit
 
 **Receber atualizações experimentais** começa desativado. Ative para encontrar betas e outras prévias publicadas; desligar não rebaixa a instalação. Baixar e instalar continuam sendo escolhas suas.
 
-**O repositório e o [beta.8 público](https://github.com/Hailton-Reis/Polaris/releases/tag/v0.1.0-beta.8) estão disponíveis**, com APKs ARM64 e ARM32 completos para baixar pelo navegador, sem login no GitHub. A atualização real no aparelho ainda precisa de validação. [Canais, compatibilidade e publicação →](docs/ATUALIZACOES.md)
+**O repositório e o [beta.9 público](https://github.com/Hailton-Reis/Polaris/releases/tag/v0.1.0-beta.9) estão disponíveis**, com APKs ARM64 e ARM32 completos para baixar pelo navegador, sem login no GitHub. A atualização real no aparelho ainda precisa de validação. [Canais, compatibilidade e publicação →](docs/ATUALIZACOES.md)
+
+## Prepare as fontes pelo aplicativo
+
+Depois da configuração inicial, use **Preparar fontes**; o guia também fica em **Navegar → Extensões → ⋮**. A introdução explica os riscos de código de terceiros, permite importar um backup primeiro e pode ser adiada.
+
+Revise um repositório sugerido ou informe um link HTTPS. Confira endereço e certificado, selecione fontes da biblioteca, idiomas ou uma lista manual e confirme o lote. O Polaris prepara as extensões **dentro do próprio aplicativo**, com progresso, cancelamento e repetição das falhas. Não é preciso confirmar uma instalação Android para cada nova extensão desse fluxo. As extensões já instaladas pelo Android são preservadas.
+
+A fila depende do processo do aplicativo e não retoma downloads de extensões após seu encerramento. O backup conserva o formato e os identificadores existentes, mas não inclui APKs privados: no Mihon/Tachiyomi, instale as fontes naquele aplicativo. Testes de codec passaram; restauração/mescla real em banco e o percurso completo no celular continuam pendentes. [Roteiro e limites](docs/versoes/0.1.0-beta.9.md).
 
 ## Uma sequência, com fontes por obra
 
@@ -62,7 +70,7 @@ Capítulo 0 Official e capítulo 0 Unofficial agora ocupam uma única posição 
 
 Em **Opções de capítulos → Fontes desta obra**, deixe **Automático** ou escolha uma fonte fixa para aquela obra. A descoberta compara extensões instaladas e habilitadas no mesmo idioma, confirmando título, autoria e numeração. Prioriza continuidade e cobertura do catálogo; não mede automaticamente a qualidade das imagens ou da tradução de uma scan.
 
-A descoberta baixa metadados, sem instalar extensões nem baixar imagens de todos os catálogos. A escolha da fonte também preserva o escopo do glossário. [Comportamento e limites](https://github.com/Hailton-Reis/Polaris/blob/v0.1.0-beta.8/docs/SEQUENCIA_E_FONTES_P20261103_1.md).
+A descoberta baixa metadados, sem instalar extensões nem baixar imagens de todos os catálogos. A escolha da fonte também preserva o escopo do glossário. [Comportamento e limites](https://github.com/Hailton-Reis/Polaris/blob/v0.1.0-beta.9/docs/SEQUENCIA_E_FONTES_P20261103_1.md).
 
 ## Seu arquivo, sua classificação
 
@@ -116,11 +124,11 @@ O painel **Dados e armazenamento → Armazenamento do Polaris** ajuda a separar 
 
 ## Onde o projeto está
 
-O beta público atual é **`0.1.0-beta.8` · revisão `P20261103.1` · versionCode `109`**. Ele incorpora as revisões internas beta.4 a beta.7, incluindo identidade Polaris, leitura sem edição avançada por padrão e OCR experimental por regiões em páginas longas em inglês.
+O beta público atual é **`0.1.0-beta.9` · revisão `P20261104.4` · versionCode `110`**. Ele acrescenta o assistente de fontes, correções de cedilha/encaixe, opções coerentes de OCR e recuperação de downloads de atualizações. A edição avançada continua desligada por padrão; PaddleOCR permanece opcional em inglês.
 
-**[Baixar e ver as notas da beta.8](https://github.com/Hailton-Reis/Polaris/releases/tag/v0.1.0-beta.8)** · **[Roteiro de primeiro teste](https://github.com/Hailton-Reis/Polaris/releases/download/v0.1.0-beta.8/PRIMEIRO_TESTE.md)**. Baixe somente o APK compatível com seu Android: ARM64 ou ARM32. Não é necessário montar partes nem executar CMD para instalar pelo GitHub.
+**[Baixar e ver as notas da beta.9](https://github.com/Hailton-Reis/Polaris/releases/tag/v0.1.0-beta.9)** · **[Roteiro de primeiro teste](https://github.com/Hailton-Reis/Polaris/releases/download/v0.1.0-beta.9/PRIMEIRO_TESTE.md)**. Baixe somente o APK compatível com seu Android: ARM64 ou ARM32. Não é necessário montar partes nem executar CMD para instalar pelo GitHub.
 
-A comparação final executou **589 testes JVM: 555 aprovações e as mesmas 34 falhas preexistentes**, sem regressões novas. Os 42 testes desta revisão passaram. Isso não equivale a uma suíte totalmente verde nem a aceite em aparelhos. Instalação, atualização com continuidade dos dados, fluxo entre extensões reais e consumo de recursos ainda precisam de teste físico. A [implementação](https://github.com/Hailton-Reis/Polaris/tree/v0.1.0-beta.8) e a [evidência](https://github.com/Hailton-Reis/Polaris/blob/v0.1.0-beta.8/integration/document-reader/TEST_RESULTS.json) estão identificadas pela versão. Ainda não há lançamento estável.
+A comparação final executou **707 testes JVM: 690 aprovações e as mesmas 17 falhas preexistentes**, sem regressões novas. Os 34 novos casos do assistente passaram; 16 controles Android de tipografia e quatro controles isolados de segurança também passaram. Isso não equivale a uma suíte totalmente verde nem a aceite em aparelhos. Instalação, atualização com continuidade dos dados, fluxo entre extensões reais e consumo de recursos ainda precisam de teste físico. A [implementação](https://github.com/Hailton-Reis/Polaris/tree/v0.1.0-beta.9) e a [evidência](https://github.com/Hailton-Reis/Polaris/blob/v0.1.0-beta.9/integration/document-reader/TEST_RESULTS.json) estão identificadas pela versão. Ainda não há lançamento estável.
 
 O resultado em inglês foi confirmado pelo mantenedor em um candidato anterior. Japonês, chinês simplificado/tradicional e coreano continuam com validação de OCR e tradução nas imagens pendente, incluindo japonês vertical. A automação global desses idiomas é opcional neste estágio; PaddleOCR permanece apenas em inglês.
 
@@ -140,7 +148,7 @@ A base Android vem do ecossistema **Yomotsu / Mihon**, com conceitos de múltipl
 
 [Registros de compilação e testes](https://github.com/Hailton-Reis/Polaris/blob/r001/multisource-foundation/integration/document-reader/TEST_RESULTS.json) distinguem testes automatizados de aceite nos aparelhos. Existem falhas preexistentes no projeto-base; uma comparação sem novas regressões não significa que todos os testes estão verdes.
 
-A beta.8 integra seleção automática de catálogos compatíveis, preferência por obra e sequência lógica, com testes de provedores simulados. O aceite completo com extensões reais, aparelhos e cenários R001 continua pendente.
+A beta.9 integra o assistente de fontes e mantém a seleção automática de catálogos compatíveis, preferência por obra e sequência lógica. A instalação em lote foi verificada por testes JVM e componentes Android; o aceite completo com extensões reais, aparelhos e cenários R001 continua pendente.
 
 Veja [como contribuir](CONTRIBUTING.md). Para problemas de armazenamento, informe tamanhos antes/depois. Para tradução, diferencie o texto que o OCR reconheceu do resultado traduzido.
 

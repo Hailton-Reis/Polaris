@@ -138,3 +138,7 @@ A descoberta automática consulta metadados de catálogos; não baixa imagens de
 Traduções de edições alternativas usam identidades separadas para evitar aplicar texto/coordenadas de uma fonte em outra imagem. A exclusão do download pela lista remove suas edições e traduções, preservando o vocabulário. O fluxo completo continua dependendo de medição física.
 
 [Análise da beta.8](https://github.com/Hailton-Reis/Polaris/blob/v0.1.0-beta.8/docs/SEQUENCIA_E_FONTES_P20261103_1.md) · [Parâmetros da estimativa](https://github.com/Hailton-Reis/Polaris/blob/v0.1.0-beta.8/integration/document-reader/source-storage-estimate_P20261103_1.json).
+
+## Beta.9 / P20261104.4 — distribuição de 05/11/2026 UTC
+
+Os APKs completos têm **199.132.104 bytes em ARM64** e **159.334.281 bytes em ARM32**. Isso mede o download, não a instalação. O assistente também baixa APKs de extensões, guardados internamente; a quantidade e o espaço dependem da seleção. A fila possui dois downloads simultâneos, mas não é uma quota de armazenamento. Os modelos, fontes e bibliotecas nativas permanecem iguais à revisão interna anterior; acrescentou-se a biblioteca Java de verificação de assinatura. [Notas e limites](versoes/0.1.0-beta.9.md).
