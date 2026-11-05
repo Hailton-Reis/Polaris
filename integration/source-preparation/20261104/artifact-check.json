@@ -1,0 +1,40 @@
+{
+  "revision": "P20261104.4",
+  "signer_sha256": "3ae747069cc9015ca1777f94fd56b030501f45d6af380426a572ad60e94d8227",
+  "artifacts": [
+    {
+      "abi": "arm64-v8a",
+      "file": "Polaris-0.1.0-beta.9-arm64-v8a.apk",
+      "bytes": 199132104,
+      "sha256": "dfd7ce4e567db9036c6d72f50f67f9c11b48754de49a912089c42d712e6c43bb"
+    },
+    {
+      "abi": "armeabi-v7a",
+      "file": "Polaris-0.1.0-beta.9-armeabi-v7a.apk",
+      "bytes": 159334281,
+      "sha256": "c916f3623bff124bc280c127672b96dc3aed40ee7277ee655484b25d50d0a4b6"
+    }
+  ],
+  "comparison": [
+    {
+      "abi": "arm64-v8a",
+      "comparison_revision": "P20261104.3",
+      "old_bytes": 192987175,
+      "new_bytes": 199132104,
+      "delta_bytes": 6144929,
+      "payload_files_compared": 83,
+      "changed_assets_libraries_fonts": [],
+      "native_libraries_and_fonts_unchanged": true
+    },
+    {
+      "abi": "armeabi-v7a",
+      "comparison_revision": "P20261104.3",
+      "old_bytes": 153189352,
+      "new_bytes": 159334281,
+      "delta_bytes": 6144929,
+      "payload_files_compared": 82,
+      "changed_assets_libraries_fonts": [],
+      "native_libraries_and_fonts_unchanged": true
+    }
+  ]
+}

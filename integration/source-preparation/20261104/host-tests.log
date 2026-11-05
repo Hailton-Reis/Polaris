@@ -1,0 +1,15 @@
+test_crlf_stack (scripts.r001.test_apply_document_reader.DocumentOverlayTests.test_crlf_stack) ... ok
+test_drift_is_rejected_without_partial_application (scripts.r001.test_apply_document_reader.DocumentOverlayTests.test_drift_is_rejected_without_partial_application) ... ok
+test_full_stack_application_and_idempotence (scripts.r001.test_apply_document_reader.DocumentOverlayTests.test_full_stack_application_and_idempotence) ... ok
+test_prerequisite_and_migration_gate (scripts.r001.test_apply_document_reader.DocumentOverlayTests.test_prerequisite_and_migration_gate) ... ok
+test_existing_output_is_never_overwritten (scripts.beta.test_package_internal_beta.BetaPackagingTests.test_existing_output_is_never_overwritten) ... ok
+test_missing_or_multiple_signers_are_rejected (scripts.beta.test_package_internal_beta.BetaPackagingTests.test_missing_or_multiple_signers_are_rejected) ... ok
+test_sdk_36_and_37_certificate_formats_are_accepted (scripts.beta.test_package_internal_beta.BetaPackagingTests.test_sdk_36_and_37_certificate_formats_are_accepted) ... ok
+test_compiled_polaris_branding_is_accepted (scripts.beta.test_package_internal_beta.CompiledBrandingTests.test_compiled_polaris_branding_is_accepted) ... ok
+test_upstream_label_is_rejected_even_if_apk_filename_says_polaris (scripts.beta.test_package_internal_beta.CompiledBrandingTests.test_upstream_label_is_rejected_even_if_apk_filename_says_polaris) ... ok
+test_wrong_round_icon_or_missing_splash_is_rejected (scripts.beta.test_package_internal_beta.CompiledBrandingTests.test_wrong_round_icon_or_missing_splash_is_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 10 tests in 4.882s
+
+OK

@@ -1,10 +1,20 @@
 # Polaris 0.1.0-beta.9 — candidato interno para teste
 
-Revisão: **P20261104.3**. Android mínimo: **8.0 / API 26**. Este candidato ainda não foi publicado como Release. A beta.8 continua sendo a prévia pública. A conferência nos celulares ainda está pendente.
+Revisão: **P20261104.4**. Android mínimo: **8.0 / API 26**. Este candidato ainda não foi publicado como Release. A beta.8 continua sendo a prévia pública. A conferência nos celulares ainda está pendente.
+
+## Preparar fontes sem instalações individuais
+
+Ao concluir a configuração inicial, abra **Preparar fontes**. Também há acesso em **Navegar → Extensões → ⋮ → Preparar fontes** e na lista vazia. Quem vem do Mihon ou Tachiyomi pode importar o backup primeiro e retornar ao assistente depois da restauração.
+
+Confira a explicação, selecione os repositórios e revise o certificado antes de adicionar uma sugestão ou link HTTPS. Escolha as fontes da biblioteca, dos idiomas desejados ou uma seleção manual. O download só começa ao confirmar a quantidade. As novas extensões ficam dentro do Polaris; as que já estão instaladas pelo Android são preservadas.
+
+A fila prepara até duas extensões por vez, informa os resultados e permite cancelar ou repetir somente falhas/cancelamentos. Ela continua ao sair da tela enquanto o processo existir. Se o Android encerrar o Polaris, reabra o assistente para preparar as restantes. Não há instalação automática de todas as fontes por restaurar um backup.
+
+A revisão .4 acrescenta a validação criptográfica dos APKs privados e a conferência de pacote, certificado e versão no fluxo guiado. Dados, formato de backup e identificadores das fontes permanecem preservados. Veja [fluxo e limites](../../docs/ASSISTENTE_DE_FONTES_BETA9.md).
 
 ## Proteção de extensões e backups
 
-A revisão P20261104.3 prepara e valida a extensão privada antes de substituir seu arquivo anterior. Falha ou cancelamento durante a preparação preserva a extensão funcional. Downloads simultâneos e novas tentativas têm arquivos e identificadores próprios.
+A revisão P20261104.4 prepara e valida a extensão privada antes de substituir seu arquivo anterior. Falha ou cancelamento durante a preparação preserva a extensão funcional. Downloads simultâneos e novas tentativas têm arquivos e identificadores próprios.
 
 Backups novos são gravados, fechados e relidos antes de registrar sucesso ou remover cópias antigas. A retenção mantém quatro cópias verificadas; arquivos antigos ilegíveis ou inválidos são preservados separadamente. O destino precisa permitir leitura e, para uma pasta, renomeação. Um destino incompatível produz erro explícito. O formato de backup e as identidades das fontes foram preservados.
 
@@ -26,7 +36,7 @@ O pacote contém dois APKs. Use **arm64-v8a** primeiro nos aparelhos Android de 
 
 Instale apenas um APK por aparelho. Não é necessário o APK universal nem as versões x86 do emulador. Instalações e atualizações devem vir sempre da mesma máquina/assinatura usada para esse beta. Não apague a instalação antiga para contornar um erro de assinatura: isso pode remover os dados locais. O mantenedor deve reconstruir e compartilhar o APK com a assinatura original.
 
-O mantenedor gera o pacote com a opção **4** do CMD atualizado. Ao concluir a comparação automatizada, a pasta de evidências contém **beta/**, com APKs ARM, hashes e exemplos. A opção **9** continua sendo o fluxo local de instalação já existente. Confira **P20261104.3** em **Sobre** antes de registrar resultados. O versionCode agora é **110**; a beta.8 pública usa 109.
+O mantenedor gera o pacote com a opção **4** do CMD atualizado. Ao concluir a comparação automatizada, a pasta de evidências contém **beta/**, com APKs ARM, hashes e exemplos. A opção **9** continua sendo o fluxo local de instalação já existente. Confira **P20261104.4** em **Sobre** antes de registrar resultados. O versionCode agora é **110**; a beta.8 pública usa 109.
 
 ## Uso inicial
 

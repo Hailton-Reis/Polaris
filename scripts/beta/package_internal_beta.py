@@ -11,7 +11,7 @@ import tempfile
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[2]
-REVISION = 'P20261104.3'
+REVISION = 'P20261104.4'
 
 
 def sha256(path):

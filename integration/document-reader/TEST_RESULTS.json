@@ -1,32 +1,32 @@
 {
-  "date_utc": "2026-11-04",
+  "date_utc": "2026-11-05",
   "timezone": "UTC",
-  "candidate_revision": "Polaris P20261104.3",
+  "candidate_revision": "Polaris P20261104.4",
   "version_name": "0.1.0-beta.9",
   "version_code": 110,
   "publication": "UNPUBLISHED_INTERNAL_CANDIDATE",
   "current_public_release": "v0.1.0-beta.8",
   "pinned_yomotsu": "0fb80c439ef816eeb50674f1b90af39918b176d8",
-  "patch_sha256": "ea14786b1446695258f9a226ea5776bf63e9797d0640ab7c87ebc21154079c0a",
-  "assembly": "PASS: all configured debug APKs and instrumentation APK assembled. Native build exits1 solely for17 preexisting app unit failures.",
+  "patch_sha256": "713bea8e58215681a833ed27e9962406911a2533c0e5b1267f2cdfb7be7e8f06",
+  "assembly": "PASS: ARM32, ARM64, x86_64 and Android test APK assembled with the recorded scoped ABI profile. Unit tests and assembly were run separately.",
   "full_build_completion": {
     "status": "ASSEMBLY_AND_UNIT_REPORTS_COMPLETE",
-    "unit_tests": 673,
+    "unit_tests": 707,
     "unit_gradle_exit": 1,
-    "packaging_only_exit": null,
-    "note": "All configured debug APKs and test APK assembled in the full run; only failed task app:testDebugUnitTest with17 preexisting failures."
+    "packaging_only_exit": 0,
+    "note": "690 passed and 17 preexisting unit failures; no new failures, skips or missing baseline cases. Three ABI profile; default project split configuration remains unchanged."
   },
   "android_unit_comparison": {
     "status": "NO_NEW_UNIT_REGRESSIONS",
     "baseline": {
-      "total": 635,
-      "passed": 618,
+      "total": 673,
+      "passed": 656,
       "failed": 17,
       "skipped": 0
     },
     "patched": {
-      "total": 673,
-      "passed": 656,
+      "total": 707,
+      "passed": 690,
       "failed": 17,
       "skipped": 0
     },
@@ -39,7 +39,7 @@
       "patched": 1
     },
     "required_module_coverage": {
-      "app": 550,
+      "app": 588,
       "domain": 85
     }
   },
@@ -98,7 +98,8 @@
         "status": "PASS",
         "note": "Five additional cases for safe-envelope selection."
       }
-    ]
+    ],
+    "scope": "Historical subset recorded for P20261104.2; subsequent storage, codec and preparation additions are reported separately."
   },
   "repaired_preexisting_tests": {
     "count": 17,
@@ -116,21 +117,21 @@
   },
   "source_to_build_verification": {
     "status": "BYTE_IDENTICAL",
-    "files_checked": 182,
+    "files_checked": 219,
     "mismatches": []
   },
   "apk_artifacts": [
     {
       "abi": "arm64-v8a",
       "file": "Polaris-0.1.0-beta.9-arm64-v8a.apk",
-      "bytes": 192966287,
-      "sha256": "426853254bae47d91972af5262e1f6c3ed1a1075e84da3a0b7e08dbece22dd3e"
+      "bytes": 199132104,
+      "sha256": "dfd7ce4e567db9036c6d72f50f67f9c11b48754de49a912089c42d712e6c43bb"
     },
     {
       "abi": "armeabi-v7a",
       "file": "Polaris-0.1.0-beta.9-armeabi-v7a.apk",
-      "bytes": 153168464,
-      "sha256": "d65c73e228e55e65b3a7bdcd1d8f195dde0cbe38f795174229021c46c3a544f7"
+      "bytes": 159334281,
+      "sha256": "c916f3623bff124bc280c127672b96dc3aed40ee7277ee655484b25d50d0a4b6"
     }
   ],
   "signer_sha256": "3ae747069cc9015ca1777f94fd56b030501f45d6af380426a572ad60e94d8227",
@@ -138,23 +139,23 @@
   "apk_payload_and_size_comparison": [
     {
       "abi": "arm64-v8a",
-      "unchanged_font_asset_and_native_library_files": 83,
-      "changed_payload_files": [],
-      "added_payload_files": [],
-      "comparison_revision": "P20261104.1",
-      "old_bytes": 192948823,
-      "new_bytes": 192966287,
-      "delta_bytes": 17464
+      "comparison_revision": "P20261104.3",
+      "old_bytes": 192987175,
+      "new_bytes": 199132104,
+      "delta_bytes": 6144929,
+      "payload_files_compared": 83,
+      "changed_assets_libraries_fonts": [],
+      "native_libraries_and_fonts_unchanged": true
     },
     {
       "abi": "armeabi-v7a",
-      "unchanged_font_asset_and_native_library_files": 82,
-      "changed_payload_files": [],
-      "added_payload_files": [],
-      "comparison_revision": "P20261104.1",
-      "old_bytes": 153151000,
-      "new_bytes": 153168464,
-      "delta_bytes": 17464
+      "comparison_revision": "P20261104.3",
+      "old_bytes": 153189352,
+      "new_bytes": 159334281,
+      "delta_bytes": 6144929,
+      "payload_files_compared": 82,
+      "changed_assets_libraries_fonts": [],
+      "native_libraries_and_fonts_unchanged": true
     }
   ],
   "android_component_verification": {
@@ -363,6 +364,47 @@
     "counterfactual_old_implementation_failures": 3,
     "host_guard_tests": 10,
     "android_runtime": "NOT_VALIDATED_INSTALLATION_DID_NOT_COMPLETE",
-    "format_changed": false
+    "format_changed": false,
+    "scope": "The previous four SafeStorageAndroidTest cases remain without completed runtime acceptance; the new four signature/file controls have separate scope and do not validate SAF/backups."
+  },
+  "source_preparation": {
+    "report": "../source-preparation/20261104/README.md",
+    "new_jvm_cases_vs_P20261104_3": 34,
+    "selected_cases": 52,
+    "selected_failed": 0,
+    "selected_skipped": 0,
+    "wizard_ui_acceptance": "PENDING",
+    "physical_ARM_acceptance": "PENDING",
+    "android_component_checks": {
+      "status": "PASS",
+      "api": 26,
+      "abi": "x86_64",
+      "runtime": "Android emulator with software acceleration; ordinary application UID",
+      "checks": 4,
+      "passed": 4,
+      "failed": 0,
+      "production_helpers": "BYTE_IDENTICAL_TO_READER_COMPILED_CLASSES",
+      "scope": [
+        "APK cryptographic verification",
+        "tampered APK rejection preserving earlier file",
+        "reviewed package and certificate pinning",
+        "readonly atomic file replacement"
+      ],
+      "not_validated": [
+        "full application startup",
+        "wizard UI",
+        "real extension loading",
+        "Android 14+",
+        "physical ARM32/ARM64",
+        "database restore and SAF providers"
+      ],
+      "command": "adb shell am instrument -w -r test.polaris.preparation.probe/.Probe"
+    },
+    "queue_workers": 2,
+    "format_or_source_id_changes": false,
+    "automatic_install_from_backup": false,
+    "private_installer_preference_overwritten": false,
+    "process_death_download_resume": false,
+    "apk_signature_library": "com.android.tools.build:apksig:9.3.1"
   }
 }

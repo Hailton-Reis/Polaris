@@ -1,6 +1,6 @@
 # Compatibilidade de backups e preparação de fontes
 
-Requisito do produto: facilitar repositórios e instalar extensões privadamente sem prejudicar importação/exportação de backups Tachiyomi, Mihon e variantes compatíveis. Beta.9 permanece sem lançamento. Este documento fixa o contrato da implementação futura; não declara novos testes de restauração aprovados.
+Requisito do produto: facilitar repositórios e instalar extensões privadamente sem prejudicar importação/exportação de backups Tachiyomi, Mihon e variantes compatíveis. Beta.9 permanece sem lançamento. Este documento fixa o contrato de compatibilidade. O assistente está descrito em [Assistente de fontes](ASSISTENTE_DE_FONTES_BETA9.md); os testes do fluxo não declaram a restauração em banco aprovada.
 
 ## Estrutura preservada
 
@@ -30,7 +30,7 @@ Backups de biblioteca e preferências não devem ser apresentados como cópias d
 - Preparar a extensão privadamente depois da restauração e confirmar que a mesma obra volta a resolver sua fonte, preservando os dados.
 - Exportar do Polaris e restaurar nos aplicativos/versões declarados compatíveis; comparar os campos comuns. Documentar limites dos campos específicos de cada fork.
 - Verificar backup sem repositórios, fonte removida, assinaturas divergentes, falha/cancelamento e repetição da preparação, além de restauração em instalação já existente.
-- Preservar a extensão anterior quando uma atualização privada falhar. O instalador atual precisa de substituição segura antes da instalação em massa: hoje remove o arquivo de destino antes de concluir a cópia do novo.
+- Preservar a extensão anterior quando uma atualização privada falhar. A revisão P20261104.3 implementou a substituição segura; a revisão .4 acrescenta a conferência criptográfica e a vinculação ao pacote, certificado e versão revistos.
 
 A compatibilidade ampla é uma meta com matriz de versões e resultados, não uma garantia para qualquer backup de qualquer fork. Os ensaios de layout/OCR já realizados não substituem esta aceitação.
 

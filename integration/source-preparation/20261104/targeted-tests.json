@@ -1,0 +1,55 @@
+{
+  "new_cases": 34,
+  "selected_cases": 52,
+  "status": "PASS",
+  "suites": [
+    {
+      "suite": "PreparationPlanTest",
+      "tests": 10,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "ExtensionPreparationQueueTest",
+      "tests": 9,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "SourcePreparationViewModelTest",
+      "tests": 5,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "RepositoryReviewTest",
+      "tests": 4,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "PrivateExtensionSignatureTest",
+      "tests": 4,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "ExtensionInstallerDownloadTest",
+      "tests": 7,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "PrivateExtensionFilesTest",
+      "tests": 7,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "BackupInteropTest",
+      "tests": 6,
+      "failed": 0,
+      "skipped": 0
+    }
+  ]
+}

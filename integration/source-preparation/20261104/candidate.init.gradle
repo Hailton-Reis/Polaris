@@ -1,0 +1,12 @@
+gradle.beforeProject { p ->
+    p.plugins.withId('com.android.application') {
+        if (p.path == ':app') {
+            p.extensions.getByName('androidComponents').finalizeDsl { dsl ->
+                dsl.buildTypes.getByName('debug').buildConfigField('String', 'BUILD_TIME', '"2026-11-04T23:13:42Z"')
+                dsl.splits.abi.reset()
+                dsl.splits.abi.include('armeabi-v7a', 'arm64-v8a', 'x86_64')
+                dsl.splits.abi.setUniversalApk(false)
+            }
+        }
+    }
+}

@@ -1,5 +1,5 @@
 diff --git a/app/build.gradle.kts b/app/build.gradle.kts
-index 63e2698..71f41e9 100644
+index 63e2698..0baf1a4 100644
 --- a/app/build.gradle.kts
 +++ b/app/build.gradle.kts
 @@ -32,14 +32,14 @@ android {
@@ -29,7 +29,15 @@ index 63e2698..71f41e9 100644
              isPseudoLocalesEnabled = true
          }
          val release = getByName("release") {
-@@ -148,7 +148,7 @@ dependencies {
+@@ -135,6 +135,7 @@ kotlin {
+ baselineProfile { baselineProfileOutputDir = "baselineProfiles"; mergeIntoMain = true }
+ 
+ dependencies {
++    implementation(libs.android.apksig)
+     baselineProfile(projects.baselineProfile)
+     implementation(projects.i18n); implementation(projects.i18nAt); implementation(projects.core.archive); implementation(projects.core.common); implementation(projects.core.viewmodel); implementation(projects.coreMetadata); implementation(projects.sourceApi); implementation(projects.sourceLocal); implementation(projects.data); implementation(projects.domain); implementation(projects.presentationCore); implementation(projects.presentationWidget); implementation(projects.telemetry)
+     implementation(projects.dbnetNative)
+@@ -148,7 +149,7 @@ dependencies {
      implementation(libs.quickJs)
      implementation(libs.image.decoder); implementation(libs.material); implementation(libs.flexibleAdapter); implementation(libs.photoView)
      implementation(libs.directionalViewPager) { exclude(group = "androidx.viewpager", module = "viewpager") }
@@ -1405,6 +1413,38 @@ index 28da13e..5ca1407 100644
  fun Chapter.copyFromSChapter(sChapter: SChapter): Chapter {
      return this.copy(
          name = sChapter.name,
+diff --git a/app/src/main/java/eu/kanade/presentation/browse/ExtensionsScreen.kt b/app/src/main/java/eu/kanade/presentation/browse/ExtensionsScreen.kt
+index 914cb5e..2b9efca 100644
+--- a/app/src/main/java/eu/kanade/presentation/browse/ExtensionsScreen.kt
++++ b/app/src/main/java/eu/kanade/presentation/browse/ExtensionsScreen.kt
+@@ -48,6 +48,7 @@ import eu.kanade.presentation.browse.components.ExtensionIcon
+ import eu.kanade.presentation.components.WarningBanner
+ import eu.kanade.presentation.manga.components.DotSeparatorNoSpaceText
+ import eu.kanade.presentation.more.settings.screen.browse.ExtensionStoresScreen
++import eu.kanade.presentation.more.settings.screen.browse.preparation.SourcePreparationScreen
+ import eu.kanade.presentation.util.rememberRequestPackageInstallsPermissionState
+ import eu.kanade.tachiyomi.extension.model.Extension
+ import eu.kanade.tachiyomi.extension.model.InstallStep
+@@ -56,6 +57,7 @@ import eu.kanade.tachiyomi.ui.browse.extension.ExtensionsViewModel
+ import eu.kanade.tachiyomi.util.system.LocaleHelper
+ import eu.kanade.tachiyomi.util.system.launchRequestPackageInstallsPermission
+ import tachiyomi.i18n.MR
++import tachiyomi.i18n.at.ATMR
+ import tachiyomi.presentation.core.components.FastScrollLazyColumn
+ import tachiyomi.presentation.core.components.material.PullRefresh
+ import tachiyomi.presentation.core.components.material.padding
+@@ -103,6 +105,11 @@ fun ExtensionScreen(
+                     stringRes = msg,
+                     modifier = Modifier.padding(contentPadding),
+                     actions = listOf(
++                        EmptyScreenAction(
++                            stringRes = ATMR.strings.preparation_title,
++                            icon = Icons.Outlined.Settings,
++                            onClick = { navigator.push(SourcePreparationScreen()) },
++                        ),
+                         EmptyScreenAction(
+                             stringRes = MR.strings.extensionStores,
+                             icon = Icons.Outlined.Settings,
 diff --git a/app/src/main/java/eu/kanade/presentation/documents/DocumentImportDialog.kt b/app/src/main/java/eu/kanade/presentation/documents/DocumentImportDialog.kt
 new file mode 100644
 index 0000000..7d94070
@@ -2824,7 +2864,7 @@ index a198c3f..9a3e84f 100644
                      preference = translationPreferences.translationEngineTemperature(),
                      title = stringResource(ATMR.strings.pref_engine_temperature),
 diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
-index 7f411fd..76dfb49 100644
+index 7f411fd..35bfaed 100644
 --- a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
 +++ b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
 @@ -1,15 +1,18 @@
@@ -2885,7 +2925,7 @@ index 7f411fd..76dfb49 100644
  
      // Identifies this overlay independently of the pinned upstream COMMIT_SHA.
 -    private const val POLARIS_READER_REVISION = "P20261031.2"
-+    private const val POLARIS_READER_REVISION = "P20261104.3"
++    private const val POLARIS_READER_REVISION = "P20261104.4"
  
      @Composable
      override fun Content() {
@@ -3153,6 +3193,892 @@ index 0000000..4d59c26
 +        }
 +    }
 +    return checking to check
++}
+diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/browse/preparation/SourcePreparationScreen.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/browse/preparation/SourcePreparationScreen.kt
+new file mode 100644
+index 0000000..5b1a846
+--- /dev/null
++++ b/app/src/main/java/eu/kanade/presentation/more/settings/screen/browse/preparation/SourcePreparationScreen.kt
+@@ -0,0 +1,565 @@
++package eu.kanade.presentation.more.settings.screen.browse.preparation
++
++import androidx.activity.compose.BackHandler
++import androidx.compose.foundation.layout.Arrangement
++import androidx.compose.foundation.layout.Column
++import androidx.compose.foundation.layout.Row
++import androidx.compose.foundation.layout.fillMaxWidth
++import androidx.compose.foundation.layout.navigationBarsPadding
++import androidx.compose.foundation.layout.padding
++import androidx.compose.foundation.lazy.LazyColumn
++import androidx.compose.foundation.lazy.items
++import androidx.compose.foundation.lazy.rememberLazyListState
++import androidx.compose.foundation.selection.toggleable
++import androidx.compose.material3.Button
++import androidx.compose.material3.Checkbox
++import androidx.compose.material3.HorizontalDivider
++import androidx.compose.material3.LinearProgressIndicator
++import androidx.compose.material3.MaterialTheme
++import androidx.compose.material3.OutlinedButton
++import androidx.compose.material3.OutlinedTextField
++import androidx.compose.material3.Surface
++import androidx.compose.material3.Text
++import androidx.compose.material3.TextButton
++import androidx.compose.runtime.Composable
++import androidx.compose.runtime.LaunchedEffect
++import androidx.compose.runtime.collectAsState
++import androidx.compose.runtime.getValue
++import androidx.compose.runtime.mutableIntStateOf
++import androidx.compose.runtime.mutableStateOf
++import androidx.compose.runtime.remember
++import androidx.compose.runtime.saveable.rememberSaveable
++import androidx.compose.runtime.setValue
++import androidx.compose.ui.Modifier
++import androidx.compose.ui.platform.LocalContext
++import androidx.compose.ui.semantics.Role
++import androidx.compose.ui.unit.dp
++import androidx.lifecycle.viewmodel.compose.viewModel
++import cafe.adriel.voyager.navigator.LocalNavigator
++import cafe.adriel.voyager.navigator.currentOrThrow
++import eu.kanade.presentation.components.AppBar
++import eu.kanade.presentation.more.settings.screen.SearchableSettings
++import eu.kanade.presentation.more.settings.screen.SettingsDataScreen
++import eu.kanade.presentation.more.settings.screen.browse.discovery.RepositoryCatalog
++import eu.kanade.presentation.util.Screen
++import eu.kanade.tachiyomi.extension.preparation.PreparationSelection
++import eu.kanade.tachiyomi.extension.preparation.PreparationStatus
++import eu.kanade.tachiyomi.extension.preparation.RepositoryIdentity
++import eu.kanade.tachiyomi.ui.setting.SettingsScreen
++import eu.kanade.tachiyomi.util.system.LocaleHelper
++import tachiyomi.i18n.at.ATMR
++import tachiyomi.presentation.core.components.material.Scaffold
++import tachiyomi.presentation.core.i18n.stringResource
++
++class SourcePreparationScreen : Screen() {
++    @Composable
++    override fun Content() {
++        val navigator = LocalNavigator.currentOrThrow
++        val model = viewModel<SourcePreparationViewModel>()
++        val state by model.state.collectAsState()
++        val batch by model.queue.state.collectAsState()
++        var page by rememberSaveable { mutableIntStateOf(0) }
++        var url by rememberSaveable { mutableStateOf("") }
++        var query by rememberSaveable { mutableStateOf("") }
++        val restoreKey = stringResource(SettingsDataScreen.restorePreferenceKeyString)
++        val importBackup = {
++            SearchableSettings.highlightKey = restoreKey
++            navigator.push(SettingsScreen(SettingsScreen.Destination.DataAndStorage))
++        }
++        val plan = remember(state) { state.plan }
++        val activeBatch = batch.entries.isNotEmpty()
++        LaunchedEffect(state.consent, activeBatch) { if (!state.consent && !activeBatch) page = 0 }
++        val listState = rememberLazyListState()
++        LaunchedEffect(page, activeBatch, state.error) { listState.scrollToItem(0) }
++        BackHandler(enabled = page > 0 && !activeBatch) { page-- }
++        Scaffold(
++            topBar = { behavior ->
++                AppBar(
++                    title = stringResource(ATMR.strings.preparation_title),
++                    navigateUp = { if (page > 0 && !activeBatch) page-- else navigator.pop() },
++                    scrollBehavior = behavior,
++                )
++            },
++            bottomBar = {
++                if ((page == 2 && !activeBatch) || (activeBatch && batch.running)) {
++                    Surface(tonalElevation = 2.dp) {
++                        Column(Modifier.fillMaxWidth().navigationBarsPadding().padding(16.dp)) {
++                            if (activeBatch) {
++                                OutlinedButton(
++                                    onClick = model.queue::cancel,
++                                    modifier = Modifier.fillMaxWidth(),
++                                ) {
++                                    Text(stringResource(ATMR.strings.preparation_cancel))
++                                }
++                            } else {
++                                Button(
++                                    onClick = model::prepare,
++                                    modifier = Modifier.fillMaxWidth(),
++                                    enabled =
++                                    !state.busy &&
++                                        state.consent &&
++                                        state.catalogLoaded &&
++                                        plan.extensions.isNotEmpty(),
++                                ) {
++                                    Text(
++                                        stringResource(
++                                            ATMR.strings.preparation_start,
++                                            plan.extensions.size,
++                                        ),
++                                    )
++                                }
++                            }
++                        }
++                    }
++                }
++            },
++        ) { padding ->
++            LazyColumn(
++                state = listState,
++                contentPadding = padding,
++                modifier = Modifier.padding(horizontal = 16.dp),
++                verticalArrangement = Arrangement.spacedBy(12.dp),
++            ) {
++                item {
++                    if (state.busy || (!state.loaded && state.error == null)) {
++                        LinearProgressIndicator(Modifier.fillMaxWidth())
++                    }
++                    state.error?.let { error ->
++                        Text(
++                            stringResource(
++                                when (error) {
++                                    PreparationError.STORES -> ATMR.strings.preparation_store_error
++                                    PreparationError.REPOSITORY ->
++                                        ATMR.strings.preparation_repo_error
++                                    PreparationError.CATALOG ->
++                                        ATMR.strings.preparation_catalog_error
++                                    PreparationError.UNSIGNED -> ATMR.strings.preparation_unsigned
++                                    PreparationError.ADULT_DISABLED ->
++                                        ATMR.strings.preparation_adult_disabled
++                                },
++                            ),
++                            color = MaterialTheme.colorScheme.error,
++                        )
++                    }
++                }
++                if (state.error == PreparationError.STORES) {
++                    item {
++                        OutlinedButton(onClick = model::reloadStores) {
++                            Text(stringResource(ATMR.strings.preparation_refresh_catalog))
++                        }
++                    }
++                }
++                when {
++                    activeBatch -> {
++                        item {
++                            Text(
++                                stringResource(
++                                    ATMR.strings.preparation_progress,
++                                    batch.entries.count { it.status.terminal },
++                                    batch.entries.size,
++                                ),
++                            )
++                            LinearProgressIndicator(
++                                progress = {
++                                    batch.entries.count { it.status.terminal }.toFloat() /
++                                        batch.entries.size
++                                },
++                                modifier = Modifier.fillMaxWidth(),
++                            )
++                            Text(
++                                stringResource(
++                                    ATMR.strings.preparation_summary,
++                                    batch.entries.count { it.status == PreparationStatus.READY },
++                                    batch.entries.count {
++                                        it.status == PreparationStatus.NEEDS_TRUST
++                                    },
++                                    batch.entries.count { it.status == PreparationStatus.FAILED },
++                                    batch.entries.count { it.status == PreparationStatus.CANCELLED },
++                                ),
++                            )
++                            Text(stringResource(ATMR.strings.preparation_lifetime))
++                            if (!state.consent) {
++                                Text(stringResource(ATMR.strings.preparation_risks))
++                                PreparationCheck(
++                                    stringResource(ATMR.strings.preparation_consent),
++                                    false,
++                                    enabled = !batch.running,
++                                    onChange = model::consent,
++                                )
++                            }
++                            if (batch.running) {
++                                OutlinedButton(onClick = model.queue::cancel) {
++                                    Text(stringResource(ATMR.strings.preparation_cancel))
++                                }
++                            } else {
++                                if (
++                                    batch.entries.any {
++                                        it.status == PreparationStatus.FAILED ||
++                                            it.status == PreparationStatus.CANCELLED
++                                    }
++                                ) {
++                                    Button(
++                                        onClick = { model.queue.retryFailures(state.consent) },
++                                        enabled = state.consent,
++                                    ) {
++                                        Text(stringResource(ATMR.strings.preparation_retry))
++                                    }
++                                }
++                                OutlinedButton(
++                                    onClick = {
++                                        model.queue.clear()
++                                        page = 0
++                                    },
++                                ) {
++                                    Text(stringResource(ATMR.strings.preparation_review))
++                                }
++                            }
++                            TextButton(onClick = { navigator.pop() }) {
++                                Text(stringResource(ATMR.strings.preparation_close))
++                            }
++                        }
++                        items(batch.entries, key = { it.extension.pkgName }) { entry ->
++                            Column {
++                                Text(
++                                    entry.extension.name,
++                                    style = MaterialTheme.typography.titleSmall,
++                                )
++                                Text(
++                                    stringResource(
++                                        when (entry.status) {
++                                            PreparationStatus.QUEUED ->
++                                                ATMR.strings.preparation_queued
++                                            PreparationStatus.DOWNLOADING ->
++                                                ATMR.strings.preparation_downloading
++                                            PreparationStatus.INSTALLING ->
++                                                ATMR.strings.preparation_installing
++                                            PreparationStatus.READY ->
++                                                ATMR.strings.preparation_ready
++                                            PreparationStatus.NEEDS_TRUST ->
++                                                ATMR.strings.preparation_needs_trust
++                                            PreparationStatus.FAILED ->
++                                                ATMR.strings.preparation_failed
++                                            PreparationStatus.CANCELLED ->
++                                                ATMR.strings.preparation_cancelled
++                                        },
++                                    ),
++                                )
++                                HorizontalDivider()
++                            }
++                        }
++                    }
++                    page == 0 -> {
++                        item {
++                            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
++                                Text(
++                                    stringResource(ATMR.strings.preparation_intro),
++                                    style = MaterialTheme.typography.titleMedium,
++                                )
++                                Text(stringResource(ATMR.strings.preparation_backup_intro))
++                                OutlinedButton(onClick = { importBackup() }) {
++                                    Text(stringResource(ATMR.strings.preparation_import))
++                                }
++                                Text(stringResource(ATMR.strings.preparation_risks))
++                                PreparationCheck(
++                                    stringResource(ATMR.strings.preparation_consent),
++                                    state.consent,
++                                    enabled = true,
++                                    onChange = model::consent,
++                                )
++                                Button(
++                                    onClick = { page = 1 },
++                                    enabled = state.consent && state.loaded,
++                                ) {
++                                    Text(stringResource(ATMR.strings.preparation_continue))
++                                }
++                                TextButton(onClick = { navigator.pop() }) {
++                                    Text(stringResource(ATMR.strings.preparation_later))
++                                }
++                            }
++                        }
++                    }
++                    page == 1 -> {
++                        item {
++                            Text(
++                                stringResource(ATMR.strings.preparation_repositories),
++                                style = MaterialTheme.typography.titleMedium,
++                            )
++                        }
++                        items(state.stores, key = { it.indexUrl }) { store ->
++                            val identity = RepositoryIdentity.of(store)
++                            Column {
++                                PreparationCheck(
++                                    store.name,
++                                    identity in state.selectedRepositories,
++                                    enabled = !state.busy && identity.canVerify && state.consent,
++                                    onChange = { model.selectRepository(identity) },
++                                )
++                                Text(store.indexUrl, style = MaterialTheme.typography.bodySmall)
++                                Text(
++                                    stringResource(ATMR.strings.preparation_key, store.signingKey),
++                                    style = MaterialTheme.typography.bodySmall,
++                                )
++                                if (!identity.canVerify) {
++                                    Text(stringResource(ATMR.strings.preparation_unsigned))
++                                }
++                            }
++                        }
++                        item {
++                            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
++                                Text(stringResource(ATMR.strings.preparation_suggestions))
++                                RepositoryCatalog.entries.forEach { entry ->
++                                    OutlinedButton(
++                                        onClick = { model.previewRepository(entry.indexUrl) },
++                                        enabled = !state.busy && state.consent,
++                                    ) {
++                                        Text(
++                                            stringResource(
++                                                ATMR.strings.preparation_check_repo,
++                                                entry.name,
++                                            ),
++                                        )
++                                    }
++                                }
++                                OutlinedTextField(
++                                    value = url,
++                                    onValueChange = { url = it },
++                                    label = { Text(stringResource(ATMR.strings.preparation_link)) },
++                                    enabled = !state.busy,
++                                    singleLine = true,
++                                    modifier = Modifier.fillMaxWidth(),
++                                )
++                                OutlinedButton(
++                                    onClick = { model.previewRepository(url) },
++                                    enabled = url.isNotBlank() && !state.busy && state.consent,
++                                ) {
++                                    Text(stringResource(ATMR.strings.preparation_check_link))
++                                }
++                            }
++                        }
++                        state.pendingStore?.let { store ->
++                            item {
++                                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
++                                    Text(
++                                        stringResource(ATMR.strings.preparation_review_repo),
++                                        style = MaterialTheme.typography.titleMedium,
++                                    )
++                                    Text(store.name)
++                                    Text(store.indexUrl)
++                                    Text(
++                                        stringResource(
++                                            ATMR.strings.preparation_key,
++                                            store.signingKey,
++                                        ),
++                                    )
++                                    Text(stringResource(ATMR.strings.preparation_key_warning))
++                                    Button(
++                                        onClick = { model.confirmRepository() },
++                                        enabled = !state.busy && state.consent,
++                                    ) {
++                                        Text(stringResource(ATMR.strings.preparation_add_repo))
++                                    }
++                                    TextButton(
++                                        onClick = model::dismissStore,
++                                        enabled = !state.busy,
++                                    ) {
++                                        Text(stringResource(ATMR.strings.preparation_dismiss))
++                                    }
++                                }
++                            }
++                        }
++                        item {
++                            Button(
++                                onClick = {
++                                    model.loadCatalog()
++                                    page = 2
++                                },
++                                enabled =
++                                state.selectedRepositories.isNotEmpty() &&
++                                    !state.busy &&
++                                    state.consent,
++                            ) {
++                                Text(stringResource(ATMR.strings.preparation_load_sources))
++                            }
++                        }
++                    }
++                    else -> {
++                        item {
++                            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
++                                Text(
++                                    stringResource(ATMR.strings.preparation_choose),
++                                    style = MaterialTheme.typography.titleMedium,
++                                )
++                                state.catalogFailures.forEach {
++                                    Text(
++                                        stringResource(
++                                            ATMR.strings.preparation_partial_catalog,
++                                            it,
++                                        ),
++                                        color = MaterialTheme.colorScheme.error,
++                                    )
++                                }
++                                OutlinedButton(
++                                    onClick = { model.loadCatalog() },
++                                    enabled = !state.busy,
++                                ) {
++                                    Text(stringResource(ATMR.strings.preparation_refresh_catalog))
++                                }
++                                PreparationSelection.entries.forEach { choice ->
++                                    PreparationCheck(
++                                        stringResource(
++                                            when (choice) {
++                                                PreparationSelection.LIBRARY ->
++                                                    ATMR.strings.preparation_library
++                                                PreparationSelection.LANGUAGES ->
++                                                    ATMR.strings.preparation_languages
++                                                PreparationSelection.MANUAL ->
++                                                    ATMR.strings.preparation_manual
++                                            },
++                                        ),
++                                        choice == state.selection,
++                                        enabled = !state.busy,
++                                        onChange = { model.selection(choice) },
++                                    )
++                                }
++                                PreparationCheck(
++                                    stringResource(ATMR.strings.preparation_nsfw),
++                                    state.includeNsfw,
++                                    enabled = !state.busy,
++                                    onChange = model::includeNsfw,
++                                )
++                                if (state.selection == PreparationSelection.LANGUAGES) {
++                                    Text(stringResource(ATMR.strings.preparation_language_help))
++                                    OutlinedButton(
++                                        onClick = model::allLanguages,
++                                        enabled = !state.busy,
++                                    ) {
++                                        Text(stringResource(ATMR.strings.preparation_all_languages))
++                                    }
++                                }
++                                if (
++                                    state.selection == PreparationSelection.LIBRARY &&
++                                    plan.missingSourceIds.isNotEmpty()
++                                ) {
++                                    Text(
++                                        stringResource(
++                                            ATMR.strings.preparation_missing,
++                                            plan.missingSourceIds.size,
++                                        ),
++                                    )
++                                }
++                                if (plan.unsupportedPackages.isNotEmpty()) {
++                                    Text(
++                                        stringResource(
++                                            ATMR.strings.preparation_unsupported,
++                                            plan.unsupportedPackages.size,
++                                        ),
++                                    )
++                                }
++                                if (plan.conflicts.isNotEmpty()) {
++                                    Text(
++                                        stringResource(
++                                            ATMR.strings.preparation_conflicts,
++                                            plan.conflicts.size,
++                                        ),
++                                    )
++                                }
++                                Text(
++                                    stringResource(
++                                        ATMR.strings.preparation_review_count,
++                                        plan.extensions.size,
++                                    ),
++                                )
++                                Text(stringResource(ATMR.strings.preparation_download_notice))
++                                if (state.catalogLoaded && plan.extensions.isEmpty()) {
++                                    Text(stringResource(ATMR.strings.preparation_empty))
++                                }
++                                if (state.selection == PreparationSelection.MANUAL) {
++                                    OutlinedTextField(
++                                        value = query,
++                                        onValueChange = { query = it },
++                                        label = {
++                                            Text(stringResource(ATMR.strings.preparation_search))
++                                        },
++                                        modifier = Modifier.fillMaxWidth(),
++                                    )
++                                }
++                            }
++                        }
++                        if (state.selection == PreparationSelection.LANGUAGES) {
++                            items(
++                                state.available
++                                    .flatMap { it.sources.map { source -> source.lang } + it.lang }
++                                    .distinct()
++                                    .sorted(),
++                                key = { it },
++                            ) { language ->
++                                PreparationCheck(
++                                    LocaleHelper.getSourceDisplayName(
++                                        language,
++                                        LocalContext.current,
++                                    ),
++                                    language in state.languages,
++                                    enabled = !state.busy,
++                                    onChange = { model.language(language) },
++                                )
++                            }
++                        } else if (state.selection == PreparationSelection.MANUAL) {
++                            items(
++                                state.available
++                                    .filter {
++                                        (state.includeNsfw || !it.isNsfw) &&
++                                            it.pkgName !in state.sharedPackages &&
++                                            (state.installedVersions[it.pkgName] ?: -1) <
++                                            it.versionCode &&
++                                            (
++                                                it.name.contains(query, true) ||
++                                                    it.sources.any { source ->
++                                                        source.name.contains(query, true)
++                                                    }
++                                                )
++                                    }
++                                    .distinctBy { it.pkgName }
++                                    .sortedBy { it.name },
++                                key = { it.pkgName },
++                            ) { extension ->
++                                PreparationCheck(
++                                    "${extension.name} · ${extension.lang}",
++                                    extension.pkgName in state.manualPackages,
++                                    enabled = !state.busy,
++                                    onChange = { model.manualPackage(extension.pkgName) },
++                                )
++                            }
++                        } else {
++                            items(plan.extensions, key = { it.pkgName }) { extension ->
++                                Text(extension.name)
++                            }
++                        }
++                    }
++                }
++                item { HorizontalDivider(Modifier.padding(vertical = 8.dp)) }
++            }
++        }
++    }
++}
++
++@Composable
++private fun PreparationCheck(
++    label: String,
++    checked: Boolean,
++    enabled: Boolean,
++    onChange: (Boolean) -> Unit,
++) {
++    Row(
++        Modifier.fillMaxWidth()
++            .toggleable(
++                value = checked,
++                enabled = enabled,
++                role = Role.Checkbox,
++                onValueChange = onChange,
++            )
++            .padding(vertical = 8.dp),
++    ) {
++        Checkbox(checked = checked, onCheckedChange = null, enabled = enabled)
++        Text(label, modifier = Modifier.weight(1f).padding(start = 8.dp))
++    }
++}
+diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/browse/preparation/SourcePreparationViewModel.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/browse/preparation/SourcePreparationViewModel.kt
+new file mode 100644
+index 0000000..f239e02
+--- /dev/null
++++ b/app/src/main/java/eu/kanade/presentation/more/settings/screen/browse/preparation/SourcePreparationViewModel.kt
+@@ -0,0 +1,309 @@
++package eu.kanade.presentation.more.settings.screen.browse.preparation
++
++import androidx.lifecycle.ViewModel
++import androidx.lifecycle.viewModelScope
++import eu.kanade.domain.source.service.SourcePreferences
++import eu.kanade.tachiyomi.extension.ExtensionManager
++import eu.kanade.tachiyomi.extension.model.Extension
++import eu.kanade.tachiyomi.extension.preparation.PreparationPlanner
++import eu.kanade.tachiyomi.extension.preparation.PreparationSelection
++import eu.kanade.tachiyomi.extension.preparation.RepositoryIdentity
++import kotlinx.coroutines.CancellationException
++import kotlinx.coroutines.CoroutineDispatcher
++import kotlinx.coroutines.Dispatchers
++import kotlinx.coroutines.Job
++import kotlinx.coroutines.TimeoutCancellationException
++import kotlinx.coroutines.currentCoroutineContext
++import kotlinx.coroutines.ensureActive
++import kotlinx.coroutines.flow.MutableStateFlow
++import kotlinx.coroutines.flow.catch
++import kotlinx.coroutines.flow.update
++import kotlinx.coroutines.launch
++import kotlinx.coroutines.withTimeout
++import mihon.data.extension.service.ExtensionStoreService
++import mihon.domain.extension.model.ExtensionStore
++import mihon.domain.extension.repository.ExtensionStoreRepository
++import tachiyomi.domain.manga.interactor.GetFavorites
++import uy.kohesive.injekt.Injekt
++import uy.kohesive.injekt.api.get
++
++internal enum class PreparationError {
++    STORES,
++    REPOSITORY,
++    CATALOG,
++    UNSIGNED,
++    ADULT_DISABLED,
++}
++
++internal data class SourcePreparationState(
++    val loaded: Boolean = false,
++    val stores: List<ExtensionStore> = emptyList(),
++    val selectedRepositories: Set<RepositoryIdentity> = emptySet(),
++    val consent: Boolean = false,
++    val busy: Boolean = false,
++    val error: PreparationError? = null,
++    val pendingStore: ExtensionStore? = null,
++    val available: List<Extension.Available> = emptyList(),
++    val catalogLoaded: Boolean = false,
++    val catalogFailures: List<String> = emptyList(),
++    val librarySources: Set<Long> = emptySet(),
++    val installedVersions: Map<String, Long> = emptyMap(),
++    val sharedPackages: Set<String> = emptySet(),
++    val selection: PreparationSelection = PreparationSelection.LANGUAGES,
++    val languages: Set<String> = setOf("pt-BR", "pt", "en"),
++    val manualPackages: Set<String> = emptySet(),
++    val includeNsfw: Boolean = false,
++) {
++    val plan
++        get() =
++            PreparationPlanner.create(
++                available,
++                selectedRepositories,
++                installedVersions,
++                sharedPackages,
++                selection,
++                languages,
++                librarySources,
++                manualPackages,
++                includeNsfw,
++            )
++}
++
++internal class SourcePreparationViewModel(
++    private val repository: ExtensionStoreRepository = Injekt.get(),
++    private val service: ExtensionStoreService = Injekt.get(),
++    private val favorites: GetFavorites = Injekt.get(),
++    private val extensions: ExtensionManager = Injekt.get(),
++    private val preferences: SourcePreferences = Injekt.get(),
++    private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
++) : ViewModel() {
++    val state =
++        MutableStateFlow(
++            SourcePreparationState(
++                languages =
++                if (preferences.enabledLanguages.isSet()) {
++                    preferences.enabledLanguages.get()
++                } else {
++                    preferences.enabledLanguages.get() + setOf("pt-BR", "en")
++                },
++            ),
++        )
++    val queue = extensions.preparationQueue
++    private var operation: Job? = null
++    private var storesJob: Job? = null
++
++    init {
++        reloadStores()
++        viewModelScope.launch {
++            extensions.installedExtensionsFlow.collect { installed ->
++                state.update {
++                    it.copy(
++                        installedVersions =
++                        installed.associate { extension ->
++                            extension.pkgName to extension.versionCode
++                        },
++                        sharedPackages =
++                        installed
++                            .filter { extension -> extension.isShared }
++                            .map { extension -> extension.pkgName }
++                            .toSet(),
++                    )
++                }
++            }
++        }
++    }
++
++    fun reloadStores() {
++        storesJob?.cancel()
++        state.update { it.copy(error = null) }
++        storesJob =
++            viewModelScope.launch(dispatcher) {
++                repository
++                    .getAllAsFlow()
++                    .catch { state.update { it.copy(error = PreparationError.STORES) } }
++                    .collect { stores ->
++                        state.update { old ->
++                            val selected =
++                                old.selectedRepositories.intersect(
++                                    stores.map(RepositoryIdentity::of).toSet(),
++                                )
++                            old.copy(
++                                loaded = true,
++                                stores = stores,
++                                selectedRepositories = selected,
++                                catalogLoaded =
++                                old.catalogLoaded && selected == old.selectedRepositories,
++                                available =
++                                if (selected == old.selectedRepositories) {
++                                    old.available
++                                } else {
++                                    emptyList()
++                                },
++                            )
++                        }
++                    }
++            }
++    }
++
++    fun consent(value: Boolean) {
++        state.update { it.copy(consent = value) }
++    }
++
++    fun selectRepository(identity: RepositoryIdentity) {
++        if (
++            state.value.busy ||
++            queue.state.value.running ||
++            !state.value.consent ||
++            !identity.canVerify
++        ) {
++            return
++        }
++        state.update {
++            it.copy(
++                selectedRepositories = it.selectedRepositories.toggle(identity),
++                available = emptyList(),
++                catalogLoaded = false,
++            )
++        }
++    }
++
++    fun selection(value: PreparationSelection) {
++        state.update { it.copy(selection = value) }
++    }
++
++    fun language(value: String) {
++        state.update { it.copy(languages = it.languages.toggle(value)) }
++    }
++
++    fun allLanguages() {
++        state.update {
++            it.copy(
++                languages =
++                it.available
++                    .flatMap { extension ->
++                        extension.sources.map { source -> source.lang } + extension.lang
++                    }
++                    .toSet(),
++            )
++        }
++    }
++
++    fun manualPackage(value: String) {
++        state.update { it.copy(manualPackages = it.manualPackages.toggle(value)) }
++    }
++
++    fun includeNsfw(value: Boolean) {
++        if (value && !preferences.showNsfwSource.get()) {
++            state.update { it.copy(error = PreparationError.ADULT_DISABLED) }
++            return
++        }
++        state.update { it.copy(includeNsfw = value, error = null) }
++    }
++
++    fun dismissStore() {
++        state.update { it.copy(pendingStore = null) }
++    }
++
++    fun previewRepository(url: String) = operate {
++        check(state.value.consent)
++        check(RepositoryIdentity.isHttps(url.trim()))
++        val store = withTimeout(45_000) { service.fetch(url.trim()).getOrThrow() }
++        if (!RepositoryIdentity.of(store).canVerify) {
++            state.update { it.copy(error = PreparationError.UNSIGNED) }
++        } else {
++            state.update { it.copy(pendingStore = store) }
++        }
++    }
++
++    fun confirmRepository() = operate {
++        check(state.value.consent)
++        val store = requireNotNull(state.value.pendingStore)
++        withTimeout(45_000) { repository.insertVerified(store).getOrThrow() }
++        state.update {
++            it.copy(
++                pendingStore = null,
++                selectedRepositories = it.selectedRepositories + RepositoryIdentity.of(store),
++                catalogLoaded = false,
++                available = emptyList(),
++            )
++        }
++    }
++
++    fun loadCatalog() =
++        operate(PreparationError.CATALOG) {
++            check(state.value.consent)
++            val snapshot = state.value
++            check(snapshot.selectedRepositories.isNotEmpty())
++            val selected =
++                repository.getAll().filter {
++                    RepositoryIdentity.of(it) in snapshot.selectedRepositories
++                }
++            check(selected.size == snapshot.selectedRepositories.size)
++            val all = mutableListOf<Extension.Available>()
++            val failures = mutableListOf<String>()
++            for (store in selected) {
++                try {
++                    all +=
++                        withTimeout(45_000) { service.getExtensions(store).getOrThrow() }
++                            .filter {
++                                RepositoryIdentity.of(it.store) == RepositoryIdentity.of(store)
++                            }
++                } catch (error: kotlinx.coroutines.TimeoutCancellationException) {
++                    failures += store.name
++                } catch (error: CancellationException) {
++                    throw error
++                } catch (_: Exception) {
++                    failures += store.name
++                }
++            }
++            val library = favorites.await().map { it.source }.toSet()
++            state.update {
++                it.copy(
++                    available = all,
++                    catalogLoaded = true,
++                    catalogFailures = failures,
++                    librarySources = library,
++                    selection =
++                    if (library.isEmpty()) {
++                        PreparationSelection.LANGUAGES
++                    } else {
++                        PreparationSelection.LIBRARY
++                    },
++                )
++            }
++        }
++
++    fun prepare() {
++        val snapshot = state.value
++        if (snapshot.busy || !snapshot.catalogLoaded || !snapshot.consent) return
++        queue.start(snapshot.plan.extensions, snapshot.consent)
++    }
++
++    private fun operate(
++        error: PreparationError = PreparationError.REPOSITORY,
++        action: suspend () -> Unit,
++    ) {
++        if (operation?.isCompleted == false || queue.state.value.running || !state.value.loaded) {
++            return
++        }
++        state.update { it.copy(busy = true, error = null) }
++        operation =
++            viewModelScope.launch(dispatcher) {
++                try {
++                    action()
++                } catch (_: TimeoutCancellationException) {
++                    currentCoroutineContext().ensureActive()
++                    state.update { it.copy(error = error) }
++                } catch (cancelled: CancellationException) {
++                    throw cancelled
++                } catch (_: Exception) {
++                    state.update { it.copy(error = error) }
++                } finally {
++                    state.update { it.copy(busy = false) }
++                }
++            }
++    }
++
++    private fun <T> Set<T>.toggle(value: T): Set<T> =
++        if (value in this) this - value else this + value
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/App.kt b/app/src/main/java/eu/kanade/tachiyomi/App.kt
 index 6707d1a..c89047c 100644
@@ -4457,11 +5383,424 @@ index 0000000..1134341
 +        return last == 0L || now < last || now - last >= 24 * 60 * 60 * 1000L
 +    }
 +}
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/extension/ExtensionManager.kt b/app/src/main/java/eu/kanade/tachiyomi/extension/ExtensionManager.kt
+index 699e074..9f73930 100644
+--- a/app/src/main/java/eu/kanade/tachiyomi/extension/ExtensionManager.kt
++++ b/app/src/main/java/eu/kanade/tachiyomi/extension/ExtensionManager.kt
+@@ -9,9 +9,14 @@ import eu.kanade.tachiyomi.extension.api.ExtensionUpdateNotifier
+ import eu.kanade.tachiyomi.extension.model.Extension
+ import eu.kanade.tachiyomi.extension.model.InstallStep
+ import eu.kanade.tachiyomi.extension.model.LoadResult
++import eu.kanade.tachiyomi.extension.preparation.ExtensionPreparationQueue
++import eu.kanade.tachiyomi.extension.preparation.PreparationStatus
++import eu.kanade.tachiyomi.extension.preparation.RepositoryIdentity
+ import eu.kanade.tachiyomi.extension.util.ExtensionInstallReceiver
+ import eu.kanade.tachiyomi.extension.util.ExtensionInstaller
+ import eu.kanade.tachiyomi.extension.util.ExtensionLoader
++import eu.kanade.tachiyomi.extension.util.ReviewedPrivateExtension
++import eu.kanade.tachiyomi.util.system.isPackageInstalled
+ import eu.kanade.tachiyomi.util.system.toast
+ import kotlinx.coroutines.CoroutineScope
+ import kotlinx.coroutines.SupervisorJob
+@@ -20,10 +25,14 @@ import kotlinx.coroutines.flow.MutableStateFlow
+ import kotlinx.coroutines.flow.SharingStarted
+ import kotlinx.coroutines.flow.StateFlow
+ import kotlinx.coroutines.flow.asStateFlow
++import kotlinx.coroutines.flow.combine
+ import kotlinx.coroutines.flow.emptyFlow
++import kotlinx.coroutines.flow.first
+ import kotlinx.coroutines.flow.map
+ import kotlinx.coroutines.flow.stateIn
++import kotlinx.coroutines.withTimeout
+ import logcat.LogPriority
++import mihon.domain.extension.repository.ExtensionStoreRepository
+ import tachiyomi.core.common.util.lang.withUIContext
+ import tachiyomi.core.common.util.system.logcat
+ import tachiyomi.domain.source.model.StubSource
+@@ -60,6 +69,63 @@ class ExtensionManager(
+      */
+     private val installer by lazy { ExtensionInstaller(context) }
+ 
++    private suspend fun repositoryStillAuthorized(identity: RepositoryIdentity): Boolean =
++        Injekt.get<ExtensionStoreRepository>().getAll().any { RepositoryIdentity.of(it) == identity }
++
++    val preparationQueue by lazy {
++        ExtensionPreparationQueue(
++            scope = scope,
++            isAuthorized = ::repositoryStillAuthorized,
++            install = install@{ extension, progress ->
++                // Existing Android-installed extensions keep their installation method.
++                if (context.isPackageInstalled(extension.pkgName)) return@install PreparationStatus.NEEDS_TRUST
++                val identity = RepositoryIdentity.of(extension.store)
++                var terminal = InstallStep.Idle
++                installer.downloadAndInstall(
++                    extension.apkUrl,
++                    extension,
++                    isUpdateForPrivatelyInstalled = true,
++                    privateIdentity = ReviewedPrivateExtension(
++                        extension.pkgName,
++                        identity.signingKey,
++                        extension.versionCode,
++                    ),
++                    beforePrivateInstall = { check(repositoryStillAuthorized(identity)) },
++                ).collect { step ->
++                    terminal = step
++                    when (step) {
++                        InstallStep.Downloading -> progress(PreparationStatus.DOWNLOADING)
++                        InstallStep.Installing -> progress(PreparationStatus.INSTALLING)
++                        else -> Unit
++                    }
++                }
++                if (terminal != InstallStep.Installed) {
++                    PreparationStatus.FAILED
++                } else {
++                    // A copied APK is not proof that a source loaded successfully.
++                    withTimeout(15_000) {
++                        combine(installedExtensionsFlow, untrustedExtensionsFlow) { installed, untrusted ->
++                            when {
++                                installed.any {
++                                    it.pkgName == extension.pkgName && it.versionCode >= extension.versionCode &&
++                                        it.sources.isNotEmpty() && !it.isShared &&
++                                        it.sources.map { source ->
++                                            source.id
++                                        }.containsAll(extension.sources.map { source -> source.id })
++                                } -> PreparationStatus.READY
++                                untrusted.any {
++                                    it.pkgName == extension.pkgName && it.versionCode >= extension.versionCode &&
++                                        it.signatureHash.equals(identity.signingKey, ignoreCase = true)
++                                } -> PreparationStatus.NEEDS_TRUST
++                                else -> null
++                            }
++                        }.first { it != null }!!
++                    }
++                }
++            },
++        )
++    }
++
+     private val iconMap = mutableMapOf<String, Drawable>()
+ 
+     private val installedExtensionMapFlow = MutableStateFlow(emptyMap<String, Extension.Installed>())
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/extension/preparation/ExtensionPreparationQueue.kt b/app/src/main/java/eu/kanade/tachiyomi/extension/preparation/ExtensionPreparationQueue.kt
+new file mode 100644
+index 0000000..16b27b4
+--- /dev/null
++++ b/app/src/main/java/eu/kanade/tachiyomi/extension/preparation/ExtensionPreparationQueue.kt
+@@ -0,0 +1,188 @@
++package eu.kanade.tachiyomi.extension.preparation
++
++import eu.kanade.tachiyomi.extension.model.Extension
++import kotlinx.coroutines.CancellationException
++import kotlinx.coroutines.CoroutineScope
++import kotlinx.coroutines.CoroutineStart
++import kotlinx.coroutines.Job
++import kotlinx.coroutines.TimeoutCancellationException
++import kotlinx.coroutines.coroutineScope
++import kotlinx.coroutines.ensureActive
++import kotlinx.coroutines.flow.MutableStateFlow
++import kotlinx.coroutines.flow.asStateFlow
++import kotlinx.coroutines.flow.update
++import kotlinx.coroutines.launch
++import kotlinx.coroutines.withTimeout
++import java.util.concurrent.atomic.AtomicInteger
++import kotlin.coroutines.coroutineContext
++
++enum class PreparationStatus {
++    QUEUED,
++    DOWNLOADING,
++    INSTALLING,
++    READY,
++    NEEDS_TRUST,
++    FAILED,
++    CANCELLED,
++    ;
++
++    val terminal
++        get() = this in setOf(READY, NEEDS_TRUST, FAILED, CANCELLED)
++}
++
++data class PreparationEntry(
++    val extension: Extension.Available,
++    val status: PreparationStatus = PreparationStatus.QUEUED,
++)
++
++data class PreparationBatch(
++    val running: Boolean = false,
++    val entries: List<PreparationEntry> = emptyList(),
++)
++
++/**
++ * App-lifetime queue, two workers at most. Nothing starts merely by observing it or restoring a
++ * backup.
++ */
++class ExtensionPreparationQueue(
++    private val scope: CoroutineScope,
++    private val isAuthorized: suspend (RepositoryIdentity) -> Boolean,
++    private val install:
++    suspend (Extension.Available, (PreparationStatus) -> Unit) -> PreparationStatus,
++    private val timeoutMillis: Long = 180_000,
++) {
++    private val mutableState = MutableStateFlow(PreparationBatch())
++    val state = mutableState.asStateFlow()
++    private var job: Job? = null
++
++    @Synchronized
++    fun start(extensions: List<Extension.Available>, consent: Boolean): Boolean {
++        if (!consent || job?.isCompleted == false || extensions.isEmpty()) return false
++        if (extensions.map { it.pkgName }.distinct().size != extensions.size) return false
++        if (
++            extensions.any {
++                !RepositoryIdentity.of(it.store).canVerify || !RepositoryIdentity.isHttps(it.apkUrl)
++            }
++        ) {
++            return false
++        }
++        launchBatch(extensions.map(::PreparationEntry))
++        return true
++    }
++
++    @Synchronized
++    fun retryFailures(consent: Boolean): Boolean {
++        if (!consent || job?.isCompleted == false) return false
++        val entries = state.value.entries
++        if (
++            entries.none {
++                it.status in setOf(PreparationStatus.FAILED, PreparationStatus.CANCELLED)
++            }
++        ) {
++            return false
++        }
++        launchBatch(
++            entries.map {
++                if (it.status in setOf(PreparationStatus.FAILED, PreparationStatus.CANCELLED)) {
++                    it.copy(status = PreparationStatus.QUEUED)
++                } else {
++                    it
++                }
++            },
++        )
++        return true
++    }
++
++    @Synchronized
++    fun cancel() {
++        job?.cancel()
++    }
++
++    @Synchronized
++    fun clear() {
++        if (job?.isCompleted != false) mutableState.value = PreparationBatch()
++    }
++
++    private fun launchBatch(entries: List<PreparationEntry>) {
++        val pending = entries.filter { !it.status.terminal }
++        val cursor = AtomicInteger()
++        val next =
++            scope.launch(start = CoroutineStart.LAZY) {
++                coroutineScope {
++                    repeat(minOf(2, pending.size)) {
++                        launch {
++                            while (true) {
++                                coroutineContext.ensureActive()
++                                val entry = pending.getOrNull(cursor.getAndIncrement()) ?: break
++                                val extension = entry.extension
++                                try {
++                                    val result =
++                                        withTimeout(timeoutMillis) {
++                                            check(
++                                                isAuthorized(RepositoryIdentity.of(extension.store)),
++                                            )
++                                            install(extension) { status ->
++                                                require(
++                                                    status == PreparationStatus.DOWNLOADING ||
++                                                        status == PreparationStatus.INSTALLING,
++                                                )
++                                                update(extension.pkgName, status)
++                                            }
++                                        }
++                                    update(
++                                        extension.pkgName,
++                                        when (result) {
++                                            PreparationStatus.READY,
++                                            PreparationStatus.NEEDS_TRUST,
++                                            -> result
++                                            else -> PreparationStatus.FAILED
++                                        },
++                                    )
++                                } catch (_: TimeoutCancellationException) {
++                                    coroutineContext.ensureActive()
++                                    update(extension.pkgName, PreparationStatus.FAILED)
++                                } catch (error: CancellationException) {
++                                    throw error
++                                } catch (_: Exception) {
++                                    update(extension.pkgName, PreparationStatus.FAILED)
++                                }
++                            }
++                        }
++                    }
++                }
++            }
++        job = next
++        mutableState.value = PreparationBatch(running = true, entries = entries)
++        next.invokeOnCompletion {
++            synchronized(this@ExtensionPreparationQueue) {
++                if (job === next) {
++                    mutableState.update { batch ->
++                        batch.copy(
++                            running = false,
++                            entries =
++                            batch.entries.map {
++                                if (!it.status.terminal) {
++                                    it.copy(status = PreparationStatus.CANCELLED)
++                                } else {
++                                    it
++                                }
++                            },
++                        )
++                    }
++                }
++            }
++        }
++        next.start()
++    }
++
++    private fun update(pkg: String, status: PreparationStatus) {
++        mutableState.update { batch ->
++            batch.copy(
++                entries =
++                batch.entries.map {
++                    if (it.extension.pkgName == pkg) it.copy(status = status) else it
++                },
++            )
++        }
++    }
++}
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/extension/preparation/PreparationPlan.kt b/app/src/main/java/eu/kanade/tachiyomi/extension/preparation/PreparationPlan.kt
+new file mode 100644
+index 0000000..e998eaf
+--- /dev/null
++++ b/app/src/main/java/eu/kanade/tachiyomi/extension/preparation/PreparationPlan.kt
+@@ -0,0 +1,115 @@
++package eu.kanade.tachiyomi.extension.preparation
++
++import eu.kanade.tachiyomi.extension.model.Extension
++import mihon.domain.extension.model.ExtensionStore
++import java.net.URI
++
++/** Consent belongs to this plan, never to imported preferences. */
++data class RepositoryIdentity(val indexUrl: String, val signingKey: String) {
++    val canVerify: Boolean
++        get() = signingKey.matches(Regex("[a-fA-F0-9]{64}")) && isHttps(indexUrl)
++
++    companion object {
++        fun isHttps(url: String): Boolean =
++            runCatching {
++                val uri = URI(url)
++                uri.scheme.equals("https", true) &&
++                    uri.host != null &&
++                    uri.userInfo == null &&
++                    uri.fragment == null
++            }
++                .getOrDefault(false)
++
++        fun of(store: ExtensionStore) = RepositoryIdentity(store.indexUrl, store.signingKey)
++    }
++}
++
++object ExtensionLibraryCompatibility {
++    val supportedVersions = setOf(1.4, 1.6)
++}
++
++enum class PreparationSelection {
++    LIBRARY,
++    LANGUAGES,
++    MANUAL,
++}
++
++data class PreparationPlan(
++    val extensions: List<Extension.Available>,
++    val conflicts: Set<String>,
++    val missingSourceIds: Set<Long>,
++    val unsupportedPackages: Set<String> = emptySet(),
++)
++
++object PreparationPlanner {
++    fun create(
++        available: List<Extension.Available>,
++        authorized: Set<RepositoryIdentity>,
++        installedVersions: Map<String, Long>,
++        sharedPackages: Set<String>,
++        selection: PreparationSelection,
++        languages: Set<String>,
++        librarySources: Set<Long>,
++        manualPackages: Set<String>,
++        includeNsfw: Boolean,
++    ): PreparationPlan {
++        val eligible =
++            available.filter { extension ->
++                RepositoryIdentity.of(extension.store) in authorized &&
++                    RepositoryIdentity.of(extension.store).canVerify &&
++                    extension.pkgName !in sharedPackages &&
++                    (includeNsfw || !extension.isNsfw) &&
++                    when (selection) {
++                        PreparationSelection.LIBRARY ->
++                            extension.sources.any { it.id in librarySources }
++                        PreparationSelection.LANGUAGES ->
++                            extension.lang in languages ||
++                                extension.sources.any { it.lang in languages }
++                        PreparationSelection.MANUAL -> extension.pkgName in manualPackages
++                    }
++            }
++        // Never choose a repository/key for a duplicate package on the user's behalf.
++        val grouped = eligible.groupBy { it.pkgName }
++        val conflicts =
++            grouped
++                .filterValues { versions ->
++                    versions.map { RepositoryIdentity.of(it.store) }.distinct().size > 1 ||
++                        versions
++                            .groupBy { it.versionCode }
++                            .values
++                            .any { sameVersion ->
++                                sameVersion.map { it.apkUrl }.distinct().size > 1
++                            }
++                }
++                .keys
++        return PreparationPlan(
++            extensions =
++            grouped
++                .filterKeys { it !in conflicts }
++                .values
++                .map { it.maxBy { version -> version.versionCode } }
++                .filter { (installedVersions[it.pkgName] ?: -1) < it.versionCode }
++                .filter {
++                    it.libVersion in ExtensionLibraryCompatibility.supportedVersions &&
++                        RepositoryIdentity.isHttps(it.apkUrl)
++                }
++                .sortedBy { it.name },
++            conflicts = conflicts,
++            unsupportedPackages =
++            eligible
++                .filter {
++                    it.libVersion !in ExtensionLibraryCompatibility.supportedVersions ||
++                        !RepositoryIdentity.isHttps(it.apkUrl)
++                }
++                .map { it.pkgName }
++                .toSet(),
++            missingSourceIds =
++            librarySources -
++                available
++                    .filter { RepositoryIdentity.of(it.store) in authorized }
++                    .flatMap { it.sources }
++                    .map { it.id }
++                    .toSet(),
++        )
++    }
++}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/extension/util/ExtensionInstaller.kt b/app/src/main/java/eu/kanade/tachiyomi/extension/util/ExtensionInstaller.kt
-index 4d9493f..1e98ed6 100644
+index 4d9493f..fddb83c 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/extension/util/ExtensionInstaller.kt
 +++ b/app/src/main/java/eu/kanade/tachiyomi/extension/util/ExtensionInstaller.kt
-@@ -9,23 +9,33 @@ import eu.kanade.tachiyomi.extension.installer.Installer
+@@ -9,23 +9,35 @@ import eu.kanade.tachiyomi.extension.installer.Installer
  import eu.kanade.tachiyomi.extension.model.Extension
  import eu.kanade.tachiyomi.extension.model.InstallStep
  import eu.kanade.tachiyomi.network.NetworkHelper
@@ -4492,10 +5831,12 @@ index 4d9493f..1e98ed6 100644
  import java.io.File
 +import java.util.concurrent.ConcurrentHashMap
 +import java.util.concurrent.atomic.AtomicLong
++
++internal data class ReviewedPrivateExtension(val packageName: String, val signingKey: String, val versionCode: Long)
  
  /**
   * The installer which installs, updates and uninstalls the extensions.
-@@ -34,14 +44,15 @@ import java.io.File
+@@ -34,14 +46,15 @@ import java.io.File
   */
  internal class ExtensionInstaller(
      private val context: Context,
@@ -4516,7 +5857,7 @@ index 4d9493f..1e98ed6 100644
  
      /**
       * Adds the given extension to the downloads queue and returns an observable containing its
-@@ -51,51 +62,77 @@ internal class ExtensionInstaller(
+@@ -51,51 +64,81 @@ internal class ExtensionInstaller(
       * @param extension The extension to install.
       * @param isUpdateForPrivatelyInstalled If this is an update for a privately installed extension
       */
@@ -4525,6 +5866,8 @@ index 4d9493f..1e98ed6 100644
          url: String,
          extension: Extension,
          isUpdateForPrivatelyInstalled: Boolean = false,
++        privateIdentity: ReviewedPrivateExtension? = null,
++        beforePrivateInstall: suspend () -> Unit = {},
      ): Flow<InstallStep> {
 -        val downloadId = extension.pkgName.hashCode().toLong()
          cancelInstall(extension.pkgName)
@@ -4585,7 +5928,9 @@ index 4d9493f..1e98ed6 100644
 -                    logcat(LogPriority.ERROR, e)
 -                    step.value = InstallStep.Error
 -                }
-+                installApk(downloadId, download, isUpdateForPrivatelyInstalled)
++                beforePrivateInstall()
++                currentCoroutineContext().ensureActive()
++                installApk(downloadId, download, isUpdateForPrivatelyInstalled, privateIdentity)
 +                handedToInstaller = true
 +            } catch (error: CancellationException) {
 +                throw error
@@ -4616,25 +5961,48 @@ index 4d9493f..1e98ed6 100644
                  job.cancel()
              }
      }
-@@ -106,7 +143,7 @@ internal class ExtensionInstaller(
+@@ -106,9 +149,14 @@ internal class ExtensionInstaller(
       * @param tempFile The file of the extension to install. Delete after use.
       * @param isUpdateForPrivatelyInstalled If this install is an update for a privately installed extension
       */
 -    private fun installApk(downloadId: Long, tempFile: File, isUpdateForPrivatelyInstalled: Boolean = false) {
-+    private suspend fun installApk(downloadId: Long, tempFile: File, isUpdateForPrivatelyInstalled: Boolean = false) {
++    private suspend fun installApk(
++        downloadId: Long,
++        tempFile: File,
++        isUpdateForPrivatelyInstalled: Boolean = false,
++        privateIdentity: ReviewedPrivateExtension? = null,
++    ) {
          if (isUpdateForPrivatelyInstalled) {
-             installApkPrivately(downloadId, tempFile)
+-            installApkPrivately(downloadId, tempFile)
++            installApkPrivately(downloadId, tempFile, privateIdentity)
              return
-@@ -138,13 +175,16 @@ internal class ExtensionInstaller(
+         }
+ 
+@@ -138,13 +186,31 @@ internal class ExtensionInstaller(
          }
      }
  
 -    private fun installApkPrivately(downloadId: Long, tempFile: File) {
-+    private suspend fun installApkPrivately(downloadId: Long, tempFile: File) {
++    private suspend fun installApkPrivately(
++        downloadId: Long,
++        tempFile: File,
++        identity: ReviewedPrivateExtension? = null,
++    ) {
          try {
 -            if (ExtensionLoader.installPrivateExtensionFile(context, tempFile)) {
 +            val coroutineContext = currentCoroutineContext()
-+            if (ExtensionLoader.installPrivateExtensionFile(context, tempFile) { coroutineContext.ensureActive() }) {
++            val installed = if (identity == null) {
++                ExtensionLoader.installPrivateExtensionFile(context, tempFile) { coroutineContext.ensureActive() }
++            } else {
++                ExtensionLoader.installVerifiedPrivateExtensionFile(
++                    context,
++                    tempFile,
++                    identity,
++                ) {
++                    coroutineContext.ensureActive()
++                }
++            }
++            if (installed) {
                  updateInstallStep(downloadId, InstallStep.Installed)
              } else {
                  updateInstallStep(downloadId, InstallStep.Error)
@@ -4644,7 +6012,7 @@ index 4d9493f..1e98ed6 100644
          } catch (e: Exception) {
              logcat(LogPriority.ERROR, e) { "Failed to read downloaded extension file." }
              updateInstallStep(downloadId, InstallStep.Error)
-@@ -156,9 +196,16 @@ internal class ExtensionInstaller(
+@@ -156,9 +222,16 @@ internal class ExtensionInstaller(
      /**
       * Cancels extension install and remove from download manager and installer.
       */
@@ -4662,7 +6030,7 @@ index 4d9493f..1e98ed6 100644
      }
  
      /**
-@@ -167,14 +214,14 @@ internal class ExtensionInstaller(
+@@ -167,14 +240,14 @@ internal class ExtensionInstaller(
       * @param pkgName The package name of the extension to uninstall
       */
      fun uninstallApk(pkgName: String) {
@@ -4679,7 +6047,7 @@ index 4d9493f..1e98ed6 100644
          }
      }
  
-@@ -189,6 +236,7 @@ internal class ExtensionInstaller(
+@@ -189,6 +262,7 @@ internal class ExtensionInstaller(
      }
  
      companion object {
@@ -4688,10 +6056,14 @@ index 4d9493f..1e98ed6 100644
          const val EXTRA_DOWNLOAD_ID = "ExtensionInstaller.extra.DOWNLOAD_ID"
      }
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/extension/util/ExtensionLoader.kt b/app/src/main/java/eu/kanade/tachiyomi/extension/util/ExtensionLoader.kt
-index 962fafa..7a715f9 100644
+index 962fafa..a1b148e 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/extension/util/ExtensionLoader.kt
 +++ b/app/src/main/java/eu/kanade/tachiyomi/extension/util/ExtensionLoader.kt
-@@ -13,8 +13,8 @@ import eu.kanade.tachiyomi.extension.model.LoadResult
+@@ -10,11 +10,12 @@ import eu.kanade.domain.extension.interactor.TrustExtension
+ import eu.kanade.domain.source.service.SourcePreferences
+ import eu.kanade.tachiyomi.extension.model.Extension
+ import eu.kanade.tachiyomi.extension.model.LoadResult
++import eu.kanade.tachiyomi.extension.preparation.ExtensionLibraryCompatibility
  import eu.kanade.tachiyomi.source.Source
  import eu.kanade.tachiyomi.source.SourceFactory
  import eu.kanade.tachiyomi.util.lang.Hash
@@ -4701,7 +6073,7 @@ index 962fafa..7a715f9 100644
  import kotlinx.coroutines.async
  import kotlinx.coroutines.awaitAll
  import kotlinx.coroutines.runBlocking
-@@ -22,6 +22,7 @@ import logcat.LogPriority
+@@ -22,6 +23,7 @@ import logcat.LogPriority
  import tachiyomi.core.common.util.system.logcat
  import uy.kohesive.injekt.injectLazy
  import java.io.File
@@ -4709,16 +6081,22 @@ index 962fafa..7a715f9 100644
  
  /**
   * Class that handles the loading of the extensions. Supports two kinds of extensions:
-@@ -66,50 +67,54 @@ internal object ExtensionLoader {
+@@ -54,7 +56,7 @@ internal object ExtensionLoader {
+     private const val METADATA_EXTENSION_LIB = "tachiyomix.extensionLib"
+     private const val METADATA_CONTENT_WARNING = "tachiyomix.contentWarning"
+ 
+-    private val SUPPORTED_LIB_VERSIONS = listOf(1.4, 1.6)
++    private val SUPPORTED_LIB_VERSIONS = ExtensionLibraryCompatibility.supportedVersions
+ 
+     @Suppress("DEPRECATION")
+     private val PACKAGE_FLAGS = PackageManager.GET_CONFIGURATIONS or
+@@ -66,50 +68,89 @@ internal object ExtensionLoader {
  
      private fun getPrivateExtensionDir(context: Context) = File(context.filesDir, "exts")
  
 -    fun installPrivateExtensionFile(context: Context, file: File): Boolean {
 -        val extension = context.packageManager.getPackageArchiveInfo(file.absolutePath, PACKAGE_FLAGS)
-+    @Synchronized
-+    fun installPrivateExtensionFile(context: Context, file: File, checkCancelled: () -> Unit = {}): Boolean {
-+        val candidate = context.packageManager.getPackageArchiveInfo(file.absolutePath, PACKAGE_FLAGS)
-             ?.takeIf { isPackageAnExtension(it) } ?: return false
+-            ?.takeIf { isPackageAnExtension(it) } ?: return false
 -        val currentExtension = getExtensionPackageInfoFromPkgName(context, extension.packageName)
 -
 -        if (currentExtension != null) {
@@ -4740,8 +6118,28 @@ index 962fafa..7a715f9 100644
 -                return false
 -            }
 -        }
--
++    @Synchronized
++    fun installPrivateExtensionFile(context: Context, file: File, checkCancelled: () -> Unit = {}): Boolean {
++        return replacePrivateExtension(context, file, null, checkCancelled)
++    }
+ 
 -        val target = File(getPrivateExtensionDir(context), "${extension.packageName}.$PRIVATE_EXTENSION_EXTENSION")
++    @Synchronized
++    fun installVerifiedPrivateExtensionFile(
++        context: Context,
++        file: File,
++        identity: ReviewedPrivateExtension,
++        checkCancelled: () -> Unit,
++    ): Boolean = replacePrivateExtension(context, file, identity, checkCancelled)
++
++    private fun replacePrivateExtension(
++        context: Context,
++        file: File,
++        identity: ReviewedPrivateExtension?,
++        checkCancelled: () -> Unit,
++    ): Boolean {
++        val candidate = context.packageManager.getPackageArchiveInfo(file.absolutePath, PACKAGE_FLAGS)
++            ?.takeIf { isPackageAnExtension(it) } ?: return false
 +        val target = File(getPrivateExtensionDir(context), "${candidate.packageName}.$PRIVATE_EXTENSION_EXTENSION")
          return try {
 -            target.delete()
@@ -4754,8 +6152,26 @@ index 962fafa..7a715f9 100644
 +                val extension = context.packageManager.getPackageArchiveInfo(staged.absolutePath, PACKAGE_FLAGS)
 +                    ?.takeIf { isPackageAnExtension(it) && it.packageName == candidate.packageName }
 +                    ?: throw IOException("Invalid staged extension")
++                if (extensionLibraryVersion(extension) !in SUPPORTED_LIB_VERSIONS ||
++                    extension.applicationInfo == null ||
++                    extension.applicationInfo!!.minSdkVersion > Build.VERSION.SDK_INT
++                ) {
++                    throw IOException("Private extension is incompatible with this app or Android version")
++                }
++                val verifiedSigners = PrivateExtensionSignature.verify(staged, Build.VERSION.SDK_INT)
 +                val signatures = getSignatures(extension).orEmpty()
 +                if (signatures.isEmpty()) throw IOException("Extension is not signed")
++                if (identity != null) {
++                    PrivateExtensionSignature.requireReviewedIdentity(
++                        identity.packageName,
++                        identity.signingKey,
++                        extension.packageName,
++                        verifiedSigners,
++                    )
++                    if (PackageInfoCompat.getLongVersionCode(extension) != identity.versionCode) {
++                        throw IOException("Private extension version differs from the reviewed catalog")
++                    }
++                }
 +                val current = getExtensionPackageInfoFromPkgName(context, extension.packageName)
 +                replacing = current != null
 +                if (current != null) {
@@ -4798,6 +6214,31 @@ index 962fafa..7a715f9 100644
      }
  
      /**
+@@ -243,11 +284,7 @@ internal object ExtensionLoader {
+         }
+ 
+         // Validate lib version
+-        val libVersion = appInfo.metaData.getFloat(METADATA_EXTENSION_LIB)
+-            .takeUnless { it == 0.0f }
+-            ?.toString()
+-            ?.toDouble()
+-            ?: versionName.substringBeforeLast('.').toDoubleOrNull()
++        val libVersion = extensionLibraryVersion(pkgInfo)
+         if (libVersion == null || libVersion !in SUPPORTED_LIB_VERSIONS) {
+             logcat(LogPriority.WARN) {
+                 "Lib version is $libVersion, while only version(s) ${SUPPORTED_LIB_VERSIONS.joinToString()} are supported"
+@@ -359,6 +396,11 @@ internal object ExtensionLoader {
+      *
+      * @param pkgInfo The package info of the application.
+      */
++    private fun extensionLibraryVersion(pkgInfo: PackageInfo): Double? =
++        pkgInfo.applicationInfo?.metaData?.getFloat(METADATA_EXTENSION_LIB)
++            ?.takeUnless { it == 0.0f }?.toString()?.toDoubleOrNull()
++            ?: pkgInfo.versionName?.substringBeforeLast('.')?.toDoubleOrNull()
++
+     private fun isPackageAnExtension(pkgInfo: PackageInfo): Boolean {
+         return pkgInfo.reqFeatures.orEmpty().any { it.name == EXTENSION_FEATURE }
+     }
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/extension/util/PrivateExtensionFiles.kt b/app/src/main/java/eu/kanade/tachiyomi/extension/util/PrivateExtensionFiles.kt
 new file mode 100644
 index 0000000..736f4b9
@@ -4852,6 +6293,56 @@ index 0000000..736f4b9
 +
 +    @Synchronized
 +    fun delete(target: File): Boolean = target.delete()
++}
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/extension/util/PrivateExtensionSignature.kt b/app/src/main/java/eu/kanade/tachiyomi/extension/util/PrivateExtensionSignature.kt
+new file mode 100644
+index 0000000..97fd65f
+--- /dev/null
++++ b/app/src/main/java/eu/kanade/tachiyomi/extension/util/PrivateExtensionSignature.kt
+@@ -0,0 +1,44 @@
++package eu.kanade.tachiyomi.extension.util
++
++import com.android.apksig.ApkVerifier
++import java.io.File
++import java.io.IOException
++import java.security.MessageDigest
++
++/** Verify signed bytes, not only certificate metadata exposed by PackageManager. */
++internal object PrivateExtensionSignature {
++    fun verify(file: File, androidApi: Int): Set<String> {
++        val result =
++            ApkVerifier.Builder(file)
++                .setMinCheckedPlatformVersion(androidApi)
++                .setMaxCheckedPlatformVersion(androidApi)
++                .build()
++                .verify()
++        if (!result.isVerified || result.signerCertificates.isEmpty()) {
++            throw IOException("Private extension APK signature verification failed")
++        }
++        return result.signerCertificates
++            .map { certificate ->
++                MessageDigest.getInstance("SHA-256").digest(certificate.encoded).joinToString("") {
++                    "%02x".format(it)
++                }
++            }
++            .toSet()
++    }
++
++    fun requireReviewedIdentity(
++        expectedPackage: String,
++        expectedKey: String,
++        actualPackage: String,
++        verifiedKeys: Set<String>,
++    ) {
++        if (
++            expectedPackage != actualPackage ||
++            verifiedKeys.none { it.equals(expectedKey, ignoreCase = true) }
++        ) {
++            throw IOException(
++                "Private extension does not match the reviewed package and certificate",
++            )
++        }
++    }
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalog.kt b/app/src/main/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalog.kt
 new file mode 100644
@@ -5228,6 +6719,29 @@ index 0000000..0d3fb90
 +        return creators.isNotEmpty() && creators.intersect(otherCreators).isNotEmpty()
 +    }
 +}
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/browse/extension/ExtensionsTab.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/browse/extension/ExtensionsTab.kt
+index efc3654..8858809 100644
+--- a/app/src/main/java/eu/kanade/tachiyomi/ui/browse/extension/ExtensionsTab.kt
++++ b/app/src/main/java/eu/kanade/tachiyomi/ui/browse/extension/ExtensionsTab.kt
+@@ -18,6 +18,7 @@ import eu.kanade.presentation.components.AppBar
+ import eu.kanade.presentation.components.TabContent
+ import eu.kanade.presentation.more.settings.screen.browse.ExtensionStoresScreen
+ import eu.kanade.presentation.more.settings.screen.browse.discovery.RepositoryDiscoveryScreen
++import eu.kanade.presentation.more.settings.screen.browse.preparation.SourcePreparationScreen
+ import eu.kanade.tachiyomi.extension.model.Extension
+ import eu.kanade.tachiyomi.ui.browse.extension.details.ExtensionDetailsScreen
+ import eu.kanade.tachiyomi.ui.webview.WebViewScreen
+@@ -41,6 +42,10 @@ fun extensionsTab(
+         badgeNumber = state.updates.takeIf { it > 0 },
+         searchEnabled = true,
+         actions = listOf(
++            AppBar.OverflowAction(
++                title = stringResource(ATMR.strings.preparation_title),
++                onClick = { navigator.push(SourcePreparationScreen()) },
++            ),
+             AppBar.OverflowAction(
+                 title = stringResource(ATMR.strings.repository_discovery),
+                 onClick = { navigator.push(RepositoryDiscoveryScreen()) },
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentImporter.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentImporter.kt
 new file mode 100644
 index 0000000..9e9e164
@@ -7068,6 +8582,33 @@ index beb77f2..5097a32 100644
                  )
              }
          }
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/more/OnboardingScreen.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/more/OnboardingScreen.kt
+index 3e8a36b..10494d6 100644
+--- a/app/src/main/java/eu/kanade/tachiyomi/ui/more/OnboardingScreen.kt
++++ b/app/src/main/java/eu/kanade/tachiyomi/ui/more/OnboardingScreen.kt
+@@ -10,6 +10,7 @@ import eu.kanade.domain.base.BasePreferences
+ import eu.kanade.presentation.more.onboarding.OnboardingScreen
+ import eu.kanade.presentation.more.settings.screen.SearchableSettings
+ import eu.kanade.presentation.more.settings.screen.SettingsDataScreen
++import eu.kanade.presentation.more.settings.screen.browse.preparation.SourcePreparationScreen
+ import eu.kanade.presentation.util.Screen
+ import eu.kanade.tachiyomi.ui.setting.SettingsScreen
+ import tachiyomi.presentation.core.i18n.stringResource
+@@ -38,9 +39,13 @@ class OnboardingScreen : Screen() {
+         }
+ 
+         OnboardingScreen(
+-            onComplete = finishOnboarding,
++            onComplete = {
++                finishOnboarding()
++                navigator.push(SourcePreparationScreen())
++            },
+             onRestoreBackup = {
+                 finishOnboarding()
++                navigator.push(SourcePreparationScreen())
+                 SearchableSettings.highlightKey = restoreSettingKey
+                 navigator.push(SettingsScreen(SettingsScreen.Destination.DataAndStorage))
+             },
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/reader/ReaderActivity.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/reader/ReaderActivity.kt
 index c878b34..5dca1c3 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/ui/reader/ReaderActivity.kt
@@ -10996,6 +12537,311 @@ index 0000000..249ef72
 +        assertFalse(gesture.tap(1))
 +    }
 +}
+diff --git a/app/src/test/java/eu/kanade/presentation/more/settings/screen/browse/preparation/SourcePreparationViewModelTest.kt b/app/src/test/java/eu/kanade/presentation/more/settings/screen/browse/preparation/SourcePreparationViewModelTest.kt
+new file mode 100644
+index 0000000..55d423b
+--- /dev/null
++++ b/app/src/test/java/eu/kanade/presentation/more/settings/screen/browse/preparation/SourcePreparationViewModelTest.kt
+@@ -0,0 +1,299 @@
++package eu.kanade.presentation.more.settings.screen.browse.preparation
++
++import androidx.lifecycle.ViewModelStore
++import eu.kanade.domain.source.service.SourcePreferences
++import eu.kanade.tachiyomi.extension.ExtensionManager
++import eu.kanade.tachiyomi.extension.preparation.ExtensionPreparationQueue
++import eu.kanade.tachiyomi.extension.preparation.PreparationSelection
++import eu.kanade.tachiyomi.extension.preparation.PreparationStatus
++import eu.kanade.tachiyomi.extension.preparation.RepositoryIdentity
++import eu.kanade.tachiyomi.extension.preparation.extension
++import eu.kanade.tachiyomi.extension.preparation.store
++import io.mockk.coEvery
++import io.mockk.coVerify
++import io.mockk.every
++import io.mockk.mockk
++import kotlinx.coroutines.Dispatchers
++import kotlinx.coroutines.awaitCancellation
++import kotlinx.coroutines.flow.MutableStateFlow
++import kotlinx.coroutines.test.StandardTestDispatcher
++import kotlinx.coroutines.test.advanceUntilIdle
++import kotlinx.coroutines.test.resetMain
++import kotlinx.coroutines.test.runCurrent
++import kotlinx.coroutines.test.runTest
++import kotlinx.coroutines.test.setMain
++import mihon.data.extension.service.ExtensionStoreService
++import mihon.domain.extension.repository.ExtensionStoreRepository
++import org.junit.jupiter.api.Assertions.assertEquals
++import org.junit.jupiter.api.Assertions.assertFalse
++import org.junit.jupiter.api.Assertions.assertTrue
++import org.junit.jupiter.api.Test
++import tachiyomi.core.common.preference.Preference
++import tachiyomi.domain.manga.interactor.GetFavorites
++import tachiyomi.domain.manga.model.Manga
++
++class SourcePreparationViewModelTest {
++    @Test
++    fun `restored repositories and language preferences do not start downloads or change backup data`() =
++        runTest {
++            val dispatcher = StandardTestDispatcher(testScheduler)
++            Dispatchers.setMain(dispatcher)
++            val owner = ViewModelStore()
++            try {
++                val repos = MutableStateFlow(listOf(store()))
++                val repository = mockk<ExtensionStoreRepository>()
++                every { repository.getAllAsFlow() } returns repos
++                val manager = mockk<ExtensionManager>()
++                val queue =
++                    ExtensionPreparationQueue(
++                        backgroundScope,
++                        { true },
++                        { _, _ -> error("no download authorized") },
++                    )
++                every { manager.preparationQueue } returns queue
++                every { manager.installedExtensionsFlow } returns MutableStateFlow(emptyList())
++                val preference = mockk<Preference<Set<String>>>()
++                every { preference.isSet() } returns true
++                every { preference.get() } returns setOf("ja")
++                val preferences = mockk<SourcePreferences>()
++                every { preferences.enabledLanguages } returns preference
++                val adults = mockk<Preference<Boolean>>()
++                every { adults.get() } returns false
++                every { preferences.showNsfwSource } returns adults
++                val vm =
++                    SourcePreparationViewModel(
++                        repository,
++                        mockk(),
++                        mockk(),
++                        manager,
++                        preferences,
++                        dispatcher,
++                    )
++                owner.put("test", vm)
++                runCurrent()
++                assertTrue(vm.state.value.loaded)
++                assertFalse(vm.state.value.consent)
++                assertTrue(vm.state.value.selectedRepositories.isEmpty())
++                assertEquals(setOf("ja"), vm.state.value.languages)
++                vm.prepare()
++                runCurrent()
++                assertTrue(queue.state.value.entries.isEmpty())
++                assertEquals(listOf(store()), repos.value)
++                vm.includeNsfw(true)
++                assertFalse(vm.state.value.includeNsfw)
++                assertEquals(PreparationError.ADULT_DISABLED, vm.state.value.error)
++                assertFalse(adults.get())
++            } finally {
++                owner.clear()
++                Dispatchers.resetMain()
++            }
++        }
++
++    @Test
++    fun `repository review does not insert until explicit confirmation and certificate changes require new review`() =
++        runTest {
++            val dispatcher = StandardTestDispatcher(testScheduler)
++            Dispatchers.setMain(dispatcher)
++            val owner = ViewModelStore()
++            try {
++                val repository = mockk<ExtensionStoreRepository>()
++                every { repository.getAllAsFlow() } returns MutableStateFlow(emptyList())
++                val service = mockk<ExtensionStoreService>()
++                coEvery { service.fetch(store().indexUrl) } returns Result.success(store())
++                coEvery { repository.insertVerified(store()) } returns
++                    Result.failure(IllegalStateException("identity changed"))
++                val manager = mockk<ExtensionManager>()
++                every { manager.preparationQueue } returns
++                    ExtensionPreparationQueue(
++                        backgroundScope,
++                        { true },
++                        { _, _ -> PreparationStatus.READY },
++                    )
++                every { manager.installedExtensionsFlow } returns MutableStateFlow(emptyList())
++                val prefs = mockk<SourcePreferences>()
++                val languages = mockk<Preference<Set<String>>>()
++                every { prefs.enabledLanguages } returns languages
++                every { languages.isSet() } returns false
++                every { languages.get() } returns setOf("pt-BR")
++                val vm =
++                    SourcePreparationViewModel(
++                        repository,
++                        service,
++                        mockk(),
++                        manager,
++                        prefs,
++                        dispatcher,
++                    )
++                owner.put("test", vm)
++                runCurrent()
++                vm.consent(true)
++                vm.previewRepository(store().indexUrl)
++                advanceUntilIdle()
++                coVerify(exactly = 0) { repository.insertVerified(any()) }
++                assertEquals(store(), vm.state.value.pendingStore)
++                vm.confirmRepository()
++                advanceUntilIdle()
++                assertEquals(PreparationError.REPOSITORY, vm.state.value.error)
++                assertTrue(vm.state.value.selectedRepositories.isEmpty())
++                assertEquals(store(), vm.state.value.pendingStore)
++            } finally {
++                owner.clear()
++                Dispatchers.resetMain()
++            }
++        }
++
++    @Test
++    fun `partial catalog failures preserve available sources and restored source ids`() = runTest {
++        val dispatcher = StandardTestDispatcher(testScheduler)
++        Dispatchers.setMain(dispatcher)
++        val owner = ViewModelStore()
++        try {
++            val one = store()
++            val two = store("two")
++            val repository = mockk<ExtensionStoreRepository>()
++            every { repository.getAllAsFlow() } returns MutableStateFlow(listOf(one, two))
++            coEvery { repository.getAll() } returns listOf(one, two)
++            val service = mockk<ExtensionStoreService>()
++            coEvery { service.getExtensions(one) } returns Result.success(listOf(extension()))
++            coEvery { service.getExtensions(two) } returns
++                Result.failure(IllegalStateException("offline"))
++            val manga = mockk<Manga>()
++            every { manga.source } returns 42L
++            val favorites = mockk<GetFavorites>()
++            coEvery { favorites.await() } returns listOf(manga)
++            val manager = mockk<ExtensionManager>()
++            every { manager.preparationQueue } returns
++                ExtensionPreparationQueue(
++                    backgroundScope,
++                    { true },
++                    { _, _ -> PreparationStatus.READY },
++                )
++            every { manager.installedExtensionsFlow } returns MutableStateFlow(emptyList())
++            val prefs = mockk<SourcePreferences>()
++            val languages = mockk<Preference<Set<String>>>()
++            every { prefs.enabledLanguages } returns languages
++            every { languages.isSet() } returns true
++            every { languages.get() } returns setOf("en")
++            val vm =
++                SourcePreparationViewModel(
++                    repository,
++                    service,
++                    favorites,
++                    manager,
++                    prefs,
++                    dispatcher,
++                )
++            owner.put("test", vm)
++            runCurrent()
++            vm.consent(true)
++            vm.selectRepository(RepositoryIdentity.of(one))
++            vm.selectRepository(RepositoryIdentity.of(two))
++            vm.loadCatalog()
++            advanceUntilIdle()
++            assertEquals(listOf(two.name), vm.state.value.catalogFailures)
++            assertEquals(setOf(42L), vm.state.value.librarySources)
++            assertEquals(PreparationSelection.LIBRARY, vm.state.value.selection)
++            assertEquals(listOf(extension()), vm.state.value.plan.extensions)
++            assertEquals(42L, manga.source)
++            coVerify(exactly = 0) { repository.insertVerified(any()) }
++        } finally {
++            owner.clear()
++            Dispatchers.resetMain()
++        }
++    }
++
++    @Test
++    fun `changed repository selection clears a previously loaded plan`() = runTest {
++        val dispatcher = StandardTestDispatcher(testScheduler)
++        Dispatchers.setMain(dispatcher)
++        val owner = ViewModelStore()
++        try {
++            val repos = MutableStateFlow(listOf(store()))
++            val repository = mockk<ExtensionStoreRepository>()
++            every { repository.getAllAsFlow() } returns repos
++            coEvery { repository.getAll() } returns repos.value
++            val service = mockk<ExtensionStoreService>()
++            coEvery { service.getExtensions(any()) } returns Result.success(listOf(extension()))
++            val favorites = mockk<GetFavorites>()
++            coEvery { favorites.await() } returns emptyList()
++            val manager = mockk<ExtensionManager>()
++            every { manager.preparationQueue } returns
++                ExtensionPreparationQueue(
++                    backgroundScope,
++                    { true },
++                    { _, _ -> error("no download") },
++                )
++            every { manager.installedExtensionsFlow } returns MutableStateFlow(emptyList())
++            val prefs = mockk<SourcePreferences>()
++            val languages = mockk<Preference<Set<String>>>()
++            every { prefs.enabledLanguages } returns languages
++            every { languages.isSet() } returns true
++            every { languages.get() } returns setOf("en")
++            val vm =
++                SourcePreparationViewModel(
++                    repository,
++                    service,
++                    favorites,
++                    manager,
++                    prefs,
++                    dispatcher,
++                )
++            owner.put("test", vm)
++            runCurrent()
++            vm.consent(true)
++            vm.selectRepository(RepositoryIdentity.of(store()))
++            vm.loadCatalog()
++            advanceUntilIdle()
++            assertTrue(vm.state.value.catalogLoaded)
++            repos.value = listOf(store(key = "b".repeat(64)))
++            runCurrent()
++            assertFalse(vm.state.value.catalogLoaded)
++            assertTrue(vm.state.value.selectedRepositories.isEmpty())
++            vm.prepare()
++            runCurrent()
++            assertTrue(manager.preparationQueue.state.value.entries.isEmpty())
++        } finally {
++            owner.clear()
++            Dispatchers.resetMain()
++        }
++    }
++
++    @Test
++    fun `metadata timeout is reported and does not leave the assistant busy`() = runTest {
++        val dispatcher = StandardTestDispatcher(testScheduler)
++        Dispatchers.setMain(dispatcher)
++        val owner = ViewModelStore()
++        try {
++            val repository = mockk<ExtensionStoreRepository>()
++            every { repository.getAllAsFlow() } returns MutableStateFlow(emptyList())
++            val service = mockk<ExtensionStoreService>()
++            coEvery { service.fetch(any()) } coAnswers { awaitCancellation() }
++            val manager = mockk<ExtensionManager>()
++            every { manager.preparationQueue } returns
++                ExtensionPreparationQueue(
++                    backgroundScope,
++                    { true },
++                    { _, _ -> PreparationStatus.READY },
++                )
++            every { manager.installedExtensionsFlow } returns MutableStateFlow(emptyList())
++            val prefs = mockk<SourcePreferences>()
++            val languages = mockk<Preference<Set<String>>>()
++            every { prefs.enabledLanguages } returns languages
++            every { languages.isSet() } returns true
++            every { languages.get() } returns setOf("en")
++            val vm =
++                SourcePreparationViewModel(repository, service, mockk(), manager, prefs, dispatcher)
++            owner.put("test", vm)
++            runCurrent()
++            vm.consent(true)
++            vm.previewRepository(store().indexUrl)
++            advanceUntilIdle()
++            assertFalse(vm.state.value.busy)
++            assertEquals(PreparationError.REPOSITORY, vm.state.value.error)
++            coVerify(exactly = 0) { repository.insertVerified(any()) }
++        } finally {
++            owner.clear()
++            Dispatchers.resetMain()
++        }
++    }
++}
 diff --git a/app/src/test/java/eu/kanade/tachiyomi/data/backup/BackupInteropTest.kt b/app/src/test/java/eu/kanade/tachiyomi/data/backup/BackupInteropTest.kt
 new file mode 100644
 index 0000000..4d5291f
@@ -12093,12 +13939,654 @@ index 0000000..52defe4
 +        assertTrue(preferences.shouldCheck(true, true, now))
 +    }
 +}
+diff --git a/app/src/test/java/eu/kanade/tachiyomi/extension/preparation/ExtensionPreparationQueueTest.kt b/app/src/test/java/eu/kanade/tachiyomi/extension/preparation/ExtensionPreparationQueueTest.kt
+new file mode 100644
+index 0000000..780e90b
+--- /dev/null
++++ b/app/src/test/java/eu/kanade/tachiyomi/extension/preparation/ExtensionPreparationQueueTest.kt
+@@ -0,0 +1,218 @@
++package eu.kanade.tachiyomi.extension.preparation
++
++import kotlinx.coroutines.CompletableDeferred
++import kotlinx.coroutines.awaitCancellation
++import kotlinx.coroutines.delay
++import kotlinx.coroutines.test.advanceTimeBy
++import kotlinx.coroutines.test.advanceUntilIdle
++import kotlinx.coroutines.test.runCurrent
++import kotlinx.coroutines.test.runTest
++import org.junit.jupiter.api.Assertions.assertEquals
++import org.junit.jupiter.api.Assertions.assertFalse
++import org.junit.jupiter.api.Assertions.assertTrue
++import org.junit.jupiter.api.Assertions.fail
++import org.junit.jupiter.api.Test
++
++class ExtensionPreparationQueueTest {
++    @Test
++    fun `opening or restoring data never starts downloads and consent is mandatory`() = runTest {
++        var calls = 0
++        val queue =
++            ExtensionPreparationQueue(
++                this,
++                { true },
++                { _, _ ->
++                    calls++
++                    PreparationStatus.READY
++                },
++            )
++        runCurrent()
++        assertFalse(queue.start(listOf(extension()), consent = false))
++        assertEquals(0, calls)
++        assertFalse(queue.state.value.running)
++        assertTrue(queue.state.value.entries.isEmpty())
++    }
++
++    @Test
++    fun `at most two downloads run and each package is prepared once`() = runTest {
++        val gate = CompletableDeferred<Unit>()
++        var active = 0
++        var maximum = 0
++        val calls = mutableListOf<String>()
++        val queue =
++            ExtensionPreparationQueue(
++                this,
++                { true },
++                { ext, progress ->
++                    calls += ext.pkgName
++                    active++
++                    maximum = maxOf(maximum, active)
++                    progress(PreparationStatus.DOWNLOADING)
++                    gate.await()
++                    active--
++                    PreparationStatus.READY
++                },
++            )
++        assertTrue(queue.start((1..15).map { extension("pkg$it") }, true))
++        runCurrent()
++        assertEquals(2, calls.size)
++        assertFalse(queue.start(listOf(extension("replacement")), true))
++        gate.complete(Unit)
++        advanceUntilIdle()
++        assertEquals(2, maximum)
++        assertEquals(15, calls.distinct().size)
++        assertTrue(queue.state.value.entries.all { it.status == PreparationStatus.READY })
++        assertFalse(queue.state.value.running)
++    }
++
++    @Test
++    fun `cancelling before dispatch still finishes the queue`() = runTest {
++        val queue = ExtensionPreparationQueue(this, { true }, { _, _ -> fail("must not install") })
++        queue.start(listOf(extension()), true)
++        queue.cancel()
++        runCurrent()
++        assertFalse(queue.state.value.running)
++        assertEquals(PreparationStatus.CANCELLED, queue.state.value.entries.single().status)
++        queue.clear()
++        assertTrue(queue.state.value.entries.isEmpty())
++    }
++
++    @Test
++    fun `cancellation preserves completed items and does not start queued ones`() = runTest {
++        val calls = mutableListOf<String>()
++        val queue =
++            ExtensionPreparationQueue(
++                this,
++                { true },
++                { ext, _ ->
++                    calls += ext.pkgName
++                    if (ext.pkgName == "ready") PreparationStatus.READY else awaitCancellation()
++                },
++            )
++        queue.start(
++            listOf(extension("ready"), extension("slow1"), extension("slow2"), extension("queued")),
++            true,
++        )
++        runCurrent()
++        queue.cancel()
++        advanceUntilIdle()
++        assertEquals(PreparationStatus.READY, queue.state.value.entries.first().status)
++        assertTrue(
++            queue.state.value.entries.drop(1).all { it.status == PreparationStatus.CANCELLED },
++        )
++        assertFalse("queued" in calls)
++    }
++
++    @Test
++    fun `retry only repeats failed items and never grants trust`() = runTest {
++        val calls = mutableListOf<String>()
++        var failFirst = true
++        val queue =
++            ExtensionPreparationQueue(
++                this,
++                { true },
++                { ext, _ ->
++                    calls += ext.pkgName
++                    when (ext.pkgName) {
++                        "trust" -> PreparationStatus.NEEDS_TRUST
++                        "fail" ->
++                            if (failFirst) PreparationStatus.FAILED else PreparationStatus.READY
++                        else -> PreparationStatus.READY
++                    }
++                },
++            )
++        queue.start(listOf(extension("ok"), extension("trust"), extension("fail")), true)
++        advanceUntilIdle()
++        assertFalse(queue.retryFailures(false))
++        failFirst = false
++        assertTrue(queue.retryFailures(true))
++        advanceUntilIdle()
++        assertEquals(listOf("fail", "fail"), calls.filter { it == "fail" })
++        assertEquals(1, calls.count { it == "ok" })
++        assertEquals(1, calls.count { it == "trust" })
++        assertEquals(PreparationStatus.NEEDS_TRUST, queue.state.value.entries[1].status)
++    }
++
++    @Test
++    fun `repository changes are checked again before queued work and retries`() = runTest {
++        var authorized = true
++        val gate = CompletableDeferred<Unit>()
++        val calls = mutableListOf<String>()
++        val queue =
++            ExtensionPreparationQueue(
++                this,
++                { authorized },
++                { ext, _ ->
++                    calls += ext.pkgName
++                    gate.await()
++                    PreparationStatus.READY
++                },
++            )
++        queue.start((1..3).map { extension("pkg$it") }, true)
++        runCurrent()
++        authorized = false
++        gate.complete(Unit)
++        advanceUntilIdle()
++        assertEquals(2, calls.size)
++        assertEquals(PreparationStatus.FAILED, queue.state.value.entries.last().status)
++        queue.retryFailures(true)
++        advanceUntilIdle()
++        assertEquals(2, calls.size)
++    }
++
++    @Test
++    fun `a timed out item does not prevent other items from finishing`() = runTest {
++        val queue =
++            ExtensionPreparationQueue(
++                this,
++                { true },
++                { ext, _ ->
++                    if (ext.pkgName == "slow") delay(1000)
++                    PreparationStatus.READY
++                },
++                timeoutMillis = 100,
++            )
++        queue.start(listOf(extension("slow"), extension("ok")), true)
++        advanceTimeBy(101)
++        runCurrent()
++        assertEquals(
++            listOf(PreparationStatus.FAILED, PreparationStatus.READY),
++            queue.state.value.entries.map { it.status },
++        )
++        assertFalse(queue.state.value.running)
++    }
++
++    @Test
++    fun `duplicate packages invalid identities and insecure downloads are rejected before starting`() =
++        runTest {
++            val queue =
++                ExtensionPreparationQueue(this, { true }, { _, _ -> fail("must not install") })
++            assertFalse(queue.start(listOf(extension(), extension()), true))
++            assertFalse(queue.start(listOf(extension(repo = store(key = "NO_SIGNING_KEY"))), true))
++            assertFalse(
++                queue.start(listOf(extension().copy(apkUrl = "http://example.org/file.apk")), true),
++            )
++            assertTrue(queue.state.value.entries.isEmpty())
++        }
++
++    @Test
++    fun `one exception fails only its item and a new batch starts cleanly`() = runTest {
++        val queue =
++            ExtensionPreparationQueue(
++                this,
++                { true },
++                { ext, _ ->
++                    if (ext.pkgName == "bad") error("unavailable") else PreparationStatus.READY
++                },
++            )
++        queue.start(listOf(extension("bad"), extension("ok")), true)
++        advanceUntilIdle()
++        assertEquals(
++            listOf(PreparationStatus.FAILED, PreparationStatus.READY),
++            queue.state.value.entries.map { it.status },
++        )
++        assertTrue(queue.start(listOf(extension("new")), true))
++        advanceUntilIdle()
++        assertEquals(listOf("new"), queue.state.value.entries.map { it.extension.pkgName })
++    }
++}
+diff --git a/app/src/test/java/eu/kanade/tachiyomi/extension/preparation/PreparationPlanTest.kt b/app/src/test/java/eu/kanade/tachiyomi/extension/preparation/PreparationPlanTest.kt
+new file mode 100644
+index 0000000..8daa45e
+--- /dev/null
++++ b/app/src/test/java/eu/kanade/tachiyomi/extension/preparation/PreparationPlanTest.kt
+@@ -0,0 +1,193 @@
++package eu.kanade.tachiyomi.extension.preparation
++
++import eu.kanade.tachiyomi.extension.model.Extension
++import mihon.domain.extension.model.ExtensionStore
++import org.junit.jupiter.api.Assertions.assertEquals
++import org.junit.jupiter.api.Assertions.assertFalse
++import org.junit.jupiter.api.Assertions.assertTrue
++import org.junit.jupiter.api.Test
++
++internal fun store(name: String = "one", key: String = "a".repeat(64)) =
++    ExtensionStore(
++        "https://example.org/$name/index.pb",
++        name,
++        name,
++        key,
++        ExtensionStore.Contact("https://example.org", null),
++        false,
++        null,
++    )
++
++internal fun extension(
++    pkg: String = "test.one",
++    repo: ExtensionStore = store(),
++    lang: String = "en",
++    ids: List<Long> = listOf(42L),
++    version: Long = 2,
++    nsfw: Boolean = false,
++) =
++    Extension.Available(
++        pkg,
++        pkg,
++        "1.0",
++        version,
++        1.4,
++        lang,
++        nsfw,
++        ids.map { Extension.Available.Source(it, "en", pkg, "https://example.org") },
++        "https://example.org/$pkg.apk",
++        "",
++        repo,
++    )
++
++class PreparationPlanTest {
++    private fun plan(
++        available: List<Extension.Available>,
++        repos: Set<RepositoryIdentity> = setOf(RepositoryIdentity.of(store())),
++        installed: Map<String, Long> = emptyMap(),
++        shared: Set<String> = emptySet(),
++        mode: PreparationSelection = PreparationSelection.LANGUAGES,
++        langs: Set<String> = setOf("en"),
++        sources: Set<Long> = emptySet(),
++        manual: Set<String> = emptySet(),
++        nsfw: Boolean = false,
++    ) =
++        PreparationPlanner.create(
++            available,
++            repos,
++            installed,
++            shared,
++            mode,
++            langs,
++            sources,
++            manual,
++            nsfw,
++        )
++
++    @Test
++    fun `restored source ids select exact sources without title matching or remapping`() {
++        val ids = setOf(Long.MAX_VALUE - 4, 99L)
++        val original = extension(ids = listOf(Long.MAX_VALUE - 4))
++        val result =
++            plan(
++                listOf(original, extension("other", ids = listOf(10))),
++                mode = PreparationSelection.LIBRARY,
++                sources = ids,
++            )
++        assertEquals(listOf(original), result.extensions)
++        assertEquals(setOf(99L), result.missingSourceIds)
++        assertEquals(setOf(Long.MAX_VALUE - 4, 99L), ids)
++    }
++
++    @Test
++    fun `matching a member language includes multilingual extensions`() {
++        assertEquals(1, plan(listOf(extension(lang = "all"))).extensions.size)
++        assertTrue(plan(listOf(extension(lang = "all")), langs = setOf("ja")).extensions.isEmpty())
++    }
++
++    @Test
++    fun `installed private versions are skipped and shared packages are never converted`() {
++        val available = listOf(extension("current"), extension("update"), extension("shared"))
++        val result =
++            plan(
++                available,
++                installed = mapOf("current" to 2L, "update" to 1L),
++                shared = setOf("shared"),
++            )
++        assertEquals(listOf("update"), result.extensions.map { it.pkgName })
++    }
++
++    @Test
++    fun `same package from two repositories requires repository choice`() {
++        val first = extension()
++        val other = extension(repo = store("two", "b".repeat(64)))
++        val both =
++            plan(
++                listOf(first, other),
++                repos =
++                setOf(RepositoryIdentity.of(first.store), RepositoryIdentity.of(other.store)),
++            )
++        assertEquals(setOf(first.pkgName), both.conflicts)
++        assertTrue(both.extensions.isEmpty())
++        assertEquals(listOf(first), plan(listOf(first, other)).extensions)
++    }
++
++    @Test
++    fun `conflicting download urls for the same version are not chosen arbitrarily`() {
++        val one = extension()
++        assertTrue(
++            plan(listOf(one, one.copy(apkUrl = "https://other.org/file.apk"))).extensions.isEmpty(),
++        )
++    }
++
++    @Test
++    fun `exact duplicate metadata is deduplicated and latest version from one repository wins`() {
++        val one = extension()
++        assertEquals(
++            listOf(one.copy(versionCode = 3)),
++            plan(listOf(one, one, one.copy(versionCode = 3))).extensions,
++        )
++    }
++
++    @Test
++    fun `manual selection and adult content require explicit choices`() {
++        val adult = extension(nsfw = true)
++        assertTrue(
++            plan(listOf(adult), mode = PreparationSelection.MANUAL, manual = setOf(adult.pkgName))
++                .extensions
++                .isEmpty(),
++        )
++        assertEquals(
++            listOf(adult),
++            plan(
++                listOf(adult),
++                mode = PreparationSelection.MANUAL,
++                manual = setOf(adult.pkgName),
++                nsfw = true,
++            )
++                .extensions,
++        )
++        assertTrue(
++            plan(listOf(extension()), mode = PreparationSelection.MANUAL).extensions.isEmpty(),
++        )
++    }
++
++    @Test
++    fun `restored repositories without a certificate and changed keys do not authorize preparation`() {
++        val invalid = extension(repo = store(key = "NO_SIGNING_KEY"))
++        assertTrue(
++            plan(listOf(invalid), repos = setOf(RepositoryIdentity.of(invalid.store)))
++                .extensions
++                .isEmpty(),
++        )
++        assertTrue(plan(listOf(extension(repo = store(key = "b".repeat(64))))).extensions.isEmpty())
++        assertFalse(RepositoryIdentity("http://example.org/index.pb", "a".repeat(64)).canVerify)
++    }
++
++    @Test
++    fun `a newer package cannot silently switch an installed source to another selected repository`() {
++        val original = extension()
++        val alternative = extension(repo = store("two", "b".repeat(64)), version = 3)
++        val result =
++            plan(
++                listOf(original, alternative),
++                repos =
++                setOf(
++                    RepositoryIdentity.of(original.store),
++                    RepositoryIdentity.of(alternative.store),
++                ),
++                installed = mapOf(original.pkgName to 2L),
++            )
++        assertTrue(result.extensions.isEmpty())
++        assertEquals(setOf(original.pkgName), result.conflicts)
++    }
++
++    @Test
++    fun `unsupported extension library versions are reported without attempting installation`() {
++        val incompatible = extension().copy(libVersion = 99.0)
++        val insecure = extension("insecure").copy(apkUrl = "http://example.org/file.apk")
++        val result = plan(listOf(incompatible, insecure))
++        assertTrue(result.extensions.isEmpty())
++        assertEquals(setOf(incompatible.pkgName, insecure.pkgName), result.unsupportedPackages)
++    }
++}
+diff --git a/app/src/test/java/eu/kanade/tachiyomi/extension/preparation/PrivateExtensionSignatureTest.kt b/app/src/test/java/eu/kanade/tachiyomi/extension/preparation/PrivateExtensionSignatureTest.kt
+new file mode 100644
+index 0000000..277f8b2
+--- /dev/null
++++ b/app/src/test/java/eu/kanade/tachiyomi/extension/preparation/PrivateExtensionSignatureTest.kt
+@@ -0,0 +1,85 @@
++package eu.kanade.tachiyomi.extension.preparation
++
++import eu.kanade.tachiyomi.extension.util.PrivateExtensionFiles
++import eu.kanade.tachiyomi.extension.util.PrivateExtensionSignature
++import org.junit.jupiter.api.Assertions.assertArrayEquals
++import org.junit.jupiter.api.Assertions.assertEquals
++import org.junit.jupiter.api.Test
++import org.junit.jupiter.api.assertThrows
++import org.junit.jupiter.api.io.TempDir
++import java.io.File
++import java.io.IOException
++
++class PrivateExtensionSignatureTest {
++    @TempDir lateinit var folder: File
++
++    private fun fixture(name: String): File {
++        val stream =
++            PrivateExtensionSignatureTest::class
++                .java
++                .getResourceAsStream("/extension-preparation/$name")
++        val bytes = requireNotNull(stream).use { it.readBytes() }
++        return File(folder, name).apply { writeBytes(bytes) }
++    }
++
++    @Test
++    fun `signed fixture verifies under Android 8 and Android 14 signature rules`() {
++        val apk = fixture("signed.apk")
++        val keys = PrivateExtensionSignature.verify(apk, 26)
++        assertEquals(1, keys.size)
++        assertEquals(keys, PrivateExtensionSignature.verify(apk, 34))
++        PrivateExtensionSignature.requireReviewedIdentity(
++            "test.polaris.reviewed",
++            keys.single().uppercase(),
++            "test.polaris.reviewed",
++            keys,
++        )
++    }
++
++    @Test
++    fun `an altered signed apk is rejected before replacement and working file survives`() {
++        val old = File(folder, "working.ext").apply { writeText("working") }
++        val changed = fixture("tampered.apk")
++        assertThrows<IOException> {
++            PrivateExtensionFiles.replace(changed, old) { staged ->
++                PrivateExtensionSignature.verify(staged, 26)
++            }
++        }
++        assertEquals("working", old.readText())
++        assertEquals(0, folder.listFiles()!!.count { it.name.endsWith(".pending") })
++    }
++
++    @Test
++    fun `correct certificate cannot authorize a different package or an unreviewed key`() {
++        val apk = fixture("signed.apk")
++        val keys = PrivateExtensionSignature.verify(apk, 26)
++        val old = File(folder, "working.ext").apply { writeText("working") }
++        for (
++        (pkg, key) in
++        listOf("wrong.package" to keys.single(), "test.polaris.reviewed" to "0".repeat(64))
++        ) {
++            assertThrows<IOException> {
++                PrivateExtensionFiles.replace(apk, old) { staged ->
++                    PrivateExtensionSignature.requireReviewedIdentity(
++                        pkg,
++                        key,
++                        "test.polaris.reviewed",
++                        PrivateExtensionSignature.verify(staged, 26),
++                    )
++                }
++            }
++            assertEquals("working", old.readText())
++        }
++    }
++
++    @Test
++    fun `verified bytes can replace the extension without changing the apk`() {
++        val apk = fixture("signed.apk")
++        val old = File(folder, "working.ext").apply { writeText("working") }
++        PrivateExtensionFiles.replace(apk, old) { staged ->
++            PrivateExtensionSignature.verify(staged, 26)
++        }
++        assertArrayEquals(apk.readBytes(), old.readBytes())
++        old.setWritable(true)
++    }
++}
+diff --git a/app/src/test/java/eu/kanade/tachiyomi/extension/preparation/RepositoryReviewTest.kt b/app/src/test/java/eu/kanade/tachiyomi/extension/preparation/RepositoryReviewTest.kt
+new file mode 100644
+index 0000000..d399c28
+--- /dev/null
++++ b/app/src/test/java/eu/kanade/tachiyomi/extension/preparation/RepositoryReviewTest.kt
+@@ -0,0 +1,122 @@
++package eu.kanade.tachiyomi.extension.preparation
++
++import app.cash.sqldelight.Query
++import app.cash.sqldelight.async.coroutines.awaitAsList
++import io.mockk.coEvery
++import io.mockk.coVerify
++import io.mockk.every
++import io.mockk.mockk
++import io.mockk.mockkStatic
++import io.mockk.unmockkStatic
++import kotlinx.coroutines.test.runTest
++import mihon.data.extension.repository.ExtensionStoreRepositoryImpl
++import mihon.data.extension.service.ExtensionStoreService
++import org.junit.jupiter.api.Assertions.assertFalse
++import org.junit.jupiter.api.Assertions.assertTrue
++import org.junit.jupiter.api.Test
++import tachiyomi.data.Database
++import tachiyomi.data.Extension_store
++
++class RepositoryReviewTest {
++    @Test
++    fun `metadata changed after review is rejected without overwriting the stored repository`() =
++        runTest {
++            val service = mockk<ExtensionStoreService>()
++            val database = mockk<Database>(relaxed = true)
++            coEvery { service.fetch(store().indexUrl) } returns
++                Result.success(store(key = "b".repeat(64)))
++            assertTrue(
++                ExtensionStoreRepositoryImpl(service, database).insertVerified(store()).isFailure,
++            )
++            coVerify(exactly = 0) {
++                database.extension_storeQueries.upsert(
++                    any(),
++                    any(),
++                    any(),
++                    any(),
++                    any(),
++                    any(),
++                    any(),
++                    any(),
++                )
++            }
++        }
++
++    @Test
++    fun `reviewed metadata is inserted with its original certificate and identity`() = runTest {
++        val service = mockk<ExtensionStoreService>()
++        val database = mockk<Database>(relaxed = true)
++        coEvery { service.fetch(store().indexUrl) } returns Result.success(store())
++        assertTrue(
++            ExtensionStoreRepositoryImpl(service, database).insertVerified(store()).isSuccess,
++        )
++        coVerify(exactly = 1) {
++            database.extension_storeQueries.upsert(
++                store().indexUrl,
++                store().name,
++                store().badgeLabel,
++                store().signingKey,
++                store().contact.website,
++                null,
++                false,
++                null,
++            )
++        }
++    }
++
++    @Test
++    fun `network failures cannot register a repository`() = runTest {
++        val service = mockk<ExtensionStoreService>()
++        val database = mockk<Database>(relaxed = true)
++        coEvery { service.fetch(any()) } returns Result.failure(IllegalStateException("offline"))
++        assertFalse(
++            ExtensionStoreRepositoryImpl(service, database).insertVerified(store()).isSuccess,
++        )
++        coVerify(exactly = 0) {
++            database.extension_storeQueries.upsert(
++                any(),
++                any(),
++                any(),
++                any(),
++                any(),
++                any(),
++                any(),
++                any(),
++            )
++        }
++    }
++
++    @Test
++    fun `background refresh cannot silently replace a restored signing certificate`() = runTest {
++        mockkStatic("app.cash.sqldelight.async.coroutines.QueryExtensionsKt")
++        try {
++            val database = mockk<Database>(relaxed = true)
++            val queries = database.extension_storeQueries
++            val query = mockk<Query<Extension_store>>()
++            every { queries.getAll() } returns query
++            val original = store()
++            coEvery { query.awaitAsList() } returns
++                listOf(
++                    Extension_store(
++                        original.indexUrl,
++                        original.name,
++                        original.badgeLabel,
++                        original.signingKey,
++                        original.contact.website,
++                        null,
++                        false,
++                        null,
++                    ),
++                )
++            val service = mockk<ExtensionStoreService>()
++            coEvery { service.fetch(original.indexUrl) } returns
++                Result.success(original.copy(signingKey = "b".repeat(64)))
++            ExtensionStoreRepositoryImpl(service, database).refreshAll()
++            coVerify(exactly = 0) {
++                queries.upsert(any(), any(), any(), any(), any(), any(), any(), any())
++            }
++        } finally {
++            unmockkStatic("app.cash.sqldelight.async.coroutines.QueryExtensionsKt")
++        }
++    }
++}
 diff --git a/app/src/test/java/eu/kanade/tachiyomi/extension/util/ExtensionInstallerDownloadTest.kt b/app/src/test/java/eu/kanade/tachiyomi/extension/util/ExtensionInstallerDownloadTest.kt
 new file mode 100644
-index 0000000..0bb4014
+index 0000000..84cac8c
 --- /dev/null
 +++ b/app/src/test/java/eu/kanade/tachiyomi/extension/util/ExtensionInstallerDownloadTest.kt
-@@ -0,0 +1,191 @@
+@@ -0,0 +1,301 @@
 +package eu.kanade.tachiyomi.extension.util
 +
 +import android.content.Context
@@ -12139,41 +14627,62 @@ index 0000000..0bb4014
 +import java.util.concurrent.TimeUnit
 +import java.util.concurrent.atomic.AtomicInteger
 +
-+/** Real localhost HTTP and file pipeline. Android package parsing/notifications are the mocked boundary. */
++/**
++ * Real localhost HTTP and file pipeline. Android package parsing/notifications are the mocked
++ * boundary.
++ */
 +class ExtensionInstallerDownloadTest {
 +    @TempDir lateinit var folder: File
 +    private val context = mockk<Context>()
 +    private val preference = mockk<Preference<BasePreferences.ExtensionInstaller>>()
 +    private val client = OkHttpClient.Builder().readTimeout(10, TimeUnit.SECONDS).build()
-+    private val extension = Extension.Installed(
-+        "Test", "test.source", "1", 1, 1.4, "en", false, null, emptyList(), null, isShared = false,
-+    )
++    private val extension =
++        Extension.Installed(
++            "Test",
++            "test.source",
++            "1",
++            1,
++            1.4,
++            "en",
++            false,
++            null,
++            emptyList(),
++            null,
++            isShared = false,
++        )
 +    private val bytes = ByteArray(150_000) { (it % 251).toByte() }
 +    private val started = arrayOf(CountDownLatch(1), CountDownLatch(1))
 +    private val release = CountDownLatch(1)
 +    private val requests = AtomicInteger()
-+    private val threads = Executors.newCachedThreadPool { task -> Thread(task).apply { isDaemon = true } }
++    private val threads =
++        Executors.newCachedThreadPool { task -> Thread(task).apply { isDaemon = true } }
 +    private var server: HttpServer? = null
 +    private lateinit var installer: ExtensionInstaller
-+    private val cache get() = File(folder, "cache")
-+    private val target get() = File(folder, "source.ext")
++    private val cache
++        get() = File(folder, "cache")
 +
-+    @BeforeEach fun setup() {
++    private val target
++        get() = File(folder, "source.ext")
++
++    @BeforeEach
++    fun setup() {
 +        cache.mkdirs()
 +        every { context.cacheDir } returns cache
 +        every { preference.get() } returns BasePreferences.ExtensionInstaller.PRIVATE
 +        mockkObject(ExtensionLoader, Installer.Companion)
 +        justRun { Installer.cancelInstallQueue(context, any()) }
-+        every { ExtensionLoader.installPrivateExtensionFile(context, any(), any()) } answers {
-+            PrivateExtensionFiles.replace(secondArg(), target, thirdArg()) { staged ->
-+                assertArrayEquals(bytes, staged.readBytes())
++        every { ExtensionLoader.installPrivateExtensionFile(context, any(), any()) } answers
++            {
++                PrivateExtensionFiles.replace(secondArg(), target, thirdArg()) { staged ->
++                    assertArrayEquals(bytes, staged.readBytes())
++                }
++                true
 +            }
-+            true
-+        }
 +        installer = ExtensionInstaller(context, preference, client)
 +    }
 +
-+    @AfterEach fun cleanup() {
++    @AfterEach
++    fun cleanup() {
 +        listOf(extension.pkgName, "test.Aa", "test.BB").forEach(installer::cancelInstall)
 +        release.countDown()
 +        client.dispatcher.cancelAll()
@@ -12187,6 +14696,78 @@ index 0000000..0bb4014
 +        client.connectionPool.evictAll()
 +        folder.walk().forEach { it.setWritable(true) }
 +    }
++
++    @Test
++    fun `reviewed identity is passed to private validation without changing the selected installer`() =
++        runBlocking {
++            every { preference.get() } returns BasePreferences.ExtensionInstaller.LEGACY
++            every {
++                ExtensionLoader.installVerifiedPrivateExtensionFile(
++                    context,
++                    any(),
++                    ReviewedPrivateExtension(
++                        extension.pkgName,
++                        "a".repeat(64),
++                        extension.versionCode,
++                    ),
++                    any(),
++                )
++            } answers
++                {
++                    PrivateExtensionFiles.replace(secondArg(), target, arg(3)) { staged ->
++                        assertArrayEquals(bytes, staged.readBytes())
++                    }
++                    true
++                }
++            val steps =
++                installer
++                    .downloadAndInstall(
++                        serve(),
++                        extension,
++                        true,
++                        ReviewedPrivateExtension(
++                            extension.pkgName,
++                            "a".repeat(64),
++                            extension.versionCode,
++                        ),
++                    )
++                    .toList()
++            assertEquals(InstallStep.Installed, steps.last())
++            verify(exactly = 0) {
++                ExtensionLoader.installPrivateExtensionFile(context, any(), any())
++            }
++            assertEquals(BasePreferences.ExtensionInstaller.LEGACY, preference.get())
++        }
++
++    @Test
++    fun `repository revoked during transfer prevents private installation and preserves the old file`() =
++        runBlocking {
++            target.writeText("working")
++            val steps =
++                installer
++                    .downloadAndInstall(
++                        serve(),
++                        extension,
++                        true,
++                        ReviewedPrivateExtension(
++                            extension.pkgName,
++                            "a".repeat(64),
++                            extension.versionCode,
++                        ),
++                        beforePrivateInstall = {
++                            error("repository removed or signing key changed")
++                        },
++                    )
++                    .toList()
++            assertEquals(InstallStep.Error, steps.last())
++            assertEquals("working", target.readText())
++            verify(exactly = 0) {
++                ExtensionLoader.installPrivateExtensionFile(context, any(), any())
++            }
++            verify(exactly = 0) {
++                ExtensionLoader.installVerifiedPrivateExtensionFile(context, any(), any(), any())
++            }
++        }
 +
 +    private fun serve(partial: Boolean = false, status: Int = 200): String {
 +        val instance = HttpServer.create(InetSocketAddress("127.0.0.1", 0), 0)
@@ -12225,33 +14806,43 @@ index 0000000..0bb4014
 +        assertTrue(withContext(Dispatchers.IO) { started[index].await(5, TimeUnit.SECONDS) })
 +    }
 +
-+    @Test fun `private download emits a terminal success and removes the consumed APK`() = runBlocking {
++    @Test
++    fun `private download emits a terminal success and removes the consumed APK`() = runBlocking {
 +        val steps = withTimeout(5000) { installer.downloadAndInstall(serve(), extension).toList() }
 +        assertEquals(InstallStep.Installed, steps.last())
 +        assertArrayEquals(bytes, target.readBytes())
 +        withTimeout(5000) { while (cache.listFiles().orEmpty().isNotEmpty()) delay(10) }
 +    }
 +
-+    @Test fun `HTTP failure completes the flow with error and cleans its download`() = runBlocking {
-+        val steps = withTimeout(5000) { installer.downloadAndInstall(serve(status = 503), extension).toList() }
++    @Test
++    fun `HTTP failure completes the flow with error and cleans its download`() = runBlocking {
++        val steps =
++            withTimeout(5000) {
++                installer.downloadAndInstall(serve(status = 503), extension).toList()
++            }
 +        assertEquals(InstallStep.Error, steps.last())
 +        verify(exactly = 0) { ExtensionLoader.installPrivateExtensionFile(context, any(), any()) }
 +    }
 +
-+    @Test fun `cancellation interrupts a stalled response without replacing the working extension`() = runBlocking {
-+        val original = "working".encodeToByteArray()
-+        target.writeBytes(original)
-+        val url = serve(partial = true)
-+        val collecting = async { installer.downloadAndInstall(url, extension).toList() }
-+        awaitStart(0)
-+        installer.cancelInstall(extension.pkgName)
-+        val steps = withTimeout(5000) { collecting.await() }
-+        assertEquals(InstallStep.Idle, steps.last())
-+        assertArrayEquals(original, target.readBytes())
-+        verify(exactly = 0) { ExtensionLoader.installPrivateExtensionFile(context, any(), any()) }
-+    }
++    @Test
++    fun `cancellation interrupts a stalled response without replacing the working extension`() =
++        runBlocking {
++            val original = "working".encodeToByteArray()
++            target.writeBytes(original)
++            val url = serve(partial = true)
++            val collecting = async { installer.downloadAndInstall(url, extension).toList() }
++            awaitStart(0)
++            installer.cancelInstall(extension.pkgName)
++            val steps = withTimeout(5000) { collecting.await() }
++            assertEquals(InstallStep.Idle, steps.last())
++            assertArrayEquals(original, target.readBytes())
++            verify(exactly = 0) {
++                ExtensionLoader.installPrivateExtensionFile(context, any(), any())
++            }
++        }
 +
-+    @Test fun `different package names with the same hash cannot cancel each other`() = runBlocking {
++    @Test
++    fun `different package names with the same hash cannot cancel each other`() = runBlocking {
 +        val firstExtension = extension.copy(pkgName = "test.Aa")
 +        val secondExtension = extension.copy(pkgName = "test.BB")
 +        assertEquals(firstExtension.pkgName.hashCode(), secondExtension.pkgName.hashCode())
@@ -12267,28 +14858,35 @@ index 0000000..0bb4014
 +        assertArrayEquals(bytes, target.readBytes())
 +    }
 +
-+    @Test fun `completion of a cancelled attempt cannot remove the retry from active jobs`() = runBlocking {
-+        val url = serve(partial = true)
-+        val oldAtIdle = CompletableDeferred<Unit>()
-+        val releaseOldCollector = CompletableDeferred<Unit>()
-+        val first = async {
-+            installer.downloadAndInstall(url, extension).onEach {
-+                if (it == InstallStep.Idle) {
-+                    oldAtIdle.complete(Unit)
-+                    releaseOldCollector.await()
-+                }
-+            }.toList()
++    @Test
++    fun `completion of a cancelled attempt cannot remove the retry from active jobs`() =
++        runBlocking {
++            val url = serve(partial = true)
++            val oldAtIdle = CompletableDeferred<Unit>()
++            val releaseOldCollector = CompletableDeferred<Unit>()
++            val first = async {
++                installer
++                    .downloadAndInstall(url, extension)
++                    .onEach {
++                        if (it == InstallStep.Idle) {
++                            oldAtIdle.complete(Unit)
++                            releaseOldCollector.await()
++                        }
++                    }
++                    .toList()
++            }
++            awaitStart(0)
++            val second = async { installer.downloadAndInstall(url, extension).toList() }
++            withTimeout(5000) { oldAtIdle.await() }
++            awaitStart(1)
++            releaseOldCollector.complete(Unit)
++            withTimeout(5000) { first.await() }
++            installer.cancelInstall(extension.pkgName)
++            assertEquals(InstallStep.Idle, withTimeout(5000) { second.await() }.last())
++            verify(exactly = 0) {
++                ExtensionLoader.installPrivateExtensionFile(context, any(), any())
++            }
 +        }
-+        awaitStart(0)
-+        val second = async { installer.downloadAndInstall(url, extension).toList() }
-+        withTimeout(5000) { oldAtIdle.await() }
-+        awaitStart(1)
-+        releaseOldCollector.complete(Unit)
-+        withTimeout(5000) { first.await() }
-+        installer.cancelInstall(extension.pkgName)
-+        assertEquals(InstallStep.Idle, withTimeout(5000) { second.await() }.last())
-+        verify(exactly = 0) { ExtensionLoader.installPrivateExtensionFile(context, any(), any()) }
-+    }
 +}
 diff --git a/app/src/test/java/eu/kanade/tachiyomi/extension/util/PrivateExtensionFilesTest.kt b/app/src/test/java/eu/kanade/tachiyomi/extension/util/PrivateExtensionFilesTest.kt
 new file mode 100644
@@ -14851,6 +17449,167 @@ Rqjda*egm~QHfh!a001#;6^j4>
 literal 0
 HcmV?d00001
 
+diff --git a/app/src/test/resources/extension-preparation/provenance.json b/app/src/test/resources/extension-preparation/provenance.json
+new file mode 100644
+index 0000000..6ae3a7a
+--- /dev/null
++++ b/app/src/test/resources/extension-preparation/provenance.json
+@@ -0,0 +1,11 @@
++{
++  "purpose": "Synthetic non-executable APK with v2/v3 signatures; no extension or user content. Private test key is not committed.",
++  "package": "test.polaris.reviewed",
++  "min_sdk": 26,
++  "signer_sha256": "5a7a06cb326b09d4c872f35c553d8a3b6278ca01b3f0c92f333f3e73c53c96b7",
++  "tamper": "One asset payload byte changed after signing; original signing blocks retained.",
++  "sha256": {
++    "signed.apk": "da38d64abe8bf34bd1b2f0e2f7cc0dbba1c04a7978c78feac78650cdf9399143",
++    "tampered.apk": "d5e2c497fe93a4045a8c0581266505df00145c899d6fee39881926a95a559b75"
++  }
++}
+diff --git a/app/src/test/resources/extension-preparation/signed.apk b/app/src/test/resources/extension-preparation/signed.apk
+new file mode 100644
+index 0000000000000000000000000000000000000000..41aad479ad971214d87727b5cc25aeac6ed1daab
+GIT binary patch
+literal 8403
+zcmeHNX;c&067D2yK_jam(Lg|C6EJK7L)cNlfJ6d<$YMa0J&*(mvYDue?1JLR;zN)f
+zQ5I1!hziKAfXJdCD6$3xSrl}X>F`F!H}l?k{+)ADeX6@|_pN*Te7CAj*R96mU|ax5
+zd>~5$TG4)^22cQK;06E@@Q$(n5i-f^h!xS_>!=5Xs!H?ojZbOwe`+Ke^`rrz<@a39
+zuQm4w9Y25$IDDo-_&DFyz2-xAt@f6TyCp9&Y^5cE_kvi+cCnHWu7()i5sCi$+D)T0
+z%(<Sjh>pvv?HPAr@UcU74d%EL^k#%&?-}_Ur%(Y>SYFiJhA^n>ee0WEW{!u&XXvm1
+z$h}jpBihkQb0e^2{)m%Bi`!CRQ{}PBElE#LrZkr?CdtoR?xt0?BhyZAzM&)4W-z!Z
+zoDmUy+-~10F(%lfqwR8Hjpg~K`Lw50`cM+V{$(>f?xODpgsz!hl4z-b_Uc#%Zm=~+
+zd49v2^Jepcg^a~tYZXHWr+u!$caTJUE``TXxhM(L?6QHP#{TI5<kcz94{Ac!nAXwq
+z<NlJv`byX_+}OFw6}ib!2MN!ioaEeQkEaJhn`YeOv%mbS39qtV7gep}=cG6&J?nP8
+zDznO#l1BDvV9~M9kRQv+>atQUMG_WixKLjW+?(r1lag@u#Yb5#i$0+T`uGeZ8n<>V
+ziB@kv=Fj6zyE6HOH|^L=kn|!|<ZX@ftW`m{mYXHuEw<6!pDt$pU=OAgsR41D{$xGR
+zYL@CnevZmqxBNtsWbZt2%_6hn*40Qto`3{(R3{?%U>Dyuhd`&vp}VX*#lPqd)Y|2f
+zJmb~<Uj(M--ahbh{!Ucv$1{&9LbE~Qq{dk7xtDKs-o-Qxl?6LlwN{a(=uNKaqxA}x
+z#yY8k<X8218VmcYE`D~HUtZERFw5V%u)i&|>i(XA1NiBXmxn42i+zRS|1dYU$w>q2
+z@H<5mK#9#8060MQppb&d?j96XBAMc@HNXw5*(MZNzt)AV1Oc{y#}5PnzPH(fi>^KT
+zwd#oTikd_2R<OlpVbH#b6p9CxvcsL^PbHIlRjD+p)&SSq1bAypV;c(sns9KRt@$on
+z3sW?~V$VKfTRWRwXjAKbwl>z5KTOCGIS6nN;2^+3fP(-B0S*Ej1ULwA5a1y2&qQEZ
+z;NR~Z1!nwgLY{>OMu74Okg+fTPzLX@(=!;DXQ9Dssxa2rCUMDVPzIVP+c>P36R@CR
+zJ(zki(J|WFu((@w5!^kP0~y1B&R`gjo-7y?0)@hX8kW=f%%#T}7z7VoDat(RBLV_h
+z&kbN?)nqVe9+({$Ohf`t@+FeJC}>KEKh@KN>gA3;>P4dlkv%Yy;t2JfYHAowb#*Ou
+zbqz;xga*5*_DAz4M`1u@ew-e{4Zs)>0q|8J{7?o20u%_pj$ff#n&l*CV7s<N`qT}k
+zq?*;+7RZ~Vb>CBbT%~2zjCITyCA3^smG#5VJrvy{-D_u`qu*E@d*Ve(mdIj^q8?#u
+z;`?wGo@UqD#=78SDAP2R#Ohbs{Y)@$p#tE+8KjU{(4P8g#|#IiKoj$HmR)Jjt!|8w
+zY+Mws&@3M&=wxxy%GtrHOi_}U!@IlFS0Zs>{W|}+1UO8eFf{HHvYa$irq^EDlY6N`
+znV&hCCn)ZhAGu6h-RaW%Xf`2JMaQ~S<)(k-L1J&G-zHtsT<U{mhM6{wsNyzJakjBA
+zIcFt_ekeyqC2lZgO!cx+M61+!JkIpk#B_kZ1Qc9kNRBi{3WEYy1hs)nj7zl8Wtn<1
+z!@J5V3R^TOdBpY*bk^cW5WzJBL4*J@^Uskdor+DXQ8&`%!fzJW!6x>n)<A0)BzIWb
+z-;S7m1#zZJ<kL-9E0y(MH4Z6hB%louv8iRBpYH9-w+I^VZzIAJm-gE&wV!^_V#TKs
+z7pHTlwOZ4e{!!o+vTw%GIa@iIkwLJ`=-vQLhdeowtPm_cT(0C=XJ;BRA`%?6P=|2R
+zz{;@-$nbvM<3$T^Q>CuGL%7z~zU*&f0fr+bJjd>Nt#k9|g-c2(SS=y2&pNv;hv%7e
+zQ=?RIIW2uwg?^#D!UJ73SEGDZvsd}{4l{g<3%Q*yO*4Av_3Uez@FZ%B=B{`u-3@Q^
+zc<`+hzjs7Cw_LJ%<kEyXENOf_=o{=kG{oHOJ<x5|Xg%mNd?2%Z2i&*->{SQ?TQ49#
+z$)l{7!=87A#N=t<OCZ(6ox~S;CMJC?4UeiS%@$=bw`$wTF?r;!4~^y8ne}47Dbr$P
+zj(6#1hn+V5Z5<aOU7tK9dF+bRCm&c-%H6cWT4ztj?$mMPm5}gI<~x}C@q&Uk@Rrml
+z6@-fC#`sE_4nw?a?^o4bv2!<y!aAoAMHvc0N=8%S!e0{1fq{k(Qo}_zLm%ly@SY1#
+zzh1T@Qrh%-Uo$jq<%NNv?XFkA)+~ov>9(oHsdt&kD|sa%>AtrOQeK#*hha}$us<xt
+z6q4NL^W~#uST<9LSLty_Ny&9`8LHrcOCYvzzEmXSb4(|*7In6)+{Q)@!~k?QjuZZ0
+zC;S$T?|TyFzC~kAPBi93V@@>wsc5_j47jVStC8$5{7wFAG>)5DxLu!vQk#?`B5m{f
+z98^A`O3gQqhaI?w4C8isk4?a<#`(6vuSa0j$umc>?*m_T6RlQbm%A9K@qKm)t}xB8
+zOtdf`e{0vfo2H*D>F-_Qq&0(i<8#kFoG0ZsL>py~QE%)2k_Gh<$md$Eo6`t!+{7!>
+zk<1hvmaCz><rguI_<Ga+6pdN)?)72iNWoiqH7!c29dRA69V-HIcgA}5e{NCVV|;t#
+zqMNLricubBo)kAOw=h^<Uf=n?E?KY9i|hgYScIqPdf$3@Ws}6_Xw;|++=YLyP<-p1
+z3%vz3%qiqpkMM|nU++Xwzs$=ZH{^}e<I5JNV^VU4g@;Ty(fDUSiI{6u2mlE7Ae*o)
+zibEU(I0$eM_$MLoEzdW`<In`JV`vj!lDiLDQyq_kfY~~m*xAe9{{UEf^!@Z-{s;JT
+z0Cumx)^xvXf&vMg=szpGY+X^<|0>!3se2OA4(k5BfQ!d*^RRotz@wHepxLM20RV?K
+A_5c6?
+
+literal 0
+HcmV?d00001
+
+diff --git a/app/src/test/resources/extension-preparation/signed.apk.idsig b/app/src/test/resources/extension-preparation/signed.apk.idsig
+new file mode 100644
+index 0000000000000000000000000000000000000000..262be662d9d136a3dee00326a05161b75f1cda2f
+GIT binary patch
+literal 5515
+zcmZQ#U|`S%Vn!h50b&LPAoey~$JcSM`r!9n9$#mBp6YL8tez=%zWCm>e>cqvRUA3}
+zSRv}B3E4OX^?!A^qr}v&a`e9S;)2h{{&%KL?T_lnvR{2k?*kJ9gFzG18-pgsD+`#J
+z7@3$j8FsynnK<|Bxj6>BY@Awc9&O)w85wz484Oeml?)Wvm_u2Zg(U;>a}tX(ixrA1
+z^GY&OOEQxc(lRSbN{dnr<ivT6%nS_;OpJ_7jf{+=#CeTDTtg_ANK={^m5{AxWMyD(
+zV&n%pm6407iII_Eh0vqkpCvvnizm&oxhPYgz5mYSX)cFDR;WA8y0lO8+%{9+6E;zE
+z9tWRXsHc(}@Zpe%jN-M>@Wr-AS9e$4p1eT#OP8i~uyX&$+SdUUp{Gv2o)TlPbo}Ln
+z*Ee+Ct_l=>-ps(}Z8tgpHPe;DJEP`A?BPGYr)5Ftx+_~R891o)w0W;|S<WmF<JsUF
+z8{xZAQ!a5ayW52v$^M%>+<85HoXobtcb{cf{+RG)qxG3}SC&rSti!eE#WDf$+~xH@
+zD*l_rT|4%^Z?3L||2o|bd0QeAuU*KMu+0B3?ck3l7jy4K-K6K6+mEiCwD{+Q#^}XL
+zx;=Ngp6bnXs5>P;F~Hk7{rRf`TS+EnMh3>kiU#rqvcMRT<zo?J5m_1cqoiR@);8ZZ
+zn^iC5QbMAc-g_bkA}|htfyl_9^y!vVL(FRDowDm^tJQ8;y`TAc;Iv&#dq2zR`-g9@
+zd-aepwo!6<qtol3TMqv-j@B~nQ?Tdlp0@G#Wv`3NJxib6IGxDZ|1~i5>zS5=Cw)1L
+zdwMK(oZ4v;+xVUTq15#^QL&43CN<3o_L*~uk7+jJ`IJc-<%;(=X~pjkb*_9MT;BG1
+zKW~h&joRxKMVvP*%T|4UJ57GcJKp%cd+*&i{hGo4!5X&oeVN=zdF-5Wk{Z5Wd2Oy<
+zxa4#H)1F3WhiT$!rnav)+pbjCIB01Y@38#!iOfyfXI%nL#uc66m}Sy&_tE=DO0^S8
+zPMWy(mNX^>1f9F{R-P-X?hLEiB%}JT&yAQTJOkw+HDGQ6CZ^FuMlg{96B@Yev0S>e
+zI`na2d+_@`_5qR?b_@S`q%Bxr_<y1c3vaBGO!?uf^OL9kDBaE2{c`U{c3I_nt3r10
+zE%f*zqgGvD9a;8Zi}u{$1xx2FdGn(=<(S<0df`tQ*FH_>Wz>$0@IKd{KK0gXjsLys
+z?LrKz)6!KYUlj75(9ot>9Kxs&RsM<b+PUk8Za&@{{8F%I)6YLvoV%4@-R-f_zWt`^
+z5l7MaPKnjgpK~9%Z{Ij|E+?m|i-mnTcg5ty<Y&(vOJ8;-HI*MTuR53+I7w#e<g;59
+z{jTUvotgf-@z{;)vc}e|3#Lq(J&S#T@}&I!;E9c5`RQ+F>o6+(Ti@z+ew))v@ssgN
+zT8?knpOi5OFfg>(TQ^2ZG(2l>_;;F1?vHPO+=ukPXB8}1SE`)|-<3W0s?D?DYZDIc
+zP$@{6p}H+L*=J94^u4d;(-jnaTjnuc)Z9F^ljT06)g{5LHtiKZ)P3qVeGk~LGwIi>
+zeWe8_LZ&VRrOZ(<8UmvsFd71*Aut*OqaiRF0;3@?8UmvsFd71*Aut*OqaiS`Apihg
+Ch>ynr
+
+literal 0
+HcmV?d00001
+
+diff --git a/app/src/test/resources/extension-preparation/tampered.apk b/app/src/test/resources/extension-preparation/tampered.apk
+new file mode 100644
+index 0000000000000000000000000000000000000000..313a35e8eef42de9a20a09fddfeaa9e36d234dca
+GIT binary patch
+literal 8403
+zcmeHNX;c&067D1*1dXhML_@+N0s@9jVGOdWU_c@PK~}>eJHaGKkTp>e*#*Us#it<q
+zBAXx>L<MA5Kx9!6TtFcx$fBU5Ooul*zM1#V^Y5IK>QmiyyKmjw=et#Px^6WA590wq
+z;s;q8(2DkZxf==qO}qdg3f?jBccYNK+{{V-UPs-jG*!BvZ+uFJ|08{|sE17mEx#x7
+ze(gDK48jm5;K=DFk>mVV_nVB|GT&c3;gY<-w33zr-V5O%+r*25d75JQ#v}*t>}+{S
+z$DZvg5AV9P(wT7!1|PS#ZZg52V6-9>`%iDZei9Xc#_^$M*M~x#?^u+18QUF^m}bBN
+zAh%CCkL`?BnjM2J34})$E^JAKO;*Gzw<SG_OlhrHNZLAQwwGSjiA+1S>AE($WB2gJ
+zFlKo4aq9ysq?jQ0u8vEIb!O*U=F%R~7$ZqUn`f=?xC_1?5IV-YlEg{{cdm?g;fLF^
+zmFL#KI%hm5RKQ&LwO%n~c*^G*d^=gx=VDk4jfa{*%PJo#Y#y8nKwh2n{GcX$jb#zN
+zb;4h2R96W%jvqf;wJiT8#8%RCBs)2$)&0?-kd|rJ_^dDgY9Xks(?Qj0`#C5MOV7BJ
+zRA*LOQPU_sO>744G4f-1dBc^IixI>HIzGf#1OKYzXi^g1rsyc!X~8Gt&;Y+)c(ZKR
+zqFC)V5C1jZ^viF)@TGZ72TCu{MBmmq&Y0(iX}OpI-r^fv{TbpWclTjSks1(}sZSPj
+z>{fI?@^e(?+NFn5WE;oV*Gw}jZ(NNa<_b#EUTTL29q!@ZVtdTt&B!hG&7xm)hU%^J
+z$e!`){!fpk=hPf}Hg_{B_T%XXRN<LG337An&e>;gwco|GjFbmCn73C`(2N%6^p}ka
+z7stD4!<6TZxf=5at1o=Eom*Pe*=?LBJAbevr25Xjp+khJ;Ai%gN5sEE34fRy$K<4e
+zwS*m_3ZTT{^#B~8xKqi26jyhuDv3gM)f(ajR&5gstXu8EQGx)Q!Q%&l0N>l3!Npb|
+z{aWqjxU6QIBMY`TECSj$iAr^+QMbF2{b>}kuPTjB(;DJgo#3E_nSrG#5kowDz{+Hg
+zm8lViXu9u!ft9u89*mL20V_)jvmYkpid+P^2yhYLBEUs}ivSk^E&^NxxCn3&_-7)p
+zB>3<5jsi1&4k6FLkA;Ks36OCx08j?+andswm}g<YYpMv&z%p@Be^>^ZDAzo?D?4Cb
+z!(uq~LZV%?w_Z`N>H@fXFbgu437y6=A$?b1PzV$X2kO`k=Q0-`WMC0%;7U;@Q6CWy
+z$U0sCE2k!d#jJr@^T0$U31nXq#fyre2K&=I-DzH~n4?~FS|G(8D<y$Y-=U_4)l^s4
+zQdifolR#*2nreSEe{vKiMCQloA-n*L2@wQe6(Rs-LLflC$cy-8nwfESat5wvbA(UB
+za7wCiqgDP^!?fPpiVv!_%v*7G883-#S5@Ww2($OZHcR(g+hprD7sZ}<nsP;SAx3c*
+zQ8w{?7@I)1Ztq~9chHk*nM`62s_cC%bZov7ScBi4LS{qz8f)z`Y*~UWtW#I4OZ#s0
+zV)f<XqVNUAc`zXd(@1kiTk~>7DN;7y-fmyX#G!R-{o@kgFkRxvgir8N(scQ*&eFb|
+zi<Qa(tT(wr5`K9ROZ1f;PW|_15;9e^ElO3&{HqR=`n&x$>X2ts?=CTocj8GZF0U)k
+zG#4aiFDEhVvt?A`hGWK6FX@N3qt6lWMjo%H0(2#z;37k^rLkx%3S1G?dLD5eu>z+h
+zT4aWIwRse-@Qsw4l|6LE^hXfEH3UI~05Wq=kdY2WMzyHx>GEM^MGdgm2UF{y_488O
+zEo^GSr=CL`8IpMnL-ul2<5vxPC5;4(9wIii{PUyzJ$a^q6N4Qjc;ezg>&4DfciYVQ
+zHR9s5Z?@NJIx;>AK1U8r+c{<_Co?mMW*NQfq3Mu^ZpjKk(xVkh&JET^!DFI9QS%K5
+z2MwG&JD&m{)Hz-_|27qU?H$6ozW&)@2OH2ED_-Mq+iR_hKObC5Qo(!?fqUHDYc@K^
+zVi@VCO2}*JvMY59wkq7!QFGSMW4C%$Z0j;6v^h~a`O`F`M_$alkO@nowQ25&r!iaz
+zmJf#Cq6NIeJ9*`k)gu;PtHY8e)`7mk*+WCj&fEswW|h`~KEn?($9KSu3&2K&C@6a#
+z`DrW4Vkz`VPjF1G2B8>IOWHwtnrmn{(AIRny2^M#4tt}%lM<6l>G{xHu`{z#{5NHK
+zjLh*KovhGP2EVQ4A*Sn6CZ#+sqd)n;T2gMM71TR=GWVuV7%T^eg|ObiT#x7Hzk;`=
+zMyViFJU7Hw(Y2WpJ^R0^?unhfUKrXvi73oa5LVKklo0unU;+#^eL#;EmWABk70!1y
+zEWM<BdxW%6$v`VKZTabLJ*z#>0og0IGtwQC&6Dpkk(YCeMbmw2cBecwN)N@IJa2OZ
+z%@UT{;`8OBS!fnZm`~|JS8;I(r5u%i*XbCpV6Id&_;XA*s~&Zxyu#8_9>f52Hm(!?
+zUnl$)jqi98XTL>bO>Q*iMq_R?{;6oZ5e&F1D=QJ4F#JvaYc!6Vp08=lMyb7#Cn2qJ
+z2W(Y7p-N3QO@to0jSS^=c#lgUsK)trz)Qk$>XhlDxcA4N_ma$4VwZZDsEGsC3C=Lh
+z&`gX7zd(D>yE3ECRgCveanhPWeDOJF@6D0(nxgfy#%VRWzg&U(2<GvuG|XxQ+im2N
+z=}Kk^jmp<i-wKEtgnuowIZ0>Ly?b#)IYQ`0Ze5#_YFAv>3%kmIoE@>AgP+^f_Zie|
+zSa6Z^Q_;`G&XMCL<mZPgDjK`rHze<B_M*5$KNb?`I^H+#UEV0UDH`?C3GO7YUpT(~
+z=K22oI@Tm|yia7zW}yFd;h@a3Ko{ioQxi+3M&oFCy#jkfZZ!VcPa@W86#@W)+$n|}
+zi{cU&0WJbu1pY|~e9Q9<2zU(9%L8NROLq0aXsQ$N5HMTk5GQ;2`yT+SkG`M&%l`m>
+z4#4U4*P8BkO;8|%6a8m}m!m5N`(Gv7KXoG^ouKaD3%CS4?;1`o7<klk1Ptf&J04ax
+A_W%F@
+
+literal 0
+HcmV?d00001
+
 diff --git a/app/src/test/resources/ocr-strips/mlkit.json b/app/src/test/resources/ocr-strips/mlkit.json
 new file mode 100644
 index 0000000..345728d
@@ -17209,6 +19968,36 @@ index 0000000..ee88790
 +        }
 +    }
 +}
+diff --git a/data/src/main/java/mihon/data/extension/repository/ExtensionStoreRepositoryImpl.kt b/data/src/main/java/mihon/data/extension/repository/ExtensionStoreRepositoryImpl.kt
+index fbd4317..f25dd44 100644
+--- a/data/src/main/java/mihon/data/extension/repository/ExtensionStoreRepositoryImpl.kt
++++ b/data/src/main/java/mihon/data/extension/repository/ExtensionStoreRepositoryImpl.kt
+@@ -23,6 +23,15 @@ class ExtensionStoreRepositoryImpl(
+         return service.fetch(indexUrl).mapCatching { upsert(it) }
+     }
+ 
++    override suspend fun insertVerified(store: ExtensionStore): Result<Unit> {
++        return service.fetch(store.indexUrl).mapCatching { fetched ->
++            check(fetched.indexUrl == store.indexUrl && fetched.signingKey == store.signingKey) {
++                "Repository identity changed; review it again"
++            }
++            upsert(fetched)
++        }
++    }
++
+     override suspend fun insertFromPreference(indexUrl: String, name: String) {
+         database.extension_storeQueries.upsert(
+             indexUrl = indexUrl,
+@@ -41,6 +50,9 @@ class ExtensionStoreRepositoryImpl(
+             database.extension_storeQueries.getAll().awaitAsList().forEach { store ->
+                 service.fetch(store.index_url)
+                     .mapCatching {
++                        check(it.signingKey == store.signing_key) {
++                            "Repository signing key changed; explicit review is required"
++                        }
+                         database.transaction {
+                             upsert(it)
+                             if (store.index_url != it.indexUrl) {
 diff --git a/data/src/main/java/tachiyomi/data/chapter/ChapterRepositoryImpl.kt b/data/src/main/java/tachiyomi/data/chapter/ChapterRepositoryImpl.kt
 index 9f3397a..7c2df30 100644
 --- a/data/src/main/java/tachiyomi/data/chapter/ChapterRepositoryImpl.kt
@@ -17460,6 +20249,19 @@ index b5d1909..2bd16cf 100644
  insertNetworkManga {
      -- Insert the manga if it doesn't exist already
      INSERT INTO mangas(
+diff --git a/domain/src/main/java/mihon/domain/extension/repository/ExtensionStoreRepository.kt b/domain/src/main/java/mihon/domain/extension/repository/ExtensionStoreRepository.kt
+index 3ab4770..527bf8d 100644
+--- a/domain/src/main/java/mihon/domain/extension/repository/ExtensionStoreRepository.kt
++++ b/domain/src/main/java/mihon/domain/extension/repository/ExtensionStoreRepository.kt
+@@ -7,6 +7,8 @@ import mihon.domain.extension.model.ExtensionStore
+ interface ExtensionStoreRepository {
+     suspend fun insert(indexUrl: String): Result<Unit>
+ 
++    suspend fun insertVerified(store: ExtensionStore): Result<Unit>
++
+     suspend fun insertFromPreference(indexUrl: String, name: String)
+ 
+     suspend fun refreshAll()
 diff --git a/domain/src/main/java/tachiyomi/domain/chapter/model/ChapterOrigin.kt b/domain/src/main/java/tachiyomi/domain/chapter/model/ChapterOrigin.kt
 new file mode 100644
 index 0000000..6f16661
@@ -18354,7 +21156,7 @@ index 0000000..c62d0ce
 +    }
 +}
 diff --git a/gradle/libs.versions.toml b/gradle/libs.versions.toml
-index 9839272..197aec7 100644
+index 9839272..53717be 100644
 --- a/gradle/libs.versions.toml
 +++ b/gradle/libs.versions.toml
 @@ -56,7 +56,6 @@ material = "1.12.0"
@@ -18373,8 +21175,16 @@ index 9839272..197aec7 100644
  mlkit-text-recognition = { module = "com.google.mlkit:text-recognition", version.ref = "mlkit-text-recognition" }
  mlkit-text-recognition-chinese = { module = "com.google.mlkit:text-recognition-chinese", version.ref = "mlkit-text-recognition" }
  mlkit-text-recognition-japanese = { module = "com.google.mlkit:text-recognition-japanese", version.ref = "mlkit-text-recognition" }
+@@ -89,6 +87,7 @@ mlkit-text-translate = { module = "com.google.mlkit:translate", version.ref = "m
+ aboutLibraries-compose = { module = "com.mikepenz:aboutlibraries-compose-m3", version.ref = "aboutLibraries" }
+ android-desugar = { module = "com.android.tools:desugar_jdk_libs", version.ref = "android-desugar" }
+ android-gradle = { module = "com.android.tools.build:gradle", version.ref = "android-gradle" }
++android-apksig = { module = "com.android.tools.build:apksig", version.ref = "android-gradle" }
+ androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity-compose" }
+ androidx-annotation = { module = "androidx.annotation:annotation", version.ref = "androidx-annotation" }
+ androidx-appCompat = { module = "androidx.appcompat:appcompat", version.ref = "androidx-appCompat" }
 diff --git a/i18n-at/src/commonMain/moko-resources/base/strings.xml b/i18n-at/src/commonMain/moko-resources/base/strings.xml
-index 7ed4795..b127937 100644
+index 7ed4795..d8f63d2 100644
 --- a/i18n-at/src/commonMain/moko-resources/base/strings.xml
 +++ b/i18n-at/src/commonMain/moko-resources/base/strings.xml
 @@ -10,7 +10,7 @@
@@ -18386,7 +21196,7 @@ index 7ed4795..b127937 100644
      <string name="pref_group_setup">Translation Setup</string>
      <string name="pref_translate_from">Translate From</string>
      <string name="pref_translate_to">Translate To</string>
-@@ -73,12 +73,139 @@
+@@ -73,12 +73,196 @@
      <string name="repository_add_error">Could not add this repository. Check your connection and try again.</string>
      <string name="repository_refresh_error">Repository added, but extension listings could not be refreshed. Refresh the Extensions screen.</string>
      <string name="chapter_group_version">Group/version: %1$s</string>
@@ -18527,9 +21337,66 @@ index 7ed4795..b127937 100644
 +    <string name="backup_verify_failed">The written backup failed verification. Previous backups were preserved.</string>
 +    <string name="backup_target_not_empty">Choose a new file for the backup. The existing file was preserved.</string>
 +    <string name="backup_finalize_failed">The backup could not be finalized in this location. Previous backups were preserved.</string>
++
++    <!-- Guided repository and private-extension preparation -->
++    <string name="preparation_title">Prepare sources</string>
++    <string name="preparation_intro">Choose where to search and prepare your sources in a few steps.</string>
++    <string name="preparation_backup_intro">Coming from Mihon or Tachiyomi? Import your backup first. Your library can be restored before installing sources. Return here afterwards; existing repositories and settings are preserved.</string>
++    <string name="preparation_import">Import a backup</string>
++    <string name="preparation_risks">Repositories supply third-party extensions that run inside Polaris. They may fail, stop working or contain unsafe code. Suggested repositories are not a guarantee of safety or permission to access content. Choose providers you trust and use content you are authorized to access.</string>
++    <string name="preparation_consent">I understand and want to choose repositories and prepare sources.</string>
++    <string name="preparation_continue">Choose repositories</string>
++    <string name="preparation_later">Not now</string>
++    <string name="preparation_repositories">Select repositories you trust</string>
++    <string name="preparation_key">Signing certificate: %1$s</string>
++    <string name="preparation_unsigned">This repository has no verifiable certificate for this assistant. Manage it separately in Extensions.</string>
++    <string name="preparation_suggestions">Suggested repositories — optional</string>
++    <string name="preparation_check_repo">Review %1$s</string>
++    <string name="preparation_link">Repository link</string>
++    <string name="preparation_check_link">Check link</string>
++    <string name="preparation_review_repo">Review before adding</string>
++    <string name="preparation_key_warning">Adding this repository authorizes extensions signed with this certificate. If a repository you already use has changed its certificate, confirm the change with its maintainer before continuing.</string>
++    <string name="preparation_add_repo">Add and select repository</string>
++    <string name="preparation_dismiss">Dismiss</string>
++    <string name="preparation_load_sources">Find available sources</string>
++    <string name="preparation_choose">Choose what to prepare</string>
++    <string name="preparation_partial_catalog">Could not load %1$s. You can retry or continue with the other loaded repositories.</string>
++    <string name="preparation_refresh_catalog">Reload catalogs</string>
++    <string name="preparation_library">Only sources needed by my library</string>
++    <string name="preparation_languages">All sources for selected languages</string>
++    <string name="preparation_manual">Choose sources individually</string>
++    <string name="preparation_nsfw">Include sources marked as adult</string>
++    <string name="preparation_language_help">Select languages below. Multilingual extensions are included when they offer a selected language.</string>
++    <string name="preparation_all_languages">Select all languages</string>
++    <string name="preparation_missing">%1$d library sources were not found in the loaded catalogs. Their books and progress will be kept.</string>
++    <string name="preparation_conflicts">%1$d packages appear in conflicting repositories or versions and were excluded. Go back and select only one repository for them.</string>
++    <string name="preparation_review_count">%1$d extensions selected for preparation.</string>
++    <string name="preparation_download_notice">Extensions will be installed inside Polaris. Extensions already installed as Android apps will be kept. Downloads may use significant data and storage; total size is not supplied by the catalogs. Nothing starts until you confirm.</string>
++    <string name="preparation_empty">No new extensions in this selection. They may already be installed; check the languages, repositories or manual selection.</string>
++    <string name="preparation_start">Prepare %1$d extensions</string>
++    <string name="preparation_search">Search sources</string>
++    <string name="preparation_progress">%1$d of %2$d extensions finished</string>
++    <string name="preparation_lifetime">You can leave this screen while preparation continues. If Android closes Polaris, reopen the assistant to prepare the remaining sources.</string>
++    <string name="preparation_cancel">Cancel remaining downloads</string>
++    <string name="preparation_retry">Retry failed or cancelled items</string>
++    <string name="preparation_review">Review repositories and prepare more</string>
++    <string name="preparation_close">Close</string>
++    <string name="preparation_queued">Waiting</string>
++    <string name="preparation_downloading">Downloading</string>
++    <string name="preparation_installing">Checking and installing</string>
++    <string name="preparation_ready">Ready to use</string>
++    <string name="preparation_needs_trust">Installed; review it in Browse → Extensions before using.</string>
++    <string name="preparation_failed">Could not prepare. Check the connection and repository; you can retry.</string>
++    <string name="preparation_cancelled">Cancelled; existing sources were kept</string>
++    <string name="preparation_store_error">Could not read repositories. Close and reopen the assistant to retry.</string>
++    <string name="preparation_repo_error">Could not verify or add this repository. Check its HTTPS link and certificate, then review it again.</string>
++    <string name="preparation_catalog_error">Could not prepare the source list. Review repositories and try again.</string>
++    <string name="preparation_summary">%1$d ready · %2$d awaiting review · %3$d failed · %4$d cancelled</string>
++    <string name="preparation_unsupported">%1$d extensions require an unsupported source library or have an insecure download link and were excluded.</string>
++    <string name="preparation_adult_disabled">Adult sources are hidden in your Browse settings. Change that setting there first if you want to include them. Your current preference was kept.</string>
  </resources>
 diff --git a/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml b/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
-index d1748bc..ce075c3 100644
+index d1748bc..2db0023 100644
 --- a/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
 +++ b/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
 @@ -10,7 +10,7 @@
@@ -18541,7 +21408,7 @@ index d1748bc..ce075c3 100644
      <string name="pref_group_setup">Configuração da tradução</string>
      <string name="pref_translate_from">Traduzir de</string>
      <string name="pref_translate_to">Traduzir para</string>
-@@ -73,12 +73,139 @@
+@@ -73,12 +73,196 @@
      <string name="repository_add_error">Não foi possível adicionar o repositório. Confira a conexão e tente novamente.</string>
      <string name="repository_refresh_error">Repositório adicionado, mas não foi possível atualizar as extensões. Atualize a tela Extensões.</string>
      <string name="chapter_group_version">Grupo/versão: %1$s</string>
@@ -18682,6 +21549,63 @@ index d1748bc..ce075c3 100644
 +    <string name="backup_verify_failed">O backup gravado não passou pela verificação. Os backups anteriores foram preservados.</string>
 +    <string name="backup_target_not_empty">Escolha um arquivo novo para o backup. O arquivo existente foi preservado.</string>
 +    <string name="backup_finalize_failed">Não foi possível concluir o backup neste local. Os backups anteriores foram preservados.</string>
++
++    <!-- Guided repository and private-extension preparation -->
++    <string name="preparation_title">Preparar fontes</string>
++    <string name="preparation_intro">Escolha onde pesquisar e prepare suas fontes em poucos passos.</string>
++    <string name="preparation_backup_intro">Vindo do Mihon ou Tachiyomi? Importe seu backup primeiro. A biblioteca pode ser restaurada antes de instalar fontes. Depois, volte aqui; repositórios e configurações existentes serão preservados.</string>
++    <string name="preparation_import">Importar um backup</string>
++    <string name="preparation_risks">Repositórios fornecem extensões de terceiros que executam código dentro do Polaris. Elas podem falhar, deixar de funcionar ou conter código inseguro. As sugestões não garantem segurança nem autorização de acesso ao conteúdo. Escolha provedores em que confia e conteúdos que tem autorização para acessar.</string>
++    <string name="preparation_consent">Entendi e quero escolher repositórios e preparar fontes.</string>
++    <string name="preparation_continue">Escolher repositórios</string>
++    <string name="preparation_later">Agora não</string>
++    <string name="preparation_repositories">Selecione os repositórios em que confia</string>
++    <string name="preparation_key">Certificado de assinatura: %1$s</string>
++    <string name="preparation_unsigned">Este repositório não tem certificado verificável para este assistente. Gerencie-o separadamente em Extensões.</string>
++    <string name="preparation_suggestions">Repositórios sugeridos — opcionais</string>
++    <string name="preparation_check_repo">Conferir %1$s</string>
++    <string name="preparation_link">Link do repositório</string>
++    <string name="preparation_check_link">Conferir link</string>
++    <string name="preparation_review_repo">Confira antes de adicionar</string>
++    <string name="preparation_key_warning">Adicionar este repositório autoriza extensões assinadas com este certificado. Se um repositório que você já usa mudou de certificado, confirme a mudança com o mantenedor antes de continuar.</string>
++    <string name="preparation_add_repo">Adicionar e selecionar repositório</string>
++    <string name="preparation_dismiss">Dispensar</string>
++    <string name="preparation_load_sources">Consultar fontes disponíveis</string>
++    <string name="preparation_choose">Escolha o que preparar</string>
++    <string name="preparation_partial_catalog">Não foi possível consultar %1$s. Você pode tentar novamente ou continuar com os outros repositórios carregados.</string>
++    <string name="preparation_refresh_catalog">Consultar catálogos novamente</string>
++    <string name="preparation_library">Somente fontes necessárias à minha biblioteca</string>
++    <string name="preparation_languages">Todas as fontes dos idiomas escolhidos</string>
++    <string name="preparation_manual">Escolher fontes individualmente</string>
++    <string name="preparation_nsfw">Incluir fontes marcadas como adultas</string>
++    <string name="preparation_language_help">Selecione os idiomas abaixo. Extensões multilíngues entram quando oferecem um idioma escolhido.</string>
++    <string name="preparation_all_languages">Selecionar todos os idiomas</string>
++    <string name="preparation_missing">%1$d fontes da biblioteca não foram encontradas nos catálogos carregados. Suas obras e seu progresso serão mantidos.</string>
++    <string name="preparation_conflicts">%1$d pacotes aparecem em repositórios ou versões conflitantes e foram excluídos. Volte e selecione apenas um repositório para eles.</string>
++    <string name="preparation_review_count">%1$d extensões selecionadas para preparação.</string>
++    <string name="preparation_download_notice">As extensões serão instaladas dentro do Polaris. Extensões já instaladas como aplicativos Android serão mantidas. Os downloads podem consumir muitos dados e espaço; os catálogos não informam o tamanho total. Nada começa antes da sua confirmação.</string>
++    <string name="preparation_empty">Nenhuma extensão nova nesta seleção. Elas podem já estar instaladas; confira os idiomas, repositórios ou a seleção manual.</string>
++    <string name="preparation_start">Preparar %1$d extensões</string>
++    <string name="preparation_search">Buscar fontes</string>
++    <string name="preparation_progress">%1$d de %2$d extensões concluídas</string>
++    <string name="preparation_lifetime">Você pode sair desta tela enquanto a preparação continua. Se o Android encerrar o Polaris, reabra o assistente para preparar as fontes restantes.</string>
++    <string name="preparation_cancel">Cancelar downloads restantes</string>
++    <string name="preparation_retry">Repetir itens com falha ou cancelados</string>
++    <string name="preparation_review">Revisar repositórios e preparar mais</string>
++    <string name="preparation_close">Fechar</string>
++    <string name="preparation_queued">Na fila</string>
++    <string name="preparation_downloading">Baixando</string>
++    <string name="preparation_installing">Verificando e instalando</string>
++    <string name="preparation_ready">Pronta para usar</string>
++    <string name="preparation_needs_trust">Instalada; revise em Navegar → Extensões antes de usar.</string>
++    <string name="preparation_failed">Não foi possível preparar. Confira a conexão e o repositório; você pode tentar novamente.</string>
++    <string name="preparation_cancelled">Cancelada; as fontes existentes foram mantidas</string>
++    <string name="preparation_store_error">Não foi possível ler os repositórios. Feche e reabra o assistente para tentar novamente.</string>
++    <string name="preparation_repo_error">Não foi possível conferir ou adicionar este repositório. Confira o link HTTPS e o certificado e revise novamente.</string>
++    <string name="preparation_catalog_error">Não foi possível preparar a lista de fontes. Revise os repositórios e tente novamente.</string>
++    <string name="preparation_summary">%1$d prontas · %2$d aguardando revisão · %3$d com falha · %4$d canceladas</string>
++    <string name="preparation_unsupported">%1$d extensões exigem uma biblioteca incompatível ou têm link de download inseguro e foram excluídas.</string>
++    <string name="preparation_adult_disabled">As fontes adultas estão ocultas nas configurações de Navegação. Altere essa opção lá primeiro se quiser incluí-las. Sua preferência atual foi mantida.</string>
  </resources>
 diff --git a/i18n/src/commonMain/moko-resources/base/strings.xml b/i18n/src/commonMain/moko-resources/base/strings.xml
 index c0832ba..ebf8f48 100644
