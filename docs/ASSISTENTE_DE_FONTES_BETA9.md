@@ -1,6 +1,6 @@
-# Assistente de fontes — beta.9 interna
+# Assistente de fontes — beta.9
 
-A revisão P20261104.4 acrescenta o fluxo guiado de preparação de fontes. A beta.9 permanece sem lançamento público.
+A revisão P20261104.4 acrescenta o fluxo guiado de preparação de fontes. A beta.9 foi publicada como pré-lançamento em 05/11/2026 UTC, com o aceite completo no celular ainda pendente. [Registro da publicação](../integration/release-candidates/0.1.0-beta.9/README.md).
 
 ## Caminho de uso
 

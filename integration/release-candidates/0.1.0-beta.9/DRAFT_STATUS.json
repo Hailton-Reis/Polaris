@@ -1,76 +1,12 @@
 {
-  "status": "DRAFT_ASSETS_VERIFIED_NOT_PUBLISHED",
+  "status": "SUPERSEDED_BY_PUBLISHED_PRERELEASE",
   "tag": "v0.1.0-beta.9",
+  "revision": "P20261104.4",
   "release_id": 434234234,
-  "draft_url": "https://github.com/Hailton-Reis/Polaris/releases/tag/untagged-e498da151b0296209fe2",
-  "draft": true,
+  "draft": false,
   "prerelease": true,
-  "published_at": null,
-  "repository": "Hailton-Reis/Polaris",
-  "source_commit": "e6bab4bc4fade68e3aa74e2677500ea762d34d29",
-  "publisher_commit": "3e8a96b45765cd4c18ea13a77133bcc88b5a156c",
-  "publisher_workflow": "https://github.com/Hailton-Reis/Polaris/actions/runs/41878102194",
-  "publisher_safety_tests": 8,
-  "publisher_workflow_log_result": "DRAFT_ASSETS_UPLOADED_NOT_PUBLISHED",
-  "publisher_status_api_note": "Run/job API remained queued after completed upload; job log confirms upload17:31:05 and remote7assets are independently verified.",
-  "reassembled_payload_verified": true,
-  "assets": [
-    {
-      "file": "Polaris-0.1.0-beta.9-arm64-v8a.apk",
-      "bytes": 192966287,
-      "sha256": "426853254bae47d91972af5262e1f6c3ed1a1075e84da3a0b7e08dbece22dd3e",
-      "state": "uploaded",
-      "digest_verified": true
-    },
-    {
-      "file": "Polaris-0.1.0-beta.9-armeabi-v7a.apk",
-      "bytes": 153168464,
-      "sha256": "d65c73e228e55e65b3a7bdcd1d8f195dde0cbe38f795174229021c46c3a544f7",
-      "state": "uploaded",
-      "digest_verified": true
-    },
-    {
-      "file": "manifest.json",
-      "bytes": 1840,
-      "sha256": "a16e453d224deb8f1a3c95be53960adeb7d7b9e9327e9fdcf6cafdfd04662e0d",
-      "state": "uploaded",
-      "digest_verified": true
-    },
-    {
-      "file": "SHA256SUMS.txt",
-      "bytes": 204,
-      "sha256": "fa13182a1d7fe4b4c7ab55701f173d68fd0e8c4ff99cdab8c4b08b38276cd161",
-      "state": "uploaded",
-      "digest_verified": true
-    },
-    {
-      "file": "PRIMEIRO_TESTE.md",
-      "bytes": 2514,
-      "sha256": "8b16520e8c878f7326342825e863c097a493d0f82f23ee1e4974863636b30e03",
-      "state": "uploaded",
-      "digest_verified": true
-    },
-    {
-      "file": "RELEASE_NOTES.md",
-      "bytes": 6434,
-      "sha256": "8bf603aae406d4c52eb8a649d5aafae8ecddda1bd39dafc66448db2c80636154",
-      "state": "uploaded",
-      "digest_verified": true
-    },
-    {
-      "file": "VALIDACAO.json",
-      "bytes": 14201,
-      "sha256": "1283440279c7e8475d47ce72bf002d8c1b69d4dad90e9cfb644530c8ab702a59",
-      "state": "uploaded",
-      "digest_verified": true
-    }
-  ],
-  "public_release_preserved": "v0.1.0-beta.8",
-  "public_beta8_inventory_and_available_digests_unchanged": true,
-  "anonymous_download_available": false,
-  "updater_can_offer_draft": false,
-  "physical_device_acceptance": "PENDING",
-  "github_pr_checks": "BLOCKED_OLD_BACKUP_PROTOTYPE_AND_SDK_SETUP",
-  "temporary_transport_ref_removed": true,
-  "upload_job_log_sha256": "6e849aa077cd37905e0d83285f6bb22a24b2b4c7414a76c192d99ba96a966cfa"
+  "url": "https://github.com/Hailton-Reis/Polaris/releases/tag/v0.1.0-beta.9",
+  "published_at": "2026-11-05T03:34:10Z",
+  "current_record": "PUBLICATION.json",
+  "superseded_draft_record": "history/P20261104.2/DRAFT_STATUS.json"
 }

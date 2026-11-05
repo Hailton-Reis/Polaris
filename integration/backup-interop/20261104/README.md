@@ -25,7 +25,7 @@ Duas leituras independentes verificam que cada arquivo reexportado pelo serializ
 - Os testes ainda não executam restauração em banco SQLDelight, mescla de biblioteca existente, UI dos aplicativos, instalação de fontes privadas nem arquivos reais de capítulos. Não validam reinstalação automática de extensões ou disponibilização de fontes removidas.
 - O protótipo de backup de pais virtuais não foi ativado. Seus checks antigos de CI permanecem uma pendência separada.
 
-Não houve mudança no formato ou no código de produção do backup, nem nova compilação/publicação dos APKs. O overlay recebeu apenas testes e quatro arquivos sintéticos. A beta.9 permanece em rascunho com seus APKs anteriores.
+Nesta rodada de codec não houve mudança no formato ou no código de produção do backup; o overlay recebeu apenas testes e quatro arquivos sintéticos. Naquele momento a beta.9 estava em rascunho. Posteriormente, a revisão P20261104.4 foi compilada com o assistente de fontes e publicada como pré-lançamento em 05/11/2026 UTC, com restauração real ainda pendente. [Registro atual](../../release-candidates/0.1.0-beta.9/README.md).
 
 ## Reprodução
 

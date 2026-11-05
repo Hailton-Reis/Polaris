@@ -1,6 +1,6 @@
 # Assistente de fontes — P20261104.4
 
-Candidato interno beta.9, versionCode 110, Android 8/API 26 mínimo. Não publicado. A beta.8 permanece pública. O rascunho remoto beta.9 anterior não é substituído automaticamente por estes arquivos.
+Beta.9 / P20261104.4, versionCode 110, Android 8/API 26 mínimo. Publicada como pré-lançamento em 05/11/2026 UTC, substituindo os anexos .2 do rascunho. A beta.8 foi preservada. O aceite completo em celulares continua pendente. [Registro de publicação e downloads verificados](../../release-candidates/0.1.0-beta.9/README.md).
 
 O [guia do fluxo](../../../docs/ASSISTENTE_DE_FONTES_BETA9.md) descreve o uso inicial, restauração de backup antes da preparação, consentimento, sugestões ou link próprio, seleção por biblioteca/idiomas/manual, preparação privada e recuperação de falhas.
 

@@ -1,6 +1,6 @@
-# Polaris 0.1.0-beta.9 — candidato interno para teste
+# Polaris 0.1.0-beta.9 — pré-lançamento para teste
 
-Revisão: **P20261104.4**. Android mínimo: **8.0 / API 26**. Este candidato ainda não foi publicado como Release. A beta.8 continua sendo a prévia pública. A conferência nos celulares ainda está pendente.
+Revisão: **P20261104.4**. Android mínimo: **8.0 / API 26**. Esta revisão foi publicada como pré-lançamento público em 05/11/2026 UTC. A conferência nos celulares ainda está pendente.
 
 ## Preparar fontes sem instalações individuais
 
@@ -18,7 +18,7 @@ A revisão P20261104.4 prepara e valida a extensão privada antes de substituir 
 
 Backups novos são gravados, fechados e relidos antes de registrar sucesso ou remover cópias antigas. A retenção mantém quatro cópias verificadas; arquivos antigos ilegíveis ou inválidos são preservados separadamente. O destino precisa permitir leitura e, para uma pasta, renomeação. Um destino incompatível produz erro explícito. O formato de backup e as identidades das fontes foram preservados.
 
-A validação automatizada não substitui os testes em celulares, provedores SAF e Android 14+. A beta.9 segue sem lançamento público.
+A validação automatizada não substitui os testes em celulares, provedores SAF e Android 14+. O aceite completo permanece pendente na beta.9 publicada.
 
 ## Nome e ícone corrigidos
 
@@ -125,7 +125,7 @@ Para a comparação atual em inglês: **OCR PaddleOCR**, **OCR por faixas ligado
 
 O download da atualização continua ao sair da tela. Quedas de rede têm novas tentativas automáticas e retomada do parcial quando o servidor permite, com verificação do APK completo antes de instalar. Ao terminar, a tela e a notificação oferecem abrir o instalador do Android. Cada versão continua baixando um APK completo; a retomada evita repetir a parte já recebida do mesmo arquivo.
 
-Essa correção exige instalar a beta.9 uma vez: não modifica o atualizador da beta.8 já instalada. A distribuição deste candidato ainda está pendente. Veja [comportamento, diagnóstico e limites](../../docs/CORRECOES_LEITURA_ATUALIZACAO_P20261104_1.md).
+Essa correção exige instalar a beta.9 uma vez: não modifica o atualizador da beta.8 já instalada. A distribuição pública desta revisão foi conferida; o aceite Android continua pendente. Veja [comportamento, diagnóstico e limites](../../docs/CORRECOES_LEITURA_ATUALIZACAO_P20261104_1.md).
 
 O [ensaio real do capítulo 40](../ocr-benchmark/20261104-chapter40/README.md) compara11 recortes difíceis. Paddle teve 9 textos exatos e2 erros de caracteres; ML Kit 7 e 10, em 465 caracteres. Os controles brancos passaram nos dois. O benchmark não mede desempenho ARM nem valida tradução editorial do capítulo inteiro.
 
@@ -135,6 +135,6 @@ A Anime Ace incluída não tinha Ç/ç; o candidato complementa essas letras com
 
 **Fonte das traduções** aplica a família escolhida ao texto traduzido; tamanho e quebras são automáticos para cada região. Não há identificação automática da fonte original. Reabra o leitor para conferir traduções salvas com a correção; não é necessário refazer o OCR somente por causa da fonte. Veja [diagnóstico e limites](../../docs/TIPOGRAFIA_PT_P20261104_2.md).
 
-## Rascunho beta.9 no GitHub
+## Publicação beta.9 no GitHub
 
-O [rascunho de Release beta.9](https://github.com/Hailton-Reis/Polaris/releases/tag/untagged-e498da151b0296209fe2) contém os APKs ARM32/ARM64 e cinco anexos de metadados, roteiro, notas e validação, com tamanhos e hashes remotos conferidos. Continua sem publicação; não aparece no atualizador nem oferece download anônimo. A beta.8 permanece como prévia pública. Veja [o registro de preparação e as pendências de CI](../release-candidates/0.1.0-beta.9/README.md).
+A [Release beta.9](https://github.com/Hailton-Reis/Polaris/releases/tag/v0.1.0-beta.9) contém os APKs P20261104.4 ARM32/ARM64 e cinco anexos de metadados, roteiro, notas e validação. Os sete downloads públicos completos tiveram tamanho/SHA-256 conferidos. A tag aponta o código compilado e a beta.8 foi preservada. Veja [registro, validação e pendências](../release-candidates/0.1.0-beta.9/README.md).

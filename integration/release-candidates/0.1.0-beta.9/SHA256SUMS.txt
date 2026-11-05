@@ -1,0 +1,2 @@
+dfd7ce4e567db9036c6d72f50f67f9c11b48754de49a912089c42d712e6c43bb  Polaris-0.1.0-beta.9-arm64-v8a.apk
+c916f3623bff124bc280c127672b96dc3aed40ee7277ee655484b25d50d0a4b6  Polaris-0.1.0-beta.9-armeabi-v7a.apk
