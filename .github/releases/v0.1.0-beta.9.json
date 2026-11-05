@@ -5,41 +5,46 @@
   "signer_sha256": "3ae747069cc9015ca1777f94fd56b030501f45d6af380426a572ad60e94d8227",
   "repository": "Hailton-Reis/Polaris",
   "tag": "v0.1.0-beta.9",
-  "source_commit": "e6bab4bc4fade68e3aa74e2677500ea762d34d29",
+  "source_commit": "efc2543487f02ff15c3bc51f3ef0a25723809527",
   "artifacts": [
     {
       "abi": "arm64-v8a",
       "file": "Polaris-0.1.0-beta.9-arm64-v8a.apk",
-      "bytes": 192966287,
-      "sha256": "426853254bae47d91972af5262e1f6c3ed1a1075e84da3a0b7e08dbece22dd3e",
+      "bytes": 199132104,
+      "sha256": "dfd7ce4e567db9036c6d72f50f67f9c11b48754de49a912089c42d712e6c43bb",
       "parts": [
         {
           "file": "Polaris-0.1.0-beta.9-arm64-v8a.apk.001",
           "bytes": 98000000,
-          "sha256": "29a2e49c60d6f147fa868ef62e5fdb755f932fc2b64ab07e6b73675798c47e69"
+          "sha256": "7ef950eaeec633baafb4a69fe1e1ef6799a7c6410978289a32af3aa4615e92c0"
         },
         {
           "file": "Polaris-0.1.0-beta.9-arm64-v8a.apk.002",
-          "bytes": 94966287,
-          "sha256": "20c9ab9dd55ab16919c1ebab94f146de0559257e3f34164741ab3cd6e2f0e2e3"
+          "bytes": 98000000,
+          "sha256": "4edd4ad973453dbef41a54256a00b5ad0e8c72b24601f75dfdfab51620b53240"
+        },
+        {
+          "file": "Polaris-0.1.0-beta.9-arm64-v8a.apk.003",
+          "bytes": 3132104,
+          "sha256": "d74423f2976b38c0b13ab9177b5e2ff9f01e4ab8f2ae4f69abd1ad104dcbd8c9"
         }
       ]
     },
     {
       "abi": "armeabi-v7a",
       "file": "Polaris-0.1.0-beta.9-armeabi-v7a.apk",
-      "bytes": 153168464,
-      "sha256": "d65c73e228e55e65b3a7bdcd1d8f195dde0cbe38f795174229021c46c3a544f7",
+      "bytes": 159334281,
+      "sha256": "c916f3623bff124bc280c127672b96dc3aed40ee7277ee655484b25d50d0a4b6",
       "parts": [
         {
           "file": "Polaris-0.1.0-beta.9-armeabi-v7a.apk.001",
           "bytes": 98000000,
-          "sha256": "b793fca708586751792c6d76c10f0a5a98feec8bb932d7a021f44974b2b7a9a5"
+          "sha256": "4950b4113b1cac330da90bc99d1ee27754f2e1178dcb4bba7152505a00993ce3"
         },
         {
           "file": "Polaris-0.1.0-beta.9-armeabi-v7a.apk.002",
-          "bytes": 55168464,
-          "sha256": "c70b735e8a5fbd97a9f94baa76505744f21026e3326ccab02bc942f80d97fd4e"
+          "bytes": 61334281,
+          "sha256": "4cd61dde4c2cfc79ad70ec06a2860ad4ec3d393d1de7fb34e999b43251031113"
         }
       ]
     }
@@ -47,28 +52,28 @@
   "files": [
     {
       "file": "manifest.json",
-      "bytes": 1840,
-      "sha256": "a16e453d224deb8f1a3c95be53960adeb7d7b9e9327e9fdcf6cafdfd04662e0d"
+      "bytes": 1958,
+      "sha256": "89a1a6237576c9bea37e2eee5a3128f59e192c45601faabfcf156c4778b9ad9a"
     },
     {
       "file": "SHA256SUMS.txt",
       "bytes": 204,
-      "sha256": "fa13182a1d7fe4b4c7ab55701f173d68fd0e8c4ff99cdab8c4b08b38276cd161"
+      "sha256": "4383487a8b5136e07d7ef1fc61ee2f9ea6b7c1a4f89cb6841b23a98172498127"
     },
     {
       "file": "PRIMEIRO_TESTE.md",
-      "bytes": 2514,
-      "sha256": "8b16520e8c878f7326342825e863c097a493d0f82f23ee1e4974863636b30e03"
+      "bytes": 3800,
+      "sha256": "f9084fbcdc26b4a50f6aaeab5a5a85460c1175151a92873792343b35779cde11"
     },
     {
       "file": "RELEASE_NOTES.md",
-      "bytes": 6434,
-      "sha256": "8bf603aae406d4c52eb8a649d5aafae8ecddda1bd39dafc66448db2c80636154"
+      "bytes": 9835,
+      "sha256": "eaa487ff1d833dda80d62d605d84e6529acb974a83240f60012239d34a0885ce"
     },
     {
       "file": "VALIDACAO.json",
-      "bytes": 14201,
-      "sha256": "1283440279c7e8475d47ce72bf002d8c1b69d4dad90e9cfb644530c8ab702a59"
+      "bytes": 16591,
+      "sha256": "938966a3de2f93d11b8a06231f29f2b0f9c4bd9f3a8a08649564690dd44f869b"
     }
   ]
 }
