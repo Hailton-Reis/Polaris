@@ -1,0 +1,50 @@
+[
+  {
+    "asset": "Polaris-0.1.0-beta.8-arm64-v8a.apk",
+    "client_sent_authorization_header": false,
+    "requested_range": "bytes=0-1023",
+    "status": 206,
+    "content_range": "bytes 0-1023/194508943",
+    "content_length": "1024",
+    "accept_ranges": "bytes",
+    "prefix_bytes_read": 1024,
+    "first_four_bytes_hex": "504b0304",
+    "scope": "Public GitHub server range support only; not Android/WorkManager acceptance."
+  },
+  {
+    "asset": "Polaris-0.1.0-beta.8-arm64-v8a.apk",
+    "client_sent_authorization_header": false,
+    "requested_range": "bytes=1048576-1049599",
+    "status": 206,
+    "content_range": "bytes 1048576-1049599/194508943",
+    "content_length": "1024",
+    "accept_ranges": "bytes",
+    "prefix_bytes_read": 1024,
+    "first_four_bytes_hex": "0e78e231",
+    "scope": "Public GitHub server range support only; not Android/WorkManager acceptance."
+  },
+  {
+    "asset": "Polaris-0.1.0-beta.8-armeabi-v7a.apk",
+    "client_sent_authorization_header": false,
+    "requested_range": "bytes=0-1023",
+    "status": 206,
+    "content_range": "bytes 0-1023/154711120",
+    "content_length": "1024",
+    "accept_ranges": "bytes",
+    "prefix_bytes_read": 1024,
+    "first_four_bytes_hex": "504b0304",
+    "scope": "Public GitHub server range support only; not Android/WorkManager acceptance."
+  },
+  {
+    "asset": "Polaris-0.1.0-beta.8-armeabi-v7a.apk",
+    "client_sent_authorization_header": false,
+    "requested_range": "bytes=1048576-1049599",
+    "status": 206,
+    "content_range": "bytes 1048576-1049599/154711120",
+    "content_length": "1024",
+    "accept_ranges": "bytes",
+    "prefix_bytes_read": 1024,
+    "first_four_bytes_hex": "0e78e231",
+    "scope": "Public GitHub server range support only; not Android/WorkManager acceptance."
+  }
+]

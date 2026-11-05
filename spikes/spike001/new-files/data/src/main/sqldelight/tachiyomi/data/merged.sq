@@ -1,0 +1,113 @@
+import kotlin.Boolean;
+
+CREATE TABLE merged(
+    _id INTEGER NOT NULL PRIMARY KEY,
+    info_manga INTEGER AS Boolean NOT NULL,
+    get_chapter_updates INTEGER AS Boolean NOT NULL,
+    chapter_sort_mode INTEGER NOT NULL,
+    chapter_priority INTEGER NOT NULL,
+    download_chapters INTEGER AS Boolean NOT NULL,
+    merge_id INTEGER NOT NULL,
+    merge_url TEXT NOT NULL,
+    manga_id INTEGER,
+    manga_url TEXT NOT NULL,
+    manga_source INTEGER NOT NULL,
+    FOREIGN KEY(manga_id) REFERENCES mangas (_id) ON DELETE SET NULL,
+    FOREIGN KEY(merge_id) REFERENCES mangas (_id) ON DELETE CASCADE
+);
+
+CREATE INDEX merged_merge_id_index ON merged(merge_id);
+
+selectByMergeId:
+SELECT * FROM merged WHERE merge_id = ? ORDER BY chapter_priority, _id;
+
+selectMergedMangasById:
+-- One manga per linked local manga_id, even if legacy rows were duplicated.
+-- Stable ordering follows the most preferred link then its first DB row.
+SELECT mangas.*
+FROM mangas
+JOIN (
+    SELECT manga_id, MIN(chapter_priority) AS first_priority,
+           MIN(_id) AS first_reference_id
+    FROM merged
+    WHERE merge_id = ? AND manga_id IS NOT NULL
+    GROUP BY manga_id
+) AS refs ON refs.manga_id = mangas._id
+ORDER BY refs.first_priority, refs.first_reference_id, mangas._id;
+
+insertReturningId:
+INSERT INTO merged(
+    info_manga, get_chapter_updates, chapter_sort_mode, chapter_priority,
+    download_chapters, merge_id, merge_url, manga_id, manga_url, manga_source
+)
+SELECT
+    :infoManga,
+    :getChapterUpdates,
+    :chapterSortMode,
+    :chapterPriority,
+    :downloadChapters,
+    :mergeId,
+    :mergeUrl,
+    :mangaId,
+    :mangaUrl,
+    :mangaSource
+WHERE NOT EXISTS (
+    SELECT 1 FROM merged existing
+    WHERE existing.merge_id = :mergeId
+      AND (
+          (:mangaId IS NOT NULL AND existing.manga_id = :mangaId)
+          OR (
+              :mangaId IS NULL AND existing.manga_id IS NULL
+              AND existing.manga_source = :mangaSource
+              AND existing.manga_url = :mangaUrl
+          )
+      )
+)
+RETURNING _id;
+
+insert:
+INSERT INTO merged(
+    info_manga, get_chapter_updates, chapter_sort_mode, chapter_priority,
+    download_chapters, merge_id, merge_url, manga_id, manga_url, manga_source
+)
+SELECT
+    :infoManga,
+    :getChapterUpdates,
+    :chapterSortMode,
+    :chapterPriority,
+    :downloadChapters,
+    :mergeId,
+    :mergeUrl,
+    :mangaId,
+    :mangaUrl,
+    :mangaSource
+WHERE NOT EXISTS (
+    SELECT 1 FROM merged existing
+    WHERE existing.merge_id = :mergeId
+      AND (
+          (:mangaId IS NOT NULL AND existing.manga_id = :mangaId)
+          OR (
+              :mangaId IS NULL AND existing.manga_id IS NULL
+              AND existing.manga_source = :mangaSource
+              AND existing.manga_url = :mangaUrl
+          )
+      )
+);
+
+updateSettingsById:
+UPDATE merged
+SET
+    get_chapter_updates = coalesce(:getChapterUpdates, get_chapter_updates),
+    download_chapters = coalesce(:downloadChapters, download_chapters),
+    info_manga = coalesce(:infoManga, info_manga),
+    chapter_priority = coalesce(:chapterPriority, chapter_priority),
+    chapter_sort_mode = coalesce(:chapterSortMode, chapter_sort_mode)
+WHERE _id = :id;
+
+deleteById:
+DELETE FROM merged WHERE _id = ?;
+
+-- Remove only virtual manga rows; FK ON DELETE CASCADE removes their links.
+-- Real source mangas can never be deleted through this operation.
+deleteByMergeId:
+DELETE FROM mangas WHERE _id = :mergeId AND source = :mergedSourceId;

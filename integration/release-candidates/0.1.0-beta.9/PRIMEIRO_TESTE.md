@@ -1,0 +1,12 @@
+# Primeiro teste — Polaris beta.9 / P20261104.2
+
+1. Baixe somente o APK compatível com seu Android: ARM64 ou ARM32. Instale sobre a versão anterior e confira **Sobre → 0.1.0-beta.9 / P20261104.2**. Confirme biblioteca, downloads e progresso. Preserve a instalação existente se houver conflito de assinatura.
+2. Em **Traduções**, prepare inglês → português se os recursos ainda não estiverem prontos. Essa preparação inicial precisa de internet; depois, o ML Kit permite traduzir offline.
+3. Para o primeiro comparativo: **OCR PaddleOCR**, **faixas ligadas**, **DBNet desligado**, **tradutor ML Kit no dispositivo**, **Português (Brasil)**, **Anime Ace**, efeitos sonoros e edição avançada desligados.
+4. Reabra uma tradução salva. Confira palavras com **Ç/ç**, como “AÇÃO”, “PROTEÇÃO” e “FORÇA”, e os acentos. A fonte escolhida vale para as traduções; tamanho e quebras são automáticos. Trocar a apresentação não exige refazer o OCR.
+5. No trecho problemático de Solo Leveling: Ragnarok ou em outra obra, compare original e tradução: balões brancos, caixas escuras, painéis de missão, títulos, balões conectados e primeiras/últimas linhas. Confira nos modos vertical e paginado, com zoom. As faixas só atuam se a imagem individual for suficientemente alta.
+6. Para comparar o OCR ML Kit com Paddle, mantenha as demais escolhas. Remova **somente a tradução salva** e traduza novamente. O original baixado permanece. Retraduzir uma frase usa o texto OCR salvo e não compara o reconhecimento da imagem.
+7. Confira que ligar faixas desliga DBNet e vice-versa. DBNet exige inglês e Android/processo ARM64. Ao retirar um requisito, o dependente deve desligar; restaurá-lo deve apenas permitir sua escolha.
+8. Em atualização futura disponível, teste queda de conexão, mudança de rede e sair/voltar à tela. A retomada deve conservar bytes do mesmo APK e conferir o hash antes de instalar. Instalar beta.9 não oferece baixar a própria beta.9; esse ensaio de atualização precisa de uma versão posterior publicada. Rascunhos são ignorados pelo atualizador. A beta.8 instalada pode exigir uma instalação manual inicial.
+
+Ao relatar problemas, informe versão/revisão, modelo, Android, arquitetura quando conhecida, fonte/extensão, obra/capítulo, motor OCR, opções ligadas e passos para reproduzir. Uma captura do original e outra do resultado ajudam a distinguir texto ausente, tradução e encaixe. Não inclua credenciais ou dados pessoais.

@@ -1,0 +1,171 @@
+{
+  "scope": "Manual transcripts and original/cropped images kept private; coordinates and hashes permit input identification.",
+  "normalization": "Unicode NFKC, casefold, whitespace removed, curly quotes canonicalized, punctuation retained",
+  "regions": [
+    {
+      "id": "quest_title",
+      "page": 2,
+      "kind": "dark_panel",
+      "box": [
+        125,
+        11480,
+        550,
+        125
+      ],
+      "benchmark_page": 101,
+      "normalized_reference_characters": 45,
+      "normalized_reference_sha256": "9245ed0b3fd0a8f4bd00e563d1133672b7b7350ff4dfd69a6fe3d90fd1d1a29e",
+      "pixel_input_file_sha256": "1b1bf0489a93640a57bf930bb1a863760cd89463833c2963fd0172dab8164f35"
+    },
+    {
+      "id": "quest_description",
+      "page": 2,
+      "kind": "dark_panel",
+      "box": [
+        130,
+        11630,
+        530,
+        180
+      ],
+      "benchmark_page": 102,
+      "normalized_reference_characters": 78,
+      "normalized_reference_sha256": "6a2bc0c457bff1bd52cb994bcdbdc1e95082bbb1eef126457bd24ade202fc64b",
+      "pixel_input_file_sha256": "d443dc80baeaf6cfb5d3c621af897203c6e1524f9742da6ee9a3845988a618ad"
+    },
+    {
+      "id": "quest_counter",
+      "page": 2,
+      "kind": "dark_panel",
+      "box": [
+        230,
+        11830,
+        350,
+        135
+      ],
+      "benchmark_page": 103,
+      "normalized_reference_characters": 36,
+      "normalized_reference_sha256": "8be48abc9bc01b70c75379c912c6a92fc18336d6423ea43ec873af7f388bf385",
+      "pixel_input_file_sha256": "cbc23bf0d107fc714353312af1ca624ebe92ffd59aedc95fd15fde2ee7964b5f"
+    },
+    {
+      "id": "connected_upper",
+      "page": 3,
+      "kind": "connected_spiky",
+      "box": [
+        130,
+        135,
+        360,
+        175
+      ],
+      "benchmark_page": 104,
+      "normalized_reference_characters": 31,
+      "normalized_reference_sha256": "04327612bccec1e0b753790772f3523cac83ed8d989f7e2ccc4df51b3d592427",
+      "pixel_input_file_sha256": "5e5de1954bc3ad30bff449ca1ee41a7dee822ae233974e2b6f47d4c11ffd4e7d"
+    },
+    {
+      "id": "connected_lower",
+      "page": 3,
+      "kind": "connected_spiky",
+      "box": [
+        325,
+        375,
+        320,
+        180
+      ],
+      "benchmark_page": 105,
+      "normalized_reference_characters": 25,
+      "normalized_reference_sha256": "7f4d0009e69dd41f4d3f00497b11e88206bfbe949692dbc07d61198789d338ae",
+      "pixel_input_file_sha256": "a268428a99b87fdf538508af9f7aad417bd4089cd3e6276b260bd600ba3425f0"
+    },
+    {
+      "id": "spiky_combat",
+      "page": 5,
+      "kind": "spiky",
+      "box": [
+        245,
+        1880,
+        335,
+        120
+      ],
+      "benchmark_page": 106,
+      "normalized_reference_characters": 27,
+      "normalized_reference_sha256": "061a845403bf354f84831d1d927dfb7fd52028085be1fda68519039bcd19acec",
+      "pixel_input_file_sha256": "cb0b87f0723d98202e455c3301529f6e189969668a6597572567e78a802bee42"
+    },
+    {
+      "id": "dark_caption_short",
+      "page": 11,
+      "kind": "text_on_art",
+      "box": [
+        40,
+        10240,
+        420,
+        95
+      ],
+      "benchmark_page": 107,
+      "normalized_reference_characters": 19,
+      "normalized_reference_sha256": "a4cf0e76a5a908eb16b5b640bb92cbf8348535811d92b4aee79582f7c2bb79cd",
+      "pixel_input_file_sha256": "baf0f2c0011453a3a38f25b6f736fea82dfb23ca950805930b696ff4b6137fdc"
+    },
+    {
+      "id": "dark_caption_question",
+      "page": 11,
+      "kind": "text_on_art",
+      "box": [
+        235,
+        10540,
+        520,
+        200
+      ],
+      "benchmark_page": 108,
+      "normalized_reference_characters": 55,
+      "normalized_reference_sha256": "06ea9cdca2c276fb28ff8dd7332aabc9b7425de80b3c3820eeff5bfebb3b6afa",
+      "pixel_input_file_sha256": "64be784c1cb4a53b09dc74d4f067748838053cc87bba12094650a8f884915527"
+    },
+    {
+      "id": "white_caption",
+      "page": 13,
+      "kind": "white_panel",
+      "box": [
+        120,
+        7350,
+        455,
+        180
+      ],
+      "benchmark_page": 109,
+      "normalized_reference_characters": 43,
+      "normalized_reference_sha256": "3b68285fdcb31089f3c86d698e7e282687c1d647d8e387d70a6db6c5e926fff8",
+      "pixel_input_file_sha256": "4f8f08dec2a05c016e43265523f3711ae41a6d0bcad30be9a670ee2dc1895515"
+    },
+    {
+      "id": "white_balloon_control",
+      "page": 3,
+      "kind": "white_balloon",
+      "box": [
+        300,
+        4890,
+        420,
+        135
+      ],
+      "benchmark_page": 110,
+      "normalized_reference_characters": 51,
+      "normalized_reference_sha256": "bda1074ece77a3317c211f2b241228e20c04ac2dfd12727f6e7aa8516a82d70c",
+      "pixel_input_file_sha256": "c9dc79360b9c8f6c4545e5f905140c2a7bd51b087ededf2308cd169af390786d"
+    },
+    {
+      "id": "partial_white_oval",
+      "page": 9,
+      "kind": "white_balloon_partial",
+      "box": [
+        320,
+        7435,
+        430,
+        315
+      ],
+      "benchmark_page": 111,
+      "normalized_reference_characters": 55,
+      "normalized_reference_sha256": "876e294d0251275feaaa606909422cf48e805414a954917163b9276446d4c787",
+      "pixel_input_file_sha256": "35065b2315c9e3c31a9f2b33907d1ae3cc11c0a50c13339ece083961dc51ff50"
+    }
+  ]
+}

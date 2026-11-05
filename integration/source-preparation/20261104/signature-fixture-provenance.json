@@ -1,0 +1,11 @@
+{
+  "purpose": "Synthetic non-executable APK with v2/v3 signatures; no extension or user content. Private test key is not committed.",
+  "package": "test.polaris.reviewed",
+  "min_sdk": 26,
+  "signer_sha256": "5a7a06cb326b09d4c872f35c553d8a3b6278ca01b3f0c92f333f3e73c53c96b7",
+  "tamper": "One asset payload byte changed after signing; original signing blocks retained.",
+  "sha256": {
+    "signed.apk": "da38d64abe8bf34bd1b2f0e2f7cc0dbba1c04a7978c78feac78650cdf9399143",
+    "tampered.apk": "d5e2c497fe93a4045a8c0581266505df00145c899d6fee39881926a95a559b75"
+  }
+}

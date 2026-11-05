@@ -1,0 +1,14 @@
+[
+  {
+    "host": "api.mangadex.org",
+    "returncode": 0,
+    "http_status": "200",
+    "stderr": ""
+  },
+  {
+    "host": "jumpg-webapi.tokyo-cdn.com",
+    "returncode": 0,
+    "http_status": "200",
+    "stderr": ""
+  }
+]

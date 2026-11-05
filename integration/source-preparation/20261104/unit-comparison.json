@@ -1,0 +1,27 @@
+{
+  "status": "NO_NEW_UNIT_REGRESSIONS",
+  "baseline": {
+    "total": 673,
+    "passed": 656,
+    "failed": 17,
+    "skipped": 0
+  },
+  "patched": {
+    "total": 707,
+    "passed": 690,
+    "failed": 17,
+    "skipped": 0
+  },
+  "preexisting_failures_still_present": 17,
+  "missing_baseline_tests": [],
+  "new_failures_or_skips": [],
+  "android_runtime_verified": false,
+  "gradle_exit_codes": {
+    "baseline": 1,
+    "patched": 1
+  },
+  "required_module_coverage": {
+    "app": 588,
+    "domain": 85
+  }
+}

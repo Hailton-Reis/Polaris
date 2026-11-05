@@ -1,0 +1,101 @@
+{
+  "status": "COMPLETE",
+  "requested": 11,
+  "executed": 11,
+  "exact": 7,
+  "errors": 10,
+  "characters": 465,
+  "cer": 0.021505376344086023,
+  "missing": 0,
+  "execution_errors": 0,
+  "regions": [
+    {
+      "id": "quest_title",
+      "kind": "dark_panel",
+      "status": "OK",
+      "characters": 45,
+      "errors": 2,
+      "exact": false
+    },
+    {
+      "id": "quest_description",
+      "kind": "dark_panel",
+      "status": "OK",
+      "characters": 78,
+      "errors": 0,
+      "exact": true
+    },
+    {
+      "id": "quest_counter",
+      "kind": "dark_panel",
+      "status": "OK",
+      "characters": 36,
+      "errors": 5,
+      "exact": false
+    },
+    {
+      "id": "connected_upper",
+      "kind": "connected_spiky",
+      "status": "OK",
+      "characters": 31,
+      "errors": 0,
+      "exact": true
+    },
+    {
+      "id": "connected_lower",
+      "kind": "connected_spiky",
+      "status": "OK",
+      "characters": 25,
+      "errors": 0,
+      "exact": true
+    },
+    {
+      "id": "spiky_combat",
+      "kind": "spiky",
+      "status": "OK",
+      "characters": 27,
+      "errors": 0,
+      "exact": true
+    },
+    {
+      "id": "dark_caption_short",
+      "kind": "text_on_art",
+      "status": "OK",
+      "characters": 19,
+      "errors": 1,
+      "exact": false
+    },
+    {
+      "id": "dark_caption_question",
+      "kind": "text_on_art",
+      "status": "OK",
+      "characters": 55,
+      "errors": 2,
+      "exact": false
+    },
+    {
+      "id": "white_caption",
+      "kind": "white_panel",
+      "status": "OK",
+      "characters": 43,
+      "errors": 0,
+      "exact": true
+    },
+    {
+      "id": "white_balloon_control",
+      "kind": "white_balloon",
+      "status": "OK",
+      "characters": 51,
+      "errors": 0,
+      "exact": true
+    },
+    {
+      "id": "partial_white_oval",
+      "kind": "white_balloon_partial",
+      "status": "OK",
+      "characters": 55,
+      "errors": 0,
+      "exact": true
+    }
+  ]
+}

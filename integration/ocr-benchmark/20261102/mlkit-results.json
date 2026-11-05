@@ -1,0 +1,1135 @@
+[
+  {
+    "id": "en-sans-0",
+    "text": "",
+    "lines": [],
+    "status": "OK",
+    "elapsed_ms": 25081
+  },
+  {
+    "id": "en-sans-1",
+    "text": "iON",
+    "lines": [
+      {
+        "text": "iON",
+        "x": 12,
+        "y": 9,
+        "width": 55,
+        "height": 31
+      }
+    ],
+    "status": "OK",
+    "elapsed_ms": 13109
+  },
+  {
+    "id": "en-sans-2",
+    "text": "Keep the final line.",
+    "lines": [
+      {
+        "text": "Keep the final line.",
+        "x": 21,
+        "y": 11,
+        "width": 272,
+        "height": 33
+      }
+    ],
+    "status": "OK",
+    "elapsed_ms": 11658
+  },
+  {
+    "id": "en-sans-3",
+    "text": "Sora will bring the blue book.",
+    "lines": [
+      {
+        "text": "Sora will bring the blue book.",
+        "x": 30,
+        "y": 12,
+        "width": 424,
+        "height": 31
+      }
+    ],
+    "status": "OK",
+    "elapsed_ms": 10597
+  },
+  {
+    "id": "en-sans-4",
+    "text": "I will return tomorrow.",
+    "lines": [
+      {
+        "text": "I will return tomorrow.",
+        "x": 30,
+        "y": 14,
+        "width": 314,
+        "height": 28
+      }
+    ],
+    "status": "OK",
+    "elapsed_ms": 8336
+  },
+  {
+    "id": "en-sans-5",
+    "text": "The library opens tomorrow.",
+    "lines": [
+      {
+        "text": "The library opens tomorrow.",
+        "x": 19,
+        "y": 16,
+        "width": 418,
+        "height": 28
+      }
+    ],
+    "status": "OK",
+    "elapsed_ms": 7965
+  },
+  {
+    "id": "en-sans-6",
+    "text": "Do not leave the last line behind.",
+    "lines": [
+      {
+        "text": "Do not leave the last line behind.",
+        "x": 21,
+        "y": 13,
+        "width": 494,
+        "height": 28
+      }
+    ],
+    "status": "OK",
+    "elapsed_ms": 8837
+  },
+  {
+    "id": "en-sans-7",
+    "text": "Please keep the name Sora unchanged.",
+    "lines": [
+      {
+        "text": "Please keep the name Sora unchanged.",
+        "x": 21,
+        "y": 15,
+        "width": 590,
+        "height": 29
+      }
+    ],
+    "status": "OK",
+    "elapsed_ms": 14831
+  },
+  {
+    "id": "en-anime-0",
+    "text": "H",
+    "lines": [
+      {
+        "text": "H",
+        "x": 17,
+        "y": 13,
+        "width": 17,
+        "height": 27
+      }
+    ],
+    "status": "OK",
+    "elapsed_ms": 12228
+  },
+  {
+    "id": "en-anime-1",
+    "text": "jON",
+    "lines": [
+      {
+        "text": "jON",
+        "x": 11,
+        "y": 12,
+        "width": 71,
+        "height": 38
+      }
+    ],
+    "status": "OK",
+    "elapsed_ms": 10221
+  },
+  {
+    "id": "en-anime-2",
+    "text": "KEEP THE FINAL LINE.",
+    "lines": [
+      {
+        "text": "KEEP THE FINAL LINE.",
+        "x": 20,
+        "y": 15,
+        "width": 371,
+        "height": 27
+      }
+    ],
+    "status": "OK",
+    "elapsed_ms": 7371
+  },
+  {
+    "id": "en-anime-3",
+    "text": "SORA WILL BRING THE BLUE BOOK.",
+    "lines": [
+      {
+        "text": "SORA WILL BRING THE BLUE BOOK.",
+        "x": 20,
+        "y": 15,
+        "width": 616,
+        "height": 27
+      }
+    ],
+    "status": "OK",
+    "elapsed_ms": 7082
+  },
+  {
+    "id": "en-anime-4",
+    "text": "I WILL RETURN TOMORR0W.",
+    "lines": [
+      {
+        "text": "I WILL RETURN TOMORR0W.",
+        "x": 19,
+        "y": 16,
+        "width": 483,
+        "height": 27
+      }
+    ],
+    "status": "OK",
+    "elapsed_ms": 6573
+  },
+  {
+    "id": "en-anime-5",
+    "text": "THE LIBRARY OPENS TOMORROW.",
+    "lines": [
+      {
+        "text": "THE LIBRARY OPENS TOMORROW.",
+        "x": 18,
+        "y": 16,
+        "width": 585,
+        "height": 27
+      }
+    ],
+    "status": "OK",
+    "elapsed_ms": 13115
+  },
+  {
+    "id": "en-anime-6",
+    "text": "DO NOT LEAVE THE LAST LINE BEHIND,",
+    "lines": [
+      {
+        "text": "DO NOT LEAVE THE LAST LINE BEHIND,",
+        "x": 20,
+        "y": 15,
+        "width": 665,
+        "height": 27
+      }
+    ],
+    "status": "OK",
+    "elapsed_ms": 27694
+  },
+  {
+    "id": "en-anime-7",
+    "text": "PLEASE KEEP THE NAME SORA INCHANGED.",
+    "lines": [
+      {
+        "text": "PLEASE KEEP THE NAME SORA INCHANGED.",
+        "x": 19,
+        "y": 16,
+        "width": 775,
+        "height": 27
+      }
+    ],
+    "status": "OK",
+    "elapsed_ms": 74527
+  },
+  {
+    "id": "en-balsamiq-0",
+    "text": "I",
+    "lines": [
+      {
+        "text": "I",
+        "x": 19,
+        "y": 15,
+        "width": 7,
+        "height": 21
+      }
+    ],
+    "status": "OK",
+    "elapsed_ms": 10999
+  },
+  {
+    "id": "en-balsamiq-1",
+    "text": "iON",
+    "lines": [
+      {
+        "text": "iON",
+        "x": 13,
+        "y": 9,
+        "width": 54,
+        "height": 31
+      }
+    ],
+    "status": "OK",
+    "elapsed_ms": 6920
+  },
+  {
+    "id": "en-balsamiq-2",
+    "text": "Keep the final line.",
+    "lines": [
+      {
+        "text": "Keep the final line.",
+        "x": 21,
+        "y": 15,
+        "width": 244,
+        "height": 28
+      }
+    ],
+    "status": "OK",
+    "elapsed_ms": 9804
+  },
+  {
+    "id": "en-balsamiq-3",
+    "text": "Sora will bring the blue book.",
+    "lines": [
+      {
+        "text": "Sora will bring the blue book.",
+        "x": 19,
+        "y": 15,
+        "width": 384,
+        "height": 27
+      }
+    ],
+    "status": "OK",
+    "elapsed_ms": 5706
+  },
+  {
+    "id": "en-balsamiq-4",
+    "text": "I will return tomorrow.",
+    "lines": [
+      {
+        "text": "I will return tomorrow.",
+        "x": 29,
+        "y": 13,
+        "width": 271,
+        "height": 28
+      }
+    ],
+    "status": "OK",
+    "elapsed_ms": 8093
+  },
+  {
+    "id": "en-balsamiq-5",
+    "text": "The library opens tomorrow.",
+    "lines": [
+      {
+        "text": "The library opens tomorrow.",
+        "x": 18,
+        "y": 15,
+        "width": 368,
+        "height": 28
+      }
+    ],
+    "status": "OK",
+    "elapsed_ms": 6173
+  },
+  {
+    "id": "en-balsamiq-6",
+    "text": "Do not leave the last line behind.",
+    "lines": [
+      {
+        "text": "Do not leave the last line behind.",
+        "x": 21,
+        "y": 15,
+        "width": 437,
+        "height": 22
+      }
+    ],
+    "status": "OK",
+    "elapsed_ms": 10675
+  },
+  {
+    "id": "en-balsamiq-7",
+    "text": "Please keep the name Sora unchanged.",
+    "lines": [
+      {
+        "text": "Please keep the name Sora unchanged.",
+        "x": 21,
+        "y": 16,
+        "width": 535,
+        "height": 27
+      }
+    ],
+    "status": "OK",
+    "elapsed_ms": 9273
+  },
+  {
+    "id": "en-panel-0",
+    "text": "The library opens tomorrow.",
+    "lines": [
+      {
+        "text": "The library opens tomorrow.",
+        "x": 10,
+        "y": 11,
+        "width": 577,
+        "height": 43
+      }
+    ],
+    "status": "OK",
+    "elapsed_ms": 11435
+  },
+  {
+    "id": "en-panel-1",
+    "text": "Sora will bring the blue book.",
+    "lines": [
+      {
+        "text": "Sora will bring the blue book.",
+        "x": 12,
+        "y": 6,
+        "width": 591,
+        "height": 48
+      }
+    ],
+    "status": "OK",
+    "elapsed_ms": 9387
+  },
+  {
+    "id": "en-panel-2",
+    "text": "Please keep the name Sora unchanged.",
+    "lines": [
+      {
+        "text": "Please keep the name Sora unchanged.",
+        "x": 12,
+        "y": 8,
+        "width": 795,
+        "height": 47
+      }
+    ],
+    "status": "OK",
+    "elapsed_ms": 13500
+  },
+  {
+    "id": "ja-panel-0",
+    "text": "図書館は明日開きます。",
+    "lines": [
+      {
+        "text": "図書館は明日開きます。",
+        "x": 12,
+        "y": 8,
+        "width": 447,
+        "height": 42
+      }
+    ],
+    "status": "OK",
+    "elapsed_ms": 83486
+  },
+  {
+    "id": "ja-panel-1",
+    "text": "ソラは青い本を持ってきます。",
+    "lines": [
+      {
+        "text": "ソラは青い本を持ってきます。",
+        "x": 14,
+        "y": 8,
+        "width": 573,
+        "height": 42
+      }
+    ],
+    "status": "OK",
+    "elapsed_ms": 10545
+  },
+  {
+    "id": "ja-panel-2",
+    "text": "ソラという名前は変えないでください。",
+    "lines": [
+      {
+        "text": "ソラという名前は変えないでください。",
+        "x": 14,
+        "y": 8,
+        "width": 756,
+        "height": 42
+      }
+    ],
+    "status": "OK",
+    "elapsed_ms": 7838
+  },
+  {
+    "id": "zh-CN-panel-0",
+    "text": "图书馆明天开放。",
+    "lines": [
+      {
+        "text": "图书馆明天开放。",
+        "x": 12,
+        "y": 8,
+        "width": 319,
+        "height": 42
+      }
+    ],
+    "status": "OK",
+    "elapsed_ms": 8289
+  },
+  {
+    "id": "zh-CN-panel-1",
+    "text": "小空会带来那本蓝色的书。",
+    "lines": [
+      {
+        "text": "小空会带来那本蓝色的书。",
+        "x": 13,
+        "y": 8,
+        "width": 494,
+        "height": 42
+      }
+    ],
+    "status": "OK",
+    "elapsed_ms": 12690
+  },
+  {
+    "id": "zh-CN-panel-2",
+    "text": "请保留小空这个名字。",
+    "lines": [
+      {
+        "text": "请保留小空这个名字。",
+        "x": 12,
+        "y": 9,
+        "width": 407,
+        "height": 42
+      }
+    ],
+    "status": "OK",
+    "elapsed_ms": 7736
+  },
+  {
+    "id": "zh-TW-panel-0",
+    "text": "圖書館明天開放。",
+    "lines": [
+      {
+        "text": "圖書館明天開放。",
+        "x": 12,
+        "y": 8,
+        "width": 334,
+        "height": 42
+      }
+    ],
+    "status": "OK",
+    "elapsed_ms": 7890
+  },
+  {
+    "id": "zh-TW-panel-1",
+    "text": "小空會帶來那本藍色的書。",
+    "lines": [
+      {
+        "text": "小空會帶來那本藍色的書。",
+        "x": 11,
+        "y": 8,
+        "width": 510,
+        "height": 42
+      }
+    ],
+    "status": "OK",
+    "elapsed_ms": 7809
+  },
+  {
+    "id": "zh-TW-panel-2",
+    "text": "請保留小空這個名字。",
+    "lines": [
+      {
+        "text": "請保留小空這個名字。",
+        "x": 12,
+        "y": 9,
+        "width": 421,
+        "height": 42
+      }
+    ],
+    "status": "OK",
+    "elapsed_ms": 7948
+  },
+  {
+    "id": "ko-panel-0",
+    "text": "도서관은 내일 문을 엽니다.",
+    "lines": [
+      {
+        "text": "도서관은 내일 문을 엽니다.",
+        "x": 12,
+        "y": 9,
+        "width": 479,
+        "height": 41
+      }
+    ],
+    "status": "OK",
+    "elapsed_ms": 6408
+  },
+  {
+    "id": "ko-panel-1",
+    "text": "소라는 파란 책을 가져올 것입니다.",
+    "lines": [
+      {
+        "text": "소라는 파란 책을 가져올 것입니다.",
+        "x": 12,
+        "y": 9,
+        "width": 610,
+        "height": 41
+      }
+    ],
+    "status": "OK",
+    "elapsed_ms": 11702
+  },
+  {
+    "id": "ko-panel-2",
+    "text": "소라라는 이름은 바꾸지 마세요.",
+    "lines": [
+      {
+        "text": "소라라는 이름은 바꾸지 마세요.",
+        "x": 12,
+        "y": 9,
+        "width": 560,
+        "height": 41
+      }
+    ],
+    "status": "OK",
+    "elapsed_ms": 7583
+  },
+  {
+    "id": "en-long-strips",
+    "lines": [
+      {
+        "text": "POLARIS - LONG STRIP OCR",
+        "x": 63,
+        "y": 83,
+        "width": 395,
+        "height": 28,
+        "region": 0,
+        "edge": 83
+      },
+      {
+        "text": "Synthetic control, not a quality score",
+        "x": 62,
+        "y": 130,
+        "width": 531,
+        "height": 28,
+        "region": 0,
+        "edge": 130
+      },
+      {
+        "text": "I",
+        "x": 169,
+        "y": 618,
+        "width": 17,
+        "height": 47,
+        "region": 0,
+        "edge": 618
+      },
+      {
+        "text": "NO!",
+        "x": 438,
+        "y": 984,
+        "width": 102,
+        "height": 57,
+        "region": 0,
+        "edge": 984
+      },
+      {
+        "text": "A caption outside the balloons.",
+        "x": 102,
+        "y": 1401,
+        "width": 424,
+        "height": 32,
+        "region": 0,
+        "edge": 615
+      },
+      {
+        "text": "Scene 01 begins here.",
+        "x": 112,
+        "y": 1968,
+        "width": 313,
+        "height": 28,
+        "region": 0,
+        "edge": 52
+      },
+      {
+        "text": "Keep every single word.",
+        "x": 113,
+        "y": 2022,
+        "width": 341,
+        "height": 26,
+        "region": 0,
+        "edge": 0
+      },
+      {
+        "text": "Scene 01 begins here.",
+        "x": 112,
+        "y": 1968,
+        "width": 314,
+        "height": 27,
+        "region": 1,
+        "edge": 304
+      },
+      {
+        "text": "Keep every single word.",
+        "x": 113,
+        "y": 2022,
+        "width": 341,
+        "height": 28,
+        "region": 1,
+        "edge": 358
+      },
+      {
+        "text": "This is the final line.",
+        "x": 110,
+        "y": 2076,
+        "width": 287,
+        "height": 22,
+        "region": 1,
+        "edge": 412
+      },
+      {
+        "text": "Scene 02 begins here.",
+        "x": 112,
+        "y": 3632,
+        "width": 313,
+        "height": 28,
+        "region": 1,
+        "edge": 52
+      },
+      {
+        "text": "Keep every single word.",
+        "x": 113,
+        "y": 3686,
+        "width": 341,
+        "height": 26,
+        "region": 1,
+        "edge": 0
+      },
+      {
+        "text": "Scene 02 begins here.",
+        "x": 112,
+        "y": 3632,
+        "width": 314,
+        "height": 27,
+        "region": 2,
+        "edge": 304
+      },
+      {
+        "text": "Keep every single word.",
+        "x": 113,
+        "y": 3686,
+        "width": 341,
+        "height": 28,
+        "region": 2,
+        "edge": 358
+      },
+      {
+        "text": "This is the final line.",
+        "x": 110,
+        "y": 3740,
+        "width": 287,
+        "height": 22,
+        "region": 2,
+        "edge": 412
+      },
+      {
+        "text": "Scene 03 begins here.",
+        "x": 112,
+        "y": 5296,
+        "width": 313,
+        "height": 28,
+        "region": 2,
+        "edge": 52
+      },
+      {
+        "text": "Keep every single word.",
+        "x": 113,
+        "y": 5350,
+        "width": 341,
+        "height": 26,
+        "region": 2,
+        "edge": 0
+      },
+      {
+        "text": "Scene 03 begins here.",
+        "x": 112,
+        "y": 5296,
+        "width": 313,
+        "height": 28,
+        "region": 3,
+        "edge": 304
+      },
+      {
+        "text": "Keep every single word.",
+        "x": 113,
+        "y": 5350,
+        "width": 341,
+        "height": 28,
+        "region": 3,
+        "edge": 358
+      },
+      {
+        "text": "This is the final line.",
+        "x": 110,
+        "y": 5404,
+        "width": 287,
+        "height": 22,
+        "region": 3,
+        "edge": 412
+      },
+      {
+        "text": "Scene 04 begins here.",
+        "x": 112,
+        "y": 6960,
+        "width": 313,
+        "height": 28,
+        "region": 3,
+        "edge": 52
+      },
+      {
+        "text": "Keep every single word.",
+        "x": 113,
+        "y": 7014,
+        "width": 341,
+        "height": 26,
+        "region": 3,
+        "edge": 0
+      },
+      {
+        "text": "Scene 04 begins here.",
+        "x": 112,
+        "y": 6960,
+        "width": 313,
+        "height": 28,
+        "region": 4,
+        "edge": 304
+      },
+      {
+        "text": "Keep every single word.",
+        "x": 113,
+        "y": 7014,
+        "width": 341,
+        "height": 28,
+        "region": 4,
+        "edge": 358
+      },
+      {
+        "text": "This is the final line.",
+        "x": 110,
+        "y": 7068,
+        "width": 287,
+        "height": 22,
+        "region": 4,
+        "edge": 412
+      },
+      {
+        "text": "Scene 05 begins here.",
+        "x": 112,
+        "y": 8624,
+        "width": 313,
+        "height": 28,
+        "region": 4,
+        "edge": 52
+      },
+      {
+        "text": "Keep every single word.",
+        "x": 113,
+        "y": 8678,
+        "width": 341,
+        "height": 26,
+        "region": 4,
+        "edge": 0
+      },
+      {
+        "text": "Scene 05 begins here.",
+        "x": 112,
+        "y": 8624,
+        "width": 314,
+        "height": 27,
+        "region": 5,
+        "edge": 304
+      },
+      {
+        "text": "Keep every single word.",
+        "x": 113,
+        "y": 8674,
+        "width": 340,
+        "height": 33,
+        "region": 5,
+        "edge": 354
+      },
+      {
+        "text": "This is the final line.",
+        "x": 110,
+        "y": 8732,
+        "width": 287,
+        "height": 22,
+        "region": 5,
+        "edge": 412
+      },
+      {
+        "text": "Scene 06 begins here.",
+        "x": 112,
+        "y": 10288,
+        "width": 313,
+        "height": 28,
+        "region": 5,
+        "edge": 52
+      },
+      {
+        "text": "Keep every single word.",
+        "x": 113,
+        "y": 10342,
+        "width": 341,
+        "height": 26,
+        "region": 5,
+        "edge": 0
+      },
+      {
+        "text": "Scene 06 begins here.",
+        "x": 112,
+        "y": 10288,
+        "width": 314,
+        "height": 27,
+        "region": 6,
+        "edge": 304
+      },
+      {
+        "text": "Keep every single word.",
+        "x": 113,
+        "y": 10342,
+        "width": 341,
+        "height": 28,
+        "region": 6,
+        "edge": 358
+      },
+      {
+        "text": "This is the final line.",
+        "x": 110,
+        "y": 10396,
+        "width": 287,
+        "height": 22,
+        "region": 6,
+        "edge": 412
+      },
+      {
+        "text": "Scene 07 begins here.",
+        "x": 112,
+        "y": 11952,
+        "width": 313,
+        "height": 28,
+        "region": 6,
+        "edge": 52
+      },
+      {
+        "text": "Keep every single word.",
+        "x": 113,
+        "y": 12006,
+        "width": 341,
+        "height": 25,
+        "region": 6,
+        "edge": 1
+      },
+      {
+        "text": "Scene 07 begins here.",
+        "x": 112,
+        "y": 11952,
+        "width": 314,
+        "height": 27,
+        "region": 7,
+        "edge": 304
+      },
+      {
+        "text": "Keep every single word.",
+        "x": 113,
+        "y": 12006,
+        "width": 341,
+        "height": 28,
+        "region": 7,
+        "edge": 358
+      },
+      {
+        "text": "This is the final line.",
+        "x": 110,
+        "y": 12060,
+        "width": 287,
+        "height": 22,
+        "region": 7,
+        "edge": 412
+      },
+      {
+        "text": "Scene 08 begins here.",
+        "x": 112,
+        "y": 13616,
+        "width": 314,
+        "height": 27,
+        "region": 7,
+        "edge": 53
+      },
+      {
+        "text": "Keep every single word.",
+        "x": 113,
+        "y": 13670,
+        "width": 341,
+        "height": 26,
+        "region": 7,
+        "edge": 0
+      },
+      {
+        "text": "Scene 08 begins here.",
+        "x": 112,
+        "y": 13616,
+        "width": 314,
+        "height": 27,
+        "region": 8,
+        "edge": 304
+      },
+      {
+        "text": "Keep every single word.",
+        "x": 113,
+        "y": 13670,
+        "width": 341,
+        "height": 28,
+        "region": 8,
+        "edge": 358
+      },
+      {
+        "text": "This is the final line.",
+        "x": 110,
+        "y": 13724,
+        "width": 287,
+        "height": 22,
+        "region": 8,
+        "edge": 412
+      },
+      {
+        "text": "Scene 09 begins here.",
+        "x": 112,
+        "y": 15280,
+        "width": 313,
+        "height": 28,
+        "region": 8,
+        "edge": 52
+      },
+      {
+        "text": "Keep every single word.",
+        "x": 113,
+        "y": 15334,
+        "width": 341,
+        "height": 26,
+        "region": 8,
+        "edge": 0
+      },
+      {
+        "text": "Scene 09 begins here.",
+        "x": 112,
+        "y": 15280,
+        "width": 314,
+        "height": 27,
+        "region": 9,
+        "edge": 304
+      },
+      {
+        "text": "Keep every single word.",
+        "x": 113,
+        "y": 15334,
+        "width": 341,
+        "height": 28,
+        "region": 9,
+        "edge": 358
+      },
+      {
+        "text": "This is the final line.",
+        "x": 110,
+        "y": 15388,
+        "width": 287,
+        "height": 22,
+        "region": 9,
+        "edge": 412
+      },
+      {
+        "text": "Scene 10 begins here.",
+        "x": 112,
+        "y": 16944,
+        "width": 313,
+        "height": 28,
+        "region": 9,
+        "edge": 52
+      },
+      {
+        "text": "Keep every single word.",
+        "x": 113,
+        "y": 16998,
+        "width": 341,
+        "height": 26,
+        "region": 9,
+        "edge": 0
+      },
+      {
+        "text": "Scene 10 begins here.",
+        "x": 112,
+        "y": 16944,
+        "width": 313,
+        "height": 28,
+        "region": 10,
+        "edge": 304
+      },
+      {
+        "text": "Keep every single word.",
+        "x": 113,
+        "y": 16998,
+        "width": 341,
+        "height": 28,
+        "region": 10,
+        "edge": 358
+      },
+      {
+        "text": "This is the final line.",
+        "x": 110,
+        "y": 17051,
+        "width": 287,
+        "height": 27,
+        "region": 10,
+        "edge": 411
+      },
+      {
+        "text": "Scene 11 begins here.",
+        "x": 112,
+        "y": 18608,
+        "width": 313,
+        "height": 28,
+        "region": 10,
+        "edge": 52
+      },
+      {
+        "text": "Keep every single word.",
+        "x": 113,
+        "y": 18662,
+        "width": 341,
+        "height": 26,
+        "region": 10,
+        "edge": 0
+      },
+      {
+        "text": "Scene 11 begins here.",
+        "x": 112,
+        "y": 18608,
+        "width": 314,
+        "height": 27,
+        "region": 11,
+        "edge": 304
+      },
+      {
+        "text": "Keep every single word.",
+        "x": 113,
+        "y": 18662,
+        "width": 341,
+        "height": 28,
+        "region": 11,
+        "edge": 358
+      },
+      {
+        "text": "This is the final line.",
+        "x": 110,
+        "y": 18714,
+        "width": 287,
+        "height": 27,
+        "region": 11,
+        "edge": 410
+      }
+    ],
+    "regions": 12,
+    "status": "OK",
+    "elapsed_ms": 300051,
+    "text": "Raw overlapping lines; deduplicate geometrically on host"
+  },
+  {
+    "id": "en-long-full",
+    "text": "",
+    "lines": [],
+    "status": "OK",
+    "elapsed_ms": 314035
+  }
+]

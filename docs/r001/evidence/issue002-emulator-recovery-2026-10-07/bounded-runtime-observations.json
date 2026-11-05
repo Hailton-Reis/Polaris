@@ -1,0 +1,75 @@
+{
+  "provenance": {
+    "kind": "transcription_of_observed_tool_results",
+    "raw_files": "Exec-server became unavailable before these session files could be read for upload."
+  },
+  "emulator": {
+    "version": "37.2.12",
+    "build": 16428233,
+    "api": 31,
+    "guest_abis": [
+      "x86_64",
+      "arm64-v8a"
+    ],
+    "native_bridge": "libndk_translation.so",
+    "cpu_acceleration": false,
+    "cores": 2
+  },
+  "egress_setup": {
+    "returncode": 0,
+    "stderr": "",
+    "allowed_hosts": [
+      "api.mangadex.org",
+      "uploads.mangadex.org",
+      "mangakatana.com"
+    ]
+  },
+  "actual_firebase_denial": {
+    "host": "firebaseinstallations.googleapis.com",
+    "port": 443,
+    "allowed": false,
+    "observed_repeatedly": true
+  },
+  "mangakatana_install": {
+    "returncode": 0,
+    "stdout": "Performing Streamed Install\nSuccess\n",
+    "version": "1.6.1",
+    "sha256": "83c158cafea666de09926a69e8d9dd4319eb2089576a58e9675c98bb9fb2bdfb",
+    "source_id": "3170561626848540385"
+  },
+  "spike_arm64_install": {
+    "args": [
+      "shell",
+      "pm install --abi arm64-v8a -r /data/local/tmp/polaris-spike001-arm64.apk"
+    ],
+    "returncode": 0,
+    "stdout": "Success\n",
+    "stderr": "",
+    "sha256": "87bb88a1a676caa78fafc3c022ac45a30b8bcc65673c7e4352f3942ec3d21666"
+  },
+  "activity_start": {
+    "returncode": 0,
+    "stdout": "Starting: Intent { cmp=app.mihon.tachiyomiat.dev/eu.kanade.tachiyomi.ui.main.MainActivity }\n"
+  },
+  "screenshot_observation": "Tool displayed Android/Yomotsu splash screen. Full application UI and reader were not validated. Raw PNG was not uploaded before disconnect.",
+  "network_tests": {
+    "passed": 3,
+    "duration_seconds": 3.016,
+    "cases": [
+      "allowlisted source tunnel relays bytes",
+      "Firebase denied before upstream connection or payload",
+      "malformed host policy fails closed"
+    ]
+  },
+  "verified_source_page": {
+    "url": "https://mangakatana.com/manga/one-piece.49/c1",
+    "title": "Chapter 1: Romance Dawn - One Piece",
+    "image_host": "i1.mangakatana.com"
+  },
+  "final_blocker": "exec-server transport disconnected; failed to resume exec-server session: recovery timed out after 25s. Subsequent read-only pwd did not return; waiting cell terminated.",
+  "runtime_gate": {
+    "B01": "NOT_RUN",
+    "B02": "NOT_RUN",
+    "B03": "NOT_RUN"
+  }
+}

@@ -1,0 +1,127 @@
+{
+  "date": "2026-10-31",
+  "scope": "Paginated image/translation viewport synchronization and explicit About candidate revision; includes previous reader/discovery overlay",
+  "pinned_yomotsu": "0fb80c439ef816eeb50674f1b90af39918b176d8",
+  "patch_sha256": "0e1fae7b822627e137d53a84b0be91c17790010a4d8406a47bc7ac4fb953afcd",
+  "assembly": "PASS: app:assembleDebug completed; overall Gradle exit 1 from known unit failures",
+  "apk_signature_verification": "PASS",
+  "apk_x86_64_sha256": "b8ec13ad95a0082ad25085f818459cf6fd6d30f89200547040089fbcaa636335",
+  "selected_tests": {
+    "tests": 41,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "selected_test_suites": {
+    "EnglishDownloadTranslationPolicyTest": {
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "PendingDownloadTranslationsTest": {
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "TranslationLaunchPolicyTest": {
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "TranslationTextFitTest": {
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "TranslationFontSizeSearchTest": {
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "TranslationFitPolicyTest": {
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "TranslationViewportScaleTest": {
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "RepositoryCatalogTest": {
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "RepositoryDiscoveryControllerTest": {
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "TranslationViewportTransformTest": {
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "overlay_application_tests": {
+    "passed": 4,
+    "failed": 0,
+    "crlf_simulation_included": true
+  },
+  "targeted_formatting": "PASS: Spotless IDE formatter completed for 6 Kotlin files touched by this change; not a repository-wide lint run",
+  "android_unit_comparison": {
+    "status": "NO_NEW_UNIT_REGRESSIONS",
+    "baseline": {
+      "total": 428,
+      "passed": 394,
+      "failed": 34,
+      "skipped": 0
+    },
+    "patched": {
+      "total": 453,
+      "passed": 419,
+      "failed": 34,
+      "skipped": 0
+    },
+    "preexisting_failures_still_present": 34,
+    "missing_baseline_tests": [],
+    "new_failures_or_skips": [],
+    "android_runtime_verified": false,
+    "gradle_exit_codes": {
+      "baseline": 1,
+      "patched": 1
+    },
+    "required_module_coverage": {
+      "domain": 58,
+      "app": 370
+    }
+  },
+  "repository_catalog": {
+    "entries": 2,
+    "search": "Bundled local catalog only; no internet-wide search",
+    "http_and_declared_metadata_checks": "PASS for both modern indexes at the time of check; see REPOSITORY_INDEX_CHECKS_2026_10_30.json",
+    "android_registration_and_installation": "PENDING on Windows test device",
+    "extension_apk_audit": false
+  },
+  "visual_acceptance": "PENDING for P20261031.1: paginated initial fit, zoom/pan and resize; geometry tests do not exercise Android rendering",
+  "language_identification": "Source metadata, not chapter-content detection",
+  "installed_user_version": "User believes they ran options 4 and 9, but the exact installed overlay revision is unconfirmed",
+  "multi_source_runtime_acceptance": "PENDING, separate from these candidate improvements",
+  "migration15_applied": false,
+  "backup_v2_enabled": false,
+  "candidate_revision": "Polaris P20261031.1",
+  "embedded_revision_verification": "PASS: Polaris P20261031.1 found in assembled APK DEX",
+  "user_runtime_evidence_2026_10_31": "User reports aligned long-strip mode and displaced paginated mode, with screenshots; this does not certify the new candidate",
+  "candidate_revision_semantics": "Explicit overlay code revision; same-code rebuild retains revision and changes debug build date; not an automatic Android versionCode increment"
+}

@@ -1,0 +1,5 @@
+# A unified diff uses a single mandatory space for an empty context line.
+# Keep the artifact bytes stable; actual source whitespace is checked separately.
+integration/reader-translation-ux/*.patch text eol=lf -whitespace
+integration/document-reader/*.patch text eol=lf -whitespace
+integration/document-reader/fixtures/*.pdf binary

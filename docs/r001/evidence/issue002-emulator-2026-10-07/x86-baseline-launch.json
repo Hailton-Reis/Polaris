@@ -1,0 +1,12 @@
+{
+  "args": [
+    "shell",
+    "am",
+    "start",
+    "-n",
+    "app.mihon.tachiyomiat.dev/eu.kanade.tachiyomi.ui.main.MainActivity"
+  ],
+  "returncode": 0,
+  "stdout": "Starting: Intent { cmp=app.mihon.tachiyomiat.dev/eu.kanade.tachiyomi.ui.main.MainActivity }\n",
+  "stderr": ""
+}

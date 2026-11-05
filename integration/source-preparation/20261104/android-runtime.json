@@ -1,0 +1,25 @@
+{
+  "status": "PASS",
+  "api": 26,
+  "abi": "x86_64",
+  "runtime": "Android emulator with software acceleration; ordinary application UID",
+  "checks": 4,
+  "passed": 4,
+  "failed": 0,
+  "production_helpers": "BYTE_IDENTICAL_TO_READER_COMPILED_CLASSES",
+  "scope": [
+    "APK cryptographic verification",
+    "tampered APK rejection preserving earlier file",
+    "reviewed package and certificate pinning",
+    "readonly atomic file replacement"
+  ],
+  "not_validated": [
+    "full application startup",
+    "wizard UI",
+    "real extension loading",
+    "Android14+",
+    "physical ARM32/ARM64",
+    "database restore and SAF providers"
+  ],
+  "command": "adb shell am instrument -w -r test.polaris.preparation.probe/.Probe"
+}

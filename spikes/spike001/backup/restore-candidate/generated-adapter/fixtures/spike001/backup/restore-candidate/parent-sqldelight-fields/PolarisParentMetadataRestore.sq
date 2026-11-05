@@ -1,0 +1,124 @@
+-- R001 STAGING-ONLY FIELD-COMPLETE QUERY SURFACE for the pinned Yomotsu schema.
+-- Not installed in app or passed through SQLDelight codegen yet.
+-- Do NOT copy only this file and unblock the backup-v2 preflight.
+-- Requires already-applied Spike-001 migration14 merged.sq and a reviewed UUID-ledger migration.
+-- The caller must use the ONE coordinator-owned transaction, prove no existing
+-- parent/user metadata, preserve unknown JSON memo keys and check full readback.
+-- The real Yomotsu UPDATE/category triggers can modify last_modified_at/version.
+-- Unverifiable exact metadata is a HARD FAILURE; NEVER leave is_syncing=1.
+
+-- Allocate the parent after BEGIN IMMEDIATE, before any rows are inserted.
+-- All generated-query writes MUST run on the same transaction/writer connection.
+selectPolarisNextFreshParentId:
+SELECT COALESCE(MAX(_id), 0) + 1 AS next_parent_id FROM mangas;
+
+selectPolarisRestoredParentFull:
+SELECT * FROM mangas WHERE _id = :parentId AND source = 6969;
+
+selectPolarisRestoreCategoryCandidates:
+SELECT _id FROM categories WHERE name = :categoryName ORDER BY _id;
+
+selectPolarisRestoreRealChildCandidates:
+SELECT _id FROM mangas WHERE source = :childSource AND url = :childUrl ORDER BY _id;
+
+selectPolarisRestoreParentUrlCandidates:
+SELECT _id FROM mangas WHERE source = 6969 AND url = :destinationUrl ORDER BY _id;
+
+selectPolarisParentChaptersFull:
+SELECT * FROM chapters WHERE manga_id = :parentId ORDER BY _id;
+
+selectPolarisParentHistoryFull:
+SELECT h.chapter_id, c.url AS chapter_url, h.last_read, h.time_read
+FROM history h JOIN chapters c ON h.chapter_id = c._id
+WHERE c.manga_id = :parentId ORDER BY h.chapter_id;
+
+selectPolarisParentTrackingFull:
+SELECT * FROM manga_sync WHERE manga_id = :parentId ORDER BY sync_id, _id;
+
+selectPolarisParentCategoriesFull:
+SELECT category_id FROM mangas_categories WHERE manga_id = :parentId ORDER BY category_id;
+
+selectPolarisParentExclusionsFull:
+SELECT scanlator FROM excluded_scanlators WHERE manga_id = :parentId ORDER BY scanlator;
+
+selectPolarisParentEdgesFull:
+SELECT info_manga, get_chapter_updates, chapter_sort_mode, chapter_priority,
+       download_chapters, merge_id, merge_url, manga_id, manga_url, manga_source
+FROM merged WHERE merge_id = :parentId ORDER BY chapter_priority, _id;
+
+-- Full list of persistent Yomotsu manga columns: no lossy title-only insert.
+-- Technical state last_update,next_update,cover_last_modified,calculate_interval
+-- is explicit and MUST be specified by caller's approved restore policy.
+insertPolarisRestoredParentFull:
+INSERT INTO mangas(
+    source, url, artist, author, description, genre, title, status,
+    thumbnail_url, favorite, last_update, next_update, initialized, viewer,
+    chapter_flags, cover_last_modified, date_added, update_strategy,
+    calculate_interval, last_modified_at, favorite_modified_at, version,
+    is_syncing, notes, memo
+) VALUES (
+    6969, :destinationUrl, :artist, :author, :description, :genre, :title, :status,
+    :thumbnailUrl, :favorite, :lastUpdate, :nextUpdate, :initialized, :viewer,
+    :chapterFlags, :coverLastModified, :dateAdded, :updateStrategy,
+    :calculateInterval, :lastModifiedAt, :favoriteModifiedAt, :version,
+    :isSyncing, :notes, :memo
+) RETURNING _id;
+
+-- Preserve all chapter columns rather than using stock update/merge semantics.
+insertPolarisRestoredChapterFull:
+INSERT INTO chapters(
+    manga_id, url, name, scanlator, read, bookmark, last_page_read,
+    chapter_number, source_order, date_fetch, date_upload, last_modified_at,
+    version, is_syncing, memo
+) VALUES (
+    :parentId, :chapterUrl, :chapterName, :scanlator, :read, :bookmark,
+    :lastPageRead, :chapterNumber, :sourceOrder, :dateFetch, :dateUpload,
+    :chapterLastModifiedAt, :chapterVersion, :chapterIsSyncing, :chapterMemo
+) RETURNING _id;
+
+insertPolarisRestoredHistoryExact:
+INSERT INTO history(chapter_id, last_read, time_read)
+VALUES (:chapterId, :lastRead, :readDuration);
+
+insertPolarisRestoredTrackExact:
+INSERT INTO manga_sync(
+    manga_id, sync_id, remote_id, library_id, title, last_chapter_read,
+    total_chapters, status, score, remote_url, start_date, finish_date, private
+) VALUES (
+    :parentId, :syncId, :remoteId, :libraryId, :trackTitle,
+    :lastChapterRead, :totalChapters, :trackStatus, :trackScore, :remoteUrl,
+    :startDate, :finishDate, :isPrivate
+);
+
+insertPolarisRestoredCategoryExact:
+INSERT INTO mangas_categories(manga_id, category_id)
+VALUES (:parentId, :categoryId);
+
+insertPolarisRestoredExclusionExact:
+INSERT INTO excluded_scanlators(manga_id, scanlator)
+VALUES (:parentId, :excludedScanlator);
+
+-- The merge-link insert must be the existing Spike-001 query or its exact
+-- equivalent inside the same transaction; never invent a local child ID.
+
+-- EXPERIMENTAL NEW-PARENT-ONLY PATH, not compiled against Yomotsu/Android.
+-- Called LAST, after writing all referencing rows in ONE BEGIN IMMEDIATE
+-- transaction with PRAGMA defer_foreign_keys=ON on the SAME connection.
+-- A prevalidated, reserved parentId is allocated while holding write lock.
+-- Existing parents must NEVER use this path, and the whole transaction must
+-- reject duplicate ID/source URL/UUID claims and verify FK + full readback.
+-- Parent and chapter inserts use isSyncing=0, avoiding an UPDATE finalizer.
+insertPolarisRestoredReservedParentLast:
+INSERT INTO mangas(
+    _id, source, url, artist, author, description, genre, title, status,
+    thumbnail_url, favorite, last_update, next_update, initialized, viewer,
+    chapter_flags, cover_last_modified, date_added, update_strategy,
+    calculate_interval, last_modified_at, favorite_modified_at, version,
+    is_syncing, notes, memo
+) VALUES (
+    :parentId, 6969, :destinationUrl, :artist, :author, :description, :genre,
+    :title, :status, :thumbnailUrl, :favorite, :lastUpdate, :nextUpdate,
+    :initialized, :viewer, :chapterFlags, :coverLastModified, :dateAdded,
+    :updateStrategy, :calculateInterval, :lastModifiedAt,
+    :favoriteModifiedAt, :version, 0, :notes, :memo
+) RETURNING _id;

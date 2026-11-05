@@ -1,0 +1,60 @@
+{
+  "status": "AUTHORED_PAYLOAD_ESTIMATE_NOT_DATABASE_MEASUREMENT",
+  "assumptions": [
+    "Uniform chapter URLs, 19-digit source IDs, empty provider-specific memo, same numbered sequence at each provider",
+    "Compact UTF-8 JSON omits default origin fields as the Kotlin serializer does",
+    "Counts only origin metadata and additional URL bytes relative to the same edition rows without routing",
+    "Excludes extra edition row fields, SQLite pages/indexes/WAL, filesystem overhead, app installed size and image/translation payloads",
+    "Provider-specific memo and different URLs may materially increase the result; this is not a database quota"
+  ],
+  "scenarios": [
+    {
+      "logical_chapters": 100,
+      "providers": 1,
+      "edition_rows": 100,
+      "origin_json_added_bytes": 18092,
+      "routed_url_added_bytes": 0,
+      "payload_sum_bytes": 18092
+    },
+    {
+      "logical_chapters": 100,
+      "providers": 4,
+      "edition_rows": 400,
+      "origin_json_added_bytes": 75068,
+      "routed_url_added_bytes": 13800,
+      "payload_sum_bytes": 88868
+    },
+    {
+      "logical_chapters": 1000,
+      "providers": 1,
+      "edition_rows": 1000,
+      "origin_json_added_bytes": 181893,
+      "routed_url_added_bytes": 0,
+      "payload_sum_bytes": 181893
+    },
+    {
+      "logical_chapters": 1000,
+      "providers": 4,
+      "edition_rows": 4000,
+      "origin_json_added_bytes": 754572,
+      "routed_url_added_bytes": 138003,
+      "payload_sum_bytes": 892575
+    },
+    {
+      "logical_chapters": 10000,
+      "providers": 1,
+      "edition_rows": 10000,
+      "origin_json_added_bytes": 1828894,
+      "routed_url_added_bytes": 0,
+      "payload_sum_bytes": 1828894
+    },
+    {
+      "logical_chapters": 10000,
+      "providers": 4,
+      "edition_rows": 40000,
+      "origin_json_added_bytes": 7585576,
+      "routed_url_added_bytes": 1407003,
+      "payload_sum_bytes": 8992579
+    }
+  ]
+}

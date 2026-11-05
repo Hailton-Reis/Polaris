@@ -1,0 +1,22 @@
+{
+  "revision": "P20261104.3",
+  "signer_sha256": "3ae747069cc9015ca1777f94fd56b030501f45d6af380426a572ad60e94d8227",
+  "artifacts": [
+    {
+      "abi": "arm64-v8a",
+      "file": "Polaris-0.1.0-beta.9-arm64-v8a.apk",
+      "bytes": 192987175,
+      "sha256": "f5d09bea8c6fcf4f1448ffbaeda74aa65845152654fa7e7a4de5051e2ee92113"
+    },
+    {
+      "abi": "armeabi-v7a",
+      "file": "Polaris-0.1.0-beta.9-armeabi-v7a.apk",
+      "bytes": 153189352,
+      "sha256": "74250e12ae8523d586b18743e61253e3fda2ed44fec9b2c7d1d5230b7cc4150e"
+    }
+  ],
+  "changed_assets_libraries_fonts_vs_P20261104_2": {
+    "arm64-v8a": [],
+    "armeabi-v7a": []
+  }
+}

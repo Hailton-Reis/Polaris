@@ -1,0 +1,9 @@
+{
+  "args": [
+    "shell",
+    "getprop sys.boot_completed; service check package; getprop init.svc.zygote"
+  ],
+  "returncode": 0,
+  "stdout": "\nService package: not found\nrunning\n",
+  "stderr": ""
+}

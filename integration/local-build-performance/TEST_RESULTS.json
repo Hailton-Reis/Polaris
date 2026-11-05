@@ -1,0 +1,148 @@
+{
+  "date": "2026-10-31",
+  "scope": "Local build orchestration only; Android overlay remains Polaris P20261031.1",
+  "host_unit_tests": {
+    "new_resource_and_completion_tests": 15,
+    "existing_junit_comparison_tests": 16,
+    "existing_local_orchestration_tests": 11,
+    "windows_setup_static_tests": 33,
+    "total_passed": 75,
+    "failures": 0
+  },
+  "bash_syntax_check": "PASS",
+  "python_compile_check": "PASS",
+  "expected_user_profile_simulated": {
+    "profile": "auto",
+    "detected_cpus": 16,
+    "detected_memory_bytes": 34359738368,
+    "max_workers": 8,
+    "gradle_heap_gib": 8,
+    "cache": true,
+    "incremental": true,
+    "daemon": true,
+    "parallel": true,
+    "kotlin_compiler": "in-process",
+    "gradle_arguments": [
+      "--build-cache",
+      "--daemon",
+      "--parallel",
+      "-Pkotlin.incremental=true",
+      "-Pkotlin.compiler.execution.strategy=in-process",
+      "--console=plain",
+      "--stacktrace",
+      "--max-workers=8",
+      "-Dorg.gradle.jvmargs=-Xmx8g -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8"
+    ]
+  },
+  "actual_engineering_profile": {
+    "profile": "auto",
+    "detected_cpus": 2,
+    "detected_memory_bytes": 8589934592,
+    "max_workers": 2,
+    "gradle_heap_gib": 3,
+    "cache": true,
+    "incremental": true,
+    "daemon": true,
+    "parallel": true,
+    "kotlin_compiler": "in-process",
+    "gradle_arguments": [
+      "--build-cache",
+      "--daemon",
+      "--parallel",
+      "-Pkotlin.incremental=true",
+      "-Pkotlin.compiler.execution.strategy=in-process",
+      "--console=plain",
+      "--stacktrace",
+      "--max-workers=2",
+      "-Dorg.gradle.jvmargs=-Xmx3g -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8"
+    ]
+  },
+  "real_gradle_runs": {
+    "combined_graphs": 2,
+    "assembly_and_junit_in_each_graph": true,
+    "sql_generation_and_migration_verification_in_patched_graph": true,
+    "existing_engineering_worktrees_reused": true,
+    "full_new_worktree_driver_rerun": false,
+    "offline_verification": true,
+    "timings_seconds": [
+      {
+        "side": "baseline",
+        "exit": 1,
+        "seconds": 322.87
+      },
+      {
+        "side": "patched",
+        "exit": 1,
+        "seconds": 71.45
+      }
+    ],
+    "timing_comparison_limit": "Different workspaces and cache/compiler history; these timings are not a before/after benchmark and do not predict Windows performance",
+    "artifacts": {
+      "baseline": {
+        "x86_64_signature_verified": true,
+        "x86_64_sha256": "88833143788c122f57e06ff811bbf873de32c5febac4f801aa598a3d5da7b542",
+        "apk_completion": {
+          "status": "ASSEMBLY_AND_UNIT_REPORTS_COMPLETE",
+          "apks": [
+            "app-universal-debug.apk",
+            "app-armeabi-v7a-debug.apk",
+            "app-x86_64-debug.apk",
+            "app-x86-debug.apk",
+            "app-arm64-v8a-debug.apk"
+          ],
+          "unit_tests": 428
+        },
+        "from_cache_task_count": 9
+      },
+      "patched": {
+        "x86_64_signature_verified": true,
+        "x86_64_sha256": "dfb3584b17605099529f7bd012f0272580c37b65847d239fc75637f2ede6a2f7",
+        "apk_completion": {
+          "status": "ASSEMBLY_AND_UNIT_REPORTS_COMPLETE",
+          "apks": [
+            "app-universal-debug.apk",
+            "app-armeabi-v7a-debug.apk",
+            "app-x86_64-debug.apk",
+            "app-x86-debug.apk",
+            "app-arm64-v8a-debug.apk"
+          ],
+          "unit_tests": 453
+        },
+        "from_cache_task_count": 0
+      }
+    }
+  },
+  "android_unit_comparison": {
+    "status": "NO_NEW_UNIT_REGRESSIONS",
+    "baseline": {
+      "total": 428,
+      "passed": 394,
+      "failed": 34,
+      "skipped": 0
+    },
+    "patched": {
+      "total": 453,
+      "passed": 419,
+      "failed": 34,
+      "skipped": 0
+    },
+    "preexisting_failures_still_present": 34,
+    "missing_baseline_tests": [],
+    "new_failures_or_skips": [],
+    "android_runtime_verified": false,
+    "gradle_exit_codes": {
+      "baseline": 1,
+      "patched": 1
+    },
+    "required_module_coverage": {
+      "domain": 58,
+      "app": 370
+    }
+  },
+  "windows_runtime_verified": false,
+  "user_pc_benchmark_performed": false,
+  "fresh_worktree_and_pinned_source_protections": "Preserved in build driver; existing real-Git isolation test passed",
+  "migration15_applied": false,
+  "backup_v2_enabled": false,
+  "pr1_remains_draft": true
+}

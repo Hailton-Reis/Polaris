@@ -1,0 +1,2402 @@
+diff --git a/app/src/main/java/eu/kanade/presentation/browse/GlobalSearchScreen.kt b/app/src/main/java/eu/kanade/presentation/browse/GlobalSearchScreen.kt
+index 1f9e2d4..4887205 100644
+--- a/app/src/main/java/eu/kanade/presentation/browse/GlobalSearchScreen.kt
++++ b/app/src/main/java/eu/kanade/presentation/browse/GlobalSearchScreen.kt
+@@ -1,10 +1,14 @@
+ package eu.kanade.presentation.browse
+ 
+ import androidx.compose.foundation.layout.PaddingValues
++import androidx.compose.foundation.layout.padding
+ import androidx.compose.foundation.lazy.LazyColumn
++import androidx.compose.material3.MaterialTheme
++import androidx.compose.material3.Text
+ import androidx.compose.runtime.Composable
+ import androidx.compose.runtime.State
+ import androidx.compose.ui.Modifier
++import androidx.compose.ui.unit.dp
+ import eu.kanade.presentation.browse.components.GlobalSearchCardRow
+ import eu.kanade.presentation.browse.components.GlobalSearchErrorResultItem
+ import eu.kanade.presentation.browse.components.GlobalSearchLoadingResultItem
+@@ -16,7 +20,9 @@ import eu.kanade.tachiyomi.ui.browse.source.globalsearch.SearchViewModel
+ import eu.kanade.tachiyomi.ui.browse.source.globalsearch.SourceFilter
+ import eu.kanade.tachiyomi.util.system.LocaleHelper
+ import tachiyomi.domain.manga.model.Manga
++import tachiyomi.i18n.at.ATMR
+ import tachiyomi.presentation.core.components.material.Scaffold
++import tachiyomi.presentation.core.i18n.stringResource
+ 
+ @Composable
+ fun GlobalSearchScreen(
+@@ -73,6 +79,13 @@ internal fun GlobalSearchContent(
+     LazyColumn(
+         contentPadding = contentPadding,
+     ) {
++        item(key = "polaris-source-search-info") {
++            Text(
++                stringResource(ATMR.strings.source_search_separate_results),
++                modifier = Modifier.padding(16.dp),
++                style = MaterialTheme.typography.bodySmall,
++            )
++        }
+         items.forEach { (source, result) ->
+             item(key = source.id) {
+                 GlobalSearchResultItem(
+diff --git a/app/src/main/java/eu/kanade/presentation/manga/ChapterSettingsDialog.kt b/app/src/main/java/eu/kanade/presentation/manga/ChapterSettingsDialog.kt
+index e4f9082..1aa3af7 100644
+--- a/app/src/main/java/eu/kanade/presentation/manga/ChapterSettingsDialog.kt
++++ b/app/src/main/java/eu/kanade/presentation/manga/ChapterSettingsDialog.kt
+@@ -34,6 +34,7 @@ import eu.kanade.presentation.components.TabbedDialogPaddings
+ import tachiyomi.core.common.preference.TriState
+ import tachiyomi.domain.manga.model.Manga
+ import tachiyomi.i18n.MR
++import tachiyomi.i18n.at.ATMR
+ import tachiyomi.presentation.core.components.LabeledCheckbox
+ import tachiyomi.presentation.core.components.RadioItem
+ import tachiyomi.presentation.core.components.SortItem
+@@ -154,6 +155,11 @@ private fun ColumnScope.FilterPage(
+         state = bookmarkedFilter,
+         onClick = onBookmarkedFilterChanged,
+     )
++    Text(
++        stringResource(ATMR.strings.chapter_versions_hint),
++        modifier = Modifier.padding(horizontal = TabbedDialogPaddings.Horizontal, vertical = 8.dp),
++        style = MaterialTheme.typography.bodySmall,
++    )
+     ScanlatorFilterItem(
+         active = scanlatorFilterActive,
+         onClick = onScanlatorFilterClicked,
+@@ -183,7 +189,7 @@ fun ScanlatorFilterItem(
+             },
+         )
+         Text(
+-            text = stringResource(MR.strings.scanlator),
++            text = stringResource(ATMR.strings.chapter_versions_filter),
+             style = MaterialTheme.typography.bodyMedium,
+         )
+     }
+diff --git a/app/src/main/java/eu/kanade/presentation/manga/components/ChapterHeader.kt b/app/src/main/java/eu/kanade/presentation/manga/components/ChapterHeader.kt
+index 6067d24..d93fc06 100644
+--- a/app/src/main/java/eu/kanade/presentation/manga/components/ChapterHeader.kt
++++ b/app/src/main/java/eu/kanade/presentation/manga/components/ChapterHeader.kt
+@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
+ import androidx.compose.ui.text.style.TextOverflow
+ import androidx.compose.ui.unit.dp
+ import tachiyomi.i18n.MR
++import tachiyomi.i18n.at.ATMR
+ import tachiyomi.presentation.core.components.material.SECONDARY_ALPHA
+ import tachiyomi.presentation.core.components.material.padding
+ import tachiyomi.presentation.core.i18n.pluralStringResource
+@@ -39,12 +40,19 @@ fun ChapterHeader(
+             text = if (chapterCount == null) {
+                 stringResource(MR.strings.chapters)
+             } else {
+-                pluralStringResource(MR.plurals.manga_num_chapters, count = chapterCount, chapterCount)
++                stringResource(ATMR.strings.chapter_entries_count, chapterCount)
+             },
+             style = MaterialTheme.typography.titleMedium,
+             color = MaterialTheme.colorScheme.onBackground,
+         )
+ 
++        if (enabled && chapterCount != null && chapterCount > 0) {
++            Text(
++                stringResource(ATMR.strings.chapter_versions_shortcut),
++                style = MaterialTheme.typography.bodySmall,
++                color = MaterialTheme.colorScheme.primary,
++            )
++        }
+         MissingChaptersWarning(missingChapterCount)
+     }
+ }
+diff --git a/app/src/main/java/eu/kanade/presentation/manga/components/ChapterTranslationIndicator.kt b/app/src/main/java/eu/kanade/presentation/manga/components/ChapterTranslationIndicator.kt
+index 7774cda..47eb001 100644
+--- a/app/src/main/java/eu/kanade/presentation/manga/components/ChapterTranslationIndicator.kt
++++ b/app/src/main/java/eu/kanade/presentation/manga/components/ChapterTranslationIndicator.kt
+@@ -10,8 +10,14 @@ import androidx.compose.material.icons.outlined.Translate
+ import androidx.compose.material3.CircularProgressIndicator
+ import androidx.compose.material3.DropdownMenuItem
+ import androidx.compose.material3.Icon
++import androidx.compose.material3.IconButton
+ import androidx.compose.material3.MaterialTheme
++import androidx.compose.material3.PlainTooltip
+ import androidx.compose.material3.Text
++import androidx.compose.material3.TooltipAnchorPosition
++import androidx.compose.material3.TooltipBox
++import androidx.compose.material3.TooltipDefaults.rememberTooltipPositionProvider
++import androidx.compose.material3.rememberTooltipState
+ import androidx.compose.material3.ripple
+ import androidx.compose.runtime.Composable
+ import androidx.compose.runtime.getValue
+@@ -47,10 +53,12 @@ fun ChapterTranslationIndicator(
+     translationStateProvider: () -> Translation.State,
+     onClick: (ChapterTranslationAction) -> Unit,
+     modifier: Modifier = Modifier,
++    downloaded: Boolean = true,
+ ) {
+     when (val translationState = translationStateProvider()) {
+         Translation.State.NOT_TRANSLATED -> NotTranslatedIndicator(
+             enabled = enabled,
++            downloaded = downloaded,
+             modifier = modifier,
+             onClick = onClick,
+         )
+@@ -75,27 +83,31 @@ fun ChapterTranslationIndicator(
+ @Composable
+ private fun NotTranslatedIndicator(
+     enabled: Boolean,
++    downloaded: Boolean,
+     modifier: Modifier = Modifier,
+     onClick: (ChapterTranslationAction) -> Unit,
+ ) {
+-    Box(
+-        modifier = modifier
+-            .size(IconButtonTokens.StateLayerSize)
+-            .commonClickable(
+-                enabled = enabled,
+-                hapticFeedback = LocalHapticFeedback.current,
+-                onLongClick = { onClick(ChapterTranslationAction.START) },
+-                onClick = { onClick(ChapterTranslationAction.START) },
+-            )
+-            .secondaryItemAlpha(),
+-        contentAlignment = Alignment.Center,
++    val label = stringResource(
++        if (downloaded) ATMR.strings.manga_translate else ATMR.strings.manga_download_and_translate,
++    )
++    TooltipBox(
++        positionProvider = rememberTooltipPositionProvider(TooltipAnchorPosition.Above),
++        tooltip = { PlainTooltip { Text(label) } },
++        state = rememberTooltipState(),
++        focusable = false,
+     ) {
+-        Icon(
+-            imageVector = Icons.Outlined.Translate,
+-            contentDescription = stringResource(ATMR.strings.manga_translate),
+-            modifier = Modifier.size(IndicatorSize),
+-            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+-        )
++        IconButton(
++            onClick = { onClick(ChapterTranslationAction.START) },
++            enabled = enabled,
++            modifier = modifier.size(IconButtonTokens.StateLayerSize).secondaryItemAlpha(),
++        ) {
++            Icon(
++                imageVector = Icons.Outlined.Translate,
++                contentDescription = label,
++                modifier = Modifier.size(IndicatorSize),
++                tint = MaterialTheme.colorScheme.onSurfaceVariant,
++            )
++        }
+     }
+ }
+ 
+diff --git a/app/src/main/java/eu/kanade/presentation/manga/components/MangaChapterListItem.kt b/app/src/main/java/eu/kanade/presentation/manga/components/MangaChapterListItem.kt
+index c581eef..661b4ee 100644
+--- a/app/src/main/java/eu/kanade/presentation/manga/components/MangaChapterListItem.kt
++++ b/app/src/main/java/eu/kanade/presentation/manga/components/MangaChapterListItem.kt
+@@ -41,6 +41,7 @@ import eu.kanade.translation.model.Translation
+ import me.saket.swipe.SwipeableActionsBox
+ import tachiyomi.domain.library.service.LibraryPreferences
+ import tachiyomi.i18n.MR
++import tachiyomi.i18n.at.ATMR
+ import tachiyomi.presentation.core.components.material.DISABLED_ALPHA
+ import tachiyomi.presentation.core.components.material.SECONDARY_ALPHA
+ import tachiyomi.presentation.core.i18n.stringResource
+@@ -57,7 +58,7 @@ fun MangaChapterListItem(
+     selected: Boolean,
+     downloadIndicatorEnabled: Boolean,
+     downloadStateProvider: () -> Download.State,
+-    //TachiyomiAT
++    // TachiyomiAT
+     translationStateProvider: () -> Translation.State,
+     downloadProgressProvider: () -> Int,
+     chapterSwipeStartAction: LibraryPreferences.ChapterSwipeAction,
+@@ -65,7 +66,7 @@ fun MangaChapterListItem(
+     onLongClick: () -> Unit,
+     onClick: () -> Unit,
+     onDownloadClick: ((ChapterDownloadAction) -> Unit)?,
+-    //TachiyomiAT
++    // TachiyomiAT
+     onTranslationClick: ((ChapterTranslationAction) -> Unit)?,
+     onChapterSwipe: (LibraryPreferences.ChapterSwipeAction) -> Unit,
+     modifier: Modifier = Modifier,
+@@ -134,7 +135,7 @@ fun MangaChapterListItem(
+                     Text(
+                         text = title,
+                         style = MaterialTheme.typography.bodyMedium,
+-                        maxLines = 1,
++                        maxLines = 2,
+                         overflow = TextOverflow.Ellipsis,
+                         onTextLayout = { textHeight = it.size.height },
+                         color = LocalContentColor.current.copy(alpha = if (read) DISABLED_ALPHA else 1f),
+@@ -154,7 +155,7 @@ fun MangaChapterListItem(
+                                 maxLines = 1,
+                                 overflow = TextOverflow.Ellipsis,
+                             )
+-                            if (readProgress != null || scanlator != null) DotSeparatorText()
++                            if (readProgress != null) DotSeparatorText()
+                         }
+                         if (readProgress != null) {
+                             Text(
+@@ -163,22 +164,24 @@ fun MangaChapterListItem(
+                                 overflow = TextOverflow.Ellipsis,
+                                 color = LocalContentColor.current.copy(alpha = DISABLED_ALPHA),
+                             )
+-                            if (scanlator != null) DotSeparatorText()
+-                        }
+-                        if (scanlator != null) {
+-                            Text(
+-                                text = scanlator,
+-                                maxLines = 1,
+-                                overflow = TextOverflow.Ellipsis,
+-                            )
+                         }
+                     }
+                 }
++                if (!scanlator.isNullOrBlank()) {
++                    Text(
++                        stringResource(ATMR.strings.chapter_group_version, scanlator),
++                        style = MaterialTheme.typography.bodySmall,
++                        color = LocalContentColor.current.copy(alpha = SECONDARY_ALPHA),
++                        maxLines = 2,
++                        overflow = TextOverflow.Ellipsis,
++                    )
++                }
+             }
+-            //TachiyomiAT
+-            if (onTranslationClick != null && downloadStateProvider() == Download.State.DOWNLOADED) {
++            // TachiyomiAT
++            if (onTranslationClick != null) {
+                 ChapterTranslationIndicator(
+-                    enabled = true,
++                    enabled = downloadIndicatorEnabled || downloadStateProvider() == Download.State.DOWNLOADED,
++                    downloaded = downloadStateProvider() == Download.State.DOWNLOADED,
+                     modifier = Modifier.padding(start = 4.dp),
+                     translationStateProvider = translationStateProvider,
+                     onClick = { onTranslationClick.invoke(it) },
+diff --git a/app/src/main/java/eu/kanade/presentation/manga/components/MangaInfoHeader.kt b/app/src/main/java/eu/kanade/presentation/manga/components/MangaInfoHeader.kt
+index 6e38d19..ff57af5 100644
+--- a/app/src/main/java/eu/kanade/presentation/manga/components/MangaInfoHeader.kt
++++ b/app/src/main/java/eu/kanade/presentation/manga/components/MangaInfoHeader.kt
+@@ -9,12 +9,13 @@ import androidx.compose.animation.graphics.vector.AnimatedImageVector
+ import androidx.compose.foundation.background
+ import androidx.compose.foundation.layout.Arrangement
+ import androidx.compose.foundation.layout.Box
++import androidx.compose.foundation.layout.BoxWithConstraints
+ import androidx.compose.foundation.layout.Column
+ import androidx.compose.foundation.layout.ColumnScope
+ import androidx.compose.foundation.layout.FlowRow
++import androidx.compose.foundation.layout.FlowRowScope
+ import androidx.compose.foundation.layout.PaddingValues
+ import androidx.compose.foundation.layout.Row
+-import androidx.compose.foundation.layout.RowScope
+ import androidx.compose.foundation.layout.Spacer
+ import androidx.compose.foundation.layout.fillMaxWidth
+ import androidx.compose.foundation.layout.height
+@@ -71,6 +72,7 @@ import androidx.compose.ui.layout.ContentScale
+ import androidx.compose.ui.layout.Layout
+ import androidx.compose.ui.layout.onSizeChanged
+ import androidx.compose.ui.platform.LocalContext
++import androidx.compose.ui.platform.LocalDensity
+ import androidx.compose.ui.text.LinkAnnotation
+ import androidx.compose.ui.text.SpanStyle
+ import androidx.compose.ui.text.style.TextAlign
+@@ -198,50 +200,53 @@ fun MangaActionRow(
+         }
+     }
+ 
+-    Row(modifier = modifier.padding(start = 16.dp, top = 8.dp, end = 16.dp)) {
+-        MangaActionButton(
+-            title = if (favorite) {
+-                stringResource(MR.strings.in_library)
+-            } else {
+-                stringResource(MR.strings.add_to_library)
+-            },
+-            icon = if (favorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+-            color = if (favorite) MaterialTheme.colorScheme.primary else defaultActionButtonColor,
+-            onClick = onAddToLibraryClicked,
+-            onLongClick = onEditCategory,
+-        )
+-        MangaActionButton(
+-            title = when (nextUpdateDays) {
+-                null -> stringResource(MR.strings.not_applicable)
+-                0 -> stringResource(MR.strings.manga_interval_expected_update_soon)
+-                else -> pluralStringResource(
+-                    MR.plurals.day,
+-                    count = nextUpdateDays,
+-                    nextUpdateDays,
+-                )
+-            },
+-            icon = Icons.Default.HourglassEmpty,
+-            color = if (isUserIntervalMode) MaterialTheme.colorScheme.primary else defaultActionButtonColor,
+-            onClick = { onEditIntervalClicked?.invoke() },
+-        )
+-        MangaActionButton(
+-            title = if (trackingCount == 0) {
+-                stringResource(MR.strings.manga_tracking_tab)
+-            } else {
+-                pluralStringResource(MR.plurals.num_trackers, count = trackingCount, trackingCount)
+-            },
+-            icon = if (trackingCount == 0) Icons.Outlined.Sync else Icons.Outlined.Done,
+-            color = if (trackingCount == 0) defaultActionButtonColor else MaterialTheme.colorScheme.primary,
+-            onClick = onTrackingClicked,
+-        )
+-        if (onWebViewClicked != null) {
++    BoxWithConstraints(modifier = modifier.fillMaxWidth().padding(start = 16.dp, top = 8.dp, end = 16.dp)) {
++        val columns = if (maxWidth < 400.dp * LocalDensity.current.fontScale) 2 else 4
++        FlowRow(maxItemsInEachRow = columns) {
+             MangaActionButton(
+-                title = stringResource(MR.strings.action_web_view),
+-                icon = Icons.Outlined.Public,
+-                color = defaultActionButtonColor,
+-                onClick = onWebViewClicked,
+-                onLongClick = onWebViewLongClicked,
++                title = if (favorite) {
++                    stringResource(MR.strings.in_library)
++                } else {
++                    stringResource(MR.strings.add_to_library)
++                },
++                icon = if (favorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
++                color = if (favorite) MaterialTheme.colorScheme.primary else defaultActionButtonColor,
++                onClick = onAddToLibraryClicked,
++                onLongClick = onEditCategory,
+             )
++            MangaActionButton(
++                title = when (nextUpdateDays) {
++                    null -> stringResource(MR.strings.not_applicable)
++                    0 -> stringResource(MR.strings.manga_interval_expected_update_soon)
++                    else -> pluralStringResource(
++                        MR.plurals.day,
++                        count = nextUpdateDays,
++                        nextUpdateDays,
++                    )
++                },
++                icon = Icons.Default.HourglassEmpty,
++                color = if (isUserIntervalMode) MaterialTheme.colorScheme.primary else defaultActionButtonColor,
++                onClick = { onEditIntervalClicked?.invoke() },
++            )
++            MangaActionButton(
++                title = if (trackingCount == 0) {
++                    stringResource(MR.strings.manga_tracking_tab)
++                } else {
++                    pluralStringResource(MR.plurals.num_trackers, count = trackingCount, trackingCount)
++                },
++                icon = if (trackingCount == 0) Icons.Outlined.Sync else Icons.Outlined.Done,
++                color = if (trackingCount == 0) defaultActionButtonColor else MaterialTheme.colorScheme.primary,
++                onClick = onTrackingClicked,
++            )
++            if (onWebViewClicked != null) {
++                MangaActionButton(
++                    title = stringResource(MR.strings.action_web_view),
++                    icon = Icons.Outlined.Public,
++                    color = defaultActionButtonColor,
++                    onClick = onWebViewClicked,
++                    onLongClick = onWebViewLongClicked,
++                )
++            }
+         }
+     }
+ }
+@@ -563,7 +568,7 @@ private fun ColumnScope.MangaContentInfo(
+                     )
+                 },
+                 overflow = TextOverflow.Ellipsis,
+-                maxLines = 1,
++                maxLines = 2,
+             )
+         }
+     }
+@@ -719,7 +724,7 @@ private fun TagsChip(
+ }
+ 
+ @Composable
+-private fun RowScope.MangaActionButton(
++private fun FlowRowScope.MangaActionButton(
+     title: String,
+     icon: ImageVector,
+     color: Color,
+@@ -729,6 +734,7 @@ private fun RowScope.MangaActionButton(
+     TextButton(
+         onClick = onClick,
+         modifier = Modifier.weight(1f),
++        contentPadding = PaddingValues(horizontal = 4.dp, vertical = 8.dp),
+         onLongClick = onLongClick,
+     ) {
+         Column(horizontalAlignment = Alignment.CenterHorizontally) {
+@@ -744,6 +750,8 @@ private fun RowScope.MangaActionButton(
+                 color = color,
+                 fontSize = 12.sp,
+                 textAlign = TextAlign.Center,
++                maxLines = 2,
++                overflow = TextOverflow.Ellipsis,
+             )
+         }
+     }
+diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsBrowseScreen.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsBrowseScreen.kt
+index 0c401d8..82142a3 100644
+--- a/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsBrowseScreen.kt
++++ b/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsBrowseScreen.kt
+@@ -12,10 +12,12 @@ import cafe.adriel.voyager.navigator.currentOrThrow
+ import eu.kanade.domain.source.service.SourcePreferences
+ import eu.kanade.presentation.more.settings.Preference
+ import eu.kanade.presentation.more.settings.screen.browse.ExtensionStoresScreen
++import eu.kanade.presentation.more.settings.screen.browse.discovery.RepositoryDiscoveryScreen
+ import eu.kanade.tachiyomi.util.system.AuthenticatorUtil.authenticate
+ import mihon.domain.extension.interactor.GetExtensionStoreCountAsFlow
+ import tachiyomi.core.common.i18n.stringResource
+ import tachiyomi.i18n.MR
++import tachiyomi.i18n.at.ATMR
+ import tachiyomi.presentation.core.i18n.pluralStringResource
+ import tachiyomi.presentation.core.i18n.stringResource
+ import uy.kohesive.injekt.Injekt
+@@ -45,6 +47,10 @@ object SettingsBrowseScreen : SearchableSettings {
+                         preference = sourcePreferences.hideInLibraryItems,
+                         title = stringResource(MR.strings.pref_hide_in_library_items),
+                     ),
++                    Preference.PreferenceItem.TextPreference(
++                        title = stringResource(ATMR.strings.repository_discovery),
++                        onClick = { navigator.push(RepositoryDiscoveryScreen()) },
++                    ),
+                     Preference.PreferenceItem.TextPreference(
+                         title = stringResource(MR.strings.extensionStores),
+                         subtitle = pluralStringResource(MR.plurals.num_repos, reposCount.toInt(), reposCount),
+diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsReaderScreen.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsReaderScreen.kt
+index bae7edc..648cd1d 100644
+--- a/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsReaderScreen.kt
++++ b/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsReaderScreen.kt
+@@ -11,6 +11,7 @@ import eu.kanade.tachiyomi.ui.reader.setting.ReaderPreferences
+ import eu.kanade.tachiyomi.ui.reader.setting.ReadingMode
+ import eu.kanade.tachiyomi.util.system.hasDisplayCutout
+ import tachiyomi.i18n.MR
++import tachiyomi.i18n.at.ATMR
+ import tachiyomi.presentation.core.i18n.pluralStringResource
+ import tachiyomi.presentation.core.i18n.stringResource
+ import tachiyomi.presentation.core.util.collectAsState
+@@ -238,6 +239,7 @@ object SettingsReaderScreen : SearchableSettings {
+                 Preference.PreferenceItem.SwitchPreference(
+                     preference = readerPreferences.cropBorders,
+                     title = stringResource(MR.strings.pref_crop_borders),
++                    subtitle = stringResource(ATMR.strings.translation_crop_borders_summary),
+                 ),
+                 Preference.PreferenceItem.SwitchPreference(
+                     preference = readerPreferences.landscapeZoom,
+@@ -338,6 +340,7 @@ object SettingsReaderScreen : SearchableSettings {
+                 Preference.PreferenceItem.SwitchPreference(
+                     preference = readerPreferences.cropBordersWebtoon,
+                     title = stringResource(MR.strings.pref_crop_borders),
++                    subtitle = stringResource(ATMR.strings.translation_crop_borders_summary),
+                 ),
+                 Preference.PreferenceItem.SwitchPreference(
+                     preference = dualPageSplitPref,
+diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsTranslationScreen.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsTranslationScreen.kt
+index 3075333..a198c3f 100644
+--- a/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsTranslationScreen.kt
++++ b/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsTranslationScreen.kt
+@@ -50,6 +50,11 @@ object SettingsTranslationScreen : SearchableSettings {
+     override fun getPreferences(): List<Preference> {
+         val translationPreferences = remember { Injekt.get<TranslationPreferences>() }
+         return listOf(
++            Preference.PreferenceItem.SwitchPreference(
++                preference = translationPreferences.autoTranslateEnglishDownloads(),
++                title = stringResource(ATMR.strings.pref_auto_translate_english_downloads),
++                subtitle = stringResource(ATMR.strings.pref_auto_translate_english_downloads_summary),
++            ),
+             Preference.PreferenceItem.SwitchPreference(
+                 preference = translationPreferences.translateSoundEffects(),
+                 title = stringResource(ATMR.strings.pref_translate_sound_effects),
+diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
+index d144e7f..7f411fd 100644
+--- a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
++++ b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
+@@ -51,6 +51,9 @@ import kotlin.time.Instant
+ 
+ object AboutScreen : Screen() {
+ 
++    // Identifies this overlay independently of the pinned upstream COMMIT_SHA.
++    private const val POLARIS_READER_REVISION = "P20261031.2"
++
+     @Composable
+     override fun Content() {
+         val scope = rememberCoroutineScope()
+@@ -188,7 +191,7 @@ object AboutScreen : Screen() {
+     }
+ 
+     fun getVersionName(withBuildDate: Boolean): String {
+-        return when {
++        val upstream = when {
+             BuildConfig.DEBUG -> {
+                 "Debug ${BuildConfig.COMMIT_SHA}".let {
+                     if (withBuildDate) {
+@@ -217,6 +220,7 @@ object AboutScreen : Screen() {
+                 }
+             }
+         }
++        return "Polaris $POLARIS_READER_REVISION · $upstream"
+     }
+ 
+     internal fun getFormattedBuildTime(): String {
+diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/browse/ExtensionStoresScreen.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/browse/ExtensionStoresScreen.kt
+index a46b9dc..bb01ece 100644
+--- a/app/src/main/java/eu/kanade/presentation/more/settings/screen/browse/ExtensionStoresScreen.kt
++++ b/app/src/main/java/eu/kanade/presentation/more/settings/screen/browse/ExtensionStoresScreen.kt
+@@ -12,6 +12,7 @@ import eu.kanade.presentation.more.settings.screen.browse.components.ExtensionSt
+ import eu.kanade.presentation.more.settings.screen.browse.components.ExtensionStoreCreateDialog
+ import eu.kanade.presentation.more.settings.screen.browse.components.ExtensionStoreDeleteDialog
+ import eu.kanade.presentation.more.settings.screen.browse.components.ExtensionStoresScreen
++import eu.kanade.presentation.more.settings.screen.browse.discovery.RepositoryDiscoveryScreen
+ import eu.kanade.presentation.util.Screen
+ import eu.kanade.tachiyomi.util.system.copyToClipboard
+ import eu.kanade.tachiyomi.util.system.openInBrowser
+@@ -48,6 +49,7 @@ class ExtensionStoresScreen(
+             onOpenDiscord = { it.contact.discord?.let(context::openInBrowser) },
+             onClickDelete = { viewModel.showDialog(ExtensionStoreDialog.Delete(it)) },
+             onClickRefresh = { viewModel.refreshRepos() },
++            onClickDiscover = { navigator.push(RepositoryDiscoveryScreen()) },
+             navigateUp = navigator::pop,
+         )
+ 
+diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/browse/components/ExtensionStoresScreen.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/browse/components/ExtensionStoresScreen.kt
+index e659578..69034fc 100644
+--- a/app/src/main/java/eu/kanade/presentation/more/settings/screen/browse/components/ExtensionStoresScreen.kt
++++ b/app/src/main/java/eu/kanade/presentation/more/settings/screen/browse/components/ExtensionStoresScreen.kt
+@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.padding
+ import androidx.compose.foundation.lazy.rememberLazyListState
+ import androidx.compose.material.icons.Icons
+ import androidx.compose.material.icons.outlined.Refresh
++import androidx.compose.material.icons.outlined.Search
+ import androidx.compose.material3.Icon
+ import androidx.compose.material3.IconButton
+ import androidx.compose.material3.MaterialTheme
+@@ -15,6 +16,7 @@ import eu.kanade.presentation.components.AppBar
+ import eu.kanade.presentation.more.settings.screen.browse.ExtensionStoreScreenState
+ import mihon.domain.extension.model.ExtensionStore
+ import tachiyomi.i18n.MR
++import tachiyomi.i18n.at.ATMR
+ import tachiyomi.presentation.core.components.material.Scaffold
+ import tachiyomi.presentation.core.components.material.padding
+ import tachiyomi.presentation.core.components.material.topSmallPaddingValues
+@@ -31,6 +33,7 @@ fun ExtensionStoresScreen(
+     onOpenDiscord: (ExtensionStore) -> Unit,
+     onClickDelete: (ExtensionStore) -> Unit,
+     onClickRefresh: () -> Unit,
++    onClickDiscover: () -> Unit,
+     navigateUp: () -> Unit,
+ ) {
+     val lazyListState = rememberLazyListState()
+@@ -41,6 +44,12 @@ fun ExtensionStoresScreen(
+                 title = stringResource(MR.strings.extensionStores),
+                 scrollBehavior = scrollBehavior,
+                 actions = {
++                    IconButton(onClick = onClickDiscover) {
++                        Icon(
++                            Icons.Outlined.Search,
++                            contentDescription = stringResource(ATMR.strings.repository_discovery),
++                        )
++                    }
+                     IconButton(onClick = onClickRefresh) {
+                         Icon(
+                             imageVector = Icons.Outlined.Refresh,
+diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/browse/discovery/RepositoryCatalog.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/browse/discovery/RepositoryCatalog.kt
+new file mode 100644
+index 0000000..8b271c1
+--- /dev/null
++++ b/app/src/main/java/eu/kanade/presentation/more/settings/screen/browse/discovery/RepositoryCatalog.kt
+@@ -0,0 +1,74 @@
++package eu.kanade.presentation.more.settings.screen.browse.discovery
++
++import java.net.URI
++import java.text.Normalizer
++import java.util.Locale
++
++data class DiscoverableRepository(
++    val id: String,
++    val name: String,
++    val maintainer: String,
++    val indexUrl: String,
++    val tags: List<String>,
++)
++
++/** Bundled discovery only. Search terms are not sent to GitHub or repository servers. */
++object RepositoryCatalog {
++    val entries = listOf(
++        DiscoverableRepository(
++            "nox",
++            "Project Nox",
++            "Awerkori",
++            "https://raw.githubusercontent.com/Awerkori/extensoes/repo/index.pb",
++            listOf("PT-BR", "Português", "Brasil", "EN", "English", "Inglês", "mangá", "manhwa", "webtoon"),
++        ),
++        DiscoverableRepository(
++            "keiyoushi",
++            "Keiyoushi",
++            "Keiyoushi",
++            "https://raw.githubusercontent.com/keiyoushi/extensions/repo/index.pb",
++            listOf("PT-BR", "Português", "EN", "English", "Inglês", "multilíngue", "mangá", "manhwa", "webtoon"),
++        ),
++    )
++
++    fun search(query: String): List<DiscoverableRepository> {
++        val terms = normalized(query).split(' ').filter(String::isNotBlank)
++        return entries.filter { entry ->
++            val searchable = normalized(listOf(entry.name, entry.maintainer).plus(entry.tags).joinToString(" "))
++            terms.all(searchable::contains)
++        }
++    }
++
++    fun isAdded(entry: DiscoverableRepository, urls: Set<String>): Boolean {
++        val expected = repositoryKey(entry.indexUrl) ?: return false
++        return urls.any { repositoryKey(it) == expected }
++    }
++
++    /** Only normalize known static GitHub index aliases; branch names remain case-sensitive. */
++    fun repositoryKey(url: String): String? {
++        return runCatching {
++            val uri = URI(url.trim())
++            if (!uri.scheme.equals("https", true) || uri.userInfo != null ||
++                uri.rawQuery != null || uri.rawFragment != null || uri.port !in listOf(-1, 443)
++            ) {
++                return null
++            }
++            var host = uri.host?.lowercase(Locale.ROOT) ?: return null
++            var parts = uri.path.split('/').filter(String::isNotBlank)
++            if (host == "github.com" && parts.size >= 5 && parts[2] == "raw") {
++                host = "raw.githubusercontent.com"
++                parts = parts.take(2) + parts.drop(3)
++            }
++            if (host != "raw.githubusercontent.com" || parts.size < 3) return null
++            if (parts.last() in listOf("index.pb", "index.min.json", "repo.json")) parts = parts.dropLast(1)
++            parts = parts.mapIndexed { index, part -> if (index < 2) part.lowercase(Locale.ROOT) else part }
++            "$host/${parts.joinToString("/")}"
++        }.getOrNull()
++    }
++
++    private fun normalized(text: String): String = Normalizer.normalize(text, Normalizer.Form.NFKD)
++        .replace(Regex("\\p{M}+"), "")
++        .lowercase(Locale.ROOT)
++        .replace(Regex("[^\\p{L}\\p{N}]+"), " ")
++        .trim()
++}
+diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/browse/discovery/RepositoryDiscoveryController.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/browse/discovery/RepositoryDiscoveryController.kt
+new file mode 100644
+index 0000000..ad55f3d
+--- /dev/null
++++ b/app/src/main/java/eu/kanade/presentation/more/settings/screen/browse/discovery/RepositoryDiscoveryController.kt
+@@ -0,0 +1,76 @@
++package eu.kanade.presentation.more.settings.screen.browse.discovery
++
++import kotlinx.coroutines.CoroutineDispatcher
++import kotlinx.coroutines.CoroutineScope
++import kotlinx.coroutines.Job
++import kotlinx.coroutines.flow.Flow
++import kotlinx.coroutines.flow.MutableStateFlow
++import kotlinx.coroutines.flow.asStateFlow
++import kotlinx.coroutines.flow.catch
++import kotlinx.coroutines.flow.collectLatest
++import kotlinx.coroutines.flow.update
++import kotlinx.coroutines.launch
++import kotlin.coroutines.cancellation.CancellationException
++
++enum class DiscoveryError { LOAD, ADD, REFRESH }
++
++data class RepositoryDiscoveryState(
++    val loaded: Boolean = false,
++    val installedUrls: Set<String> = emptySet(),
++    val pendingId: String? = null,
++    val error: DiscoveryError? = null,
++)
++
++class RepositoryDiscoveryController(
++    private val observe: () -> Flow<Set<String>>,
++    private val addStore: suspend (String) -> Unit,
++    private val refresh: suspend () -> Unit,
++    private val scope: CoroutineScope,
++    private val dispatcher: CoroutineDispatcher,
++) {
++    private val mutableState = MutableStateFlow(RepositoryDiscoveryState())
++    val state = mutableState.asStateFlow()
++    private var storesJob: Job? = null
++
++    init {
++        reload()
++    }
++
++    fun reload() {
++        storesJob?.cancel()
++        mutableState.update { it.copy(loaded = false, error = null) }
++        storesJob = scope.launch(dispatcher) {
++            observe()
++                .catch { mutableState.update { it.copy(loaded = false, error = DiscoveryError.LOAD) } }
++                .collectLatest { urls -> mutableState.update { it.copy(loaded = true, installedUrls = urls) } }
++        }
++    }
++
++    fun add(id: String) {
++        val entry = RepositoryCatalog.entries.singleOrNull { it.id == id } ?: return
++        while (true) {
++            val snapshot = state.value
++            if (!snapshot.loaded || snapshot.pendingId != null ||
++                RepositoryCatalog.isAdded(entry, snapshot.installedUrls)
++            ) {
++                return
++            }
++            if (mutableState.compareAndSet(snapshot, snapshot.copy(pendingId = id, error = null))) break
++        }
++        scope.launch(dispatcher) {
++            var added = false
++            try {
++                addStore(entry.indexUrl)
++                added = true
++                mutableState.update { it.copy(installedUrls = it.installedUrls + entry.indexUrl) }
++                refresh()
++            } catch (error: CancellationException) {
++                throw error
++            } catch (_: Exception) {
++                mutableState.update { it.copy(error = if (added) DiscoveryError.REFRESH else DiscoveryError.ADD) }
++            } finally {
++                mutableState.update { it.copy(pendingId = null) }
++            }
++        }
++    }
++}
+diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/browse/discovery/RepositoryDiscoveryScreen.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/browse/discovery/RepositoryDiscoveryScreen.kt
+new file mode 100644
+index 0000000..aa3b6ae
+--- /dev/null
++++ b/app/src/main/java/eu/kanade/presentation/more/settings/screen/browse/discovery/RepositoryDiscoveryScreen.kt
+@@ -0,0 +1,160 @@
++package eu.kanade.presentation.more.settings.screen.browse.discovery
++
++import androidx.compose.foundation.layout.Arrangement
++import androidx.compose.foundation.layout.Column
++import androidx.compose.foundation.layout.Row
++import androidx.compose.foundation.layout.fillMaxWidth
++import androidx.compose.foundation.layout.padding
++import androidx.compose.foundation.layout.size
++import androidx.compose.foundation.lazy.LazyColumn
++import androidx.compose.foundation.lazy.items
++import androidx.compose.material3.Button
++import androidx.compose.material3.CircularProgressIndicator
++import androidx.compose.material3.ElevatedCard
++import androidx.compose.material3.MaterialTheme
++import androidx.compose.material3.OutlinedTextField
++import androidx.compose.material3.Text
++import androidx.compose.material3.TextButton
++import androidx.compose.runtime.Composable
++import androidx.compose.runtime.collectAsState
++import androidx.compose.runtime.getValue
++import androidx.compose.runtime.mutableStateOf
++import androidx.compose.runtime.saveable.rememberSaveable
++import androidx.compose.runtime.setValue
++import androidx.compose.ui.Alignment
++import androidx.compose.ui.Modifier
++import androidx.compose.ui.unit.dp
++import androidx.lifecycle.viewmodel.compose.viewModel
++import cafe.adriel.voyager.navigator.LocalNavigator
++import cafe.adriel.voyager.navigator.currentOrThrow
++import eu.kanade.presentation.components.AppBar
++import eu.kanade.presentation.util.Screen
++import tachiyomi.i18n.at.ATMR
++import tachiyomi.presentation.core.components.material.Scaffold
++import tachiyomi.presentation.core.i18n.stringResource
++
++class RepositoryDiscoveryScreen : Screen() {
++    @Composable
++    override fun Content() {
++        val navigator = LocalNavigator.currentOrThrow
++        val model = viewModel<RepositoryDiscoveryViewModel>()
++        val state by model.state.collectAsState()
++        var query by rememberSaveable { mutableStateOf("") }
++        val results = RepositoryCatalog.search(query)
++        Scaffold(
++            topBar = { behavior ->
++                AppBar(
++                    title = stringResource(ATMR.strings.repository_discovery),
++                    navigateUp = navigator::pop,
++                    scrollBehavior = behavior,
++                )
++            },
++        ) { padding ->
++            LazyColumn(
++                contentPadding = padding,
++                modifier = Modifier.padding(horizontal = 16.dp),
++                verticalArrangement = Arrangement.spacedBy(12.dp),
++            ) {
++                item {
++                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
++                        OutlinedTextField(
++                            value = query,
++                            onValueChange = { query = it },
++                            label = { Text(stringResource(ATMR.strings.repository_search_hint)) },
++                            singleLine = true,
++                            modifier = Modifier.fillMaxWidth(),
++                        )
++                        if (!state.loaded && state.error == null) {
++                            Text(stringResource(ATMR.strings.repository_loading))
++                        }
++                        Text(
++                            stringResource(ATMR.strings.repository_catalog_scope),
++                            style = MaterialTheme.typography.bodySmall,
++                        )
++                        Text(
++                            stringResource(ATMR.strings.repository_third_party_notice),
++                            style = MaterialTheme.typography.bodySmall,
++                        )
++                        Text(
++                            stringResource(ATMR.strings.repository_overlap_notice),
++                            style = MaterialTheme.typography.bodySmall,
++                        )
++                    }
++                }
++                state.error?.let { error ->
++                    item {
++                        Text(
++                            stringResource(
++                                when (error) {
++                                    DiscoveryError.LOAD -> ATMR.strings.repository_load_error
++                                    DiscoveryError.ADD -> ATMR.strings.repository_add_error
++                                    DiscoveryError.REFRESH -> ATMR.strings.repository_refresh_error
++                                },
++                            ),
++                            color = MaterialTheme.colorScheme.error,
++                        )
++                        if (error == DiscoveryError.LOAD) {
++                            TextButton(onClick = model::reload) { Text(stringResource(ATMR.strings.repository_retry)) }
++                        }
++                    }
++                }
++                if (results.isEmpty()) {
++                    item { Text(stringResource(ATMR.strings.repository_no_results)) }
++                }
++                items(results, key = { it.id }) { entry ->
++                    val added = RepositoryCatalog.isAdded(entry, state.installedUrls)
++                    val pending = state.pendingId == entry.id
++                    ElevatedCard(modifier = Modifier.fillMaxWidth()) {
++                        Column(
++                            modifier = Modifier.padding(16.dp),
++                            verticalArrangement = Arrangement.spacedBy(8.dp),
++                        ) {
++                            Text(entry.name, style = MaterialTheme.typography.titleMedium)
++                            Text(stringResource(ATMR.strings.repository_maintainer, entry.maintainer))
++                            Text(entry.tags.take(6).joinToString(" · "), style = MaterialTheme.typography.bodySmall)
++                            Text(entry.indexUrl, style = MaterialTheme.typography.bodySmall)
++                            Text(
++                                stringResource(ATMR.strings.repository_last_checked),
++                                style = MaterialTheme.typography.bodySmall,
++                            )
++                            Row(
++                                modifier = Modifier.fillMaxWidth(),
++                                horizontalArrangement = Arrangement.End,
++                                verticalAlignment = Alignment.CenterVertically,
++                            ) {
++                                Button(
++                                    onClick = { model.add(entry.id) },
++                                    enabled = state.loaded && state.pendingId == null && !added,
++                                ) {
++                                    if (pending) {
++                                        CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp)
++                                        Text(
++                                            stringResource(ATMR.strings.repository_adding),
++                                            modifier = Modifier.padding(start = 8.dp),
++                                        )
++                                    } else {
++                                        Text(
++                                            stringResource(
++                                                if (added) {
++                                                    ATMR.strings.repository_added
++                                                } else {
++                                                    ATMR.strings.repository_add
++                                                },
++                                            ),
++                                        )
++                                    }
++                                }
++                            }
++                        }
++                    }
++                }
++                item {
++                    Text(
++                        stringResource(ATMR.strings.repository_after_add),
++                        style = MaterialTheme.typography.bodySmall,
++                    )
++                }
++            }
++        }
++    }
++}
+diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/browse/discovery/RepositoryDiscoveryViewModel.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/browse/discovery/RepositoryDiscoveryViewModel.kt
+new file mode 100644
+index 0000000..e41ba10
+--- /dev/null
++++ b/app/src/main/java/eu/kanade/presentation/more/settings/screen/browse/discovery/RepositoryDiscoveryViewModel.kt
+@@ -0,0 +1,28 @@
++package eu.kanade.presentation.more.settings.screen.browse.discovery
++
++import androidx.lifecycle.ViewModel
++import androidx.lifecycle.viewModelScope
++import eu.kanade.tachiyomi.extension.ExtensionManager
++import kotlinx.coroutines.Dispatchers
++import kotlinx.coroutines.flow.map
++import mihon.domain.extension.interactor.AddExtensionStore
++import mihon.domain.extension.interactor.GetExtensionStores
++import uy.kohesive.injekt.Injekt
++import uy.kohesive.injekt.api.get
++
++class RepositoryDiscoveryViewModel(
++    getStores: GetExtensionStores = Injekt.get(),
++    addStore: AddExtensionStore = Injekt.get(),
++    extensions: ExtensionManager = Injekt.get(),
++) : ViewModel() {
++    private val controller = RepositoryDiscoveryController(
++        observe = { getStores.subscribe().map { stores -> stores.map { it.indexUrl }.toSet() } },
++        addStore = { addStore(it).getOrThrow() },
++        refresh = { extensions.findAvailableExtensions() },
++        scope = viewModelScope,
++        dispatcher = Dispatchers.IO,
++    )
++    val state = controller.state
++    fun reload() = controller.reload()
++    fun add(id: String) = controller.add(id)
++}
+diff --git a/app/src/main/java/eu/kanade/presentation/reader/settings/ReadingModePage.kt b/app/src/main/java/eu/kanade/presentation/reader/settings/ReadingModePage.kt
+index d6687ab..32faa11 100644
+--- a/app/src/main/java/eu/kanade/presentation/reader/settings/ReadingModePage.kt
++++ b/app/src/main/java/eu/kanade/presentation/reader/settings/ReadingModePage.kt
+@@ -1,6 +1,7 @@
+ package eu.kanade.presentation.reader.settings
+ 
+ import androidx.compose.foundation.layout.ColumnScope
++import androidx.compose.foundation.layout.padding
+ import androidx.compose.material3.FilterChip
+ import androidx.compose.material3.MaterialTheme
+ import androidx.compose.material3.Text
+@@ -8,6 +9,8 @@ import androidx.compose.runtime.Composable
+ import androidx.compose.runtime.collectAsState
+ import androidx.compose.runtime.getValue
+ import androidx.compose.runtime.remember
++import androidx.compose.ui.Modifier
++import androidx.compose.ui.unit.dp
+ import eu.kanade.domain.manga.model.readerOrientation
+ import eu.kanade.domain.manga.model.readingMode
+ import eu.kanade.tachiyomi.ui.reader.setting.ReaderOrientation
+@@ -104,6 +107,11 @@ private fun ColumnScope.PagerViewerSettings(viewModel: ReaderSettingsViewModel)
+         label = stringResource(MR.strings.pref_crop_borders),
+         pref = viewModel.preferences.cropBorders,
+     )
++    Text(
++        stringResource(ATMR.strings.translation_crop_borders_summary),
++        style = MaterialTheme.typography.bodySmall,
++        modifier = Modifier.padding(horizontal = 24.dp),
++    )
+ 
+     CheckboxItem(
+         label = stringResource(MR.strings.pref_landscape_zoom),
+@@ -189,6 +197,11 @@ private fun ColumnScope.WebtoonViewerSettings(viewModel: ReaderSettingsViewModel
+         label = stringResource(MR.strings.pref_crop_borders),
+         pref = viewModel.preferences.cropBordersWebtoon,
+     )
++    Text(
++        stringResource(ATMR.strings.translation_crop_borders_summary),
++        style = MaterialTheme.typography.bodySmall,
++        modifier = Modifier.padding(horizontal = 24.dp),
++    )
+ 
+     val dualPageSplitWebtoon by viewModel.preferences.dualPageSplitWebtoon.collectAsState()
+     CheckboxItem(
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/data/download/DownloadManager.kt b/app/src/main/java/eu/kanade/tachiyomi/data/download/DownloadManager.kt
+index 921f8d0..c45a189 100644
+--- a/app/src/main/java/eu/kanade/tachiyomi/data/download/DownloadManager.kt
++++ b/app/src/main/java/eu/kanade/tachiyomi/data/download/DownloadManager.kt
+@@ -4,6 +4,7 @@ import android.content.Context
+ import eu.kanade.tachiyomi.data.download.model.Download
+ import eu.kanade.tachiyomi.source.Source
+ import eu.kanade.tachiyomi.source.model.Page
++import eu.kanade.translation.TranslationManager
+ import kotlinx.coroutines.flow.Flow
+ import kotlinx.coroutines.flow.asFlow
+ import kotlinx.coroutines.flow.drop
+@@ -46,6 +47,7 @@ class DownloadManager(
+      * Downloader whose only task is to download chapters.
+      */
+     private val downloader = Downloader(context, provider, cache)
++    private val translationManager by lazy { Injekt.get<TranslationManager>() }
+ 
+     val isRunning: Boolean
+         get() = downloader.isRunning
+@@ -90,6 +92,7 @@ class DownloadManager(
+      * Empties the download queue.
+      */
+     fun clearQueue() {
++        translationManager.pendingDownloads.clear()
+         downloader.clearQueue()
+         downloader.stop()
+     }
+@@ -250,6 +253,9 @@ class DownloadManager(
+     fun deleteManga(manga: Manga, source: Source, removeQueued: Boolean = true) {
+         launchIO {
+             if (removeQueued) {
++                translationManager.pendingDownloads.cancel(
++                    queueState.value.filter { it.manga.id == manga.id }.map { it.chapter.id },
++                )
+                 downloader.removeFromQueue(manga)
+             }
+             provider.findMangaDir(manga.title, source)?.delete()
+@@ -265,6 +271,7 @@ class DownloadManager(
+     }
+ 
+     private fun removeFromDownloadQueue(chapters: List<Chapter>) {
++        translationManager.pendingDownloads.cancel(chapters.map { it.id })
+         val wasRunning = downloader.isRunning
+         if (wasRunning) {
+             downloader.pause()
+@@ -342,6 +349,9 @@ class DownloadManager(
+         if (oldFolder.name == newName) return
+ 
+         // just to be safe, don't allow downloads for this manga while renaming it
++        translationManager.pendingDownloads.cancel(
++            queueState.value.filter { it.manga.id == manga.id }.map { it.chapter.id },
++        )
+         downloader.removeFromQueue(manga)
+ 
+         val capitalizationChanged = oldFolder.name.equals(newName, ignoreCase = true)
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/data/download/Downloader.kt b/app/src/main/java/eu/kanade/tachiyomi/data/download/Downloader.kt
+index 74ac77c..d56914c 100644
+--- a/app/src/main/java/eu/kanade/tachiyomi/data/download/Downloader.kt
++++ b/app/src/main/java/eu/kanade/tachiyomi/data/download/Downloader.kt
+@@ -16,7 +16,6 @@ import eu.kanade.tachiyomi.util.storage.DiskUtil
+ import eu.kanade.tachiyomi.util.storage.DiskUtil.NOMEDIA_FILE
+ import eu.kanade.tachiyomi.util.storage.saveTo
+ import eu.kanade.translation.TranslationManager
+-import eu.kanade.translation.TranslationRequestOrigin
+ import kotlinx.coroutines.CancellationException
+ import kotlinx.coroutines.CoroutineScope
+ import kotlinx.coroutines.Dispatchers
+@@ -450,11 +449,7 @@ class Downloader(
+             }
+ 
+             runCatching {
+-                translationManager.translateChapter(
+-                    manga = download.manga,
+-                    chapter = download.chapter,
+-                    origin = TranslationRequestOrigin.DOWNLOAD_COMPLETION,
+-                )
++                translationManager.translateDownloadedChapter(download.manga, download.chapter)
+             }.onFailure { error ->
+                 logcat(LogPriority.ERROR, error) {
+                     "Download concluído, mas não foi possível enfileirar a tradução automática."
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/browse/extension/ExtensionsTab.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/browse/extension/ExtensionsTab.kt
+index 35c3579..efc3654 100644
+--- a/app/src/main/java/eu/kanade/tachiyomi/ui/browse/extension/ExtensionsTab.kt
++++ b/app/src/main/java/eu/kanade/tachiyomi/ui/browse/extension/ExtensionsTab.kt
+@@ -17,11 +17,13 @@ import eu.kanade.presentation.browse.ExtensionScreen
+ import eu.kanade.presentation.components.AppBar
+ import eu.kanade.presentation.components.TabContent
+ import eu.kanade.presentation.more.settings.screen.browse.ExtensionStoresScreen
++import eu.kanade.presentation.more.settings.screen.browse.discovery.RepositoryDiscoveryScreen
+ import eu.kanade.tachiyomi.extension.model.Extension
+ import eu.kanade.tachiyomi.ui.browse.extension.details.ExtensionDetailsScreen
+ import eu.kanade.tachiyomi.ui.webview.WebViewScreen
+ import eu.kanade.tachiyomi.util.system.isPackageInstalled
+ import tachiyomi.i18n.MR
++import tachiyomi.i18n.at.ATMR
+ import tachiyomi.presentation.core.i18n.stringResource
+ 
+ @Composable
+@@ -39,6 +41,10 @@ fun extensionsTab(
+         badgeNumber = state.updates.takeIf { it > 0 },
+         searchEnabled = true,
+         actions = listOf(
++            AppBar.OverflowAction(
++                title = stringResource(ATMR.strings.repository_discovery),
++                onClick = { navigator.push(RepositoryDiscoveryScreen()) },
++            ),
+             AppBar.OverflowAction(
+                 title = stringResource(MR.strings.action_filter),
+                 onClick = { navigator.push(ExtensionFilterScreen()) },
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/manga/MangaViewModel.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/manga/MangaViewModel.kt
+index 19de11d..be73cb2 100644
+--- a/app/src/main/java/eu/kanade/tachiyomi/ui/manga/MangaViewModel.kt
++++ b/app/src/main/java/eu/kanade/tachiyomi/ui/manga/MangaViewModel.kt
+@@ -188,10 +188,14 @@ class MangaViewModel(
+ 
+     init {
+         viewModelScope.launchIO {
+-            autoTranslationPreference.changes()
+-                .distinctUntilChanged()
+-                .collectLatest { enabled ->
+-                    updateSuccessState { state -> state.copy(autoTranslateEnabled = enabled) }
++            combine(
++                autoTranslationPreference.changes(),
++                translationPreferences.autoTranslateEnglishDownloads().changes(),
++                translationPreferences.translateFromLanguage().changes(),
++                translationPreferences.translateToLanguage().changes(),
++            ) { _, _, _, _ -> Unit }
++                .collectLatest {
++                    updateSuccessState { state -> state.copy(autoTranslateEnabled = translationManager.isAutomaticTranslationEnabled(state.manga)) }
+                 }
+         }
+ 
+@@ -259,7 +263,7 @@ class MangaViewModel(
+                     isRefreshingData = needRefreshInfo || needRefreshChapter,
+                     dialog = null,
+                     hideMissingChapters = libraryPreferences.hideMissingChapters.get(),
+-                    autoTranslateEnabled = autoTranslationPreference.get(),
++                    autoTranslateEnabled = translationManager.isAutomaticTranslationEnabled(manga),
+                 )
+             }
+ 
+@@ -796,8 +800,24 @@ class MangaViewModel(
+     ) {
+         when (action) {
+             ChapterTranslationAction.START -> {
+-                if (item.downloadState != Download.State.DOWNLOADED) return
+                 val manga = successState?.manga ?: return
++                if (item.downloadState != Download.State.DOWNLOADED) {
++                    translationManager.pendingDownloads.request(item.chapter.id)
++                    // Recheck after persisting the request to close the completion race.
++                    val downloaded = downloadManager.isChapterDownloaded(
++                        item.chapter.name,
++                        item.chapter.scanlator,
++                        item.chapter.url,
++                        manga.title,
++                        manga.source,
++                    )
++                    if (downloaded) {
++                        translationManager.completeRequestedDownload(manga, item.chapter)
++                    } else {
++                        startDownload(listOf(item.chapter), startNow = false)
++                    }
++                    return
++                }
+                 viewModelScope.launchNonCancellable {
+                     translationManager.translateChapter(
+                         manga,
+@@ -837,7 +857,7 @@ class MangaViewModel(
+     }
+ 
+     fun toggleAutomaticTranslation() {
+-        autoTranslationPreference.set(!autoTranslationPreference.get())
++        autoTranslationPreference.set(!(successState?.autoTranslateEnabled ?: return))
+     }
+ 
+     fun translateDownloadedChapters() {
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/reader/viewer/ReaderPageImageView.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/reader/viewer/ReaderPageImageView.kt
+index 6599345..d21d403 100644
+--- a/app/src/main/java/eu/kanade/tachiyomi/ui/reader/viewer/ReaderPageImageView.kt
++++ b/app/src/main/java/eu/kanade/tachiyomi/ui/reader/viewer/ReaderPageImageView.kt
+@@ -1,6 +1,7 @@
+ package eu.kanade.tachiyomi.ui.reader.viewer
+ 
+ import android.content.Context
++import android.graphics.Canvas
+ import android.graphics.PointF
+ import android.graphics.RectF
+ import android.graphics.drawable.Animatable
+@@ -65,7 +66,7 @@ open class ReaderPageImageView @JvmOverloads constructor(
+         Injekt.get<BasePreferences>().alwaysDecodeLongStripWithSSIV.get()
+     }
+ 
+-    //TachiyomiAT : need this for textblock placements
++    // TachiyomiAT : need this for textblock placements
+     var pageView: View? = null
+ 
+     private var config: Config? = null
+@@ -73,7 +74,8 @@ open class ReaderPageImageView @JvmOverloads constructor(
+     var onImageLoaded: (() -> Unit)? = null
+     var onImageLoadError: ((Throwable?) -> Unit)? = null
+     var onScaleChanged: ((newScale: Float) -> Unit)? = null
+-    //TachiyomiAT
++
++    // TachiyomiAT
+     var onCenterChanged: ((newCenter: PointF) -> Unit)? = null
+ 
+     var onViewClicked: (() -> Unit)? = null
+@@ -99,7 +101,11 @@ open class ReaderPageImageView @JvmOverloads constructor(
+         onScaleChanged?.invoke(newScale)
+     }
+ 
+-    //TachiyomiAT
++    /** Called after SSIV has applied pending fit/center changes inside its draw pass. */
++    @CallSuper
++    open fun onImageDrawn() = Unit
++
++    // TachiyomiAT
+     @CallSuper
+     open fun onCenterChanged(newCenter: PointF?) {
+         if (newCenter != null) onCenterChanged?.invoke(newCenter)
+@@ -276,7 +282,12 @@ open class ReaderPageImageView @JvmOverloads constructor(
+         pageView = if (isWebtoon) {
+             WebtoonSubsamplingImageView(context)
+         } else {
+-            SubsamplingScaleImageView(context)
++            object : SubsamplingScaleImageView(context) {
++                override fun onDraw(canvas: Canvas) {
++                    super.onDraw(canvas)
++                    this@ReaderPageImageView.onImageDrawn()
++                }
++            }
+         }.apply {
+             setMaxTileSize(ImageUtil.hardwareBitmapThreshold)
+             setDoubleTapZoomStyle(SubsamplingScaleImageView.ZOOM_FOCUS_CENTER)
+@@ -289,7 +300,7 @@ open class ReaderPageImageView @JvmOverloads constructor(
+                     }
+ 
+                     override fun onCenterChanged(newCenter: PointF?, origin: Int) {
+-                        //TachiyomiAT
++                        // TachiyomiAT
+                         this@ReaderPageImageView.onCenterChanged(newCenter)
+                     }
+                 },
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/reader/viewer/pager/PagerPageHolder.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/reader/viewer/pager/PagerPageHolder.kt
+index 15b320d..501f41e 100644
+--- a/app/src/main/java/eu/kanade/tachiyomi/ui/reader/viewer/pager/PagerPageHolder.kt
++++ b/app/src/main/java/eu/kanade/tachiyomi/ui/reader/viewer/pager/PagerPageHolder.kt
+@@ -18,7 +18,8 @@ import eu.kanade.tachiyomi.ui.webview.WebViewActivity
+ import eu.kanade.tachiyomi.widget.ViewPagerAdapter
+ import eu.kanade.translation.data.TranslationFont
+ import eu.kanade.translation.presentation.PagerTranslationsView
+-import eu.kanade.translation.presentation.WebtoonTranslationsView
++import eu.kanade.translation.presentation.TranslationImageCrop
++import eu.kanade.translation.presentation.TranslationViewportTransform
+ import kotlinx.coroutines.Job
+ import kotlinx.coroutines.MainScope
+ import kotlinx.coroutines.flow.collectLatest
+@@ -46,15 +47,17 @@ class PagerPageHolder(
+     readerThemedContext: Context,
+     val viewer: PagerViewer,
+     val page: ReaderPage,
+-    //TachiyomiAT
++    // TachiyomiAT
+     translationPreferences: TranslationPreferences = Injekt.get(),
+     private val font: TranslationFont = TranslationFont.fromPref(translationPreferences.translationFont()),
+     readerPreferences: ReaderPreferences = Injekt.get(),
+ ) : ReaderPageImageView(readerThemedContext), ViewPagerAdapter.PositionableView {
+ 
+-    //TachiyomiAT
++    // TachiyomiAT
+     private var showTranslations = true
+     private var translationsView: PagerTranslationsView? = null
++    private val translationCrop = TranslationImageCrop()
++    private var cropReloadJob: Job? = null
+ 
+     /**
+      * Item that identifies this view. Needed by the adapter to not recreate views.
+@@ -81,7 +84,7 @@ class PagerPageHolder(
+ 
+     init {
+         loadJob = scope.launch { loadPageAndProcessStatus() }
+-        //TachiyomiAT
++        // TachiyomiAT
+         showTranslations = readerPreferences.showTranslations.get()
+         readerPreferences.showTranslations.changes().onEach {
+             showTranslations = it
+@@ -101,6 +104,8 @@ class PagerPageHolder(
+         super.onDetachedFromWindow()
+         loadJob?.cancel()
+         loadJob = null
++        cropReloadJob?.cancel()
++        cropReloadJob = null
+     }
+ 
+     private fun initProgressIndicator() {
+@@ -136,7 +141,7 @@ class PagerPageHolder(
+                     }
+                     Page.State.Ready -> {
+                         setImage()
+-                        //TachiyomiAT
++                        // TachiyomiAT
+                         addTranslationsView()
+                     }
+                     is Page.State.Error -> setError(state.error)
+@@ -192,13 +197,15 @@ class PagerPageHolder(
+                 Triple(source, isAnimated, background)
+             }
+             withUIContext {
++                val cropBorders = translationCrop.forImage(viewer.config.imageCropBorders, page.translation != null)
++                translationCrop.recordImage(cropBorders)
+                 setImage(
+                     source,
+                     isAnimated,
+                     Config(
+                         zoomDuration = viewer.config.doubleTapAnimDuration,
+                         minimumScaleType = viewer.config.imageScaleType,
+-                        cropBorders = viewer.config.imageCropBorders,
++                        cropBorders = cropBorders,
+                         zoomStartPosition = viewer.config.imageZoomType,
+                         landscapeZoom = viewer.config.landscapeZoom,
+                     ),
+@@ -279,17 +286,17 @@ class PagerPageHolder(
+     private fun setError(error: Throwable?) {
+         progressIndicator?.hide()
+         showErrorLayout(error)
+-        //TachiyomiAT
++        // TachiyomiAT
+         translationsView?.hide()
+     }
+ 
+     override fun onImageLoaded() {
+         super.onImageLoaded()
+         progressIndicator?.hide()
+-        //TachiyomiAT
+-        updateTranslationCoords(pageView as SubsamplingScaleImageView)
+-        //TachiyomiAT
+-        translationsView?.show()
++        // TachiyomiAT
++        (pageView as? SubsamplingScaleImageView)?.let(::updateTranslationCoords)
++        // TachiyomiAT
++        if (showTranslations) translationsView?.show()
+     }
+ 
+     /**
+@@ -298,7 +305,7 @@ class PagerPageHolder(
+     override fun onImageLoadError(error: Throwable?) {
+         super.onImageLoadError(error)
+         setError(error)
+-        //TachiyomiAT
++        // TachiyomiAT
+         translationsView?.hide()
+     }
+ 
+@@ -308,17 +315,24 @@ class PagerPageHolder(
+     override fun onScaleChanged(newScale: Float) {
+         super.onScaleChanged(newScale)
+         viewer.activity.hideMenu()
+-        //TachiyomiAT
+-        updateTranslationCoords(pageView as SubsamplingScaleImageView)
++        // TachiyomiAT
++        (pageView as? SubsamplingScaleImageView)?.let(::updateTranslationCoords)
+     }
+ 
+-    //TachiyomiAT
++    // TachiyomiAT
+     override fun onCenterChanged(newCenter: PointF?) {
+         super.onCenterChanged(newCenter)
+-        updateTranslationCoords(pageView as SubsamplingScaleImageView)
++        (pageView as? SubsamplingScaleImageView)?.let(::updateTranslationCoords)
++    }
++
++    override fun onImageDrawn() {
++        super.onImageDrawn()
++        // SSIV's preDraw() can change fit/center without notifying its state listener.
++        // Read after the image draw so startup, resize and pending center changes are included.
++        (pageView as? SubsamplingScaleImageView)?.let(::updateTranslationCoords)
+     }
+ 
+-    //TachiyomiAT
++    // TachiyomiAT
+     private fun addTranslationsView() {
+         if (page.translation == null) return
+         removeView(translationsView)
+@@ -338,21 +352,37 @@ class PagerPageHolder(
+         } else {
+             translationsView?.refreshContent()
+         }
++        if (translationCrop.needsOriginalImage(page.translation != null)) {
++            translationsView?.viewportState?.value = null
++            if (cropReloadJob?.isActive != true) {
++                cropReloadJob = scope.launch { setImage() }
++            }
++            return
++        }
+         (pageView as? SubsamplingScaleImageView)?.let(::updateTranslationCoords)
+         if (showTranslations) translationsView?.show()
+     }
+ 
+-    //TachiyomiAT
++    // TachiyomiAT
+     private fun updateTranslationCoords(vi: SubsamplingScaleImageView) {
+-        if (page.translation == null) return
+-        val coords = vi.sourceToViewCoord(0f, 0f)
+-        if (coords != null) {
+-            translationsView?.viewTLState?.value = coords
++        val overlay = translationsView ?: return
++        val translation = page.translation ?: return
++        if (translationCrop.needsOriginalImage(hasTranslation = true)) {
++            overlay.viewportState.value = null
++            return
++        }
++        val origin = if (vi.isReady) vi.sourceToViewCoord(0f, 0f) else null
++        overlay.viewportState.value = origin?.let {
++            TranslationViewportTransform.resolve(
++                viewScale = vi.scale,
++                sourceWidth = vi.sWidth,
++                translationWidth = translation.imgWidth,
++                originX = it.x + vi.left - overlay.left,
++                originY = it.y + vi.top - overlay.top,
++            )
+         }
+-        translationsView?.scaleState?.value = vi.scale
+     }
+ 
+-
+     private fun showErrorLayout(error: Throwable?): ReaderErrorBinding {
+         if (errorLayout == null) {
+             errorLayout = ReaderErrorBinding.inflate(LayoutInflater.from(context), this, true)
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/reader/viewer/webtoon/WebtoonPageHolder.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/reader/viewer/webtoon/WebtoonPageHolder.kt
+index ccb7013..a9a6333 100644
+--- a/app/src/main/java/eu/kanade/tachiyomi/ui/reader/viewer/webtoon/WebtoonPageHolder.kt
++++ b/app/src/main/java/eu/kanade/tachiyomi/ui/reader/viewer/webtoon/WebtoonPageHolder.kt
+@@ -21,6 +21,7 @@ import eu.kanade.tachiyomi.ui.webview.WebViewActivity
+ import eu.kanade.tachiyomi.util.system.dpToPx
+ import eu.kanade.translation.data.TranslationFont
+ import eu.kanade.translation.model.ManualTranslationPosition
++import eu.kanade.translation.presentation.TranslationImageCrop
+ import eu.kanade.translation.presentation.WebtoonTranslationsView
+ import kotlinx.coroutines.Job
+ import kotlinx.coroutines.MainScope
+@@ -53,6 +54,9 @@ class WebtoonPageHolder(
+     private var showTranslations = true
+     private var translationsView: WebtoonTranslationsView? = null
+     private var translationPageIndex: Int? = null
++    private val translationCrop = TranslationImageCrop()
++    private var cropReloadJob: Job? = null
++    private var cropReloadPage: ReaderPage? = null
+ 
+     private val progressIndicator = createProgressIndicator()
+     private lateinit var progressContainer: ViewGroup
+@@ -80,6 +84,10 @@ class WebtoonPageHolder(
+         // page before binding a new one; otherwise an old translation can remain visible
+         // while the new image/translation is loading.
+         clearTranslationsView()
++        cropReloadJob?.cancel()
++        cropReloadJob = null
++        cropReloadPage = null
++        translationCrop.reset()
+         this.page = page
+         loadJob?.cancel()
+         loadJob = scope.launch { loadPageAndProcessStatus() }
+@@ -96,6 +104,14 @@ class WebtoonPageHolder(
+         } else {
+             translationsView?.refreshContent()
+         }
++        if (translationCrop.needsOriginalImage(currentPage.translation != null)) {
++            clearTranslationsView()
++            cropReloadPage = currentPage
++            if (cropReloadJob?.isActive != true) {
++                cropReloadJob = scope.launch { setImage(currentPage) }
++            }
++            return
++        }
+         if (showTranslations) translationsView?.show()
+     }
+ 
+@@ -109,6 +125,10 @@ class WebtoonPageHolder(
+     }
+ 
+     override fun recycle() {
++        cropReloadJob?.cancel()
++        cropReloadJob = null
++        cropReloadPage = null
++        translationCrop.reset()
+         loadJob?.cancel()
+         loadJob = null
+         clearTranslationsView()
+@@ -181,13 +201,18 @@ class WebtoonPageHolder(
+             withUIContext {
+                 // The holder may have been rebound while image decoding was running.
+                 if (page !== expectedPage) return@withUIContext
++                val cropBorders = translationCrop.forImage(
++                    viewer.config.imageCropBorders,
++                    expectedPage.translation != null,
++                )
++                translationCrop.recordImage(cropBorders)
+                 frame.setImage(
+                     source,
+                     isAnimated,
+                     ReaderPageImageView.Config(
+                         zoomDuration = viewer.config.doubleTapAnimDuration,
+                         minimumScaleType = SubsamplingScaleImageView.SCALE_TYPE_FIT_WIDTH,
+-                        cropBorders = viewer.config.imageCropBorders,
++                        cropBorders = cropBorders,
+                     ),
+                 )
+                 removeErrorLayout()
+@@ -217,7 +242,9 @@ class WebtoonPageHolder(
+         return if (isDoublePage) {
+             val rotation = if (viewer.config.dualPageRotateToFitInvert) -90f else 90f
+             ImageUtil.rotateImage(imageSource, rotation)
+-        } else imageSource
++        } else {
++            imageSource
++        }
+     }
+ 
+     private fun setError(error: Throwable?) {
+@@ -229,7 +256,13 @@ class WebtoonPageHolder(
+     private fun onImageDecoded() {
+         progressContainer.isVisible = false
+         removeErrorLayout()
+-        if (translationPageIndex == page?.index) translationsView?.show()
++        val currentPage = page ?: return
++        if (translationCrop.needsOriginalImage(currentPage.translation != null)) return
++        if (cropReloadPage === currentPage) {
++            cropReloadPage = null
++            if (translationsView == null) addTranslationsView(currentPage)
++        }
++        if (showTranslations && translationPageIndex == page?.index) translationsView?.show()
+     }
+ 
+     private fun addTranslationsView(expectedPage: ReaderPage) {
+diff --git a/app/src/main/java/eu/kanade/translation/EnglishDownloadTranslationPolicy.kt b/app/src/main/java/eu/kanade/translation/EnglishDownloadTranslationPolicy.kt
+new file mode 100644
+index 0000000..e672f58
+--- /dev/null
++++ b/app/src/main/java/eu/kanade/translation/EnglishDownloadTranslationPolicy.kt
+@@ -0,0 +1,11 @@
++package eu.kanade.translation
++
++/** Source language is a routing hint, not a claim that OCR detected the chapter language. */
++object EnglishDownloadTranslationPolicy {
++    fun enabled(globalEnabled: Boolean, workOverride: Boolean?, sourceLanguage: String?, from: String, to: String): Boolean {
++        if (workOverride != null) return workOverride
++        val language = sourceLanguage?.lowercase(java.util.Locale.ROOT)?.replace('_', '-')
++        return globalEnabled && (language == "en" || language?.startsWith("en-") == true) &&
++            from == "ENGLISH" && to.isNotBlank() && to != "ENGLISH"
++    }
++}
+diff --git a/app/src/main/java/eu/kanade/translation/PendingDownloadTranslations.kt b/app/src/main/java/eu/kanade/translation/PendingDownloadTranslations.kt
+new file mode 100644
+index 0000000..f6e9da9
+--- /dev/null
++++ b/app/src/main/java/eu/kanade/translation/PendingDownloadTranslations.kt
+@@ -0,0 +1,25 @@
++package eu.kanade.translation
++
++/** Explicit per-chapter requests survive restart and are consumed only after enqueue succeeds. */
++class PendingDownloadTranslations(
++    private val load: () -> Set<String>,
++    private val save: (Set<String>) -> Unit,
++) {
++    @Synchronized
++    fun request(chapterId: Long) = save(load() + chapterId.toString())
++
++    @Synchronized
++    fun cancel(chapterIds: Iterable<Long>) = save(load() - chapterIds.map(Long::toString).toSet())
++
++    @Synchronized
++    fun clear() = save(emptySet())
++
++    @Synchronized
++    fun complete(chapterId: Long, enqueue: () -> Unit): Boolean {
++        val key = chapterId.toString()
++        if (key !in load()) return false
++        enqueue()
++        save(load() - key)
++        return true
++    }
++}
+diff --git a/app/src/main/java/eu/kanade/translation/TranslationManager.kt b/app/src/main/java/eu/kanade/translation/TranslationManager.kt
+index d2aad1f..ec83930 100644
+--- a/app/src/main/java/eu/kanade/translation/TranslationManager.kt
++++ b/app/src/main/java/eu/kanade/translation/TranslationManager.kt
+@@ -53,6 +53,22 @@ class TranslationManager(
+     private val sourceManager: SourceManager = Injekt.get(),
+     private val translationPreferences: TranslationPreferences = Injekt.get(),
+ ) {
++    val pendingDownloads = PendingDownloadTranslations(
++        load = { translationPreferences.pendingDownloadTranslations().get() },
++        save = { translationPreferences.pendingDownloadTranslations().set(it) },
++    )
++
++    fun completeRequestedDownload(manga: Manga, chapter: Chapter): Boolean =
++        pendingDownloads.complete(chapter.id) {
++            translateChapter(manga, chapter, TranslationRequestOrigin.USER_ACTION)
++        }
++
++    fun translateDownloadedChapter(manga: Manga, chapter: Chapter) {
++        if (!completeRequestedDownload(manga, chapter)) {
++            translateChapter(manga, chapter, TranslationRequestOrigin.DOWNLOAD_COMPLETION)
++        }
++    }
++
+     private val translator = ChapterTranslator(context, provider)
+     private val editorScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+     private val translationFileMutex = Mutex()
+@@ -95,12 +111,23 @@ class TranslationManager(
+         origin: TranslationRequestOrigin,
+     ) = translateChapters(manga, listOf(chapter), origin)
+ 
++    fun isAutomaticTranslationEnabled(manga: Manga): Boolean {
++        val work = translationPreferences.autoTranslateManga(manga.id)
++        return EnglishDownloadTranslationPolicy.enabled(
++            globalEnabled = translationPreferences.autoTranslateEnglishDownloads().get(),
++            workOverride = work.get().takeIf { work.isSet() },
++            sourceLanguage = (sourceManager.get(manga.source) as? eu.kanade.tachiyomi.source.online.HttpSource)?.lang,
++            from = translationPreferences.translateFromLanguage().get(),
++            to = translationPreferences.translateToLanguage().get(),
++        )
++    }
++
+     fun translateChapters(
+         manga: Manga,
+         chapters: Iterable<Chapter>,
+         origin: TranslationRequestOrigin,
+     ) {
+-        val autoTranslateEnabled = translationPreferences.autoTranslateManga(manga.id).get()
++        val autoTranslateEnabled = isAutomaticTranslationEnabled(manga)
+         if (!TranslationLaunchPolicy.canStart(origin, autoTranslateEnabled)) return
+         chapters.forEach { chapter -> translator.queueChapter(manga, chapter) }
+         startTranslation()
+diff --git a/app/src/main/java/eu/kanade/translation/presentation/PagerTranslationsView.kt b/app/src/main/java/eu/kanade/translation/presentation/PagerTranslationsView.kt
+index 874cd23..4a1aeb5 100644
+--- a/app/src/main/java/eu/kanade/translation/presentation/PagerTranslationsView.kt
++++ b/app/src/main/java/eu/kanade/translation/presentation/PagerTranslationsView.kt
+@@ -1,10 +1,9 @@
+ package eu.kanade.translation.presentation
+ 
+ import android.content.Context
+-import android.graphics.PointF
+ import android.util.AttributeSet
+ import androidx.compose.foundation.layout.Box
+-import androidx.compose.foundation.layout.absoluteOffset
++import androidx.compose.foundation.layout.fillMaxSize
+ import androidx.compose.runtime.Composable
+ import androidx.compose.runtime.collectAsState
+ import androidx.compose.runtime.getValue
+@@ -13,6 +12,8 @@ import androidx.compose.runtime.mutableStateOf
+ import androidx.compose.runtime.remember
+ import androidx.compose.runtime.setValue
+ import androidx.compose.ui.Modifier
++import androidx.compose.ui.draw.clipToBounds
++import androidx.compose.ui.graphics.graphicsLayer
+ import androidx.compose.ui.platform.AbstractComposeView
+ import androidx.compose.ui.text.font.Font
+ import androidx.compose.ui.text.font.FontFamily
+@@ -57,8 +58,7 @@ class PagerTranslationsView : AbstractComposeView {
+         fontFamily = Font(resId = this.font.res, weight = FontWeight.Bold).toFontFamily()
+     }
+ 
+-    val scaleState = MutableStateFlow(1f)
+-    val viewTLState = MutableStateFlow(PointF())
++    val viewportState = MutableStateFlow<TranslationViewportTransform?>(null)
+     private var refreshRevision by mutableStateOf(0)
+ 
+     fun refreshContent() {
+@@ -67,21 +67,28 @@ class PagerTranslationsView : AbstractComposeView {
+ 
+     @Composable
+     override fun Content() {
+-        val viewTL by viewTLState.collectAsState()
+-        val scale by scaleState.collectAsState()
++        val viewport by viewportState.collectAsState()
+         var editingBlockIndex by remember { mutableStateOf<Int?>(null) }
+         var contentRevision by remember { mutableStateOf(0) }
+-        Box(modifier = Modifier.absoluteOffset(viewTL.x.pxToDp(), viewTL.y.pxToDp())) {
+-            val visibleRevision = contentRevision + refreshRevision
+-            key(visibleRevision) {
+-                TextBlockBackground(scale)
+-                TextBlockContent(
+-                    zoomScale = scale,
+-                    contentRevision = visibleRevision,
+-                    onEdit = editor?.let {
+-                        { index -> editingBlockIndex = index }
+-                    },
+-                )
++        Box(modifier = Modifier.fillMaxSize().clipToBounds()) {
++            val frame = viewport ?: return@Box
++            Box(
++                modifier = Modifier.fillMaxSize().graphicsLayer {
++                    translationX = frame.offsetX
++                    translationY = frame.offsetY
++                },
++            ) {
++                val visibleRevision = contentRevision + refreshRevision
++                key(visibleRevision) {
++                    TextBlockBackground(frame.scale)
++                    TextBlockContent(
++                        zoomScale = frame.scale,
++                        contentRevision = visibleRevision,
++                        onEdit = editor?.let {
++                            { index -> editingBlockIndex = index }
++                        },
++                    )
++                }
+             }
+         }
+         val blockIndex = editingBlockIndex
+diff --git a/app/src/main/java/eu/kanade/translation/presentation/SmartTranslationBlock.kt b/app/src/main/java/eu/kanade/translation/presentation/SmartTranslationBlock.kt
+index 87bae27..5ba09d6 100644
+--- a/app/src/main/java/eu/kanade/translation/presentation/SmartTranslationBlock.kt
++++ b/app/src/main/java/eu/kanade/translation/presentation/SmartTranslationBlock.kt
+@@ -2,7 +2,8 @@ package eu.kanade.translation.presentation
+ 
+ import androidx.compose.foundation.combinedClickable
+ import androidx.compose.foundation.layout.Box
+-import androidx.compose.foundation.layout.offset
++import androidx.compose.foundation.layout.absoluteOffset
++import androidx.compose.foundation.layout.wrapContentSize
+ import androidx.compose.foundation.layout.requiredSize
+ import androidx.compose.foundation.layout.width
+ import androidx.compose.material3.LocalTextStyle
+@@ -57,7 +58,8 @@ fun SmartTranslationBlock(
+         if (onLongClick != null) {
+             Box(
+                 modifier = modifier
+-                    .offset(xPx.pxToDp(), yPx.pxToDp())
++                    .wrapContentSize(Alignment.TopStart, unbounded = true)
++            .absoluteOffset(xPx.pxToDp(), yPx.pxToDp())
+                     .requiredSize(width, height)
+             .graphicsLayer {
+                 scaleX = scaleFactor
+@@ -75,7 +77,8 @@ fun SmartTranslationBlock(
+ 
+     Box(
+         modifier = modifier
+-            .offset(xPx.pxToDp(), yPx.pxToDp())
++            .wrapContentSize(Alignment.TopStart, unbounded = true)
++            .absoluteOffset(xPx.pxToDp(), yPx.pxToDp())
+             .requiredSize(width, height)
+             .graphicsLayer {
+                 scaleX = scaleFactor
+diff --git a/app/src/main/java/eu/kanade/translation/presentation/TranslationCleanupBlock.kt b/app/src/main/java/eu/kanade/translation/presentation/TranslationCleanupBlock.kt
+index 973dea0..eb9b340 100644
+--- a/app/src/main/java/eu/kanade/translation/presentation/TranslationCleanupBlock.kt
++++ b/app/src/main/java/eu/kanade/translation/presentation/TranslationCleanupBlock.kt
+@@ -3,7 +3,7 @@ package eu.kanade.translation.presentation
+ import androidx.compose.foundation.Canvas
+ import androidx.compose.foundation.background
+ import androidx.compose.foundation.layout.Box
+-import androidx.compose.foundation.layout.offset
++import androidx.compose.foundation.layout.absoluteOffset
+ import androidx.compose.foundation.layout.requiredSize
+ import androidx.compose.foundation.layout.wrapContentSize
+ import androidx.compose.foundation.shape.RoundedCornerShape
+@@ -48,7 +48,8 @@ fun TranslationCleanupBlock(
+             }
+             Box(
+                 modifier = Modifier
+-                    .offset((adjustedX * scaleFactor).pxToDp(), (adjustedY * scaleFactor).pxToDp())
++                    .wrapContentSize(Alignment.TopStart, unbounded = true)
++            .absoluteOffset((adjustedX * scaleFactor).pxToDp(), (adjustedY * scaleFactor).pxToDp())
+                     .requiredSize(
+                         (adjustedWidth * scaleFactor).pxToDp(),
+                         (adjustedHeight * scaleFactor).pxToDp(),
+diff --git a/app/src/main/java/eu/kanade/translation/presentation/TranslationImageCrop.kt b/app/src/main/java/eu/kanade/translation/presentation/TranslationImageCrop.kt
+new file mode 100644
+index 0000000..5bddbe5
+--- /dev/null
++++ b/app/src/main/java/eu/kanade/translation/presentation/TranslationImageCrop.kt
+@@ -0,0 +1,18 @@
++package eu.kanade.translation.presentation
++
++/** Stored OCR coordinates refer to the original file, not the decoder's border-cropped image. */
++class TranslationImageCrop {
++    private var appliedCrop: Boolean? = null
++
++    fun forImage(requested: Boolean, hasTranslation: Boolean): Boolean = requested && !hasTranslation
++
++    fun recordImage(cropped: Boolean) {
++        appliedCrop = cropped
++    }
++
++    fun needsOriginalImage(hasTranslation: Boolean): Boolean = hasTranslation && appliedCrop == true
++
++    fun reset() {
++        appliedCrop = null
++    }
++}
+diff --git a/app/src/main/java/eu/kanade/translation/presentation/TranslationTextFit.kt b/app/src/main/java/eu/kanade/translation/presentation/TranslationTextFit.kt
+index b43aaac..ae93f81 100644
+--- a/app/src/main/java/eu/kanade/translation/presentation/TranslationTextFit.kt
++++ b/app/src/main/java/eu/kanade/translation/presentation/TranslationTextFit.kt
+@@ -14,13 +14,15 @@ object TranslationTextFit {
+     ): Selection {
+         val measured = mutableMapOf<Int, Measurement>()
+         fun measurement(size: Int) = measured.getOrPut(size) { measure(size) }
+-        val wholeWords = TranslationFontSizeSearch.largestFitting(minimum, maximum) {
+-            val result = measurement(it)
+-            result.fits && result.keepsWords
++        val largest = TranslationFontSizeSearch.largestFitting(minimum, maximum) { measurement(it).fits }
++            ?: return Selection(minimum.coerceAtMost(maximum), false, false)
++        // Word-boundary preservation is not monotonic: a smaller font can wrap
++        // at a different word. Binary search is valid for fit, not for this predicate.
++        for (size in largest downTo minimum) {
++            val result = measurement(size)
++            if (result.fits && result.keepsWords) return Selection(size, true, true)
+         }
+-        if (wholeWords != null) return Selection(wholeWords, true, true)
+-        val fallback = TranslationFontSizeSearch.selectWithFloor(minimum, maximum) { measurement(it).fits }
+-        return Selection(fallback.fontSizeSp, fallback.fits, false)
++        return Selection(largest, true, false)
+     }
+ 
+     fun keepsWords(text: String, lineEnds: List<Int>): Boolean = lineEnds.none { end ->
+diff --git a/app/src/main/java/eu/kanade/translation/presentation/TranslationViewportScale.kt b/app/src/main/java/eu/kanade/translation/presentation/TranslationViewportScale.kt
+new file mode 100644
+index 0000000..607f550
+--- /dev/null
++++ b/app/src/main/java/eu/kanade/translation/presentation/TranslationViewportScale.kt
+@@ -0,0 +1,9 @@
++package eu.kanade.translation.presentation
++
++object TranslationViewportScale {
++    fun resolve(viewScale: Float, sourceWidth: Int, translationWidth: Float): Float {
++        if (!viewScale.isFinite() || viewScale <= 0f) return 0f
++        if (sourceWidth <= 0 || !translationWidth.isFinite() || translationWidth <= 0f) return viewScale
++        return (viewScale * sourceWidth / translationWidth).takeIf { it.isFinite() } ?: viewScale
++    }
++}
+diff --git a/app/src/main/java/eu/kanade/translation/presentation/TranslationViewportTransform.kt b/app/src/main/java/eu/kanade/translation/presentation/TranslationViewportTransform.kt
+new file mode 100644
+index 0000000..69937ee
+--- /dev/null
++++ b/app/src/main/java/eu/kanade/translation/presentation/TranslationViewportTransform.kt
+@@ -0,0 +1,28 @@
++package eu.kanade.translation.presentation
++
++/** One immutable snapshot: the image origin and scale must describe the same reader frame. */
++data class TranslationViewportTransform(
++    val scale: Float,
++    val offsetX: Float,
++    val offsetY: Float,
++) {
++    companion object {
++        fun resolve(
++            viewScale: Float,
++            sourceWidth: Int,
++            translationWidth: Float,
++            originX: Float,
++            originY: Float,
++        ): TranslationViewportTransform? {
++            if (!viewScale.isFinite() || viewScale <= 0f || sourceWidth <= 0 ||
++                !translationWidth.isFinite() || translationWidth <= 0f ||
++                !originX.isFinite() || !originY.isFinite()
++            ) {
++                return null
++            }
++            val scale = TranslationViewportScale.resolve(viewScale, sourceWidth, translationWidth)
++            if (!scale.isFinite() || scale <= 0f) return null
++            return TranslationViewportTransform(scale, originX, originY)
++        }
++    }
++}
+diff --git a/app/src/test/java/eu/kanade/presentation/more/settings/screen/browse/discovery/RepositoryCatalogTest.kt b/app/src/test/java/eu/kanade/presentation/more/settings/screen/browse/discovery/RepositoryCatalogTest.kt
+new file mode 100644
+index 0000000..09a3662
+--- /dev/null
++++ b/app/src/test/java/eu/kanade/presentation/more/settings/screen/browse/discovery/RepositoryCatalogTest.kt
+@@ -0,0 +1,57 @@
++package eu.kanade.presentation.more.settings.screen.browse.discovery
++
++import org.junit.jupiter.api.Assertions.assertEquals
++import org.junit.jupiter.api.Assertions.assertFalse
++import org.junit.jupiter.api.Assertions.assertTrue
++import org.junit.jupiter.api.Test
++
++class RepositoryCatalogTest {
++    @Test
++    fun `empty search returns the initial catalog without registering anything`() {
++        assertEquals(RepositoryCatalog.entries, RepositoryCatalog.search("  "))
++        assertEquals(2, RepositoryCatalog.entries.size)
++        assertEquals(2, RepositoryCatalog.entries.map { it.id }.distinct().size)
++        assertTrue(RepositoryCatalog.entries.all { it.indexUrl.startsWith("https://") })
++    }
++
++    @Test
++    fun `search accepts accents case language and multiple terms`() {
++        assertEquals(listOf("nox"), RepositoryCatalog.search("AWERKORI português").map { it.id })
++        assertEquals(2, RepositoryCatalog.search("PT-BR inglês").size)
++        assertEquals(listOf("keiyoushi"), RepositoryCatalog.search("Keiyoushi").map { it.id })
++        assertTrue(RepositoryCatalog.search("unknown project").isEmpty())
++    }
++
++    @Test
++    fun `known legacy and redirected index URLs do not duplicate repositories`() {
++        val entry = RepositoryCatalog.entries.last()
++        assertTrue(RepositoryCatalog.isAdded(entry, setOf("https://github.com/keiyoushi/extensions/raw/repo/index.pb")))
++        assertTrue(
++            RepositoryCatalog.isAdded(
++                entry,
++                setOf("https://raw.githubusercontent.com/Keiyoushi/Extensions/repo/repo.json"),
++            ),
++        )
++        assertTrue(
++            RepositoryCatalog.isAdded(
++                entry,
++                setOf("https://raw.githubusercontent.com/keiyoushi/extensions/repo/index.min.json/"),
++            ),
++        )
++    }
++
++    @Test
++    fun `different branches hosts and unsafe URL forms are not conflated`() {
++        val entry = RepositoryCatalog.entries.last()
++        for (url in listOf(
++            "https://raw.githubusercontent.com/keiyoushi/extensions/other/index.pb",
++            "https://evil.example/keiyoushi/extensions/repo/index.pb",
++            "http://raw.githubusercontent.com/keiyoushi/extensions/repo/index.pb",
++            "https://user@raw.githubusercontent.com/keiyoushi/extensions/repo/index.pb",
++            "https://raw.githubusercontent.com/keiyoushi/extensions/repo/index.pb?token=abc",
++            "not a url",
++        )) {
++            assertFalse(RepositoryCatalog.isAdded(entry, setOf(url)), url)
++        }
++    }
++}
+diff --git a/app/src/test/java/eu/kanade/presentation/more/settings/screen/browse/discovery/RepositoryDiscoveryControllerTest.kt b/app/src/test/java/eu/kanade/presentation/more/settings/screen/browse/discovery/RepositoryDiscoveryControllerTest.kt
+new file mode 100644
+index 0000000..c9027c7
+--- /dev/null
++++ b/app/src/test/java/eu/kanade/presentation/more/settings/screen/browse/discovery/RepositoryDiscoveryControllerTest.kt
+@@ -0,0 +1,105 @@
++package eu.kanade.presentation.more.settings.screen.browse.discovery
++
++import kotlinx.coroutines.CompletableDeferred
++import kotlinx.coroutines.flow.MutableStateFlow
++import kotlinx.coroutines.flow.flow
++import kotlinx.coroutines.test.StandardTestDispatcher
++import kotlinx.coroutines.test.runCurrent
++import kotlinx.coroutines.test.runTest
++import org.junit.jupiter.api.Assertions.assertEquals
++import org.junit.jupiter.api.Assertions.assertNull
++import org.junit.jupiter.api.Assertions.assertTrue
++import org.junit.jupiter.api.Test
++
++class RepositoryDiscoveryControllerTest {
++    @Test
++    fun `one direct add registers the chosen repository and ignores repeated clicks`() = runTest {
++        val installed = MutableStateFlow(emptySet<String>())
++        val gate = CompletableDeferred<Unit>()
++        val calls = mutableListOf<String>()
++        var refreshes = 0
++        val controller = RepositoryDiscoveryController({ installed }, { url ->
++            calls += url
++            gate.await()
++            installed.value = installed.value + url
++        }, { refreshes++ }, backgroundScope, StandardTestDispatcher(testScheduler))
++        runCurrent()
++        controller.add("nox")
++        controller.add("nox")
++        controller.add("keiyoushi")
++        runCurrent()
++        assertEquals(listOf(RepositoryCatalog.entries.first().indexUrl), calls)
++        assertEquals("nox", controller.state.value.pendingId)
++        gate.complete(Unit)
++        runCurrent()
++        assertNull(controller.state.value.pendingId)
++        assertNull(controller.state.value.error)
++        assertEquals(1, refreshes)
++        controller.add("nox")
++        runCurrent()
++        assertEquals(1, calls.size)
++    }
++
++    @Test
++    fun `registration failure permits retry without claiming success`() = runTest {
++        var fail = true
++        val controller = RepositoryDiscoveryController({ MutableStateFlow(emptySet<String>()) }, {
++            if (fail) error("network failed")
++        }, {}, backgroundScope, StandardTestDispatcher(testScheduler))
++        runCurrent()
++        controller.add("nox")
++        runCurrent()
++        assertEquals(DiscoveryError.ADD, controller.state.value.error)
++        assertTrue(controller.state.value.installedUrls.isEmpty())
++        assertNull(controller.state.value.pendingId)
++        fail = false
++        controller.add("nox")
++        runCurrent()
++        assertNull(controller.state.value.error)
++        assertTrue(controller.state.value.installedUrls.isNotEmpty())
++    }
++
++    @Test
++    fun `listing refresh failure retains a successfully registered repository`() = runTest {
++        var adds = 0
++        val controller = RepositoryDiscoveryController(
++            { MutableStateFlow(emptySet<String>()) },
++            { adds++ },
++            { error("refresh failed") },
++            backgroundScope,
++            StandardTestDispatcher(testScheduler),
++        )
++        runCurrent()
++        controller.add("keiyoushi")
++        runCurrent()
++        assertEquals(DiscoveryError.REFRESH, controller.state.value.error)
++        assertTrue(RepositoryCatalog.isAdded(RepositoryCatalog.entries.last(), controller.state.value.installedUrls))
++        controller.add("keiyoushi")
++        runCurrent()
++        assertEquals(1, adds)
++    }
++
++    @Test
++    fun `database read failure blocks additions and can be retried`() = runTest {
++        var fail = true
++        var adds = 0
++        val controller = RepositoryDiscoveryController({
++            flow {
++                if (fail) error("db unavailable")
++                emit(emptySet<String>())
++            }
++        }, { adds++ }, {}, backgroundScope, StandardTestDispatcher(testScheduler))
++        runCurrent()
++        assertEquals(DiscoveryError.LOAD, controller.state.value.error)
++        controller.add("nox")
++        runCurrent()
++        assertEquals(0, adds)
++        fail = false
++        controller.reload()
++        runCurrent()
++        assertTrue(controller.state.value.loaded)
++        controller.add("unknown-id")
++        runCurrent()
++        assertEquals(0, adds)
++    }
++}
+diff --git a/app/src/test/java/eu/kanade/translation/EnglishDownloadTranslationPolicyTest.kt b/app/src/test/java/eu/kanade/translation/EnglishDownloadTranslationPolicyTest.kt
+new file mode 100644
+index 0000000..cb3a663
+--- /dev/null
++++ b/app/src/test/java/eu/kanade/translation/EnglishDownloadTranslationPolicyTest.kt
+@@ -0,0 +1,39 @@
++package eu.kanade.translation
++
++import org.junit.jupiter.api.Assertions.assertFalse
++import org.junit.jupiter.api.Assertions.assertTrue
++import org.junit.jupiter.api.Test
++
++class EnglishDownloadTranslationPolicyTest {
++    private fun enabled(lang: String?, global: Boolean = true, work: Boolean? = null,
++                        from: String = "ENGLISH", to: String = "PORTUGUESE") =
++        EnglishDownloadTranslationPolicy.enabled(global, work, lang, from, to)
++
++    @Test
++    fun `English source variants are eligible`() {
++        for (lang in listOf("en", "en-US", "en_GB", "EN")) assertTrue(enabled(lang))
++    }
++
++    @Test
++    fun `Portuguese and unknown sources are not guessed as English`() {
++        for (lang in listOf("pt", "pt-BR", "all", "", "enough", null)) assertFalse(enabled(lang))
++    }
++
++    @Test
++    fun `explicit work choices take priority`() {
++        assertFalse(enabled("en", work = false))
++        assertTrue(enabled("all", global = false, work = true))
++    }
++
++    @Test
++    fun `global off disables the English default`() {
++        assertFalse(enabled("en", global = false))
++    }
++
++    @Test
++    fun `configured source and target must permit English translation`() {
++        assertFalse(enabled("en", from = "JAPANESE"))
++        assertFalse(enabled("en", to = "ENGLISH"))
++        assertFalse(enabled("en", to = ""))
++    }
++}
+diff --git a/app/src/test/java/eu/kanade/translation/PendingDownloadTranslationsTest.kt b/app/src/test/java/eu/kanade/translation/PendingDownloadTranslationsTest.kt
+new file mode 100644
+index 0000000..f9f38c4
+--- /dev/null
++++ b/app/src/test/java/eu/kanade/translation/PendingDownloadTranslationsTest.kt
+@@ -0,0 +1,55 @@
++package eu.kanade.translation
++
++import org.junit.jupiter.api.Assertions.assertEquals
++import org.junit.jupiter.api.Assertions.assertFalse
++import org.junit.jupiter.api.Assertions.assertThrows
++import org.junit.jupiter.api.Assertions.assertTrue
++import org.junit.jupiter.api.Test
++
++class PendingDownloadTranslationsTest {
++    private var stored = emptySet<String>()
++    private fun requests() = PendingDownloadTranslations({ stored }, { stored = it })
++
++    @Test
++    fun `explicit chapter request survives restart and does not select other chapters`() {
++        requests().request(42)
++        var enqueued = 0
++        assertFalse(requests().complete(43) { enqueued++ })
++        assertTrue(requests().complete(42) { enqueued++ })
++        assertEquals(1, enqueued)
++        assertTrue(stored.isEmpty())
++        assertFalse(requests().complete(42) { enqueued++ })
++    }
++
++    @Test
++    fun `enqueue failure preserves request for retry`() {
++        val requests = requests()
++        requests.request(42)
++        assertThrows(IllegalStateException::class.java) {
++            requests.complete(42) { error("queue unavailable") }
++        }
++        assertEquals(setOf("42"), stored)
++        assertTrue(requests.complete(42) {})
++    }
++
++    @Test
++    fun `cancellation prevents a later ordinary download from consuming the request`() {
++        val requests = requests()
++        requests.request(42)
++        requests.request(43)
++        requests.cancel(listOf(42))
++        assertFalse(requests.complete(42) { error("cancelled chapter enqueued") })
++        assertEquals(setOf("43"), stored)
++        requests.clear()
++        assertTrue(stored.isEmpty())
++    }
++
++    @Test
++    fun `duplicate clicks and simultaneous requests do not lose chapters`() {
++        val requests = requests()
++        val threads = (1L..20L).map { id -> Thread { repeat(5) { requests.request(id) } } }
++        threads.forEach(Thread::start)
++        threads.forEach(Thread::join)
++        assertEquals((1L..20L).map(Long::toString).toSet(), stored)
++    }
++}
+diff --git a/app/src/test/java/eu/kanade/translation/presentation/TranslationImageCropTest.kt b/app/src/test/java/eu/kanade/translation/presentation/TranslationImageCropTest.kt
+new file mode 100644
+index 0000000..b8a93f0
+--- /dev/null
++++ b/app/src/test/java/eu/kanade/translation/presentation/TranslationImageCropTest.kt
+@@ -0,0 +1,47 @@
++package eu.kanade.translation.presentation
++
++import org.junit.jupiter.api.Assertions.assertFalse
++import org.junit.jupiter.api.Assertions.assertTrue
++import org.junit.jupiter.api.Test
++
++class TranslationImageCropTest {
++    @Test
++    fun `saved translation keeps the original image even when the reader requests border crop`() {
++        val policy = TranslationImageCrop()
++        val crop = policy.forImage(requested = true, hasTranslation = true)
++        assertFalse(crop)
++        policy.recordImage(crop)
++        assertFalse(policy.needsOriginalImage(hasTranslation = true))
++    }
++
++    @Test
++    fun `translation arriving on an already cropped page requires one uncropped reload`() {
++        val policy = TranslationImageCrop()
++        policy.recordImage(policy.forImage(requested = true, hasTranslation = false))
++        assertFalse(policy.needsOriginalImage(hasTranslation = false))
++        assertTrue(policy.needsOriginalImage(hasTranslation = true))
++        policy.recordImage(policy.forImage(requested = true, hasTranslation = true))
++        assertFalse(policy.needsOriginalImage(hasTranslation = true))
++        // A later edit must not trigger another image decode.
++        assertFalse(policy.needsOriginalImage(hasTranslation = true))
++    }
++
++    @Test
++    fun `untranslated pages retain the user choice and uncropped pages need no extra decode`() {
++        val policy = TranslationImageCrop()
++        assertTrue(policy.forImage(requested = true, hasTranslation = false))
++        assertFalse(policy.forImage(requested = false, hasTranslation = false))
++        policy.recordImage(cropped = false)
++        assertFalse(policy.needsOriginalImage(hasTranslation = true))
++    }
++
++    @Test
++    fun `recycled holder does not carry the prior page crop into its next binding`() {
++        val policy = TranslationImageCrop()
++        policy.recordImage(cropped = true)
++        policy.reset()
++        assertFalse(policy.needsOriginalImage(hasTranslation = true))
++        assertFalse(policy.forImage(requested = true, hasTranslation = true))
++        assertTrue(policy.forImage(requested = true, hasTranslation = false))
++    }
++}
+diff --git a/app/src/test/java/eu/kanade/translation/presentation/TranslationTextFitTest.kt b/app/src/test/java/eu/kanade/translation/presentation/TranslationTextFitTest.kt
+index f26ef06..dc8cbdf 100644
+--- a/app/src/test/java/eu/kanade/translation/presentation/TranslationTextFitTest.kt
++++ b/app/src/test/java/eu/kanade/translation/presentation/TranslationTextFitTest.kt
+@@ -60,4 +60,16 @@ class TranslationTextFitTest {
+         assertTrue(wider.keepsWords)
+         assertEquals(7, wider.fontSizeSp)
+     }
++    @Test
++    fun `does not discard a larger intact word layout when boundaries are nonmonotonic`() {
++        val calls = mutableMapOf<Int, Int>()
++        val result = TranslationTextFit.select(6, 25) { size ->
++            calls[size] = calls.getOrDefault(size, 0) + 1
++            TranslationTextFit.Measurement(size <= 23, size <= 14 || size == 22)
++        }
++        assertEquals(22, result.fontSizeSp)
++        assertTrue(result.keepsWords)
++        assertTrue(calls.values.all { it == 1 })
++    }
++
+ }
+diff --git a/app/src/test/java/eu/kanade/translation/presentation/TranslationViewportScaleTest.kt b/app/src/test/java/eu/kanade/translation/presentation/TranslationViewportScaleTest.kt
+new file mode 100644
+index 0000000..b1b308c
+--- /dev/null
++++ b/app/src/test/java/eu/kanade/translation/presentation/TranslationViewportScaleTest.kt
+@@ -0,0 +1,27 @@
++package eu.kanade.translation.presentation
++
++import org.junit.jupiter.api.Assertions.assertEquals
++import org.junit.jupiter.api.Test
++
++class TranslationViewportScaleTest {
++    @Test
++    fun `same pixel space preserves reader zoom`() {
++        assertEquals(0.4f, TranslationViewportScale.resolve(0.4f, 1200, 1200f), 0.0001f)
++    }
++
++    @Test
++    fun `downsampled translation coordinates are mapped to source pixels exactly once`() {
++        val scale = TranslationViewportScale.resolve(0.25f, 2400, 1200f)
++        assertEquals(0.5f, scale, 0.0001f)
++        assertEquals(100f, 200f * scale, 0.0001f)
++        assertEquals(2f, TranslationViewportScale.resolve(1f, 2400, 1200f), 0.0001f)
++    }
++
++    @Test
++    fun `invalid page metadata does not introduce NaN or infinite scale`() {
++        assertEquals(1f, TranslationViewportScale.resolve(1f, 0, 1200f))
++        assertEquals(1f, TranslationViewportScale.resolve(1f, 1200, 0f))
++        assertEquals(1f, TranslationViewportScale.resolve(1f, 1200, Float.NaN))
++        assertEquals(0f, TranslationViewportScale.resolve(Float.NaN, 1200, 1200f))
++    }
++}
+diff --git a/app/src/test/java/eu/kanade/translation/presentation/TranslationViewportTransformTest.kt b/app/src/test/java/eu/kanade/translation/presentation/TranslationViewportTransformTest.kt
+new file mode 100644
+index 0000000..cdf7b87
+--- /dev/null
++++ b/app/src/test/java/eu/kanade/translation/presentation/TranslationViewportTransformTest.kt
+@@ -0,0 +1,42 @@
++package eu.kanade.translation.presentation
++
++import org.junit.jupiter.api.Assertions.assertEquals
++import org.junit.jupiter.api.Assertions.assertNull
++import org.junit.jupiter.api.Test
++
++class TranslationViewportTransformTest {
++    @Test
++    fun `fitted portrait includes the black margin above the image once`() {
++        val transform = requireNotNull(TranslationViewportTransform.resolve(0.25f, 1440, 1440f, 0f, 120f))
++        assertEquals(100f, transform.offsetX + 400f * transform.scale, 0.001f)
++        assertEquals(270f, transform.offsetY + 600f * transform.scale, 0.001f)
++    }
++
++    @Test
++    fun `downsampled translation maps to the same displayed pixels as the source`() {
++        val transform = requireNotNull(TranslationViewportTransform.resolve(0.125f, 2880, 1440f, 16f, 120f))
++        assertEquals(116f, transform.offsetX + 400f * transform.scale, 0.001f)
++        assertEquals(270f, transform.offsetY + 600f * transform.scale, 0.001f)
++    }
++
++    @Test
++    fun `zoom and pan snapshot replaces both origin and scale without mutating the prior frame`() {
++        val fitted = requireNotNull(TranslationViewportTransform.resolve(0.25f, 1440, 1440f, 0f, 120f))
++        val zoomed = requireNotNull(TranslationViewportTransform.resolve(0.5f, 1440, 1440f, -150f, -200f))
++        assertEquals(50f, zoomed.offsetX + 400f * zoomed.scale, 0.001f)
++        assertEquals(100f, zoomed.offsetY + 600f * zoomed.scale, 0.001f)
++        assertEquals(120f, fitted.offsetY)
++        assertEquals(0.25f, fitted.scale)
++    }
++
++    @Test
++    fun `incomplete or invalid geometry has no drawable viewport`() {
++        assertNull(TranslationViewportTransform.resolve(0f, 1440, 1440f, 0f, 0f))
++        assertNull(TranslationViewportTransform.resolve(Float.NaN, 1440, 1440f, 0f, 0f))
++        assertNull(TranslationViewportTransform.resolve(1f, 0, 1440f, 0f, 0f))
++        assertNull(TranslationViewportTransform.resolve(1f, 1440, 0f, 0f, 0f))
++        assertNull(TranslationViewportTransform.resolve(1f, 1440, Float.POSITIVE_INFINITY, 0f, 0f))
++        assertNull(TranslationViewportTransform.resolve(1f, 1440, 1440f, Float.NaN, 0f))
++        assertNull(TranslationViewportTransform.resolve(1f, 1440, 1440f, 0f, Float.POSITIVE_INFINITY))
++    }
++}
+diff --git a/domain/src/main/java/tachiyomi/domain/translation/TranslationPreferences.kt b/domain/src/main/java/tachiyomi/domain/translation/TranslationPreferences.kt
+index 18b804f..ee30e4b 100644
+--- a/domain/src/main/java/tachiyomi/domain/translation/TranslationPreferences.kt
++++ b/domain/src/main/java/tachiyomi/domain/translation/TranslationPreferences.kt
+@@ -1,5 +1,6 @@
+ package tachiyomi.domain.translation
+ 
++import tachiyomi.core.common.preference.Preference
+ import tachiyomi.core.common.preference.PreferenceStore
+ 
+ enum class TranslationLlmProvider(
+@@ -21,6 +22,13 @@ class TranslationPreferences(
+         preferenceStore.getString("translation_${provider.preferenceKey}_model", provider.defaultModel)
+     }
+ 
++    fun pendingDownloadTranslations() = preferenceStore.getStringSet(
++        Preference.appStateKey("pending_download_translations"),
++        emptySet(),
++    )
++
++    fun autoTranslateEnglishDownloads() = preferenceStore.getBoolean("auto_translate_english_downloads", true)
++
+     fun autoTranslateAfterDownload() = preferenceStore.getBoolean("auto_translate_after_download", false)
+     fun autoTranslateNovels() = preferenceStore.getBoolean("auto_translate_novels", true)
+     fun novelTranslationEngine() = preferenceStore.getInt("novel_translation_engine", 1)
+diff --git a/i18n-at/src/commonMain/moko-resources/base/strings.xml b/i18n-at/src/commonMain/moko-resources/base/strings.xml
+index aab8cdd..7ed4795 100644
+--- a/i18n-at/src/commonMain/moko-resources/base/strings.xml
++++ b/i18n-at/src/commonMain/moko-resources/base/strings.xml
+@@ -54,4 +54,31 @@
+     <string name="translation_notification_text_progress">Translating the text from %1$d pages</string>
+     <string name="translation_notification_chapter_progress">Chapter %1$d of %2$d</string>
+     <string name="translation_notification_error">Could not finish the translation</string>
++    <string name="manga_download_and_translate">Download and translate</string>
++    <string name="pref_auto_translate_english_downloads">Translate downloads from English sources</string>
++    <string name="pref_auto_translate_english_downloads_summary">Starts after download when the source is English and the target language is different. Per-work settings take priority.</string>
++    <string name="repository_discovery">Discover repositories</string>
++    <string name="repository_search_hint">Name, language or maintainer</string>
++    <string name="repository_catalog_scope">Initial catalog bundled with Polaris. Search filters this list, not the entire internet.</string>
++    <string name="repository_third_party_notice">Third-party extensions execute code. A signature identifies a publisher, not a security audit. Respect source terms and applicable rights.</string>
++    <string name="repository_overlap_notice">Repositories can offer overlapping extensions with different signatures. Choose the extension origin deliberately.</string>
++    <string name="repository_maintainer">Maintainer: %1$s</string>
++    <string name="repository_last_checked">Index checked on 2026-10-30; individual extensions are not certified.</string>
++    <string name="repository_add">Add repository</string>
++    <string name="repository_added">Added</string>
++    <string name="repository_retry">Try again</string>
++    <string name="repository_no_results">No entries match. You can still add a URL on the Repositories screen.</string>
++    <string name="repository_after_add">After adding, return to Browse → Extensions to choose what to install.</string>
++    <string name="repository_load_error">Could not read installed repositories. Try again.</string>
++    <string name="repository_add_error">Could not add this repository. Check your connection and try again.</string>
++    <string name="repository_refresh_error">Repository added, but extension listings could not be refreshed. Refresh the Extensions screen.</string>
++    <string name="chapter_group_version">Group/version: %1$s</string>
++    <string name="chapter_entries_count">%1$d chapters/versions</string>
++    <string name="chapter_versions_filter">Source groups and versions</string>
++    <string name="chapter_versions_hint">One source may list multiple groups, editions and side stories with overlapping chapter numbers. Filter groups below without deleting chapters. Labels such as official come from the source.</string>
++    <string name="source_search_separate_results">Results stay separate by source. Searching does not merge works or chapters.</string>
++    <string name="repository_loading">Reading added repositories…</string>
++    <string name="repository_adding">Adding…</string>
++    <string name="chapter_versions_shortcut">Tap to filter source groups and versions</string>
++    <string name="translation_crop_borders_summary">Pages with saved translations keep their borders to align text with the original image.</string>
+ </resources>
+diff --git a/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml b/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
+index 3a4b6eb..d1748bc 100644
+--- a/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
++++ b/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
+@@ -54,4 +54,31 @@
+     <string name="translation_notification_text_progress">Traduzindo os textos de %1$d páginas</string>
+     <string name="translation_notification_chapter_progress">Capítulo %1$d de %2$d</string>
+     <string name="translation_notification_error">Não foi possível concluir a tradução</string>
++    <string name="manga_download_and_translate">Baixar e traduzir</string>
++    <string name="pref_auto_translate_english_downloads">Traduzir downloads de fontes em inglês</string>
++    <string name="pref_auto_translate_english_downloads_summary">Inicia após o download quando a fonte é inglesa e o idioma de destino é diferente. A configuração por obra tem prioridade.</string>
++    <string name="repository_discovery">Descobrir repositórios</string>
++    <string name="repository_search_hint">Nome, idioma ou mantenedor</string>
++    <string name="repository_catalog_scope">Catálogo inicial incluído no Polaris. A busca filtra esta lista, não toda a internet.</string>
++    <string name="repository_third_party_notice">Extensões de terceiros executam código. Assinatura identifica o publicador, não é auditoria de segurança. Respeite os termos das fontes e os direitos aplicáveis.</string>
++    <string name="repository_overlap_notice">Repositórios podem oferecer extensões sobrepostas com assinaturas diferentes. Escolha a origem da extensão.</string>
++    <string name="repository_maintainer">Mantenedor: %1$s</string>
++    <string name="repository_last_checked">Índice consultado em 30/10/2026; as extensões não são certificadas individualmente.</string>
++    <string name="repository_add">Adicionar repositório</string>
++    <string name="repository_added">Adicionado</string>
++    <string name="repository_retry">Tentar novamente</string>
++    <string name="repository_no_results">Nenhuma entrada encontrada. Você pode adicionar uma URL na tela Repositórios.</string>
++    <string name="repository_after_add">Depois de adicionar, volte a Explorar → Extensões e escolha o que instalar.</string>
++    <string name="repository_load_error">Não foi possível consultar os repositórios adicionados. Tente novamente.</string>
++    <string name="repository_add_error">Não foi possível adicionar o repositório. Confira a conexão e tente novamente.</string>
++    <string name="repository_refresh_error">Repositório adicionado, mas não foi possível atualizar as extensões. Atualize a tela Extensões.</string>
++    <string name="chapter_group_version">Grupo/versão: %1$s</string>
++    <string name="chapter_entries_count">%1$d capítulos/versões</string>
++    <string name="chapter_versions_filter">Grupos e versões da fonte</string>
++    <string name="chapter_versions_hint">Uma fonte pode listar grupos, edições e extras com números repetidos. Filtre os grupos abaixo sem apagar capítulos. Rótulos como official vêm da própria fonte.</string>
++    <string name="source_search_separate_results">Os resultados ficam separados por fonte. A busca não junta obras nem capítulos.</string>
++    <string name="repository_loading">Consultando repositórios adicionados…</string>
++    <string name="repository_adding">Adicionando…</string>
++    <string name="chapter_versions_shortcut">Toque para filtrar grupos e versões da fonte</string>
++    <string name="translation_crop_borders_summary">Páginas com tradução salva preservam as bordas para alinhar o texto à imagem original.</string>
+ </resources>

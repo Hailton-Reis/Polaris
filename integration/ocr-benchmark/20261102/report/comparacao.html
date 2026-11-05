@@ -1,0 +1,207 @@
+<!doctype html><html lang="pt-BR"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Polaris — benchmark OCR</title><style>body{font:16px system-ui;background:#101522;color:#eef3ff;margin:24px;max-width:1200px}td,th{border:1px solid #607080;padding:10px;vertical-align:top}table{border-collapse:collapse;width:100%}img{max-width:100%;background:white}pre{white-space:pre-wrap;overflow-wrap:anywhere}a{color:#85d8f3}section{margin:35px 0}select{padding:8px}.error{color:#ffd497}</style><h1>Benchmark controlado de OCR</h1><p>Imagens sintéticas com transcrição conhecida. Execuções reais, sem tradução. Os recortes não representam toda a diversidade de manhwas.</p><p><a href="RESULTADOS.md">Método e resultados completos</a></p><table><tr><th>Motor</th><th>Inglês: textos completos exatos</th><th>CER</th></tr>
+<tr><td>ML Kit 16.0.1 (API Android)</td><td>19/27</td><td>2.09%</td></tr>
+<tr><td>PaddleOCR v6 Small + detector Small</td><td>26/27</td><td>0.19%</td></tr>
+<tr><td>PaddleOCR v6 Tiny + detector Small</td><td>22/27</td><td>0.95%</td></tr>
+</table><p>ML Kit: Android x86_64. Paddle: port CPU/Linux. Não é um ranking de desempenho ARM.</p><label>Idioma: <select id="lang"><option value="all">Todos</option>
+<option>en</option>
+<option>ja</option>
+<option>zh-CN</option>
+<option>zh-TW</option>
+<option>ko</option>
+</select></label>
+<section data-lang="en"><h2>en-sans-0</h2><img alt="Imagem de controle en-sans-0" src="../android/app/src/main/assets/cases/en-sans-0.png"><p>Esperado: I</p><table><tr><th>Motor</th><th>Saída real</th></tr>
+<tr><td>ML Kit 16.0.1 (API Android)</td><td class="error"><pre></pre></td></tr>
+<tr><td>PaddleOCR v6 Small + detector Small</td><td class="error"><pre></pre></td></tr>
+<tr><td>PaddleOCR v6 Tiny + detector Small</td><td class="error"><pre></pre></td></tr>
+</table></section>
+<section data-lang="en"><h2>en-sans-1</h2><img alt="Imagem de controle en-sans-1" src="../android/app/src/main/assets/cases/en-sans-1.png"><p>Esperado: NO!</p><table><tr><th>Motor</th><th>Saída real</th></tr>
+<tr><td>ML Kit 16.0.1 (API Android)</td><td class="error"><pre>iON</pre></td></tr>
+<tr><td>PaddleOCR v6 Small + detector Small</td><td><pre>NO!</pre></td></tr>
+<tr><td>PaddleOCR v6 Tiny + detector Small</td><td><pre>NO!</pre></td></tr>
+</table></section>
+<section data-lang="en"><h2>en-sans-2</h2><img alt="Imagem de controle en-sans-2" src="../android/app/src/main/assets/cases/en-sans-2.png"><p>Esperado: Keep the final line.</p><table><tr><th>Motor</th><th>Saída real</th></tr>
+<tr><td>ML Kit 16.0.1 (API Android)</td><td><pre>Keep the final line.</pre></td></tr>
+<tr><td>PaddleOCR v6 Small + detector Small</td><td><pre>Keep the final line.</pre></td></tr>
+<tr><td>PaddleOCR v6 Tiny + detector Small</td><td><pre>Keep the final line.</pre></td></tr>
+</table></section>
+<section data-lang="en"><h2>en-sans-3</h2><img alt="Imagem de controle en-sans-3" src="../android/app/src/main/assets/cases/en-sans-3.png"><p>Esperado: Sora will bring the blue book.</p><table><tr><th>Motor</th><th>Saída real</th></tr>
+<tr><td>ML Kit 16.0.1 (API Android)</td><td><pre>Sora will bring the blue book.</pre></td></tr>
+<tr><td>PaddleOCR v6 Small + detector Small</td><td><pre>Sora will bring the blue book.</pre></td></tr>
+<tr><td>PaddleOCR v6 Tiny + detector Small</td><td><pre>Sora will bring the blue book.</pre></td></tr>
+</table></section>
+<section data-lang="en"><h2>en-sans-4</h2><img alt="Imagem de controle en-sans-4" src="../android/app/src/main/assets/cases/en-sans-4.png"><p>Esperado: I will return tomorrow.</p><table><tr><th>Motor</th><th>Saída real</th></tr>
+<tr><td>ML Kit 16.0.1 (API Android)</td><td><pre>I will return tomorrow.</pre></td></tr>
+<tr><td>PaddleOCR v6 Small + detector Small</td><td><pre>I will return tomorrow.</pre></td></tr>
+<tr><td>PaddleOCR v6 Tiny + detector Small</td><td><pre>I will return tomorrow.</pre></td></tr>
+</table></section>
+<section data-lang="en"><h2>en-sans-5</h2><img alt="Imagem de controle en-sans-5" src="../android/app/src/main/assets/cases/en-sans-5.png"><p>Esperado: The library opens tomorrow.</p><table><tr><th>Motor</th><th>Saída real</th></tr>
+<tr><td>ML Kit 16.0.1 (API Android)</td><td><pre>The library opens tomorrow.</pre></td></tr>
+<tr><td>PaddleOCR v6 Small + detector Small</td><td><pre>The library opens tomorrow.</pre></td></tr>
+<tr><td>PaddleOCR v6 Tiny + detector Small</td><td><pre>The library opens tomorrow.</pre></td></tr>
+</table></section>
+<section data-lang="en"><h2>en-sans-6</h2><img alt="Imagem de controle en-sans-6" src="../android/app/src/main/assets/cases/en-sans-6.png"><p>Esperado: Do not leave the last line behind.</p><table><tr><th>Motor</th><th>Saída real</th></tr>
+<tr><td>ML Kit 16.0.1 (API Android)</td><td><pre>Do not leave the last line behind.</pre></td></tr>
+<tr><td>PaddleOCR v6 Small + detector Small</td><td><pre>Do not leave the last line behind.</pre></td></tr>
+<tr><td>PaddleOCR v6 Tiny + detector Small</td><td><pre>Do not leave the last line behind.</pre></td></tr>
+</table></section>
+<section data-lang="en"><h2>en-sans-7</h2><img alt="Imagem de controle en-sans-7" src="../android/app/src/main/assets/cases/en-sans-7.png"><p>Esperado: Please keep the name Sora unchanged.</p><table><tr><th>Motor</th><th>Saída real</th></tr>
+<tr><td>ML Kit 16.0.1 (API Android)</td><td><pre>Please keep the name Sora unchanged.</pre></td></tr>
+<tr><td>PaddleOCR v6 Small + detector Small</td><td><pre>Please keep the name Sora unchanged.</pre></td></tr>
+<tr><td>PaddleOCR v6 Tiny + detector Small</td><td><pre>Please keep the name Sora unchanged.</pre></td></tr>
+</table></section>
+<section data-lang="en"><h2>en-anime-0</h2><img alt="Imagem de controle en-anime-0" src="../android/app/src/main/assets/cases/en-anime-0.png"><p>Esperado: I</p><table><tr><th>Motor</th><th>Saída real</th></tr>
+<tr><td>ML Kit 16.0.1 (API Android)</td><td class="error"><pre>H</pre></td></tr>
+<tr><td>PaddleOCR v6 Small + detector Small</td><td><pre>I</pre></td></tr>
+<tr><td>PaddleOCR v6 Tiny + detector Small</td><td class="error"><pre>工</pre></td></tr>
+</table></section>
+<section data-lang="en"><h2>en-anime-1</h2><img alt="Imagem de controle en-anime-1" src="../android/app/src/main/assets/cases/en-anime-1.png"><p>Esperado: NO!</p><table><tr><th>Motor</th><th>Saída real</th></tr>
+<tr><td>ML Kit 16.0.1 (API Android)</td><td class="error"><pre>jON</pre></td></tr>
+<tr><td>PaddleOCR v6 Small + detector Small</td><td><pre>NO!</pre></td></tr>
+<tr><td>PaddleOCR v6 Tiny + detector Small</td><td><pre>NO!</pre></td></tr>
+</table></section>
+<section data-lang="en"><h2>en-anime-2</h2><img alt="Imagem de controle en-anime-2" src="../android/app/src/main/assets/cases/en-anime-2.png"><p>Esperado: Keep the final line.</p><table><tr><th>Motor</th><th>Saída real</th></tr>
+<tr><td>ML Kit 16.0.1 (API Android)</td><td><pre>KEEP THE FINAL LINE.</pre></td></tr>
+<tr><td>PaddleOCR v6 Small + detector Small</td><td><pre>KEEP THE FINAL LINE.</pre></td></tr>
+<tr><td>PaddleOCR v6 Tiny + detector Small</td><td><pre>KEEP THE FINAL LINE.</pre></td></tr>
+</table></section>
+<section data-lang="en"><h2>en-anime-3</h2><img alt="Imagem de controle en-anime-3" src="../android/app/src/main/assets/cases/en-anime-3.png"><p>Esperado: Sora will bring the blue book.</p><table><tr><th>Motor</th><th>Saída real</th></tr>
+<tr><td>ML Kit 16.0.1 (API Android)</td><td><pre>SORA WILL BRING THE BLUE BOOK.</pre></td></tr>
+<tr><td>PaddleOCR v6 Small + detector Small</td><td><pre>SORA WILL BRING THE BLUE BOOK.</pre></td></tr>
+<tr><td>PaddleOCR v6 Tiny + detector Small</td><td class="error"><pre>SORA WILL BRING THE BLLE BOOK.</pre></td></tr>
+</table></section>
+<section data-lang="en"><h2>en-anime-4</h2><img alt="Imagem de controle en-anime-4" src="../android/app/src/main/assets/cases/en-anime-4.png"><p>Esperado: I will return tomorrow.</p><table><tr><th>Motor</th><th>Saída real</th></tr>
+<tr><td>ML Kit 16.0.1 (API Android)</td><td class="error"><pre>I WILL RETURN TOMORR0W.</pre></td></tr>
+<tr><td>PaddleOCR v6 Small + detector Small</td><td><pre>I WILL RETURN TOMORROW.</pre></td></tr>
+<tr><td>PaddleOCR v6 Tiny + detector Small</td><td class="error"><pre>I WILL RETLRN TOMORROW.</pre></td></tr>
+</table></section>
+<section data-lang="en"><h2>en-anime-5</h2><img alt="Imagem de controle en-anime-5" src="../android/app/src/main/assets/cases/en-anime-5.png"><p>Esperado: The library opens tomorrow.</p><table><tr><th>Motor</th><th>Saída real</th></tr>
+<tr><td>ML Kit 16.0.1 (API Android)</td><td><pre>THE LIBRARY OPENS TOMORROW.</pre></td></tr>
+<tr><td>PaddleOCR v6 Small + detector Small</td><td><pre>THE LIBRARY OPENS TOMORROW.</pre></td></tr>
+<tr><td>PaddleOCR v6 Tiny + detector Small</td><td><pre>THE LIBRARY OPENS TOMORROW.</pre></td></tr>
+</table></section>
+<section data-lang="en"><h2>en-anime-6</h2><img alt="Imagem de controle en-anime-6" src="../android/app/src/main/assets/cases/en-anime-6.png"><p>Esperado: Do not leave the last line behind.</p><table><tr><th>Motor</th><th>Saída real</th></tr>
+<tr><td>ML Kit 16.0.1 (API Android)</td><td class="error"><pre>DO NOT LEAVE THE LAST LINE BEHIND,</pre></td></tr>
+<tr><td>PaddleOCR v6 Small + detector Small</td><td><pre>DO NOT LEAVE THE LAST LINE BEHIND.</pre></td></tr>
+<tr><td>PaddleOCR v6 Tiny + detector Small</td><td><pre>DO NOT LEAVE THE LAST LINE BEHIND.</pre></td></tr>
+</table></section>
+<section data-lang="en"><h2>en-anime-7</h2><img alt="Imagem de controle en-anime-7" src="../android/app/src/main/assets/cases/en-anime-7.png"><p>Esperado: Please keep the name Sora unchanged.</p><table><tr><th>Motor</th><th>Saída real</th></tr>
+<tr><td>ML Kit 16.0.1 (API Android)</td><td class="error"><pre>PLEASE KEEP THE NAME SORA INCHANGED.</pre></td></tr>
+<tr><td>PaddleOCR v6 Small + detector Small</td><td><pre>PLEASE KEEP THE NAME SORA UNCHANGED.</pre></td></tr>
+<tr><td>PaddleOCR v6 Tiny + detector Small</td><td class="error"><pre>PLEASE KEEP THE NAME SORA LNCHANGED.</pre></td></tr>
+</table></section>
+<section data-lang="en"><h2>en-balsamiq-0</h2><img alt="Imagem de controle en-balsamiq-0" src="../android/app/src/main/assets/cases/en-balsamiq-0.png"><p>Esperado: I</p><table><tr><th>Motor</th><th>Saída real</th></tr>
+<tr><td>ML Kit 16.0.1 (API Android)</td><td><pre>I</pre></td></tr>
+<tr><td>PaddleOCR v6 Small + detector Small</td><td><pre>I</pre></td></tr>
+<tr><td>PaddleOCR v6 Tiny + detector Small</td><td><pre>I</pre></td></tr>
+</table></section>
+<section data-lang="en"><h2>en-balsamiq-1</h2><img alt="Imagem de controle en-balsamiq-1" src="../android/app/src/main/assets/cases/en-balsamiq-1.png"><p>Esperado: NO!</p><table><tr><th>Motor</th><th>Saída real</th></tr>
+<tr><td>ML Kit 16.0.1 (API Android)</td><td class="error"><pre>iON</pre></td></tr>
+<tr><td>PaddleOCR v6 Small + detector Small</td><td><pre>NO!</pre></td></tr>
+<tr><td>PaddleOCR v6 Tiny + detector Small</td><td><pre>NO!</pre></td></tr>
+</table></section>
+<section data-lang="en"><h2>en-balsamiq-2</h2><img alt="Imagem de controle en-balsamiq-2" src="../android/app/src/main/assets/cases/en-balsamiq-2.png"><p>Esperado: Keep the final line.</p><table><tr><th>Motor</th><th>Saída real</th></tr>
+<tr><td>ML Kit 16.0.1 (API Android)</td><td><pre>Keep the final line.</pre></td></tr>
+<tr><td>PaddleOCR v6 Small + detector Small</td><td><pre>Keep the final line.</pre></td></tr>
+<tr><td>PaddleOCR v6 Tiny + detector Small</td><td><pre>Keep the final line.</pre></td></tr>
+</table></section>
+<section data-lang="en"><h2>en-balsamiq-3</h2><img alt="Imagem de controle en-balsamiq-3" src="../android/app/src/main/assets/cases/en-balsamiq-3.png"><p>Esperado: Sora will bring the blue book.</p><table><tr><th>Motor</th><th>Saída real</th></tr>
+<tr><td>ML Kit 16.0.1 (API Android)</td><td><pre>Sora will bring the blue book.</pre></td></tr>
+<tr><td>PaddleOCR v6 Small + detector Small</td><td><pre>Sora will bring the blue book.</pre></td></tr>
+<tr><td>PaddleOCR v6 Tiny + detector Small</td><td><pre>Sora will bring the blue book.</pre></td></tr>
+</table></section>
+<section data-lang="en"><h2>en-balsamiq-4</h2><img alt="Imagem de controle en-balsamiq-4" src="../android/app/src/main/assets/cases/en-balsamiq-4.png"><p>Esperado: I will return tomorrow.</p><table><tr><th>Motor</th><th>Saída real</th></tr>
+<tr><td>ML Kit 16.0.1 (API Android)</td><td><pre>I will return tomorrow.</pre></td></tr>
+<tr><td>PaddleOCR v6 Small + detector Small</td><td><pre>I will return tomorrow.</pre></td></tr>
+<tr><td>PaddleOCR v6 Tiny + detector Small</td><td><pre>I will return tomorrow.</pre></td></tr>
+</table></section>
+<section data-lang="en"><h2>en-balsamiq-5</h2><img alt="Imagem de controle en-balsamiq-5" src="../android/app/src/main/assets/cases/en-balsamiq-5.png"><p>Esperado: The library opens tomorrow.</p><table><tr><th>Motor</th><th>Saída real</th></tr>
+<tr><td>ML Kit 16.0.1 (API Android)</td><td><pre>The library opens tomorrow.</pre></td></tr>
+<tr><td>PaddleOCR v6 Small + detector Small</td><td><pre>The library opens tomorrow.</pre></td></tr>
+<tr><td>PaddleOCR v6 Tiny + detector Small</td><td><pre>The library opens tomorrow.</pre></td></tr>
+</table></section>
+<section data-lang="en"><h2>en-balsamiq-6</h2><img alt="Imagem de controle en-balsamiq-6" src="../android/app/src/main/assets/cases/en-balsamiq-6.png"><p>Esperado: Do not leave the last line behind.</p><table><tr><th>Motor</th><th>Saída real</th></tr>
+<tr><td>ML Kit 16.0.1 (API Android)</td><td><pre>Do not leave the last line behind.</pre></td></tr>
+<tr><td>PaddleOCR v6 Small + detector Small</td><td><pre>Do not leave the last line behind.</pre></td></tr>
+<tr><td>PaddleOCR v6 Tiny + detector Small</td><td><pre>Do not leave the last line behind.</pre></td></tr>
+</table></section>
+<section data-lang="en"><h2>en-balsamiq-7</h2><img alt="Imagem de controle en-balsamiq-7" src="../android/app/src/main/assets/cases/en-balsamiq-7.png"><p>Esperado: Please keep the name Sora unchanged.</p><table><tr><th>Motor</th><th>Saída real</th></tr>
+<tr><td>ML Kit 16.0.1 (API Android)</td><td><pre>Please keep the name Sora unchanged.</pre></td></tr>
+<tr><td>PaddleOCR v6 Small + detector Small</td><td><pre>Please keep the name Sora unchanged.</pre></td></tr>
+<tr><td>PaddleOCR v6 Tiny + detector Small</td><td><pre>Please keep the name Sora unchanged.</pre></td></tr>
+</table></section>
+<section data-lang="en"><h2>en-panel-0</h2><img alt="Imagem de controle en-panel-0" src="../android/app/src/main/assets/cases/en-panel-0.png"><p>Esperado: The library opens tomorrow.</p><table><tr><th>Motor</th><th>Saída real</th></tr>
+<tr><td>ML Kit 16.0.1 (API Android)</td><td><pre>The library opens tomorrow.</pre></td></tr>
+<tr><td>PaddleOCR v6 Small + detector Small</td><td><pre>The library opens tomorrow.</pre></td></tr>
+<tr><td>PaddleOCR v6 Tiny + detector Small</td><td><pre>The library opens tomorrow.</pre></td></tr>
+</table></section>
+<section data-lang="en"><h2>en-panel-1</h2><img alt="Imagem de controle en-panel-1" src="../android/app/src/main/assets/cases/en-panel-1.png"><p>Esperado: Sora will bring the blue book.</p><table><tr><th>Motor</th><th>Saída real</th></tr>
+<tr><td>ML Kit 16.0.1 (API Android)</td><td><pre>Sora will bring the blue book.</pre></td></tr>
+<tr><td>PaddleOCR v6 Small + detector Small</td><td><pre>Sora will bring the blue book.</pre></td></tr>
+<tr><td>PaddleOCR v6 Tiny + detector Small</td><td><pre>Sora will bring the blue book.</pre></td></tr>
+</table></section>
+<section data-lang="en"><h2>en-panel-2</h2><img alt="Imagem de controle en-panel-2" src="../android/app/src/main/assets/cases/en-panel-2.png"><p>Esperado: Please keep the name Sora unchanged.</p><table><tr><th>Motor</th><th>Saída real</th></tr>
+<tr><td>ML Kit 16.0.1 (API Android)</td><td><pre>Please keep the name Sora unchanged.</pre></td></tr>
+<tr><td>PaddleOCR v6 Small + detector Small</td><td><pre>Please keep the name Sora unchanged.</pre></td></tr>
+<tr><td>PaddleOCR v6 Tiny + detector Small</td><td><pre>Please keep the name Sora unchanged.</pre></td></tr>
+</table></section>
+<section data-lang="ja"><h2>ja-panel-0</h2><img alt="Imagem de controle ja-panel-0" src="../android/app/src/main/assets/cases/ja-panel-0.png"><p>Esperado: 図書館は明日開きます。</p><table><tr><th>Motor</th><th>Saída real</th></tr>
+<tr><td>ML Kit 16.0.1 (API Android)</td><td><pre>図書館は明日開きます。</pre></td></tr>
+<tr><td>PaddleOCR v6 Small + detector Small</td><td><pre>図書館は明日開きます。</pre></td></tr>
+<tr><td>PaddleOCR v6 Tiny + detector Small (escrita sem cobertura neste modelo)</td><td class="error"><pre>凶書館志明日開寺主寸。</pre></td></tr>
+</table></section>
+<section data-lang="ja"><h2>ja-panel-1</h2><img alt="Imagem de controle ja-panel-1" src="../android/app/src/main/assets/cases/ja-panel-1.png"><p>Esperado: ソラは青い本を持ってきます。</p><table><tr><th>Motor</th><th>Saída real</th></tr>
+<tr><td>ML Kit 16.0.1 (API Android)</td><td><pre>ソラは青い本を持ってきます。</pre></td></tr>
+<tr><td>PaddleOCR v6 Small + detector Small</td><td><pre>ソラは青い本を持ってきます。</pre></td></tr>
+<tr><td>PaddleOCR v6 Tiny + detector Small (escrita sem cobertura neste modelo)</td><td class="error"><pre>方法青本老持⊃寺末寸。</pre></td></tr>
+</table></section>
+<section data-lang="ja"><h2>ja-panel-2</h2><img alt="Imagem de controle ja-panel-2" src="../android/app/src/main/assets/cases/ja-panel-2.png"><p>Esperado: ソラという名前は変えないでください。</p><table><tr><th>Motor</th><th>Saída real</th></tr>
+<tr><td>ML Kit 16.0.1 (API Android)</td><td><pre>ソラという名前は変えないでください。</pre></td></tr>
+<tr><td>PaddleOCR v6 Small + detector Small</td><td><pre>ソラという名前は変えないでください。</pre></td></tr>
+<tr><td>PaddleOCR v6 Tiny + detector Small (escrita sem cobertura neste modelo)</td><td class="error"><pre>亏℃八5名前法变元本下&lt;尤志)。</pre></td></tr>
+</table></section>
+<section data-lang="zh-CN"><h2>zh-CN-panel-0</h2><img alt="Imagem de controle zh-CN-panel-0" src="../android/app/src/main/assets/cases/zh-CN-panel-0.png"><p>Esperado: 图书馆明天开放。</p><table><tr><th>Motor</th><th>Saída real</th></tr>
+<tr><td>ML Kit 16.0.1 (API Android)</td><td><pre>图书馆明天开放。</pre></td></tr>
+<tr><td>PaddleOCR v6 Small + detector Small</td><td><pre>图书馆明天开放。</pre></td></tr>
+<tr><td>PaddleOCR v6 Tiny + detector Small</td><td><pre>图书馆明天开放。</pre></td></tr>
+</table></section>
+<section data-lang="zh-CN"><h2>zh-CN-panel-1</h2><img alt="Imagem de controle zh-CN-panel-1" src="../android/app/src/main/assets/cases/zh-CN-panel-1.png"><p>Esperado: 小空会带来那本蓝色的书。</p><table><tr><th>Motor</th><th>Saída real</th></tr>
+<tr><td>ML Kit 16.0.1 (API Android)</td><td><pre>小空会带来那本蓝色的书。</pre></td></tr>
+<tr><td>PaddleOCR v6 Small + detector Small</td><td><pre>小空会带来那本蓝色的书。</pre></td></tr>
+<tr><td>PaddleOCR v6 Tiny + detector Small</td><td><pre>小空会带来那本蓝色的书。</pre></td></tr>
+</table></section>
+<section data-lang="zh-CN"><h2>zh-CN-panel-2</h2><img alt="Imagem de controle zh-CN-panel-2" src="../android/app/src/main/assets/cases/zh-CN-panel-2.png"><p>Esperado: 请保留小空这个名字。</p><table><tr><th>Motor</th><th>Saída real</th></tr>
+<tr><td>ML Kit 16.0.1 (API Android)</td><td><pre>请保留小空这个名字。</pre></td></tr>
+<tr><td>PaddleOCR v6 Small + detector Small</td><td><pre>请保留小空这个名字。</pre></td></tr>
+<tr><td>PaddleOCR v6 Tiny + detector Small</td><td><pre>请保留小空这个名字。</pre></td></tr>
+</table></section>
+<section data-lang="zh-TW"><h2>zh-TW-panel-0</h2><img alt="Imagem de controle zh-TW-panel-0" src="../android/app/src/main/assets/cases/zh-TW-panel-0.png"><p>Esperado: 圖書館明天開放。</p><table><tr><th>Motor</th><th>Saída real</th></tr>
+<tr><td>ML Kit 16.0.1 (API Android)</td><td><pre>圖書館明天開放。</pre></td></tr>
+<tr><td>PaddleOCR v6 Small + detector Small</td><td><pre>圖書館明天開放。</pre></td></tr>
+<tr><td>PaddleOCR v6 Tiny + detector Small</td><td><pre>圖書館明天開放。</pre></td></tr>
+</table></section>
+<section data-lang="zh-TW"><h2>zh-TW-panel-1</h2><img alt="Imagem de controle zh-TW-panel-1" src="../android/app/src/main/assets/cases/zh-TW-panel-1.png"><p>Esperado: 小空會帶來那本藍色的書。</p><table><tr><th>Motor</th><th>Saída real</th></tr>
+<tr><td>ML Kit 16.0.1 (API Android)</td><td><pre>小空會帶來那本藍色的書。</pre></td></tr>
+<tr><td>PaddleOCR v6 Small + detector Small</td><td><pre>小空會帶來那本藍色的書。</pre></td></tr>
+<tr><td>PaddleOCR v6 Tiny + detector Small</td><td><pre>小空會帶來那本藍色的書。</pre></td></tr>
+</table></section>
+<section data-lang="zh-TW"><h2>zh-TW-panel-2</h2><img alt="Imagem de controle zh-TW-panel-2" src="../android/app/src/main/assets/cases/zh-TW-panel-2.png"><p>Esperado: 請保留小空這個名字。</p><table><tr><th>Motor</th><th>Saída real</th></tr>
+<tr><td>ML Kit 16.0.1 (API Android)</td><td><pre>請保留小空這個名字。</pre></td></tr>
+<tr><td>PaddleOCR v6 Small + detector Small</td><td><pre>請保留小空這個名字。</pre></td></tr>
+<tr><td>PaddleOCR v6 Tiny + detector Small</td><td class="error"><pre>请保留小空這個名字。</pre></td></tr>
+</table></section>
+<section data-lang="ko"><h2>ko-panel-0</h2><img alt="Imagem de controle ko-panel-0" src="../android/app/src/main/assets/cases/ko-panel-0.png"><p>Esperado: 도서관은 내일 문을 엽니다.</p><table><tr><th>Motor</th><th>Saída real</th></tr>
+<tr><td>ML Kit 16.0.1 (API Android)</td><td><pre>도서관은 내일 문을 엽니다.</pre></td></tr>
+<tr><td>PaddleOCR v6 Small + detector Small (escrita sem cobertura neste modelo)</td><td class="error"><pre></pre></td></tr>
+<tr><td>PaddleOCR v6 Tiny + detector Small (escrita sem cobertura neste modelo)</td><td class="error"><pre>E对恐芒智是音.</pre></td></tr>
+</table></section>
+<section data-lang="ko"><h2>ko-panel-1</h2><img alt="Imagem de controle ko-panel-1" src="../android/app/src/main/assets/cases/ko-panel-1.png"><p>Esperado: 소라는 파란 책을 가져올 것입니다.</p><table><tr><th>Motor</th><th>Saída real</th></tr>
+<tr><td>ML Kit 16.0.1 (API Android)</td><td><pre>소라는 파란 책을 가져올 것입니다.</pre></td></tr>
+<tr><td>PaddleOCR v6 Small + detector Small (escrita sem cobertura neste modelo)</td><td class="error"><pre></pre></td></tr>
+<tr><td>PaddleOCR v6 Tiny + detector Small (escrita sem cobertura neste modelo)</td><td class="error"><pre>企斗乞包赳号外含LC.</pre></td></tr>
+</table></section>
+<section data-lang="ko"><h2>ko-panel-2</h2><img alt="Imagem de controle ko-panel-2" src="../android/app/src/main/assets/cases/ko-panel-2.png"><p>Esperado: 소라라는 이름은 바꾸지 마세요.</p><table><tr><th>Motor</th><th>Saída real</th></tr>
+<tr><td>ML Kit 16.0.1 (API Android)</td><td><pre>소라라는 이름은 바꾸지 마세요.</pre></td></tr>
+<tr><td>PaddleOCR v6 Small + detector Small (escrita sem cobertura neste modelo)</td><td class="error"><pre>.</pre></td></tr>
+<tr><td>PaddleOCR v6 Tiny + detector Small (escrita sem cobertura neste modelo)</td><td class="error"><pre>企斗己乞 0言芒邮平对叶州豆.</pre></td></tr>
+</table></section>
+<script>document.getElementById("lang").onchange=function(){document.querySelectorAll("section[data-lang]").forEach(s=>s.hidden=this.value!=="all"&&s.dataset.lang!==this.value)}</script></html>

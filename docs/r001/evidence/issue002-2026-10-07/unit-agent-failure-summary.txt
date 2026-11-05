@@ -1,0 +1,39 @@
+{'name': 'tachiyomi.domain.chapter.service.ChapterRecognitionTest', 'tests': '34', 'skipped': '0', 'failures': '0', 'errors': '0', 'timestamp': '2026-10-07T16:57:42.881Z', 'hostname': 'fe2240e50b0e', 'time': '0.132'}
+
+{'name': 'tachiyomi.domain.chapter.service.MissingChaptersTest', 'tests': '6', 'skipped': '0', 'failures': '0', 'errors': '0', 'timestamp': '2026-10-07T16:57:43.015Z', 'hostname': 'fe2240e50b0e', 'time': '0.013'}
+
+{'name': 'tachiyomi.domain.library.model.LibraryFlagsTest', 'tests': '5', 'skipped': '0', 'failures': '0', 'errors': '0', 'timestamp': '2026-10-07T16:57:43.028Z', 'hostname': 'fe2240e50b0e', 'time': '0.022'}
+
+{'name': 'tachiyomi.domain.manga.interactor.FetchIntervalTest', 'tests': '10', 'skipped': '0', 'failures': '10', 'errors': '0', 'timestamp': '2026-10-07T16:57:43.052Z', 'hostname': 'fe2240e50b0e', 'time': '0.229'}
+
+java.lang.ExceptionInInitializerError
+	at tachiyomi.domain.manga.interactor.FetchIntervalTest.<init>(FetchIntervalTest.kt:153)
+Caused by: java.lang.IllegalStateException: Could not self-attach to current VM using external process - set a property net.bytebuddy.agent.attacher.dump to dump the process output to a file at the specified location
+	at net.bytebuddy.agent.ByteBuddyAgent.installExternal(ByteBuddyAgent.java:685)
+	at net.bytebuddy.agent.ByteBuddyAgent.install(ByteBuddyAgent.java:612)
+	at net.bytebuddy.agent.ByteBuddyAgent.install(ByteBuddyAgent.java:592)
+	at net.bytebuddy.agent.ByteBuddyAgent.install(ByteBuddyAgent.java:544)
+	at net.bytebuddy.agent.ByteBuddyAgent.install(ByteBuddyAgent.java:521)
+	at io.mockk.proxy.jvm.JvmMockKAgentFactory.initInstrumentation(JvmMockKAgentFactory.kt:135)
+	at io.mockk.proxy.jvm.JvmMockKAgentFactory.init(JvmMockKAgentFactory.kt:39)
+	at io.mockk.impl.JvmMockKGateway.<init>(JvmMockKGateway.kt:82)
+	at io.mockk.impl.JvmMockKGateway.<clinit>(JvmMockKGateway.kt:230)
+	... 1 more
+
+
+{'name': 'tachiyomi.domain.release.interactor.GetApplicationReleaseTest', 'tests': '3', 'skipped': '0', 'failures': '3', 'errors': '0', 'timestamp': '2026-10-07T16:57:43.283Z', 'hostname': 'fe2240e50b0e', 'time': '0.007'}
+
+java.lang.NoClassDefFoundError: Could not initialize class io.mockk.impl.JvmMockKGateway
+	at tachiyomi.domain.release.interactor.GetApplicationReleaseTest.beforeEach(GetApplicationReleaseTest.kt:110)
+Caused by: java.lang.ExceptionInInitializerError: Exception java.lang.IllegalStateException: Could not self-attach to current VM using external process - set a property net.bytebuddy.agent.attacher.dump to dump the process output to a file at the specified location [in thread "Test worker"]
+	at net.bytebuddy.agent.ByteBuddyAgent.installExternal(ByteBuddyAgent.java:685)
+	at net.bytebuddy.agent.ByteBuddyAgent.install(ByteBuddyAgent.java:612)
+	at net.bytebuddy.agent.ByteBuddyAgent.install(ByteBuddyAgent.java:592)
+	at net.bytebuddy.agent.ByteBuddyAgent.install(ByteBuddyAgent.java:544)
+	at net.bytebuddy.agent.ByteBuddyAgent.install(ByteBuddyAgent.java:521)
+	at io.mockk.proxy.jvm.JvmMockKAgentFactory.initInstrumentation(JvmMockKAgentFactory.kt:135)
+	at io.mockk.proxy.jvm.JvmMockKAgentFactory.init(JvmMockKAgentFactory.kt:39)
+	at io.mockk.impl.JvmMockKGateway.<init>(JvmMockKGateway.kt:82)
+	at io.mockk.impl.JvmMockKGateway.<clinit>(JvmMockKGateway.kt:230)
+	at tachiyomi.domain.manga.interactor.FetchIntervalTest.<init>(FetchIntervalTest.kt:153)
+

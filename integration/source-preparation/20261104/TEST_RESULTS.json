@@ -1,0 +1,89 @@
+{
+  "revision": "P20261104.4",
+  "date_utc": "2026-11-05",
+  "publication": "UNPUBLISHED_INTERNAL_CANDIDATE",
+  "patch_sha256": "713bea8e58215681a833ed27e9962406911a2533c0e5b1267f2cdfb7be7e8f06",
+  "assembly_exit": 0,
+  "abi_profile": [
+    "armeabi-v7a",
+    "arm64-v8a",
+    "x86_64"
+  ],
+  "jvm": {
+    "status": "NO_NEW_UNIT_REGRESSIONS",
+    "baseline": {
+      "total": 673,
+      "passed": 656,
+      "failed": 17,
+      "skipped": 0
+    },
+    "patched": {
+      "total": 707,
+      "passed": 690,
+      "failed": 17,
+      "skipped": 0
+    },
+    "preexisting_failures_still_present": 17,
+    "missing_baseline_tests": [],
+    "new_failures_or_skips": [],
+    "android_runtime_verified": false,
+    "gradle_exit_codes": {
+      "baseline": 1,
+      "patched": 1
+    },
+    "required_module_coverage": {
+      "app": 588,
+      "domain": 85
+    }
+  },
+  "selected_cases": 52,
+  "new_cases": 34,
+  "host_guards": {
+    "tests": 10,
+    "failed": 0
+  },
+  "compiled_source_files_matched": 219,
+  "android": {
+    "status": "PASS",
+    "api": 26,
+    "abi": "x86_64",
+    "runtime": "Android emulator with software acceleration; ordinary application UID",
+    "checks": 4,
+    "passed": 4,
+    "failed": 0,
+    "production_helpers": "BYTE_IDENTICAL_TO_READER_COMPILED_CLASSES",
+    "scope": [
+      "APK cryptographic verification",
+      "tampered APK rejection preserving earlier file",
+      "reviewed package and certificate pinning",
+      "readonly atomic file replacement"
+    ],
+    "not_validated": [
+      "full application startup",
+      "wizard UI",
+      "real extension loading",
+      "Android14+",
+      "physical ARM32/ARM64",
+      "database restore and SAF providers"
+    ],
+    "command": "adb shell am instrument -w -r test.polaris.preparation.probe/.Probe"
+  },
+  "signer_sha256": "3ae747069cc9015ca1777f94fd56b030501f45d6af380426a572ad60e94d8227",
+  "apk_artifacts": [
+    {
+      "abi": "arm64-v8a",
+      "file": "Polaris-0.1.0-beta.9-arm64-v8a.apk",
+      "bytes": 199132104,
+      "sha256": "dfd7ce4e567db9036c6d72f50f67f9c11b48754de49a912089c42d712e6c43bb"
+    },
+    {
+      "abi": "armeabi-v7a",
+      "file": "Polaris-0.1.0-beta.9-armeabi-v7a.apk",
+      "bytes": 159334281,
+      "sha256": "c916f3623bff124bc280c127672b96dc3aed40ee7277ee655484b25d50d0a4b6"
+    }
+  ],
+  "backup_format_changed": false,
+  "physical_acceptance": "PENDING",
+  "full_wizard_ui_acceptance": "PENDING"
+}

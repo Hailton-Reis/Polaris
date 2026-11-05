@@ -1,0 +1,166 @@
+{
+  "date_local": "2026-11-02",
+  "timezone": "America/Fortaleza",
+  "candidate_revision": "Polaris P20261102.4",
+  "version_name": "0.1.0-beta.7",
+  "version_code": 108,
+  "publication": "HELD_BY_USER_NO_NEW_GITHUB_RELEASE; private internal Drive candidate",
+  "pinned_yomotsu": "0fb80c439ef816eeb50674f1b90af39918b176d8",
+  "patch_sha256": "8542c59d9c9531a5b595cbd5f91f3fba69e6a108ee0fffe624220f0d84404a07",
+  "assembly": "PASS: main APKs and instrumentation APK assembled; only the same 34 baseline unit failures remain",
+  "full_build_completion": {
+    "status": "ASSEMBLY_AND_UNIT_REPORTS_COMPLETE",
+    "apks": [
+      "app-universal-debug.apk",
+      "app-armeabi-v7a-debug.apk",
+      "app-x86_64-debug.apk",
+      "app-x86-debug.apk",
+      "app-arm64-v8a-debug.apk"
+    ],
+    "unit_tests": 547
+  },
+  "android_unit_comparison": {
+    "status": "NO_NEW_UNIT_REGRESSIONS",
+    "baseline": {
+      "total": 428,
+      "passed": 394,
+      "failed": 34,
+      "skipped": 0
+    },
+    "patched": {
+      "total": 547,
+      "passed": 513,
+      "failed": 34,
+      "skipped": 0
+    },
+    "preexisting_failures_still_present": 34,
+    "missing_baseline_tests": [],
+    "new_failures_or_skips": [],
+    "android_runtime_verified": false,
+    "gradle_exit_codes": {
+      "baseline": 1,
+      "patched": 1
+    },
+    "required_module_coverage": {
+      "domain": 58,
+      "app": 370
+    }
+  },
+  "strip_reconciliation_tests": {
+    "status": "PASS",
+    "tests": 12,
+    "measured_overlap_fixtures": [
+      "mlkit",
+      "paddle_pipeline_small",
+      "paddle_pipeline_tiny"
+    ],
+    "expected_unique_lines_per_fixture": 38,
+    "scope": "Product Kotlin geometry/deduplication over recorded synthetic benchmark outputs; not new inference"
+  },
+  "android_region_decoder_tests": {
+    "status": "PASS",
+    "tests": 2,
+    "api": 26,
+    "abi": "x86_64",
+    "isolated_application": true,
+    "full_app_startup": "Not validated: minimal AOSP image has no WebView provider",
+    "scope": "Product Android region decoder, stream/bitmap cleanup and EXIF gate. No Paddle/ML Kit inference or physical ARM validation."
+  },
+  "paddle_sdk_smoke": {
+    "status": "NOT_COMPLETED",
+    "reason": "600-second software-emulator deadline",
+    "api": 26,
+    "abi": "x86_64"
+  },
+  "full_application_startup_in_test_image": {
+    "status": "NOT_VALIDATED",
+    "cause": "Minimal AOSP API26 image has no configured WebView provider. The normal Application crashed before component tests; component-only runner uses android.app.Application. Reader APK startup behavior remains unchanged."
+  },
+  "host_checks": {
+    "overlay_application_idempotence_crlf_and_drift": 4,
+    "windows_launcher_static_contract": 33,
+    "packager": 6,
+    "unit_comparator": 16,
+    "build_completion_guards": 7
+  },
+  "source_verification": {
+    "app/src/main/java/eu/kanade/translation/recognizer/OcrStripPlan.kt": "a0f5c26b06b21cc1811d91788386f691c9e8c85c623c26b887419cc29c0c7ee6",
+    "app/src/main/java/eu/kanade/translation/recognizer/OcrStripImage.kt": "9fcde51a1dff941ce4ae45de3854a6ea3928426981d44f5ac2fb67b15deb208e",
+    "app/src/main/java/eu/kanade/translation/recognizer/MlKitOcrEngine.kt": "cfe2035f015b973a4176fcc2b4009342775bb28ea3e2418d1540a08551330499",
+    "app/src/main/java/eu/kanade/translation/recognizer/PaddleOcrEngine.kt": "82cacb0fe4460308e1fba9ef0eca9355656deedc4b9116fa428361048b8f7e79",
+    "app/src/main/java/eu/kanade/translation/recognizer/OcrEngineFactory.kt": "f0c11035cdb5f929052992d42a9a10a693a4ac5174b55801ee9124d8e45463f9",
+    "app/src/main/java/eu/kanade/translation/diagnostics/ReaderCaptureSession.kt": "efedf7b093770416c29e91d9890624aaf4b62b7b5fe78875d756e131451d1ec9",
+    "app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsTranslationScreen.kt": "8a19a058a2b14ae90b021433d83989bfdeaf28b50217d9463bd96b4353e00a2d",
+    "app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt": "022c28489b378bd929736735af1f48745d520ab6712b1066be6ba4fdf132ed1d",
+    "app/src/test/java/eu/kanade/translation/recognizer/OcrStripPlanTest.kt": "1ca1364ed2ec81bcdb47f18db6414246b4ade32df8c6142cab0d825fbb8279f2",
+    "app/src/androidTest/java/eu/kanade/translation/recognizer/OcrStripImageTest.kt": "67e37d1469b57989b453eb6f191e04a747cbc8a92c9651b7b053fe2612bf21a9",
+    "domain/src/main/java/tachiyomi/domain/translation/TranslationPreferences.kt": "359fa42f2c7706eb7afabd4c32647ef6c390c8f7d0129306aa23b203d7d1b8dc",
+    "overlay_sha256": "8542c59d9c9531a5b595cbd5f91f3fba69e6a108ee0fffe624220f0d84404a07",
+    "cumulative_source_files_checked": 115,
+    "source_build_mismatches": [],
+    "component_runner_scope": "AndroidTest source and opt-in init script only. Reader APKs unchanged."
+  },
+  "signed_internal_arm_artifacts": [
+    {
+      "abi": "arm64-v8a",
+      "file": "Polaris-0.1.0-beta.7-arm64-v8a.apk",
+      "bytes": 192832755,
+      "sha256": "394abcb7620abfe64dbee44b0e9acac9df95c8123c17e2fe3c9c449e984a3a11"
+    },
+    {
+      "abi": "armeabi-v7a",
+      "file": "Polaris-0.1.0-beta.7-armeabi-v7a.apk",
+      "bytes": 153034932,
+      "sha256": "94f9ed0e7f5868b0e7a4c1e5d07a66377ef3471542a7354e58bc08743964ce84"
+    }
+  ],
+  "signer_sha256": "3ae747069cc9015ca1777f94fd56b030501f45d6af380426a572ad60e94d8227",
+  "apk_payload_and_size_comparison": [
+    {
+      "abi": "arm64-v8a",
+      "old_bytes": 192813767,
+      "new_bytes": 192832755,
+      "delta_bytes": 18988,
+      "unchanged_asset_and_native_library_files": 78,
+      "sha256": "394abcb7620abfe64dbee44b0e9acac9df95c8123c17e2fe3c9c449e984a3a11"
+    },
+    {
+      "abi": "armeabi-v7a",
+      "old_bytes": 153015944,
+      "new_bytes": 153034932,
+      "delta_bytes": 18988,
+      "unchanged_asset_and_native_library_files": 77,
+      "sha256": "94f9ed0e7f5868b0e7a4c1e5d07a66377ef3471542a7354e58bc08743964ce84"
+    }
+  ],
+  "regional_ocr": {
+    "engines": [
+      "ML_KIT",
+      "PADDLE_OCR"
+    ],
+    "language": "ENGLISH",
+    "default_enabled": false,
+    "preference_storage_key_preserved": "mlkit_long_page_strips",
+    "blocked_with_dbnet": true,
+    "max_tile_pixels": 2097152,
+    "max_argb_pixel_bytes_per_tile": 8388608,
+    "max_regions": 256,
+    "max_width": 4096,
+    "extra_models_added": false,
+    "new_image_files_written": false,
+    "memory_scope": "Pixel budget only. Native/model buffers, compressed-image decoder storage and total process peak not measured."
+  },
+  "internal_drive": {
+    "folder_id": "1BIxWG55WkmS8LDAlFRZvo7RZPhjzxtsK",
+    "url": "https://drive.google.com/drive/folders/1BIxWG55WkmS8LDAlFRZvo7RZPhjzxtsK",
+    "arm32_folder": "1pzGzLITgCaPAOImg8OqmcfQbgnq3DA1z",
+    "arm64_folder": "1bwHGpw0p27nOluAhAZ36G0I77nqN13G6",
+    "visibility": "PRIVATE"
+  },
+  "pending": [
+    "Physical ARM32/ARM64 installation and same-signature update with data continuity",
+    "Physical RAM/storage/speed measurements",
+    "Full reader startup, chapter workflow and overlay alignment on target phones",
+    "OCR and translation acceptance on real chapters, including Japanese/Chinese/Korean and vertical reading"
+  ]
+}

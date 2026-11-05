@@ -1,0 +1,146 @@
+{
+  "fixture": "Polaris-faixa-longa-controle.cbz",
+  "purpose": "Synthetic long-strip control; Android OCR results remain unmeasured",
+  "image": "001.png",
+  "width": 720,
+  "height": 20000,
+  "image_sha256": "78329dfffdedf56e1b6f654989a4b5289b4b0ddcfa5c5853c6fa4ffe189596c2",
+  "archive_sha256": "9256d896bcb1526c644605ffaa4859b18a02fb55987e9ba1a3da65dd5dd31741",
+  "font": "DejaVu Sans and Serif (system fonts; no font file embedded)",
+  "source_text_and_art": "Original generated test material, CC0",
+  "expected_cases": [
+    {
+      "case": "seam-01",
+      "page_y": 2048,
+      "source_lines": [
+        "Scene 01 begins here.",
+        "Keep every single word.",
+        "This is the final line."
+      ],
+      "note": "Phrase crosses a potential strip edge; compare completeness and duplicate counts."
+    },
+    {
+      "case": "seam-02",
+      "page_y": 3712,
+      "source_lines": [
+        "Scene 02 begins here.",
+        "Keep every single word.",
+        "This is the final line."
+      ],
+      "note": "Phrase crosses a potential strip edge; compare completeness and duplicate counts."
+    },
+    {
+      "case": "seam-03",
+      "page_y": 5376,
+      "source_lines": [
+        "Scene 03 begins here.",
+        "Keep every single word.",
+        "This is the final line."
+      ],
+      "note": "Phrase crosses a potential strip edge; compare completeness and duplicate counts."
+    },
+    {
+      "case": "seam-04",
+      "page_y": 7040,
+      "source_lines": [
+        "Scene 04 begins here.",
+        "Keep every single word.",
+        "This is the final line."
+      ],
+      "note": "Phrase crosses a potential strip edge; compare completeness and duplicate counts."
+    },
+    {
+      "case": "seam-05",
+      "page_y": 8704,
+      "source_lines": [
+        "Scene 05 begins here.",
+        "Keep every single word.",
+        "This is the final line."
+      ],
+      "note": "Phrase crosses a potential strip edge; compare completeness and duplicate counts."
+    },
+    {
+      "case": "seam-06",
+      "page_y": 10368,
+      "source_lines": [
+        "Scene 06 begins here.",
+        "Keep every single word.",
+        "This is the final line."
+      ],
+      "note": "Phrase crosses a potential strip edge; compare completeness and duplicate counts."
+    },
+    {
+      "case": "seam-07",
+      "page_y": 12032,
+      "source_lines": [
+        "Scene 07 begins here.",
+        "Keep every single word.",
+        "This is the final line."
+      ],
+      "note": "Phrase crosses a potential strip edge; compare completeness and duplicate counts."
+    },
+    {
+      "case": "seam-08",
+      "page_y": 13696,
+      "source_lines": [
+        "Scene 08 begins here.",
+        "Keep every single word.",
+        "This is the final line."
+      ],
+      "note": "Phrase crosses a potential strip edge; compare completeness and duplicate counts."
+    },
+    {
+      "case": "seam-09",
+      "page_y": 15360,
+      "source_lines": [
+        "Scene 09 begins here.",
+        "Keep every single word.",
+        "This is the final line."
+      ],
+      "note": "Phrase crosses a potential strip edge; compare completeness and duplicate counts."
+    },
+    {
+      "case": "seam-10",
+      "page_y": 17024,
+      "source_lines": [
+        "Scene 10 begins here.",
+        "Keep every single word.",
+        "This is the final line."
+      ],
+      "note": "Phrase crosses a potential strip edge; compare completeness and duplicate counts."
+    },
+    {
+      "case": "seam-11",
+      "page_y": 18688,
+      "source_lines": [
+        "Scene 11 begins here.",
+        "Keep every single word.",
+        "This is the final line."
+      ],
+      "note": "Phrase crosses a potential strip edge; compare completeness and duplicate counts."
+    },
+    {
+      "case": "single-character",
+      "page_y": 605,
+      "source_lines": [
+        "I"
+      ]
+    },
+    {
+      "case": "large-short-dialogue",
+      "page_y": 975,
+      "source_lines": [
+        "NO!"
+      ]
+    },
+    {
+      "case": "outside-caption",
+      "page_y": 1400,
+      "source_lines": [
+        "A caption outside the balloons."
+      ],
+      "note": "Recognition and safe automatic placement must be assessed separately."
+    }
+  ],
+  "manual_test": "Compare standard ML Kit and opt-in strips on this same image. This fixture cannot validate real manga fonts or CJK quality."
+}
