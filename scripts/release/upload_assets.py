@@ -6,7 +6,7 @@ from pathlib import Path
 import subprocess
 import tempfile
 
-from prepare_assets import check_file, safe_file
+from prepare_assets import check_file, safe_file, unique_artifacts
 
 
 def gh(*arguments):
@@ -30,7 +30,7 @@ def upload(repo, plan, assets):
     current = release(repo, plan['tag'])
     if current['target_commitish'] != plan['source_commit']:
         raise ValueError('Draft points at a different source commit')
-    expected = plan['artifacts'] + plan['files']
+    expected = unique_artifacts(plan) + plan['files']
     for item in expected:
         path = safe_file(assets, item['file'])
         check_file(path, item)

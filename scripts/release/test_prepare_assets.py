@@ -44,6 +44,56 @@ class ReleaseBytesTests(unittest.TestCase):
     def tearDown(self):
         self.temp.cleanup()
 
+    def use_universal(self):
+        name = 'Polaris-0.1.0-beta.8-universal.apk'
+        data = b'reviewed universal ARM32 and ARM64 bytes'
+        part = record(name + '.001', data)
+        (self.payload / part['file']).write_bytes(data)
+        self.plan['distribution'] = 'universal-arm'
+        self.plan['artifacts'] = [dict(abi=abi, **record(name, data), parts=[part])
+                                  for abi in ['arm64-v8a', 'armeabi-v7a']]
+        path = self.payload / 'manifest.json'
+        manifest = json.loads(path.read_text())
+        manifest['distribution'] = 'universal-arm'
+        manifest['artifacts'] = [{k: a[k] for k in ['abi', 'file', 'bytes', 'sha256']}
+                                 for a in self.plan['artifacts']]
+        raw = json.dumps(manifest).encode()
+        path.write_bytes(raw)
+        self.plan['files'] = [record('manifest.json', raw)]
+
+    def test_universal_reassembles_once_with_two_updater_abi_descriptors(self):
+        self.use_universal()
+        names = prepare(self.plan, self.payload, self.output)
+        self.assertEqual(len(names), 2)
+        self.assertEqual(len(list(self.output.glob('*.apk'))), 1)
+        self.assertEqual(len(json.loads((self.output / 'manifest.json').read_text())['artifacts']), 2)
+
+    def test_universal_descriptor_byte_or_part_mismatch_fails_closed(self):
+        self.use_universal()
+        for field in ['sha256', 'bytes', 'parts', 'file']:
+            other = copy.deepcopy(self.plan)
+            other['artifacts'][1][field] = 'different'
+            with self.assertRaisesRegex(ValueError, 'exact same bytes'):
+                prepare(other, self.payload, self.output)
+            self.assertFalse(self.output.exists())
+
+    def test_duplicate_split_names_cannot_bypass_universal_validation(self):
+        self.use_universal()
+        del self.plan['distribution']
+        with self.assertRaises(ValueError):
+            prepare(self.plan, self.payload, self.output)
+
+    def test_universal_upload_sends_shared_apk_only_once(self):
+        self.use_universal()
+        prepare(self.plan, self.payload, self.output)
+        current = {'id': 123, 'target_commitish': self.plan['source_commit'], 'assets': []}
+        expected = [self.plan['artifacts'][0]] + self.plan['files']
+        verified = dict(current, assets=[dict(name=a['file'], size=a['bytes'], state='uploaded',
+                                            digest='sha256:' + a['sha256']) for a in expected])
+        with patch('upload_assets.release', side_effect=[current, verified]), patch('upload_assets.subprocess.run') as run:
+            upload(self.plan['repository'], self.plan, self.output)
+        self.assertEqual(run.call_count, 2)
+
     def test_exact_bytes_and_identity_produce_the_reviewed_bundle(self):
         names = prepare(self.plan, self.payload, self.output)
         self.assertEqual(len(names), 3)

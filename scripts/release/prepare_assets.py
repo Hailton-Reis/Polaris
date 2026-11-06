@@ -29,22 +29,41 @@ def check_file(path, expected):
         raise ValueError('Wrong SHA-256: ' + path.name)
 
 
+def unique_artifacts(plan):
+    """Keep two updater ABI descriptors while uploading a shared universal once."""
+    artifacts = plan['artifacts']
+    if len(artifacts) != 2 or {a['abi'] for a in artifacts} != {'arm64-v8a', 'armeabi-v7a'}:
+        raise ValueError('Expected one descriptor per supported ARM architecture')
+    if plan.get('distribution') == 'universal-arm':
+        first, second = artifacts
+        if {k: v for k, v in first.items() if k != 'abi'} != {k: v for k, v in second.items() if k != 'abi'}:
+            raise ValueError('Universal descriptors must identify the exact same bytes and parts')
+        if first['file'] != 'Polaris-' + plan['tag'][1:] + '-universal.apk':
+            raise ValueError('Unexpected universal APK name')
+        return [first]
+    if plan.get('distribution', 'split-arm') != 'split-arm':
+        raise ValueError('Unsupported distribution')
+    for artifact in artifacts:
+        if artifact['file'] != 'Polaris-' + plan['tag'][1:] + '-' + artifact['abi'] + '.apk':
+            raise ValueError('Unexpected split APK name')
+    return artifacts
+
+
 def prepare(plan, payload, output):
     if output.exists():
         raise ValueError('Output must be a new directory')
     if not re.fullmatch(r'v\d+\.\d+\.\d+-beta\.\d+', plan['tag']):
         raise ValueError('Only reviewed beta tags are accepted')
-    if len(plan['artifacts']) != 2 or {a['abi'] for a in plan['artifacts']} != {'arm64-v8a', 'armeabi-v7a'}:
-        raise ValueError('Expected one artifact per supported ARM architecture')
-    names = [a['file'] for a in plan['artifacts']] + [a['file'] for a in plan['files']]
+    artifacts = unique_artifacts(plan)
+    names = [a['file'] for a in artifacts] + [a['file'] for a in plan['files']]
     if len(names) != len(set(names)):
         raise ValueError('Repeated asset name')
     output.parent.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(prefix='.release-', dir=output.parent) as directory:
         stage = Path(directory)
-        for artifact in plan['artifacts']:
-            expected_name = 'Polaris-' + plan['tag'][1:] + '-' + artifact['abi'] + '.apk'
-            if artifact['file'] != expected_name or not artifact['parts']:
+        for artifact in artifacts:
+            expected_name = artifact['file']
+            if not artifact['parts']:
                 raise ValueError('Unexpected APK name or empty parts')
             target = stage / expected_name
             with target.open('wb') as destination:
@@ -69,6 +88,8 @@ def prepare(plan, payload, output):
         wanted = [{k: a[k] for k in ['abi', 'file', 'bytes', 'sha256']} for a in plan['artifacts']]
         if manifest['artifacts'] != wanted:
             raise ValueError('Manifest artifacts mismatch')
+        if plan.get('distribution') == 'universal-arm' and manifest.get('distribution') != 'universal-arm':
+            raise ValueError('Manifest distribution mismatch')
         # Atomic handoff only after all bytes and identities are verified.
         stage.rename(output)
     return names
