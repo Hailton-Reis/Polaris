@@ -116,6 +116,9 @@ python3 "$polaris_root/scripts/r001/compare_android_unit_tests.py" "$baseline" "
 )
 test -s "$evidence/apks/SHA256SUMS.txt"
 python3 -m unittest discover -s "$polaris_root/scripts/beta" -p 'test_*.py' -v 2>&1 | tee "$evidence/beta-packaging-tests.log"
+# Emulator APKs are already preserved above. Export one phone APK from the same reviewed sources;
+# only its native ABI packaging changes, and any assembly failure aborts the export.
+run_gradle "$patched" universal-arm-build.log -Ppolaris.universalArm=true :app:assembleDebug
 python3 "$polaris_root/scripts/beta/package_internal_beta.py" \
     --apks "$patched/app/build/outputs/apk/debug" --output "$evidence/beta" \
     --comparison "$evidence/unit-test-comparison.json" | tee "$evidence/package-beta.log"

@@ -1,4 +1,4 @@
-"""Export verified ARM beta APKs and original fixtures; no keys or app data."""
+"""Export a verified universal ARM beta APK and original fixtures; no keys or app data."""
 import argparse
 import hashlib
 import json
@@ -11,7 +11,27 @@ import tempfile
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[2]
-REVISION = 'P20261104.4'
+REVISION = 'P20261106.1'
+VERSION = '0.1.0-beta.10'
+VERSION_CODE = 111
+ARM_ABIS = ['arm64-v8a', 'armeabi-v7a']
+
+
+def verify_universal_architectures(archive):
+    names = archive.namelist()
+    if len(names) != len(set(names)):
+        raise ValueError('Duplicate entries in universal APK')
+    libraries = {abi: {name.split('/')[-1] for name in names if name.startswith(f'lib/{abi}/')}
+                 for abi in ARM_ABIS}
+    all_abis = {name.split('/')[1] for name in names if name.startswith('lib/') and name.endswith('.so')}
+    if all_abis != set(ARM_ABIS):
+        raise ValueError('Universal phone APK must contain exactly ARM32 and ARM64 native libraries')
+    required = {'libimagedecoder.so', 'libarchive-jni.so', 'libsqliteJni.so',
+                'libmlkit_google_ocr_pipeline.so', 'libtranslate_jni.so',
+                'libonnxruntime.so', 'libonnxruntime4j_jni.so', 'libopencv_java4.so'}
+    if any(not required <= provided for provided in libraries.values()):
+        raise ValueError('Missing required reader/OCR libraries for an ARM architecture')
+    return libraries
 
 
 def sha256(path):
@@ -64,10 +84,11 @@ def package(apks, output, comparison, apksigner):
         raise ValueError('Expected the tested debug candidate')
     selected = []
     signer_hash = None
-    for abi in ['arm64-v8a', 'armeabi-v7a']:
-        entry = next(e for e in metadata['elements'] if any(
-            f.get('filterType') == 'ABI' and f.get('value') == abi for f in e['filters']))
-        if entry['versionCode'] != 110 or entry['versionName'] != '0.1.0-beta.9':
+    entries = [e for e in metadata['elements'] if not e.get('filters')]
+    if len(entries) != 1:
+        raise ValueError('Expected exactly one universal APK in tested output metadata')
+    for entry in entries:
+        if entry['versionCode'] != VERSION_CODE or entry['versionName'] != VERSION:
             raise ValueError('Stale beta APK version metadata')
         name = entry['outputFile']
         if Path(name).name != name:
@@ -82,29 +103,36 @@ def package(apks, output, comparison, apksigner):
         with zipfile.ZipFile(apk) as archive:
             if not any(REVISION.encode() in archive.read(n) for n in archive.namelist() if n.endswith('.dex')):
                 raise ValueError('Beta revision missing from APK')
+            verify_universal_architectures(archive)
         verify_branding(apk, apksigner)
-        selected.append((abi, apk))
+        selected.append(apk)
     output.parent.mkdir(parents=True, exist_ok=True)
     temporary = Path(tempfile.mkdtemp(prefix='.polaris-beta-', dir=output.parent))
     try:
         artifacts = []
-        for abi, apk in selected:
-            name = f'Polaris-0.1.0-beta.9-{abi}.apk'
+        for apk in selected:
+            name = f'Polaris-{VERSION}-universal.apk'
             shutil.copy2(apk, temporary / name)
-            artifacts.append({'abi': abi, 'file': name, 'bytes': apk.stat().st_size, 'sha256': sha256(apk)})
-        shutil.copy2(ROOT / 'integration/internal-beta/README.md', temporary / 'COMECE_AQUI.md')
+            digest = sha256(apk)
+            # Older Polaris updaters select an exact ABI descriptor. Both entries deliberately
+            # refer to the SAME asset; users download and install one APK, never two copies.
+            artifacts.extend({'abi': abi, 'file': name, 'bytes': apk.stat().st_size, 'sha256': digest}
+                             for abi in ARM_ABIS)
+        shutil.copy2(ROOT / 'docs/UNIVERSAL_FONTES_SEGURANCA_P20261106_1.md', temporary / 'COMECE_AQUI.md')
+        shutil.copy2(ROOT / 'docs/ISOLAMENTO_DE_EXTENSOES.md', temporary / 'ISOLAMENTO_DE_EXTENSOES.md')
         shutil.copytree(ROOT / 'integration/internal-beta/language-fixtures', temporary / 'testes/idiomas')
         shutil.copytree(ROOT / 'integration/document-reader/fixtures', temporary / 'testes/documentos')
         shutil.copytree(ROOT / 'integration/internal-beta/long-strip-fixture', temporary / 'testes/faixa-longa')
-        manifest = {'status': 'INTERNAL_BETA_CANDIDATE', 'version': '0.1.0-beta.9', 'version_code': 110,
+        manifest = {'status': 'INTERNAL_BETA_CANDIDATE', 'version': VERSION, 'version_code': VERSION_CODE,
                     'revision': REVISION, 'minimum_android_api': 26,
                     'application_id': metadata['applicationId'], 'signer_sha256': signer_hash,
                     'artifacts': artifacts, 'unit_comparison': evidence,
                     'display_name': 'Polaris', 'branding_verified': True,
-                    'physical_device_acceptance': 'PENDING', 'cjk_ocr_quality': 'PENDING'}
+                    'physical_device_acceptance': 'PENDING', 'cjk_ocr_quality': 'PENDING',
+                    'distribution': 'universal-arm', 'apk_files': 1}
         (temporary / 'manifest.json').write_text(json.dumps(manifest, indent=2) + '\n', encoding='utf-8')
         (temporary / 'SHA256SUMS.txt').write_text(''.join(
-            f"{a['sha256']}  {a['file']}\n" for a in artifacts), encoding='utf-8')
+            f"{a['sha256']}  {a['file']}\n" for a in {a['file']: a for a in artifacts}.values()), encoding='utf-8')
         temporary.rename(output)
     finally:
         if temporary.exists():
@@ -130,7 +158,7 @@ def main():
             parser.error('Android build-tools apksigner is missing')
         signer = sorted(candidates, key=lambda p: tuple(int(x) for x in re.findall(r'\d+', p.parent.name)))[-1]
     result = package(args.apks, args.output, args.comparison, signer)
-    print(f"INTERNAL_BETA_CANDIDATE_EXPORTED: {args.output} ({len(result['artifacts'])} ARM APKs)")
+    print(f"INTERNAL_BETA_CANDIDATE_EXPORTED: {args.output} (one universal ARM32/ARM64 APK)")
 
 
 if __name__ == '__main__':

@@ -1,0 +1,124 @@
+{
+  "date": "2026-11-06",
+  "date_timezone": "America/Fortaleza",
+  "version_name": "0.1.0-beta.10",
+  "version_code": 111,
+  "candidate_revision": "P20261106.1",
+  "publication": "UNPUBLISHED_INTERNAL_CANDIDATE",
+  "current_public_release": "v0.1.0-beta.9",
+  "patch_sha256": "6500245f46a764435d607c5a8bc46e7447494d351ca31773ff036b159b4487f4",
+  "assembly": "PASS",
+  "assembly_profile": "polaris.universalArm=true; one APK for ARM32 and ARM64",
+  "combined_assembly_and_unit_execution": true,
+  "combined_gradle_exit": 1,
+  "combined_failure_classification": "Only :app:testDebugUnitTest with the same17 preexisting failures; assembly completed",
+  "final_fresh_packaging_exit": 0,
+  "unit_comparison": {
+    "status": "NO_NEW_UNIT_REGRESSIONS",
+    "baseline": {
+      "total": 707,
+      "passed": 690,
+      "failed": 17,
+      "skipped": 0
+    },
+    "patched": {
+      "total": 738,
+      "passed": 721,
+      "failed": 17,
+      "skipped": 0
+    },
+    "preexisting_failures_still_present": 17,
+    "missing_baseline_tests": [],
+    "new_failures_or_skips": [],
+    "android_runtime_verified": false,
+    "gradle_exit_codes": {
+      "baseline": 1,
+      "patched": 1
+    },
+    "required_module_coverage": {
+      "app": 622,
+      "domain": 85
+    }
+  },
+  "new_test_cases": 31,
+  "source_to_build": {
+    "status": "BYTE_IDENTICAL",
+    "files_checked": 240,
+    "mismatches": []
+  },
+  "artifacts": [
+    {
+      "abi": "arm64-v8a",
+      "file": "Polaris-0.1.0-beta.10-universal.apk",
+      "bytes": 261130442,
+      "sha256": "f1a556d2620a5984c76cebe2dc5a10e461d8d5a2feb6a91018371beaec0a90da"
+    },
+    {
+      "abi": "armeabi-v7a",
+      "file": "Polaris-0.1.0-beta.10-universal.apk",
+      "bytes": 261130442,
+      "sha256": "f1a556d2620a5984c76cebe2dc5a10e461d8d5a2feb6a91018371beaec0a90da"
+    }
+  ],
+  "apk_files": 1,
+  "signer_sha256": "3ae747069cc9015ca1777f94fd56b030501f45d6af380426a572ad60e94d8227",
+  "branding_verified": true,
+  "host_checks": {
+    "overlay_application_tests": 4,
+    "packaging_tests": 9,
+    "build_driver_syntax": "PASS"
+  },
+  "isolated_component_proof": {
+    "worker_uid": 99000,
+    "internet_permission": -1,
+    "host_secret_read": false,
+    "host_canary_written": false,
+    "direct_network_connected": false,
+    "host_uid": 10065,
+    "api": 26,
+    "passed_checks": 6,
+    "status": "PASS",
+    "scope": "Android isolation component proof; NOT an integrated extension sandbox",
+    "abi": "x86_64",
+    "hardware_acceleration": false,
+    "integrated_extension_executor": false
+  },
+  "production_extension_sandbox": "NOT_INTEGRATED",
+  "compatibility_mode_decision": "Maintainer chose optional compatibility with explicit warning for extensions unsupported by the future isolated runtime.",
+  "backup": {
+    "protobuf_fields_changed": false,
+    "original_source_ids_changed": false,
+    "codec_cases_passed": 6,
+    "real_database_restore_merge_ui_roundtrip": "PENDING",
+    "nextUpdate_preserved": false,
+    "universal_fork_compatibility_guaranteed": false,
+    "internal_approval_preferences_imported": false,
+    "restored_new_repository_keys_grant_automatic_code_trust": false,
+    "composite_chapter_urls_external_reader_normalization": "NOT_IMPLEMENTED; routed polaris:// chapter URLs require separate export/reader validation"
+  },
+  "a12": {
+    "observed": "MangaDex listed works but chapter lists did not load; brief maintainer test.",
+    "exact_cause": "NOT_CONFIRMED",
+    "physical_reproduction": "PENDING",
+    "wrong_abi_proven": false
+  },
+  "pending": [
+    "full application startup/wizard/real extension installation and update on ARM32/ARM64",
+    "A12 chapter failure reproduction and measurements of reading/OCR/memory",
+    "Android14+, notifications, network transitions and SAF providers",
+    "actual extension runtime in isolated UID with controlled network/preferences IPC",
+    "novel JavaScript runtime isolation and signed/update resource constraints",
+    "Mihon/Tachiyomi real DB and UI roundtrip including composite chapter origins",
+    "shared Android-installed extensions restored in untrusted state: verify batch readiness and trust flow",
+    "new universal asset support in the GitHub publisher before a future beta10 publication"
+  ],
+  "logs_sha256": {
+    "full-unit.log": "f882d07a78db3db7bc9feafeb448c3f3f5327438d2c27e435649610fddaeacd3",
+    "combined-final-before-fresh-package.log": "f882d07a78db3db7bc9feafeb448c3f3f5327438d2c27e435649610fddaeacd3",
+    "compile.log": "191bf9b412254b96c7e905df26c60351b77b119005aada9c158aa5847af42d6b",
+    "package-fresh.log": "78f4bc6a23ff01b496cebd01499d51289d9d7d5b4ff9d24cbdbfa7fc8e6ea283",
+    "isolation-runtime.log": "a86723805053fb88e58b2ee7923776d87f5ee9ae3c01de03a133385afdde6517"
+  },
+  "evidence_directory": "integration/universal-recovery/20261106",
+  "inherited_scope": "Earlier typography and OCR benchmark evidence is historical, not reexecuted whole-app acceptance for this candidate."
+}

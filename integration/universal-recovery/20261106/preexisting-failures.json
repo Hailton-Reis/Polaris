@@ -1,0 +1,90 @@
+{
+  "count": 17,
+  "failures": [
+    {
+      "module": "app",
+      "classname": "eu.kanade.translation.detection.DbnetCleanupMaskTest",
+      "name": "dense mask is rejected instead of becoming a large rectangular cleanup fill()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.translation.detection.DbnetPageCoordinatorTest",
+      "name": "Paddle fallback uses selected once and releases its one owned ML Kit session()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.translation.translator.TranslationProviderFailureTest",
+      "name": "OpenRouter rejects blank model through typed boundary()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.translation.translator.TranslationProviderFailureTest",
+      "name": "Gemini rejects blank key before SDK use()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.translation.translator.TranslationProviderFailureTest",
+      "name": "OpenRouter rejects blank key through typed boundary()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.translation.translator.TranslationProviderFailureTest",
+      "name": "DeepL rejects blank key through typed boundary()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.translation.detection.ExperimentalDbnetOcrEngineTest",
+      "name": "cancellation leaves concrete wrapper client enabled without fallback or failure cleanup()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.translation.detection.ExperimentalDbnetOcrEngineTest",
+      "name": "technical failure closes and disables concrete wrapper then releases owned ML Kit after one fallback()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.novel.tts.NovelSpeechSanitizerTest",
+      "name": "collapses repeated dots to single ellipsis()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.translation.translator.ComicTranslationPromptTest",
+      "name": "parses clean JSON response()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.translation.translator.ComicTranslationPromptTest",
+      "name": "parses markdown wrapped JSON response()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.translation.translator.ComicTranslationPromptTest",
+      "name": "salvages completed pages from truncated JSON response()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.translation.detection.DbnetFullPageMlKitCoordinatorTest",
+      "name": "Paddle selection uses one owned ML Kit pass then one selected fallback()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.translation.detection.DbnetFullPageMlKitCoordinatorTest",
+      "name": "owned ML Kit is lazy and released without releasing selected engine()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.translation.detection.DbnetMlKitAssociationTest",
+      "name": "meaningful unmatched ML Kit text cannot silently disappear()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.translation.detection.DbnetMlKitAssociationTest",
+      "name": "ML Kit block spanning incompatible groups is ambiguous()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.translation.detection.DbnetMlKitAssociationTest",
+      "name": "partially recognized grouped region is rejected before cleanup can own every member()"
+    }
+  ]
+}

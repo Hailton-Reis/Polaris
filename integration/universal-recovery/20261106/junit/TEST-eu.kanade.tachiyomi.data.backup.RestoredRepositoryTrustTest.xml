@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.tachiyomi.data.backup.RestoredRepositoryTrustTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-11-06T16:22:20.397Z" hostname="550a0106d184" time="0.343">
+  <properties/>
+  <testcase name="an unchanged repository already reviewed on this device keeps its local trust()" classname="eu.kanade.tachiyomi.data.backup.RestoredRepositoryTrustTest" time="0.31"/>
+  <testcase name="restoring a new certificate preserves metadata but cannot authorize installed code()" classname="eu.kanade.tachiyomi.data.backup.RestoredRepositoryTrustTest" time="0.02"/>
+  <testcase name="a second import cannot launder a previously pending certificate into trusted state()" classname="eu.kanade.tachiyomi.data.backup.RestoredRepositoryTrustTest" time="0.01"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

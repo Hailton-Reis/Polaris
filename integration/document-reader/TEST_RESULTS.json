@@ -1,32 +1,29 @@
 {
-  "date_utc": "2026-11-05",
-  "timezone": "UTC",
-  "candidate_revision": "Polaris P20261104.4",
-  "version_name": "0.1.0-beta.9",
-  "version_code": 110,
-  "publication": "PUBLISHED_PRERELEASE_WITH_PENDING_ACCEPTANCE",
+  "date": "2026-11-06",
+  "date_timezone": "America/Fortaleza",
+  "version_name": "0.1.0-beta.10",
+  "version_code": 111,
+  "candidate_revision": "P20261106.1",
+  "publication": "UNPUBLISHED_INTERNAL_CANDIDATE",
   "current_public_release": "v0.1.0-beta.9",
-  "pinned_yomotsu": "0fb80c439ef816eeb50674f1b90af39918b176d8",
-  "patch_sha256": "713bea8e58215681a833ed27e9962406911a2533c0e5b1267f2cdfb7be7e8f06",
-  "assembly": "PASS: ARM32, ARM64, x86_64 and Android test APK assembled with the recorded scoped ABI profile. Unit tests and assembly were run separately.",
-  "full_build_completion": {
-    "status": "ASSEMBLY_AND_UNIT_REPORTS_COMPLETE",
-    "unit_tests": 707,
-    "unit_gradle_exit": 1,
-    "packaging_only_exit": 0,
-    "note": "690 passed and 17 preexisting unit failures; no new failures, skips or missing baseline cases. Three ABI profile; default project split configuration remains unchanged."
-  },
-  "android_unit_comparison": {
+  "patch_sha256": "6500245f46a764435d607c5a8bc46e7447494d351ca31773ff036b159b4487f4",
+  "assembly": "PASS",
+  "assembly_profile": "polaris.universalArm=true; one APK for ARM32 and ARM64",
+  "combined_assembly_and_unit_execution": true,
+  "combined_gradle_exit": 1,
+  "combined_failure_classification": "Only :app:testDebugUnitTest with the same17 preexisting failures; assembly completed",
+  "final_fresh_packaging_exit": 0,
+  "unit_comparison": {
     "status": "NO_NEW_UNIT_REGRESSIONS",
     "baseline": {
-      "total": 673,
-      "passed": 656,
+      "total": 707,
+      "passed": 690,
       "failed": 17,
       "skipped": 0
     },
     "patched": {
-      "total": 707,
-      "passed": 690,
+      "total": 738,
+      "passed": 721,
       "failed": 17,
       "skipped": 0
     },
@@ -39,374 +36,89 @@
       "patched": 1
     },
     "required_module_coverage": {
-      "app": 588,
+      "app": 622,
       "domain": 85
     }
   },
-  "new_tests_vs_beta8": {
-    "total": 46,
-    "failed": 0,
-    "skipped": 0,
-    "classes": [
-      {
-        "module": "app",
-        "classname": "eu.kanade.tachiyomi.data.updater.PolarisApkDownloaderTest",
-        "tests": 12,
-        "status": "PASS"
-      },
-      {
-        "module": "app",
-        "classname": "eu.kanade.translation.model.TranslationPageLayoutTest",
-        "tests": 8,
-        "status": "PASS"
-      },
-      {
-        "module": "app",
-        "classname": "eu.kanade.translation.recognizer.CaptionSurfaceRegressionTest",
-        "tests": 3,
-        "status": "PASS"
-      },
-      {
-        "module": "domain",
-        "classname": "tachiyomi.domain.translation.OcrExperimentPreferencesTest",
-        "tests": 8,
-        "status": "PASS"
-      },
-      {
-        "module": "app",
-        "classname": "eu.kanade.translation.recognizer.OcrStripPlanTest",
-        "tests": 4,
-        "total_in_class": 16,
-        "status": "PASS"
-      },
-      {
-        "module": "app",
-        "classname": "eu.kanade.translation.model.PortugueseTextNormalizationTest",
-        "tests": 3,
-        "status": "PASS"
-      },
-      {
-        "module": "app",
-        "classname": "eu.kanade.translation.presentation.TranslationTypographyTest",
-        "tests": 3,
-        "status": "PASS"
-      },
-      {
-        "module": "app",
-        "classname": "eu.kanade.translation.presentation.TranslationTextFitTest",
-        "tests": 5,
-        "status": "PASS",
-        "note": "Five additional cases for safe-envelope selection."
-      }
-    ],
-    "scope": "Historical subset recorded for P20261104.2; subsequent storage, codec and preparation additions are reported separately."
-  },
-  "repaired_preexisting_tests": {
-    "count": 17,
-    "reason": "Bitmap fixtures now implement production bulk getPixels, not only getPixel. All baseline cases remain present. Pure equivalent ARGB math avoids excessive MockK call recording."
-  },
-  "host_checks_current_run": {
-    "overlay_application_idempotence_crlf_and_drift": {
-      "tests": 4,
-      "status": "PASS"
-    },
-    "packager": {
-      "tests": 6,
-      "status": "PASS"
-    }
-  },
-  "source_to_build_verification": {
+  "new_test_cases": 31,
+  "source_to_build": {
     "status": "BYTE_IDENTICAL",
-    "files_checked": 219,
+    "files_checked": 240,
     "mismatches": []
   },
-  "apk_artifacts": [
+  "artifacts": [
     {
       "abi": "arm64-v8a",
-      "file": "Polaris-0.1.0-beta.9-arm64-v8a.apk",
-      "bytes": 199132104,
-      "sha256": "dfd7ce4e567db9036c6d72f50f67f9c11b48754de49a912089c42d712e6c43bb"
+      "file": "Polaris-0.1.0-beta.10-universal.apk",
+      "bytes": 261130442,
+      "sha256": "f1a556d2620a5984c76cebe2dc5a10e461d8d5a2feb6a91018371beaec0a90da"
     },
     {
       "abi": "armeabi-v7a",
-      "file": "Polaris-0.1.0-beta.9-armeabi-v7a.apk",
-      "bytes": 159334281,
-      "sha256": "c916f3623bff124bc280c127672b96dc3aed40ee7277ee655484b25d50d0a4b6"
+      "file": "Polaris-0.1.0-beta.10-universal.apk",
+      "bytes": 261130442,
+      "sha256": "f1a556d2620a5984c76cebe2dc5a10e461d8d5a2feb6a91018371beaec0a90da"
     }
   ],
+  "apk_files": 1,
   "signer_sha256": "3ae747069cc9015ca1777f94fd56b030501f45d6af380426a572ad60e94d8227",
   "branding_verified": true,
-  "apk_payload_and_size_comparison": [
-    {
-      "abi": "arm64-v8a",
-      "comparison_revision": "P20261104.3",
-      "old_bytes": 192987175,
-      "new_bytes": 199132104,
-      "delta_bytes": 6144929,
-      "payload_files_compared": 83,
-      "changed_assets_libraries_fonts": [],
-      "native_libraries_and_fonts_unchanged": true
-    },
-    {
-      "abi": "armeabi-v7a",
-      "comparison_revision": "P20261104.3",
-      "old_bytes": 153189352,
-      "new_bytes": 159334281,
-      "delta_bytes": 6144929,
-      "payload_files_compared": 82,
-      "changed_assets_libraries_fonts": [],
-      "native_libraries_and_fonts_unchanged": true
-    }
-  ],
-  "android_component_verification": {
-    "status": "PASS_16_SELECTED_COMPONENT_CASES",
+  "host_checks": {
+    "overlay_application_tests": 4,
+    "packaging_tests": 9,
+    "build_driver_syntax": "PASS"
+  },
+  "isolated_component_proof": {
+    "worker_uid": 99000,
+    "internet_permission": -1,
+    "host_secret_read": false,
+    "host_canary_written": false,
+    "direct_network_connected": false,
+    "host_uid": 10065,
     "api": 26,
+    "passed_checks": 6,
+    "status": "PASS",
+    "scope": "Android isolation component proof; NOT an integrated extension sandbox",
     "abi": "x86_64",
     "hardware_acceleration": false,
-    "isolated_application": true,
-    "installed_renderer_apk_sha256": "04dae311a7439f8ade99889cd20961b01005485ef3266635aab5b56b1445e958",
-    "font": "Anime Ace with Bubble Sans cedilla supplement; all5 bundled fonts checked; original authored controls also use Default.",
-    "case_groups": {
-      "glyphs_and_measured_paragraphs": 3,
-      "opt_in_original_with_authored_portuguese": 1,
-      "shaped_text_fitting": 3,
-      "authored_reader_surfaces": 6,
-      "region_decoder": 2,
-      "cleanup_mask": 1
-    },
-    "runs": [
-      {
-        "log": "instrumentation-first-run.txt",
-        "successful_actual_cases": 15,
-        "initialization_errors": [
-          {
-            "test": "initializationError",
-            "class": "eu.kanade.translation.recognizer.DbnetCleanupMaskLayoutTest",
-            "code": -2
-          }
-        ],
-        "note": "Invocation used the wrong package for the mask class. All15 actual selected cases passed."
-      },
-      {
-        "log": "instrumentation-mask-correct-package.txt",
-        "successful_actual_cases": 1,
-        "initialization_errors": [],
-        "note": "Only the previously unexecuted mask class rerun under its actual detection package; no code changes."
-      }
-    ],
-    "successful_cases": [
-      {
-        "test": "widerSafeEnvelopesCanIncreaseReadablePortugueseWithoutClipping",
-        "class": "eu.kanade.translation.presentation.PortugueseTypographyAndroidTest",
-        "code": 0
-      },
-      {
-        "test": "cedillasMatchTheSelectedComicCapHeightInsteadOfTheSystemLowercase",
-        "class": "eu.kanade.translation.presentation.PortugueseTypographyAndroidTest",
-        "code": 0
-      },
-      {
-        "test": "portugueseAccentsStayInsideTheMeasuredParagraphWithEveryBundledFont",
-        "class": "eu.kanade.translation.presentation.PortugueseTypographyAndroidTest",
-        "code": 0
-      },
-      {
-        "test": "drawComicPortugueseOnTheReportedTextOnArtworkCase",
-        "class": "eu.kanade.translation.presentation.PortugueseRealPageTypographyTest",
-        "code": 0
-      },
-      {
-        "test": "crowdedAndRotatedTextStaysInsideTheOriginalEnvelope",
-        "class": "eu.kanade.translation.presentation.TranslationTextFitAndroidTest",
-        "code": 0
-      },
-      {
-        "test": "growsOnlyInsideTheExistingSafeEnvelope",
-        "class": "eu.kanade.translation.presentation.TranslationTextFitAndroidTest",
-        "code": 0
-      },
-      {
-        "test": "arrependimentosStaysWholeWithEveryBundledFont",
-        "class": "eu.kanade.translation.presentation.TranslationTextFitAndroidTest",
-        "code": 0
-      },
-      {
-        "test": "portugueseComicTextPreservesTheDarkCaptionAtTwoZoomLevels",
-        "class": "eu.kanade.translation.presentation.TranslationSurfaceLayoutTest",
-        "code": 0
-      },
-      {
-        "test": "whiteBalloonContourAndArtworkRemainUntouched",
-        "class": "eu.kanade.translation.presentation.TranslationSurfaceLayoutTest",
-        "code": 0
-      },
-      {
-        "test": "darkCaptionTextAndCleanupStayInsideThePanelAtTwoZoomLevels",
-        "class": "eu.kanade.translation.presentation.TranslationSurfaceLayoutTest",
-        "code": 0
-      },
-      {
-        "test": "legacyCleanupDoesNotAddPaddingOutsideItsMeasuredBounds",
-        "class": "eu.kanade.translation.presentation.TranslationSurfaceLayoutTest",
-        "code": 0
-      },
-      {
-        "test": "mixedSizeTitleTranslationsHaveSeparateRenderedWritingAreas",
-        "class": "eu.kanade.translation.presentation.TranslationSurfaceLayoutTest",
-        "code": 0
-      },
-      {
-        "test": "portugueseComicTextPreservesTheWhiteBalloonContour",
-        "class": "eu.kanade.translation.presentation.TranslationSurfaceLayoutTest",
-        "code": 0
-      },
-      {
-        "test": "rotatedExifDoesNotUseRawRegionCoordinates",
-        "class": "eu.kanade.translation.recognizer.OcrStripImageTest",
-        "code": 0
-      },
-      {
-        "test": "regionsPreserveCoordinatesAndPixelBudgetAndCloseOnFailure",
-        "class": "eu.kanade.translation.recognizer.OcrStripImageTest",
-        "code": 0
-      },
-      {
-        "test": "oversizedCleanupMaskKeepsPageOriginAtViewportTopLeft",
-        "class": "eu.kanade.translation.detection.DbnetCleanupMaskLayoutTest",
-        "code": 0
-      }
-    ],
-    "visual_review": [
-      "Actual Android C Ç ç before/after: comic height/style retained instead of Android system fallback.",
-      "Accented Anime Ace paragraph and dark/white authored regions viewed.",
-      "Private original stats artwork with manually authored Portuguese viewed; original/derived capture not uploaded."
-    ],
-    "scope": "Component rendering/fit/decoding only. No full application startup, physical ARM performance, update/install acceptance or automatic translation-quality score."
+    "integrated_extension_executor": false
   },
-  "updater": {
-    "artifact": "FULL_APK",
-    "partial_downloads": "Digest-and-URL scoped .part files in internal cache",
-    "resume": "HTTP Range with 206 validation; 200 restarts; 416 verifies or restarts",
-    "integrity": "SHA-256 before atomic promotion; legacy requests without hash do not resume",
-    "automatic_retries": 5,
-    "background": "No longer cancelled on update screen disposal; WorkManager network constraints and exponential backoff",
-    "installation": "User initiated Android installer from screen or ready notification",
-    "tests": "12 real localhost HTTP/stream tests; Android WorkManager/notification/install acceptance remains pending",
-    "delta_patching": false
+  "production_extension_sandbox": "NOT_INTEGRATED",
+  "compatibility_mode_decision": "Maintainer chose optional compatibility with explicit warning for extensions unsupported by the future isolated runtime.",
+  "backup": {
+    "protobuf_fields_changed": false,
+    "original_source_ids_changed": false,
+    "codec_cases_passed": 6,
+    "real_database_restore_merge_ui_roundtrip": "PENDING",
+    "nextUpdate_preserved": false,
+    "universal_fork_compatibility_guaranteed": false,
+    "internal_approval_preferences_imported": false,
+    "restored_new_repository_keys_grant_automatic_code_trust": false,
+    "composite_chapter_urls_external_reader_normalization": "NOT_IMPLEMENTED; routed polaris:// chapter URLs require separate export/reader validation"
   },
-  "ocr_configuration": {
-    "mutually_exclusive_experiments": [
-      "long_page_strips",
-      "dbnet"
-    ],
-    "old_conflicting_flags": "Keep strips and selected OCR, disable DBNet",
-    "aot_gan_checkbox": "Removed: its stored preference was never read by translation processing",
-    "new_models": false,
-    "new_apis": false,
-    "prerequisites": "UI clears/disables non-English experiments when no English input/source-language possibility; DBNet additionally requires ARM64. Restoring prerequisites never auto-enables experiments.",
-    "overlap_reconciliation": "Equal text with almost-contained bounded-height boxes uses larger-height center tolerance; 2 regressions failed before/16 tests pass after; six extra real-chapter repetitions removed in replay."
+  "a12": {
+    "observed": "MangaDex listed works but chapter lists did not load; brief maintainer test.",
+    "exact_cause": "NOT_CONFIRMED",
+    "physical_reproduction": "PENDING",
+    "wrong_abi_proven": false
   },
-  "physical_device_acceptance": "PENDING",
-  "real_page_ocr_quality": "Scoped11-region real-source OCR benchmark complete; full reader/physical quality acceptance pending",
-  "known_limits": [
-    "MangaCloud original files and saved user OCR payload unavailable; public Asura originals used for scoped real-source benchmarking with different segmentation.",
-    "Missing lines, connected balloon occupancy and decorative panel reconstruction are not declared fixed.",
-    "Full application startup unvalidated on minimal AOSP image without WebView.",
-    "17 existing JVM failures remain. No new failures, skips or missing baseline cases.",
-    "The installed beta.8 updater is not patched remotely; one manual installation may be needed when beta.9 is distributed."
+  "pending": [
+    "full application startup/wizard/real extension installation and update on ARM32/ARM64",
+    "A12 chapter failure reproduction and measurements of reading/OCR/memory",
+    "Android14+, notifications, network transitions and SAF providers",
+    "actual extension runtime in isolated UID with controlled network/preferences IPC",
+    "novel JavaScript runtime isolation and signed/update resource constraints",
+    "Mihon/Tachiyomi real DB and UI roundtrip including composite chapter origins",
+    "shared Android-installed extensions restored in untrusted state: verify batch readiness and trust flow",
+    "new universal asset support in the GitHub publisher before a future beta10 publication"
   ],
-  "real_chapter_benchmark": {
-    "report": "../ocr-benchmark/20261104-chapter40/README.md",
-    "chapter": "Solo Leveling Ragnarok40",
-    "requested_source": "MangaCloud EN",
-    "measured_source": "Public Asura15images; same scenes/different segmentation, file identity to MangaCloud not verified",
-    "region_count": 11,
-    "normalized_characters": 465,
-    "paddle_exact": 9,
-    "paddle_character_errors": 2,
-    "mlkit_exact": 7,
-    "mlkit_character_errors": 10,
-    "runtimes": "Desktop Paddle port vs real Android MLKit API; no speed/ARM ranking",
-    "native_full_page_images": 15,
-    "native_regional": "PARTIAL: one high image complete, two180s timeouts, no character penalty assigned",
-    "translation": {
-      "status": "NOT_VALIDATED_MODEL_PREPARATION_TIMEOUT",
-      "model_preparation_error_type": "TimeoutCancellationException",
-      "model_preparation_elapsed_ms": 182722,
-      "translation_quality_score": null,
-      "successful_translation_cases": 0,
-      "scope": "First120s task timeout; explicit model-preparation retry180s timeout on minimal software AOSP emulator. No alternative translator substituted and no accuracy penalty assigned."
-    }
+  "logs_sha256": {
+    "full-unit.log": "f882d07a78db3db7bc9feafeb448c3f3f5327438d2c27e435649610fddaeacd3",
+    "combined-final-before-fresh-package.log": "f882d07a78db3db7bc9feafeb448c3f3f5327438d2c27e435649610fddaeacd3",
+    "compile.log": "191bf9b412254b96c7e905df26c60351b77b119005aada9c158aa5847af42d6b",
+    "package-fresh.log": "78f4bc6a23ff01b496cebd01499d51289d9d7d5b4ff9d24cbdbfa7fc8e6ea283",
+    "isolation-runtime.log": "a86723805053fb88e58b2ee7923776d87f5ee9ae3c01de03a133385afdde6517"
   },
-  "new_typography_unit_tests": {
-    "total": 11,
-    "failed": 0,
-    "skipped": 0,
-    "normalization": 3,
-    "glyph_spans": 3,
-    "fit_candidate_selection": 5
-  },
-  "typography": {
-    "report": "../typography/20261104/README.md",
-    "font_files_modified": false,
-    "new_models": false,
-    "new_apis": false,
-    "diagnosis": "Bundled Anime Ace lacks Ç and ç; prior Android system fallback differed in style/size.",
-    "fix": "Existing Bubble Sans supplement for Ç/ç only at1.125 cap-height scale; NFC; same styled text for measure/draw; natural font leading; consider all existing safe envelopes.",
-    "reader_behavior": "User-selected family; size and line breaks adapt to each region; no identification of original typeface.",
-    "saved_translations": "Reopen reader; no OCR rerun required for display-only fixes.",
-    "android_component_result": "PASS:16 selected actual cases across two invocations; command-package initialization error recorded separately."
-  },
-  "safe_storage": {
-    "report": "../safe-storage/20261104/README.md",
-    "storage_unit_tests": 32,
-    "backup_codec_tests": 6,
-    "counterfactual_old_implementation_failures": 3,
-    "host_guard_tests": 10,
-    "android_runtime": "NOT_VALIDATED_INSTALLATION_DID_NOT_COMPLETE",
-    "format_changed": false,
-    "scope": "The previous four SafeStorageAndroidTest cases remain without completed runtime acceptance; the new four signature/file controls have separate scope and do not validate SAF/backups."
-  },
-  "source_preparation": {
-    "report": "../source-preparation/20261104/README.md",
-    "new_jvm_cases_vs_P20261104_3": 34,
-    "selected_cases": 52,
-    "selected_failed": 0,
-    "selected_skipped": 0,
-    "wizard_ui_acceptance": "PENDING",
-    "physical_ARM_acceptance": "PENDING",
-    "android_component_checks": {
-      "status": "PASS",
-      "api": 26,
-      "abi": "x86_64",
-      "runtime": "Android emulator with software acceleration; ordinary application UID",
-      "checks": 4,
-      "passed": 4,
-      "failed": 0,
-      "production_helpers": "BYTE_IDENTICAL_TO_READER_COMPILED_CLASSES",
-      "scope": [
-        "APK cryptographic verification",
-        "tampered APK rejection preserving earlier file",
-        "reviewed package and certificate pinning",
-        "readonly atomic file replacement"
-      ],
-      "not_validated": [
-        "full application startup",
-        "wizard UI",
-        "real extension loading",
-        "Android 14+",
-        "physical ARM32/ARM64",
-        "database restore and SAF providers"
-      ],
-      "command": "adb shell am instrument -w -r test.polaris.preparation.probe/.Probe"
-    },
-    "queue_workers": 2,
-    "format_or_source_id_changes": false,
-    "automatic_install_from_backup": false,
-    "private_installer_preference_overwritten": false,
-    "process_death_download_resume": false,
-    "apk_signature_library": "com.android.tools.build:apksig:9.3.1"
-  },
-  "source_commit": "efc2543487f02ff15c3bc51f3ef0a25723809527",
-  "publication_record": "integration/release-candidates/0.1.0-beta.9/PUBLICATION.json"
+  "evidence_directory": "integration/universal-recovery/20261106",
+  "inherited_scope": "Earlier typography and OCR benchmark evidence is historical, not reexecuted whole-app acceptance for this candidate."
 }

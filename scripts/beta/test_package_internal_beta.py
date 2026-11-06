@@ -1,7 +1,38 @@
 from pathlib import Path
 import tempfile
 import unittest
-from package_internal_beta import package, signer_digest, validate_branding
+from package_internal_beta import package, signer_digest, validate_branding, verify_universal_architectures
+import zipfile
+
+
+class UniversalPackagingTests(unittest.TestCase):
+    required = ['libimagedecoder.so', 'libarchive-jni.so', 'libsqliteJni.so',
+                'libmlkit_google_ocr_pipeline.so', 'libtranslate_jni.so',
+                'libonnxruntime.so', 'libonnxruntime4j_jni.so', 'libopencv_java4.so']
+
+    def check(self, abis, missing=None):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / 'universal.apk'
+            with zipfile.ZipFile(path, 'w') as archive:
+                archive.writestr('assets/shared.txt', 'one copy')
+                for abi in abis:
+                    for name in self.required:
+                        if (abi, name) != missing:
+                            archive.writestr(f'lib/{abi}/{name}', b'fixture')
+            with zipfile.ZipFile(path) as archive:
+                return verify_universal_architectures(archive)
+
+    def test_both_arm_architectures_share_one_asset_tree(self):
+        self.assertEqual({'arm64-v8a', 'armeabi-v7a'}, set(self.check(['arm64-v8a', 'armeabi-v7a'])))
+
+    def test_a_mislabeled_single_architecture_or_accidental_emulator_build_is_rejected(self):
+        for abis in [['arm64-v8a'], ['armeabi-v7a'], ['arm64-v8a', 'armeabi-v7a', 'x86_64']]:
+            with self.subTest(abis=abis), self.assertRaisesRegex(ValueError, 'exactly ARM32 and ARM64'):
+                self.check(abis)
+
+    def test_missing_32_bit_reader_or_ocr_dependency_is_rejected(self):
+        with self.assertRaisesRegex(ValueError, 'Missing required'):
+            self.check(['arm64-v8a', 'armeabi-v7a'], ('armeabi-v7a', 'libonnxruntime.so'))
 
 class BetaPackagingTests(unittest.TestCase):
     def test_sdk_36_and_37_certificate_formats_are_accepted(self):

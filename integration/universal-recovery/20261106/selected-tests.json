@@ -1,0 +1,78 @@
+{
+  "status": "PASS",
+  "tests": 77,
+  "classes": [
+    {
+      "classname": "eu.kanade.tachiyomi.extension.util.ExtensionSecurityAuditTest",
+      "tests": 6,
+      "status": "PASS",
+      "execution": "Final full-suite run"
+    },
+    {
+      "classname": "eu.kanade.tachiyomi.data.backup.RestoredRepositoryTrustTest",
+      "tests": 3,
+      "status": "PASS",
+      "execution": "Final full-suite run"
+    },
+    {
+      "classname": "eu.kanade.tachiyomi.util.system.DeviceWorkloadPolicyTest",
+      "tests": 3,
+      "status": "PASS",
+      "execution": "Final full-suite run"
+    },
+    {
+      "classname": "eu.kanade.tachiyomi.source.selection.ChapterLoadFallbackTest",
+      "tests": 4,
+      "status": "PASS",
+      "execution": "Final full-suite run"
+    },
+    {
+      "classname": "eu.kanade.presentation.more.settings.screen.browse.preparation.SourcePreparationViewModelTest",
+      "tests": 5,
+      "status": "PASS",
+      "execution": "Final full-suite run"
+    },
+    {
+      "classname": "eu.kanade.tachiyomi.data.backup.BackupInteropTest",
+      "tests": 6,
+      "status": "PASS",
+      "execution": "Final full-suite run"
+    },
+    {
+      "classname": "eu.kanade.tachiyomi.extension.novel.NovelPluginPathsTest",
+      "tests": 3,
+      "status": "PASS",
+      "execution": "Final full-suite run"
+    },
+    {
+      "classname": "eu.kanade.tachiyomi.data.updater.PolarisUpdateClientTest",
+      "tests": 13,
+      "status": "PASS",
+      "execution": "Final full-suite run"
+    },
+    {
+      "classname": "eu.kanade.tachiyomi.extension.preparation.ExtensionPreparationQueueTest",
+      "tests": 10,
+      "status": "PASS",
+      "execution": "Final full-suite run"
+    },
+    {
+      "classname": "eu.kanade.tachiyomi.source.selection.SourceMatchingTest",
+      "tests": 7,
+      "status": "PASS",
+      "execution": "Final full-suite run"
+    },
+    {
+      "classname": "eu.kanade.tachiyomi.data.backup.PreferenceRestoreSecurityTest",
+      "tests": 2,
+      "status": "PASS",
+      "execution": "Final full-suite run"
+    },
+    {
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "tests": 15,
+      "status": "PASS",
+      "execution": "Final full-suite run"
+    }
+  ]
+}

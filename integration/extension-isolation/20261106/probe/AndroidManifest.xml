@@ -1,0 +1,8 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="test.polaris.isolation.probe">
+    <uses-sdk android:minSdkVersion="26" android:targetSdkVersion="28" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <application android:label="Polaris isolation component probe" android:allowBackup="false">
+        <service android:name=".IsolationService" android:exported="false" android:isolatedProcess="true" android:process=":isolated_extension_probe" />
+    </application>
+    <instrumentation android:name=".Probe" android:targetPackage="test.polaris.isolation.probe" android:label="Isolation component checks" />
+</manifest>
