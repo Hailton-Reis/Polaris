@@ -1,5 +1,7 @@
 # Universal ARM, fontes e segurança — P20261106.1
 
+**Publicação posterior:** a candidata foi liberada como pré-lançamento público em 06/11/2026. Este diretório conserva o registro de compilação anterior à autorização. Veja [o registro público e os downloads conferidos](../../release-candidates/0.1.0-beta.10/README.md).
+
 **Beta.10 / código 111 / candidata interna sem publicação.** A [beta.9 pública](https://github.com/Hailton-Reis/Polaris/releases/tag/v0.1.0-beta.9) permanece inalterada.
 
 O único APK `Polaris-0.1.0-beta.10-universal.apk` tem **261.130.442 bytes** (261.1MB / 249.0MiB), SHA-256 `f1a556d2620a5984c76cebe2dc5a10e461d8d5a2feb6a91018371beaec0a90da` e a assinatura da beta.9. Os dois descritores do manifesto apontam para esse mesmo arquivo. Há uma linha de hash e bibliotecas de leitura/OCR em ambas as arquiteturas. Assets, fontes e bibliotecas nativas conferidos permanecem idênticos aos APKs .4 da beta.9. O tamanho instalado e o desempenho físico não foram aprovados.

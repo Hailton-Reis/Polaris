@@ -1,0 +1,69 @@
+{
+  "status": "PUBLIC_BETA_PRERELEASE",
+  "version": "0.1.0-beta.10",
+  "version_code": 111,
+  "revision": "P20261106.1",
+  "minimum_android_api": 26,
+  "application_id": "app.mihon.tachiyomiat.dev",
+  "signer_sha256": "3ae747069cc9015ca1777f94fd56b030501f45d6af380426a572ad60e94d8227",
+  "artifacts": [
+    {
+      "abi": "arm64-v8a",
+      "file": "Polaris-0.1.0-beta.10-universal.apk",
+      "bytes": 261130442,
+      "sha256": "f1a556d2620a5984c76cebe2dc5a10e461d8d5a2feb6a91018371beaec0a90da"
+    },
+    {
+      "abi": "armeabi-v7a",
+      "file": "Polaris-0.1.0-beta.10-universal.apk",
+      "bytes": 261130442,
+      "sha256": "f1a556d2620a5984c76cebe2dc5a10e461d8d5a2feb6a91018371beaec0a90da"
+    }
+  ],
+  "unit_comparison": {
+    "status": "NO_NEW_UNIT_REGRESSIONS",
+    "baseline": {
+      "total": 707,
+      "passed": 690,
+      "failed": 17,
+      "skipped": 0
+    },
+    "patched": {
+      "total": 738,
+      "passed": 721,
+      "failed": 17,
+      "skipped": 0
+    },
+    "preexisting_failures_still_present": 17,
+    "missing_baseline_tests": [],
+    "new_failures_or_skips": [],
+    "android_runtime_verified": false,
+    "gradle_exit_codes": {
+      "baseline": 1,
+      "patched": 1
+    },
+    "required_module_coverage": {
+      "app": 622,
+      "domain": 85
+    }
+  },
+  "display_name": "Polaris",
+  "branding_verified": true,
+  "physical_device_acceptance": "PENDING",
+  "cjk_ocr_quality": "PENDING",
+  "distribution": "universal-arm",
+  "apk_files": 1,
+  "source_patch_sha256": "6500245f46a764435d607c5a8bc46e7447494d351ca31773ff036b159b4487f4",
+  "source_to_build": {
+    "status": "BYTE_IDENTICAL",
+    "files": 240
+  },
+  "isolated_component_checks": 6,
+  "production_extension_sandbox": "NOT_INTEGRATED",
+  "real_backup_ui_roundtrip": "PENDING",
+  "engineering_source_commit": "c708f1beadf8bf2c4ea462b927e4d861dd44cea5",
+  "verified_implementation_commit": "c708f1beadf8bf2c4ea462b927e4d861dd44cea5",
+  "source_commit": "805f707e828dd20b6aee28468140f4c50a8d4f49",
+  "release_tag": "v0.1.0-beta.10",
+  "release_url": "https://github.com/Hailton-Reis/Polaris/releases/tag/v0.1.0-beta.10"
+}

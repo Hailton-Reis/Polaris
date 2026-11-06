@@ -13,9 +13,7 @@
   <a href="docs/ARMAZENAMENTO.md"><strong>Armazenamento</strong></a>
 </p>
 
-**Pré-lançamento público atual: [beta.9 / P20261104.4 / código 110](https://github.com/Hailton-Reis/Polaris/releases/tag/v0.1.0-beta.9).** Assistente para preparar extensões internas em lote, correções de OCR/tipografia e atualização recuperável. [Notas e evidências](integration/release-candidates/0.1.0-beta.9/README.md). Esta branch contém a engenharia; a apresentação atual fica em [main](https://github.com/Hailton-Reis/Polaris). O aceite completo em aparelhos e da migração real de backups continua pendente.
-
-**Em desenvolvimento, sem publicação: [beta.10 / P20261106.1](docs/UNIVERSAL_FONTES_SEGURANCA_P20261106_1.md).** Um APK universal ARM32/ARM64, recuperação de fontes e novas barreiras de segurança. A sandbox completa e a migração real de backups seguem pendentes. [Evidências](integration/universal-recovery/20261106/README.md).
+**Pré-lançamento público atual: [beta.10 / P20261106.1 / código 111](https://github.com/Hailton-Reis/Polaris/releases/tag/v0.1.0-beta.10).** Um APK universal ARM32/ARM64, recuperação de fontes e inspeção preventiva de extensões. [Publicação, downloads e limites](integration/release-candidates/0.1.0-beta.10/README.md). A sandbox completa ainda não está integrada e a exportação de capítulos mesclados para outros leitores precisa de normalização e teste real; preserve o backup original. Esta branch contém a engenharia; a apresentação atual fica em [main](https://github.com/Hailton-Reis/Polaris).
 
 <table>
   <tr>

@@ -1,5 +1,7 @@
 # Candidata beta.10 — universal ARM e recuperação de fontes
 
+**Publicado posteriormente como beta.10 em 06/11/2026.** O texto abaixo conserva o contexto de preparação; [publicação e limites atuais](../integration/release-candidates/0.1.0-beta.10/README.md).
+
 **P20261106.1 / código 111 / Android 8+; ainda sem publicação.** A versão pública continua sendo a beta.9. Os resultados de compilação e testes desta candidata serão registrados separadamente; a lista abaixo descreve implementação e limites, não aceite em celulares.
 
 ## Um APK para ARM32 e ARM64
