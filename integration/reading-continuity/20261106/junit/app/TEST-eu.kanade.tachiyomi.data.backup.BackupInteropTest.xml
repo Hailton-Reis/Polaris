@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.tachiyomi.data.backup.BackupInteropTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-11-06T19:56:34.906Z" hostname="550a0106d184" time="1.403">
+  <properties/>
+  <testcase name="Mihon pinned raw protobuf imports notes memo and repository signing identity()" classname="eu.kanade.tachiyomi.data.backup.BackupInteropTest" time="1.214"/>
+  <testcase name="Tachiyomi 0153 raw protobuf imports with empty repository defaults()" classname="eu.kanade.tachiyomi.data.backup.BackupInteropTest" time="0.013"/>
+  <testcase name="Mihon pinned gzip imports common fields without installed sources()" classname="eu.kanade.tachiyomi.data.backup.BackupInteropTest" time="0.051"/>
+  <testcase name="Tachiyomi 0153 gzip imports common fields without installed sources()" classname="eu.kanade.tachiyomi.data.backup.BackupInteropTest" time="0.018"/>
+  <testcase name="Polaris reexports imported Mihon data using the real protobuf codec()" classname="eu.kanade.tachiyomi.data.backup.BackupInteropTest" time="0.031"/>
+  <testcase name="Polaris reexports imported Tachiyomi data using the real protobuf codec()" classname="eu.kanade.tachiyomi.data.backup.BackupInteropTest" time="0.063"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.domain.chapter.model.ChapterRoutingTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-11-06T19:56:29.452Z" hostname="550a0106d184" time="0.095">
+  <properties/>
+  <testcase name="network request restores provider URL and memo without changing storage identity()" classname="eu.kanade.domain.chapter.model.ChapterRoutingTest" time="0.087"/>
+  <testcase name="primary legacy chapter retains URL and provider metadata()" classname="eu.kanade.domain.chapter.model.ChapterRoutingTest" time="0.003"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

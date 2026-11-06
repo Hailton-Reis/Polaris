@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.translation.translator.GeminiComicProtocolTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-11-06T19:57:49.791Z" hostname="550a0106d184" time="0.015">
+  <properties/>
+  <testcase name="splits requests by phrase count while preserving original block identity()" classname="eu.kanade.translation.translator.GeminiComicProtocolTest" time="0.002"/>
+  <testcase name="refuses a URL or credential as a model identifier()" classname="eu.kanade.translation.translator.GeminiComicProtocolTest" time="0.004"/>
+  <testcase name="rejects missing extra null blank or unaligned phrases()" classname="eu.kanade.translation.translator.GeminiComicProtocolTest" time="0.005"/>
+  <testcase name="accepts complete responses regardless of page key order and ignores thoughts()" classname="eu.kanade.translation.translator.GeminiComicProtocolTest" time="0.001"/>
+  <testcase name="rejects truncated or blocked responses even if JSON appears complete()" classname="eu.kanade.translation.translator.GeminiComicProtocolTest" time="0.001"/>
+  <testcase name="character budget separates long phrases without splitting a phrase()" classname="eu.kanade.translation.translator.GeminiComicProtocolTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

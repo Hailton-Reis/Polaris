@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.translation.presentation.TranslationViewportTransformTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-11-06T19:56:58.811Z" hostname="550a0106d184" time="0.004">
+  <properties/>
+  <testcase name="incomplete or invalid geometry has no drawable viewport()" classname="eu.kanade.translation.presentation.TranslationViewportTransformTest" time="0.001"/>
+  <testcase name="zoom and pan snapshot replaces both origin and scale without mutating the prior frame()" classname="eu.kanade.translation.presentation.TranslationViewportTransformTest" time="0.0"/>
+  <testcase name="fitted portrait includes the black margin above the image once()" classname="eu.kanade.translation.presentation.TranslationViewportTransformTest" time="0.001"/>
+  <testcase name="downsampled translation maps to the same displayed pixels as the source()" classname="eu.kanade.translation.presentation.TranslationViewportTransformTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

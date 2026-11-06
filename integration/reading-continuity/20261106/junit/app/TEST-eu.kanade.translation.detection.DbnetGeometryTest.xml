@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.translation.detection.DbnetGeometryTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-11-06T19:56:56.998Z" hostname="550a0106d184" time="0.015">
+  <properties/>
+  <testcase name="extremely narrow accepted input retains one resized pixel()" classname="eu.kanade.translation.detection.DbnetGeometryTest" time="0.001"/>
+  <testcase name="minimum rectangle follows rotated shape and ignores interior points()" classname="eu.kanade.translation.detection.DbnetGeometryTest" time="0.007"/>
+  <testcase name="resize upscales longest edge and pads right and bottom to 256()" classname="eu.kanade.translation.detection.DbnetGeometryTest" time="0.0"/>
+  <testcase name="unclip expands each edge by area times ratio divided by perimeter()" classname="eu.kanade.translation.detection.DbnetGeometryTest" time="0.0"/>
+  <testcase name="rejects nonpositive absurd and overflow dimensions before multiplication()" classname="eu.kanade.translation.detection.DbnetGeometryTest" time="0.002"/>
+  <testcase name="resize retains nominal ratio despite rounding and preserves portrait orientation()" classname="eu.kanade.translation.detection.DbnetGeometryTest" time="0.0"/>
+  <testcase name="empty singleton nonfinite and collinear geometry has no usable rectangle()" classname="eu.kanade.translation.detection.DbnetGeometryTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

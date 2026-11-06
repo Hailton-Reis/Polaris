@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.translation.presentation.TranslationViewportScaleTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-11-06T19:56:58.805Z" hostname="550a0106d184" time="0.005">
+  <properties/>
+  <testcase name="same pixel space preserves reader zoom()" classname="eu.kanade.translation.presentation.TranslationViewportScaleTest" time="0.001"/>
+  <testcase name="downsampled translation coordinates are mapped to source pixels exactly once()" classname="eu.kanade.translation.presentation.TranslationViewportScaleTest" time="0.001"/>
+  <testcase name="invalid page metadata does not introduce NaN or infinite scale()" classname="eu.kanade.translation.presentation.TranslationViewportScaleTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

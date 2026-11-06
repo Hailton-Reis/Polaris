@@ -1,5 +1,7 @@
 # Extensões: isolamento, compatibilidade e quarentena
 
+**Atualização de desenvolvimento P20261106.2:** existe agora um executor experimental integrado, optativo por extensão, em avaliação. [Comportamento, instrumentação e limites atuais](../integration/reading-continuity/20261106/README.md). As seções abaixo documentam o diagnóstico e os critérios da beta.10 publicada, anterior a essa integração; não descrevem uma garantia de segurança absoluta.
+
 Decisão do mantenedor em 06/11/2026, America/Fortaleza: permitir um modo de compatibilidade opcional para extensões antigas, com aviso explícito de execução fora da sandbox. A beta.9 pública permanece inalterada. Esta análise não declara um executor isolado concluído.
 
 ## Limite atual confirmado no código

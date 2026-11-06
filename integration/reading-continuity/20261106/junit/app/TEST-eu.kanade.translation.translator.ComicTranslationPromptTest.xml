@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.translation.translator.ComicTranslationPromptTest" tests="9" skipped="0" failures="3" errors="0" timestamp="2026-11-06T19:56:29.090Z" hostname="550a0106d184" time="0.156">
+  <properties/>
+  <testcase name="normalizes non breaking spaces()" classname="eu.kanade.translation.translator.ComicTranslationPromptTest" time="0.038"/>
+  <testcase name="removes spaces before punctuation and collapses repeated spaces()" classname="eu.kanade.translation.translator.ComicTranslationPromptTest" time="0.003"/>
+  <testcase name="keeps ordinary text unchanged()" classname="eu.kanade.translation.translator.ComicTranslationPromptTest" time="0.001"/>
+  <testcase name="parses clean JSON response()" classname="eu.kanade.translation.translator.ComicTranslationPromptTest" time="0.009">
+    <failure message="java.lang.RuntimeException: Method length in org.json.JSONObject not mocked. See https://developer.android.com/r/studio-ui/build/not-mocked for details." type="java.lang.RuntimeException">java.lang.RuntimeException: Method length in org.json.JSONObject not mocked. See https://developer.android.com/r/studio-ui/build/not-mocked for details.
+	at org.json.JSONObject.length(JSONObject.java)
+	at eu.kanade.translation.translator.ComicTranslationPromptTest.parses clean JSON response(ComicTranslationPromptTest.kt:42)
+</failure>
+  </testcase>
+  <testcase name="parses markdown wrapped JSON response()" classname="eu.kanade.translation.translator.ComicTranslationPromptTest" time="0.002">
+    <failure message="java.lang.RuntimeException: Method length in org.json.JSONObject not mocked. See https://developer.android.com/r/studio-ui/build/not-mocked for details." type="java.lang.RuntimeException">java.lang.RuntimeException: Method length in org.json.JSONObject not mocked. See https://developer.android.com/r/studio-ui/build/not-mocked for details.
+	at org.json.JSONObject.length(JSONObject.java)
+	at eu.kanade.translation.translator.ComicTranslationPromptTest.parses markdown wrapped JSON response(ComicTranslationPromptTest.kt:56)
+</failure>
+  </testcase>
+  <testcase name="normalizes invisible Unicode spaces between words()" classname="eu.kanade.translation.translator.ComicTranslationPromptTest" time="0.037"/>
+  <testcase name="salvages completed pages from truncated JSON response()" classname="eu.kanade.translation.translator.ComicTranslationPromptTest" time="0.047">
+    <failure message="java.lang.RuntimeException: Method put in org.json.JSONArray not mocked. See https://developer.android.com/r/studio-ui/build/not-mocked for details." type="java.lang.RuntimeException">java.lang.RuntimeException: Method put in org.json.JSONArray not mocked. See https://developer.android.com/r/studio-ui/build/not-mocked for details.
+	at org.json.JSONArray.put(JSONArray.java)
+	at eu.kanade.translation.translator.ComicTranslationPromptKt.repairTruncatedComicTranslationJson(ComicTranslationPrompt.kt:148)
+	at eu.kanade.translation.translator.ComicTranslationPromptKt.parseComicTranslationResponse(ComicTranslationPrompt.kt:125)
+	at eu.kanade.translation.translator.ComicTranslationPromptTest.salvages completed pages from truncated JSON response(ComicTranslationPromptTest.kt:68)
+</failure>
+  </testcase>
+  <testcase name="removes zero width formatting characters()" classname="eu.kanade.translation.translator.ComicTranslationPromptTest" time="0.001"/>
+  <testcase name="preserves intentional paragraph breaks()" classname="eu.kanade.translation.translator.ComicTranslationPromptTest" time="0.002"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

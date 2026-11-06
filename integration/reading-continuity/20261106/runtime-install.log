@@ -1,0 +1,8 @@
+/data/app/app.mihon.tachiyomiat.dev-1NOBnEARjNlprqU_b3UfRA==/base.apk: 1 file pulled, 0 skipped. 35.7 MB/s (231068051 bytes in 6.178s)
+/workspace/scratch/polaris-cloud-e7d774c/android-build/patched-yomotsu/app/build/outputs/apk/debug/app-debug.apk: 1 file pushed, 0 skipped. 12.1 MB/s (236896057 bytes in 18.676s)
+Performing Push Install
+Success
+/data/app/app.mihon.tachiyomiat.dev.test-w-fcy2MhQofBRFyR3JCeMA==/base.apk: 1 file pulled, 0 skipped. 1.2 MB/s (485503 bytes in 0.396s)
+/workspace/scratch/polaris-cloud-e7d774c/android-build/patched-yomotsu/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk: 1 file pushed, 0 skipped. 258.4 MB/s (499380 bytes in 0.002s)
+Performing Push Install
+Success

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.translation.detection.DbnetFullPageMlKitCoordinatorTest" tests="4" skipped="0" failures="2" errors="0" timestamp="2026-11-06T19:56:22.501Z" hostname="550a0106d184" time="0.023">
+  <properties/>
+  <testcase name="failure before selected ML Kit success invokes selected fallback once()" classname="eu.kanade.translation.detection.DbnetFullPageMlKitCoordinatorTest" time="0.005"/>
+  <testcase name="selected ML Kit success is reused unchanged when association later fails()" classname="eu.kanade.translation.detection.DbnetFullPageMlKitCoordinatorTest" time="0.005"/>
+  <testcase name="Paddle selection uses one owned ML Kit pass then one selected fallback()" classname="eu.kanade.translation.detection.DbnetFullPageMlKitCoordinatorTest" time="0.005">
+    <failure message="org.opentest4j.AssertionFailedError: expected: &lt;full-page ML Kit&gt; but was: &lt;selected Paddle page&gt;" type="org.opentest4j.AssertionFailedError">org.opentest4j.AssertionFailedError: expected: &lt;full-page ML Kit&gt; but was: &lt;selected Paddle page&gt;
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:1199)
+	at eu.kanade.translation.detection.DbnetFullPageMlKitCoordinatorTest$Paddle selection uses one owned ML Kit pass then one selected fallback$1$result$1.invokeSuspend(DbnetMlKitAssociationTest.kt:260)
+	at eu.kanade.translation.detection.DbnetFullPageMlKitCoordinatorTest$Paddle selection uses one owned ML Kit pass then one selected fallback$1$result$1.invoke(DbnetMlKitAssociationTest.kt)
+	at eu.kanade.translation.detection.DbnetFullPageMlKitCoordinatorTest$Paddle selection uses one owned ML Kit pass then one selected fallback$1$result$1.invoke(DbnetMlKitAssociationTest.kt)
+	at eu.kanade.translation.detection.ExperimentalDetectionRoute.execute(ExperimentalDetectionRoute.kt:23)
+	at eu.kanade.translation.detection.DbnetFullPageMlKitCoordinatorTest$Paddle selection uses one owned ML Kit pass then one selected fallback$1.invokeSuspend(DbnetMlKitAssociationTest.kt:256)
+	at eu.kanade.translation.detection.DbnetFullPageMlKitCoordinatorTest$Paddle selection uses one owned ML Kit pass then one selected fallback$1.invoke(DbnetMlKitAssociationTest.kt)
+	at eu.kanade.translation.detection.DbnetFullPageMlKitCoordinatorTest$Paddle selection uses one owned ML Kit pass then one selected fallback$1.invoke(DbnetMlKitAssociationTest.kt)
+	at kotlinx.coroutines.test.TestBuildersKt__TestBuildersKt$runTest$2$1$1.invokeSuspend(TestBuilders.kt:317)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:34)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+	at kotlinx.coroutines.test.TestDispatcher.processEvent$kotlinx_coroutines_test(TestDispatcher.kt:24)
+	at kotlinx.coroutines.test.TestCoroutineScheduler.tryRunNextTaskUnless$kotlinx_coroutines_test(TestCoroutineScheduler.kt:98)
+	at kotlinx.coroutines.test.TestBuildersKt__TestBuildersKt$runTest$2$1$workRunner$1.invokeSuspend(TestBuilders.kt:326)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:34)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:256)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:54)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlockingImpl(Builders.kt:30)
+	at kotlinx.coroutines.BuildersKt.runBlockingImpl(Unknown Source)
+	at kotlinx.coroutines.BuildersKt__Builders_concurrentKt.runBlockingK(Builders.concurrent.kt:172)
+	at kotlinx.coroutines.BuildersKt.runBlockingK(Unknown Source)
+	at kotlinx.coroutines.BuildersKt__Builders_concurrentKt.runBlockingK$default(Builders.concurrent.kt:157)
+	at kotlinx.coroutines.BuildersKt.runBlockingK$default(Unknown Source)
+	at kotlinx.coroutines.test.TestBuildersJvmKt.createTestResult(TestBuildersJvm.kt:10)
+	at kotlinx.coroutines.test.TestBuildersKt__TestBuildersKt.runTest-8Mi8wO0(TestBuilders.kt:309)
+	at kotlinx.coroutines.test.TestBuildersKt.runTest-8Mi8wO0(TestBuilders.kt:1)
+	at kotlinx.coroutines.test.TestBuildersKt__TestBuildersKt.runTest-8Mi8wO0(TestBuilders.kt:167)
+	at kotlinx.coroutines.test.TestBuildersKt.runTest-8Mi8wO0(TestBuilders.kt:1)
+	at kotlinx.coroutines.test.TestBuildersKt__TestBuildersKt.runTest-8Mi8wO0$default(TestBuilders.kt:159)
+	at kotlinx.coroutines.test.TestBuildersKt.runTest-8Mi8wO0$default(TestBuilders.kt:1)
+	at eu.kanade.translation.detection.DbnetFullPageMlKitCoordinatorTest.Paddle selection uses one owned ML Kit pass then one selected fallback(DbnetMlKitAssociationTest.kt:246)
+</failure>
+  </testcase>
+  <testcase name="owned ML Kit is lazy and released without releasing selected engine()" classname="eu.kanade.translation.detection.DbnetFullPageMlKitCoordinatorTest" time="0.003">
+    <failure message="org.opentest4j.AssertionFailedError: expected: &lt;1&gt; but was: &lt;0&gt;" type="org.opentest4j.AssertionFailedError">org.opentest4j.AssertionFailedError: expected: &lt;1&gt; but was: &lt;0&gt;
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:569)
+	at eu.kanade.translation.detection.DbnetFullPageMlKitCoordinatorTest$owned ML Kit is lazy and released without releasing selected engine$1.invokeSuspend(DbnetMlKitAssociationTest.kt:290)
+	at eu.kanade.translation.detection.DbnetFullPageMlKitCoordinatorTest$owned ML Kit is lazy and released without releasing selected engine$1.invoke(DbnetMlKitAssociationTest.kt)
+	at eu.kanade.translation.detection.DbnetFullPageMlKitCoordinatorTest$owned ML Kit is lazy and released without releasing selected engine$1.invoke(DbnetMlKitAssociationTest.kt)
+	at kotlinx.coroutines.test.TestBuildersKt__TestBuildersKt$runTest$2$1$1.invokeSuspend(TestBuilders.kt:317)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:34)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+	at kotlinx.coroutines.test.TestDispatcher.processEvent$kotlinx_coroutines_test(TestDispatcher.kt:24)
+	at kotlinx.coroutines.test.TestCoroutineScheduler.tryRunNextTaskUnless$kotlinx_coroutines_test(TestCoroutineScheduler.kt:98)
+	at kotlinx.coroutines.test.TestBuildersKt__TestBuildersKt$runTest$2$1$workRunner$1.invokeSuspend(TestBuilders.kt:326)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:34)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:256)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:54)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlockingImpl(Builders.kt:30)
+	at kotlinx.coroutines.BuildersKt.runBlockingImpl(Unknown Source)
+	at kotlinx.coroutines.BuildersKt__Builders_concurrentKt.runBlockingK(Builders.concurrent.kt:172)
+	at kotlinx.coroutines.BuildersKt.runBlockingK(Unknown Source)
+	at kotlinx.coroutines.BuildersKt__Builders_concurrentKt.runBlockingK$default(Builders.concurrent.kt:157)
+	at kotlinx.coroutines.BuildersKt.runBlockingK$default(Unknown Source)
+	at kotlinx.coroutines.test.TestBuildersJvmKt.createTestResult(TestBuildersJvm.kt:10)
+	at kotlinx.coroutines.test.TestBuildersKt__TestBuildersKt.runTest-8Mi8wO0(TestBuilders.kt:309)
+	at kotlinx.coroutines.test.TestBuildersKt.runTest-8Mi8wO0(TestBuilders.kt:1)
+	at kotlinx.coroutines.test.TestBuildersKt__TestBuildersKt.runTest-8Mi8wO0(TestBuilders.kt:167)
+	at kotlinx.coroutines.test.TestBuildersKt.runTest-8Mi8wO0(TestBuilders.kt:1)
+	at kotlinx.coroutines.test.TestBuildersKt__TestBuildersKt.runTest-8Mi8wO0$default(TestBuilders.kt:159)
+	at kotlinx.coroutines.test.TestBuildersKt.runTest-8Mi8wO0$default(TestBuilders.kt:1)
+	at eu.kanade.translation.detection.DbnetFullPageMlKitCoordinatorTest.owned ML Kit is lazy and released without releasing selected engine(DbnetMlKitAssociationTest.kt:272)
+</failure>
+  </testcase>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

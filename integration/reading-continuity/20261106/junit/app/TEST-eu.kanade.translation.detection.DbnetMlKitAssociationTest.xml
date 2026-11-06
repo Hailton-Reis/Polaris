@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.translation.detection.DbnetMlKitAssociationTest" tests="11" skipped="0" failures="3" errors="0" timestamp="2026-11-06T19:56:22.527Z" hostname="550a0106d184" time="0.067">
+  <properties/>
+  <testcase name="association retains the exact detector mask metadata()" classname="eu.kanade.translation.detection.DbnetMlKitAssociationTest" time="0.008"/>
+  <testcase name="page dimensions geometry and text are validated independently()" classname="eu.kanade.translation.detection.DbnetMlKitAssociationTest" time="0.001"/>
+  <testcase name="meaningful unmatched ML Kit text cannot silently disappear()" classname="eu.kanade.translation.detection.DbnetMlKitAssociationTest" time="0.003">
+    <failure message="org.opentest4j.AssertionFailedError: Expected eu.kanade.translation.detection.DbnetAssociationException to be thrown, but nothing was thrown." type="org.opentest4j.AssertionFailedError">org.opentest4j.AssertionFailedError: Expected eu.kanade.translation.detection.DbnetAssociationException to be thrown, but nothing was thrown.
+	at org.junit.jupiter.api.Assertions.assertThrows(Assertions.java:3234)
+	at eu.kanade.translation.detection.DbnetMlKitAssociationTest.meaningful unmatched ML Kit text cannot silently disappear(DbnetMlKitAssociationTest.kt:125)
+</failure>
+  </testcase>
+  <testcase name="one ML Kit block may own multiple DBNet lines in one group()" classname="eu.kanade.translation.detection.DbnetMlKitAssociationTest" time="0.006"/>
+  <testcase name="unmatched detector group is rejected as noise without losing assigned text()" classname="eu.kanade.translation.detection.DbnetMlKitAssociationTest" time="0.001"/>
+  <testcase name="same-geometry duplicate is emitted once but repeated text elsewhere is preserved()" classname="eu.kanade.translation.detection.DbnetMlKitAssociationTest" time="0.001"/>
+  <testcase name="multiple compatible ML Kit blocks become one coherent group block()" classname="eu.kanade.translation.detection.DbnetMlKitAssociationTest" time="0.001"/>
+  <testcase name="no usable association fails instead of producing a partial page()" classname="eu.kanade.translation.detection.DbnetMlKitAssociationTest" time="0.0"/>
+  <testcase name="ML Kit block spanning incompatible groups is ambiguous()" classname="eu.kanade.translation.detection.DbnetMlKitAssociationTest" time="0.035">
+    <failure message="org.opentest4j.AssertionFailedError: Expected eu.kanade.translation.detection.DbnetAssociationException to be thrown, but nothing was thrown." type="org.opentest4j.AssertionFailedError">org.opentest4j.AssertionFailedError: Expected eu.kanade.translation.detection.DbnetAssociationException to be thrown, but nothing was thrown.
+	at org.junit.jupiter.api.Assertions.assertThrows(Assertions.java:3234)
+	at eu.kanade.translation.detection.DbnetMlKitAssociationTest.ML Kit block spanning incompatible groups is ambiguous(DbnetMlKitAssociationTest.kt:114)
+</failure>
+  </testcase>
+  <testcase name="adjacent groups remain separate association owners()" classname="eu.kanade.translation.detection.DbnetMlKitAssociationTest" time="0.002"/>
+  <testcase name="partially recognized grouped region is rejected before cleanup can own every member()" classname="eu.kanade.translation.detection.DbnetMlKitAssociationTest" time="0.002">
+    <failure message="org.opentest4j.AssertionFailedError: Expected eu.kanade.translation.detection.DbnetAssociationException to be thrown, but nothing was thrown." type="org.opentest4j.AssertionFailedError">org.opentest4j.AssertionFailedError: Expected eu.kanade.translation.detection.DbnetAssociationException to be thrown, but nothing was thrown.
+	at org.junit.jupiter.api.Assertions.assertThrows(Assertions.java:3234)
+	at eu.kanade.translation.detection.DbnetMlKitAssociationTest.partially recognized grouped region is rejected before cleanup can own every member(DbnetMlKitAssociationTest.kt:53)
+</failure>
+  </testcase>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

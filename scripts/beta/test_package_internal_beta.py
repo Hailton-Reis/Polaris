@@ -7,7 +7,7 @@ import zipfile
 
 class UniversalPackagingTests(unittest.TestCase):
     required = ['libimagedecoder.so', 'libarchive-jni.so', 'libsqliteJni.so',
-                'libmlkit_google_ocr_pipeline.so', 'libtranslate_jni.so',
+                'libmlkit_google_ocr_pipeline.so', 'libtranslate_jni.so', 'liblanguage_id_l2c_jni.so',
                 'libonnxruntime.so', 'libonnxruntime4j_jni.so', 'libopencv_java4.so']
 
     def check(self, abis, missing=None):
@@ -31,8 +31,9 @@ class UniversalPackagingTests(unittest.TestCase):
                 self.check(abis)
 
     def test_missing_32_bit_reader_or_ocr_dependency_is_rejected(self):
-        with self.assertRaisesRegex(ValueError, 'Missing required'):
-            self.check(['arm64-v8a', 'armeabi-v7a'], ('armeabi-v7a', 'libonnxruntime.so'))
+        for library in ('libonnxruntime.so', 'liblanguage_id_l2c_jni.so'):
+            with self.subTest(library=library), self.assertRaisesRegex(ValueError, 'Missing required'):
+                self.check(['arm64-v8a', 'armeabi-v7a'], ('armeabi-v7a', library))
 
 class BetaPackagingTests(unittest.TestCase):
     def test_sdk_36_and_37_certificate_formats_are_accepted(self):

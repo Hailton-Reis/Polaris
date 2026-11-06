@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.translation.EnglishTranslationBootstrapTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-11-06T19:56:55.242Z" hostname="550a0106d184" time="0.074">
+  <properties/>
+  <testcase name="failed downloads close resources without probing or claiming readiness()" classname="eu.kanade.translation.EnglishTranslationBootstrapTest" time="0.006"/>
+  <testcase name="existing resources can be verified offline without requesting a download()" classname="eu.kanade.translation.EnglishTranslationBootstrapTest" time="0.046"/>
+  <testcase name="readiness waits for models and the SDK probe before closing the session()" classname="eu.kanade.translation.EnglishTranslationBootstrapTest" time="0.006"/>
+  <testcase name="an empty SDK probe cannot be marked ready()" classname="eu.kanade.translation.EnglishTranslationBootstrapTest" time="0.003"/>
+  <testcase name="cancellation releases the translator without running the probe()" classname="eu.kanade.translation.EnglishTranslationBootstrapTest" time="0.007"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

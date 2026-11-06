@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.tachiyomi.extension.preparation.ExtensionPreparationQueueTest" tests="10" skipped="0" failures="0" errors="0" timestamp="2026-11-06T19:56:46.231Z" hostname="550a0106d184" time="0.271">
+  <properties/>
+  <testcase name="completion is emitted once per explicit batch and includes trust failures()" classname="eu.kanade.tachiyomi.extension.preparation.ExtensionPreparationQueueTest" time="0.103"/>
+  <testcase name="repository changes are checked again before queued work and retries()" classname="eu.kanade.tachiyomi.extension.preparation.ExtensionPreparationQueueTest" time="0.059"/>
+  <testcase name="retry only repeats failed items and never grants trust()" classname="eu.kanade.tachiyomi.extension.preparation.ExtensionPreparationQueueTest" time="0.011"/>
+  <testcase name="a timed out item does not prevent other items from finishing()" classname="eu.kanade.tachiyomi.extension.preparation.ExtensionPreparationQueueTest" time="0.01"/>
+  <testcase name="cancelling before dispatch still finishes the queue()" classname="eu.kanade.tachiyomi.extension.preparation.ExtensionPreparationQueueTest" time="0.011"/>
+  <testcase name="one exception fails only its item and a new batch starts cleanly()" classname="eu.kanade.tachiyomi.extension.preparation.ExtensionPreparationQueueTest" time="0.01"/>
+  <testcase name="at most two downloads run and each package is prepared once()" classname="eu.kanade.tachiyomi.extension.preparation.ExtensionPreparationQueueTest" time="0.005"/>
+  <testcase name="opening or restoring data never starts downloads and consent is mandatory()" classname="eu.kanade.tachiyomi.extension.preparation.ExtensionPreparationQueueTest" time="0.004"/>
+  <testcase name="cancellation preserves completed items and does not start queued ones()" classname="eu.kanade.tachiyomi.extension.preparation.ExtensionPreparationQueueTest" time="0.042"/>
+  <testcase name="duplicate packages invalid identities and insecure downloads are rejected before starting()" classname="eu.kanade.tachiyomi.extension.preparation.ExtensionPreparationQueueTest" time="0.006"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -13,7 +13,7 @@
   <a href="docs/ARMAZENAMENTO.md"><strong>Armazenamento</strong></a>
 </p>
 
-**Pré-lançamento público atual: [beta.10 / P20261106.1 / código 111](https://github.com/Hailton-Reis/Polaris/releases/tag/v0.1.0-beta.10).** Um APK universal ARM32/ARM64, recuperação de fontes e inspeção preventiva de extensões. [Publicação, downloads e limites](integration/release-candidates/0.1.0-beta.10/README.md). A sandbox completa ainda não está integrada e a exportação de capítulos mesclados para outros leitores precisa de normalização e teste real; preserve o backup original. Esta branch contém a engenharia; a apresentação atual fica em [main](https://github.com/Hailton-Reis/Polaris).
+**Pré-lançamento público atual: [beta.10 / P20261106.1 / código 111](https://github.com/Hailton-Reis/Polaris/releases/tag/v0.1.0-beta.10).** Um APK universal ARM32/ARM64, recuperação de fontes e inspeção preventiva de extensões. [Publicação, downloads e limites](integration/release-candidates/0.1.0-beta.10/README.md). Na beta.10 publicada, a sandbox e a normalização de capítulos mesclados para outros leitores ainda não estão integradas. A [próxima revisão em desenvolvimento](integration/reading-continuity/20261106/README.md) implementa isolamento optativo experimental e a projeção de backup, com aceite nos aparelhos e em leitores externos ainda pendente; preserve o backup original. Esta branch contém a engenharia; a apresentação atual fica em [main](https://github.com/Hailton-Reis/Polaris).
 
 <table>
   <tr>
@@ -109,7 +109,7 @@ O painel **Dados e armazenamento → Armazenamento do Polaris** ajuda a separar 
 
 ## Onde o projeto está
 
-O beta público disponível é **`0.1.0-beta.9` · revisão `P20261104.4` · versionCode `110`**. [Notas e registro de publicação](integration/release-candidates/0.1.0-beta.9/README.md). A implementação está em avaliação na [branch de engenharia](https://github.com/Hailton-Reis/Polaris/tree/r001/multisource-foundation).
+O beta público disponível é **`0.1.0-beta.10` · revisão `P20261106.1` · versionCode `111`**. [Notas e registro de publicação](integration/release-candidates/0.1.0-beta.10/README.md). A próxima revisão, `P20261106.2` (beta.11 em desenvolvimento, sem publicação), reúne continuidade entre fontes e isolamento experimental. [Escopo e limites](integration/reading-continuity/20261106/README.md). A implementação está em avaliação na [branch de engenharia](https://github.com/Hailton-Reis/Polaris/tree/r001/multisource-foundation).
 
 **O [primeiro beta público](https://github.com/Hailton-Reis/Polaris/releases/tag/v0.1.0-beta.3) está disponível; ainda não há lançamento estável.** O pacote de teste e a compilação não equivalem a aprovação do consumo, da compatibilidade ou da qualidade em todos os idiomas.
 

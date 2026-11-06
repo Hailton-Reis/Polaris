@@ -11,9 +11,9 @@ import tempfile
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[2]
-REVISION = 'P20261106.1'
-VERSION = '0.1.0-beta.10'
-VERSION_CODE = 111
+REVISION = 'P20261106.2'
+VERSION = '0.1.0-beta.11'
+VERSION_CODE = 112
 ARM_ABIS = ['arm64-v8a', 'armeabi-v7a']
 
 
@@ -27,7 +27,7 @@ def verify_universal_architectures(archive):
     if all_abis != set(ARM_ABIS):
         raise ValueError('Universal phone APK must contain exactly ARM32 and ARM64 native libraries')
     required = {'libimagedecoder.so', 'libarchive-jni.so', 'libsqliteJni.so',
-                'libmlkit_google_ocr_pipeline.so', 'libtranslate_jni.so',
+                'libmlkit_google_ocr_pipeline.so', 'libtranslate_jni.so', 'liblanguage_id_l2c_jni.so',
                 'libonnxruntime.so', 'libonnxruntime4j_jni.so', 'libopencv_java4.so'}
     if any(not required <= provided for provided in libraries.values()):
         raise ValueError('Missing required reader/OCR libraries for an ARM architecture')

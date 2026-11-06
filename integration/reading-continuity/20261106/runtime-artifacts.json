@@ -1,0 +1,12 @@
+{
+  "scope": "Component emulator test APK, not a phone release",
+  "abis": [
+    "x86_64"
+  ],
+  "app_bytes": 236896057,
+  "app_sha256": "9008121199c97954a210348a05538626ca158af7474b4ed1fa93981ede208888",
+  "test_bytes": 499380,
+  "test_sha256": "6f6981d82e2a78f250a95ed4cbc43ecf8d0bfdc65820176aa20bda55ea1e504f",
+  "fixture_sha256": "85d591ba1deceec49c2d512ad12c1f02eacf9b665738a6c62eb97334eb450a07",
+  "language_model_bytes": 315520
+}

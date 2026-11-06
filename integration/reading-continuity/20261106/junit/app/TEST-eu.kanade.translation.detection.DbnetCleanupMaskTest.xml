@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.translation.detection.DbnetCleanupMaskTest" tests="18" skipped="0" failures="1" errors="0" timestamp="2026-11-06T19:56:20.600Z" hostname="550a0106d184" time="1.9">
+  <properties/>
+  <testcase name="high confidence sparse large glyph mask gains only one extra pixel inside permission()" classname="eu.kanade.translation.detection.DbnetCleanupMaskTest" time="0.423"/>
+  <testcase name="small residuals two pixels from a glyph are covered without escaping member permission()" classname="eu.kanade.translation.detection.DbnetCleanupMaskTest" time="0.008"/>
+  <testcase name="saved page aggregate mask budget fails closed without invoking legacy erasers()" classname="eu.kanade.translation.detection.DbnetCleanupMaskTest" time="0.082"/>
+  <testcase name="uncertain mask keeps the existing two pixel expansion()" classname="eu.kanade.translation.detection.DbnetCleanupMaskTest" time="0.01"/>
+  <testcase name="prepared mask ownership survives OCR normalization copy and filtering()" classname="eu.kanade.translation.detection.DbnetCleanupMaskTest" time="0.002"/>
+  <testcase name="null mask uses the exact legacy cleanup patches and masked blank translation erases nothing()" classname="eu.kanade.translation.detection.DbnetCleanupMaskTest" time="0.06"/>
+  <testcase name="DBNet pixel outside permission cannot seed dilation back inside()" classname="eu.kanade.translation.detection.DbnetCleanupMaskTest" time="0.008"/>
+  <testcase name="rotated member quad remains the exact permission instead of its group AABB()" classname="eu.kanade.translation.detection.DbnetCleanupMaskTest" time="0.028"/>
+  <testcase name="checkerboard source is rejected before intermediate runs exceed the page cap()" classname="eu.kanade.translation.detection.DbnetCleanupMaskTest" time="0.295"/>
+  <testcase name="invalid mask preparation falls back before translation side effects()" classname="eu.kanade.translation.detection.DbnetCleanupMaskTest" time="0.26"/>
+  <testcase name="mask round trips old JSON defaults null and corrupt optional payload fails closed()" classname="eu.kanade.translation.detection.DbnetCleanupMaskTest" time="0.118"/>
+  <testcase name="valid empty persisted mask stays a safe explicit no erase mask()" classname="eu.kanade.translation.detection.DbnetCleanupMaskTest" time="0.003"/>
+  <testcase name="associated group with no usable glyph mask fails the experimental page()" classname="eu.kanade.translation.detection.DbnetCleanupMaskTest" time="0.004"/>
+  <testcase name="non square native mask maps with detector input scale and ignores padding()" classname="eu.kanade.translation.detection.DbnetCleanupMaskTest" time="0.067"/>
+  <testcase name="one empty associated group rejects all prepared masks atomically()" classname="eu.kanade.translation.detection.DbnetCleanupMaskTest" time="0.002"/>
+  <testcase name="mask keeps glyphs inside translated member quads and removes outside pixels()" classname="eu.kanade.translation.detection.DbnetCleanupMaskTest" time="0.002"/>
+  <testcase name="dense mask is rejected instead of becoming a large rectangular cleanup fill()" classname="eu.kanade.translation.detection.DbnetCleanupMaskTest" time="0.005">
+    <failure message="org.opentest4j.AssertionFailedError: Expected eu.kanade.translation.detection.DbnetCleanupMaskException to be thrown, but nothing was thrown." type="org.opentest4j.AssertionFailedError">org.opentest4j.AssertionFailedError: Expected eu.kanade.translation.detection.DbnetCleanupMaskException to be thrown, but nothing was thrown.
+	at org.junit.jupiter.api.Assertions.assertThrows(Assertions.java:3234)
+	at eu.kanade.translation.detection.DbnetCleanupMaskTest.dense mask is rejected instead of becoming a large rectangular cleanup fill(DbnetCleanupMaskTest.kt:100)
+</failure>
+  </testcase>
+  <testcase name="invalid dimensions ratio byte count and bounded work are rejected before use()" classname="eu.kanade.translation.detection.DbnetCleanupMaskTest" time="0.487"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
