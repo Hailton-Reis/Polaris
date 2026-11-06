@@ -2,6 +2,20 @@
 
 Este arquivo registra a evolução real do código. **Revisões de desenvolvimento não são lançamentos públicos.** As datas abaixo usam America/Fortaleza, exceto quando houver indicação de UTC. O histórico de distribuição fica em [Releases](https://github.com/Hailton-Reis/Polaris/releases).
 
+## 0.1.0-beta.10 · P20261106.1 — 06/11/2026
+
+**Estado:** pré-lançamento público para testes; versionCode 111; Android 8+, um APK universal ARM32/ARM64 de 261.130.442 bytes, com a assinatura anterior.
+
+- Recursos comuns compartilhados no APK; Android seleciona as bibliotecas nativas compatíveis na instalação.
+- Lista de capítulos principal salva antes da descoberta de alternativas. Recuperação de fontes após restauração, inclusive obras antigas/concluídas, com amostragem de páginas/imagens e preferência por português entre fontes habilitadas e verificadas.
+- Tentativas de outra edição confirmada quando a lista de páginas falha; fonte fixa, modo somente baixados e progresso preservados.
+- Menor concorrência/cache em processos com memória limitada e diagnóstico de ABI/processo no Sobre.
+- Inspeção preventiva, quarentena e aprovação por versão exata; confiança interna não importada de backups. A sandbox completa ainda não está integrada.
+
+738 testes JVM: 721 aprovações e as mesmas 17 falhas preexistentes. 31 casos novos, 13 controles de empacotamento/overlay e seis controles Android isolados passaram. Sem aceite completo em celulares; falha do A12 ainda sem causa confirmada. A exportação de capítulos mesclados para Mihon/Tachiyomi precisa de normalização e teste real: **preserve o backup original**.
+
+[Baixar beta.10](https://github.com/Hailton-Reis/Polaris/releases/tag/v0.1.0-beta.10) · [Notas e limites](docs/versoes/0.1.0-beta.10.md).
+
 ## 0.1.0-beta.9 · P20261104.4 — 05/11/2026 (UTC)
 
 **Estado:** pré-lançamento público para testes; versionCode 110; Android 8+, ARM32 e ARM64. Publicado com aceitação física, assistente completo e migração real em banco ainda pendentes.

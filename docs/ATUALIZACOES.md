@@ -14,9 +14,9 @@ Rascunhos são ignorados. No canal padrão, tanto a marcação `prerelease` do G
 
 ## Acesso ao GitHub
 
-O endereço consultado é `Hailton-Reis/Polaris`, sem token de acesso embutido no aplicativo. O repositório e a [Release beta.9](https://github.com/Hailton-Reis/Polaris/releases/tag/v0.1.0-beta.9) agora são **públicos**. Ela contém dois APKs completos, manifesto, hashes, roteiro e relatório de validação. O download pelo navegador do celular não exige uma conta do GitHub.
+O endereço consultado é `Hailton-Reis/Polaris`, sem token de acesso embutido no aplicativo. O repositório e a [Release beta.10](https://github.com/Hailton-Reis/Polaris/releases/tag/v0.1.0-beta.10) agora são **públicos**. Ela contém um APK universal ARM32/ARM64, manifesto, hashes, roteiro e relatório de validação. Os dois descritores de arquitetura no manifesto apontam para o mesmo arquivo; apenas um download é necessário. O download pelo navegador do celular não exige uma conta do GitHub.
 
-O aplicativo está configurado para consultar esse repositório. As versões beta dependem da opção **Receber atualizações experimentais**, desativada por padrão. Acesso público não equivale a validação de atualização no aparelho: consulta, download e instalação com a assinatura original ainda precisam desse teste. Uma instalação anterior pode encontrar a beta.9 ao ativar o canal experimental; instalar a própria beta.9 não cria uma versão posterior para o atualizador oferecer.
+O aplicativo está configurado para consultar esse repositório. As versões beta dependem da opção **Receber atualizações experimentais**, desativada por padrão. Acesso público não equivale a validação de atualização no aparelho: consulta, download e instalação com a assinatura original ainda precisam desse teste. Uma instalação anterior pode encontrar a beta.10 ao ativar o canal experimental; instalar a própria beta.10 não cria uma versão posterior para o atualizador oferecer.
 
 Falhas de rede e limites do GitHub são diferenciados de uma consulta concluída. Uma eventual indisponibilidade ou restrição futura do repositório também deve ser informada, em vez de ser apresentada como ausência de atualização.
 
@@ -55,8 +55,8 @@ A atualização usa o APK inteiro, sem patches entre versões. A retomada reapro
 
 ## Estado de validação
 
-A beta.9 / P20261104.4 tem APKs ARM32 e ARM64 conferidos por tamanho, SHA-256 e assinatura. A comparação final executou 707 testes JVM: 690 aprovações e as mesmas 17 falhas preexistentes, sem novas regressões. Os testes de versão, canal, seleção, metadados e integridade continuam incluídos. Os checks antigos do PR ainda têm pendências registradas no protótipo de backup e no preparo do SDK.
+A beta.10 / P20261106.1 tem um APK universal ARM32/ARM64 conferido por tamanho, SHA-256 e assinatura. A comparação final executou 738 testes JVM: 721 aprovações e as mesmas 17 falhas preexistentes, sem novas regressões. Os testes de versão, canal, seleção, metadados e integridade continuam incluídos. Os checks antigos do PR ainda têm pendências registradas no protótipo de backup e no preparo do SDK.
 
-Os APKs mantêm a identidade e a assinatura da beta.8 distribuída. Compilação, hashes e testes JVM não validam uma atualização real: retomada entre redes, instalação e preservação dos dados ainda exigem aceite nos aparelhos.
+O APK universal mantém a identidade e a assinatura da beta.9 distribuída. Compilação, hashes e testes JVM não validam uma atualização real: retomada entre redes, instalação e preservação dos dados ainda exigem aceite nos aparelhos.
 
-[Notas e evidência da beta.9](versoes/0.1.0-beta.9.md).
+[Notas e evidência da beta.10](versoes/0.1.0-beta.10.md).
