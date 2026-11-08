@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.presentation.more.settings.screen.browse.discovery.RepositoryDiscoveryControllerTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-11-08T01:12:10.321Z" hostname="a1f1fc307d5f" time="0.41">
+  <properties/>
+  <testcase name="database read failure blocks additions and can be retried()" classname="eu.kanade.presentation.more.settings.screen.browse.discovery.RepositoryDiscoveryControllerTest" time="0.322"/>
+  <testcase name="registration failure permits retry without claiming success()" classname="eu.kanade.presentation.more.settings.screen.browse.discovery.RepositoryDiscoveryControllerTest" time="0.058"/>
+  <testcase name="listing refresh failure retains a successfully registered repository()" classname="eu.kanade.presentation.more.settings.screen.browse.discovery.RepositoryDiscoveryControllerTest" time="0.008"/>
+  <testcase name="one direct add registers the chosen repository and ignores repeated clicks()" classname="eu.kanade.presentation.more.settings.screen.browse.discovery.RepositoryDiscoveryControllerTest" time="0.013"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

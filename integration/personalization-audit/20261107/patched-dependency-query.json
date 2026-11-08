@@ -1,0 +1,26 @@
+{
+  "queries": {
+    "queries": [
+      {
+        "package": {
+          "ecosystem": "Maven",
+          "name": "org.jsoup:jsoup"
+        },
+        "version": "1.23.2"
+      },
+      {
+        "package": {
+          "ecosystem": "Maven",
+          "name": "com.google.guava:guava"
+        },
+        "version": "33.7.2-android"
+      }
+    ]
+  },
+  "response": {
+    "results": [
+      {},
+      {}
+    ]
+  }
+}

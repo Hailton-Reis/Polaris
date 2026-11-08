@@ -15,6 +15,8 @@
 
 **Pré-lançamento público atual: [beta.10 / P20261106.1 / código 111](https://github.com/Hailton-Reis/Polaris/releases/tag/v0.1.0-beta.10).** Um APK universal ARM32/ARM64, recuperação de fontes e inspeção preventiva de extensões. [Publicação, downloads e limites](integration/release-candidates/0.1.0-beta.10/README.md). Na beta.10 publicada, a sandbox e a normalização de capítulos mesclados para outros leitores ainda não estão integradas. A [próxima revisão em desenvolvimento](integration/reading-continuity/20261106/README.md) implementa isolamento optativo experimental e a projeção de backup, com aceite nos aparelhos e em leitores externos ainda pendente; preserve o backup original. Esta branch contém a engenharia; a apresentação atual fica em [main](https://github.com/Hailton-Reis/Polaris).
 
+**Revisão em desenvolvimento P20261107.1:** a [auditoria geral](docs/AUDITORIA_GERAL_P20261107_1.md) registra correções, evidências e trabalho ainda pendente. A Jornada Polaris oferece títulos decorativos; três ícones alternativos e os temas Boreal, Aurora e Âmbar ficam disponíveis nas configurações, sem exigir XP. Essa revisão ainda não é uma nova Release.
+
 <table>
   <tr>
     <td width="33%" valign="top"><strong>01 · Leia</strong><br><br>Quadrinhos, livros e artigos. Leitura por páginas ou por texto, com retomada de posição.</td>

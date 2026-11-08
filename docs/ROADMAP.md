@@ -2,6 +2,18 @@
 
 O roadmap indica prioridades e critérios de verificação. Não representa prazo de entrega nem recurso já aprovado.
 
+## Estado da auditoria P20261107.1
+
+A [auditoria geral](AUDITORIA_GERAL_P20261107_1.md) separa implementação, prova por componentes e aceite externo. A Jornada Polaris, títulos decorativos, três ícones alternativos e três temas estão implementados na revisão de desenvolvimento. A beta.10 publicada não muda com esta revisão.
+
+Antes de ampliar a distribuição, priorizar:
+
+- Medir abertura de capítulos, memória, armazenamento e processamento no A12/ARM32 e no S20FE/ARM64.
+- Validar restauração e continuidade com fontes reais e ida/volta por banco/interface de leitores externos.
+- Evoluir a união de obras para resultados globais e entradas antigas separadas, sem associar obras diferentes por títulos parecidos.
+- Ampliar a sandbox HTTP experimental, adaptar preferências/login/filtros e tratar novels explicitamente.
+- Consolidar distribuição não depurável, preservando ID, assinatura e instalação por cima; validar callbacks dos rastreadores em navegador real.
+
 ## Prioridade atual: armazenamento antes da ampliação do beta
 
 - Medir instalação completa, modelos, cópias, renderização e temporários nos aparelhos.

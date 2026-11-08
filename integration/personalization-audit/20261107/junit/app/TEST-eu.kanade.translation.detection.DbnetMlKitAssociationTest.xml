@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.translation.detection.DbnetMlKitAssociationTest" tests="11" skipped="0" failures="0" errors="0" timestamp="2026-11-08T01:12:28.601Z" hostname="a1f1fc307d5f" time="0.022">
+  <properties/>
+  <testcase name="association retains the exact detector mask metadata()" classname="eu.kanade.translation.detection.DbnetMlKitAssociationTest" time="0.007"/>
+  <testcase name="page dimensions geometry and text are validated independently()" classname="eu.kanade.translation.detection.DbnetMlKitAssociationTest" time="0.001"/>
+  <testcase name="meaningful unmatched ML Kit text cannot silently disappear()" classname="eu.kanade.translation.detection.DbnetMlKitAssociationTest" time="0.001"/>
+  <testcase name="one ML Kit block may own multiple DBNet lines in one group()" classname="eu.kanade.translation.detection.DbnetMlKitAssociationTest" time="0.002"/>
+  <testcase name="unmatched detector group is rejected as noise without losing assigned text()" classname="eu.kanade.translation.detection.DbnetMlKitAssociationTest" time="0.001"/>
+  <testcase name="same-geometry duplicate is emitted once but repeated text elsewhere is preserved()" classname="eu.kanade.translation.detection.DbnetMlKitAssociationTest" time="0.001"/>
+  <testcase name="multiple compatible ML Kit blocks become one coherent group block()" classname="eu.kanade.translation.detection.DbnetMlKitAssociationTest" time="0.001"/>
+  <testcase name="no usable association fails instead of producing a partial page()" classname="eu.kanade.translation.detection.DbnetMlKitAssociationTest" time="0.001"/>
+  <testcase name="ML Kit block spanning incompatible groups is ambiguous()" classname="eu.kanade.translation.detection.DbnetMlKitAssociationTest" time="0.001"/>
+  <testcase name="adjacent groups remain separate association owners()" classname="eu.kanade.translation.detection.DbnetMlKitAssociationTest" time="0.001"/>
+  <testcase name="partially recognized grouped region is rejected before cleanup can own every member()" classname="eu.kanade.translation.detection.DbnetMlKitAssociationTest" time="0.003"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

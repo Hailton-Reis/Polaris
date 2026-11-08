@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.tachiyomi.data.track.TrackerOAuthGateTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-11-08T01:12:05.953Z" hostname="a1f1fc307d5f" time="4.059">
+  <properties/>
+  <testcase name="custom Hikka reference callbacks still require an explicit active flow()" classname="eu.kanade.tachiyomi.data.track.TrackerOAuthGateTest" time="0.131"/>
+  <testcase name="pending login survives recreation but is excluded from backups()" classname="eu.kanade.tachiyomi.data.track.TrackerOAuthGateTest" time="3.826"/>
+  <testcase name="unsolicited callbacks are rejected()" classname="eu.kanade.tachiyomi.data.track.TrackerOAuthGateTest" time="0.036"/>
+  <testcase name="state is provider bound and accepted only once()" classname="eu.kanade.tachiyomi.data.track.TrackerOAuthGateTest" time="0.006"/>
+  <testcase name="expired callbacks and clock rollback require a new login()" classname="eu.kanade.tachiyomi.data.track.TrackerOAuthGateTest" time="0.006"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[WARNING: A Java agent has been loaded dynamically (/workspace/polaris-cloud-tools/gradle/caches/modules-2/files-2.1/net.bytebuddy/byte-buddy-agent/1.18.2/62f38a6faf7f069d661b79a07d566f504b0b20c4/byte-buddy-agent-1.18.2.jar)
+WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+WARNING: Dynamic loading of agents will be disallowed by default in a future release
+]]></system-err>
+</testsuite>

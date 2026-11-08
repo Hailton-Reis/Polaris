@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.translation.recognizer.PaddleOcrRuntimeTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-11-08T01:12:37.308Z" hostname="a1f1fc307d5f" time="0.001">
+  <properties/>
+  <testcase name="fails before inference when opencv cannot be initialized()" classname="eu.kanade.translation.recognizer.PaddleOcrRuntimeTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

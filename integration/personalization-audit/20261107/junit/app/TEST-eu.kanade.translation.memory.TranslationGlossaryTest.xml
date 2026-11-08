@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.translation.memory.TranslationGlossaryTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-11-08T01:12:29.626Z" hostname="a1f1fc307d5f" time="0.018">
+  <properties/>
+  <testcase name="prompt identifies entry types and excludes learned complete lines()" classname="eu.kanade.translation.memory.TranslationGlossaryTest" time="0.003"/>
+  <testcase name="protected names survive an engine changing token spacing()" classname="eu.kanade.translation.memory.TranslationGlossaryTest" time="0.011"/>
+  <testcase name="manual correction wins for the same complete speech even after punctuation changes()" classname="eu.kanade.translation.memory.TranslationGlossaryTest" time="0.0"/>
+  <testcase name="protected CJK names match attached particles while Latin words retain their boundaries()" classname="eu.kanade.translation.memory.TranslationGlossaryTest" time="0.002"/>
+  <testcase name="multiple protected titles and techniques are restored together()" classname="eu.kanade.translation.memory.TranslationGlossaryTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

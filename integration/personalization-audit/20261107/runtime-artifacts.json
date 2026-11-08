@@ -1,0 +1,18 @@
+[
+  {
+    "path": "outputs/apk/debug/app-debug.apk",
+    "bytes": 236327928,
+    "sha256": "f4230b2f99030ec65de28f73c9696a9900128c5c543a46e14c8f1837816b836c",
+    "packaged_abis": [
+      "x86_64"
+    ],
+    "scope": "Debug x86_64 instrumentation assembly only; not a phone release; locally built native detector may retain ARM64-specific binaries"
+  },
+  {
+    "path": "outputs/apk/androidTest/debug/app-debug-androidTest.apk",
+    "bytes": 512926,
+    "sha256": "47260e0ee08b755775d492a2ef521fdb6b62353d1d5b1fa93adae36dcedfe95e",
+    "packaged_abis": [],
+    "scope": "Debug x86_64 instrumentation assembly only; not a phone release; locally built native detector may retain ARM64-specific binaries"
+  }
+]

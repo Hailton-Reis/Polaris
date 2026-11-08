@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.translation.TranslationLaunchPolicyTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-11-08T01:12:27.325Z" hostname="a1f1fc307d5f" time="0.003">
+  <properties/>
+  <testcase name="explicit user action is independent of manga opt in()" classname="eu.kanade.translation.TranslationLaunchPolicyTest" time="0.001"/>
+  <testcase name="download completion is allowed after manga opt in()" classname="eu.kanade.translation.TranslationLaunchPolicyTest" time="0.0"/>
+  <testcase name="download completion is denied while manga opt in is disabled()" classname="eu.kanade.translation.TranslationLaunchPolicyTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

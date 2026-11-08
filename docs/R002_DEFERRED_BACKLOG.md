@@ -2,6 +2,10 @@
 
 This document protects R001 from scope creep.
 
+## Audit checkpoint P20261107.1
+
+See [the current audit](AUDITORIA_GERAL_P20261107_1.md) for implemented components, evidence and outstanding acceptance. Cosmetic titles, launcher icons and themes are implemented in development; they do not close the following backlog. Global search/restored-library work deduplication, novel multi-source continuity, broader sandbox compatibility, cross-edition page correspondence, content-addressed reuse and physical ARM acceptance remain open. The opt-in HTTP sandbox is not a guarantee for compatibility-mode extensions. Public beta.10 remains unchanged.
+
 ## R001 must prove only
 
 - one canonical work can link multiple real source manga;

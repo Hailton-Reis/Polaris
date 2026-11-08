@@ -1,0 +1,10 @@
+{
+  "status": "COMPLETED_ADVISORY_LOOKUP_REQUIRES_REACHABILITY_REVIEW",
+  "checked_at_utc": "2026-11-08T00:49:38.547363+00:00",
+  "source": "https://api.osv.dev/v1/querybatch",
+  "scope": "Resolved app debugRuntimeClasspath Maven coordinates; not a native-binary, extension-repository or zero-day certification",
+  "packages": 380,
+  "packages_with_advisories": 0,
+  "unique_advisories": 0,
+  "findings": []
+}

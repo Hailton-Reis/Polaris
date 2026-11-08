@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.tachiyomi.ui.reader.setting.ReaderAutoScrollPreferencesTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-11-08T01:12:26.454Z" hostname="a1f1fc307d5f" time="0.032">
+  <properties/>
+  <testcase name="auto scroll speed uses the stable persisted key and default()" classname="eu.kanade.tachiyomi.ui.reader.setting.ReaderAutoScrollPreferencesTest" time="0.031"/>
+  <testcase name="auto scroll speed exposes the supported range and step()" classname="eu.kanade.tachiyomi.ui.reader.setting.ReaderAutoScrollPreferencesTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

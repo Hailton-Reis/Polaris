@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.translation.model.TranslationBlockVisualGroupingTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-11-08T01:12:29.750Z" hostname="a1f1fc307d5f" time="0.002">
+  <properties/>
+  <testcase name="nearby aligned fragments with very different visual character size stay separate()" classname="eu.kanade.translation.model.TranslationBlockVisualGroupingTest" time="0.001"/>
+  <testcase name="aligned open ended fragments at comic spacing merge when visual size matches()" classname="eu.kanade.translation.model.TranslationBlockVisualGroupingTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

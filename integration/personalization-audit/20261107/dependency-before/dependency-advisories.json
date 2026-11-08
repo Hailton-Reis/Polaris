@@ -1,0 +1,25 @@
+{
+  "status": "COMPLETED_ADVISORY_LOOKUP_REQUIRES_REACHABILITY_REVIEW",
+  "checked_at_utc": "2026-11-08T00:30:36.800832+00:00",
+  "source": "https://api.osv.dev/v1/querybatch",
+  "scope": "Resolved app debugRuntimeClasspath Maven coordinates; not a native-binary, extension-repository or zero-day certification",
+  "packages": 382,
+  "packages_with_advisories": 2,
+  "unique_advisories": 2,
+  "findings": [
+    {
+      "package": "com.google.guava:guava",
+      "version": "32.0.0-jre",
+      "ids": [
+        "GHSA-xxph-c9ww-hj94"
+      ]
+    },
+    {
+      "package": "org.jsoup:jsoup",
+      "version": "1.23.1",
+      "ids": [
+        "GHSA-65r4-943x-97jj"
+      ]
+    }
+  ]
+}
