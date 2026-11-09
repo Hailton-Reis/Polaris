@@ -1,0 +1,6 @@
+{
+  "initial_failure": "PersonalizationPreviewAndroidTest activity launch timeout45s; UnifiedWorkSearchAndroidTest passed but its first screenshot was dimmed by the System UI ANR window",
+  "observed_window": "Application Not Responding: com.android.systemui",
+  "recovery": "Tapped Close App on system ANR dialog; System UI restarted with PID3353; no app/test source changed; APK verification and SELinux kept enabled",
+  "final": "Repeated full same12-case invocation: OK12tests,85.99s; final screenshot visually inspected without obstruction"
+}

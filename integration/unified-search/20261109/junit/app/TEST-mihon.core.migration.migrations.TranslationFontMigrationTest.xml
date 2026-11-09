@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="mihon.core.migration.migrations.TranslationFontMigrationTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-11-09T22:31:20.121Z" hostname="0d67ac30ae46" time="0.009">
+  <properties/>
+  <testcase name="unknown font values migrate to Anime Ace()" classname="mihon.core.migration.migrations.TranslationFontMigrationTest" time="0.006"/>
+  <testcase name="unset preference remains at Anime Ace default()" classname="mihon.core.migration.migrations.TranslationFontMigrationTest" time="0.0"/>
+  <testcase name="supported font values remain unchanged()" classname="mihon.core.migration.migrations.TranslationFontMigrationTest" time="0.0"/>
+  <testcase name="legacy comic font value migrates to Anime Ace()" classname="mihon.core.migration.migrations.TranslationFontMigrationTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

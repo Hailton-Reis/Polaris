@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.translation.model.TranslationMultilineGroupingRegressionTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-11-09T22:30:58.836Z" hostname="0d67ac30ae46" time="0.004">
+  <properties/>
+  <testcase name="multiline paragraph never pulls in a detached detected balloon()" classname="eu.kanade.translation.model.TranslationMultilineGroupingRegressionTest" time="0.0"/>
+  <testcase name="multiline paragraph includes a short source fragment missed by balloon detection()" classname="eu.kanade.translation.model.TranslationMultilineGroupingRegressionTest" time="0.001"/>
+  <testcase name="a translated paragraph never absorbs cleanup for a failed translation()" classname="eu.kanade.translation.model.TranslationMultilineGroupingRegressionTest" time="0.001"/>
+  <testcase name="multiline comparison still rejects lettering of a genuinely different scale()" classname="eu.kanade.translation.model.TranslationMultilineGroupingRegressionTest" time="0.0"/>
+  <testcase name="repeated merges do not make apparent glyph width progressively smaller()" classname="eu.kanade.translation.model.TranslationMultilineGroupingRegressionTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

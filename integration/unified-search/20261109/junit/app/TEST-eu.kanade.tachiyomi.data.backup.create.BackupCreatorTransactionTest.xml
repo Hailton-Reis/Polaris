@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.tachiyomi.data.backup.create.BackupCreatorTransactionTest" tests="11" skipped="0" failures="0" errors="0" timestamp="2026-11-09T22:30:44.332Z" hostname="0d67ac30ae46" time="2.152">
+  <properties/>
+  <testcase name="only a verified final document allows pruning the oldest copy()" classname="eu.kanade.tachiyomi.data.backup.create.BackupCreatorTransactionTest" time="0.679"/>
+  <testcase name="corrupt read back never prunes copies or records success()" classname="eu.kanade.tachiyomi.data.backup.create.BackupCreatorTransactionTest" time="0.146"/>
+  <testcase name="backups with same timestamp have distinct names and other app namespaces are unmanaged()" classname="eu.kanade.tachiyomi.data.backup.create.BackupCreatorTransactionTest" time="0.075"/>
+  <testcase name="unknown provider length cannot cause an existing document to be overwritten()" classname="eu.kanade.tachiyomi.data.backup.create.BackupCreatorTransactionTest" time="0.098"/>
+  <testcase name="cancelled creation preserves prior backups and cancellation identity()" classname="eu.kanade.tachiyomi.data.backup.create.BackupCreatorTransactionTest" time="0.107"/>
+  <testcase name="write only destination reports verification unavailable and preserves old copies()" classname="eu.kanade.tachiyomi.data.backup.create.BackupCreatorTransactionTest" time="0.103"/>
+  <testcase name="manual export never truncates or deletes a nonempty selected document()" classname="eu.kanade.tachiyomi.data.backup.create.BackupCreatorTransactionTest" time="0.083"/>
+  <testcase name="failed write preserves all four earlier copies and success timestamp()" classname="eu.kanade.tachiyomi.data.backup.create.BackupCreatorTransactionTest" time="0.106"/>
+  <testcase name="provider refusing final rename cannot trigger retention()" classname="eu.kanade.tachiyomi.data.backup.create.BackupCreatorTransactionTest" time="0.153"/>
+  <testcase name="two creator instances serialize writing and retain four complete archives()" classname="eu.kanade.tachiyomi.data.backup.create.BackupCreatorTransactionTest" time="0.212"/>
+  <testcase name="unreadable old files never displace valid backup copies()" classname="eu.kanade.tachiyomi.data.backup.create.BackupCreatorTransactionTest" time="0.149"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

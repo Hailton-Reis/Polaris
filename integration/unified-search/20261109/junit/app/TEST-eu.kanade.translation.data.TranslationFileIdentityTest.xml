@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.translation.data.TranslationFileIdentityTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-11-09T22:30:56.570Z" hostname="0d67ac30ae46" time="0.036">
+  <properties/>
+  <testcase name="same chapter URL at different providers cannot share translated pages()" classname="eu.kanade.translation.data.TranslationFileIdentityTest" time="0.001"/>
+  <testcase name="primary chapter names retain existing translation identity()" classname="eu.kanade.translation.data.TranslationFileIdentityTest" time="0.033"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

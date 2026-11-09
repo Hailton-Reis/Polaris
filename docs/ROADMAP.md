@@ -10,7 +10,7 @@ Antes de ampliar a distribuição, priorizar:
 
 - Medir abertura de capítulos, memória, armazenamento e processamento no A12/ARM32 e no S20FE/ARM64.
 - Validar restauração e continuidade com fontes reais e ida/volta por banco/interface de leitores externos.
-- Evoluir a união de obras para resultados globais e entradas antigas separadas, sem associar obras diferentes por títulos parecidos.
+- Consolidar entradas antigas separadas da biblioteca, preservando progresso/categorias/downloads e backups. A [busca unificada P20261109.1](BUSCA_UNIFICADA_P20261109_1.md) já reúne resultados corroborados e abre uma favorita existente; isso não consolida os registros antigos.
 - Ampliar a sandbox HTTP experimental, adaptar preferências/login/filtros e tratar novels explicitamente.
 - Consolidar distribuição não depurável, preservando ID, assinatura e instalação por cima; validar callbacks dos rastreadores em navegador real.
 

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.tachiyomi.extension.novel.tts.NovelSpeechSanitizerTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-11-09T22:30:48.963Z" hostname="0d67ac30ae46" time="0.005">
+  <properties/>
+  <testcase name="removes translator notes in brackets and parens()" classname="eu.kanade.tachiyomi.extension.novel.tts.NovelSpeechSanitizerTest" time="0.002"/>
+  <testcase name="normalizes asian and european dialogue quotes()" classname="eu.kanade.tachiyomi.extension.novel.tts.NovelSpeechSanitizerTest" time="0.001"/>
+  <testcase name="collapses repeated dots to single ellipsis()" classname="eu.kanade.tachiyomi.extension.novel.tts.NovelSpeechSanitizerTest" time="0.001"/>
+  <testcase name="strips markdown formatting()" classname="eu.kanade.tachiyomi.extension.novel.tts.NovelSpeechSanitizerTest" time="0.001"/>
+  <testcase name="removes visual dividers and decorative stars()" classname="eu.kanade.tachiyomi.extension.novel.tts.NovelSpeechSanitizerTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

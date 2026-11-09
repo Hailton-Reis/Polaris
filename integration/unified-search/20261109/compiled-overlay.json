@@ -1,0 +1,1391 @@
+{
+  "matching_files": 346,
+  "files": [
+    {
+      "path": "app/build.gradle.kts",
+      "sha256": "8191034bc695e512ce0fb8d40080d3ac74d11fdeb05221093273a38855205cf5"
+    },
+    {
+      "path": "app/src/androidTest/assets/polaris-sandbox/fixture.apk",
+      "sha256": "85d591ba1deceec49c2d512ad12c1f02eacf9b665738a6c62eb97334eb450a07"
+    },
+    {
+      "path": "app/src/androidTest/java/eu/kanade/tachiyomi/extension/sandbox/AutomaticLanguageAndroidTest.kt",
+      "sha256": "a0518a47dd41a24de4e5172a7b83db56ec95a257162f0b061853d0fe1c46a5bd"
+    },
+    {
+      "path": "app/src/androidTest/java/eu/kanade/tachiyomi/extension/sandbox/ExtensionSandboxAndroidTest.kt",
+      "sha256": "4e4aea4a1994c76828a12e626c340393db19aa295596e40c550b5b38c4f937dc"
+    },
+    {
+      "path": "app/src/androidTest/java/eu/kanade/tachiyomi/polaris/LauncherIconAndroidTest.kt",
+      "sha256": "160402bf03550531215ff72534461bc9f5007860dba6eed9cf4ddffa83a0b299"
+    },
+    {
+      "path": "app/src/androidTest/java/eu/kanade/tachiyomi/polaris/PersonalizationPreviewAndroidTest.kt",
+      "sha256": "5cf8d156470e24f9e41090e23d34d669593d6e1b5b5f41eb8a27578d148a6310"
+    },
+    {
+      "path": "app/src/androidTest/java/eu/kanade/tachiyomi/polaris/ProfilePreferencesAndroidTest.kt",
+      "sha256": "6bbeb3be871fb33267a4a1b204dbbd227c7eee78ecb05ea7bf5c947bc2c258fe"
+    },
+    {
+      "path": "app/src/androidTest/java/eu/kanade/tachiyomi/polaris/UnifiedWorkSearchAndroidTest.kt",
+      "sha256": "eb86935b6785b95969babb0aa54a824d4c8b01ce1125c3b710c38867a93dd8c5"
+    },
+    {
+      "path": "app/src/androidTest/java/eu/kanade/tachiyomi/storage/SafeStorageAndroidTest.kt",
+      "sha256": "6164ec9127af08cb164a8b153d8857228da2629fe231d4c051bdea42521e6a0c"
+    },
+    {
+      "path": "app/src/androidTest/java/eu/kanade/translation/presentation/PortugueseRealPageTypographyTest.kt",
+      "sha256": "df0a416da8d6c64a2f9a7e71d54e1d523194c1b08f8f37f21f07d4901d2fa6a9"
+    },
+    {
+      "path": "app/src/androidTest/java/eu/kanade/translation/presentation/PortugueseTypographyAndroidTest.kt",
+      "sha256": "a1ad3d2b3ff112925566946d07f49313ab36b7438eb3eaa34cd24c928e64b8d9"
+    },
+    {
+      "path": "app/src/androidTest/java/eu/kanade/translation/presentation/TranslationSurfaceLayoutTest.kt",
+      "sha256": "65ba9102a8d0bec21a1f3fdd19a347c39ca309b045914133aa46cc87c1d6b72f"
+    },
+    {
+      "path": "app/src/androidTest/java/eu/kanade/translation/recognizer/ChapterBenchmarkTest.kt",
+      "sha256": "96f71aa203b904a7c22e3b2d8070f43c58636eb54de7e3d2f1701cc567cc00bb"
+    },
+    {
+      "path": "app/src/androidTest/java/eu/kanade/translation/recognizer/OcrComponentTestRunner.kt",
+      "sha256": "3f572ce7716311eb005073c50bdfbdeeb59aef0402633fe7e52dc073dad2dfd0"
+    },
+    {
+      "path": "app/src/androidTest/java/eu/kanade/translation/recognizer/OcrStripImageTest.kt",
+      "sha256": "67e37d1469b57989b453eb6f191e04a747cbc8a92c9651b7b053fe2612bf21a9"
+    },
+    {
+      "path": "app/src/debug/AndroidManifest.xml",
+      "sha256": "951288baa6bd5306269b9ba46700b8dea890c49112b80ab41f0b534a01ca02fc"
+    },
+    {
+      "path": "app/src/debug/java/eu/kanade/tachiyomi/polaris/PolarisPersonalizationTestActivity.kt",
+      "sha256": "873265a9f09d6a6e55cd6a334cdbca072eafd1e66f5d3550c1e39c38a8199d0d"
+    },
+    {
+      "path": "app/src/debug/java/eu/kanade/tachiyomi/polaris/PolarisWorkSearchTestActivity.kt",
+      "sha256": "0e9a398c6768080bbf97dcee61f0c40307de975335abf696573bfc37a17edd5f"
+    },
+    {
+      "path": "app/src/debug/java/eu/kanade/tachiyomi/polaris/TranslationCaptureReceiver.kt",
+      "sha256": "a3ee078ca722e50af1f55120a36bc1042505d23d77ac8c99e1224fcd902c5c01"
+    },
+    {
+      "path": "app/src/debug/java/eu/kanade/translation/presentation/TranslationSurfaceTestActivity.kt",
+      "sha256": "e37857d2e20cd167a2b062b922c2fe879158e5d62acd4d13d72f3fb7315fc55e"
+    },
+    {
+      "path": "app/src/main/AndroidManifest.xml",
+      "sha256": "b57cdf4fd649cd803983a228f079c56255fadff73fe4837f29bd796bf043423a"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/domain/DomainModule.kt",
+      "sha256": "bdeb5aa2783fd33305e4d03e0e64091ca503ac21917b60efdb83a13ffbf170a4"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/domain/chapter/interactor/SyncChaptersWithSource.kt",
+      "sha256": "3f0b856aba71483809f2fb6e03273de7c117af8b7764f3c260b75c15b14513d1"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/domain/chapter/model/Chapter.kt",
+      "sha256": "b5cf644e1ba827d1ffca760c04711e4d93b138f8fa6988cf389cafa4fd2cd679"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/domain/extension/interactor/TrustExtension.kt",
+      "sha256": "e6ea14bccdb347869b05d10b644d8e52c4734e4386039db5090ffa12a06e9b95"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/domain/source/service/SourcePreferences.kt",
+      "sha256": "bf8ea15733556e3044214ef32f7cd69a1aa4febfdc3d482ae8f32278986fe947"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/domain/ui/UiPreferences.kt",
+      "sha256": "02d357c446d6588ed515407d427b3eb39aa3a774fed5a269486d5ba4555d433d"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/domain/ui/model/AppTheme.kt",
+      "sha256": "770b2406abfb189c10bfd7dbed1a5ef736fddf469a2c96b4bda2860b30685017"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/domain/ui/model/LauncherIcon.kt",
+      "sha256": "17c29fb4519b2b7479cce994537897f1e2dd16c01beb552f6184e8d3d4dcfdc9"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/presentation/browse/ExtensionDetailsScreen.kt",
+      "sha256": "f53ba4dae5a7e2793ffad49cf004940b3fc410b24204db6a614f89ec39ca5833"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/presentation/browse/ExtensionsScreen.kt",
+      "sha256": "82581d5ffba1650a94ee2115544c7cf3cee978e22447a089c483da3cdd136a99"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/presentation/browse/GlobalSearchScreen.kt",
+      "sha256": "49f0ff530b2b29517dcb31bc084a13478a8fd36d37418bbaff53adcdad88fce7"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/presentation/browse/UnifiedWorkSearchContent.kt",
+      "sha256": "e02e678d39a6cf9903e1828d384902c2675d236597615f13338fde621fccf5a7"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/presentation/browse/components/GlobalSearchToolbar.kt",
+      "sha256": "f4efcbdbbd3a816fde01951ae6b4c598c9aabb39ea904b924199285752925a33"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/presentation/documents/DocumentImportDialog.kt",
+      "sha256": "f596ae66be1d3cc9a5e4f94e4e9dd457ba9f4d44539bed7455cbfa108fe320f1"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/presentation/documents/DocumentsScreen.kt",
+      "sha256": "a55b682d363441e178906073c9e41bfebcf7974ff503dbf10e0eecb2cd374b2e"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/presentation/documents/EnglishPreparationCard.kt",
+      "sha256": "dd6b1c5bdb1d2a7b69010c8d7c1d1e074b42f34310f5be71e29f941b191285d9"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/presentation/documents/PolarisStorageScreen.kt",
+      "sha256": "5f29bae1f84a79f0ad6e9b2da8689b34ffc4c1d9b76f88eb6abca48d3597cd90"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/presentation/manga/ChapterSettingsDialog.kt",
+      "sha256": "8b56a692d19f1f7a979af6fc3f84d74a6dbb452169fb652fadd839a82374a3a0"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/presentation/manga/MangaScreen.kt",
+      "sha256": "5d4a1d0b0cd2602647e9f960f133561e87b78aac3f34046c2d1dff4647f7d505"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/presentation/manga/WorkSourceDialog.kt",
+      "sha256": "7ea1767b99a2bf76a61a82909b9086012bf96a7df18d5ee8fe5620f2cd8795a3"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/presentation/manga/components/ChapterTranslationIndicator.kt",
+      "sha256": "63719bf3bb38db1a130266136d84a334e054b9ae2227efe1c59a1e62bebe8bee"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/presentation/manga/components/MangaChapterListItem.kt",
+      "sha256": "0be5ce36bd7c844564835664f842151b639eead6be20ae15cc87ff46a0b99c3e"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/presentation/more/LogoHeader.kt",
+      "sha256": "228a9e46837edc5c2c08ccfc4170640c7f96873cdf844413cab6f7c01424af52"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/presentation/more/MoreScreen.kt",
+      "sha256": "bd8083ccceff55aa44ae363e22fd257a08519177dbd5bfc0db96659f3f9dca31"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/presentation/more/NewUpdateScreen.kt",
+      "sha256": "657ea47ddc2875d36cf3175fc432431ceab324d552a7091c644d94b6e1b14980"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/presentation/more/onboarding/GuidesStep.kt",
+      "sha256": "aca0ced412115b44f0ca2fdc7b050410856ea2842ce544cee50ae33ee4bdcdff"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/presentation/more/profile/UserProfileScreen.kt",
+      "sha256": "0bb763a1ebe28f6ec3ca7400aaee416de3564c7e57d0e3eeb7a8918599491721"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsAppUpdatesScreen.kt",
+      "sha256": "5ed3d06317e97f91e22a611e28b9fa4d79f33af50f3018ebf83f5f0b61dbbe61"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsAppearanceScreen.kt",
+      "sha256": "33df2734125a843811dfbb2b9a4731efb4c98c027419262e8d3906007216e853"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsDataScreen.kt",
+      "sha256": "32fdde55a12e06374ddd65042070a878da0ff1cd25d32ff46634d1a3b5bbe3c8"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsMainScreen.kt",
+      "sha256": "59117bb27873531916883d062957f2a2af42aa75be72011fe2c8bdb82828e184"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsTrackingScreen.kt",
+      "sha256": "b7b09dfcf3ad1c599ec9dd25dc88e5d0ec21e3ca8f7690bdb093e88f57360d7e"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsTranslationScreen.kt",
+      "sha256": "dcfce5914644aed6e28743a0eab5e0d69fd0b576e75ff9d6e93ff9a149ed5a1e"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt",
+      "sha256": "4ea38d144df4853233e0c725f349bebcc7b9842ff76cc3a531ceb86a7b0b9313"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/presentation/more/settings/screen/about/PolarisDedicationTrigger.kt",
+      "sha256": "9b5d5da6a4f002901046ded5edde2bfb1de957735af7ffea4015088891903fb0"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/presentation/more/settings/screen/about/PolarisUpdateCheck.kt",
+      "sha256": "41265ddb5248e7153a3debbd816c30f2923dd67f798da12472e0e5f9f386d0e2"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/presentation/more/settings/screen/browse/preparation/SourcePreparationScreen.kt",
+      "sha256": "56936cdd04ab24f1f50bafd45e64b9853b07c390b8342f02f9aee999eb7eb4c6"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/presentation/more/settings/screen/browse/preparation/SourcePreparationViewModel.kt",
+      "sha256": "fe1469f3d18dbde4e5f22011b1d3f1e9642a5a3da53ac9aad645f87397db7b1e"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/presentation/more/settings/screen/data/CreateBackupScreen.kt",
+      "sha256": "435e92cccff628cdd90683ff427f5fb41bca767c5f17e10aae65d9b4b23a8a12"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/presentation/more/settings/widget/AppIconPreferenceWidget.kt",
+      "sha256": "c67327391dccca739a55b0b511010910aecf0d8a3eeb3da9c382cf30489e399f"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/presentation/theme/TachiyomiTheme.kt",
+      "sha256": "da901dceb2e0a5619cc1ed9acef8334051121585727c1b59fdce668569cd144a"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/presentation/theme/colorscheme/PolarisColorSchemes.kt",
+      "sha256": "1d35d97749993cfa38a6d3d2a8c37608ee2eb0561d5d6be4e818bc92981e0b61"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/presentation/webview/WebViewScreenContent.kt",
+      "sha256": "773984b46ac2bf012d7593dfa6617ce000cf36c8ed1fb20c41d6238d1e72027d"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/App.kt",
+      "sha256": "331e7bd33fc8e913a859e23d0f7ed0718bd0f94f66237d93a3023792dd6f810d"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/data/backup/create/BackupArchiveWriter.kt",
+      "sha256": "ecf27d98538faff5cede5f057afc8262fe2a937e2fef6cdfce364dfc7c1ddbfe"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/data/backup/create/BackupCreateJob.kt",
+      "sha256": "097ab94d4ae3b64f396a3e2499269bece6602a4e77c6c8f92ea74fdb181ef822"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/data/backup/create/BackupCreator.kt",
+      "sha256": "8f026c164c56058cb69dbd8d21c598279f57187e70d2ec31d729c651204be1e7"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/data/backup/create/BackupRetention.kt",
+      "sha256": "d72eb37b53ecd53a68dd360482315a58ad4b8eb415d2c1d919b3160a7cd22dfa"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/data/backup/create/creators/MangaBackupCreator.kt",
+      "sha256": "c457c00c6b7eaf9b142693bed606345c087753d172d11536c687d2351db89a62"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/data/backup/create/creators/SourcesBackupCreator.kt",
+      "sha256": "c6fb02e53f36119f89fdfb96ce0d1caa2c3f3393c62fb2bfeed5d3fc53f4dd19"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/data/backup/models/BackupManga.kt",
+      "sha256": "9f8d05f473dbf1a67362b7c6516ddbf2b614c065f9d119b3bd2e1d34c62d3fd9"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/data/backup/models/PortableMangaBackup.kt",
+      "sha256": "666630eed65bc3f4f62f66d8e2256a2f96989f57887a9384b3679056f1544bed"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/data/backup/restore/BackupRestoreJob.kt",
+      "sha256": "fb1c298244221c69e3e02941fc04cca95692ed7878bc0e7743ee9e4524f7d5fc"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/data/backup/restore/BackupRestorer.kt",
+      "sha256": "7d46f73a058ea5dc0c4ffdbc64e71aaaa95138399f568476c5589ee6460c9879"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/data/backup/restore/restorers/ExtensionStoreRestorer.kt",
+      "sha256": "217e72c1ab7e059cab279ad91613952ed5271fd1e37571876052f2775f96277f"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/data/backup/restore/restorers/MangaRestorer.kt",
+      "sha256": "16361f4910f2053c52ece3ac82c2458c58acf0e9b449276b50589d26462eb2d9"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/data/backup/restore/restorers/PreferenceRestorer.kt",
+      "sha256": "2b0bab2805323d19b4f4785e46f20dd57b6cfbb99f70b430ec5e6c7056831468"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/data/coil/MangaCoverFetcher.kt",
+      "sha256": "a34eaba403d3f9c70aeffd44f063fcd6258d8e27af8e69458be055b356b170be"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/data/download/DownloadManager.kt",
+      "sha256": "d85f57801f25c6ec2cf74705e4c27f16c2f1038019bba773af4fb4f8737c7294"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/data/download/DownloadProvider.kt",
+      "sha256": "6b1e6f684206351da501850327d6972bea37be26d3199c3e9e6b872e57b43d66"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/data/download/Downloader.kt",
+      "sha256": "b789c937d449724d273bdd53feaf771880f2f6ae6f6a44f87a9a3191b636fa4f"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/data/download/model/Download.kt",
+      "sha256": "8674b3a04eb33e117e68a6315f641f6e5a9bb1ebb86fa1b62ea3ee245c463eaa"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/data/library/LibraryUpdateJob.kt",
+      "sha256": "914d058509b6be4702993bd555c17e5733d2a6c9bbc9db0718e6da6ef7e08654"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/data/library/LibraryUpdateNotifier.kt",
+      "sha256": "e4181c15843a75ca7b8667a1ea2f821dadc55270b958c1e76126a783cd5a7b00"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/data/notification/Notifications.kt",
+      "sha256": "987ac12fce894a33cd9208c5223cd5d57a7528ce4164602f6d0f6b16e45169fa"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/data/profile/PolarisLevelManager.kt",
+      "sha256": "63734a096edde4415b2249a359ef589658711191ab7653386cf4d14665e81ece"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/data/profile/ProfileChecker.kt",
+      "sha256": "753bbb2772dce6c577c3252e31c147e602ea2ccf3dbd4d5c87fcb89892fb456d"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/data/profile/ProfileImageStore.kt",
+      "sha256": "9a26bdc9928e644a1a0eba5823e9369cf20c7731b096547785131b3d30b439e5"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/data/profile/ProfileNotifier.kt",
+      "deleted": true
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/data/profile/ProfilePreferences.kt",
+      "sha256": "6a2825e9425f97a195fcfb680653bd048f22bc567350ec54ea2dd83543afe18d"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/data/profile/ProfileRepository.kt",
+      "sha256": "a78fcaff0749f840762f22ac1522a25ab1cefd9fc15b1768b07c99dbf84f9f3c"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/data/profile/YomotsuAchievementManager.kt",
+      "deleted": true
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/data/profile/YomotsuLevelManager.kt",
+      "deleted": true
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/data/telegram/TelegramCloudManager.kt",
+      "sha256": "4ed5b8f3a4a31551aaf85ba1719f7de1f8caa9a79ff9399604b31c3068d4a0ba"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/data/track/TrackerOAuthSession.kt",
+      "sha256": "e7f72dacc951ca69c764115f21cf3dd8e99effe13d5d633bf76551ec73f68bdc"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/data/updater/AppUpdateChecker.kt",
+      "sha256": "cb8b428c034086356bb6739f64ab4e9c60bc8d47985c7da74ffce0b4b9427da2"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/data/updater/AppUpdateDownloadJob.kt",
+      "sha256": "7642b8ed34a6210c1a8f5fa9f3fa8b672db03e053c70731cf77595ceb5540529"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/data/updater/PolarisApkDownloader.kt",
+      "sha256": "e09a035a364e96cafb1d52226c5b58c631a3971fdf96d7347134f428a8665eb3"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/data/updater/PolarisReleaseVersion.kt",
+      "sha256": "9efe05f64dbef6f2e33902ed3f05a591cb54dba8f51400ad20b86ec6b6ce65db"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/data/updater/PolarisUpdateClient.kt",
+      "sha256": "76de65a516d84ca95f7302da7b4fe0c4bcaf5dd7d2d1329e4944afeef5b3e711"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/data/updater/PolarisUpdateIntegrity.kt",
+      "sha256": "ef282fa750b79b3ff44a5367cddf64bc307e3ad86ec6cf7a235c0256b91663cd"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/data/updater/PolarisUpdatePreferences.kt",
+      "sha256": "bfe68bdb1adf15f81f1b6f7eb62119886b95cb0ba1d67d415a68c3ac892ba050"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/extension/ExtensionManager.kt",
+      "sha256": "6f5bfb55f5853dd417d6b53c11195c74fbdc5a5838075d2720bf1c69ea7152fe"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/extension/novel/NovelExtensionManager.kt",
+      "sha256": "4d2fbf756614ac8c293f507305c87e98415560bd3c97b4d0aeed4f73acbbba26"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/extension/novel/NovelPluginPaths.kt",
+      "sha256": "f1d193fce5a2c88ac892789bdc4e1bfeb25285d1f1de298863416adbdd487c7f"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/extension/novel/tts/NovelAudioPlayer.kt",
+      "sha256": "1e6cb3597c45dcccd133571f7702eae543bdd4c4b02cc23d35ef0c00a2d83230"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/extension/preparation/ExtensionPreparationQueue.kt",
+      "sha256": "8ab21ccc01931fa25872d51c4b4c32824377bfb50abad4b0c5ce515bc71e6f6d"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/extension/preparation/PreparationPlan.kt",
+      "sha256": "26cb52c40543236fb73bccf5bf006d7b8faf6b0a56b0f9a9986c1f62a04d2e0f"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/ExtensionSandboxProtocol.kt",
+      "sha256": "8ece610145cda9a21bd73f598d383ad1b68a2d311ad1e54af52c57e823f9818d"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/ExtensionSandboxService.kt",
+      "sha256": "082d53eac84cfe259422c17819bc292fd84d86fdec8cfc617ec473b660b55fb3"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/ExtensionSandboxSession.kt",
+      "sha256": "afb8344454531f3f8ad973d0c8534e52b2baad990c6ca6684eb96a69ff6996cb"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/IsolatedHttpSource.kt",
+      "sha256": "4b3b31d615f985c6dfcb040d7c2bfb613c1797c511c1f67447b0de6532f01eaf"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxHttpBroker.kt",
+      "sha256": "20f700c03b2c4753558194f193213399623406869d004288f6d4340d28799e40"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxNetworkPolicy.kt",
+      "sha256": "a36e58753b8095b227444ad72d6bbad16cf4c85a1ee71d1bc34059eab5581dcb"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxSourceCodec.kt",
+      "sha256": "64ebad452de8dc096ff8f9648e5aaefe856ed4d5ea75cd9e1c2a3126098b50a4"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/extension/util/ExtensionInstaller.kt",
+      "sha256": "0bee2dbfdbbb0378809c50a9f7afad670a5fd463a6aa89aead03e00042d0ea71"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/extension/util/ExtensionLoader.kt",
+      "sha256": "dccfde6c6b3ce4bd4978fadce422159a4cc4691b5020e111a79a715dac9b0559"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/extension/util/ExtensionSecurityAudit.kt",
+      "sha256": "84f4b3b9c90df91d85a2497887778fc76d5a0dbb59fdd7dfa7f6440627458b2c"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/extension/util/PrivateExtensionFiles.kt",
+      "sha256": "e6655c45ef2122fada301978ba7d14954640b1c3f47716e433db7da880bf21a9"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/extension/util/PrivateExtensionSignature.kt",
+      "sha256": "e6a1d10b9e19d9e636c5f351265516d970dd8b71e55c6cf5fe5d61e9997486e7"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/extension/util/RestoredRepositoryTrust.kt",
+      "sha256": "c953bf516e2903cd13a38340af4c600206c9a35357e2fcb1cc7d86fa7068945e"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/source/AndroidSourceManager.kt",
+      "sha256": "535f080252af91622f6c1dc9b86793ab922383825ad18416af7c6ac94cdb153c"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalog.kt",
+      "sha256": "3f10f544294977249c492067843c4809a114cc499ecb16b3dee45498c73974b4"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/source/selection/ChapterLoadFallback.kt",
+      "sha256": "23b3e723a01ea82f29e3a3d514f07c8abb99ca162584dae6e4eecbdbe9a57d6d"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/source/selection/SourceMatching.kt",
+      "sha256": "4093bf2f9f7ae0d14b29b1d8784848b35ed83bfca13cea204bd66dc948096913"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/source/selection/SourceReadabilityProbe.kt",
+      "sha256": "137f190bc8abee31407c65f7e15785f1af635881d591adc41cb1e9d1b6a37c9a"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/source/selection/UnifiedWorkSearch.kt",
+      "sha256": "b05e4097cb0ad79fcc9a6eaafad0c91a4b8288247f4873ca2473fb3256a4b8b9"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/source/selection/WorkIdentityResolver.kt",
+      "sha256": "d5877a9f4ea1fd519a2f8f75171cd0ada448af40b09644d999fc1312339f41ad"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/source/selection/WorkSearchGrouping.kt",
+      "sha256": "1ecdbb2ef97cfd8392b475a47db06c73534da88a5bbed5ad36d090737db2edbd"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/ui/browse/extension/ExtensionsTab.kt",
+      "sha256": "b6e04eab5ddcc1d62c76e014684ffa27be8010500a82324f2fa2dc6acc5ca24d"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/ui/browse/extension/details/ExtensionDetailsScreen.kt",
+      "sha256": "3a0566864af5a5342c5a0c6aa778555176c575cea11b7846abe2a31d7b9d3709"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/ui/browse/extension/details/ExtensionDetailsViewModel.kt",
+      "sha256": "0b466c7702247ccac1adbbb5b7b0ed800c36bb5506d64eb00ebf8ffa10666ee4"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/ui/browse/migration/sources/MigrateSourceTab.kt",
+      "sha256": "e1f66d87eeec2251f53951430b6b7cbde02e440af7a478715f9e68d26188bbe2"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/ui/browse/source/globalsearch/GlobalSearchScreen.kt",
+      "sha256": "5bfddd61d1222fc2a1e16610ae9e819802934a5e9e741205e6476cdfc7404db2"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/ui/browse/source/globalsearch/GlobalSearchViewModel.kt",
+      "sha256": "7bbac71bd65e4692009d26e43be4c717370cf7d7604668811e199bed095e4132"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/ui/browse/source/globalsearch/SearchViewModel.kt",
+      "sha256": "78045e44270a549be79e47a4f3d91b6316b6b66662b2906810a30a8ac08e154f"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentImporter.kt",
+      "sha256": "baa42d68616a85601a383282fc4e6240aec6a2610c432c832b569ba0cf59c882"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentOpenActivity.kt",
+      "sha256": "a61d96e202653dc9c3a93468caea786c7ead9adbcee2339095a674993f23c932"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentOrganization.kt",
+      "sha256": "ebb962d92a71467550230f05249d203e5ba686e212adc8b04dacdfb73a54e270"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentReadingPosition.kt",
+      "sha256": "4f234ce5c8a590a9bbc462e974cad3bf578b6545ab6819ff8afc69f5644f3bd6"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentSearch.kt",
+      "sha256": "e3c6d24a75e6351be2d5140b120e2b42fed0d576b51e90b399575d14226312af"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentTextTranslator.kt",
+      "sha256": "7cef482cab291dacacf26562b6b7d96474bb07a093828e08f57ec5cb3fd752c0"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentWebSearch.kt",
+      "sha256": "a3fa48b32f89a5a38daab8b1d9fe5b618e158be8be039dcb681125556b4a0d39"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/ui/documents/PolarisStorageUsage.kt",
+      "sha256": "6428af326f51d968235c2564241179ccc3adaf91a437f0984024b0582a2f3e9c"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/ui/documents/TextDocumentReaderActivity.kt",
+      "sha256": "bb545ca8e92ef17605b2658c797fbed380cdd6ab88542eef94297fc26a690533"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/ui/main/MainActivity.kt",
+      "sha256": "acd68d8937fcd052c21790dca7a59f0e4ffd1d0f9216203eaf5c0482a90b90a4"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/ui/manga/MangaScreen.kt",
+      "sha256": "61453e5a4483a47fc32eaba1137c3b7cbc715d2056c599bae2b3aa5e952a42b5"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/ui/manga/MangaViewModel.kt",
+      "sha256": "59419a1312c6cdc16e71033674ade71eaef0a10e13f4d30020be655f5d7537a3"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/ui/more/MoreTab.kt",
+      "sha256": "7db607c0cdc0c09fca634fc4cc22541536b26f752bf02be1ca202313f59ce7b0"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/ui/more/NewUpdateScreen.kt",
+      "sha256": "8e7c9cb5ecd16aeb257c408384c9bfca17f52345ea36522690a5948b40aeb57c"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/ui/more/NewUpdateScreenModel.kt",
+      "sha256": "b9b3f1d89516e13546eb10d8f5a97e2f45b220599bf040bf9f50bf096292bb11"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/ui/more/OnboardingScreen.kt",
+      "sha256": "67bcd609a4a458300ca10bf08ba0df48cc7cc1bae7e0e47ed00ee1407eededdf"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/ui/profile/PolarisProfileScreen.kt",
+      "sha256": "e4b226b77c1233b6ab27d9e0758d02398a017b72df20f62a51f6890ced972fb1"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/ui/profile/UserProfileViewModel.kt",
+      "sha256": "aeeca72926fed46e416ddf7e8f8d17c705e8da4f0f00c3d16f64d918df4d15af"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/ui/profile/YomotsuProfileScreen.kt",
+      "sha256": "4e13e5d3158a0912d30c4970be82cc80b6fdf47eb557ab494b1bbe56da674e05"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/ui/reader/ReaderActivity.kt",
+      "sha256": "047dbc36cdeba614fba66474058ebc5ea9b547dbbcbbb37815b09363cd2f3cf5"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/ui/reader/ReaderViewModel.kt",
+      "sha256": "354778bef18ed2bf1b5650db901af7c84e45ccc26c85b9047ef66b050f5ec573"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/ui/reader/loader/ChapterLoader.kt",
+      "sha256": "316331bca5e70dd178081cb8f9a9d6929bef3f47e136c3e1848489c1ec4cc250"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/ui/reader/loader/DirectoryPageLoader.kt",
+      "sha256": "ec9d259294296aa5befbb466a31987101f622245bf953a325c7c0a8c7ce556b7"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/ui/reader/loader/DownloadPageLoader.kt",
+      "sha256": "cb5e1002d4eead174dc7a48366acfd3446d3ec3a166ce884543d71e0ca1bf2d4"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/ui/reader/loader/HttpPageLoader.kt",
+      "sha256": "97e7ca5615a7e4cfc27d279030bf06b07dc0a74cda93f1c1227723fde2544c2b"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/ui/reader/loader/PageLoader.kt",
+      "sha256": "5b33bea588bd0c505cbc1796711be32c41bd3c4568fb7c749421b61548cca91b"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/ui/reader/loader/PdfPageLoader.kt",
+      "sha256": "478b38c1365dc7c9a73c2fb1afd26f0c87871ece7b8b4d05d3547797a9e56849"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/ui/setting/track/TrackLoginActivity.kt",
+      "sha256": "2e7f3ed8d217939833db2257750ed16e13fa819017e35fd07a4c8bb9083659b7"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/util/chapter/ChapterRemoveDuplicates.kt",
+      "sha256": "3a68a573df94d8de5b3d66deb3233f18a30360e8403de27233c6667d6f934436"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/util/system/DeviceWorkloadPolicy.kt",
+      "sha256": "b599ee934ba1e5198f018c2dc9d77934aeb01645409f9bc079dafd2d2415b4b9"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/util/system/LauncherIconManager.kt",
+      "sha256": "5759a360c5465ced0a6c3546792151953811153cea0189ef9d6bbdb77937b6cf"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/translation/AutomaticChapterLanguage.kt",
+      "sha256": "93ec17431fbd2e80c39d08d59eeced7e68b63dc4c5d82d0b5006ba123951d597"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/translation/ChapterTranslator.kt",
+      "sha256": "b4cc7cdc46fd25ca76d9eacfd406a35a3860ea00bc17548b0a5e67e583e3b377"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/translation/EnglishTranslationBootstrap.kt",
+      "sha256": "e240b601df90b574b8c689abb3bfa37b9fe9d1fc2af36f22a4e126d4ddb2f8bd"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/translation/EnglishTranslationSetupJob.kt",
+      "sha256": "84456e598c92db7d85b3c9bda4bda32f643be5e876c404c8bbb9e1b6e0b4f655"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/translation/SourceTranslationLanguage.kt",
+      "sha256": "07c1fb991ac60234b661baf694b67f26cbc5f40e55cdb6b007e0f1c39dcbc61d"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/translation/TranslationDeletionGate.kt",
+      "sha256": "9e98bea0c6dc3fade6741837f932aaa3d80eedd3f638c3802b63db9d3e4686c6"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/translation/TranslationManager.kt",
+      "sha256": "7c1e8f0dfc8ab8e4e313a6df976e1181a97218eb162adaf7d55059a375c0cb3f"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/translation/data/TranslationFileIdentity.kt",
+      "sha256": "42e13d8ecaa8e24b30c3c6050d03409fb2d4745e3c9d90adbdb88e4cf067f495"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/translation/data/TranslationProvider.kt",
+      "sha256": "5facd2ef16ffea679ecbcc6fc33a5718eb0c2268077e4acac20489acf764c584"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/translation/detection/DbnetCleanupMask.kt",
+      "sha256": "8401e6e207ae28aeafe804c71af361690ec66d9a3ab9ab3554d2679bdf6a63aa"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/translation/detection/DbnetMlKitAssociation.kt",
+      "sha256": "76384cb8bea2e674a48f2a808f76c756c6ea95d132459497eb51781426e2dec0"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/translation/detection/DbnetPageCoordinator.kt",
+      "sha256": "f34fd3ad95545424d10943a2020a61b2f6580c1493d800200c78007be1084744"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/translation/detection/ExperimentalDbnetOcrEngineFactory.kt",
+      "sha256": "281077233344631ca89464d2f4f225b05cebcea5f01aeaec0af6736f6fe164f3"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/translation/diagnostics/ReaderCaptureSession.kt",
+      "sha256": "efedf7b093770416c29e91d9890624aaf4b62b7b5fe78875d756e131451d1ec9"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/translation/memory/TranslationCache.kt",
+      "sha256": "757481192b5ab96e4cd41dd127540a871bfb4420080bdbb420d63ea6504860b3"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/translation/memory/TranslationGlossary.kt",
+      "sha256": "ee19927ae049ef11f579605cfa28150af4411f2b88b307ee9d6b615ace35a8ee"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/translation/model/Translation.kt",
+      "sha256": "2f588a4df3af67cd5cebcf6357b65c58cc82d434e128209b621c5056ef6595fd"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/translation/model/TranslationCandidatePolicy.kt",
+      "sha256": "c7ac2eb3dde533a7b3a644952245a756c9915c084a3ad346edf78f2947858a3f"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/translation/model/TranslationPageLayout.kt",
+      "sha256": "41f52a180334926c4e9bb0e72b2fc8fa95a0190395599feca5166985904cbe5f"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/translation/model/TranslationTextNormalizer.kt",
+      "sha256": "4da325c936fb25dbe62cc2e3db4fa43a0c3296c6a7901324d31ff7b0cb062352"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/translation/presentation/PagerTranslationsView.kt",
+      "sha256": "ea50c28e0efa2b170f1e26378f4666649c5ca21dfc63070ac27a8a32d4f80f21"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/translation/presentation/SmartTranslationBlock.kt",
+      "sha256": "be043092d509ab6e3e9aa991d36154135d61ea19e56b52b24fb4fb8cbc971b80"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/translation/presentation/TranslationCleanupBlock.kt",
+      "sha256": "e559330254c89c56288395fcb999432cf5704b80b6c389644d5eb0b880324b83"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/translation/presentation/TranslationTextFit.kt",
+      "sha256": "8f773057e8de0ab9cfe7ece49d37a3b6a22d5815e7ab0bde875a0c2368a32aa3"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/translation/presentation/TranslationTypography.kt",
+      "sha256": "f8c25401b0f7b55b74e6aa1199cb9cac217c49fdbbf877bf535a789901e460e2"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/translation/presentation/WebtoonTranslationsView.kt",
+      "sha256": "aa0aa1dc2c2bf78266eef9e8111c68f2c31d401b83eef1287a3651aba93fcb5b"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/translation/recognizer/MlKitOcrEngine.kt",
+      "sha256": "cfe2035f015b973a4176fcc2b4009342775bb28ea3e2418d1540a08551330499"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/translation/recognizer/OcrEngineFactory.kt",
+      "sha256": "bbb8ed8b77c56f1543e96380fae3420940ae706a3d5092ae0d56513cd557a4ff"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/translation/recognizer/OcrStripImage.kt",
+      "sha256": "9fcde51a1dff941ce4ae45de3854a6ea3928426981d44f5ac2fb67b15deb208e"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/translation/recognizer/OcrStripPlan.kt",
+      "sha256": "afaa7fe04266eda8b65b97a8cd7750f016219e07c97accb8aef1c65976cc0bb1"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/translation/recognizer/PaddleOcrEngine.kt",
+      "sha256": "66df63713affa6c55601d30ff81acdc720b02b0234bd82bb01d3c1065c2ccb62"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/translation/recognizer/SpeechBubbleAnalyzer.kt",
+      "sha256": "fe3c1abc2234a372bd77b7520312e7776f01b2e8f96e21a6ea57a8c229bce7ef"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/translation/translator/DeepLTranslator.kt",
+      "sha256": "beb4a7a38b6ff0c991c643797190e1a2f88783c103b622b3e0be98c0431f4784"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/translation/translator/GeminiComicProtocol.kt",
+      "sha256": "7d36715cdcf29532db5f9eecfa397f6e43af5c9544b2d174a95fd1ab17e797fa"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/translation/translator/GeminiTranslator.kt",
+      "sha256": "9805b7da15f6aa25961bf977e07878133e03367beb1d3626b79f4758a2da33fc"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/translation/translator/OpenRouterTranslator.kt",
+      "sha256": "3f31ebb2966197b5a9a8f2353f58811ba6da60bae0f0c97d86f9b487b0b662f3"
+    },
+    {
+      "path": "app/src/main/java/mihon/domain/source/interactor/UpdateMangaFromRemote.kt",
+      "sha256": "b67a68dcaca83f59bb20b0252bfc95a289f974db1df510dffc428b617f35f86b"
+    },
+    {
+      "path": "app/src/main/res/drawable-nodpi/ic_yomotsu_logo.png",
+      "deleted": true
+    },
+    {
+      "path": "app/src/main/res/drawable/ic_polaris_aurora.xml",
+      "sha256": "21e95c74cddb49ce04900b45658bc2ee1d75152d4c4df706771f103f5c754e0f"
+    },
+    {
+      "path": "app/src/main/res/drawable/ic_polaris_aurora_background.xml",
+      "sha256": "892e242dc5b4fa736bb53d1b5371fecdda9f70cbc54ee66475d5d183965262a2"
+    },
+    {
+      "path": "app/src/main/res/drawable/ic_polaris_constellation.xml",
+      "sha256": "74bf58a27a5be94101163b0d592bc541063621deee84cffbfff77a2274635fe4"
+    },
+    {
+      "path": "app/src/main/res/drawable/ic_polaris_constellation_background.xml",
+      "sha256": "fdd322dead7781d652eea6760f90750b7c17608677142fc14d111907ab748b52"
+    },
+    {
+      "path": "app/src/main/res/drawable/ic_polaris_foreground.xml",
+      "sha256": "29422fef94c3ca9ea7494f157d74522008c62a0762654b1adba17a61e668e3b4"
+    },
+    {
+      "path": "app/src/main/res/drawable/ic_polaris_logo.xml",
+      "sha256": "0e9ebbe677f75a30ad0cd48e797e148d67c35f04f056dd9d70e7c14d47044052"
+    },
+    {
+      "path": "app/src/main/res/drawable/ic_polaris_monochrome.xml",
+      "sha256": "ac5bafc67b73b9d9727a2c25f67bdc172df472a104e17cab6e41a32c840c0e2b"
+    },
+    {
+      "path": "app/src/main/res/drawable/ic_polaris_orbit.xml",
+      "sha256": "706ddbbfd76110589810ba396042dfc485f6e6b09fe5683f037c665d20f1ad60"
+    },
+    {
+      "path": "app/src/main/res/drawable/ic_polaris_orbit_background.xml",
+      "sha256": "d9e8c81917a2fd28b1754cbd481bf325fae2780fcf048abbe438625c15bfcdb0"
+    },
+    {
+      "path": "app/src/main/res/drawable/ic_polaris_splash.xml",
+      "sha256": "837b6e1d6cc489788094908d2fa21db26fdd5f33ffd88b98495542a6d0671952"
+    },
+    {
+      "path": "app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml",
+      "sha256": "1c3b3205a2d523aa70c38e5f688bcdfa21b62aca32ba57813444dca8afeca8bd"
+    },
+    {
+      "path": "app/src/main/res/mipmap-anydpi-v26/ic_polaris_aurora.xml",
+      "sha256": "de59c6a69f44d020e9287a70b3bf44552d1c48c9936d86b0034ba523ba4ace46"
+    },
+    {
+      "path": "app/src/main/res/mipmap-anydpi-v26/ic_polaris_constellation.xml",
+      "sha256": "7ff31bb29e6f40eb883c32558e2beb151c2a6ca95eb595b2047a0e9ec6a60c4d"
+    },
+    {
+      "path": "app/src/main/res/mipmap-anydpi-v26/ic_polaris_launcher.xml",
+      "sha256": "1c3b3205a2d523aa70c38e5f688bcdfa21b62aca32ba57813444dca8afeca8bd"
+    },
+    {
+      "path": "app/src/main/res/mipmap-anydpi-v26/ic_polaris_orbit.xml",
+      "sha256": "0478160f69e1d32ba8982305eb48401b5d8b5c1f3827f2b94c67e14d1293f368"
+    },
+    {
+      "path": "app/src/main/res/mipmap-anydpi-v33/ic_polaris_launcher.xml",
+      "sha256": "5fc0d6a4c2c0d2e8172a240f0f9003fffc128ca884093dfcf1c619b220391598"
+    },
+    {
+      "path": "app/src/main/res/mipmap/ic_launcher.xml",
+      "sha256": "0e9ebbe677f75a30ad0cd48e797e148d67c35f04f056dd9d70e7c14d47044052"
+    },
+    {
+      "path": "app/src/main/res/mipmap/ic_polaris_launcher.xml",
+      "sha256": "0e9ebbe677f75a30ad0cd48e797e148d67c35f04f056dd9d70e7c14d47044052"
+    },
+    {
+      "path": "app/src/main/res/values/colors_icon.xml",
+      "deleted": true
+    },
+    {
+      "path": "app/src/main/res/values/polaris_branding.xml",
+      "sha256": "abcd490f0efa2689db2746bef27c853cc2368af2fc37330ba37512d778f30b68"
+    },
+    {
+      "path": "app/src/main/res/values/themes.xml",
+      "sha256": "9b8e6035a41ebebd22e4960beceacf17974d125881c407e5241e1f7d5c6bf58b"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/domain/chapter/model/ChapterRoutingTest.kt",
+      "sha256": "c611f0118f62f1ec6c5d3f1d35dd8abf319d5a6546bb3880b51b3db6928f033f"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/domain/ui/model/LauncherIconSwitchTest.kt",
+      "sha256": "6a2b688ee52274a9dd7fbc739b241dde4a07e74cac05450ad01d7c77b794c028"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/presentation/more/settings/screen/about/PolarisDedicationTriggerTest.kt",
+      "sha256": "73644d8f3d78c40e6ffafe23f0a163ddc1c0fb3146613716666c1890440b9dfa"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/presentation/more/settings/screen/browse/preparation/SourcePreparationViewModelTest.kt",
+      "sha256": "2ab95c55cf3ac892503d4df64724a00905706a8a7431a188c3e40cef23a7752e"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/presentation/theme/PolarisThemeContrastTest.kt",
+      "sha256": "0a24431d291bf2f19e9e6ae7835b197b5eb4adf2ab8f0b2868d5947bd9d48c04"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/data/backup/BackupInteropTest.kt",
+      "sha256": "9db471dcd9b04869a8e750b79c16b52620c758619dd094bf282cfcf49995efa3"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/data/backup/PreferenceRestoreSecurityTest.kt",
+      "sha256": "8fab45151ffd4019bd3926b4f2c08f67f32b909943f8dd0bff86691e57e195ab"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/data/backup/RestoredRepositoryTrustTest.kt",
+      "sha256": "d81246d84a0c3b498b2123a66621ae6b44f925c93bd3c1631e51f0111f19c155"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/data/backup/create/BackupArchiveWriterTest.kt",
+      "sha256": "0566f0ebc63a4b4d16d3b33398fc70574a38cc55b3ab07133c39cbb825e222ad"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/data/backup/create/BackupCreatorTransactionTest.kt",
+      "sha256": "99b8f07fdfb2a1d9564daa30cdc0d06c423d5e397bc13245470fcb53d9ff972d"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/data/backup/models/PortableMangaBackupTest.kt",
+      "sha256": "f036afeba8486aa25dbc20caf40bed3108b7797e291a3957c312b28d4cabdce2"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/data/download/model/DownloadOriginRouteTest.kt",
+      "sha256": "d73b2a90e96a8a1f6822df27b62e4015150c4e020caa936b9d1246e132a35027"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/data/profile/PolarisLevelManagerTest.kt",
+      "sha256": "072a3c88ea4f076b98488d3ff0f0b8952f83dd62d48287ea3c794e926a367553"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/data/profile/ProfileImageStoreTest.kt",
+      "sha256": "9ae9fd13c0400e28b3bfd12778b03330479bc25e55e34977ee4cb125f6c93ef9"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/data/track/TrackerOAuthGateTest.kt",
+      "sha256": "ab020d78a5add1ea5b9e6e4a66a212cd29eadc841d4abfd85515e710288ebd80"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/data/updater/AppUpdateRepositoryTest.kt",
+      "sha256": "ea12ad6a5f4dc7d848418be7d40dc25ca3b9eb0e26a9b9f121bf732ece850e11"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/data/updater/PolarisApkDownloaderTest.kt",
+      "sha256": "cc8dc8259273d65f1659f190e800055b653e78333b3f002659a60a4550ec2e4e"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/data/updater/PolarisReleaseVersionTest.kt",
+      "sha256": "e6682025543b746a0e3577dd4af8c95bbc60770bd91d0e0c2660c897a07e15dd"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/data/updater/PolarisUpdateClientTest.kt",
+      "sha256": "10b3641e623826cbd5dfd9686e89391d1328cb8716e71d2a25dd946667a083f2"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/data/updater/PolarisUpdateIntegrityTest.kt",
+      "sha256": "970ee106c8e625ed4f249629ed7ae11fc464b8ad6f332a2bb94cad411a0ad7ae"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/data/updater/PolarisUpdatePreferencesTest.kt",
+      "sha256": "8e0288d0352de49ac88ad0b19bfa1a507b4be31327f36aae16e7543c4e72375f"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/extension/novel/NovelPluginPathsTest.kt",
+      "sha256": "21d7d071da5cfecd39fa09bb581acdc4b060a01f6b479d3fcfff42ab537f443c"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/extension/novel/tts/NovelSpeechSanitizerTest.kt",
+      "sha256": "ab4141afa5ef92fe58ea50cee6711ee6db7c6b63767a7c0dafea2c25a2dc313b"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/extension/preparation/ExtensionPreparationQueueTest.kt",
+      "sha256": "d27b55f666159cb3b13516e736b4254befc873ce37443dccaef20d3cd2f6e447"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/extension/preparation/PreparationPlanTest.kt",
+      "sha256": "ec3da95b3fa20293e98f855cc9aa6390ffc26ecea40e7c3d0e54f4011cb7f2af"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/extension/preparation/PrivateExtensionSignatureTest.kt",
+      "sha256": "f0e16df33ec427c0b614a0407fccdd8daa8bd1feaf5e824f99a32458c31a1d25"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/extension/preparation/RepositoryReviewTest.kt",
+      "sha256": "19be4d27059527db6ca550b659128ab6e2ca0930e8803c969fb339a768af5990"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/extension/sandbox/SandboxNetworkPolicyTest.kt",
+      "sha256": "d84e1af62914dc7776a5bd979cf7edcb0f4b96daf21e40b2c8dd1fca5652c798"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/extension/util/ExtensionInstallerDownloadTest.kt",
+      "sha256": "bafae9bdf320b171c9f1f17871807022e24a4ebf8cd234325f897d7e52e95808"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/extension/util/ExtensionSecurityAuditTest.kt",
+      "sha256": "fd86be5c886eb7a4d2b37f99fe575e730022808efb1c137096c001a7ce13664f"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/extension/util/PrivateExtensionFilesTest.kt",
+      "sha256": "6bbab63e95097f378119eb0e4bac38958e8a2170c4cc4d84b60a97a738bfe0e2"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalogTest.kt",
+      "sha256": "f28c36389fefb46bf3e10413669cc9bbd4c9462173356fdddf14e31655041c44"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/source/selection/ChapterLoadFallbackTest.kt",
+      "sha256": "2b70cdbae26b2e2bfa86a8c34e7152b02bf63b55488e335365153a7407bcf494"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/source/selection/SourceMatchingTest.kt",
+      "sha256": "b99a2312e94dda2ea47555675a3e414eee33d155fd336a02aabc092b2c7fbfac"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/source/selection/UnifiedWorkSearchTest.kt",
+      "sha256": "18df3e92f03cbf41e9fb3cde0b9dea9d9b491f03374fee10c838af4ad416436e"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/source/selection/WorkIdentityResolverTest.kt",
+      "sha256": "6d7ba741ae0d3c03749de108394c8bf09d6cea639b001974f909f73e50dc3576"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/source/selection/WorkSearchGroupingTest.kt",
+      "sha256": "daf307f8c0afc9165d343621856472167fccaece70d02fb179791b8e71b0c73a"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/ui/documents/DocumentCacheBudgetTest.kt",
+      "sha256": "59b25e3b30dabf802eeb167891087341fbc1f34db872e7dca530eb85640bcd26"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/ui/documents/DocumentOrganizationTest.kt",
+      "sha256": "cb2a2f8875e9803a81afd1adac1af2dab32ed5a6bf88a46445c995cecf0b06d2"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/ui/documents/DocumentSearchTest.kt",
+      "sha256": "89c15f529e0bd0c194331ce6e8c1be1d744e460ac93e72e954c69ca80d32e685"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/ui/documents/DocumentSelectionTest.kt",
+      "sha256": "79e9905d686cc07de36018ae18f59dbdc69999d01f9a4b4fe7f9b351732d1a6c"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/ui/documents/TextDocumentTest.kt",
+      "sha256": "282fa3410d45deef4a095e13405604e45f7ff17250d9b3966b030f8ae350ebd0"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/util/system/DeviceWorkloadPolicyTest.kt",
+      "sha256": "b2cab18122ed84d911bc95f8a33d35642271d0a747681e2451f9e5f6b631a0fd"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/translation/AutomaticChapterLanguageTest.kt",
+      "sha256": "7471531c39ae6165ee0cdad196170b55a3401a8c16c22a94dde06f8944f452b5"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/translation/EnglishTranslationBootstrapTest.kt",
+      "sha256": "039fbb9d2169f53c14a70f1983578e11305f0418d827983e6802668871daf0c9"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/translation/EnglishTranslationSetupHistoryTest.kt",
+      "sha256": "eecd3421adc30df3a6c116b90c04dbb5fe97b7bd15fe7dc45bb5197ea06804cf"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/translation/SourceTranslationLanguageTest.kt",
+      "sha256": "1bfe2b13d6b34be88002894d59ddeb37499840f6d658e2e3bd7bb67419c41036"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/translation/TranslationDeletionGateTest.kt",
+      "sha256": "1ca4a25c1a3394f8f0379d19fd69ecc7a172898ca6f82a0a6170f5d025ed0d40"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/translation/TranslationStorageSampleTest.kt",
+      "sha256": "2eb4ebdac512479882acbd4d7d1e1c53b34f53f0cb6e75c693deccf8141755bb"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/translation/data/TranslationFileIdentityTest.kt",
+      "sha256": "0b0b82ab0b885787ee3f347c035ad7e64d21dcbf98a90a0615c17d2cc4ad6450"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/translation/memory/TranslationGlossaryTest.kt",
+      "sha256": "eb03af893fa41a49c32f4ccf9373b0b4409afc6b2fd73a719a52406333e1e2a6"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/translation/memory/TranslationIntelligenceIntegrationTest.kt",
+      "sha256": "4748dd001f6ba8d9a51ee7af0bf0608341d0fc4d7585c9d814a2672fdd83019a"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/translation/model/PortugueseTextNormalizationTest.kt",
+      "sha256": "a1115daf091e773894e2d287885d13d29e39ac6afa15a45eda900bd17eeced66"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/translation/model/TranslationCandidatePolicyTest.kt",
+      "sha256": "07c8332bf917df44952a71aafbf78627d7bbbeb21a60fee8ef48ead0ca0a47f1"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/translation/model/TranslationPageLayoutTest.kt",
+      "sha256": "5606b95e1785049856587717cab5592211122c44cb850ecd5fc14f7cb434a863"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/translation/presentation/TranslationTextFitTest.kt",
+      "sha256": "4cc8bf767e5335bbf253063a0679ff81ad8f3b72cc8052128fae436953e537b6"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/translation/presentation/TranslationTypographyTest.kt",
+      "sha256": "130786a4eb2032d4e20931d6b1a141d9c10ec7f4fc60407bd9cb90f95e34e0a4"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/translation/recognizer/BitmapFixture.kt",
+      "sha256": "22a98c6bd2ca843769e35b122130c53fdc1626a5d3df7c4b1b6da7ac87d34e4d"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/translation/recognizer/CaptionSurfaceRegressionTest.kt",
+      "sha256": "136b2004e225e8ae4ed2d21f1f68c4e97e1de20d4613bfb9745b077d0b9c3e77"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/translation/recognizer/OcrStripPlanTest.kt",
+      "sha256": "070c3f498b6c7cc744b8d70ec1f9543b144c9d3ade22c4de3b14897a77295db3"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/translation/recognizer/SpeechBubbleBackgroundRegressionTest.kt",
+      "sha256": "2f48328ac35337dbfd36f2eb9bda31aa4de4b0a6d3a1ee11ca060ef7ca563440"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/translation/recognizer/SpeechBubbleCornerBoundaryRegressionTest.kt",
+      "sha256": "790910e4c7c0c15666dfcfcc243f2f998f73661a2d0899d92820aeca5aea50e7"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/translation/recognizer/SpeechBubbleOvalLayoutRegressionTest.kt",
+      "sha256": "f3d4a41c6baa6bfc73258dc0c40edb5da5e636a29a80849c0d2df2dc2c46980a"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/translation/recognizer/SpeechBubbleParagraphGroupingTest.kt",
+      "sha256": "3b467c91b33cdb9ca092af447c1c03bce22d9f6580177a7e81cfd47bccb3a50d"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/translation/recognizer/SpeechBubblePrintedParagraphRegressionTest.kt",
+      "sha256": "aab177f308947adfcb03425f72a7ae44a1080f7aab07807cea10b5dc8124b965"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/translation/recognizer/SpeechBubbleSeparationRegressionTest.kt",
+      "sha256": "10781064965acdf9960ecfbb87d07d580ab541f656922e621f6d3f11951133b4"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/translation/translator/GeminiComicProtocolTest.kt",
+      "sha256": "cb3b77339c69ae2bf3dd932b001bdb94c09e463957da1c8457373925788a5d45"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/translation/translator/GeminiTranslatorConfigTest.kt",
+      "sha256": "4ae5a74273cc7c9e1b72c8c95e448ec13e027c1cc6dd87ec18bb1915aeb31674"
+    },
+    {
+      "path": "app/src/test/java/mihon/domain/source/interactor/UpdateMangaFromRemoteTest.kt",
+      "sha256": "53812e9c036c3ab8635f486301bd3a751453a01a240fe6732dd240cde3907ed0"
+    },
+    {
+      "path": "app/src/test/resources/backup-interop/mihon.proto",
+      "sha256": "30c4b6c20c41a2f75fe2917449d8cd91a4bbd9d43cb91069571273d735fcff6a"
+    },
+    {
+      "path": "app/src/test/resources/backup-interop/mihon.tachibk",
+      "sha256": "2194767c9ac1f2cd1d1a3a918f1d891abb69a16af06c2ffa6b09c10d2d864aea"
+    },
+    {
+      "path": "app/src/test/resources/backup-interop/tachiyomi.proto",
+      "sha256": "3fabd5e5ac8a2d5710b4ec8991814a2cc80ec2068c76dfae64b982e7d64766db"
+    },
+    {
+      "path": "app/src/test/resources/backup-interop/tachiyomi.tachibk",
+      "sha256": "b4bcb49736e30834d8db207a54a97fb13c99876827431549950ca8d973984cb3"
+    },
+    {
+      "path": "app/src/test/resources/extension-preparation/provenance.json",
+      "sha256": "5b88fd36c7814611b59410e060e12d2d58f75d0e6f8af1669e0feab240a2868f"
+    },
+    {
+      "path": "app/src/test/resources/extension-preparation/signed.apk",
+      "sha256": "da38d64abe8bf34bd1b2f0e2f7cc0dbba1c04a7978c78feac78650cdf9399143"
+    },
+    {
+      "path": "app/src/test/resources/extension-preparation/signed.apk.idsig",
+      "sha256": "88be5c111fe0966cb9a53b0e36f72d06e4c543d9ec3fcff1db7f8131345823d4"
+    },
+    {
+      "path": "app/src/test/resources/extension-preparation/tampered.apk",
+      "sha256": "d5e2c497fe93a4045a8c0581266505df00145c899d6fee39881926a95a559b75"
+    },
+    {
+      "path": "app/src/test/resources/ocr-strips/mlkit.json",
+      "sha256": "adac552dac8164f0ac5f742f969352e90f44556cf402a1f2171aede3a64cf447"
+    },
+    {
+      "path": "app/src/test/resources/ocr-strips/paddle_pipeline_small.json",
+      "sha256": "b5859213692aea1ee3cfb4042923c29b34178f04579f402b173311c914a56210"
+    },
+    {
+      "path": "app/src/test/resources/ocr-strips/paddle_pipeline_tiny.json",
+      "sha256": "4ee8f410f8813986d536912e1ae4197aa34ed0449c163465a3b33f6ccd89c820"
+    },
+    {
+      "path": "core/archive/src/main/kotlin/mihon/core/archive/DocumentCacheBudget.kt",
+      "sha256": "a50ea21581eefdd4bb39f2ac4690d0f3206c14330a285d22543a3f17c6edf6b2"
+    },
+    {
+      "path": "core/archive/src/main/kotlin/mihon/core/archive/DocumentFiles.kt",
+      "sha256": "776a1a52db36a1c0d78a4c20688f005f980998a48b36176068bf1abe1e53566d"
+    },
+    {
+      "path": "core/archive/src/main/kotlin/mihon/core/archive/DocumentFormat.kt",
+      "sha256": "a8ebd1489dca0b7a0b35d50dd4ef1d041c65048e92b9330265fec84cd25d083b"
+    },
+    {
+      "path": "core/archive/src/main/kotlin/mihon/core/archive/PdfPageReader.kt",
+      "sha256": "656d9d289615e4fa16937db820122fbce825ef0c49a61bb37dab5fa694f230cc"
+    },
+    {
+      "path": "core/archive/src/main/kotlin/mihon/core/archive/TextDocument.kt",
+      "sha256": "79250d88eb441774ff54442cf162fb1aa42ef636f9d51d543eabbffe94fae5c0"
+    },
+    {
+      "path": "core/common/src/main/kotlin/eu/kanade/tachiyomi/core/security/PrivacyPreferences.kt",
+      "sha256": "7e9c47e6796cf820d8aabc2b204349f8cbb938523bfc9c2582487afdb3cd0d5e"
+    },
+    {
+      "path": "core/common/src/main/kotlin/eu/kanade/tachiyomi/network/AndroidCookieJar.kt",
+      "sha256": "0a2f14040efbcb9f740eafc65e2040e465c6c8fdb46a2b2964ec63e31b7c4117"
+    },
+    {
+      "path": "core/common/src/main/kotlin/eu/kanade/tachiyomi/network/NetworkHelper.kt",
+      "sha256": "c40064626855b091c285acc148b9d7a5a1bca89fdd926dbbad9c0d835d908ce8"
+    },
+    {
+      "path": "core/common/src/main/kotlin/eu/kanade/tachiyomi/util/system/WebViewUtil.kt",
+      "sha256": "3290bff1d9975875c01be32b7c7040237af48d131729a00b1de684b458c09a18"
+    },
+    {
+      "path": "data/src/main/java/mihon/data/extension/repository/ExtensionStoreRepositoryImpl.kt",
+      "sha256": "ee3540f5986a1a942c6cd9212d80cd6549685e68b11d4ed5a631b5bcf7461221"
+    },
+    {
+      "path": "data/src/main/java/tachiyomi/data/chapter/ChapterRepositoryImpl.kt",
+      "sha256": "f3846569ab22578bfbe13f0670a20a104f90076c98767ae852efbe8c68fab3cb"
+    },
+    {
+      "path": "data/src/main/java/tachiyomi/data/manga/MangaMapper.kt",
+      "sha256": "8618485949a83bfdf3a7fa6bd32f83236fc6302610a6da0abdb794913307324d"
+    },
+    {
+      "path": "data/src/main/java/tachiyomi/data/manga/MangaRepositoryImpl.kt",
+      "sha256": "48bd4ac1115caeabf2892834e85c13f630bc3e1f7b26cc92338730e0f112e827"
+    },
+    {
+      "path": "data/src/main/java/tachiyomi/data/updates/UpdatesRepositoryImpl.kt",
+      "sha256": "81639700030a63e27be04e50caaf80b249fb8a947cde38e365e792fe589f6ca7"
+    },
+    {
+      "path": "data/src/main/sqldelight/tachiyomi/data/mangas.sq",
+      "sha256": "43c9bf577b893b85bafe4a5e42a67401bc398e03173305710068b08bfb59d3e5"
+    },
+    {
+      "path": "domain/src/main/java/eu/kanade/tachiyomi/extension/model/Extension.kt",
+      "sha256": "d5ad2b1b3509dd13d47a85dc55927da53e88316f3bfbb153e26afb521d06f53c"
+    },
+    {
+      "path": "domain/src/main/java/mihon/domain/extension/repository/ExtensionStoreRepository.kt",
+      "sha256": "a57167637edfe31a3aa558a1bfe89bac83ebf921cd71feebb7f93fc514c53ace"
+    },
+    {
+      "path": "domain/src/main/java/tachiyomi/domain/chapter/model/ChapterOrigin.kt",
+      "sha256": "f783a36f8ac4c87f289c1148cae9eca42a0c8e86c81e2d861ce9d449fcade3f6"
+    },
+    {
+      "path": "domain/src/main/java/tachiyomi/domain/chapter/model/ChapterVersions.kt",
+      "sha256": "a98a51f3ceb04d72a391209d100e220bb35d6cb073ab5f34a192d9a533c3bb34"
+    },
+    {
+      "path": "domain/src/main/java/tachiyomi/domain/chapter/model/LogicalChapterCounts.kt",
+      "sha256": "167e1932a08f26a158d13d4191204a8d5d83a4f7c2733e9f5eccca9667082ab2"
+    },
+    {
+      "path": "domain/src/main/java/tachiyomi/domain/history/interactor/GetNextChapters.kt",
+      "sha256": "6c967183bce36582ee619e42ab4e9cca350706fb4502f3b77c311b4f5800252d"
+    },
+    {
+      "path": "domain/src/main/java/tachiyomi/domain/manga/model/WorkIdentity.kt",
+      "sha256": "b7ed81f0881b55a6e997cee11a926e69e316e1b494bfe768126dff4b4853a1a4"
+    },
+    {
+      "path": "domain/src/main/java/tachiyomi/domain/manga/model/WorkSources.kt",
+      "sha256": "7cb219488c13d3628f009d60ab2c0eac7c8032571e2d98f104a43d364075cd7c"
+    },
+    {
+      "path": "domain/src/main/java/tachiyomi/domain/manga/repository/MangaRepository.kt",
+      "sha256": "3c37ec36099e405ee40b18cda76d8ba090833e48e7d15c55a1d4898697bd2d50"
+    },
+    {
+      "path": "domain/src/main/java/tachiyomi/domain/release/model/Release.kt",
+      "sha256": "213aa0cfbd7254b09eaaa6342957592b03d2f7bc21f524bfc8a9def6f9131ae5"
+    },
+    {
+      "path": "domain/src/main/java/tachiyomi/domain/translation/TranslationPreferences.kt",
+      "sha256": "e328c83bb8d74f657e6124f7a4706a23f9f528c4d120d12db8cca8390fb33860"
+    },
+    {
+      "path": "domain/src/test/java/tachiyomi/domain/chapter/model/ChapterOriginTest.kt",
+      "sha256": "3c533feec64c9d505bea174dbdcd5c1618dc63db044c0c735627c134abc94d4a"
+    },
+    {
+      "path": "domain/src/test/java/tachiyomi/domain/chapter/model/ChapterVersionsTest.kt",
+      "sha256": "5cbd18b8c0ef4c965fc4c5df1819b5c96479072068c1629733a0308ad1dfadf7"
+    },
+    {
+      "path": "domain/src/test/java/tachiyomi/domain/chapter/model/LogicalChapterCountsTest.kt",
+      "sha256": "6f297b486c1167ff5f1be9ba1433c8a3d39b93af371fa4ad2d298e55fe27349a"
+    },
+    {
+      "path": "domain/src/test/java/tachiyomi/domain/history/interactor/GetNextChaptersTest.kt",
+      "sha256": "4a69342da0e1bd87f2cb63b688b2f5360960c7853efb0380558ae21ef539819b"
+    },
+    {
+      "path": "domain/src/test/java/tachiyomi/domain/translation/OcrExperimentPreferencesTest.kt",
+      "sha256": "dbe41eb8157e5ae9b68f5181947deed99c50ef6cccce4c0dcdf7ba035cde8607"
+    },
+    {
+      "path": "gradle/libs.versions.toml",
+      "sha256": "c1687dfacb559c08290a55d979f4c8d04dfdea1d82c81b563ddb4be24520aefc"
+    },
+    {
+      "path": "i18n-at/src/commonMain/moko-resources/base/strings.xml",
+      "sha256": "7753549e278c9b98e8e855f6ecbebf52e3760669098956542fc863f3ef175a92"
+    },
+    {
+      "path": "i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml",
+      "sha256": "82625055a5f81e4ed03eb5d6e4bd4b80e7c2c312d81456854702a1169598b835"
+    },
+    {
+      "path": "i18n/src/commonMain/moko-resources/base/strings.xml",
+      "sha256": "83e98f477129d8766dc3a18b09a01aa5b2dc76ef651507a2769190f63ca9374c"
+    },
+    {
+      "path": "source-api/src/main/kotlin/eu/kanade/tachiyomi/source/online/HttpSource.kt",
+      "sha256": "db5623ce249e0b34883ec545d256983c03c7877a2661080967ed7565f4960daf"
+    },
+    {
+      "path": "source-local/src/main/kotlin/tachiyomi/source/local/LocalSource.kt",
+      "sha256": "c079e64547ee96ed0bbb1dea360e55952477211480581853831826b1aa72f558"
+    },
+    {
+      "path": "source-local/src/main/kotlin/tachiyomi/source/local/io/Format.kt",
+      "sha256": "b007d12fc47f89f9a4681f860ca30cb34946aa21fa7f79e5fb3f3ef84c8ea6e9"
+    },
+    {
+      "path": "telemetry/build.gradle.kts",
+      "sha256": "30e92b1e7aaf0e1e0f8f13eb6af94c2a4848b4451910e2d84e1e2a1e4ad11baa"
+    }
+  ],
+  "source_patch_sha256": "0525a2cf66c0703a91fb65e7bcbd0121fbd22f97284f4d8664298974d59deaa5",
+  "export": "git diff HEAD --binary; includes staged removals as well as intent-to-add files"
+}

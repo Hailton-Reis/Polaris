@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.translation.recognizer.OcrEngineTypeTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-11-09T22:31:06.610Z" hostname="0d67ac30ae46" time="0.003">
+  <properties/>
+  <testcase name="translation preferences keep ml kit as the backward compatible default()" classname="eu.kanade.translation.recognizer.OcrEngineTypeTest" time="0.0"/>
+  <testcase name="invalid stored preference is reset to ml kit()" classname="eu.kanade.translation.recognizer.OcrEngineTypeTest" time="0.0"/>
+  <testcase name="paddle is explicit and supports only english()" classname="eu.kanade.translation.recognizer.OcrEngineTypeTest" time="0.0"/>
+  <testcase name="ml kit is the default for unknown preference values()" classname="eu.kanade.translation.recognizer.OcrEngineTypeTest" time="0.0"/>
+  <testcase name="ml kit supports every existing source language()" classname="eu.kanade.translation.recognizer.OcrEngineTypeTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

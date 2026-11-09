@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.translation.model.TranslationPostTranslationGroupingTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-11-09T22:30:58.849Z" hostname="0d67ac30ae46" time="0.0">
+  <properties/>
+  <testcase name="translated connector never bridges two distinct detected balloons()" classname="eu.kanade.translation.model.TranslationPostTranslationGroupingTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

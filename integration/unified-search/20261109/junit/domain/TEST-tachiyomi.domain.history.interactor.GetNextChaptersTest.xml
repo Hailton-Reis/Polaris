@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="tachiyomi.domain.history.interactor.GetNextChaptersTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-11-08T00:51:42.141Z" hostname="a1f1fc307d5f" time="4.302">
+  <properties/>
+  <testcase name="next unread excludes a group already read through another edition()" classname="tachiyomi.domain.history.interactor.GetNextChaptersTest" time="4.08"/>
+  <testcase name="completed current chapter cannot restart the sequence at chapter one()" classname="tachiyomi.domain.history.interactor.GetNextChaptersTest" time="0.041"/>
+  <testcase name="partially read current edition remains the starting point()" classname="tachiyomi.domain.history.interactor.GetNextChaptersTest" time="0.08"/>
+  <testcase name="missing chapter does not silently jump to an unrelated beginning()" classname="tachiyomi.domain.history.interactor.GetNextChaptersTest" time="0.095"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[WARNING: A Java agent has been loaded dynamically (/workspace/polaris-cloud-tools/gradle/caches/modules-2/files-2.1/net.bytebuddy/byte-buddy-agent/1.18.2/62f38a6faf7f069d661b79a07d566f504b0b20c4/byte-buddy-agent-1.18.2.jar)
+WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+WARNING: Dynamic loading of agents will be disallowed by default in a future release
+]]></system-err>
+</testsuite>

@@ -1,0 +1,6 @@
+8.0.0
+26
+x86_64
+Enforcing
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/block/dm-0 5.9G  425M  5.4G   8% /data

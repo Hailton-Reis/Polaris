@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.translation.presentation.TranslationRotationFitTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-11-09T22:30:59.028Z" hostname="0d67ac30ae46" time="0.006">
+  <properties/>
+  <testcase name="keeps the full text area when there is no rotation()" classname="eu.kanade.translation.presentation.TranslationRotationFitTest" time="0.0"/>
+  <testcase name="reduces text area so a rotated paragraph remains inside its region()" classname="eu.kanade.translation.presentation.TranslationRotationFitTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

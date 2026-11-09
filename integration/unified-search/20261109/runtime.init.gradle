@@ -1,0 +1,12 @@
+gradle.beforeProject { p ->
+    p.plugins.withId('com.android.application') {
+        if (p.path == ':app') {
+            p.extensions.getByName('androidComponents').finalizeDsl { dsl ->
+                dsl.defaultConfig.ndk.abiFilters.clear()
+                dsl.defaultConfig.ndk.abiFilters.add('x86_64')
+                dsl.splits.abi.enable = false
+                dsl.defaultConfig.testInstrumentationRunner = 'eu.kanade.translation.recognizer.OcrComponentTestRunner'
+            }
+        }
+    }
+}

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.translation.detection.DbnetLeaseTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-11-09T22:30:57.523Z" hostname="0d67ac30ae46" time="0.001">
+  <properties/>
+  <testcase name="only the owner may stop a worker and repeated requests retain ownership()" classname="eu.kanade.translation.detection.DbnetLeaseTest" time="0.0"/>
+  <testcase name="unclaimed or absent identity cannot stop a worker()" classname="eu.kanade.translation.detection.DbnetLeaseTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

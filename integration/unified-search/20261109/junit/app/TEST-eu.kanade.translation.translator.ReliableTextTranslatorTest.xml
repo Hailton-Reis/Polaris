@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.translation.translator.ReliableTextTranslatorTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-11-09T22:31:19.315Z" hostname="0d67ac30ae46" time="0.029">
+  <properties/>
+  <testcase name="configured fallback receives only unresolved blocks after permanent failure()" classname="eu.kanade.translation.translator.ReliableTextTranslatorTest" time="0.011"/>
+  <testcase name="fallback failure preserves progress and never exposes raw fallback error()" classname="eu.kanade.translation.translator.ReliableTextTranslatorTest" time="0.005"/>
+  <testcase name="cancellation never retries or starts fallback()" classname="eu.kanade.translation.translator.ReliableTextTranslatorTest" time="0.004"/>
+  <testcase name="no fallback propagates permanent failure without clearing valid blocks()" classname="eu.kanade.translation.translator.ReliableTextTranslatorTest" time="0.003"/>
+  <testcase name="transient failure retries once before fallback using unresolved blocks()" classname="eu.kanade.translation.translator.ReliableTextTranslatorTest" time="0.003"/>
+  <testcase name="successful transient retry prevents fallback()" classname="eu.kanade.translation.translator.ReliableTextTranslatorTest" time="0.003"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

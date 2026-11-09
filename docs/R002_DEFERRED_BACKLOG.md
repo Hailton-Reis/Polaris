@@ -6,6 +6,10 @@ This document protects R001 from scope creep.
 
 See [the current audit](AUDITORIA_GERAL_P20261107_1.md) for implemented components, evidence and outstanding acceptance. Cosmetic titles, launcher icons and themes are implemented in development; they do not close the following backlog. Global search/restored-library work deduplication, novel multi-source continuity, broader sandbox compatibility, cross-edition page correspondence, content-addressed reuse and physical ARM acceptance remain open. The opt-in HTTP sandbox is not a guarantee for compatibility-mode extensions. Public beta.10 remains unchanged.
 
+## Unified search checkpoint P20261109.1
+
+Global comic search now groups corroborated works and can reopen an existing favorite while retaining a per-source view. [Behavior and limits](BUSCA_UNIFICADA_P20261109_1.md). This does not delete/hide/merge already-separated restored library records; their data-safe consolidation remains open. Unknown media and ambiguous metadata are kept separate. Public beta.10 remains unchanged.
+
 ## R001 must prove only
 
 - one canonical work can link multiple real source manga;

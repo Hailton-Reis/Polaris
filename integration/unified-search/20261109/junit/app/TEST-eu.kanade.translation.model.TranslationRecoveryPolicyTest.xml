@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.translation.model.TranslationRecoveryPolicyTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-11-09T22:30:58.850Z" hostname="0d67ac30ae46" time="0.158">
+  <properties/>
+  <testcase name="narrow dialogue with strong balloon evidence is recovered()" classname="eu.kanade.translation.model.TranslationRecoveryPolicyTest" time="0.001"/>
+  <testcase name="sound effects repeated letters and noise are not recovered()" classname="eu.kanade.translation.model.TranslationRecoveryPolicyTest" time="0.0"/>
+  <testcase name="weak evidence stays available for manual translation()" classname="eu.kanade.translation.model.TranslationRecoveryPolicyTest" time="0.094"/>
+  <testcase name="extremely narrow text and bad source metrics stay rejected()" classname="eu.kanade.translation.model.TranslationRecoveryPolicyTest" time="0.001"/>
+  <testcase name="currently valid blocks keep their decision()" classname="eu.kanade.translation.model.TranslationRecoveryPolicyTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

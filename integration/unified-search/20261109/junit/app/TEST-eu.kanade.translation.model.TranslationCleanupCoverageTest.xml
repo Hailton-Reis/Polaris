@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.translation.model.TranslationCleanupCoverageTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-11-09T22:30:58.825Z" hostname="0d67ac30ae46" time="0.004">
+  <properties/>
+  <testcase name="merge includes cleanup for an OCR fragment without saved cleanup geometry()" classname="eu.kanade.translation.model.TranslationCleanupCoverageTest" time="0.001"/>
+  <testcase name="merging source fragments does not erase artwork in the gap between them()" classname="eu.kanade.translation.model.TranslationCleanupCoverageTest" time="0.0"/>
+  <testcase name="grouped cleanup covers the corners of the wide final OCR fragment()" classname="eu.kanade.translation.model.TranslationCleanupCoverageTest" time="0.001"/>
+  <testcase name="source footprints survive reanalysis serialization and a later merge()" classname="eu.kanade.translation.model.TranslationCleanupCoverageTest" time="0.002"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
