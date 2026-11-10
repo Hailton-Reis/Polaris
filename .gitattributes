@@ -3,3 +3,6 @@
 integration/reader-translation-ux/*.patch text eol=lf -whitespace
 integration/document-reader/*.patch text eol=lf -whitespace
 integration/document-reader/fixtures/*.pdf binary
+
+# Preserve the exact captured Android boot output, including trailing spaces.
+integration/library-consolidation/20261110/guest-install-logcat.txt -whitespace
