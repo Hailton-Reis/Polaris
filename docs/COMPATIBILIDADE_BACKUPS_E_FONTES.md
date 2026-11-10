@@ -37,3 +37,7 @@ A compatibilidade ampla é uma meta com matriz de versões e resultados, não um
 ## Primeira evidência pelo codec
 
 A [rodada de interoperabilidade de 04/11/2026](../integration/backup-interop/20261104/README.md) passou em seis testes do decodificador e mapeamentos reais do Polaris, com arquivos sintéticos dos DTOs fixados de Tachiyomi v0.15.3 e Mihon. Os dois leitores de referência aceitaram as reexportações e conferiram os valores comuns. A rodada identifica explicitamente campos não preservados e formatos não ensaiados; a restauração em banco e a preparação de fontes privadas continuam pendentes. Não houve mudança no formato de produção nem publicação da beta.9.
+
+## Edições favoritas associadas no Polaris
+
+A [biblioteca unificada P20261110.1](BIBLIOTECA_UNIFICADA_P20261110_1.md) preserva os favoritos nativos de cada fonte, capítulos, histórico e categorias. O backup exporta esses registros e uma associação opcional no memo, por fonte/URL. Outro leitor pode mostrar as edições separadas; nenhuma dependência do agrupamento é exigida para acessar os registros nativos. Ainda falta validar a ida e volta pela interface e pelo banco dos leitores externos. A prova local de produção do criador/restaurador e de IDs diferentes está no registro dessa revisão.

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="tachiyomi.domain.chapter.service.ChapterRecognitionTest" tests="34" skipped="0" failures="0" errors="0" timestamp="2026-11-10T14:10:11.053Z" hostname="7d7c5a6182d0" time="0.123">
+  <properties/>
+  <testcase name="Basic Ch prefix with decimal()" classname="tachiyomi.domain.chapter.service.ChapterRecognitionTest" time="0.016"/>
+  <testcase name="Basic Ch prefix()" classname="tachiyomi.domain.chapter.service.ChapterRecognitionTest" time="0.001"/>
+  <testcase name="Number after unwanted tag()" classname="tachiyomi.domain.chapter.service.ChapterRecognitionTest" time="0.002"/>
+  <testcase name="Chapter title containing special and vol()" classname="tachiyomi.domain.chapter.service.ChapterRecognitionTest" time="0.001"/>
+  <testcase name="Name containing one number and decimal()" classname="tachiyomi.domain.chapter.service.ChapterRecognitionTest" time="0.001"/>
+  <testcase name="Chapter containing dot v2()" classname="tachiyomi.domain.chapter.service.ChapterRecognitionTest" time="0.0"/>
+  <testcase name="Chapters ending with s()" classname="tachiyomi.domain.chapter.service.ChapterRecognitionTest" time="0.001"/>
+  <testcase name="Unparseable chapter()" classname="tachiyomi.domain.chapter.service.ChapterRecognitionTest" time="0.0"/>
+  <testcase name="Chapters containing season()" classname="tachiyomi.domain.chapter.service.ChapterRecognitionTest" time="0.001"/>
+  <testcase name="Chapter containing manga title and number decimal()" classname="tachiyomi.domain.chapter.service.ChapterRecognitionTest" time="0.001"/>
+  <testcase name="Extreme case()" classname="tachiyomi.domain.chapter.service.ChapterRecognitionTest" time="0.003"/>
+  <testcase name="Number in manga title()" classname="tachiyomi.domain.chapter.service.ChapterRecognitionTest" time="0.003"/>
+  <testcase name="Chapters containing ordinals()" classname="tachiyomi.domain.chapter.service.ChapterRecognitionTest" time="0.001"/>
+  <testcase name="Chapter title containing hyphens()" classname="tachiyomi.domain.chapter.service.ChapterRecognitionTest" time="0.001"/>
+  <testcase name="Chapter with version before number()" classname="tachiyomi.domain.chapter.service.ChapterRecognitionTest" time="0.001"/>
+  <testcase name="Chapter title containing extra and vol()" classname="tachiyomi.domain.chapter.service.ChapterRecognitionTest" time="0.0"/>
+  <testcase name="Basic Ch prefix with alpha postfix()" classname="tachiyomi.domain.chapter.service.ChapterRecognitionTest" time="0.039"/>
+  <testcase name="Name containing one number and alpha()" classname="tachiyomi.domain.chapter.service.ChapterRecognitionTest" time="0.004"/>
+  <testcase name="Extreme case with alpha()" classname="tachiyomi.domain.chapter.service.ChapterRecognitionTest" time="0.001"/>
+  <testcase name="Space between ch x()" classname="tachiyomi.domain.chapter.service.ChapterRecognitionTest" time="0.001"/>
+  <testcase name="Version attached to chapter number()" classname="tachiyomi.domain.chapter.service.ChapterRecognitionTest" time="0.001"/>
+  <testcase name="Chapter title with ch substring()" classname="tachiyomi.domain.chapter.service.ChapterRecognitionTest" time="0.0"/>
+  <testcase name="Chapter containing manga title and number alpha()" classname="tachiyomi.domain.chapter.service.ChapterRecognitionTest" time="0.003"/>
+  <testcase name="Chapter with alpha without dot()" classname="tachiyomi.domain.chapter.service.ChapterRecognitionTest" time="0.003"/>
+  <testcase name="Chapter title containing commas()" classname="tachiyomi.domain.chapter.service.ChapterRecognitionTest" time="0.005"/>
+  <testcase name="Chapter containing manga title and number()" classname="tachiyomi.domain.chapter.service.ChapterRecognitionTest" time="0.001"/>
+  <testcase name="Basic Ch prefix with space after period()" classname="tachiyomi.domain.chapter.service.ChapterRecognitionTest" time="0.001"/>
+  <testcase name="Chapter title containing omake (japanese extra) and vol()" classname="tachiyomi.domain.chapter.service.ChapterRecognitionTest" time="0.003"/>
+  <testcase name="Name containing one number()" classname="tachiyomi.domain.chapter.service.ChapterRecognitionTest" time="0.001"/>
+  <testcase name="Number after manga title with chapter in chapter title case()" classname="tachiyomi.domain.chapter.service.ChapterRecognitionTest" time="0.002"/>
+  <testcase name="Chapter with time in title()" classname="tachiyomi.domain.chapter.service.ChapterRecognitionTest" time="0.001"/>
+  <testcase name="Extreme case with decimal()" classname="tachiyomi.domain.chapter.service.ChapterRecognitionTest" time="0.0"/>
+  <testcase name="Chapters in format sx - chapter xx()" classname="tachiyomi.domain.chapter.service.ChapterRecognitionTest" time="0.0"/>
+  <testcase name="Chapter containing multiple zeros()" classname="tachiyomi.domain.chapter.service.ChapterRecognitionTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

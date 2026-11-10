@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.tachiyomi.source.selection.UnifiedWorkSearchTest" tests="10" skipped="0" failures="0" errors="0" timestamp="2026-11-10T14:11:15.080Z" hostname="7d7c5a6182d0" time="1.26">
+  <properties/>
+  <testcase name="cancellation is not converted into a successful empty search()" classname="eu.kanade.tachiyomi.source.selection.UnifiedWorkSearchTest" time="0.008"/>
+  <testcase name="enrichment has a sixteen detail budget and two concurrent requests()" classname="eu.kanade.tachiyomi.source.selection.UnifiedWorkSearchTest" time="0.769"/>
+  <testcase name="metadata requests do not expose Polaris memo to a provider()" classname="eu.kanade.tachiyomi.source.selection.UnifiedWorkSearchTest" time="0.022"/>
+  <testcase name="alias discovery tries at most four empty providers and two names each()" classname="eu.kanade.tachiyomi.source.selection.UnifiedWorkSearchTest" time="0.16"/>
+  <testcase name="detail timeouts leave unknown editions separate and finish()" classname="eu.kanade.tachiyomi.source.selection.UnifiedWorkSearchTest" time="0.029"/>
+  <testcase name="metadata network failure retains all native results()" classname="eu.kanade.tachiyomi.source.selection.UnifiedWorkSearchTest" time="0.003"/>
+  <testcase name="details corroborate duplicate titles and keep wrong author separate()" classname="eu.kanade.tachiyomi.source.selection.UnifiedWorkSearchTest" time="0.069"/>
+  <testcase name="details for a different title cannot lend its creator to the search hit()" classname="eu.kanade.tachiyomi.source.selection.UnifiedWorkSearchTest" time="0.047"/>
+  <testcase name="localized alias can recover an empty provider and join the confirmed card()" classname="eu.kanade.tachiyomi.source.selection.UnifiedWorkSearchTest" time="0.084"/>
+  <testcase name="catalogue query reference has a safe initialized URL and title()" classname="eu.kanade.tachiyomi.source.selection.UnifiedWorkSearchTest" time="0.062"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

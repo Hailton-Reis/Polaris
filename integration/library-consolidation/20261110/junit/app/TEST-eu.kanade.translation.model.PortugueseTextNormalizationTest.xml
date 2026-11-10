@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.translation.model.PortugueseTextNormalizationTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-11-10T14:11:21.276Z" hostname="7d7c5a6182d0" time="0.009">
+  <properties/>
+  <testcase name="Portuguese glyph normalization is idempotent and preserves cedillas()" classname="eu.kanade.translation.model.PortugueseTextNormalizationTest" time="0.001"/>
+  <testcase name="Unicode composition preserves paragraphs punctuation and other scripts()" classname="eu.kanade.translation.model.PortugueseTextNormalizationTest" time="0.004"/>
+  <testcase name="decomposed Portuguese letters use their precomposed glyphs()" classname="eu.kanade.translation.model.PortugueseTextNormalizationTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

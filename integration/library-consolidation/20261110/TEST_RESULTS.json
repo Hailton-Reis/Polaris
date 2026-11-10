@@ -1,0 +1,75 @@
+{
+  "status": "DEVELOPMENT_COMPONENT_VALIDATED_PENDING_EXTERNAL_ACCEPTANCE",
+  "revision": "P20261110.1",
+  "version": "0.1.0-beta.11",
+  "version_code": 112,
+  "published": false,
+  "public_release_unchanged": "v0.1.0-beta.10",
+  "checked_at_utc": "2026-11-10T14:25:30.401192+00:00",
+  "engineering_parent": "ed2c5e1a61c0f07de1480845da37375f96387b6c",
+  "jvm": {
+    "total": 837,
+    "passed": 837,
+    "failed": 0,
+    "skipped": 0
+  },
+  "baseline_jvm": {
+    "total": 811,
+    "passed": 811,
+    "failed": 0,
+    "skipped": 0
+  },
+  "new_cases": 26,
+  "missing_baseline_cases": 0,
+  "gradle_exit": 0,
+  "host_guards": {
+    "overlay_passed": 4,
+    "packager_passed": 9
+  },
+  "android": {
+    "passed": 17,
+    "failed": 0,
+    "new_real_database_backup_cases": 5,
+    "api": 26,
+    "abi": "x86_64",
+    "component_host": true,
+    "real_schema_and_production_repositories": true,
+    "real_protobuf_creator_restorer_round_trip_with_changed_ids": true,
+    "transaction_failure_rollback": true,
+    "native_same_url_chapter_restore_isolation": true,
+    "physical_ARM_acceptance": false,
+    "real_download_file_reader_acceptance": false,
+    "external_reader_acceptance": false
+  },
+  "artifacts": [
+    {
+      "file": "app-debug.apk",
+      "bytes": 236336644,
+      "sha256": "7347332ef3031edba5918bc0ceda1496b089aa90ef35ce57dfcd202383f827ad",
+      "packaged_abis": [
+        "x86_64"
+      ],
+      "scope": "debug x86_64 component fixture; not a phone release"
+    },
+    {
+      "file": "app-debug-androidTest.apk",
+      "bytes": 540692,
+      "sha256": "8d4c0c7e98ff81e66625d81e661ababe9c98ed690fb345f1395fabd35bd397ab",
+      "packaged_abis": [],
+      "scope": "debug x86_64 component fixture; not a phone release"
+    }
+  ],
+  "source_patch_sha256": "0a5aae5aecad6f8eabbb874a8ead8eb199924f57ef3303aba4a659ff7fda13f4",
+  "matching_overlay_paths": 369,
+  "changes_backup_schema": false,
+  "new_dependencies": 0,
+  "new_OCR_models": 0,
+  "pending": [
+    "Full restored-library/download-directory/search/open/read workflow with real providers",
+    "ARM32/A12 and ARM64 performance/memory and large library projection cost",
+    "External Mihon/Tachiyomi database/UI round trips; forks dropping memo may show editions separately",
+    "Unknown media and insufficient or conflicting identity/numbering remain separate",
+    "Actual Android manga-screen work actions and edition-dialog navigation still need physical/UI acceptance",
+    "Post-association chapter-renumbering revalidation remains to be developed"
+  ]
+}

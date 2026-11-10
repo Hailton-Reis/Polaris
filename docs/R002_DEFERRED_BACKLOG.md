@@ -8,7 +8,7 @@ See [the current audit](AUDITORIA_GERAL_P20261107_1.md) for implemented componen
 
 ## Unified search checkpoint P20261109.1
 
-Global comic search now groups corroborated works and can reopen an existing favorite while retaining a per-source view. [Behavior and limits](BUSCA_UNIFICADA_P20261109_1.md). This does not delete/hide/merge already-separated restored library records; their data-safe consolidation remains open. Unknown media and ambiguous metadata are kept separate. Public beta.10 remains unchanged.
+Global comic search now groups corroborated works and can reopen an existing favorite while retaining a per-source view. [Behavior and limits](BUSCA_UNIFICADA_P20261109_1.md). This search checkpoint did not consolidate already-separated library records. The subsequent [P20261110.1 library checkpoint](BIBLIOTECA_UNIFICADA_P20261110_1.md) adds reversible native-record association and grouped presentation; real restored-library/download/reader acceptance remains open. Unknown media and ambiguous metadata are kept separate. Public beta.10 remains unchanged.
 
 ## R001 must prove only
 

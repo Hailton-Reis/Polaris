@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.translation.data.TranslationFontTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-11-10T14:11:17.986Z" hostname="7d7c5a6182d0" time="0.003">
+  <properties/>
+  <testcase name="stored legacy comic value is normalized()" classname="eu.kanade.translation.data.TranslationFontTest" time="0.001"/>
+  <testcase name="stored unknown value is normalized()" classname="eu.kanade.translation.data.TranslationFontTest" time="0.0"/>
+  <testcase name="stable values preserve existing choices and reserve comic font()" classname="eu.kanade.translation.data.TranslationFontTest" time="0.0"/>
+  <testcase name="settings order contains no legacy comic entry()" classname="eu.kanade.translation.data.TranslationFontTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

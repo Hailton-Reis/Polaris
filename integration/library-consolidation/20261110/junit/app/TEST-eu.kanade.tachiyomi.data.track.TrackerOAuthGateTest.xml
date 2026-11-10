@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.tachiyomi.data.track.TrackerOAuthGateTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-11-10T14:11:10.684Z" hostname="7d7c5a6182d0" time="0.069">
+  <properties/>
+  <testcase name="custom Hikka reference callbacks still require an explicit active flow()" classname="eu.kanade.tachiyomi.data.track.TrackerOAuthGateTest" time="0.018"/>
+  <testcase name="pending login survives recreation but is excluded from backups()" classname="eu.kanade.tachiyomi.data.track.TrackerOAuthGateTest" time="0.026"/>
+  <testcase name="unsolicited callbacks are rejected()" classname="eu.kanade.tachiyomi.data.track.TrackerOAuthGateTest" time="0.018"/>
+  <testcase name="state is provider bound and accepted only once()" classname="eu.kanade.tachiyomi.data.track.TrackerOAuthGateTest" time="0.002"/>
+  <testcase name="expired callbacks and clock rollback require a new login()" classname="eu.kanade.tachiyomi.data.track.TrackerOAuthGateTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -2,6 +2,17 @@
 
 Este arquivo registra a evolução real do código. **Revisões de desenvolvimento não são lançamentos públicos.** As datas abaixo usam America/Fortaleza, exceto quando houver indicação de UTC. O histórico de distribuição fica em [Releases](https://github.com/Hailton-Reis/Polaris/releases).
 
+## Desenvolvimento · P20261110.1 — 10/11/2026
+
+**Estado:** revisão da beta.11/código 112, sem lançamento. A beta.10 pública permanece intacta.
+
+- Associação conservadora das edições favoritas já existentes e apresentação de uma entrada com capítulos complementares, categorias e progresso lógico.
+- Preservação dos registros nativos, IDs, histórico, notas, glossários, rastreadores, pastas de download e formato de backup.
+- Acesso às edições vinculadas, separação reversível e respeito à escolha de não associar automaticamente.
+- Encaminhamento do leitor, downloads e traduções para a edição original; restauração e atualização limitadas ao registro da fonte.
+
+[Comportamento, evidências e limites](docs/BIBLIOTECA_UNIFICADA_P20261110_1.md). Aceite com provedores reais, downloads e aparelhos ARM ainda pendente.
+
 ## 0.1.0-beta.4 · P20261102.1 — 02/11/2026 (UTC)
 
 **Estado:** candidato compilado; versionCode 105. Os APKs da beta.4 ainda não foram publicados nas Releases. Conferência visual no A12 pendente.

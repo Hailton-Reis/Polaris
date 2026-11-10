@@ -1,0 +1,8 @@
+{
+  "matched": true,
+  "files": [
+    "gradle/libs.versions.toml",
+    "app/build.gradle.kts"
+  ],
+  "baseline": "P20261109.1 compiled overlay; no dependencies or models added; previous advisory lookup not repeated"
+}

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.tachiyomi.extension.util.PrivateExtensionFilesTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-11-10T14:11:14.064Z" hostname="7d7c5a6182d0" time="0.044">
+  <properties/>
+  <testcase name="cancelled copy preserves the old file and cleans the staged file()" classname="eu.kanade.tachiyomi.extension.util.PrivateExtensionFilesTest" time="0.002"/>
+  <testcase name="deletion waits for an ongoing replacement and cannot be undone by that copy()" classname="eu.kanade.tachiyomi.extension.util.PrivateExtensionFilesTest" time="0.006"/>
+  <testcase name="missing download cannot erase an installed extension()" classname="eu.kanade.tachiyomi.extension.util.PrivateExtensionFilesTest" time="0.001"/>
+  <testcase name="old bytes remain visible through validation and successful replacement is read only()" classname="eu.kanade.tachiyomi.extension.util.PrivateExtensionFilesTest" time="0.005"/>
+  <testcase name="failed initial installation leaves no loadable target()" classname="eu.kanade.tachiyomi.extension.util.PrivateExtensionFilesTest" time="0.002"/>
+  <testcase name="invalid staged package never replaces the old extension()" classname="eu.kanade.tachiyomi.extension.util.PrivateExtensionFilesTest" time="0.002"/>
+  <testcase name="failed atomic move preserves the old destination()" classname="eu.kanade.tachiyomi.extension.util.PrivateExtensionFilesTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.translation.detection.DbnetLineGroupingTest" tests="9" skipped="0" failures="0" errors="0" timestamp="2026-11-10T14:11:19.053Z" hostname="7d7c5a6182d0" time="0.023">
+  <properties/>
+  <testcase name="splits two permissively linked one-line bubbles at a glyph-scale gap()" classname="eu.kanade.translation.detection.DbnetLineGroupingTest" time="0.003"/>
+  <testcase name="keeps nearby but separately aligned speech bubbles apart()" classname="eu.kanade.translation.detection.DbnetLineGroupingTest" time="0.002"/>
+  <testcase name="splits a permissively linked component at an anomalous MST gap()" classname="eu.kanade.translation.detection.DbnetLineGroupingTest" time="0.003"/>
+  <testcase name="orders groups and lines deterministically independent of detector order()" classname="eu.kanade.translation.detection.DbnetLineGroupingTest" time="0.005"/>
+  <testcase name="rejects detector output beyond the bounded line limit()" classname="eu.kanade.translation.detection.DbnetLineGroupingTest" time="0.003"/>
+  <testcase name="splits a three-line bridge by comparing its abnormal edge to the close pair()" classname="eu.kanade.translation.detection.DbnetLineGroupingTest" time="0.001"/>
+  <testcase name="splits a four-line bridge into its two close pairs()" classname="eu.kanade.translation.detection.DbnetLineGroupingTest" time="0.002"/>
+  <testcase name="merges aligned lines in one speech bubble and exposes their union geometry()" classname="eu.kanade.translation.detection.DbnetLineGroupingTest" time="0.0"/>
+  <testcase name="merges compatible rotated lines and retains their orientation()" classname="eu.kanade.translation.detection.DbnetLineGroupingTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
