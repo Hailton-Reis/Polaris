@@ -1,0 +1,20 @@
+{
+  "baseline_paths": 369,
+  "current_paths": 370,
+  "added": [
+    "domain/src/main/java/tachiyomi/domain/chapter/model/ChapterNumbering.kt"
+  ],
+  "modified": [
+    "app/src/androidTest/java/eu/kanade/tachiyomi/polaris/LibraryConsolidationAndroidTest.kt",
+    "app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt",
+    "app/src/main/java/eu/kanade/tachiyomi/source/selection/LibraryWorkConsolidator.kt",
+    "app/src/main/java/eu/kanade/tachiyomi/source/selection/SourceMatching.kt",
+    "app/src/test/java/eu/kanade/tachiyomi/source/selection/LibraryWorkConsolidatorTest.kt",
+    "app/src/test/java/eu/kanade/tachiyomi/source/selection/LibraryWorkTest.kt",
+    "app/src/test/java/eu/kanade/tachiyomi/source/selection/SourceMatchingTest.kt",
+    "data/src/main/java/tachiyomi/data/manga/LibraryWorkRepositoryImpl.kt",
+    "domain/src/main/java/tachiyomi/domain/chapter/interactor/GetLibraryWorkChapters.kt",
+    "domain/src/main/java/tachiyomi/domain/manga/model/LibraryWork.kt"
+  ],
+  "removed_overlay_paths": []
+}

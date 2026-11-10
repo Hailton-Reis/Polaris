@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.translation.memory.TranslationGlossaryManagerTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-11-10T20:37:15.051Z" hostname="7d7c5a6182d0" time="0.008">
+  <properties/>
+  <testcase name="unchanged ordinary terms are rejected()" classname="eu.kanade.translation.memory.TranslationGlossaryManagerTest" time="0.004"/>
+  <testcase name="parses several glossary separators in one paste()" classname="eu.kanade.translation.memory.TranslationGlossaryManagerTest" time="0.002"/>
+  <testcase name="protected name list accepts one unchanged name per line()" classname="eu.kanade.translation.memory.TranslationGlossaryManagerTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

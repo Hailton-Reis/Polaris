@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.translation.model.TranslationCandidatePolicyTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-11-10T20:37:15.184Z" hostname="7d7c5a6182d0" time="0.004">
+  <properties/>
+  <testcase name="large short dialogue inside a detected balloon is not removed as a sound effect()" classname="eu.kanade.translation.model.TranslationCandidatePolicyTest" time="0.001"/>
+  <testcase name="normal captions and long dialogue do not become sound effects()" classname="eu.kanade.translation.model.TranslationCandidatePolicyTest" time="0.001"/>
+  <testcase name="preserves meaningful single-character dialogue across scripts()" classname="eu.kanade.translation.model.TranslationCandidatePolicyTest" time="0.001"/>
+  <testcase name="unboxed short oversized lettering retains existing sound-effect classification()" classname="eu.kanade.translation.model.TranslationCandidatePolicyTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

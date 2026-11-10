@@ -2,6 +2,17 @@
 
 Este arquivo registra a evolução real do código. **Revisões de desenvolvimento não são lançamentos públicos.** As datas abaixo usam America/Fortaleza, exceto quando houver indicação de UTC. O histórico de distribuição fica em [Releases](https://github.com/Hailton-Reis/Polaris/releases).
 
+## Desenvolvimento · P20261110.2 — 10/11/2026
+
+**Estado:** revisão da beta.11/código 112, sem lançamento. A beta.10 pública permanece intacta.
+
+- Revalida os capítulos nativos de associações existentes nas consultas e antes de gravar o vínculo. Incompatibilidades deixam as edições visíveis separadamente, com recuperação automática quando voltam a ser compatíveis.
+- Exige a mesma temporada, volume e parte para complementar faixas adjacentes; usa critérios compartilhados de catálogo e numeração.
+- Corrige separar/permitir novamente quando a obra principal está fora dos favoritos, preservando a escolha de mantê-la fora da biblioteca.
+- Prepara metadados e perfis de numeração uma vez por edição, reduzindo trabalho repetido por capítulo.
+
+[Revisão, evidências e limites](docs/REVISAO_BIBLIOTECA_P20261110_2.md). Não há promessa de identificar toda renumeração nem de desempenho já aprovado nos aparelhos.
+
 ## Desenvolvimento · P20261110.1 — 10/11/2026
 
 **Estado:** revisão da beta.11/código 112, sem lançamento. A beta.10 pública permanece intacta.

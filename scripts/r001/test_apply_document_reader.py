@@ -40,9 +40,10 @@ class DocumentOverlayTests(unittest.TestCase):
         subprocess.run(['git', '-C', str(self.root), 'diff', '--check'], check=True)
         self.assertFalse((self.root / 'data/src/main/sqldelight/tachiyomi/migrations/15.sqm').exists())
         about = self.root / 'app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt'
-        self.assertIn('P20261110.1', about.read_text())
+        self.assertIn('P20261110.2', about.read_text())
         self.assertTrue((self.root / 'app/src/main/java/eu/kanade/tachiyomi/source/selection/UnifiedWorkSearch.kt').exists())
         self.assertTrue((self.root / 'domain/src/main/java/tachiyomi/domain/manga/model/LibraryWork.kt').exists())
+        self.assertTrue((self.root / 'domain/src/main/java/tachiyomi/domain/chapter/model/ChapterNumbering.kt').exists())
         self.assertTrue((self.root / 'app/src/androidTest/java/eu/kanade/tachiyomi/polaris/LibraryConsolidationAndroidTest.kt').exists())
         self.assertFalse((self.root / 'app/src/main/java/eu/kanade/tachiyomi/data/profile/YomotsuLevelManager.kt').exists())
         self.assertFalse((self.root / 'app/src/main/res/drawable-nodpi/ic_yomotsu_logo.png').exists())

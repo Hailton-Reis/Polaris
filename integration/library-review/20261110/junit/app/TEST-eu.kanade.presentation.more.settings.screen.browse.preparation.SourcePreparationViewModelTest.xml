@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.presentation.more.settings.screen.browse.preparation.SourcePreparationViewModelTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-11-10T20:36:55.338Z" hostname="7d7c5a6182d0" time="4.936">
+  <properties/>
+  <testcase name="partial catalog failures preserve available sources and restored source ids()" classname="eu.kanade.presentation.more.settings.screen.browse.preparation.SourcePreparationViewModelTest" time="4.75"/>
+  <testcase name="repository review does not insert until explicit confirmation and certificate changes require new review()" classname="eu.kanade.presentation.more.settings.screen.browse.preparation.SourcePreparationViewModelTest" time="0.06"/>
+  <testcase name="restored repositories and language preferences do not start downloads or change backup data()" classname="eu.kanade.presentation.more.settings.screen.browse.preparation.SourcePreparationViewModelTest" time="0.031"/>
+  <testcase name="changed repository selection clears a previously loaded plan()" classname="eu.kanade.presentation.more.settings.screen.browse.preparation.SourcePreparationViewModelTest" time="0.055"/>
+  <testcase name="metadata timeout is reported and does not leave the assistant busy()" classname="eu.kanade.presentation.more.settings.screen.browse.preparation.SourcePreparationViewModelTest" time="0.03"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[WARNING: A Java agent has been loaded dynamically (/workspace/polaris-cloud-tools/gradle/caches/modules-2/files-2.1/net.bytebuddy/byte-buddy-agent/1.18.2/62f38a6faf7f069d661b79a07d566f504b0b20c4/byte-buddy-agent-1.18.2.jar)
+WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+WARNING: Dynamic loading of agents will be disallowed by default in a future release
+]]></system-err>
+</testsuite>

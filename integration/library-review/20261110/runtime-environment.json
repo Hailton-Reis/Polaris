@@ -1,0 +1,28 @@
+{
+  "scope": "software-emulated disposable API26 x86_64 VM; component test host",
+  "observed": "Boot System UI ANR before instrumentation; window-boot.txt retained in scratch",
+  "actions": [
+    "Tapped Close App at (300,830) to restart System UI",
+    "Force-stopped previously installed app background process during replacement install and before component tests",
+    "Tapped Close App again for recurring System UI ANR after installation, before instrumentation"
+  ],
+  "data_cleared": false,
+  "SELinux": "Enforcing",
+  "APK_verification": "maintained",
+  "source_or_test_changed_for_vm_recovery": false,
+  "physical_performance_acceptance": false,
+  "host_memory_preparation": {
+    "clean_build_file_cache_advice_bytes": 352063401,
+    "data_and_guest_disk_unchanged": true,
+    "oom_kills": 0
+  },
+  "instrumentation_start_window": "Launcher; window-ready.txt",
+  "final_round": {
+    "passed": 21,
+    "failed": 0,
+    "seconds": 81.133,
+    "instrumentation_start": "Launcher; window-ready.txt",
+    "instrumentation_end": "window-end.txt",
+    "source_or_test_changed_to_recover_environment": false
+  }
+}

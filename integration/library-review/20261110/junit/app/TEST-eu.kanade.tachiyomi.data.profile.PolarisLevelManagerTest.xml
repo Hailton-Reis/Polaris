@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.tachiyomi.data.profile.PolarisLevelManagerTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-11-10T20:37:04.945Z" hostname="7d7c5a6182d0" time="0.028">
+  <properties/>
+  <testcase name="a fresh install never gets download XP before its first reading()" classname="eu.kanade.tachiyomi.data.profile.PolarisLevelManagerTest" time="0.004"/>
+  <testcase name="titles use stable identifiers and legacy names cannot equip locked titles()" classname="eu.kanade.tachiyomi.data.profile.PolarisLevelManagerTest" time="0.003"/>
+  <testcase name="extreme imported counts remain finite and maximum level is two hundred()" classname="eu.kanade.tachiyomi.data.profile.PolarisLevelManagerTest" time="0.002"/>
+  <testcase name="merged editions count once and unknown chapters retain their own identity()" classname="eu.kanade.tachiyomi.data.profile.PolarisLevelManagerTest" time="0.006"/>
+  <testcase name="legacy XP survives migration but later downloads do not enter progression()" classname="eu.kanade.tachiyomi.data.profile.PolarisLevelManagerTest" time="0.002"/>
+  <testcase name="unknown URLs shared by legacy merged children remain distinct()" classname="eu.kanade.tachiyomi.data.profile.PolarisLevelManagerTest" time="0.003"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

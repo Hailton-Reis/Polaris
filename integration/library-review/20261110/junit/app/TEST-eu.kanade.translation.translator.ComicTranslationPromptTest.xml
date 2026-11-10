@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.translation.translator.ComicTranslationPromptTest" tests="9" skipped="0" failures="0" errors="0" timestamp="2026-11-10T20:37:33.009Z" hostname="7d7c5a6182d0" time="0.021">
+  <properties/>
+  <testcase name="normalizes non breaking spaces()" classname="eu.kanade.translation.translator.ComicTranslationPromptTest" time="0.0"/>
+  <testcase name="removes spaces before punctuation and collapses repeated spaces()" classname="eu.kanade.translation.translator.ComicTranslationPromptTest" time="0.001"/>
+  <testcase name="keeps ordinary text unchanged()" classname="eu.kanade.translation.translator.ComicTranslationPromptTest" time="0.0"/>
+  <testcase name="parses clean JSON response()" classname="eu.kanade.translation.translator.ComicTranslationPromptTest" time="0.012"/>
+  <testcase name="parses markdown wrapped JSON response()" classname="eu.kanade.translation.translator.ComicTranslationPromptTest" time="0.001"/>
+  <testcase name="normalizes invisible Unicode spaces between words()" classname="eu.kanade.translation.translator.ComicTranslationPromptTest" time="0.003"/>
+  <testcase name="salvages completed pages from truncated JSON response()" classname="eu.kanade.translation.translator.ComicTranslationPromptTest" time="0.001"/>
+  <testcase name="removes zero width formatting characters()" classname="eu.kanade.translation.translator.ComicTranslationPromptTest" time="0.0"/>
+  <testcase name="preserves intentional paragraph breaks()" classname="eu.kanade.translation.translator.ComicTranslationPromptTest" time="0.002"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

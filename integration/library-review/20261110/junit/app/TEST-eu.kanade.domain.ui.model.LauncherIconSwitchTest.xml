@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.domain.ui.model.LauncherIconSwitchTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-11-10T20:36:55.141Z" hostname="7d7c5a6182d0" time="0.012">
+  <properties/>
+  <testcase name="switch enables replacement before removing original()" classname="eu.kanade.domain.ui.model.LauncherIconSwitchTest" time="0.01"/>
+  <testcase name="failed cleanup restores an accessible default launcher()" classname="eu.kanade.domain.ui.model.LauncherIconSwitchTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

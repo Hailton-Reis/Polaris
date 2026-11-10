@@ -28,7 +28,7 @@ A prova automatizada usa o criador/restaurador de backup de produção, Protobuf
 
 ## Limites e próxima validação
 
-Esta etapa associa edições que já estão na biblioteca; não instala novas extensões nem faz uma busca ilimitada na internet. Reutiliza a identificação entre fontes da revisão anterior. Processa lotes limitados de grupos e mantém casos ambíguos visíveis. A numeração é conferida antes da associação; a revalidação de mudanças posteriores de numeração em grupos já formados ainda precisa ser desenvolvida. Metadados incompatíveis ou vínculos incompletos fazem as edições reaparecer separadas, e a separação manual continua disponível.
+Esta etapa associa edições que já estão na biblioteca; não instala novas extensões nem faz uma busca ilimitada na internet. Reutiliza a identificação entre fontes da revisão anterior. Processa lotes limitados de grupos e mantém casos ambíguos visíveis. Na P20261110.1, a numeração era conferida antes da associação. A [revisão posterior P20261110.2](REVISAO_BIBLIOTECA_P20261110_2.md) acrescenta revalidação nas consultas e na transação, incluindo mudanças que mantêm a mesma quantidade de capítulos. Metadados incompatíveis ou vínculos incompletos fazem as edições reaparecer separadas, e a separação manual continua disponível.
 
 As provas locais usam dados sintéticos e componentes reais de armazenamento. Falta validar biblioteca restaurada, pastas de download reais, abertura/leitura e atualização com provedores reais, além de memória e tempo em ARM32/ARM64. A projeção de grupos consulta suas listas de capítulos; desempenho em bibliotecas grandes precisa ser medido antes de prometer melhora.
 

@@ -529,10 +529,10 @@ index 0000000..4cb2c6e
 +}
 diff --git a/app/src/androidTest/java/eu/kanade/tachiyomi/polaris/LibraryConsolidationAndroidTest.kt b/app/src/androidTest/java/eu/kanade/tachiyomi/polaris/LibraryConsolidationAndroidTest.kt
 new file mode 100644
-index 0000000..9557fca
+index 0000000..28c4b48
 --- /dev/null
 +++ b/app/src/androidTest/java/eu/kanade/tachiyomi/polaris/LibraryConsolidationAndroidTest.kt
-@@ -0,0 +1,309 @@
+@@ -0,0 +1,392 @@
 +package eu.kanade.tachiyomi.polaris
 +
 +import androidx.sqlite.driver.bundled.BundledSQLiteDriver
@@ -713,6 +713,89 @@ index 0000000..9557fca
 +                assertTrue(raw.none { ChapterStorage.KEY in it.memo })
 +            }
 +        }
++
++    @Test
++    fun associationCommitRejectsNumberingChangedAfterPlanEvenWhenMangaMetadataIsEqual() =
++        runBlocking {
++            Fixture().use { f ->
++                val before = f.seed()
++                val child = f.chapters.getChapterByMangaId(before[1].id).first { it.url == "/one" }
++                f.driver
++                    .execute(
++                        null,
++                        "UPDATE chapters SET name = 'Season 2 Chapter 1' WHERE _id = ${child.id}",
++                        0,
++                    )
++                    .await()
++                assertEquals(before, f.mangas.getFavorites())
++                assertFalse(f.works.commit(before, f.state(before)))
++                assertTrue(f.mangas.getFavorites().all { LibraryWork.from(it.memo) == null })
++                assertEquals(17L, f.chapters.getChapterById(child.id)!!.lastPageRead)
++            }
++        }
++
++    @Test
++    fun formedAssociationRevalidatesNativeRenumberingAndRecoversWithoutMovingProgress() =
++        runBlocking {
++            Fixture().use { f ->
++                val before = f.seed()
++                assertTrue(f.works.commit(before, f.state(before)))
++                val child = f.chapters.getChapterByMangaId(before[1].id).first { it.url == "/one" }
++                f.chapters.update(ChapterUpdate(child.id, name = "Season 2 Chapter 1"))
++                assertEquals(2, GetLibraryManga(f.mangas, f.query).await().size)
++                assertEquals(before[1].id, f.query.rootId(before[1].id))
++                assertEquals(listOf(before[0].id), f.query.members(before[0].id).map { it.id })
++                assertTrue(
++                    f.mangas.getFavorites().all { LibraryWork.from(it.memo) != null && it.favorite }
++                )
++                f.chapters.update(ChapterUpdate(child.id, name = "Chapter 1"))
++                assertEquals(1, GetLibraryManga(f.mangas, f.query).await().size)
++                assertEquals(before[0].id, f.query.rootId(before[1].id))
++                assertEquals(17L, f.chapters.getChapterById(child.id)!!.lastPageRead)
++                assertEquals(before.map { it.notes }, f.mangas.getFavorites().map { it.notes })
++            }
++        }
++
++    @Test
++    fun allowAutomaticAlsoClearsTheSeparatedRootOutsideFavorites() = runBlocking {
++        Fixture().use { f ->
++            val before = f.seed()
++            assertTrue(f.works.commit(before, f.state(before)))
++            assertTrue(f.works.detach(before[0].id))
++            f.mangas.update(MangaUpdate(before[0].id, favorite = false))
++            assertTrue(f.works.allowAutomatic(before[0].id))
++            val root = f.mangas.getMangaById(before[0].id)
++            assertFalse(root.favorite)
++            assertFalse(LibraryWork.separated(root.memo))
++            assertFalse(LibraryWork.SEPARATED_WORK in root.memo)
++            assertEquals(before[0].notes, root.notes)
++            assertEquals(before[0].memo["glossary"], root.memo["glossary"])
++            assertTrue(f.mangas.getFavorites().none { LibraryWork.separated(it.memo) })
++            f.mangas.update(MangaUpdate(root.id, favorite = true))
++            val restored = f.mangas.getFavorites()
++            assertTrue(f.works.commit(restored, f.state(restored)))
++            assertEquals(1, GetLibraryManga(f.mangas, f.query).await().size)
++        }
++    }
++
++    @Test
++    fun detachIncludesTheRootEvenAfterRemovalFromFavorites() = runBlocking {
++        Fixture().use { f ->
++            val before = f.seed()
++            assertTrue(f.works.commit(before, f.state(before)))
++            f.mangas.update(MangaUpdate(before[0].id, favorite = false))
++            assertTrue(f.works.detach(before[0].id))
++            val root = f.mangas.getMangaById(before[0].id)
++            assertNull(LibraryWork.from(root.memo))
++            assertTrue(LibraryWork.separated(root.memo))
++            assertFalse(root.favorite)
++            assertTrue(
++                f.mangas.getFavorites().all {
++                    LibraryWork.from(it.memo) == null && LibraryWork.separated(it.memo)
++                }
++            )
++        }
++    }
 +
 +    @Test
 +    fun staleMetadataPlanIsRejectedWithoutOverwritingNewNotes() = runBlocking {
@@ -8381,7 +8464,7 @@ index a198c3f..9a3e84f 100644
                      preference = translationPreferences.translationEngineTemperature(),
                      title = stringResource(ATMR.strings.pref_engine_temperature),
 diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
-index 7f411fd..482c296 100644
+index 7f411fd..645e43f 100644
 --- a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
 +++ b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
 @@ -1,15 +1,18 @@
@@ -8446,7 +8529,7 @@ index 7f411fd..482c296 100644
  
      // Identifies this overlay independently of the pinned upstream COMMIT_SHA.
 -    private const val POLARIS_READER_REVISION = "P20261031.2"
-+    private const val POLARIS_READER_REVISION = "P20261110.1"
++    private const val POLARIS_READER_REVISION = "P20261110.2"
  
      @Composable
      override fun Content() {
@@ -23716,10 +23799,10 @@ index 0000000..bc465af
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/source/selection/LibraryWorkConsolidator.kt b/app/src/main/java/eu/kanade/tachiyomi/source/selection/LibraryWorkConsolidator.kt
 new file mode 100644
-index 0000000..79ccbd3
+index 0000000..6452fd0
 --- /dev/null
 +++ b/app/src/main/java/eu/kanade/tachiyomi/source/selection/LibraryWorkConsolidator.kt
-@@ -0,0 +1,154 @@
+@@ -0,0 +1,134 @@
 +package eu.kanade.tachiyomi.source.selection
 +
 +import eu.kanade.tachiyomi.source.INovelSource
@@ -23807,31 +23890,11 @@ index 0000000..79ccbd3
 +                        members.mapNotNull { WorkSources.from(it.memo).pinned?.key }.distinct()
 +                    if (pins.size > 1) continue
 +                    val data = members.map { chapters.getChapterByMangaId(it.id) }
-+                    val sharedIdentity =
-+                        identities.any { identity ->
-+                            members.all { manga ->
-+                                SourceMatching.title(manga.title) in
-+                                    identity.titles.map(SourceMatching::title) &&
-+                                    SourceMatching.people(manga.author, manga.artist)
-+                                        .intersect(
-+                                            identity.creators
-+                                                .flatMap { SourceMatching.people(it) }
-+                                                .toSet()
-+                                        )
-+                                        .isNotEmpty()
-+                            }
-+                        }
 +                    val compatible =
-+                        data.indices.all { left ->
-+                            data.indices.all { right ->
-+                                left == right ||
-+                                    SourceMatching.compatibleNumbering(
-+                                        data[left],
-+                                        data[right],
-+                                        sharedIdentity,
-+                                    )
-+                            }
-+                        }
++                        tachiyomi.domain.chapter.model.ChapterNumbering.compatibleEditions(
++                            members,
++                            data,
++                        )
 +                    if (!compatible) continue
 +                    val state =
 +                        LibraryWork(
@@ -23876,15 +23939,14 @@ index 0000000..79ccbd3
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/source/selection/SourceMatching.kt b/app/src/main/java/eu/kanade/tachiyomi/source/selection/SourceMatching.kt
 new file mode 100644
-index 0000000..837822c
+index 0000000..706eefd
 --- /dev/null
 +++ b/app/src/main/java/eu/kanade/tachiyomi/source/selection/SourceMatching.kt
-@@ -0,0 +1,88 @@
+@@ -0,0 +1,66 @@
 +package eu.kanade.tachiyomi.source.selection
 +
 +import eu.kanade.tachiyomi.source.model.SManga
 +import tachiyomi.domain.chapter.model.Chapter
-+import tachiyomi.domain.chapter.model.ChapterVersions
 +import tachiyomi.domain.manga.model.WorkIdentity
 +
 +/** Similarity alone cannot join a remake, novel or unrelated work to a library entry. */
@@ -23895,33 +23957,12 @@ index 0000000..837822c
 +        reference: List<Chapter>,
 +        candidate: List<Chapter>,
 +        corroboratedIdentity: Boolean = false,
-+    ): Boolean {
-+        val a =
-+            reference.map(ChapterVersions::key).filter { it.number != null && it.special == null }
-+        val b =
-+            candidate.map(ChapterVersions::key).filter { it.number != null && it.special == null }
-+        // A library-only backup has no chapter numbering or progress to remap. Work identity is
-+        // still independently corroborated by title and creator before a candidate reaches here.
-+        if (reference.isEmpty()) return b.isNotEmpty()
-+        if (a.isEmpty() || b.isEmpty()) return false
-+        // Missing season/volume/part information cannot establish equivalent numbering.
-+        fun schemes(keys: List<ChapterVersions.Key>) =
-+            keys.map { Triple(it.season != null, it.volume != null, it.part != null) }.toSet()
-+        if (schemes(a) != schemes(b)) return false
-+        if (a.toSet().intersect(b.toSet()).isNotEmpty()) return true
-+        if (!corroboratedIdentity) return false
-+        val left =
-+            a.mapNotNull {
-+                it.number?.toBigDecimalOrNull()?.takeIf { n -> n.stripTrailingZeros().scale() <= 0 }
-+            }
-+        val right =
-+            b.mapNotNull {
-+                it.number?.toBigDecimalOrNull()?.takeIf { n -> n.stripTrailingZeros().scale() <= 0 }
-+            }
-+        if (left.isEmpty() || right.isEmpty()) return false
-+        return left.max() + java.math.BigDecimal.ONE == right.min() ||
-+            right.max() + java.math.BigDecimal.ONE == left.min()
-+    }
++    ): Boolean =
++        tachiyomi.domain.chapter.model.ChapterNumbering.compatible(
++            reference,
++            candidate,
++            corroboratedIdentity,
++        )
 +
 +    internal fun people(vararg values: String?): Set<String> =
 +        tachiyomi.domain.manga.model.WorkIdentityText.people(*values)
@@ -55391,10 +55432,10 @@ index 0000000..aa5d0b8
 +}
 diff --git a/app/src/test/java/eu/kanade/tachiyomi/source/selection/LibraryWorkConsolidatorTest.kt b/app/src/test/java/eu/kanade/tachiyomi/source/selection/LibraryWorkConsolidatorTest.kt
 new file mode 100644
-index 0000000..8895c8a
+index 0000000..b0e5c13
 --- /dev/null
 +++ b/app/src/test/java/eu/kanade/tachiyomi/source/selection/LibraryWorkConsolidatorTest.kt
-@@ -0,0 +1,209 @@
+@@ -0,0 +1,223 @@
 +package eu.kanade.tachiyomi.source.selection
 +
 +import eu.kanade.tachiyomi.source.*
@@ -55541,6 +55582,20 @@ index 0000000..8895c8a
 +    }
 +
 +    @Test
++    fun `unsupported catalogue IDs cannot corroborate adjacent non overlapping ranges`() = runTest {
++        val identity = WorkIdentity("unsupported:42", listOf("The Star"), listOf("Jane"), 1)
++        val initial =
++            listOf(manga(1), manga(2)).map {
++                it.copy(memo = WorkSources(identity = identity).attach(it.memo))
++            }
++        val f = Fixture(initial)
++        coEvery { f.chapters.getChapterByMangaId(1, any()) } returns chapters(1, 1..40)
++        coEvery { f.chapters.getChapterByMangaId(2, any()) } returns chapters(2, 41..60)
++        assertEquals(0, f.service.reconcile())
++        coVerify(exactly = 0) { f.works.commit(any(), any()) }
++    }
++
++    @Test
 +    fun `explicit separation survives new reconciliation`() = runTest {
 +        val a = manga(1).let { it.copy(memo = buildJsonObject { put(LibraryWork.SEPARATE, true) }) }
 +        val f = Fixture(listOf(a, manga(2)))
@@ -55606,15 +55661,18 @@ index 0000000..8895c8a
 +}
 diff --git a/app/src/test/java/eu/kanade/tachiyomi/source/selection/LibraryWorkTest.kt b/app/src/test/java/eu/kanade/tachiyomi/source/selection/LibraryWorkTest.kt
 new file mode 100644
-index 0000000..7d0992b
+index 0000000..d44b93c
 --- /dev/null
 +++ b/app/src/test/java/eu/kanade/tachiyomi/source/selection/LibraryWorkTest.kt
-@@ -0,0 +1,330 @@
+@@ -0,0 +1,432 @@
 +package eu.kanade.tachiyomi.source.selection
 +
 +import eu.kanade.domain.chapter.model.toRemoteSChapter
 +import io.mockk.*
-+import kotlinx.coroutines.flow.flowOf
++import kotlinx.coroutines.flow.*
++import kotlinx.coroutines.launch
++import kotlinx.coroutines.test.UnconfinedTestDispatcher
++import kotlinx.coroutines.test.runCurrent
 +import kotlinx.coroutines.test.runTest
 +import kotlinx.serialization.json.*
 +import org.junit.jupiter.api.Assertions.*
@@ -55719,6 +55777,104 @@ index 0000000..7d0992b
 +            )
 +        assertEquals(listOf(root), state.resolve(root, listOf(root, other)))
 +    }
++
++    @Test
++    fun `numbering changes are revalidated and recover without changing association or progress`() =
++        runTest {
++            val (query, members, repo) = setup()
++            assertEquals(2, query.await(1).size)
++            coEvery { repo.getChapterByMangaId(2, false) } returns
++                listOf(chapter(21, 2, 1).copy(name = "Season 2 Chapter 1", lastPageRead = 17))
++            assertEquals(listOf(11L), query.await(1).map { it.id })
++            assertEquals(listOf(1L), query.members(1).map { it.id })
++            assertEquals(2L, query.rootId(2))
++            coEvery { repo.getChapterByMangaId(2, false) } returns
++                listOf(chapter(21, 2, 1).copy(lastPageRead = 17))
++            assertEquals(17L, query.await(1).last().lastPageRead)
++            assertEquals(1L, query.rootId(2))
++            assertTrue(members.all { LibraryWork.from(it.memo) != null })
++            coVerify(exactly = 0) { repo.updateAll(any()) }
++        }
++
++    @Test
++    fun `chapter flow revalidates numbering even when manga metadata and row counts stay equal`() =
++        runTest {
++            val (query, _, repo) = setup()
++            val left = MutableStateFlow(listOf(chapter(11, 1, 1)))
++            val right = MutableStateFlow(listOf(chapter(21, 2, 1)))
++            coEvery { repo.getChapterByMangaIdAsFlow(1, false) } returns left
++            coEvery { repo.getChapterByMangaIdAsFlow(2, false) } returns right
++            val emitted = mutableListOf<List<Chapter>>()
++            val job =
++                launch(UnconfinedTestDispatcher(testScheduler)) {
++                    query.subscribe(1).take(3).toList(emitted)
++                }
++            runCurrent()
++            right.value = listOf(chapter(21, 2, 1).copy(name = "Volume 2 Chapter 1"))
++            runCurrent()
++            right.value = listOf(chapter(21, 2, 1))
++            runCurrent()
++            job.join()
++            assertEquals(
++                listOf(listOf(11L, 21L), listOf(11L), listOf(11L, 21L)),
++                emitted.map { row -> row.map { it.id } },
++            )
++        }
++
++    @Test
++    fun `scanlator filtering does not invalidate numbering established by the full native edition`() =
++        runTest {
++            val (query, _, repo) = setup()
++            coEvery { repo.getChapterByMangaId(2, true) } returns emptyList()
++            val visible = query.snapshot(1, true)
++            assertEquals(2, visible.members.size)
++            assertEquals(listOf(11L), visible.chapters.map { it.id })
++        }
++
++    @Test
++    fun `library exposes both native records after incompatible renumbering with unchanged counts`() =
++        runTest {
++            val (query, members, chapterRepo) = setup()
++            coEvery { chapterRepo.getChapterByMangaId(2, false) } returns
++                listOf(chapter(21, 2, 1).copy(name = "Season 2 Chapter 1"))
++            val rows = members.map { LibraryManga(it, emptyList(), 1, 0, 0, 0, 0, 0) }
++            val mangas = mockk<MangaRepository>()
++            coEvery { mangas.getLibraryManga() } returns rows
++            assertEquals(listOf(1L, 2L), GetLibraryManga(mangas, query).await().map { it.id })
++        }
++
++    @Test
++    fun `confirmed catalogue aliases retain adjacent Portuguese and English complements during reads`() =
++        runTest {
++            val identity =
++                WorkIdentity(
++                    "mangadex:ade0306c-f4b6-4890-9edb-1ddf04df2039",
++                    listOf("A Estrela", "The Star"),
++                    listOf("Jane"),
++                    1,
++                )
++            fun identified(m: Manga) =
++                m.copy(memo = WorkSources(identity = identity).attach(m.memo))
++            val a = identified(manga(1).copy(title = "A Estrela"))
++            val b = identified(manga(2))
++            val (query, _, _) =
++                setup(a, b, left = listOf(chapter(11, 1, 40)), right = listOf(chapter(21, 2, 41)))
++            assertEquals(listOf(11L, 21L), query.await(1).map { it.id })
++            assertEquals(1L, query.rootId(2))
++        }
++
++    @Test
++    fun `large confirmed native editions keep all storage owners and logical chapter identities`() =
++        runTest {
++            val left = (1..10000).map { chapter(it.toLong(), 1, it) }
++            val right = (1..10000).map { chapter(10000L + it, 2, it) }
++            val (query, _, _) = setup(left = left, right = right)
++            val result = query.await(1)
++            assertEquals(20000, result.size)
++            assertEquals(10000, ChapterVersions.groups(result).size)
++            assertEquals(setOf(1L, 2L), result.map { ChapterStorage.from(it)!!.mangaId }.toSet())
++            assertEquals(20000, result.map { it.id }.toSet().size)
++        }
 +
 +    @Test
 +    fun `portable association resolves after destination local IDs change`() {
@@ -55855,8 +56011,9 @@ index 0000000..7d0992b
 +    fun `unknown chapters from different owners never share a sentinel URL identity`() = runTest {
 +        val left = chapter(11, 1, 1).copy(name = "Unknown", chapterNumber = -1.0, url = "/same")
 +        val right = chapter(21, 2, 1).copy(name = "Unknown", chapterNumber = -1.0, url = "/same")
-+        val (query, _, _) = setup(left = listOf(left), right = listOf(right))
-+        assertEquals(2, ChapterVersions.groups(query.await(1)).size)
++        val (query, _, _) =
++            setup(left = listOf(chapter(12, 1, 2), left), right = listOf(chapter(22, 2, 2), right))
++        assertEquals(3, ChapterVersions.groups(query.await(1)).size)
 +    }
 +
 +    @Test
@@ -55942,10 +56099,10 @@ index 0000000..7d0992b
 +}
 diff --git a/app/src/test/java/eu/kanade/tachiyomi/source/selection/SourceMatchingTest.kt b/app/src/test/java/eu/kanade/tachiyomi/source/selection/SourceMatchingTest.kt
 new file mode 100644
-index 0000000..b6ab64a
+index 0000000..2fa8f50
 --- /dev/null
 +++ b/app/src/test/java/eu/kanade/tachiyomi/source/selection/SourceMatchingTest.kt
-@@ -0,0 +1,128 @@
+@@ -0,0 +1,148 @@
 +package eu.kanade.tachiyomi.source.selection
 +
 +import eu.kanade.tachiyomi.source.model.SManga
@@ -55955,6 +56112,26 @@ index 0000000..b6ab64a
 +import tachiyomi.domain.chapter.model.Chapter
 +
 +class SourceMatchingTest {
++    @Test
++    fun `catalogue corroboration cannot bridge adjacent numbers in different seasons volumes or parts`() {
++        for (label in listOf("Season", "Volume", "Part")) {
++            assertFalse(
++                SourceMatching.compatibleNumbering(
++                    chapters("$label 1 Chapter 40"),
++                    chapters("$label 2 Chapter 41"),
++                    true,
++                )
++            )
++            assertTrue(
++                SourceMatching.compatibleNumbering(
++                    chapters("$label 1 Chapter 40"),
++                    chapters("$label 1 Chapter 41"),
++                    true,
++                )
++            )
++        }
++    }
++
 +    @Test
 +    fun `a library-only restore can use a corroborated work without inventing previous numbering`() {
 +        assertTrue(
@@ -61951,10 +62128,10 @@ index 9f3397a..1777031 100644
  }
 diff --git a/data/src/main/java/tachiyomi/data/manga/LibraryWorkRepositoryImpl.kt b/data/src/main/java/tachiyomi/data/manga/LibraryWorkRepositoryImpl.kt
 new file mode 100644
-index 0000000..32f675c
+index 0000000..d61621f
 --- /dev/null
 +++ b/data/src/main/java/tachiyomi/data/manga/LibraryWorkRepositoryImpl.kt
-@@ -0,0 +1,116 @@
+@@ -0,0 +1,127 @@
 +package tachiyomi.data.manga
 +
 +import app.cash.sqldelight.async.coroutines.awaitAsList
@@ -62005,6 +62182,15 @@ index 0000000..32f675c
 +                    work.editions.any { edition -> current.none(edition::matches) }
 +            )
 +                return@transactionWithResult false
++            val chapterRepository = tachiyomi.data.chapter.ChapterRepositoryImpl(database)
++            val nativeChapters = current.map { chapterRepository.getChapterByMangaId(it.id, false) }
++            if (
++                !tachiyomi.domain.chapter.model.ChapterNumbering.compatibleEditions(
++                    current,
++                    nativeChapters,
++                )
++            )
++                return@transactionWithResult false
 +            val previous = current.mapNotNull { LibraryWork.from(it.memo) }.distinct()
 +            for (old in previous) for (edition in old.editions) {
 +                if (current.none { it.source == edition.source && it.url == edition.url }) {
@@ -62033,7 +62219,8 @@ index 0000000..32f675c
 +                    .awaitAsOneOrNull() ?: return@transactionWithResult false
 +            val work = LibraryWork.from(root.memo) ?: return@transactionWithResult false
 +            val archived = work.attach(JsonObject(emptyMap())).getValue(LibraryWork.KEY)
-+            favorites()
++            (favorites() + root)
++                .distinctBy { it.id }
 +                .filter { LibraryWork.from(it.memo) == work }
 +                .forEach { member ->
 +                    database.mangasQueries.updateMemo(
@@ -62057,7 +62244,8 @@ index 0000000..32f675c
 +                    .getMangaById(rootId, MangaMapper::mapManga)
 +                    .awaitAsOneOrNull() ?: return@transactionWithResult false
 +            val archived = root.memo[LibraryWork.SEPARATED_WORK]
-+            favorites()
++            (favorites() + root)
++                .distinctBy { it.id }
 +                .filter {
 +                    it.id == root.id ||
 +                        archived != null && it.memo[LibraryWork.SEPARATED_WORK] == archived
@@ -62334,10 +62522,10 @@ index 1dee777..509a479 100644
              emptyList()
 diff --git a/domain/src/main/java/tachiyomi/domain/chapter/interactor/GetLibraryWorkChapters.kt b/domain/src/main/java/tachiyomi/domain/chapter/interactor/GetLibraryWorkChapters.kt
 new file mode 100644
-index 0000000..661abda
+index 0000000..90b949a
 --- /dev/null
 +++ b/domain/src/main/java/tachiyomi/domain/chapter/interactor/GetLibraryWorkChapters.kt
-@@ -0,0 +1,104 @@
+@@ -0,0 +1,121 @@
 +package tachiyomi.domain.chapter.interactor
 +
 +import kotlinx.coroutines.flow.*
@@ -62356,25 +62544,37 @@ index 0000000..661abda
 +        val state = LibraryWork.from(owner.memo) ?: return id
 +        val favorites = works.favorites()
 +        val root = favorites.firstOrNull { state.isPrimary(it) } ?: return id
-+        return root.id.takeIf { state.resolve(root, favorites).size > 1 } ?: id
++        return root.id.takeIf {
++            members(root.id).let { it.size > 1 && it.any { member -> member.id == id } }
++        } ?: id
 +    }
 +
-+    suspend fun members(id: Long): List<Manga> {
++    private suspend fun declaredMembers(id: Long): List<Manga> {
 +        val root = mangas.getMangaById(id)
 +        return LibraryWork.from(root.memo)?.resolve(root, works.favorites()) ?: listOf(root)
 +    }
 +
-+    private fun annotate(owner: Manga, root: Manga, raw: List<Chapter>, rank: Int): List<Chapter> =
-+        raw.map { chapter ->
++    suspend fun members(id: Long): List<Manga> {
++        val declared = declaredMembers(id)
++        if (declared.size < 2) return declared
++        val raw = declared.map { chapters.getChapterByMangaId(it.id, false) }
++        return validatedMembers(declared, raw)
++    }
++
++    private fun validatedMembers(members: List<Manga>, raw: List<List<Chapter>>): List<Manga> =
++        if (members.size < 2 || ChapterNumbering.compatibleEditions(members, raw)) members
++        else listOf(members.first())
++
++    private fun annotate(owner: Manga, root: Manga, raw: List<Chapter>, rank: Int): List<Chapter> {
++        val work = LibraryWork.from(root.memo)
++        val edition =
++            work?.editions?.firstOrNull { it.source == owner.source && it.url == owner.url }
++        val pinned = WorkSources.from(root.memo).pinned
++        return raw.map { chapter ->
 +            val origin =
-+                ChapterOrigin.from(chapter.memo)
++                (if (ChapterOrigin.KEY in chapter.memo) ChapterOrigin.from(chapter.memo) else null)
 +                    ?: ChapterOrigin(owner.source, "", "", owner.url, chapter.url, rank)
-+            val edition =
-+                LibraryWork.from(root.memo)?.editions?.firstOrNull {
-+                    it.source == owner.source && it.url == owner.url
-+                }
 +            val language = origin.language.ifBlank { edition?.language.orEmpty() }
-+            val pinned = WorkSources.from(root.memo).pinned
 +            val pinRank =
 +                if (
 +                    pinned == null ||
@@ -62390,8 +62590,7 @@ index 0000000..661abda
 +                    else -> 3
 +                }
 +            val memo =
-+                if (owner.id == root.id && LibraryWork.from(root.memo) == null)
-+                    ChapterStorage.strip(chapter.memo)
++                if (owner.id == root.id && work == null) ChapterStorage.strip(chapter.memo)
 +                else
 +                    origin
 +                        .copy(
@@ -62402,22 +62601,30 @@ index 0000000..661abda
 +                        .attach(ChapterStorage.strip(chapter.memo))
 +            ChapterStorage.of(owner).attach(chapter.copy(memo = memo))
 +        }
++    }
 +
 +    data class Snapshot(val members: List<Manga>, val chapters: List<Chapter>)
 +
-+    suspend fun snapshot(id: Long, filtered: Boolean = false): Snapshot {
-+        val members = members(id)
++    private suspend fun project(
++        members: List<Manga>,
++        raw: List<List<Chapter>>,
++        filtered: Boolean,
++    ): Snapshot {
++        val valid = validatedMembers(members, raw)
 +        return Snapshot(
-+            members,
-+            members.flatMapIndexed { rank, owner ->
-+                annotate(
-+                    owner,
-+                    members.first(),
-+                    chapters.getChapterByMangaId(owner.id, filtered),
-+                    rank,
-+                )
++            valid,
++            valid.flatMapIndexed { index, owner ->
++                val visible =
++                    if (filtered) chapters.getChapterByMangaId(owner.id, true) else raw[index]
++                annotate(owner, valid.first(), visible, index)
 +            },
 +        )
++    }
++
++    suspend fun snapshot(id: Long, filtered: Boolean = false): Snapshot {
++        val members = declaredMembers(id)
++        val raw = members.map { chapters.getChapterByMangaId(it.id, false) }
++        return project(members, raw, filtered)
 +    }
 +
 +    suspend fun await(id: Long, filtered: Boolean = false): List<Chapter> =
@@ -62434,13 +62641,87 @@ index 0000000..661abda
 +            .distinctUntilChanged()
 +            .flatMapLatest { members ->
 +                combine(
-+                    members.map { owner -> chapters.getChapterByMangaIdAsFlow(owner.id, filtered) }
++                    members.map { owner -> chapters.getChapterByMangaIdAsFlow(owner.id, false) }
 +                ) { lists ->
-+                    lists.flatMapIndexed { rank, raw ->
-+                        annotate(members[rank], members.first(), raw, rank)
-+                    }
++                    project(members, lists.toList(), filtered).chapters
 +                }
 +            }
++}
+diff --git a/domain/src/main/java/tachiyomi/domain/chapter/model/ChapterNumbering.kt b/domain/src/main/java/tachiyomi/domain/chapter/model/ChapterNumbering.kt
+new file mode 100644
+index 0000000..2015d72
+--- /dev/null
++++ b/domain/src/main/java/tachiyomi/domain/chapter/model/ChapterNumbering.kt
+@@ -0,0 +1,70 @@
++package tachiyomi.domain.chapter.model
++
++import java.math.BigDecimal
++import tachiyomi.domain.manga.model.LibraryWork
++import tachiyomi.domain.manga.model.Manga
++
++/** Shared by discovery, association commits and every grouped chapter read. */
++object ChapterNumbering {
++    private data class Scope(val season: String?, val volume: String?, val part: String?)
++
++    private class Profile(chapters: List<Chapter>) {
++        val empty = chapters.isEmpty()
++        val keys =
++            chapters
++                .map(ChapterVersions::key)
++                .filter { it.number != null && it.special == null }
++                .toSet()
++        val shapes =
++            keys.map { Triple(it.season != null, it.volume != null, it.part != null) }.toSet()
++        val ranges by
++            lazy(LazyThreadSafetyMode.NONE) {
++                keys
++                    .groupBy { Scope(it.season, it.volume, it.part) }
++                    .mapValues { (_, scoped) ->
++                        val integers =
++                            scoped.mapNotNull {
++                                it.number?.toBigDecimalOrNull()?.takeIf { n ->
++                                    n.stripTrailingZeros().scale() <= 0
++                                }
++                            }
++                        if (integers.isEmpty()) null else integers.min() to integers.max()
++                    }
++            }
++    }
++
++    fun compatible(
++        reference: List<Chapter>,
++        candidate: List<Chapter>,
++        corroboratedIdentity: Boolean = false,
++    ): Boolean = compatible(Profile(reference), Profile(candidate), corroboratedIdentity)
++
++    private fun compatible(a: Profile, b: Profile, corroborated: Boolean): Boolean {
++        // Library-only recovery can establish a first sequence, not remap unknown numbering.
++        if (a.empty) return b.keys.isNotEmpty()
++        if (a.keys.isEmpty() || b.keys.isEmpty() || a.shapes != b.shapes) return false
++        if (a.keys.any { it in b.keys }) return true
++        if (!corroborated || a.ranges.keys != b.ranges.keys) return false
++        // Adjacent ranges must belong to the same actual season/volume/part, not merely mention
++        // one.
++        return a.ranges.all { (scope, range) ->
++            val left = range ?: return@all false
++            val right = b.ranges[scope] ?: return@all false
++            left.second + BigDecimal.ONE == right.first ||
++                right.second + BigDecimal.ONE == left.first
++        }
++    }
++
++    fun compatibleEditions(members: List<Manga>, chapters: List<List<Chapter>>): Boolean {
++        if (members.size != chapters.size) return false
++        if (members.size < 2) return true
++        val corroborated = LibraryWork.sharedIdentity(members)
++        // Normalize each edition once, even for the maximum group of sixteen sources.
++        val profiles = chapters.map(::Profile)
++        return profiles.indices.all { a ->
++            profiles.indices.all { b ->
++                a == b || compatible(profiles[a], profiles[b], corroborated)
++            }
++        }
++    }
 +}
 diff --git a/domain/src/main/java/tachiyomi/domain/chapter/model/ChapterOrigin.kt b/domain/src/main/java/tachiyomi/domain/chapter/model/ChapterOrigin.kt
 new file mode 100644
@@ -63173,10 +63454,10 @@ index 9713e54..230dd1f 100644
  }
 diff --git a/domain/src/main/java/tachiyomi/domain/manga/model/LibraryWork.kt b/domain/src/main/java/tachiyomi/domain/manga/model/LibraryWork.kt
 new file mode 100644
-index 0000000..ffca1c2
+index 0000000..81cc601
 --- /dev/null
 +++ b/domain/src/main/java/tachiyomi/domain/manga/model/LibraryWork.kt
-@@ -0,0 +1,119 @@
+@@ -0,0 +1,133 @@
 +package tachiyomi.domain.manga.model
 +
 +import kotlinx.serialization.Serializable
@@ -63237,6 +63518,24 @@ index 0000000..ffca1c2
 +
 +        private fun people(vararg values: String?) = WorkIdentityText.people(*values)
 +
++        private val catalogId =
++            Regex(
++                "mangadex:[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}"
++            )
++
++        fun sharedIdentity(members: List<Manga>): Boolean =
++            members
++                .flatMap { listOfNotNull(WorkSources.from(it.memo).identity) }
++                .any { identity ->
++                    identity.catalogId.matches(catalogId) &&
++                        members.all { member ->
++                            normalized(member.title) in identity.titles.map(::normalized) &&
++                                people(member.author, member.artist)
++                                    .intersect(identity.creators.flatMap { people(it) }.toSet())
++                                    .isNotEmpty()
++                        }
++                }
++
 +        fun compatible(members: List<Manga>): Boolean {
 +            val identities = members.mapNotNull { WorkSources.from(it.memo).identity }
 +            val names = members.map { normalized(it.title) }
@@ -63245,11 +63544,7 @@ index 0000000..ffca1c2
 +                members.indices.map { index ->
 +                    identities
 +                        .filter { identity ->
-+                            identity.catalogId.matches(
-+                                Regex(
-+                                    "mangadex:[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}"
-+                                )
-+                            ) &&
++                            identity.catalogId.matches(catalogId) &&
 +                                names[index] in identity.titles.map(::normalized) &&
 +                                creators[index]
 +                                    .intersect(identity.creators.flatMap { people(it) }.toSet())

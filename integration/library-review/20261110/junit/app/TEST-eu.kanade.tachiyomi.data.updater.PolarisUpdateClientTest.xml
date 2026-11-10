@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.tachiyomi.data.updater.PolarisUpdateClientTest" tests="13" skipped="0" failures="0" errors="0" timestamp="2026-11-10T20:37:05.894Z" hostname="7d7c5a6182d0" time="0.068">
+  <properties/>
+  <testcase name="newest unsupported release does not hide an older compatible update()" classname="eu.kanade.tachiyomi.data.updater.PolarisUpdateClientTest" time="0.006"/>
+  <testcase name="unsupported Android is distinguished from no update()" classname="eu.kanade.tachiyomi.data.updater.PolarisUpdateClientTest" time="0.003"/>
+  <testcase name="package identity and matching manifest version are required()" classname="eu.kanade.tachiyomi.data.updater.PolarisUpdateClientTest" time="0.003"/>
+  <testcase name="one universal asset is offered to both ARM systems using the existing manifest contract()" classname="eu.kanade.tachiyomi.data.updater.PolarisUpdateClientTest" time="0.002"/>
+  <testcase name="device ABI order selects a compatible published APK()" classname="eu.kanade.tachiyomi.data.updater.PolarisUpdateClientTest" time="0.003"/>
+  <testcase name="old versions and non increasing build codes never trigger downgrade()" classname="eu.kanade.tachiyomi.data.updater.PolarisUpdateClientTest" time="0.003"/>
+  <testcase name="beta channel is opt in and numeric beta ten is newer than beta two()" classname="eu.kanade.tachiyomi.data.updater.PolarisUpdateClientTest" time="0.002"/>
+  <testcase name="default channel ignores drafts and prereleases even when tag is mislabeled()" classname="eu.kanade.tachiyomi.data.updater.PolarisUpdateClientTest" time="0.002"/>
+  <testcase name="stable of the current beta can be offered when its build code is newer()" classname="eu.kanade.tachiyomi.data.updater.PolarisUpdateClientTest" time="0.001"/>
+  <testcase name="real manifest shape ignores extra packaging fields and nullable release notes()" classname="eu.kanade.tachiyomi.data.updater.PolarisUpdateClientTest" time="0.004"/>
+  <testcase name="unsafe APK assets and invalid checksums cannot be offered()" classname="eu.kanade.tachiyomi.data.updater.PolarisUpdateClientTest" time="0.002"/>
+  <testcase name="all pages are inspected instead of trusting GitHub listing order()" classname="eu.kanade.tachiyomi.data.updater.PolarisUpdateClientTest" time="0.002"/>
+  <testcase name="network failures and cancellation are not presented as no update()" classname="eu.kanade.tachiyomi.data.updater.PolarisUpdateClientTest" time="0.003"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

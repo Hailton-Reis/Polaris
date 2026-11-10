@@ -1,0 +1,8 @@
+{
+  "matched": true,
+  "files": [
+    "app/build.gradle.kts",
+    "gradle/libs.versions.toml"
+  ],
+  "baseline": "P20261110.1 compiled overlay; no dependency or OCR model change; previous advisory lookup not repeated"
+}

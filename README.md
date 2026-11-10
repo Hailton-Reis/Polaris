@@ -15,7 +15,7 @@
 
 **Pré-lançamento público atual: [beta.10 / P20261106.1 / código 111](https://github.com/Hailton-Reis/Polaris/releases/tag/v0.1.0-beta.10).** Um APK universal ARM32/ARM64, recuperação de fontes e inspeção preventiva de extensões. [Publicação, downloads e limites](integration/release-candidates/0.1.0-beta.10/README.md). Na beta.10 publicada, a sandbox e a normalização de capítulos mesclados para outros leitores ainda não estão integradas. A [próxima revisão em desenvolvimento](integration/reading-continuity/20261106/README.md) implementa isolamento optativo experimental e a projeção de backup, com aceite nos aparelhos e em leitores externos ainda pendente; preserve o backup original. Esta branch contém a engenharia; a apresentação atual fica em [main](https://github.com/Hailton-Reis/Polaris).
 
-**Revisão em desenvolvimento P20261110.1:** a [biblioteca unificada](docs/BIBLIOTECA_UNIFICADA_P20261110_1.md) associa edições favoritas corroboradas em uma entrada, mantendo os registros, downloads e backups nativos. A [busca por obra](docs/BUSCA_UNIFICADA_P20261109_1.md) e a [Jornada Polaris](docs/AUDITORIA_GERAL_P20261107_1.md), com títulos decorativos, ícones e temas, fazem parte do desenvolvimento anterior. A validação em aparelhos e leitores externos continua pendente. Essa revisão ainda não é uma nova Release.
+**Revisão em desenvolvimento P20261110.2:** a [revisão da biblioteca](docs/REVISAO_BIBLIOTECA_P20261110_2.md) revalida a numeração durante a leitura e a gravação da associação, distingue temporadas/volumes/partes e corrige escolhas fora dos favoritos. A [biblioteca unificada](docs/BIBLIOTECA_UNIFICADA_P20261110_1.md), a [busca por obra](docs/BUSCA_UNIFICADA_P20261109_1.md) e a [Jornada Polaris](docs/AUDITORIA_GERAL_P20261107_1.md) continuam em desenvolvimento. A validação com bibliotecas reais, aparelhos e leitores externos está pendente. Essa revisão ainda não é uma nova Release.
 
 <table>
   <tr>
@@ -111,7 +111,7 @@ O painel **Dados e armazenamento → Armazenamento do Polaris** ajuda a separar 
 
 ## Onde o projeto está
 
-O beta público disponível é **`0.1.0-beta.10` · revisão `P20261106.1` · versionCode `111`**. [Notas e registro de publicação](integration/release-candidates/0.1.0-beta.10/README.md). A revisão `P20261110.1` (beta.11 em desenvolvimento, sem publicação) acrescenta a biblioteca unificada à busca por obra, continuidade entre fontes, isolamento experimental e personalização. [Escopo e limites](docs/BIBLIOTECA_UNIFICADA_P20261110_1.md). A implementação está em avaliação na [branch de engenharia](https://github.com/Hailton-Reis/Polaris/tree/r001/multisource-foundation).
+O beta público disponível é **`0.1.0-beta.10` · revisão `P20261106.1` · versionCode `111`**. [Notas e registro de publicação](integration/release-candidates/0.1.0-beta.10/README.md). A revisão `P20261110.2` (beta.11 em desenvolvimento, sem publicação) acrescenta a biblioteca unificada à busca por obra, continuidade entre fontes, isolamento experimental e personalização. [Escopo e limites](docs/BIBLIOTECA_UNIFICADA_P20261110_1.md). A implementação está em avaliação na [branch de engenharia](https://github.com/Hailton-Reis/Polaris/tree/r001/multisource-foundation).
 
 **O [primeiro beta público](https://github.com/Hailton-Reis/Polaris/releases/tag/v0.1.0-beta.3) está disponível; ainda não há lançamento estável.** O pacote de teste e a compilação não equivalem a aprovação do consumo, da compatibilidade ou da qualidade em todos os idiomas.
 

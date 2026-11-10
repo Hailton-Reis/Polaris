@@ -1,0 +1,55 @@
+{
+  "reason": "memcg max events during VM install after Gradle stopped; OOM kills zero",
+  "operation": "POSIX_FADV_DONTNEED on clean host build-file cache; contents and guest data unchanged",
+  "requested_bytes": 352063401,
+  "files": [
+    {
+      "path": "/workspace/scratch/polaris-cloud-e7d774c/android-build/patched-yomotsu/app/build/intermediates/runtime_app_classes_jar/debug/bundleDebugClassesToRuntimeJar/classes.jar",
+      "bytes": 38075845
+    },
+    {
+      "path": "/workspace/scratch/polaris-cloud-e7d774c/android-build/patched-yomotsu/app/build/intermediates/compile_and_runtime_r_class_jar/debug/processDebugResources/R.jar",
+      "bytes": 3567670
+    },
+    {
+      "path": "/workspace/scratch/polaris-cloud-e7d774c/android-build/patched-yomotsu/app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/models/det/inference.onnx.jar",
+      "bytes": 7754401
+    },
+    {
+      "path": "/workspace/scratch/polaris-cloud-e7d774c/android-build/patched-yomotsu/app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/models/rec/inference.onnx.jar",
+      "bytes": 18694775
+    },
+    {
+      "path": "/workspace/scratch/polaris-cloud-e7d774c/android-build/patched-yomotsu/app/build/intermediates/compile_app_classes_jar/debug/bundleDebugClassesToCompileJar/classes.jar",
+      "bytes": 38075845
+    },
+    {
+      "path": "/workspace/scratch/polaris-cloud-e7d774c/android-build/patched-yomotsu/app/build/outputs/apk/debug/app-debug.apk",
+      "bytes": 236336644
+    },
+    {
+      "path": "/workspace/scratch/polaris-cloud-e7d774c/android-build/patched-yomotsu/domain/build/intermediates/compile_and_runtime_r_class_jar/debugUnitTest/generateDebugUnitTestStubRFile/R.jar",
+      "bytes": 1114678
+    },
+    {
+      "path": "/workspace/scratch/polaris-cloud-e7d774c/android-build/patched-yomotsu/domain/build/intermediates/runtime_library_classes_jar/debug/bundleLibRuntimeToJarDebug/classes.jar",
+      "bytes": 1611625
+    },
+    {
+      "path": "/workspace/scratch/polaris-cloud-e7d774c/android-build/patched-yomotsu/domain/build/intermediates/compile_library_classes_jar/debug/bundleLibCompileToJarDebug/classes.jar",
+      "bytes": 1757703
+    },
+    {
+      "path": "/workspace/scratch/polaris-cloud-e7d774c/android-build/patched-yomotsu/data/build/intermediates/compile_and_runtime_r_class_jar/debugUnitTest/generateDebugUnitTestStubRFile/R.jar",
+      "bytes": 1275433
+    },
+    {
+      "path": "/workspace/scratch/polaris-cloud-e7d774c/android-build/patched-yomotsu/data/build/intermediates/runtime_library_classes_jar/debug/bundleLibRuntimeToJarDebug/classes.jar",
+      "bytes": 1826435
+    },
+    {
+      "path": "/workspace/scratch/polaris-cloud-e7d774c/android-build/patched-yomotsu/data/build/intermediates/compile_library_classes_jar/debug/bundleLibCompileToJarDebug/classes.jar",
+      "bytes": 1972347
+    }
+  ]
+}

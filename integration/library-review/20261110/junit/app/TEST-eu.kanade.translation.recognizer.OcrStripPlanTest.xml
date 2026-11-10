@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.translation.recognizer.OcrStripPlanTest" tests="16" skipped="0" failures="0" errors="0" timestamp="2026-11-10T20:37:21.816Z" hostname="7d7c5a6182d0" time="0.028">
+  <properties/>
+  <testcase name="equal text in adjacent lines survives the larger height tolerance()" classname="eu.kanade.translation.recognizer.OcrStripPlanTest" time="0.003"/>
+  <testcase name="duplicate OCR variants prefer the region with more edge clearance()" classname="eu.kanade.translation.recognizer.OcrStripPlanTest" time="0.0"/>
+  <testcase name="recorded chapter boundary with shorter OCR box retains the text once()" classname="eu.kanade.translation.recognizer.OcrStripPlanTest" time="0.001"/>
+  <testcase name="recorded narrow height disagreement does not repeat a recognized line()" classname="eu.kanade.translation.recognizer.OcrStripPlanTest" time="0.0"/>
+  <testcase name="measured Paddle Small overlap reproduces all benchmark lines in product reconciler()" classname="eu.kanade.translation.recognizer.OcrStripPlanTest" time="0.005"/>
+  <testcase name="measured ML Kit overlap reproduces all benchmark lines in product reconciler()" classname="eu.kanade.translation.recognizer.OcrStripPlanTest" time="0.003"/>
+  <testcase name="invalid or pathological dimensions fail before allocating pixels()" classname="eu.kanade.translation.recognizer.OcrStripPlanTest" time="0.001"/>
+  <testcase name="same-strip detections are preserved even when text and geometry match()" classname="eu.kanade.translation.recognizer.OcrStripPlanTest" time="0.0"/>
+  <testcase name="measured Paddle Tiny geometry preserves overlap without enabling that model()" classname="eu.kanade.translation.recognizer.OcrStripPlanTest" time="0.002"/>
+  <testcase name="identical words at different page positions are never globally deduplicated()" classname="eu.kanade.translation.recognizer.OcrStripPlanTest" time="0.001"/>
+  <testcase name="large enclosing detections cannot suppress a distinct repeated line()" classname="eu.kanade.translation.recognizer.OcrStripPlanTest" time="0.001"/>
+  <testcase name="regions cover entire tall pages with overlap and bounded decoded pixels()" classname="eu.kanade.translation.recognizer.OcrStripPlanTest" time="0.001"/>
+  <testcase name="benchmark dimensions use the same twelve original scale regions()" classname="eu.kanade.translation.recognizer.OcrStripPlanTest" time="0.001"/>
+  <testcase name="adjacent columns and separate lines survive overlap reconciliation()" classname="eu.kanade.translation.recognizer.OcrStripPlanTest" time="0.0"/>
+  <testcase name="ordinary pages and unsupported very wide pages keep existing recognition path()" classname="eu.kanade.translation.recognizer.OcrStripPlanTest" time="0.0"/>
+  <testcase name="overlap keeps complete last line instead of the edge fragment()" classname="eu.kanade.translation.recognizer.OcrStripPlanTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
