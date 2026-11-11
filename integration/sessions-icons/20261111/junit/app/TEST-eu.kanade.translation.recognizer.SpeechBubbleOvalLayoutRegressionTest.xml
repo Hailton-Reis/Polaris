@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.translation.recognizer.SpeechBubbleOvalLayoutRegressionTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-11-11T20:06:06.684Z" hostname="b5ae99f6bd9c" time="0.298">
+  <properties/>
+  <testcase name="narrow oval balloon keeps detected layout inside curved shoulders()" classname="eu.kanade.translation.recognizer.SpeechBubbleOvalLayoutRegressionTest" time="0.297"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

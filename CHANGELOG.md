@@ -2,6 +2,17 @@
 
 Este arquivo registra a evolução real do código. **Revisões de desenvolvimento não são lançamentos públicos.** As datas abaixo usam America/Fortaleza, exceto quando houver indicação de UTC. O histórico de distribuição fica em [Releases](https://github.com/Hailton-Reis/Polaris/releases).
 
+## Desenvolvimento · P20261111.1 — 11/11/2026
+
+**Estado:** revisão da beta.11/código 112, sem lançamento. A beta.10 pública permanece intacta.
+
+- Substitui os quatro ícones geométricos por ilustrações de coruja, raposa boreal, dragão e lobo estelar. O original fica disponível; alternativas liberam por pontos de leitura, sem gasto e preservando escolhas anteriores.
+- Mantém cookies HTTP separados por pacote/assinatura, compartilhados pelo intermediário de rede e pelas imagens. Cookies persistentes usam cifragem autenticada do Android Keystore; temporários permanecem na memória.
+- Acrescenta limpeza confirmada da sessão da extensão, revogando clientes antigos e respostas atrasadas. Não importa o navegador global nem inclui cookies no backup da biblioteca.
+- Mantém as preferências básicas e filtros isolados da revisão P20261110.3. Login por WebView, controles personalizados, fontes reais, aceite ARM e ida/volta em leitores externos continuam pendentes.
+
+[Comportamento e limites](docs/SESSOES_E_ICONES_P20261111_1.md), [artes](design/polaris-guardians/20261111/README.md) e [validação](integration/sessions-icons/20261111/README.md).
+
 ## Desenvolvimento · P20261110.2 — 10/11/2026
 
 **Estado:** revisão da beta.11/código 112, sem lançamento. A beta.10 pública permanece intacta.

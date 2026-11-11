@@ -1,0 +1,8 @@
+{
+  "reason": "Low build-disk headroom before final assembly",
+  "Gradle_stopped_before_cleanup": true,
+  "only_regenerable_Gradle_task_output_cache_removed": "/workspace/polaris-cloud-tools/gradle/caches/build-cache-1",
+  "files": 609,
+  "bytes": 1111852063,
+  "sources_APKs_keys_models_SDK_Maven_dependencies_JUnit_and_guest_data_preserved": true
+}

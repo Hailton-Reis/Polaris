@@ -1,0 +1,20 @@
+{
+  "started_at_utc": "2026-11-11T20:21:00.823042+00:00",
+  "classes": [
+    "eu.kanade.tachiyomi.extension.sandbox.SandboxCookieAndroidTest",
+    "eu.kanade.tachiyomi.extension.sandbox.SandboxSettingsAndroidTest",
+    "eu.kanade.tachiyomi.extension.sandbox.ExtensionSandboxAndroidTest",
+    "eu.kanade.tachiyomi.extension.sandbox.AutomaticLanguageAndroidTest",
+    "eu.kanade.tachiyomi.polaris.LauncherIconAndroidTest",
+    "eu.kanade.tachiyomi.polaris.ProfilePreferencesAndroidTest",
+    "eu.kanade.tachiyomi.polaris.PersonalizationPreviewAndroidTest",
+    "eu.kanade.tachiyomi.polaris.UnifiedWorkSearchAndroidTest",
+    "eu.kanade.tachiyomi.polaris.LibraryConsolidationAndroidTest"
+  ],
+  "expected_tests": 35,
+  "artifacts": {
+    "outputs/apk/debug/app-debug.apk": "f3fc77158125d5f397d4ca46f73d9b351bbf0fa51f1d0520f739daa0be59345c",
+    "outputs/apk/androidTest/debug/app-debug-androidTest.apk": "fb52607ac5c513cc5197bdcaa1a3c2a4f076d918e7116a7735d3f240b51b835c"
+  },
+  "patch_sha256": "f44ce2399aaefb5a3d69cc101ff8518623b370c317ae3f0c36e274649252967a"
+}

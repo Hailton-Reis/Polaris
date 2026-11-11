@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.tachiyomi.util.system.DeviceWorkloadPolicyTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-11-11T20:05:50.167Z" hostname="b5ae99f6bd9c" time="0.009">
+  <properties/>
+  <testcase name="a 32 bit process is constrained even when Android does not mark the phone low RAM()" classname="eu.kanade.tachiyomi.util.system.DeviceWorkloadPolicyTest" time="0.004"/>
+  <testcase name="low RAM or small process heap also limits a 64 bit device()" classname="eu.kanade.tachiyomi.util.system.DeviceWorkloadPolicyTest" time="0.001"/>
+  <testcase name="larger 64 bit devices keep concurrent image loading()" classname="eu.kanade.tachiyomi.util.system.DeviceWorkloadPolicyTest" time="0.002"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

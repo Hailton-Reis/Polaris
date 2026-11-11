@@ -1,6 +1,6 @@
 # Compatibilidade de backups e preparação de fontes
 
-Requisito do produto: facilitar repositórios e instalar extensões privadamente sem prejudicar importação/exportação de backups Tachiyomi, Mihon e variantes compatíveis. A revisão P20261110.3 está em desenvolvimento, posterior à beta.10 pública. Este documento fixa o contrato de compatibilidade. O assistente está descrito em [Assistente de fontes](ASSISTENTE_DE_FONTES_BETA9.md); os testes do fluxo não declaram a restauração em banco aprovada.
+Requisito do produto: facilitar repositórios e instalar extensões privadamente sem prejudicar importação/exportação de backups Tachiyomi, Mihon e variantes compatíveis. A revisão P20261111.1 está em desenvolvimento, posterior à beta.10 pública. Este documento fixa o contrato de compatibilidade. O assistente está descrito em [Assistente de fontes](ASSISTENTE_DE_FONTES_BETA9.md); os testes do fluxo não declaram a restauração em banco aprovada.
 
 ## Estrutura preservada
 
@@ -47,3 +47,7 @@ A [biblioteca unificada P20261110.1](BIBLIOTECA_UNIFICADA_P20261110_1.md) preser
 A [revisão P20261110.3](SANDBOX_PREFERENCIAS_FILTROS_P20261110_3.md) mantém as chaves `source_<id>` e os tipos dos valores no backup. Dentro do Polaris, cada pacote/assinatura tem um armazenamento separado. Configurações antigas ou restauradas não concedem acesso automático a esse conteúdo: a tela da fonte oferece importar explicitamente os campos compatíveis, preservando o arquivo original. Isso inclui eventuais credenciais; confiança em código novo continua sendo uma decisão local.
 
 A seção de configurações de fontes da restauração aceita apenas nomes nativos canônicos com IDs Long, incluindo IDs legados negativos. Nomes arbitrários de arquivos e namespaces internos da sandbox são ignorados. A mudança não altera o Protobuf. A exportação sem configurações privadas omite também chaves obviamente sensíveis das fontes isoladas por uma heurística de nomes; não detecta universalmente todo segredo. Controles e tipos personalizados precisam de aceite específico.
+
+## Sessões e recompensas P20261111.1
+
+[Cookies persistentes isolados](SESSOES_E_ICONES_P20261111_1.md) não integram o backup da biblioteca: os arquivos são privados por extensão/assinatura e cifrados com uma chave local. Restaurar uma biblioteca não transfere automaticamente logins de navegador ou cookies. O progresso de leitura continua no campo existente; as opções de ícone liberadas usam uma preferência StringSet comum adicional. Ícones já escolhidos/restaurados continuam disponíveis. Não há alteração de esquema Protobuf/SQL nem dependência obrigatória desses cosméticos para ler os registros nativos em outro aplicativo.

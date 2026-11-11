@@ -2,6 +2,10 @@
 
 This document protects R001 from scope creep.
 
+## Isolated HTTP sessions and illustrated icon rewards P20261111.1
+
+[Scoped HTTP session storage and illustrated icon rewards](SESSOES_E_ICONES_P20261111_1.md) are implemented in development. Persistent cookies use authenticated Keystore encryption, temporary cookies stay in host memory, and clearing a principal revokes older clients. Artwork replaces the four geometric launcher marks, with reading-point milestones and retained previous choices. Browser profile/login integration and real-provider/ARM acceptance remain open; HTTP cookie persistence does not close generic WebView authentication.
+
 ## Sandbox preferences and filters P20261110.3
 
 [Basic typed preferences, stock host widgets and source filters](SANDBOX_PREFERENCIAS_FILTROS_P20261110_3.md) are implemented in development. Package/signer-scoped storage and explicit legacy import preserve native backup keys; restore now rejects non-native source preference namespaces. Real-provider compatibility, dynamic controls, login/WebView, cross-session cookies and novels remain open. Public beta.10 remains unchanged.

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.tachiyomi.extension.preparation.PreparationPlanTest" tests="10" skipped="0" failures="0" errors="0" timestamp="2026-11-11T20:05:41.166Z" hostname="b5ae99f6bd9c" time="0.016">
+  <properties/>
+  <testcase name="restored repositories without a certificate and changed keys do not authorize preparation()" classname="eu.kanade.tachiyomi.extension.preparation.PreparationPlanTest" time="0.001"/>
+  <testcase name="exact duplicate metadata is deduplicated and latest version from one repository wins()" classname="eu.kanade.tachiyomi.extension.preparation.PreparationPlanTest" time="0.002"/>
+  <testcase name="restored source ids select exact sources without title matching or remapping()" classname="eu.kanade.tachiyomi.extension.preparation.PreparationPlanTest" time="0.001"/>
+  <testcase name="installed private versions are skipped and shared packages are never converted()" classname="eu.kanade.tachiyomi.extension.preparation.PreparationPlanTest" time="0.0"/>
+  <testcase name="same package from two repositories requires repository choice()" classname="eu.kanade.tachiyomi.extension.preparation.PreparationPlanTest" time="0.001"/>
+  <testcase name="conflicting download urls for the same version are not chosen arbitrarily()" classname="eu.kanade.tachiyomi.extension.preparation.PreparationPlanTest" time="0.001"/>
+  <testcase name="a newer package cannot silently switch an installed source to another selected repository()" classname="eu.kanade.tachiyomi.extension.preparation.PreparationPlanTest" time="0.001"/>
+  <testcase name="manual selection and adult content require explicit choices()" classname="eu.kanade.tachiyomi.extension.preparation.PreparationPlanTest" time="0.001"/>
+  <testcase name="matching a member language includes multilingual extensions()" classname="eu.kanade.tachiyomi.extension.preparation.PreparationPlanTest" time="0.002"/>
+  <testcase name="unsupported extension library versions are reported without attempting installation()" classname="eu.kanade.tachiyomi.extension.preparation.PreparationPlanTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,50 @@
+{
+  "definition": "Added/removed paths refer to cumulative overlay manifest; an overlay-only resource deletion is omitted from the final patch, while upstream deletions have absent state.",
+  "baseline_revision": "P20261110.3",
+  "current_revision": "P20261111.1",
+  "added": [
+    "app/src/androidTest/java/eu/kanade/tachiyomi/extension/sandbox/SandboxCookieAndroidTest.kt",
+    "app/src/main/java/eu/kanade/domain/ui/model/LauncherIconRewards.kt",
+    "app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxCookieStore.kt",
+    "app/src/main/res/drawable-nodpi/ic_polaris_aurora.webp",
+    "app/src/main/res/drawable-nodpi/ic_polaris_constellation.webp",
+    "app/src/main/res/drawable-nodpi/ic_polaris_logo.webp",
+    "app/src/main/res/drawable-nodpi/ic_polaris_orbit.webp",
+    "app/src/main/res/drawable/ic_polaris_aurora_foreground.xml",
+    "app/src/main/res/drawable/ic_polaris_constellation_foreground.xml",
+    "app/src/main/res/drawable/ic_polaris_orbit_foreground.xml",
+    "app/src/test/java/eu/kanade/domain/ui/model/LauncherIconRewardsTest.kt",
+    "app/src/test/java/eu/kanade/tachiyomi/extension/sandbox/CookieBankTest.kt"
+  ],
+  "modified": [
+    "app/src/androidTest/java/eu/kanade/tachiyomi/polaris/LauncherIconAndroidTest.kt",
+    "app/src/debug/java/eu/kanade/tachiyomi/polaris/PolarisPersonalizationTestActivity.kt",
+    "app/src/main/java/eu/kanade/domain/ui/UiPreferences.kt",
+    "app/src/main/java/eu/kanade/domain/ui/model/LauncherIcon.kt",
+    "app/src/main/java/eu/kanade/presentation/browse/ExtensionDetailsScreen.kt",
+    "app/src/main/java/eu/kanade/presentation/browse/components/BrowseSourceToolbar.kt",
+    "app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsAppearanceScreen.kt",
+    "app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt",
+    "app/src/main/java/eu/kanade/presentation/more/settings/widget/AppIconPreferenceWidget.kt",
+    "app/src/main/java/eu/kanade/tachiyomi/data/profile/PolarisLevelManager.kt",
+    "app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/ExtensionSandboxSession.kt",
+    "app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/IsolatedHttpSource.kt",
+    "app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxHttpBroker.kt",
+    "app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxPreferenceUi.kt",
+    "app/src/main/java/eu/kanade/tachiyomi/util/system/LauncherIconManager.kt",
+    "app/src/main/res/drawable/ic_polaris_foreground.xml",
+    "app/src/main/res/drawable/ic_polaris_monochrome.xml",
+    "app/src/main/res/mipmap-anydpi-v26/ic_polaris_aurora.xml",
+    "app/src/main/res/mipmap-anydpi-v26/ic_polaris_constellation.xml",
+    "app/src/main/res/mipmap-anydpi-v26/ic_polaris_orbit.xml",
+    "app/src/main/res/mipmap/ic_polaris_launcher.xml",
+    "i18n-at/src/commonMain/moko-resources/base/strings.xml",
+    "i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml"
+  ],
+  "removed": [
+    "app/src/main/res/drawable/ic_polaris_aurora.xml",
+    "app/src/main/res/drawable/ic_polaris_constellation.xml",
+    "app/src/main/res/drawable/ic_polaris_logo.xml",
+    "app/src/main/res/drawable/ic_polaris_orbit.xml"
+  ]
+}
