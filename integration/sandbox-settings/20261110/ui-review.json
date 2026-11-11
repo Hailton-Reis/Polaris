@@ -1,0 +1,26 @@
+{
+  "inspected_at_utc": "2026-11-11T18:51:33.795971+00:00",
+  "scope": "Synthetic component Activity, preference-theme context mirrors SourcePreferencesFragment; not full-app UI acceptance",
+  "locale": "pt-BR",
+  "extension_fixture_labels": "en",
+  "before_switch_visible_and_checked": true,
+  "after_switch_visible_and_unchecked": true,
+  "private_value_masked": true,
+  "dependent_token_disabled_after_touch": true,
+  "unsupported_login_action_disabled": true,
+  "actual_touch_and_persisted_value_asserted_by_instrumentation": true,
+  "images": [
+    {
+      "file": "preview/isolated-settings.png",
+      "width": 720,
+      "height": 1600,
+      "sha256": "7774c59df1af15e86d47070ada44bd77addcfa87788ca6f6c1fd28d9cfd73b09"
+    },
+    {
+      "file": "preview/isolated-settings-disabled.png",
+      "width": 720,
+      "height": 1600,
+      "sha256": "e96043c7a0f594116111cb82a137f714ed4983a5201bd11f05c77dbe722d094b"
+    }
+  ]
+}

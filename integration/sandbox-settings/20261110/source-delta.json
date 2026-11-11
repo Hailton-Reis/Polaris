@@ -1,0 +1,38 @@
+{
+  "definition": "Added/removed paths refer to the cumulative overlay manifest, not necessarily new/deleted upstream files",
+  "baseline_revision": "P20261110.2",
+  "current_revision": "P20261110.3",
+  "added": [
+    ".gitattributes",
+    "app/src/androidTest/java/eu/kanade/tachiyomi/extension/sandbox/SandboxSettingsAndroidTest.kt",
+    "app/src/debug/java/eu/kanade/tachiyomi/polaris/SandboxSettingsTestActivity.kt",
+    "app/src/main/java/eu/kanade/presentation/browse/components/BrowseSourceToolbar.kt",
+    "app/src/main/java/eu/kanade/tachiyomi/data/backup/create/creators/PreferenceBackupCreator.kt",
+    "app/src/main/java/eu/kanade/tachiyomi/data/backup/restore/restorers/SourcePreferenceNamespace.kt",
+    "app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxFilterCodec.kt",
+    "app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxPreferenceCodec.kt",
+    "app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxPreferenceStore.kt",
+    "app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxPreferenceUi.kt",
+    "app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxPreferenceValues.kt",
+    "app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxWorkerPreferences.kt",
+    "app/src/main/java/eu/kanade/tachiyomi/ui/browse/extension/details/SourcePreferencesScreen.kt",
+    "app/src/test/java/eu/kanade/tachiyomi/data/backup/restore/SourcePreferenceNamespaceTest.kt",
+    "app/src/test/java/eu/kanade/tachiyomi/extension/sandbox/SandboxFilterCodecTest.kt",
+    "app/src/test/java/eu/kanade/tachiyomi/extension/sandbox/SandboxPreferenceValuesTest.kt"
+  ],
+  "modified": [
+    "app/src/androidTest/assets/polaris-sandbox/fixture.apk",
+    "app/src/debug/AndroidManifest.xml",
+    "app/src/main/java/eu/kanade/presentation/browse/ExtensionDetailsScreen.kt",
+    "app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt",
+    "app/src/main/java/eu/kanade/tachiyomi/data/backup/restore/restorers/PreferenceRestorer.kt",
+    "app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/ExtensionSandboxProtocol.kt",
+    "app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/ExtensionSandboxService.kt",
+    "app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/ExtensionSandboxSession.kt",
+    "app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/IsolatedHttpSource.kt",
+    "app/src/main/java/eu/kanade/tachiyomi/extension/util/ExtensionLoader.kt",
+    "i18n-at/src/commonMain/moko-resources/base/strings.xml",
+    "i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml"
+  ],
+  "removed": []
+}

@@ -1,10 +1,12 @@
 # Extensões: isolamento, compatibilidade e quarentena
 
+**Atualização P20261110.3:** [Preferências básicas e filtros do executor isolado](SANDBOX_PREFERENCIAS_FILTROS_P20261110_3.md) estão implementados em desenvolvimento, com armazenamento separado por pacote/assinatura e importação explícita de configurações antigas. Login/WebView, cookies entre sessões, controles personalizados e novels continuam pendentes. O restante desta análise histórica distingue a beta publicada das provas anteriores.
+
 **Atualização de desenvolvimento P20261106.2:** existe agora um executor experimental integrado, optativo por extensão, em avaliação. [Comportamento, instrumentação e limites atuais](../integration/reading-continuity/20261106/README.md). As seções abaixo documentam o diagnóstico e os critérios da beta.10 publicada, anterior a essa integração; não descrevem uma garantia de segurança absoluta.
 
 Decisão do mantenedor em 06/11/2026, America/Fortaleza: permitir um modo de compatibilidade opcional para extensões antigas, com aviso explícito de execução fora da sandbox. A beta.9 pública permanece inalterada. Esta análise não declara um executor isolado concluído.
 
-## Limite atual confirmado no código
+## Diagnóstico anterior: execução em compatibilidade
 
 O `ExtensionLoader` cria um `ChildFirstPathClassLoader` e instancia a extensão no processo do Polaris. A extensão privada é um APK guardado internamente, mas seu código compartilha o UID, memória e permissões do aplicativo. Guardar o arquivo privadamente, verificar a assinatura ou usar outro class loader não cria uma sandbox.
 
@@ -32,7 +34,7 @@ O isolamento efetivo deve usar um serviço Android com `android:isolatedProcess=
 4. No Android 8, um processo de trabalho deve atender uma extensão por vez, descartando o processo antes de reutilizá-lo para outra. APIs mais novas de serviços isolados não podem se tornar um requisito silencioso que elimine ARM32/API26.
 5. Extensões que dependem de arquivos privados do host, bibliotecas nativas não autorizadas, WebView ou outras APIs incompatíveis precisam de adaptação ou da escolha explícita do modo de compatibilidade. Falha do executor isolado não deve executar código automaticamente no host como reserva.
 6. Pedidos bloqueados pelo intermediário podem produzir eventos auditáveis e quarentena, com motivo e ação de manter/excluir. Uma falha HTTP, demora ou fechamento do processo não deve ser apresentado como invasão comprovada. O aplicativo não consegue observar universalmente toda tentativa de acesso feita diretamente ao Android.
-7. A interface deve identificar **Isolada**, **Compatibilidade: sem isolamento** ou **Quarentena**, sem chamar uma extensão de segura por não ter disparado alertas. A candidata atual ainda não apresenta o estado Isolada, pois não há executor integrado.
+7. A interface deve identificar **Isolada**, **Compatibilidade: sem isolamento** ou **Quarentena**, sem chamar uma extensão de segura por não ter disparado alertas. Este era um requisito anterior à integração experimental P20261106.2; consulte o checkpoint atual no início desta página.
 
 ## Aceite necessário
 

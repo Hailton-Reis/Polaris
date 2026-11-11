@@ -1,3 +1,14 @@
+diff --git a/.gitattributes b/.gitattributes
+index 11bdccf..443b668 100644
+--- a/.gitattributes
++++ b/.gitattributes
+@@ -24,3 +24,6 @@
+ *.woff binary
+ *.pyc binary
+ *.swp binary
++
++# Android test fixtures must preserve ZIP/DEX bytes.
++*.apk binary
 diff --git a/app/build.gradle.kts b/app/build.gradle.kts
 index 63e2698..4707afe 100644
 --- a/app/build.gradle.kts
@@ -72,103 +83,232 @@ index 63e2698..4707afe 100644
  androidComponents {
 diff --git a/app/src/androidTest/assets/polaris-sandbox/fixture.apk b/app/src/androidTest/assets/polaris-sandbox/fixture.apk
 new file mode 100644
-index 0000000000000000000000000000000000000000..e0414c1d624b6442ed8dfb10813912042be290a9
+index 0000000000000000000000000000000000000000..756ba1654f9751120ee3d10438aaa3b5c891e0f8
 GIT binary patch
-literal 9608
-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
-Vhg7?_ySdKDNTPL+>lSn9e*x@y)U*Hq
+literal 25728
+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
 
 literal 0
 HcmV?d00001
@@ -389,6 +529,478 @@ index 0000000..e5c1e2a
 +        ExtensionSandboxSession.withApk(context, apk, digest, fixture) {
 +            assertNotNull(it.metadata["sources"])
 +        }
++    }
++}
+diff --git a/app/src/androidTest/java/eu/kanade/tachiyomi/extension/sandbox/SandboxSettingsAndroidTest.kt b/app/src/androidTest/java/eu/kanade/tachiyomi/extension/sandbox/SandboxSettingsAndroidTest.kt
+new file mode 100644
+index 0000000..4ce14f2
+--- /dev/null
++++ b/app/src/androidTest/java/eu/kanade/tachiyomi/extension/sandbox/SandboxSettingsAndroidTest.kt
+@@ -0,0 +1,466 @@
++package eu.kanade.tachiyomi.extension.sandbox
++
++import android.app.Application
++import androidx.preference.*
++import androidx.test.core.app.ActivityScenario
++import androidx.test.ext.junit.runners.AndroidJUnit4
++import androidx.test.platform.app.InstrumentationRegistry
++import eu.kanade.tachiyomi.data.backup.create.creators.PreferenceBackupCreator
++import eu.kanade.tachiyomi.data.backup.models.*
++import eu.kanade.tachiyomi.data.backup.restore.restorers.PreferenceRestorer
++import eu.kanade.tachiyomi.polaris.SandboxSettingsTestActivity
++import eu.kanade.tachiyomi.source.Source
++import eu.kanade.tachiyomi.source.model.*
++import eu.kanade.tachiyomi.source.online.HttpSource
++import java.io.File
++import java.security.MessageDigest
++import java.util.UUID
++import kotlinx.coroutines.*
++import kotlinx.coroutines.flow.*
++import kotlinx.serialization.json.*
++import org.junit.After
++import org.junit.Assert.*
++import org.junit.Before
++import org.junit.Test
++import org.junit.runner.RunWith
++import tachiyomi.core.common.preference.AndroidPreferenceStore
++import tachiyomi.domain.category.interactor.GetCategories
++import tachiyomi.domain.category.model.Category
++import tachiyomi.domain.category.repository.CategoryRepository
++import tachiyomi.domain.source.model.StubSource
++import tachiyomi.domain.source.service.SourceManager
++import uy.kohesive.injekt.Injekt
++import uy.kohesive.injekt.api.addSingleton
++
++@RunWith(AndroidJUnit4::class)
++class SandboxSettingsAndroidTest {
++    private val instrumentation = InstrumentationRegistry.getInstrumentation()
++    private val context = instrumentation.targetContext
++    private lateinit var apk: File
++    private lateinit var digest: String
++    private lateinit var identity: String
++    private lateinit var canary: File
++    private lateinit var legacyBefore: Map<String, *>
++    private val id = 735111L
++
++    @Before
++    fun prepare() {
++        identity = "synthetic:${UUID.randomUUID()}"
++        canary =
++            File(context.filesDir, "polaris-sandbox-canary").apply {
++                writeText("synthetic-host-canary")
++            }
++        legacyBefore = context.getSharedPreferences("source_$id", 0).all
++        apk = File.createTempFile("sandbox-settings", ".apk", context.cacheDir)
++        instrumentation.context.assets.open("polaris-sandbox/fixture.apk").use { input ->
++            apk.outputStream().use(input::copyTo)
++        }
++        digest =
++            MessageDigest.getInstance("SHA-256").digest(apk.readBytes()).joinToString("") {
++                "%02x".format(it)
++            }
++    }
++
++    @After
++    fun cleanup() {
++        assertEquals("synthetic-host-canary", canary.readText())
++        SandboxPreferenceValues.write(context.getSharedPreferences("source_$id", 0), legacyBefore)
++        SandboxSettingsTestActivity.fixtureSource = null
++        canary.delete()
++        apk.delete()
++    }
++
++    private suspend fun proxy(
++        className: String = "ConfiguredSource",
++        scope: String = identity,
++    ): IsolatedHttpSource =
++        IsolatedHttpSource.load(
++                context,
++                apk,
++                digest,
++                listOf("polaris.sandbox.fixture.$className"),
++                {},
++                { false },
++                preferenceIdentity = scope,
++            )
++            .single() as IsolatedHttpSource
++
++    private suspend fun change(source: IsolatedHttpSource, values: Map<String, *>): Boolean {
++        val schema = source.preferenceSchema()
++        return source.changePreferences(
++            schema.getValue("schema").jsonPrimitive.content,
++            SandboxPreferenceValues.encode(values),
++        )
++    }
++
++    private fun node(schema: JsonObject, key: String): JsonObject {
++        fun find(nodes: JsonArray): JsonObject? {
++            nodes.forEach { item ->
++                val value = item.jsonObject
++                if (value["key"]?.jsonPrimitive?.content == key) return value
++                (value["children"] as? JsonArray)?.let {
++                    find(it)?.let { found ->
++                        return found
++                    }
++                }
++            }
++            return null
++        }
++        return requireNotNull(find(schema.getValue("nodes").jsonArray))
++    }
++
++    @Test
++    fun filtersReachOriginalSubclassInstancesInTheWorker() =
++        runBlocking<Unit> {
++            val source = proxy("FilteredSource")
++            val filters = source.getFilterList()
++            (filters[1] as Filter.Text).state = "Jane"
++            (filters[2] as Filter.Select<*>).state = 1
++            ((filters[3] as Filter.Group<*>).state[0] as Filter.TriState).state = 2
++            ((filters[3] as Filter.Group<*>).state[1] as Filter.CheckBox).state = true
++            (filters[4] as Filter.Sort).state = Filter.Sort.Selection(1, false)
++            assertEquals(
++                "Jane|1|2|true|1|false",
++                source.getSearchManga(1, "test", filters).mangas.single().title,
++            )
++            assertTrue(
++                runCatching {
++                        Class.forName(
++                            "polaris.sandbox.fixture.FixtureSelect",
++                            false,
++                            context.classLoader,
++                        )
++                    }
++                    .isFailure
++            )
++        }
++
++    @Test
++    fun settingsPersistAcrossWorkersAndCallbacksRunOnlyAtIsolatedUid() =
++        runBlocking<Unit> {
++            val source = proxy()
++            assertTrue(change(source, mapOf("token" to "synthetic-secret")))
++            assertTrue(change(source, mapOf("counter" to "42")))
++            assertEquals(42, source.getSourcePreferences().getInt("counter", 0))
++            val callback = source.getSourcePreferences().getLong("callback_uid", 0)
++            assertTrue(callback % 100000 in 90000L..99999L)
++            assertNotEquals(android.os.Process.myUid().toLong(), callback)
++            val restarted = proxy()
++            assertEquals(
++                "synthetic-secret|true|42|true",
++                restarted.getPopularManga(1).mangas.single().title,
++            )
++            val before = source.getSourcePreferences().all
++            assertFalse(change(source, mapOf("token" to "reject")))
++            assertEquals(before, source.getSourcePreferences().all)
++            assertTrue(change(source, mapOf("enabled" to false)))
++            assertFalse(
++                node(source.preferenceSchema(), "token").getValue("enabled").jsonPrimitive.boolean
++            )
++        }
++
++    @Test
++    fun packageAndSignerScopesAndNativeSettingsAreNotSharedImplicitly() =
++        runBlocking<Unit> {
++            context
++                .getSharedPreferences("source_$id", 0)
++                .edit()
++                .putString("token", "legacy-must-not-leak")
++                .commit()
++            val victim = proxy(scope = "$identity:other-package-or-signer")
++            assertTrue(change(victim, mapOf("token" to "other-extension-secret")))
++            val source = proxy()
++            assertEquals("unset|true|0|true", source.getPopularManga(1).mangas.single().title)
++            assertFalse(source.getSourcePreferences().contains("token"))
++            assertTrue(change(source, mapOf("token" to "own-secret")))
++            assertEquals(
++                "other-extension-secret",
++                victim.getSourcePreferences().getString("token", null),
++            )
++            assertEquals(
++                "legacy-must-not-leak",
++                context.getSharedPreferences("source_$id", 0).getString("token", null),
++            )
++        }
++
++    @Test
++    fun explicitLegacyImportPreservesStoredTypesAndNativeBackupKeys() =
++        runBlocking<Unit> {
++            val legacy = context.getSharedPreferences("source_$id", 0)
++            SandboxPreferenceValues.write(
++                legacy,
++                mapOf(
++                    "token" to "synthetic-import",
++                    "counter" to 17,
++                    "enabled" to true,
++                    "mode" to "normal",
++                    "tags" to setOf("b"),
++                    "not_declared" to "stay outside",
++                ),
++            )
++            val source = proxy()
++            assertEquals("unset|true|0|true", source.getPopularManga(1).mangas.single().title)
++            assertTrue(source.importLegacyPreferences(source.preferenceSchema()))
++            assertEquals(
++                "synthetic-import|true|17|true",
++                source.getPopularManga(1).mangas.single().title,
++            )
++            assertEquals(setOf("b"), source.getSourcePreferences().getStringSet("tags", null))
++            assertFalse(source.getSourcePreferences().contains("not_declared"))
++            val manager = Manager(listOf(source))
++            val store =
++                AndroidPreferenceStore(
++                    context,
++                    context.getSharedPreferences("synthetic-backup-$identity", 0),
++                )
++            val creator = PreferenceBackupCreator(manager, store)
++            val exported = creator.createSource(true).single()
++            assertEquals("source_$id", exported.sourceKey)
++            assertTrue(exported.prefs.first { it.key == "counter" }.value is IntPreferenceValue)
++            assertEquals(
++                "synthetic-import",
++                (exported.prefs.first { it.key == "token" }.value as StringPreferenceValue).value,
++            )
++            assertFalse(creator.createSource(false).flatMap { it.prefs }.any { it.key == "token" })
++            assertEquals("stay outside", legacy.getString("not_declared", null))
++        }
++
++    @Test
++    fun wrongTypesUnknownKeysAndChangedFilterOptionsFailWithoutApplyingWrongState() =
++        runBlocking<Unit> {
++            val source = proxy()
++            val schema = source.preferenceSchema()
++            val before = source.getSourcePreferences().all
++            assertTrue(
++                runCatching {
++                        source.changePreferences(
++                            schema.getValue("schema").jsonPrimitive.content,
++                            SandboxPreferenceValues.encode(mapOf("enabled" to "true")),
++                        )
++                    }
++                    .isFailure
++            )
++            assertTrue(
++                runCatching {
++                        source.changePreferences(
++                            schema.getValue("schema").jsonPrimitive.content,
++                            SandboxPreferenceValues.encode(mapOf("host_setting" to true)),
++                        )
++                    }
++                    .isFailure
++            )
++            assertEquals(before, source.getSourcePreferences().all)
++            val oldFilters = source.getFilterList()
++            assertTrue(change(source, mapOf("mode" to "expanded")))
++            assertTrue(runCatching { source.getSearchManga(1, "x", oldFilters) }.isFailure)
++            assertEquals(3, (source.getFilterList().single() as Filter.Select<*>).values.size)
++            val login = node(source.preferenceSchema(), "login")
++            assertFalse(login.getValue("enabled").jsonPrimitive.boolean)
++        }
++
++    @Test
++    fun concurrentRequestsReadFreshSettingsAfterThePreviousWorkerCommits() =
++        runBlocking<Unit> {
++            val source = proxy()
++            val schema = source.preferenceSchema().getValue("schema").jsonPrimitive.content
++            listOf(
++                    async(Dispatchers.Default) {
++                        source.changePreferences(
++                            schema,
++                            SandboxPreferenceValues.encode(mapOf("token" to "parallel")),
++                        )
++                    },
++                    async(Dispatchers.Default) {
++                        source.changePreferences(
++                            schema,
++                            SandboxPreferenceValues.encode(mapOf("mode" to "expanded")),
++                        )
++                    },
++                )
++                .awaitAll()
++                .forEach { assertTrue(it) }
++            assertEquals("parallel", source.getSourcePreferences().getString("token", null))
++            assertEquals("expanded", source.getSourcePreferences().getString("mode", null))
++        }
++
++    @Test
++    fun restoreCannotWriteTheHostOrSandboxNamespaceButNativeSourceKeysStillWork() =
++        runBlocking<Unit> {
++            // The component runner uses a plain Application; wire the normal host dependency
++            // explicitly for the production legacy preference helper used by the restorer.
++            dev.mihon.injekt.patchInjekt()
++            Injekt.addSingleton<Application>(context.applicationContext as Application)
++            val name = "polaris_sandbox_restore_canary_${UUID.randomUUID()}"
++            val prefs = context.getSharedPreferences(name, 0)
++            prefs.edit().putString("value", "host-canary").commit()
++            val restorer =
++                PreferenceRestorer(
++                    context,
++                    GetCategories(Categories()),
++                    AndroidPreferenceStore(context, prefs),
++                )
++            restorer.restoreSource(
++                listOf(
++                    BackupSourcePreferences(
++                        name,
++                        listOf(BackupPreference("value", StringPreferenceValue("malicious"))),
++                    )
++                )
++            )
++            assertEquals("host-canary", prefs.getString("value", null))
++            restorer.restoreSource(
++                listOf(
++                    BackupSourcePreferences(
++                        "source_$id",
++                        listOf(BackupPreference("restored", IntPreferenceValue(23))),
++                    )
++                )
++            )
++            assertEquals(23, context.getSharedPreferences("source_$id", 0).getInt("restored", 0))
++            context.deleteSharedPreferences(name)
++        }
++
++    @Test
++    fun settingsUiUsesStockWidgetsAndPerformsChangesAsynchronously() =
++        runBlocking<Unit> {
++            val source = proxy()
++            SandboxSettingsTestActivity.fixtureSource = source
++            ActivityScenario.launch(SandboxSettingsTestActivity::class.java).use { scenario ->
++                fun ready(checked: Boolean): Boolean {
++                    val found = java.util.concurrent.atomic.AtomicBoolean(false)
++                    scenario.onActivity { activity ->
++                        val owner =
++                            activity.supportFragmentManager.fragments
++                                .filterIsInstance<PreferenceFragmentCompat>()
++                                .singleOrNull()
++                        val control =
++                            owner
++                                ?.listView
++                                ?.findViewById<android.widget.CompoundButton>(
++                                    androidx.preference.R.id.switchWidget
++                                )
++                        found.set(
++                            control != null &&
++                                control.isShown &&
++                                control.isEnabled &&
++                                control.width > 0 &&
++                                control.height > 0 &&
++                                control.isChecked == checked
++                        )
++                    }
++                    return found.get()
++                }
++                fun awaitState(checked: Boolean) {
++                    val deadline = System.currentTimeMillis() + 60000
++                    while (!ready(checked) && System.currentTimeMillis() < deadline) Thread.sleep(
++                        100
++                    )
++                    assertTrue(
++                        "The actual switch must be visible and show the stored state",
++                        ready(checked),
++                    )
++                }
++                fun capture(name: String) {
++                    instrumentation.waitForIdleSync()
++                    val image = requireNotNull(instrumentation.uiAutomation.takeScreenshot())
++                    try {
++                        val folder =
++                            File(
++                                    context.getExternalFilesDir(null),
++                                    "polaris-sandbox-settings-preview",
++                                )
++                                .apply { mkdirs() }
++                        File(folder, name).outputStream().use {
++                            assertTrue(
++                                image.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, it)
++                            )
++                        }
++                    } finally {
++                        image.recycle()
++                    }
++                }
++                awaitState(true)
++                capture("isolated-settings.png")
++                val point = IntArray(2)
++                scenario.onActivity { activity ->
++                    val owner =
++                        activity.supportFragmentManager.fragments
++                            .filterIsInstance<PreferenceFragmentCompat>()
++                            .single()
++                    val control =
++                        requireNotNull(
++                            owner.listView.findViewById<android.widget.CompoundButton>(
++                                androidx.preference.R.id.switchWidget
++                            )
++                        )
++                    control.getLocationOnScreen(point)
++                    point[0] += control.width / 2
++                    point[1] += control.height / 2
++                }
++                val downTime = android.os.SystemClock.uptimeMillis()
++                fun touch(action: Int) {
++                    val event =
++                        android.view.MotionEvent.obtain(
++                            downTime,
++                            android.os.SystemClock.uptimeMillis(),
++                            action,
++                            point[0].toFloat(),
++                            point[1].toFloat(),
++                            0,
++                        )
++                    event.source = android.view.InputDevice.SOURCE_TOUCHSCREEN
++                    try {
++                        instrumentation.sendPointerSync(event)
++                    } finally {
++                        event.recycle()
++                    }
++                }
++                touch(android.view.MotionEvent.ACTION_DOWN)
++                android.os.SystemClock.sleep(50)
++                touch(android.view.MotionEvent.ACTION_UP)
++                awaitState(false)
++                assertFalse(source.getSourcePreferences().getBoolean("enabled", true))
++                capture("isolated-settings-disabled.png")
++            }
++        }
++
++    private class Manager(private val all: List<Source>) : SourceManager {
++        override val isInitialized = MutableStateFlow(true)
++        override val sources = MutableStateFlow(all)
++
++        override fun get(sourceKey: Long) = all.firstOrNull { it.id == sourceKey }
++
++        override fun getOrStub(sourceKey: Long): Source =
++            get(sourceKey) ?: StubSource(sourceKey, "en", "Missing")
++
++        override fun getAll() = all
++
++        override fun getOnlineSources() = all.filterIsInstance<HttpSource>()
++
++        override fun getStubSources() = emptyList<StubSource>()
++    }
++
++    private class Categories : CategoryRepository {
++        override suspend fun get(id: Long): Category? = null
++
++        override suspend fun getAll() = emptyList<Category>()
++
++        override fun getAllAsFlow() = flowOf(emptyList<Category>())
++
++        override suspend fun getCategoriesByMangaId(mangaId: Long) = emptyList<Category>()
++
++        override fun getCategoriesByMangaIdAsFlow(mangaId: Long) = flowOf(emptyList<Category>())
++
++        override suspend fun insert(category: Category) = Unit
++
++        override suspend fun updateName(categoryId: Long, name: String) = Unit
++
++        override suspend fun updateFlags(categoryId: Long, flags: Long) = Unit
++
++        override suspend fun updateAllFlags(flags: Long?) = Unit
++
++        override suspend fun updateAllOrders(orderedIds: List<Long>) = Unit
++
++        override suspend fun delete(categoryId: Long) = Unit
 +    }
 +}
 diff --git a/app/src/androidTest/java/eu/kanade/tachiyomi/polaris/LauncherIconAndroidTest.kt b/app/src/androidTest/java/eu/kanade/tachiyomi/polaris/LauncherIconAndroidTest.kt
@@ -2030,12 +2642,13 @@ index 0000000..6b8d94e
 +    }
 +}
 diff --git a/app/src/debug/AndroidManifest.xml b/app/src/debug/AndroidManifest.xml
-index aac6140..b537d12 100644
+index aac6140..573a795 100644
 --- a/app/src/debug/AndroidManifest.xml
 +++ b/app/src/debug/AndroidManifest.xml
-@@ -1,5 +1,15 @@
+@@ -1,5 +1,16 @@
  <manifest xmlns:android="http://schemas.android.com/apk/res/android">
      <application>
++        <activity android:name="eu.kanade.tachiyomi.polaris.SandboxSettingsTestActivity" android:exported="false" android:theme="@style/Theme.Tachiyomi" />
 +        <activity android:name="eu.kanade.tachiyomi.polaris.PolarisPersonalizationTestActivity"
 +            android:exported="false" android:theme="@android:style/Theme.Material.NoActionBar" />
 +        <activity
@@ -2049,7 +2662,7 @@ index aac6140..b537d12 100644
          <activity
              android:name="eu.kanade.translation.detection.DbnetCleanupMaskTestActivity"
              android:exported="false"
-@@ -7,5 +17,7 @@
+@@ -7,5 +18,7 @@
          <service android:name="eu.kanade.translation.detection.DbnetCrashTestService"
              android:exported="false" android:process=":dbnet" />
          <activity android:name="eu.kanade.tachiyomi.polaris.Spike001DebugActivity" android:exported="true" android:permission="android.permission.DUMP" android:theme="@android:style/Theme.Material.Light.NoActionBar" />
@@ -2275,6 +2888,74 @@ index 0000000..2b75244
 +                hasSearched = true,
 +                workResults = WorkSearchGrouping.group(hits, listOf(saved), listOf(identity)),
 +            )
++        }
++    }
++}
+diff --git a/app/src/debug/java/eu/kanade/tachiyomi/polaris/SandboxSettingsTestActivity.kt b/app/src/debug/java/eu/kanade/tachiyomi/polaris/SandboxSettingsTestActivity.kt
+new file mode 100644
+index 0000000..9587928
+--- /dev/null
++++ b/app/src/debug/java/eu/kanade/tachiyomi/polaris/SandboxSettingsTestActivity.kt
+@@ -0,0 +1,62 @@
++package eu.kanade.tachiyomi.polaris
++
++import android.content.Context
++import android.content.res.Configuration
++import android.os.Bundle
++import android.view.View
++import android.widget.FrameLayout
++import androidx.fragment.app.FragmentActivity
++import androidx.preference.PreferenceFragmentCompat
++import eu.kanade.tachiyomi.R
++import eu.kanade.tachiyomi.extension.sandbox.IsolatedHttpSource
++import eu.kanade.tachiyomi.extension.sandbox.SandboxPreferenceUi
++import java.util.Locale
++
++/** Non-exported component fixture; only trusted host proxies and synthetic settings are used. */
++class SandboxSettingsTestActivity : FragmentActivity() {
++    companion object {
++        internal var fixtureSource: IsolatedHttpSource? = null
++    }
++
++    override fun attachBaseContext(base: Context) {
++        super.attachBaseContext(
++            base.createConfigurationContext(
++                Configuration(base.resources.configuration).apply { setLocale(Locale("pt", "BR")) }
++            )
++        )
++    }
++
++    override fun onCreate(state: Bundle?) {
++        setTheme(R.style.Theme_Tachiyomi)
++        super.onCreate(state)
++        val frame = FrameLayout(this).apply { id = View.generateViewId() }
++        setContentView(frame)
++        if (state == null)
++            supportFragmentManager
++                .beginTransaction()
++                .replace(frame.id, SettingsFragment())
++                .commitNow()
++    }
++
++    class SettingsFragment : PreferenceFragmentCompat() {
++        private var controller: SandboxPreferenceUi? = null
++
++        // Match SourcePreferencesFragment: force the preference overlay instead of using
++        // the activity's MaterialSwitch view style as a SwitchPreferenceCompat style.
++        override fun getContext(): Context? {
++            val base = super.getContext() ?: return null
++            val theme = android.util.TypedValue()
++            base.theme.resolveAttribute(R.attr.preferenceTheme, theme, true)
++            return androidx.appcompat.view.ContextThemeWrapper(base, theme.resourceId)
++        }
++
++        override fun onCreatePreferences(state: Bundle?, root: String?) {
++            controller = SandboxPreferenceUi(this, requireNotNull(fixtureSource)).also { it.load() }
++        }
++
++        override fun onStop() {
++            controller?.onStop()
++            super.onStop()
 +        }
 +    }
 +}
@@ -3634,7 +4315,7 @@ index 0000000..8ac6f10
 +            }
 +}
 diff --git a/app/src/main/java/eu/kanade/presentation/browse/ExtensionDetailsScreen.kt b/app/src/main/java/eu/kanade/presentation/browse/ExtensionDetailsScreen.kt
-index 79352cd..d033194 100644
+index 79352cd..004775c 100644
 --- a/app/src/main/java/eu/kanade/presentation/browse/ExtensionDetailsScreen.kt
 +++ b/app/src/main/java/eu/kanade/presentation/browse/ExtensionDetailsScreen.kt
 @@ -57,6 +57,7 @@ import eu.kanade.tachiyomi.ui.browse.extension.details.ExtensionDetailsViewModel
@@ -4069,7 +4750,7 @@ index 79352cd..d033194 100644
  }
  
  @Composable
-@@ -422,15 +443,14 @@ private fun SourceSwitchPreference(
+@@ -422,16 +443,20 @@ private fun SourceSwitchPreference(
  
      TextPreferenceWidget(
          modifier = modifier,
@@ -4088,11 +4769,18 @@ index 79352cd..d033194 100644
 -            Row(
 -                verticalAlignment = Alignment.CenterVertically,
 -            ) {
+-                if (source.source is ConfigurableSource) {
 +            Row(verticalAlignment = Alignment.CenterVertically) {
-                 if (source.source is ConfigurableSource) {
++                if (
++                    source.source is ConfigurableSource &&
++                        (source.source !is
++                            eu.kanade.tachiyomi.extension.sandbox.IsolatedHttpSource ||
++                            source.source.supportsPreferences)
++                ) {
                      IconButton(onClick = { onClickSourcePreferences(source.source.id) }) {
                          Icon(
-@@ -453,13 +473,9 @@ private fun SourceSwitchPreference(
+                             imageVector = Icons.Outlined.Settings,
+@@ -453,13 +478,9 @@ private fun SourceSwitchPreference(
  }
  
  @Composable
@@ -4625,6 +5313,111 @@ index 0000000..d721f6b
 +        }
 +    }
 +}
+diff --git a/app/src/main/java/eu/kanade/presentation/browse/components/BrowseSourceToolbar.kt b/app/src/main/java/eu/kanade/presentation/browse/components/BrowseSourceToolbar.kt
+index 44de96e..53abb26 100644
+--- a/app/src/main/java/eu/kanade/presentation/browse/components/BrowseSourceToolbar.kt
++++ b/app/src/main/java/eu/kanade/presentation/browse/components/BrowseSourceToolbar.kt
+@@ -40,7 +40,10 @@ fun BrowseSourceToolbar(
+     // Avoid capturing unstable source in actions lambda
+     val title = source?.name
+     val isLocalSource = source is LocalSource
+-    val isConfigurableSource = source is ConfigurableSource
++    val isConfigurableSource =
++        source is ConfigurableSource &&
++            (source !is eu.kanade.tachiyomi.extension.sandbox.IsolatedHttpSource ||
++                source.supportsPreferences)
+ 
+     var selectingDisplayMode by remember { mutableStateOf(false) }
+ 
+@@ -53,42 +56,44 @@ fun BrowseSourceToolbar(
+         onClickCloseSearch = navigateUp,
+         actions = {
+             AppBarActions(
+-                actions = buildList {
+-                    add(
+-                        AppBar.Action(
+-                            title = stringResource(MR.strings.action_display_mode),
+-                            icon = if (displayMode == LibraryDisplayMode.List) {
+-                                Icons.AutoMirrored.Filled.ViewList
+-                            } else {
+-                                Icons.Filled.ViewModule
+-                            },
+-                            onClick = { selectingDisplayMode = true },
+-                        ),
+-                    )
+-                    if (isLocalSource) {
++                actions =
++                    buildList {
+                         add(
+-                            AppBar.OverflowAction(
+-                                title = stringResource(MR.strings.label_help),
+-                                onClick = onHelpClick,
+-                            ),
+-                        )
+-                    } else {
+-                        add(
+-                            AppBar.OverflowAction(
+-                                title = stringResource(MR.strings.action_open_in_web_view),
+-                                onClick = onWebViewClick,
+-                            ),
+-                        )
+-                    }
+-                    if (isConfigurableSource) {
+-                        add(
+-                            AppBar.OverflowAction(
+-                                title = stringResource(MR.strings.action_settings),
+-                                onClick = onSettingsClick,
+-                            ),
++                            AppBar.Action(
++                                title = stringResource(MR.strings.action_display_mode),
++                                icon =
++                                    if (displayMode == LibraryDisplayMode.List) {
++                                        Icons.AutoMirrored.Filled.ViewList
++                                    } else {
++                                        Icons.Filled.ViewModule
++                                    },
++                                onClick = { selectingDisplayMode = true },
++                            )
+                         )
++                        if (isLocalSource) {
++                            add(
++                                AppBar.OverflowAction(
++                                    title = stringResource(MR.strings.label_help),
++                                    onClick = onHelpClick,
++                                )
++                            )
++                        } else {
++                            add(
++                                AppBar.OverflowAction(
++                                    title = stringResource(MR.strings.action_open_in_web_view),
++                                    onClick = onWebViewClick,
++                                )
++                            )
++                        }
++                        if (isConfigurableSource) {
++                            add(
++                                AppBar.OverflowAction(
++                                    title = stringResource(MR.strings.action_settings),
++                                    onClick = onSettingsClick,
++                                )
++                            )
++                        }
+                     }
+-                },
+             )
+ 
+             DropdownMenu(
+@@ -96,7 +101,9 @@ fun BrowseSourceToolbar(
+                 onDismissRequest = { selectingDisplayMode = false },
+             ) {
+                 RadioMenuItem(
+-                    text = { Text(text = stringResource(MR.strings.action_display_comfortable_grid)) },
++                    text = {
++                        Text(text = stringResource(MR.strings.action_display_comfortable_grid))
++                    },
+                     isChecked = displayMode == LibraryDisplayMode.ComfortableGrid,
+                 ) {
+                     selectingDisplayMode = false
 diff --git a/app/src/main/java/eu/kanade/presentation/browse/components/GlobalSearchToolbar.kt b/app/src/main/java/eu/kanade/presentation/browse/components/GlobalSearchToolbar.kt
 index dd67afb..d78cab1 100644
 --- a/app/src/main/java/eu/kanade/presentation/browse/components/GlobalSearchToolbar.kt
@@ -8464,7 +9257,7 @@ index a198c3f..9a3e84f 100644
                      preference = translationPreferences.translationEngineTemperature(),
                      title = stringResource(ATMR.strings.pref_engine_temperature),
 diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
-index 7f411fd..645e43f 100644
+index 7f411fd..396f5db 100644
 --- a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
 +++ b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
 @@ -1,15 +1,18 @@
@@ -8529,7 +9322,7 @@ index 7f411fd..645e43f 100644
  
      // Identifies this overlay independently of the pinned upstream COMMIT_SHA.
 -    private const val POLARIS_READER_REVISION = "P20261031.2"
-+    private const val POLARIS_READER_REVISION = "P20261110.2"
++    private const val POLARIS_READER_REVISION = "P20261110.3"
  
      @Composable
      override fun Content() {
@@ -11319,6 +12112,68 @@ index 76a82fb..bcff81c 100644
          memo = MemoColumnAdapter.encode(this.memo),
 +        nextUpdate = this.nextUpdate,
      )
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/data/backup/create/creators/PreferenceBackupCreator.kt b/app/src/main/java/eu/kanade/tachiyomi/data/backup/create/creators/PreferenceBackupCreator.kt
+index e77a32f..daacf11 100644
+--- a/app/src/main/java/eu/kanade/tachiyomi/data/backup/create/creators/PreferenceBackupCreator.kt
++++ b/app/src/main/java/eu/kanade/tachiyomi/data/backup/create/creators/PreferenceBackupCreator.kt
+@@ -23,17 +23,30 @@ class PreferenceBackupCreator(
+ ) {
+ 
+     fun createApp(includePrivatePreferences: Boolean): List<BackupPreference> {
+-        return preferenceStore.getAll().toBackupPreferences()
++        return preferenceStore
++            .getAll()
++            .toBackupPreferences()
+             .withPrivatePreferences(includePrivatePreferences)
+     }
+ 
+     fun createSource(includePrivatePreferences: Boolean): List<BackupSourcePreferences> {
+-        return sourceManager.getAll()
++        return sourceManager
++            .getAll()
+             .filterIsInstance<ConfigurableSource>()
+             .map {
+                 BackupSourcePreferences(
+                     it.preferenceKey(),
+-                    it.sourcePreferences().all.toBackupPreferences()
++                    (if (it is eu.kanade.tachiyomi.extension.sandbox.IsolatedHttpSource)
++                            it.getSourcePreferences()
++                        else it.sourcePreferences())
++                        .all
++                        .filterKeys { key ->
++                            includePrivatePreferences ||
++                                it !is eu.kanade.tachiyomi.extension.sandbox.IsolatedHttpSource ||
++                                !eu.kanade.tachiyomi.extension.sandbox.SandboxPreferenceValues
++                                    .sensitive(key)
++                        }
++                        .toBackupPreferences()
+                         .withPrivatePreferences(includePrivatePreferences),
+                 )
+             }
+@@ -42,8 +55,7 @@ class PreferenceBackupCreator(
+ 
+     @Suppress("UNCHECKED_CAST")
+     private fun Map<String, *>.toBackupPreferences(): List<BackupPreference> {
+-        return this
+-            .filterKeys { !Preference.isAppState(it) }
++        return this.filterKeys { !Preference.isAppState(it) }
+             .mapNotNull { (key, value) ->
+                 when (value) {
+                     is Int -> BackupPreference(key, IntPreferenceValue(value))
+@@ -51,9 +63,10 @@ class PreferenceBackupCreator(
+                     is Float -> BackupPreference(key, FloatPreferenceValue(value))
+                     is String -> BackupPreference(key, StringPreferenceValue(value))
+                     is Boolean -> BackupPreference(key, BooleanPreferenceValue(value))
+-                    is Set<*> -> (value as? Set<String>)?.let {
+-                        BackupPreference(key, StringSetPreferenceValue(it))
+-                    }
++                    is Set<*> ->
++                        (value as? Set<String>)?.let {
++                            BackupPreference(key, StringSetPreferenceValue(it))
++                        }
+                     else -> null
+                 }
+             }
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/data/backup/create/creators/SourcesBackupCreator.kt b/app/src/main/java/eu/kanade/tachiyomi/data/backup/create/creators/SourcesBackupCreator.kt
 index d3bc573..d558b57 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/data/backup/create/creators/SourcesBackupCreator.kt
@@ -12509,7 +13364,7 @@ index 5257fde..74016d7 100644
          if (toInsert.isEmpty()) return
          toInsert.forEach { database.excluded_scanlatorsQueries.insert(manga.id, it) }
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/data/backup/restore/restorers/PreferenceRestorer.kt b/app/src/main/java/eu/kanade/tachiyomi/data/backup/restore/restorers/PreferenceRestorer.kt
-index 0417a69..12d719c 100644
+index 0417a69..27bb94e 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/data/backup/restore/restorers/PreferenceRestorer.kt
 +++ b/app/src/main/java/eu/kanade/tachiyomi/data/backup/restore/restorers/PreferenceRestorer.kt
 @@ -15,6 +15,7 @@ import eu.kanade.tachiyomi.data.backup.models.StringSetPreferenceValue
@@ -12533,7 +13388,16 @@ index 0417a69..12d719c 100644
  
          LibraryUpdateJob.setupTask(context)
          BackupCreateJob.setupTask(context)
-@@ -50,7 +47,7 @@ class PreferenceRestorer(
+@@ -45,12 +42,16 @@ class PreferenceRestorer(
+ 
+     suspend fun restoreSource(preferences: List<BackupSourcePreferences>) {
+         preferences.forEach {
++            if (!SourcePreferenceNamespace.valid(it.sourceKey)) {
++                Log.w("PreferenceRestorer", "Ignored non-native source preference namespace")
++                return@forEach
++            }
+             val sourcePrefs = AndroidPreferenceStore(context, sourcePreferences(it.sourceKey))
+             restorePreferences(it.prefs, sourcePrefs)
          }
      }
  
@@ -12542,7 +13406,7 @@ index 0417a69..12d719c 100644
          toRestore: List<BackupPreference>,
          preferenceStore: PreferenceStore,
          backupCategories: List<BackupCategory>? = null,
-@@ -60,16 +57,22 @@ class PreferenceRestorer(
+@@ -60,16 +61,22 @@ class PreferenceRestorer(
          val backupCategoriesById = backupCategories?.associateBy { it.id.toString() }.orEmpty()
          val prefs = preferenceStore.getAll()
          toRestore.forEach { (key, value) ->
@@ -12571,7 +13435,7 @@ index 0417a69..12d719c 100644
  
                              newValue?.let { preferenceStore.getInt(key).set(it) }
                          }
-@@ -96,13 +99,14 @@ class PreferenceRestorer(
+@@ -96,13 +103,14 @@ class PreferenceRestorer(
                      }
                      is StringSetPreferenceValue -> {
                          if (prefs[key] is Set<*>?) {
@@ -12593,7 +13457,7 @@ index 0417a69..12d719c 100644
                              if (!restored) preferenceStore.getStringSet(key).set(value.value)
                          }
                      }
-@@ -120,14 +124,16 @@ class PreferenceRestorer(
+@@ -120,14 +128,16 @@ class PreferenceRestorer(
          backupCategoriesById: Map<String, BackupCategory>,
          categoriesByName: Map<String, Category>,
      ): Boolean {
@@ -12615,6 +13479,24 @@ index 0417a69..12d719c 100644
  
          if (ids.isNotEmpty()) {
              preferenceStore.getStringSet(key) += ids
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/data/backup/restore/restorers/SourcePreferenceNamespace.kt b/app/src/main/java/eu/kanade/tachiyomi/data/backup/restore/restorers/SourcePreferenceNamespace.kt
+new file mode 100644
+index 0000000..4eae5ab
+--- /dev/null
++++ b/app/src/main/java/eu/kanade/tachiyomi/data/backup/restore/restorers/SourcePreferenceNamespace.kt
+@@ -0,0 +1,12 @@
++package eu.kanade.tachiyomi.data.backup.restore.restorers
++
++/**
++ * Native source preference keys only; a backup cannot select a host settings file or sandbox scope.
++ */
++internal object SourcePreferenceNamespace {
++    fun valid(key: String): Boolean {
++        if (!key.startsWith("source_")) return false
++        val id = key.removePrefix("source_").toLongOrNull() ?: return false
++        return key == "source_$id"
++    }
++}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/data/coil/MangaCoverFetcher.kt b/app/src/main/java/eu/kanade/tachiyomi/data/coil/MangaCoverFetcher.kt
 index 8ccd6d4..6ae8d0f 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/data/coil/MangaCoverFetcher.kt
@@ -20353,10 +21235,10 @@ index 0000000..e998eaf
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/ExtensionSandboxProtocol.kt b/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/ExtensionSandboxProtocol.kt
 new file mode 100644
-index 0000000..2e5e2dd
+index 0000000..1c2ab92
 --- /dev/null
 +++ b/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/ExtensionSandboxProtocol.kt
-@@ -0,0 +1,86 @@
+@@ -0,0 +1,97 @@
 +package eu.kanade.tachiyomi.extension.sandbox
 +
 +import android.os.ParcelFileDescriptor
@@ -20374,7 +21256,18 @@ index 0000000..2e5e2dd
 +    const val MAX_INPUT = 256 * 1024
 +    const val MAX_OUTPUT = 4 * 1024 * 1024
 +    val operations =
-+        setOf("popular", "latest", "search", "update", "pages", "imageUrl", "imageRequest")
++        setOf(
++            "popular",
++            "latest",
++            "search",
++            "update",
++            "pages",
++            "imageUrl",
++            "imageRequest",
++            "preferences",
++            "preferenceChange",
++            "preferenceImport",
++        )
 +
 +    fun readBounded(stream: InputStream, limit: Int): ByteArray {
 +        val out = ByteArrayOutputStream(minOf(limit, 8192))
@@ -20445,12 +21338,13 @@ index 0000000..2e5e2dd
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/ExtensionSandboxService.kt b/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/ExtensionSandboxService.kt
 new file mode 100644
-index 0000000..c248d8e
+index 0000000..b9a1d56
 --- /dev/null
 +++ b/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/ExtensionSandboxService.kt
-@@ -0,0 +1,281 @@
+@@ -0,0 +1,337 @@
 +package eu.kanade.tachiyomi.extension.sandbox
 +
++import android.app.Application
 +import android.app.Service
 +import android.content.Intent
 +import android.os.*
@@ -20475,6 +21369,8 @@ index 0000000..c248d8e
 +internal class ExtensionSandboxService : Service() {
 +    private var opened = false
 +    private var sources = emptyList<HttpSource>()
++    private lateinit var workerApplication: SandboxWorkerApplication
++    private var knownPreferenceIds = emptySet<Long>()
 +    private val serial = java.util.concurrent.Semaphore(1)
 +    private val watchdog = Executors.newSingleThreadScheduledExecutor()
 +
@@ -20524,7 +21420,15 @@ index 0000000..c248d8e
 +                                }
 +                            else -> error("Unsupported sandbox command")
 +                        }
-+                    val bytes = result.toString().toByteArray()
++                    val output =
++                        if (::workerApplication.isInitialized)
++                            JsonObject(
++                                result +
++                                    ("preferenceChanges" to
++                                        workerApplication.snapshot(knownPreferenceIds))
++                            )
++                        else result
++                    val bytes = output.toString().toByteArray()
 +                    val stream = ExtensionSandboxProtocol.pipe(bytes)
 +                    reply.writeNoException()
 +                    reply.writeTypedObject(stream, Parcelable.PARCELABLE_WRITE_RETURN_VALUE)
@@ -20556,6 +21460,12 @@ index 0000000..c248d8e
 +        val entries = data.createStringArray()?.toList() ?: error("Missing entry classes")
 +        require(entries.size in 1..64 && entries.all { it.length in 1..300 })
 +        val broker = data.readStrongBinder() ?: error("Missing HTTP capability")
++        val preferences =
++            ExtensionSandboxProtocol.input(
++                data.createByteArray() ?: error("Missing preference snapshot")
++            )
++        knownPreferenceIds = preferences.keys.map { it.removePrefix("source_").toLong() }.toSet()
++        workerApplication = SandboxWorkerApplication(this, preferences)
 +        val bytes =
 +            ParcelFileDescriptor.AutoCloseInputStream(file).use {
 +                ExtensionSandboxProtocol.readBounded(it, 32 * 1024 * 1024)
@@ -20591,6 +21501,7 @@ index 0000000..c248d8e
 +            else InMemoryDexClassLoader(dex.single(), classLoader)
 +        dev.mihon.injekt.patchInjekt()
 +        Injekt.addSingleton(NetworkHelper.isolated(SandboxHttpBroker.client(broker)))
++        Injekt.addSingleton<Application>(workerApplication)
 +        val found: List<Source> =
 +            entries.flatMap { name ->
 +                when (
@@ -20609,7 +21520,9 @@ index 0000000..c248d8e
 +            "Only HTTP comic sources are supported by this runner"
 +        }
 +        sources = found.filterIsInstance<HttpSource>()
-+        require(sources.map { it.id }.distinct().size == sources.size)
++        require(sources.map { it.id }.distinct().size == sources.size && sources.all { it.id > 0 })
++        knownPreferenceIds = knownPreferenceIds + sources.map { it.id }
++        require(knownPreferenceIds.size <= 256)
 +        return buildJsonObject {
 +            put("uid", android.os.Process.myUid())
 +            putJsonArray("sources") {
@@ -20621,7 +21534,11 @@ index 0000000..c248d8e
 +                            put("lang", source.lang.take(20))
 +                            put("url", source.baseUrl.take(8192))
 +                            put("latest", source.supportsLatest)
-+                            put("preferencesSupported", false)
++                            put(
++                                "preferencesSupported",
++                                source is eu.kanade.tachiyomi.source.ConfigurableSource,
++                            )
++                            put("filters", SandboxFilterCodec.schema(source.getFilterList()))
 +                        }
 +                    )
 +                }
@@ -20647,13 +21564,45 @@ index 0000000..c248d8e
 +                            source.getSearchManga(
 +                                page,
 +                                input["query"]?.jsonPrimitive?.content.orEmpty().take(1000),
-+                                source.getFilterList(),
++                                source.getFilterList().also { filters ->
++                                    (input["filters"] as? JsonObject)?.let {
++                                        SandboxFilterCodec.apply(filters, it)
++                                    }
++                                },
 +                            )
 +                    }
 +                require(result.mangas.size <= 500)
 +                buildJsonObject {
 +                    put("next", result.hasNextPage)
 +                    put("mangas", JsonArray(result.mangas.map(SandboxSourceCodec::manga)))
++                }
++            }
++            "preferences" ->
++                SandboxPreferenceCodec.schema(
++                    SandboxPreferenceCodec.screen(source, workerApplication)
++                )
++            "preferenceImport" -> {
++                val screen = SandboxPreferenceCodec.screen(source, workerApplication)
++                val accepted =
++                    SandboxPreferenceCodec.importValues(
++                        screen,
++                        input.getValue("schema").jsonPrimitive.content,
++                        input.getValue("changes").jsonObject,
++                    )
++                buildJsonObject { put("accepted", accepted) }
++            }
++            "preferenceChange" -> {
++                val before = workerApplication.snapshot(knownPreferenceIds)
++                val screen = SandboxPreferenceCodec.screen(source, workerApplication)
++                val accepted =
++                    SandboxPreferenceCodec.change(
++                        screen,
++                        input.getValue("schema").jsonPrimitive.content,
++                        input.getValue("changes").jsonObject,
++                    )
++                buildJsonObject {
++                    put("accepted", accepted)
++                    put("changed", before != workerApplication.snapshot(knownPreferenceIds))
 +                }
 +            }
 +            "update" -> {
@@ -20732,10 +21681,10 @@ index 0000000..c248d8e
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/ExtensionSandboxSession.kt b/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/ExtensionSandboxSession.kt
 new file mode 100644
-index 0000000..12c5069
+index 0000000..ada604f
 --- /dev/null
 +++ b/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/ExtensionSandboxSession.kt
-@@ -0,0 +1,291 @@
+@@ -0,0 +1,295 @@
 +package eu.kanade.tachiyomi.extension.sandbox
 +
 +import android.content.ComponentName
@@ -20852,6 +21801,7 @@ index 0000000..12c5069
 +            entryClasses: List<String>,
 +            onViolation: (String) -> Unit = {},
 +            callTimeoutMillis: Long = 30_000L,
++            preferenceSnapshot: () -> JsonObject = { JsonObject(emptyMap()) },
 +            action: suspend (ExtensionSandboxSession) -> T,
 +        ): T =
 +            lock.withLock {
@@ -20922,6 +21872,9 @@ index 0000000..12c5069
 +                                it.writeString(digest)
 +                                it.writeStringArray(entryClasses.toTypedArray())
 +                                it.writeStrongBinder(activeBroker)
++                                val preferences = preferenceSnapshot().toString().toByteArray()
++                                require(preferences.size <= ExtensionSandboxProtocol.MAX_INPUT)
++                                it.writeByteArray(preferences)
 +                            }
 +                        }
 +                    check(metadata.getValue("uid").jsonPrimitive.int == uid)
@@ -21029,13 +21982,14 @@ index 0000000..12c5069
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/IsolatedHttpSource.kt b/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/IsolatedHttpSource.kt
 new file mode 100644
-index 0000000..8dc861e
+index 0000000..9adeb07
 --- /dev/null
 +++ b/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/IsolatedHttpSource.kt
-@@ -0,0 +1,180 @@
+@@ -0,0 +1,297 @@
 +package eu.kanade.tachiyomi.extension.sandbox
 +
 +import android.content.Context
++import eu.kanade.tachiyomi.source.ConfigurableSource
 +import eu.kanade.tachiyomi.source.model.*
 +import eu.kanade.tachiyomi.source.online.HttpSource
 +import java.io.File
@@ -21050,12 +22004,75 @@ index 0000000..8dc861e
 + * Host proxy containing only DTOs. Extension classes/constructors exist exclusively in the worker.
 + */
 +internal class IsolatedHttpSource
-+private constructor(private val runtime: Runtime, metadata: JsonObject) : HttpSource() {
++private constructor(private val runtime: Runtime, metadata: JsonObject) :
++    HttpSource(), ConfigurableSource {
 +    override val id = metadata.getValue("id").jsonPrimitive.long
 +    override val name = metadata.getValue("name").jsonPrimitive.content
 +    override val lang = metadata.getValue("lang").jsonPrimitive.content
 +    override val baseUrl = metadata.getValue("url").jsonPrimitive.content
 +    override val supportsLatest = metadata.getValue("latest").jsonPrimitive.boolean
++    val supportsPreferences = metadata["preferencesSupported"]?.jsonPrimitive?.boolean == true
++    val owningPackageName: String?
++        get() = runtime.packageName
++
++    override fun getSourcePreferences() = runtime.preferences.preferences(id)
++
++    override fun setupPreferenceScreen(screen: androidx.preference.PreferenceScreen) {
++        error("Isolated preferences must be loaded asynchronously")
++    }
++
++    suspend fun preferenceSchema(): JsonObject = call("preferences")
++
++    suspend fun changePreferences(schema: String, changes: JsonObject): Boolean =
++        call(
++                "preferenceChange",
++                buildJsonObject {
++                    put("schema", schema)
++                    put("changes", changes)
++                },
++            )
++            .let {
++                it.getValue("accepted").jsonPrimitive.boolean ||
++                    it.getValue("changed").jsonPrimitive.boolean
++            }
++
++    fun hasLegacyPreferences(): Boolean =
++        runtime.context.getSharedPreferences("source_$id", Context.MODE_PRIVATE).all.isNotEmpty()
++
++    suspend fun importLegacyPreferences(schema: JsonObject): Boolean {
++        val keys = mutableSetOf<String>()
++        fun collect(nodes: JsonArray) {
++            nodes.forEach { node ->
++                val item = node.jsonObject
++                if (
++                    item["kind"]?.jsonPrimitive?.content in
++                        setOf("switch", "check", "list", "multi", "text")
++                )
++                    item["key"]?.jsonPrimitive?.content?.let(keys::add)
++                (item["children"] as? JsonArray)?.let(::collect)
++            }
++        }
++        collect(schema.getValue("nodes").jsonArray)
++        val selected =
++            runtime.context
++                .getSharedPreferences("source_$id", Context.MODE_PRIVATE)
++                .all
++                .filterKeys { it in keys }
++        if (selected.isEmpty()) return false
++        return call(
++                "preferenceImport",
++                buildJsonObject {
++                    put("schema", schema.getValue("schema"))
++                    put("changes", SandboxPreferenceValues.encode(selected))
++                },
++            )
++            .getValue("accepted")
++            .jsonPrimitive
++            .boolean
++    }
++
++    override fun getFilterList(): FilterList =
++        SandboxFilterCodec.host(runtime.filters[id] ?: JsonArray(emptyList()))
 +
 +    init {
 +        require(id > 0)
@@ -21082,7 +22099,7 @@ index 0000000..8dc861e
 +            call(
 +                "search",
 +                buildJsonObject {
-+                    require(filters.isEmpty()) { "Custom filters need a sandbox adapter" }
++                    SandboxFilterCodec.selection(filters)?.let { put("filters", it) }
 +                    put("page", page)
 +                    put("query", query)
 +                },
@@ -21183,11 +22200,43 @@ index 0000000..8dc861e
 +        val classes: List<String>,
 +        val onViolation: (String) -> Unit,
 +        val isQuarantined: () -> Boolean,
++        val preferences: SandboxPreferenceStore,
++        val packageName: String?,
 +    ) {
++        val filters = java.util.concurrent.ConcurrentHashMap<Long, JsonArray>()
++
++        fun remember(metadata: JsonObject) {
++            val all = metadata.getValue("sources").jsonArray
++            require(all.size in 1..256)
++            val ids = all.map { it.jsonObject.getValue("id").jsonPrimitive.long }.toSet()
++            require(ids.size == all.size && ids.all { it > 0 })
++            all.forEach { entry ->
++                val value = entry.jsonObject
++                SandboxNetworkPolicy.requireUrl(value.getValue("url").jsonPrimitive.content)
++                val schema = value.getValue("filters").jsonArray
++                SandboxFilterCodec.host(schema)
++                filters[value.getValue("id").jsonPrimitive.long] = schema
++            }
++            preferences.register(ids)
++            accept(metadata)
++        }
++
++        fun accept(result: JsonObject) {
++            (result["preferenceChanges"] as? JsonObject)?.let(preferences::accept)
++        }
++
 +        suspend fun call(source: Long, operation: String, arguments: JsonObject): JsonObject {
 +            check(!isQuarantined()) { "Extension quarantined" }
-+            return ExtensionSandboxSession.withApk(context, apk, digest, classes, onViolation) {
-+                it.request(source, operation, arguments)
++            return ExtensionSandboxSession.withApk(
++                context,
++                apk,
++                digest,
++                classes,
++                onViolation,
++                preferenceSnapshot = preferences::snapshot,
++            ) {
++                remember(it.metadata)
++                it.request(source, operation, arguments).also(::accept)
 +            }
 +        }
 +    }
@@ -21200,17 +22249,289 @@ index 0000000..8dc861e
 +            entryClasses: List<String>,
 +            onViolation: (String) -> Unit,
 +            isQuarantined: () -> Boolean,
++            preferenceIdentity: String = "unconfigured:$digest",
++            packageName: String? = null,
 +        ): List<HttpSource> {
 +            check(!isQuarantined())
++            val preferences = SandboxPreferenceStore(context, preferenceIdentity)
++            val runtime =
++                Runtime(
++                    context,
++                    apk,
++                    digest,
++                    entryClasses,
++                    onViolation,
++                    isQuarantined,
++                    preferences,
++                    packageName,
++                )
 +            val metadata =
-+                ExtensionSandboxSession.withApk(context, apk, digest, entryClasses, onViolation) {
++                ExtensionSandboxSession.withApk(
++                    context,
++                    apk,
++                    digest,
++                    entryClasses,
++                    onViolation,
++                    preferenceSnapshot = preferences::snapshot,
++                ) {
++                    runtime.remember(it.metadata)
 +                    it.metadata
 +                }
-+            val runtime = Runtime(context, apk, digest, entryClasses, onViolation, isQuarantined)
 +            return metadata.getValue("sources").jsonArray.map {
 +                IsolatedHttpSource(runtime, it.jsonObject)
 +            }
 +        }
++    }
++}
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxFilterCodec.kt b/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxFilterCodec.kt
+new file mode 100644
+index 0000000..46b82ec
+--- /dev/null
++++ b/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxFilterCodec.kt
+@@ -0,0 +1,245 @@
++package eu.kanade.tachiyomi.extension.sandbox
++
++import eu.kanade.tachiyomi.source.model.Filter
++import eu.kanade.tachiyomi.source.model.FilterList
++import java.security.MessageDigest
++import kotlinx.serialization.json.*
++
++/** Only data crosses IPC; the worker applies state to its original extension-defined classes. */
++internal object SandboxFilterCodec {
++    const val MAX_NODES = 512
++    const val MAX_DEPTH = 6
++    const val MAX_TEXT = 4096
++    private const val MAX_SCHEMA_BYTES = 256 * 1024
++
++    private class TaggedList(val nodes: List<Filter<*>>, val token: String) :
++        AbstractList<Filter<*>>() {
++        override val size
++            get() = nodes.size
++
++        override fun get(index: Int) = nodes[index]
++    }
++
++    private class Budget {
++        var count = 0
++
++        fun node(depth: Int) {
++            require(depth <= MAX_DEPTH && ++count <= MAX_NODES) { "Filter tree too large" }
++        }
++    }
++
++    private fun label(value: String): String = value.also { require(it.length <= 1024) }
++
++    private fun choices(values: Array<*>): JsonArray {
++        require(values.size in 1..512)
++        return JsonArray(values.map { JsonPrimitive(label(it.toString())) })
++    }
++
++    fun schema(filters: FilterList): JsonArray {
++        val budget = Budget()
++        val result = JsonArray(filters.map { encode(it, budget, 0) })
++        require(result.toString().toByteArray().size <= MAX_SCHEMA_BYTES)
++        return result
++    }
++
++    private fun encode(filter: Filter<*>, budget: Budget, depth: Int): JsonObject {
++        budget.node(depth)
++        return buildJsonObject {
++            put("name", label(filter.name))
++            when (filter) {
++                is Filter.Header -> put("kind", "header")
++                is Filter.Separator -> put("kind", "separator")
++                is Filter.Text -> {
++                    require(filter.state.length <= MAX_TEXT)
++                    put("kind", "text")
++                    put("state", filter.state)
++                }
++                is Filter.CheckBox -> {
++                    put("kind", "check")
++                    put("state", filter.state)
++                }
++                is Filter.TriState -> {
++                    require(filter.state in 0..2)
++                    put("kind", "tri")
++                    put("state", filter.state)
++                }
++                is Filter.Select<*> -> {
++                    require(filter.state in filter.values.indices)
++                    put("kind", "select")
++                    put("values", choices(filter.values))
++                    put("state", filter.state)
++                }
++                is Filter.Sort -> {
++                    require(filter.state == null || filter.state!!.index in filter.values.indices)
++                    put("kind", "sort")
++                    put("values", choices(filter.values))
++                    put(
++                        "state",
++                        filter.state?.let {
++                            buildJsonObject {
++                                put("index", it.index)
++                                put("ascending", it.ascending)
++                            }
++                        } ?: JsonNull,
++                    )
++                }
++                is Filter.Group<*> -> {
++                    put("kind", "group")
++                    put(
++                        "children",
++                        JsonArray(
++                            filter.state.map {
++                                encode(
++                                    it as? Filter<*> ?: error("Unsupported filter member"),
++                                    budget,
++                                    depth + 1,
++                                )
++                            }
++                        ),
++                    )
++                }
++            }
++        }
++    }
++
++    fun token(schema: JsonArray): String =
++        MessageDigest.getInstance("SHA-256").digest(schema.toString().toByteArray()).joinToString(
++            ""
++        ) {
++            "%02x".format(it)
++        }
++
++    fun host(schema: JsonArray): FilterList {
++        require(schema.toString().toByteArray().size <= MAX_SCHEMA_BYTES)
++        val budget = Budget()
++        fun decode(value: JsonElement, depth: Int): Filter<*> {
++            budget.node(depth)
++            val item = value.jsonObject
++            val name = label(item.getValue("name").jsonPrimitive.content)
++            fun values(): Array<String> =
++                item
++                    .getValue("values")
++                    .jsonArray
++                    .also { require(it.size in 1..512) }
++                    .map { label(it.jsonPrimitive.content) }
++                    .toTypedArray()
++            return when (item.getValue("kind").jsonPrimitive.content) {
++                "header" -> Filter.Header(name)
++                "separator" -> Filter.Separator(name)
++                "text" -> object : Filter.Text(name, string(item.getValue("state"))) {}
++                "check" -> object : Filter.CheckBox(name, boolean(item.getValue("state"))) {}
++                "tri" ->
++                    object :
++                        Filter.TriState(
++                            name,
++                            integer(item.getValue("state")).also { require(it in 0..2) },
++                        ) {}
++                "select" -> {
++                    val options = values()
++                    object :
++                        Filter.Select<String>(
++                            name,
++                            options,
++                            integer(item.getValue("state")).also { require(it in options.indices) },
++                        ) {}
++                }
++                "sort" -> {
++                    val options = values()
++                    object :
++                        Filter.Sort(name, options, sort(item.getValue("state"), options.size)) {}
++                }
++                "group" ->
++                    object :
++                        Filter.Group<Filter<*>>(
++                            name,
++                            item.getValue("children").jsonArray.map { decode(it, depth + 1) },
++                        ) {}
++                else -> error("Unsupported filter kind")
++            }
++        }
++        return FilterList(TaggedList(schema.map { decode(it, 0) }, token(schema)))
++    }
++
++    fun selection(filters: FilterList): JsonObject? {
++        if (filters.isEmpty()) return null
++        val tag =
++            filters.list as? TaggedList
++                ?: error("Filters did not originate from this isolated source")
++        return buildJsonObject {
++            put("schema", tag.token)
++            put("values", schema(filters))
++        }
++    }
++
++    fun apply(filters: FilterList, selected: JsonObject) {
++        val expected = selected.getValue("schema").jsonPrimitive.content
++        require(expected == token(schema(filters))) { "Filter options changed; reload filters" }
++        val values = selected.getValue("values").jsonArray
++        val budget = Budget()
++        val updates = mutableListOf<() -> Unit>()
++        fun plan(target: Filter<*>, element: JsonElement, depth: Int) {
++            budget.node(depth)
++            val value = element.jsonObject
++            val descriptor = encode(target, Budget(), 0)
++            require(value.keys == descriptor.keys)
++            require(value["kind"] == descriptor["kind"] && value["name"] == descriptor["name"])
++            if ("values" in descriptor) require(value["values"] == descriptor["values"])
++            when (target) {
++                is Filter.Header,
++                is Filter.Separator -> require(value.keys == descriptor.keys)
++                is Filter.Text -> {
++                    val state = string(value.getValue("state"))
++                    updates += { target.state = state }
++                }
++                is Filter.CheckBox -> {
++                    val state = boolean(value.getValue("state"))
++                    updates += { target.state = state }
++                }
++                is Filter.TriState -> {
++                    val state = integer(value.getValue("state"))
++                    require(state in 0..2)
++                    updates += { target.state = state }
++                }
++                is Filter.Select<*> -> {
++                    val state = integer(value.getValue("state"))
++                    require(state in target.values.indices)
++                    updates += { target.state = state }
++                }
++                is Filter.Sort -> {
++                    val state = sort(value.getValue("state"), target.values.size)
++                    updates += { target.state = state }
++                }
++                is Filter.Group<*> -> {
++                    val children = value.getValue("children").jsonArray
++                    require(children.size == target.state.size)
++                    target.state.zip(children).forEach { (child, input) ->
++                        plan(
++                            child as? Filter<*> ?: error("Unsupported filter member"),
++                            input,
++                            depth + 1,
++                        )
++                    }
++                }
++            }
++        }
++        require(values.size == filters.size)
++        filters.zip(values).forEach { (target, value) -> plan(target, value, 0) }
++        updates.forEach { it() }
++    }
++
++    private fun string(value: JsonElement) =
++        value.jsonPrimitive.also { require(it.isString && it.content.length <= MAX_TEXT) }.content
++
++    private fun integer(value: JsonElement) = value.jsonPrimitive.also { require(!it.isString) }.int
++
++    private fun boolean(value: JsonElement) =
++        value.jsonPrimitive.also { require(!it.isString) }.boolean
++
++    private fun sort(value: JsonElement, size: Int): Filter.Sort.Selection? {
++        if (value == JsonNull) return null
++        val objectValue = value.jsonObject
++        val index = integer(objectValue.getValue("index"))
++        require(index in 0 until size)
++        return Filter.Sort.Selection(index, boolean(objectValue.getValue("ascending")))
 +    }
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxHttpBroker.kt b/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxHttpBroker.kt
@@ -21680,6 +23001,791 @@ index 0000000..60652dd
 +            else -> true
 +        }
 +}
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxPreferenceCodec.kt b/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxPreferenceCodec.kt
+new file mode 100644
+index 0000000..9f67cab
+--- /dev/null
++++ b/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxPreferenceCodec.kt
+@@ -0,0 +1,298 @@
++package eu.kanade.tachiyomi.extension.sandbox
++
++import androidx.preference.*
++import eu.kanade.tachiyomi.data.preference.SharedPreferencesDataStore
++import eu.kanade.tachiyomi.source.ConfigurableSource
++import eu.kanade.tachiyomi.source.online.HttpSource
++import java.security.MessageDigest
++import kotlinx.serialization.json.*
++
++/**
++ * Extension UI/callback objects remain in the worker. The host receives stock-widget descriptors.
++ */
++internal object SandboxPreferenceCodec {
++    data class Screen(
++        val source: ConfigurableSource,
++        val root: PreferenceScreen,
++        val values: android.content.SharedPreferences,
++    )
++
++    fun screen(source: HttpSource, application: SandboxWorkerApplication): Screen {
++        val configurable = source as? ConfigurableSource ?: error("Source has no preferences")
++        val prefs =
++            application.getSharedPreferences(
++                "source_${source.id}",
++                android.content.Context.MODE_PRIVATE,
++            )
++        val themed =
++            android.view.ContextThemeWrapper(
++                application,
++                androidx.preference.R.style.PreferenceThemeOverlay,
++            )
++        val manager = PreferenceManager(themed)
++        manager.preferenceDataStore = SharedPreferencesDataStore(prefs)
++        val root = manager.createPreferenceScreen(themed)
++        manager.setPreferences(root)
++        configurable.setupPreferenceScreen(root)
++        root.onAttached()
++        return Screen(configurable, root, prefs)
++    }
++
++    fun schema(screen: Screen): JsonObject {
++        var count = 0
++        val keys = mutableSetOf<String>()
++        fun text(value: CharSequence?) = value?.toString()?.also { require(it.length <= 4096) }
++        fun node(pref: Preference, depth: Int): JsonObject {
++            require(depth <= 6 && ++count <= 256)
++            val key = pref.key?.also { require(it.length in 1..200 && keys.add(it)) }
++            val kind =
++                when (pref) {
++                    is PreferenceGroup -> "group"
++                    is SwitchPreferenceCompat,
++                    is SwitchPreference -> "switch"
++                    is CheckBoxPreference -> "check"
++                    is ListPreference -> "list"
++                    is MultiSelectListPreference -> "multi"
++                    is EditTextPreference -> "text"
++                    else -> "info"
++                }
++            val editable = kind in setOf("switch", "check", "list", "multi", "text")
++            if (editable) require(key != null)
++            val unsupportedAction =
++                pref.intent != null ||
++                    pref.fragment != null ||
++                    pref.onPreferenceClickListener != null
++            return buildJsonObject {
++                put("kind", kind)
++                key?.let { put("key", it) }
++                put("title", text(pref.title).orEmpty())
++                text(pref.summary)?.let { put("summary", it) }
++                put("visible", pref.isVisible)
++                put(
++                    "enabled",
++                    (if (pref is PreferenceCategory) !pref.shouldDisableDependents()
++                    else pref.isEnabled) && !unsupportedAction,
++                )
++                put("unsupportedAction", unsupportedAction || kind == "info")
++                if (pref is DialogPreference) text(pref.dialogMessage)?.let { put("message", it) }
++                when (pref) {
++                    is PreferenceGroup ->
++                        put(
++                            "children",
++                            JsonArray(
++                                (0 until pref.preferenceCount).map {
++                                    node(pref.getPreference(it), depth + 1)
++                                }
++                            ),
++                        )
++                    is TwoStatePreference -> put("value", pref.isChecked)
++                    is ListPreference -> {
++                        val entries = pref.entries.orEmpty()
++                        val values = pref.entryValues.orEmpty()
++                        require(entries.size == values.size && entries.size <= 512)
++                        put("entries", JsonArray(entries.map { JsonPrimitive(text(it).orEmpty()) }))
++                        put("values", JsonArray(values.map { JsonPrimitive(text(it).orEmpty()) }))
++                        put("value", pref.value?.let(::JsonPrimitive) ?: JsonNull)
++                    }
++                    is MultiSelectListPreference -> {
++                        val entries = pref.entries.orEmpty()
++                        val values = pref.entryValues.orEmpty()
++                        require(entries.size == values.size && entries.size <= 512)
++                        put("entries", JsonArray(entries.map { JsonPrimitive(text(it).orEmpty()) }))
++                        put("values", JsonArray(values.map { JsonPrimitive(text(it).orEmpty()) }))
++                        put("value", JsonArray(pref.values.orEmpty().sorted().map(::JsonPrimitive)))
++                    }
++                    is EditTextPreference -> {
++                        put("value", pref.text?.let(::JsonPrimitive) ?: JsonNull)
++                        put("password", key?.let(SandboxPreferenceValues::sensitive) == true)
++                    }
++                }
++            }
++        }
++        val nodes =
++            JsonArray(
++                (0 until screen.root.preferenceCount).map { node(screen.root.getPreference(it), 0) }
++            )
++        require(nodes.toString().toByteArray().size <= 128 * 1024)
++        return buildJsonObject {
++            put("nodes", nodes)
++            put("schema", token(nodes))
++        }
++    }
++
++    fun validate(schema: JsonObject) {
++        val nodes = schema.getValue("nodes").jsonArray
++        require(nodes.toString().toByteArray().size <= 128 * 1024)
++        require(schema.getValue("schema").jsonPrimitive.content == token(nodes))
++        var count = 0
++        val keys = mutableSetOf<String>()
++        fun string(value: JsonElement) {
++            require(value.jsonPrimitive.isString && value.jsonPrimitive.content.length <= 4096)
++        }
++        fun node(element: JsonElement, depth: Int) {
++            require(depth <= 6 && ++count <= 256)
++            val value = element.jsonObject
++            val kind = value.getValue("kind").jsonPrimitive.content
++            require(kind in setOf("group", "switch", "check", "text", "list", "multi", "info"))
++            string(value.getValue("title"))
++            value["summary"]?.let(::string)
++            value["message"]?.let(::string)
++            for (flag in listOf("enabled", "visible", "unsupportedAction")) require(
++                !value.getValue(flag).jsonPrimitive.isString &&
++                    value.getValue(flag).jsonPrimitive.booleanOrNull != null
++            )
++            value["key"]?.let { key ->
++                string(key)
++                require(
++                    key.jsonPrimitive.content.length in 1..200 &&
++                        keys.add(key.jsonPrimitive.content)
++                )
++            }
++            if (kind in setOf("switch", "check", "text", "list", "multi"))
++                require(value["key"] != null)
++            if (kind in setOf("list", "multi")) {
++                val entries = value.getValue("entries").jsonArray
++                val values = value.getValue("values").jsonArray
++                require(entries.size == values.size && entries.size <= 512)
++                entries.forEach(::string)
++                values.forEach(::string)
++            }
++            when (kind) {
++                "group" -> value.getValue("children").jsonArray.forEach { node(it, depth + 1) }
++                "switch",
++                "check" ->
++                    require(
++                        !value.getValue("value").jsonPrimitive.isString &&
++                            value.getValue("value").jsonPrimitive.booleanOrNull != null
++                    )
++                "text",
++                "list" -> if (value.getValue("value") != JsonNull) string(value.getValue("value"))
++                "multi" ->
++                    value
++                        .getValue("value")
++                        .jsonArray
++                        .also { require(it.size <= 256) }
++                        .forEach(::string)
++            }
++            value["password"]?.let {
++                require(!it.jsonPrimitive.isString && it.jsonPrimitive.booleanOrNull != null)
++            }
++        }
++        nodes.forEach { node(it, 0) }
++    }
++
++    private fun token(nodes: JsonArray): String {
++        fun shape(element: JsonElement): JsonElement =
++            when (element) {
++                is JsonArray -> JsonArray(element.map(::shape))
++                is JsonObject ->
++                    JsonObject(
++                        element
++                            .filterKeys { it !in setOf("value", "summary", "enabled", "visible") }
++                            .mapValues { (_, value) -> shape(value) }
++                    )
++                else -> element
++            }
++        return MessageDigest.getInstance("SHA-256")
++            .digest(shape(nodes).toString().toByteArray())
++            .joinToString("") { "%02x".format(it) }
++    }
++
++    fun importValues(screen: Screen, schemaToken: String, changes: JsonObject): Boolean {
++        val descriptor = schema(screen)
++        require(descriptor.getValue("schema").jsonPrimitive.content == schemaToken)
++        val keys = mutableSetOf<String>()
++        fun collect(array: JsonArray) {
++            array.forEach { item ->
++                val node = item.jsonObject
++                if (
++                    node["kind"]?.jsonPrimitive?.content in
++                        setOf("switch", "check", "text", "list", "multi")
++                )
++                    node["key"]?.jsonPrimitive?.content?.let(keys::add)
++                (node["children"] as? JsonArray)?.let(::collect)
++            }
++        }
++        collect(descriptor.getValue("nodes").jsonArray)
++        val incoming = SandboxPreferenceValues.decode(changes)
++        require(incoming.keys.all { it in keys })
++        val current = screen.values.all
++        val knownTypes = SandboxPreferenceValues.encode(current)
++        incoming.forEach { (key, _) ->
++            knownTypes[key]?.let {
++                require(
++                    it.jsonObject.getValue("type") ==
++                        changes.getValue(key).jsonObject.getValue("type")
++                ) {
++                    "Restored preference type changed"
++                }
++            }
++        }
++        // Restore stored types, not UI input types (custom listeners can persist integers from
++        // text).
++        SandboxPreferenceValues.write(screen.values, current + incoming)
++        return true
++    }
++
++    fun change(screen: Screen, schemaToken: String, changes: JsonObject): Boolean {
++        val descriptor = schema(screen)
++        require(descriptor.getValue("schema").jsonPrimitive.content == schemaToken) {
++            "Preference options changed"
++        }
++        val decoded = SandboxPreferenceValues.decode(changes)
++        val nodes = linkedMapOf<String, JsonObject>()
++        fun collect(array: JsonArray) {
++            array.forEach { item ->
++                val value = item.jsonObject
++                value["key"]?.jsonPrimitive?.content?.let { nodes[it] = value }
++                (value["children"] as? JsonArray)?.let(::collect)
++            }
++        }
++        collect(descriptor.getValue("nodes").jsonArray)
++        val planned =
++            decoded.map { (key, value) ->
++                val node = nodes[key] ?: error("Unknown preference key")
++                require(
++                    node.getValue("enabled").jsonPrimitive.boolean &&
++                        node.getValue("visible").jsonPrimitive.boolean
++                )
++                when (node.getValue("kind").jsonPrimitive.content) {
++                    "switch",
++                    "check" -> require(value is Boolean)
++                    "text" -> require(value is String)
++                    "list" ->
++                        require(
++                            value is String &&
++                                value in
++                                    node.getValue("values").jsonArray.map {
++                                        it.jsonPrimitive.content
++                                    }
++                        )
++                    "multi" ->
++                        require(
++                            value is Set<*> &&
++                                value.all {
++                                    it is String &&
++                                        it in
++                                            node.getValue("values").jsonArray.map { e ->
++                                                e.jsonPrimitive.content
++                                            }
++                                }
++                        )
++                    else -> error("Preference is not editable")
++                }
++                val pref =
++                    screen.root.findPreference<Preference>(key) ?: error("Missing preference")
++                Triple(pref, key, value)
++            }
++        // A false callback suppresses the default write; its own scoped writes still follow
++        // AndroidX semantics.
++        val accepted = linkedMapOf<String, Any>()
++        for ((pref, key, value) in planned) if (pref.callChangeListener(value))
++            accepted[key] = value
++        val next = screen.values.all.toMutableMap()
++        accepted.forEach { (key, value) -> next[key] = value }
++        if (next != screen.values.all) SandboxPreferenceValues.write(screen.values, next)
++        return accepted.size == planned.size
++    }
++}
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxPreferenceStore.kt b/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxPreferenceStore.kt
+new file mode 100644
+index 0000000..7ff21bf
+--- /dev/null
++++ b/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxPreferenceStore.kt
+@@ -0,0 +1,77 @@
++package eu.kanade.tachiyomi.extension.sandbox
++
++import android.content.Context
++import android.content.SharedPreferences
++import java.security.MessageDigest
++import kotlinx.serialization.json.*
++
++/**
++ * Host-only namespace bound to package/signing identity. Standard source keys are used on export.
++ */
++internal class SandboxPreferenceStore(private val context: Context, identity: String) {
++    private val scope =
++        MessageDigest.getInstance("SHA-256").digest(identity.toByteArray()).joinToString("") {
++            "%02x".format(it)
++        }
++    private val index =
++        context.getSharedPreferences("polaris_sandbox_index_$scope", Context.MODE_PRIVATE)
++
++    private fun ids() =
++        index
++            .getStringSet("sources", emptySet())
++            .orEmpty()
++            .map { it.toLong().also { id -> require(id > 0) } }
++            .toSet()
++
++    fun register(sourceIds: Set<Long>) =
++        synchronized(LOCK) {
++            require(sourceIds.all { it > 0 })
++            val all = ids() + sourceIds
++            require(all.size <= 256)
++            check(index.edit().putStringSet("sources", all.map { it.toString() }.toSet()).commit())
++        }
++
++    fun preferences(id: Long): SharedPreferences {
++        require(id > 0 && id in ids())
++        return context.getSharedPreferences("polaris_sandbox_${scope}_$id", Context.MODE_PRIVATE)
++    }
++
++    fun snapshot(): JsonObject =
++        synchronized(LOCK) {
++            buildJsonObject {
++                    ids().sorted().forEach { id ->
++                        val values = preferences(id).all
++                        if (values.isNotEmpty())
++                            put("source_$id", SandboxPreferenceValues.encode(values))
++                    }
++                }
++                .also {
++                    require(it.toString().toByteArray().size <= ExtensionSandboxProtocol.MAX_INPUT)
++                }
++        }
++
++    fun accept(values: JsonObject) =
++        synchronized(LOCK) {
++            require(
++                values.size <= 256 &&
++                    values.toString().toByteArray().size <= ExtensionSandboxProtocol.MAX_INPUT
++            )
++            // Validate the full envelope before persisting any source, including scope ownership.
++            val known = ids()
++            val decoded =
++                values.map { (name, value) ->
++                    require(name.matches(Regex("source_[1-9][0-9]{0,18}")))
++                    val id = name.removePrefix("source_").toLong()
++                    require(id in known)
++                    id to SandboxPreferenceValues.decode(value.jsonObject)
++                }
++            decoded.forEach { (id, value) ->
++                if (preferences(id).all != value)
++                    SandboxPreferenceValues.write(preferences(id), value)
++            }
++        }
++
++    private companion object {
++        val LOCK = Any()
++    }
++}
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxPreferenceUi.kt b/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxPreferenceUi.kt
+new file mode 100644
+index 0000000..76f5462
+--- /dev/null
++++ b/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxPreferenceUi.kt
+@@ -0,0 +1,267 @@
++package eu.kanade.tachiyomi.extension.sandbox
++
++import android.text.InputType
++import android.view.inputmethod.EditorInfo
++import androidx.appcompat.app.AlertDialog
++import androidx.lifecycle.lifecycleScope
++import androidx.preference.*
++import kotlinx.coroutines.*
++import kotlinx.serialization.json.*
++import tachiyomi.core.common.i18n.stringResource
++import tachiyomi.i18n.at.ATMR
++
++/**
++ * Stock AndroidX widgets only. No source listener, Intent, view class or Parcelable reaches host
++ * UI.
++ */
++internal class SandboxPreferenceUi(
++    private val owner: PreferenceFragmentCompat,
++    private val source: IsolatedHttpSource,
++) {
++    private val context
++        get() = owner.requireContext()
++
++    private val scope
++        get() = owner.lifecycleScope
++
++    private var dirty = false
++
++    fun load() {
++        val loading = owner.preferenceManager.createPreferenceScreen(context)
++        loading.addPreference(
++            Preference(context).apply {
++                title = context.stringResource(ATMR.strings.sandbox_settings_loading)
++                isEnabled = false
++            }
++        )
++        owner.preferenceScreen = loading
++        scope.launch {
++            try {
++                render(withContext(Dispatchers.IO) { source.preferenceSchema() })
++            } catch (cancelled: CancellationException) {
++                throw cancelled
++            } catch (_: Exception) {
++                failure()
++            }
++        }
++    }
++
++    fun onStop() {
++        if (dirty) {
++            source.owningPackageName?.let {
++                eu.kanade.tachiyomi.extension.util.ExtensionInstallReceiver.notifyReplaced(
++                    context,
++                    it,
++                )
++            }
++            dirty = false
++        }
++    }
++
++    private fun failure() {
++        if (!owner.isAdded) return
++        val screen = owner.preferenceManager.createPreferenceScreen(context)
++        screen.addPreference(
++            Preference(context).apply {
++                title = context.stringResource(ATMR.strings.sandbox_settings_failed)
++                summary = context.stringResource(ATMR.strings.sandbox_settings_retry)
++                setOnPreferenceClickListener {
++                    load()
++                    true
++                }
++            }
++        )
++        owner.preferenceScreen = screen
++    }
++
++    private fun render(schema: JsonObject) {
++        if (!owner.isAdded) return
++        SandboxPreferenceCodec.validate(schema)
++        val screen = owner.preferenceManager.createPreferenceScreen(context)
++        screen.addPreference(
++            Preference(context).apply {
++                title = context.stringResource(ATMR.strings.sandbox_settings_title)
++                summary = context.stringResource(ATMR.strings.sandbox_settings_explanation)
++                isSelectable = false
++            }
++        )
++        fun change(key: String, value: Any): Boolean {
++            screen.isEnabled = false
++            scope.launch {
++                try {
++                    val accepted =
++                        withContext(Dispatchers.IO) {
++                            source.changePreferences(
++                                schema.getValue("schema").jsonPrimitive.content,
++                                SandboxPreferenceValues.encode(mapOf(key to value)),
++                            )
++                        }
++                    dirty = dirty || accepted
++                    if (!accepted && owner.isAdded)
++                        android.widget.Toast.makeText(
++                                context,
++                                context.stringResource(ATMR.strings.sandbox_settings_rejected),
++                                android.widget.Toast.LENGTH_LONG,
++                            )
++                            .show()
++                    load()
++                } catch (cancelled: CancellationException) {
++                    throw cancelled
++                } catch (_: Exception) {
++                    failure()
++                }
++            }
++            return false // Persistence happens only after the worker accepts the change.
++        }
++        fun add(nodes: JsonArray, parent: PreferenceGroup) {
++            nodes.forEach { element ->
++                val node = element.jsonObject
++                val kind = node.getValue("kind").jsonPrimitive.content
++                val key = node["key"]?.jsonPrimitive?.content
++                val widget: Preference =
++                    when (kind) {
++                        "group" -> PreferenceCategory(context)
++                        "switch" ->
++                            SwitchPreferenceCompat(context).apply {
++                                isChecked = node.getValue("value").jsonPrimitive.boolean
++                            }
++                        "check" ->
++                            CheckBoxPreference(context).apply {
++                                isChecked = node.getValue("value").jsonPrimitive.boolean
++                            }
++                        "text" ->
++                            EditTextPreference(context).apply {
++                                text =
++                                    (node["value"] as? JsonPrimitive)
++                                        ?.takeUnless { it == JsonNull }
++                                        ?.content
++                                setOnBindEditTextListener { edit ->
++                                    edit.imeOptions =
++                                        edit.imeOptions or
++                                            EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING
++                                    if (node["password"]?.jsonPrimitive?.boolean == true)
++                                        edit.inputType =
++                                            InputType.TYPE_CLASS_TEXT or
++                                                InputType.TYPE_TEXT_VARIATION_PASSWORD
++                                }
++                            }
++                        "list" ->
++                            ListPreference(context).apply {
++                                entries =
++                                    node
++                                        .getValue("entries")
++                                        .jsonArray
++                                        .map { it.jsonPrimitive.content }
++                                        .toTypedArray()
++                                entryValues =
++                                    node
++                                        .getValue("values")
++                                        .jsonArray
++                                        .map { it.jsonPrimitive.content }
++                                        .toTypedArray()
++                                value =
++                                    node["value"]
++                                        ?.takeUnless { it == JsonNull }
++                                        ?.jsonPrimitive
++                                        ?.content
++                            }
++                        "multi" ->
++                            MultiSelectListPreference(context).apply {
++                                entries =
++                                    node
++                                        .getValue("entries")
++                                        .jsonArray
++                                        .map { it.jsonPrimitive.content }
++                                        .toTypedArray()
++                                entryValues =
++                                    node
++                                        .getValue("values")
++                                        .jsonArray
++                                        .map { it.jsonPrimitive.content }
++                                        .toTypedArray()
++                                values =
++                                    node
++                                        .getValue("value")
++                                        .jsonArray
++                                        .map { it.jsonPrimitive.content }
++                                        .toSet()
++                                        .intersect(
++                                            entryValues.orEmpty().map { it.toString() }.toSet()
++                                        )
++                            }
++                        else -> Preference(context)
++                    }
++                widget.key = key
++                widget.isPersistent = false
++                widget.title = node.getValue("title").jsonPrimitive.content
++                widget.summary =
++                    if (node["unsupportedAction"]?.jsonPrimitive?.boolean == true)
++                        context.stringResource(ATMR.strings.sandbox_settings_action_unavailable)
++                    else if (kind == "text" && node["password"]?.jsonPrimitive?.boolean == true)
++                        context.stringResource(ATMR.strings.sandbox_settings_private)
++                    else node["summary"]?.jsonPrimitive?.content
++                widget.isVisible = node.getValue("visible").jsonPrimitive.boolean
++                widget.isEnabled = node.getValue("enabled").jsonPrimitive.boolean && kind != "info"
++                widget.isIconSpaceReserved = false
++                if (widget is DialogPreference) {
++                    widget.dialogTitle = widget.title
++                    widget.dialogMessage = node["message"]?.jsonPrimitive?.content
++                }
++                if (key != null && kind in setOf("text", "switch", "check", "list", "multi")) {
++                    widget.setOnPreferenceChangeListener { _, value ->
++                        value != null && change(key, value)
++                    }
++                }
++                parent.addPreference(widget)
++                if (widget is PreferenceGroup) add(node.getValue("children").jsonArray, widget)
++            }
++        }
++        add(schema.getValue("nodes").jsonArray, screen)
++        if (source.hasLegacyPreferences())
++            screen.addPreference(
++                Preference(context).apply {
++                    title = context.stringResource(ATMR.strings.sandbox_settings_import)
++                    summary = context.stringResource(ATMR.strings.sandbox_settings_import_summary)
++                    setOnPreferenceClickListener {
++                        AlertDialog.Builder(context)
++                            .setTitle(title)
++                            .setMessage(
++                                context.stringResource(
++                                    ATMR.strings.sandbox_settings_import_warning
++                                ) + "\n\n" + source.name
++                            )
++                            .setNegativeButton(android.R.string.cancel, null)
++                            .setPositiveButton(android.R.string.ok) { _, _ ->
++                                screen.isEnabled = false
++                                scope.launch {
++                                    try {
++                                        val accepted =
++                                            withContext(Dispatchers.IO) {
++                                                source.importLegacyPreferences(schema)
++                                            }
++                                        dirty = dirty || accepted
++                                        if (!accepted && owner.isAdded)
++                                            android.widget.Toast.makeText(
++                                                    context,
++                                                    context.stringResource(
++                                                        ATMR.strings.sandbox_settings_rejected
++                                                    ),
++                                                    android.widget.Toast.LENGTH_LONG,
++                                                )
++                                                .show()
++                                        load()
++                                    } catch (cancelled: CancellationException) {
++                                        throw cancelled
++                                    } catch (_: Exception) {
++                                        failure()
++                                    }
++                                }
++                            }
++                            .show()
++                        true
++                    }
++                }
++            )
++        owner.preferenceScreen = screen
++    }
++}
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxPreferenceValues.kt b/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxPreferenceValues.kt
+new file mode 100644
+index 0000000..206ded6
+--- /dev/null
++++ b/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxPreferenceValues.kt
+@@ -0,0 +1,119 @@
++package eu.kanade.tachiyomi.extension.sandbox
++
++import android.content.SharedPreferences
++import kotlinx.serialization.json.*
++
++/** Explicit scalar/set types; no JSON coercion, paths, class names or host preference handles. */
++internal object SandboxPreferenceValues {
++    const val MAX_KEYS = 256
++
++    fun sensitive(key: String): Boolean =
++        tachiyomi.core.common.preference.Preference.isPrivate(key) ||
++            key.contains(Regex("(?i)password|passwd|secret|token|api.?key"))
++
++    fun encode(values: Map<String, *>): JsonObject {
++        require(values.size <= MAX_KEYS)
++        return buildJsonObject {
++                values.forEach { (key, value) ->
++                    require(key.length in 1..200)
++                    put(
++                        key,
++                        buildJsonObject {
++                            when (value) {
++                                is String -> {
++                                    require(value.length <= 8192)
++                                    put("type", "string")
++                                    put("value", value)
++                                }
++                                is Boolean -> {
++                                    put("type", "boolean")
++                                    put("value", value)
++                                }
++                                is Int -> {
++                                    put("type", "int")
++                                    put("value", value)
++                                }
++                                is Long -> {
++                                    put("type", "long")
++                                    put("value", value)
++                                }
++                                is Float -> {
++                                    require(value.isFinite())
++                                    put("type", "float")
++                                    put("value", value)
++                                }
++                                is Set<*> -> {
++                                    require(
++                                        value.size <= 256 &&
++                                            value.all { it is String && it.length <= 8192 }
++                                    )
++                                    put("type", "set")
++                                    put(
++                                        "value",
++                                        JsonArray(
++                                            value
++                                                .map { JsonPrimitive(it as String) }
++                                                .sortedBy { it.content }
++                                        ),
++                                    )
++                                }
++                                else -> error("Unsupported preference value")
++                            }
++                        },
++                    )
++                }
++            }
++            .also { require(it.toString().toByteArray().size <= 128 * 1024) }
++    }
++
++    fun decode(values: JsonObject): Map<String, Any> {
++        require(values.size <= MAX_KEYS && values.toString().toByteArray().size <= 128 * 1024)
++        return values.mapValues { (key, item) ->
++            require(key.length in 1..200)
++            val pair = item.jsonObject
++            require(pair.keys == setOf("type", "value"))
++            val value = pair.getValue("value")
++            when (pair.getValue("type").jsonPrimitive.content) {
++                "string" ->
++                    value.jsonPrimitive
++                        .also { require(it.isString && it.content.length <= 8192) }
++                        .content
++                "boolean" -> value.jsonPrimitive.also { require(!it.isString) }.boolean
++                "int" -> value.jsonPrimitive.also { require(!it.isString) }.int
++                "long" -> value.jsonPrimitive.also { require(!it.isString) }.long
++                "float" ->
++                    value.jsonPrimitive
++                        .also { require(!it.isString) }
++                        .float
++                        .also { require(it.isFinite()) }
++                "set" ->
++                    value.jsonArray
++                        .also { require(it.size <= 256) }
++                        .map {
++                            it.jsonPrimitive
++                                .also { p -> require(p.isString && p.content.length <= 8192) }
++                                .content
++                        }
++                        .toSet()
++                else -> error("Unsupported preference type")
++            }
++        }
++    }
++
++    fun write(prefs: SharedPreferences, values: Map<String, *>) {
++        encode(values)
++        val editor = prefs.edit().clear()
++        values.forEach { (key, value) ->
++            when (value) {
++                is String -> editor.putString(key, value)
++                is Boolean -> editor.putBoolean(key, value)
++                is Int -> editor.putInt(key, value)
++                is Long -> editor.putLong(key, value)
++                is Float -> editor.putFloat(key, value)
++                is Set<*> -> editor.putStringSet(key, value.map { it as String }.toSet())
++                else -> error("Unsupported preference value")
++            }
++        }
++        check(editor.commit()) { "Could not save isolated source settings" }
++    }
++}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxSourceCodec.kt b/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxSourceCodec.kt
 new file mode 100644
 index 0000000..93b2c27
@@ -21751,6 +23857,180 @@ index 0000000..93b2c27
 +            value["url"]?.jsonPrimitive?.content.orEmpty(),
 +            value["imageUrl"]?.jsonPrimitive?.content,
 +        )
++}
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxWorkerPreferences.kt b/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxWorkerPreferences.kt
+new file mode 100644
+index 0000000..7c153f5
+--- /dev/null
++++ b/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxWorkerPreferences.kt
+@@ -0,0 +1,168 @@
++package eu.kanade.tachiyomi.extension.sandbox
++
++import android.app.Application
++import android.content.Context
++import android.content.SharedPreferences
++import kotlinx.serialization.json.*
++
++/** In-memory worker state. The real host Application or its SharedPreferences never cross IPC. */
++internal class SandboxWorkerApplication(base: Context, input: JsonObject) : Application() {
++    private val preferences = linkedMapOf<String, MemoryPreferences>()
++
++    init {
++        attachBaseContext(base)
++        require(
++            input.size <= 256 &&
++                input.toString().toByteArray().size <= ExtensionSandboxProtocol.MAX_INPUT
++        )
++        input.forEach { (name, values) ->
++            requireName(name)
++            preferences[name] = MemoryPreferences(SandboxPreferenceValues.decode(values.jsonObject))
++        }
++    }
++
++    private fun requireName(name: String) {
++        require(name.matches(Regex("source_[1-9][0-9]{0,18}")))
++    }
++
++    override fun getApplicationContext(): Context = this
++
++    @Synchronized
++    override fun getSharedPreferences(name: String, mode: Int): SharedPreferences {
++        requireName(name)
++        require(mode == Context.MODE_PRIVATE)
++        if (name !in preferences) {
++            require(preferences.size < 256)
++            preferences[name] = MemoryPreferences(emptyMap())
++        }
++        return preferences.getValue(name)
++    }
++
++    @Synchronized
++    fun restore(snapshot: JsonObject) {
++        preferences.forEach { (name, prefs) ->
++            prefs.restore(
++                snapshot[name]?.jsonObject?.let(SandboxPreferenceValues::decode).orEmpty()
++            )
++        }
++    }
++
++    @Synchronized
++    fun snapshot(allowedIds: Set<Long>): JsonObject =
++        buildJsonObject {
++                preferences.forEach { (name, prefs) ->
++                    val id = name.removePrefix("source_").toLong()
++                    if (id in allowedIds) put(name, SandboxPreferenceValues.encode(prefs.all))
++                }
++            }
++            .also {
++                require(it.toString().toByteArray().size <= ExtensionSandboxProtocol.MAX_INPUT)
++            }
++}
++
++internal class MemoryPreferences(initial: Map<String, Any>) : SharedPreferences {
++    private val values = initial.toMutableMap()
++    private val listeners = mutableSetOf<SharedPreferences.OnSharedPreferenceChangeListener>()
++
++    @Synchronized
++    fun restore(snapshot: Map<String, Any>) {
++        SandboxPreferenceValues.encode(snapshot)
++        values.clear()
++        values.putAll(snapshot)
++    }
++
++    override fun getAll(): MutableMap<String, *> =
++        synchronized(this) {
++            values
++                .mapValues { (_, value) -> if (value is Set<*>) value.toSet() else value }
++                .toMutableMap()
++        }
++
++    override fun contains(key: String?): Boolean = synchronized(this) { values.containsKey(key) }
++
++    override fun getString(key: String?, defValue: String?): String? =
++        synchronized(this) { (values[key] ?: defValue) as String? }
++
++    @Suppress("UNCHECKED_CAST")
++    override fun getStringSet(key: String?, defValues: MutableSet<String>?): MutableSet<String>? =
++        synchronized(this) { ((values[key] ?: defValues) as Set<String>?)?.toMutableSet() }
++
++    override fun getInt(key: String?, defValue: Int): Int =
++        synchronized(this) { (values[key] ?: defValue) as Int }
++
++    override fun getLong(key: String?, defValue: Long): Long =
++        synchronized(this) { (values[key] ?: defValue) as Long }
++
++    override fun getFloat(key: String?, defValue: Float): Float =
++        synchronized(this) { (values[key] ?: defValue) as Float }
++
++    override fun getBoolean(key: String?, defValue: Boolean): Boolean =
++        synchronized(this) { (values[key] ?: defValue) as Boolean }
++
++    override fun registerOnSharedPreferenceChangeListener(
++        listener: SharedPreferences.OnSharedPreferenceChangeListener?
++    ) {
++        if (listener != null) synchronized(this) { listeners.add(listener) }
++    }
++
++    override fun unregisterOnSharedPreferenceChangeListener(
++        listener: SharedPreferences.OnSharedPreferenceChangeListener?
++    ) {
++        synchronized(this) { listeners.remove(listener) }
++    }
++
++    override fun edit(): SharedPreferences.Editor = Editor()
++
++    private inner class Editor : SharedPreferences.Editor {
++        val pending = linkedMapOf<String, Any?>()
++        var clear = false
++
++        private fun put(key: String?, value: Any?): SharedPreferences.Editor {
++            require(key != null && key.length in 1..200)
++            pending[key] = value
++            return this
++        }
++
++        override fun putString(key: String?, value: String?) = put(key, value)
++
++        override fun putStringSet(key: String?, values: MutableSet<String>?) =
++            put(key, values?.toSet())
++
++        override fun putInt(key: String?, value: Int) = put(key, value)
++
++        override fun putLong(key: String?, value: Long) = put(key, value)
++
++        override fun putFloat(key: String?, value: Float) = put(key, value)
++
++        override fun putBoolean(key: String?, value: Boolean) = put(key, value)
++
++        override fun remove(key: String?) = put(key, null)
++
++        override fun clear(): SharedPreferences.Editor {
++            clear = true
++            return this
++        }
++
++        override fun commit(): Boolean {
++            val callbacks: List<SharedPreferences.OnSharedPreferenceChangeListener>
++            synchronized(this@MemoryPreferences) {
++                val proposed = if (clear) mutableMapOf() else values.toMutableMap()
++                pending.forEach { (key, value) ->
++                    if (value == null) proposed.remove(key) else proposed[key] = value
++                }
++                SandboxPreferenceValues.encode(proposed)
++                values.clear()
++                values.putAll(proposed)
++                callbacks = listeners.toList()
++            }
++            pending.keys.forEach { key ->
++                callbacks.forEach { it.onSharedPreferenceChanged(this@MemoryPreferences, key) }
++            }
++            return true
++        }
++
++        override fun apply() {
++            commit()
++        }
++    }
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/extension/util/ExtensionInstaller.kt b/app/src/main/java/eu/kanade/tachiyomi/extension/util/ExtensionInstaller.kt
 index 4d9493f..fddb83c 100644
@@ -22012,7 +24292,7 @@ index 4d9493f..fddb83c 100644
          const val EXTRA_DOWNLOAD_ID = "ExtensionInstaller.extra.DOWNLOAD_ID"
      }
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/extension/util/ExtensionLoader.kt b/app/src/main/java/eu/kanade/tachiyomi/extension/util/ExtensionLoader.kt
-index 962fafa..ec904e8 100644
+index 962fafa..945debe 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/extension/util/ExtensionLoader.kt
 +++ b/app/src/main/java/eu/kanade/tachiyomi/extension/util/ExtensionLoader.kt
 @@ -10,40 +10,37 @@ import eu.kanade.domain.extension.interactor.TrustExtension
@@ -22419,7 +24699,7 @@ index 962fafa..ec904e8 100644
          if (libVersion == null || libVersion !in SUPPORTED_LIB_VERSIONS) {
              logcat(LogPriority.WARN) {
                  "Lib version is $libVersion, while only version(s) ${SUPPORTED_LIB_VERSIONS.joinToString()} are supported"
-@@ -255,80 +319,158 @@ internal object ExtensionLoader {
+@@ -255,80 +319,160 @@ internal object ExtensionLoader {
              return LoadResult.Error
          }
  
@@ -22525,6 +24805,8 @@ index 962fafa..ec904e8 100644
 +                            ExtensionInstallReceiver.notifyReplaced(context, pkgName)
 +                        },
 +                        isQuarantined = { runtimeKey in preferences.sandboxQuarantines.get() },
++                        preferenceIdentity = "$pkgName:${signatures.sorted().joinToString(",")}",
++                        packageName = pkgName,
 +                    )
 +                } catch (cancelled: CancellationException) {
 +                    throw cancelled
@@ -22632,7 +24914,7 @@ index 962fafa..ec904e8 100644
          return LoadResult.Success(extension)
      }
  
-@@ -338,15 +480,19 @@ internal object ExtensionLoader {
+@@ -338,15 +482,19 @@ internal object ExtensionLoader {
       * @param shared extension installed to system
       * @param private extension installed to data directory
       */
@@ -22655,7 +24937,7 @@ index 962fafa..ec904e8 100644
          ) {
              shared
          } else {
-@@ -359,6 +505,14 @@ internal object ExtensionLoader {
+@@ -359,6 +507,14 @@ internal object ExtensionLoader {
       *
       * @param pkgInfo The package info of the application.
       */
@@ -22670,7 +24952,7 @@ index 962fafa..ec904e8 100644
      private fun isPackageAnExtension(pkgInfo: PackageInfo): Boolean {
          return pkgInfo.reqFeatures.orEmpty().any { it.name == EXTENSION_FEATURE }
      }
-@@ -371,23 +525,22 @@ internal object ExtensionLoader {
+@@ -371,23 +527,22 @@ internal object ExtensionLoader {
       */
      private fun getSignatures(pkgInfo: PackageInfo): List<String>? {
          return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
@@ -22703,7 +24985,7 @@ index 962fafa..ec904e8 100644
       */
      private fun ApplicationInfo.fixBasePaths(apkPath: String) {
          if (sourceDir == null) {
-@@ -398,8 +551,5 @@ internal object ExtensionLoader {
+@@ -398,8 +553,5 @@ internal object ExtensionLoader {
          }
      }
  
@@ -24737,6 +27019,108 @@ index a1ab133..5ffde92 100644
      }
  
      fun toggleIncognito(enable: Boolean) {
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/browse/extension/details/SourcePreferencesScreen.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/browse/extension/details/SourcePreferencesScreen.kt
+index 538e257..74a1b2c 100644
+--- a/app/src/main/java/eu/kanade/tachiyomi/ui/browse/extension/details/SourcePreferencesScreen.kt
++++ b/app/src/main/java/eu/kanade/tachiyomi/ui/browse/extension/details/SourcePreferencesScreen.kt
+@@ -63,13 +63,11 @@ class SourcePreferencesScreen(val sourceId: Long) : Screen() {
+                     navigateUp = navigator::pop,
+                     scrollBehavior = it,
+                 )
+-            },
++            }
+         ) { contentPadding ->
+             FragmentContainer(
+                 fragmentManager = (context as FragmentActivity).supportFragmentManager,
+-                modifier = Modifier
+-                    .fillMaxSize()
+-                    .padding(contentPadding),
++                modifier = Modifier.fillMaxSize().padding(contentPadding),
+             ) {
+                 add(it, SourcePreferencesFragment.getInstance(sourceId), null)
+             }
+@@ -77,7 +75,8 @@ class SourcePreferencesScreen(val sourceId: Long) : Screen() {
+     }
+ 
+     /**
+-     * From https://stackoverflow.com/questions/60520145/fragment-container-in-jetpack-compose/70817794#70817794
++     * From
++     * https://stackoverflow.com/questions/60520145/fragment-container-in-jetpack-compose/70817794#70817794
+      */
+     @Composable
+     private fun FragmentContainer(
+@@ -85,16 +84,11 @@ class SourcePreferencesScreen(val sourceId: Long) : Screen() {
+         modifier: Modifier = Modifier,
+         commit: FragmentTransaction.(containerId: Int) -> Unit,
+     ) {
+-        val containerId by rememberSaveable {
+-            mutableIntStateOf(View.generateViewId())
+-        }
++        val containerId by rememberSaveable { mutableIntStateOf(View.generateViewId()) }
+         var initialized by rememberSaveable { mutableStateOf(false) }
+         AndroidView(
+             modifier = modifier,
+-            factory = { context ->
+-                FragmentContainerView(context)
+-                    .apply { id = containerId }
+-            },
++            factory = { context -> FragmentContainerView(context).apply { id = containerId } },
+             update = { view ->
+                 if (!initialized) {
+                     fragmentManager.commit { commit(view.id) }
+@@ -108,16 +102,22 @@ class SourcePreferencesScreen(val sourceId: Long) : Screen() {
+ 
+     /** Access to package-private method in FragmentManager through reflection */
+     private fun FragmentManager.onContainerAvailable(view: FragmentContainerView) {
+-        val method = FragmentManager::class.java.getDeclaredMethod(
+-            "onContainerAvailable",
+-            FragmentContainerView::class.java,
+-        )
++        val method =
++            FragmentManager::class
++                .java
++                .getDeclaredMethod("onContainerAvailable", FragmentContainerView::class.java)
+         method.isAccessible = true
+         method.invoke(this, view)
+     }
+ }
+ 
+ class SourcePreferencesFragment : PreferenceFragmentCompat() {
++    private var isolatedUi: eu.kanade.tachiyomi.extension.sandbox.SandboxPreferenceUi? = null
++
++    override fun onStop() {
++        isolatedUi?.onStop()
++        super.onStop()
++    }
+ 
+     override fun getContext(): Context? {
+         val superCtx = super.getContext() ?: return null
+@@ -127,7 +127,13 @@ class SourcePreferencesFragment : PreferenceFragmentCompat() {
+     }
+ 
+     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+-        preferenceScreen = populateScreen()
++        val source = Injekt.get<SourceManager>().getOrStub(requireArguments().getLong(SOURCE_ID))
++        if (source is eu.kanade.tachiyomi.extension.sandbox.IsolatedHttpSource) {
++            isolatedUi =
++                eu.kanade.tachiyomi.extension.sandbox.SandboxPreferenceUi(this, source).also {
++                    it.load()
++                }
++        } else preferenceScreen = populateScreen()
+     }
+ 
+     private fun populateScreen(): PreferenceScreen {
+@@ -166,9 +172,7 @@ class SourcePreferencesFragment : PreferenceFragmentCompat() {
+ 
+         fun getInstance(sourceId: Long): SourcePreferencesFragment {
+             return SourcePreferencesFragment().apply {
+-                arguments = Bundle().apply {
+-                    putLong(SOURCE_ID, sourceId)
+-                }
++                arguments = Bundle().apply { putLong(SOURCE_ID, sourceId) }
+             }
+         }
+     }
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/browse/migration/sources/MigrateSourceTab.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/browse/migration/sources/MigrateSourceTab.kt
 index e754957..8220aca 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/ui/browse/migration/sources/MigrateSourceTab.kt
@@ -52486,6 +54870,43 @@ index 0000000..b7731ad
 +        assertEquals("pt-BR", descriptors.getValue(2).language)
 +    }
 +}
+diff --git a/app/src/test/java/eu/kanade/tachiyomi/data/backup/restore/SourcePreferenceNamespaceTest.kt b/app/src/test/java/eu/kanade/tachiyomi/data/backup/restore/SourcePreferenceNamespaceTest.kt
+new file mode 100644
+index 0000000..b6fc1ed
+--- /dev/null
++++ b/app/src/test/java/eu/kanade/tachiyomi/data/backup/restore/SourcePreferenceNamespaceTest.kt
+@@ -0,0 +1,31 @@
++package eu.kanade.tachiyomi.data.backup.restore
++
++import eu.kanade.tachiyomi.data.backup.restore.restorers.SourcePreferenceNamespace
++import org.junit.jupiter.api.Assertions.*
++import org.junit.jupiter.api.Test
++
++class SourcePreferenceNamespaceTest {
++    @Test
++    fun `native signed long source keys remain portable`() {
++        for (id in listOf(Long.MIN_VALUE, -1, 0, 1, Long.MAX_VALUE)) assertTrue(
++            SourcePreferenceNamespace.valid("source_$id")
++        )
++    }
++
++    @Test
++    fun `backups cannot select global settings sandbox files or paths`() {
++        for (key in
++            listOf(
++                "",
++                "app_preferences",
++                "polaris_sandbox_index_any",
++                "polaris_sandbox_any_1",
++                "source_01",
++                "source_+1",
++                "source_1.xml",
++                "source_1/../app_preferences",
++                "../source_1",
++                "source_9223372036854775808",
++            )) assertFalse(SourcePreferenceNamespace.valid(key), key)
++    }
++}
 diff --git a/app/src/test/java/eu/kanade/tachiyomi/data/download/model/DownloadOriginRouteTest.kt b/app/src/test/java/eu/kanade/tachiyomi/data/download/model/DownloadOriginRouteTest.kt
 new file mode 100644
 index 0000000..0a4fb4c
@@ -54141,6 +56562,133 @@ index 0000000..d399c28
 +        }
 +    }
 +}
+diff --git a/app/src/test/java/eu/kanade/tachiyomi/extension/sandbox/SandboxFilterCodecTest.kt b/app/src/test/java/eu/kanade/tachiyomi/extension/sandbox/SandboxFilterCodecTest.kt
+new file mode 100644
+index 0000000..2f83c61
+--- /dev/null
++++ b/app/src/test/java/eu/kanade/tachiyomi/extension/sandbox/SandboxFilterCodecTest.kt
+@@ -0,0 +1,121 @@
++package eu.kanade.tachiyomi.extension.sandbox
++
++import eu.kanade.tachiyomi.source.model.Filter
++import eu.kanade.tachiyomi.source.model.FilterList
++import kotlinx.serialization.json.*
++import org.junit.jupiter.api.Assertions.*
++import org.junit.jupiter.api.Test
++
++class SandboxFilterCodecTest {
++    private class Genres :
++        Filter.Group<Filter<*>>(
++            "Genres",
++            listOf(object : Filter.TriState("Action") {}, object : Filter.CheckBox("Color") {}),
++        )
++
++    private class Order : Filter.Select<String>("Order", arrayOf("Latest", "Oldest"))
++
++    private fun filters() =
++        FilterList(
++            Filter.Header("Options"),
++            object : Filter.Text("Author") {},
++            Order(),
++            Genres(),
++            object : Filter.Sort("Sort", arrayOf("Name", "Date")) {},
++            Filter.Separator(),
++        )
++
++    @Test
++    fun `nested selections are applied to original concrete worker classes`() {
++        val worker = filters()
++        val host = SandboxFilterCodec.host(SandboxFilterCodec.schema(worker))
++        (host[1] as Filter.Text).state = "Jane"
++        (host[2] as Filter.Select<*>).state = 1
++        val children = (host[3] as Filter.Group<*>).state
++        (children[0] as Filter.TriState).state = 2
++        (children[1] as Filter.CheckBox).state = true
++        (host[4] as Filter.Sort).state = Filter.Sort.Selection(1, false)
++        SandboxFilterCodec.apply(worker, SandboxFilterCodec.selection(host)!!)
++        assertEquals("Jane", (worker[1] as Filter.Text).state)
++        assertEquals(1, (worker[2] as Order).state)
++        assertEquals(2, ((worker[3] as Genres).state[0] as Filter.TriState).state)
++        assertTrue(((worker[3] as Genres).state[1] as Filter.CheckBox).state)
++        assertEquals(Filter.Sort.Selection(1, false), (worker[4] as Filter.Sort).state)
++        assertNotEquals(worker[2].javaClass, host[2].javaClass)
++    }
++
++    @Test
++    fun `invalid later state never partially mutates an earlier valid choice`() {
++        val worker = filters()
++        val host = SandboxFilterCodec.host(SandboxFilterCodec.schema(worker))
++        (host[1] as Filter.Text).state = "must not apply"
++        val selected = SandboxFilterCodec.selection(host)!!
++        val nodes = selected.getValue("values").jsonArray.toMutableList()
++        nodes[2] = JsonObject(nodes[2].jsonObject + ("state" to JsonPrimitive(99)))
++        val bad = JsonObject(selected + ("values" to JsonArray(nodes)))
++        assertThrows(IllegalArgumentException::class.java) { SandboxFilterCodec.apply(worker, bad) }
++        assertEquals("", (worker[1] as Filter.Text).state)
++    }
++
++    @Test
++    fun `stale schemas and swapped labels are rejected instead of silently ignoring filters`() {
++        val original = filters()
++        val host = SandboxFilterCodec.host(SandboxFilterCodec.schema(original))
++        val changed =
++            FilterList(
++                Filter.Header("Options"),
++                object : Filter.Text("Author") {},
++                object : Filter.Select<String>("Order", arrayOf("Newest", "Oldest")) {},
++                Genres(),
++                object : Filter.Sort("Sort", arrayOf("Name", "Date")) {},
++                Filter.Separator(),
++            )
++        assertThrows(IllegalArgumentException::class.java) {
++            SandboxFilterCodec.apply(changed, SandboxFilterCodec.selection(host)!!)
++        }
++    }
++
++    @Test
++    fun `oversized and deeply nested filter trees are refused`() {
++        assertThrows(IllegalArgumentException::class.java) {
++            SandboxFilterCodec.schema(FilterList((1..513).map { Filter.Header("x") }))
++        }
++        var child: Filter<*> = Filter.Header("x")
++        repeat(8) { child = object : Filter.Group<Filter<*>>("Nested", listOf(child)) {} }
++        assertThrows(IllegalArgumentException::class.java) {
++            SandboxFilterCodec.schema(FilterList(child))
++        }
++        assertThrows(IllegalArgumentException::class.java) {
++            SandboxFilterCodec.schema(FilterList(object : Filter.Text("Text", "x".repeat(4097)) {}))
++        }
++    }
++
++    @Test
++    fun `unrelated nonempty host lists cannot masquerade as source filters`() {
++        assertNull(SandboxFilterCodec.selection(FilterList()))
++        assertThrows(IllegalStateException::class.java) {
++            SandboxFilterCodec.selection(FilterList(object : Filter.Text("Fake") {}))
++        }
++    }
++
++    @Test
++    fun `quoted scalar and unknown payload fields are refused`() {
++        val worker = FilterList(object : Filter.CheckBox("Bool") {})
++        val host = SandboxFilterCodec.host(SandboxFilterCodec.schema(worker))
++        val selected = SandboxFilterCodec.selection(host)!!
++        val node = selected.getValue("values").jsonArray[0].jsonObject
++        for (bad in
++            listOf(
++                JsonObject(node + ("state" to JsonPrimitive("true"))),
++                JsonObject(node + ("class" to JsonPrimitive("some.HostClass"))),
++            )) {
++            assertThrows(IllegalArgumentException::class.java) {
++                SandboxFilterCodec.apply(
++                    worker,
++                    JsonObject(selected + ("values" to JsonArray(listOf(bad)))),
++                )
++            }
++        }
++        assertFalse((worker[0] as Filter.CheckBox).state)
++    }
++}
 diff --git a/app/src/test/java/eu/kanade/tachiyomi/extension/sandbox/SandboxNetworkPolicyTest.kt b/app/src/test/java/eu/kanade/tachiyomi/extension/sandbox/SandboxNetworkPolicyTest.kt
 new file mode 100644
 index 0000000..c3cd037
@@ -54227,6 +56775,85 @@ index 0000000..c3cd037
 +        }
 +        val valid = "{\"value\":\"[braces] {inside a string}\"}"
 +        assertNotNull(ExtensionSandboxProtocol.input(valid.toByteArray()))
++    }
++}
+diff --git a/app/src/test/java/eu/kanade/tachiyomi/extension/sandbox/SandboxPreferenceValuesTest.kt b/app/src/test/java/eu/kanade/tachiyomi/extension/sandbox/SandboxPreferenceValuesTest.kt
+new file mode 100644
+index 0000000..0f61cae
+--- /dev/null
++++ b/app/src/test/java/eu/kanade/tachiyomi/extension/sandbox/SandboxPreferenceValuesTest.kt
+@@ -0,0 +1,73 @@
++package eu.kanade.tachiyomi.extension.sandbox
++
++import kotlinx.serialization.json.*
++import org.junit.jupiter.api.Assertions.*
++import org.junit.jupiter.api.Test
++
++class SandboxPreferenceValuesTest {
++    @Test
++    fun `stored primitive types and string sets round trip without numeric coercion`() {
++        val values =
++            mapOf(
++                "text" to "synthetic",
++                "bool" to true,
++                "int" to 4,
++                "long" to Long.MAX_VALUE,
++                "float" to 0.5f,
++                "set" to setOf("b", "a"),
++            )
++        assertEquals(values, SandboxPreferenceValues.decode(SandboxPreferenceValues.encode(values)))
++    }
++
++    @Test
++    fun `wrong types nonfinite floats oversized values and arbitrary objects are refused`() {
++        assertThrows(IllegalArgumentException::class.java) {
++            SandboxPreferenceValues.encode(mapOf("bad" to Float.NaN))
++        }
++        assertThrows(IllegalArgumentException::class.java) {
++            SandboxPreferenceValues.encode(mapOf("bad" to "x".repeat(8193)))
++        }
++        assertThrows(IllegalStateException::class.java) {
++            SandboxPreferenceValues.encode(mapOf("bad" to Any()))
++        }
++        assertThrows(IllegalArgumentException::class.java) {
++            SandboxPreferenceValues.decode(
++                buildJsonObject {
++                    putJsonObject("bool") {
++                        put("type", "boolean")
++                        put("value", "true")
++                    }
++                }
++            )
++        }
++    }
++
++    @Test
++    fun `entry counts and total payload sizes stay bounded`() {
++        assertThrows(IllegalArgumentException::class.java) {
++            SandboxPreferenceValues.encode((1..257).associate { "k$it" to true })
++        }
++        assertThrows(IllegalArgumentException::class.java) {
++            SandboxPreferenceValues.encode((1..30).associate { "k$it" to "x".repeat(8192) })
++        }
++    }
++
++    @Test
++    fun `memory editor returns copies and rejects invalid batches before writing`() {
++        val prefs = MemoryPreferences(mapOf("tags" to setOf("a"), "count" to 1))
++        prefs.getStringSet("tags", null)!!.add("not saved")
++        assertEquals(setOf("a"), prefs.getStringSet("tags", null))
++        assertThrows(IllegalArgumentException::class.java) {
++            prefs.edit().putInt("count", 2).putString("bad", "x".repeat(8193)).commit()
++        }
++        assertEquals(1, prefs.getInt("count", 0))
++    }
++
++    @Test
++    fun `obvious access values and private marked fields are omitted by nonprivate backup policy`() {
++        assertTrue(SandboxPreferenceValues.sensitive("token"))
++        assertTrue(SandboxPreferenceValues.sensitive("api_key"))
++        assertTrue(SandboxPreferenceValues.sensitive("__PRIVATE_custom"))
++        assertFalse(SandboxPreferenceValues.sensitive("language"))
 +    }
 +}
 diff --git a/app/src/test/java/eu/kanade/tachiyomi/extension/util/ExtensionInstallerDownloadTest.kt b/app/src/test/java/eu/kanade/tachiyomi/extension/util/ExtensionInstallerDownloadTest.kt
@@ -64316,7 +66943,7 @@ index 9839272..46e74da 100644
  junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }
  junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
 diff --git a/i18n-at/src/commonMain/moko-resources/base/strings.xml b/i18n-at/src/commonMain/moko-resources/base/strings.xml
-index 7ed4795..e6599f3 100644
+index 7ed4795..1b64ca7 100644
 --- a/i18n-at/src/commonMain/moko-resources/base/strings.xml
 +++ b/i18n-at/src/commonMain/moko-resources/base/strings.xml
 @@ -10,7 +10,7 @@
@@ -64328,7 +66955,7 @@ index 7ed4795..e6599f3 100644
      <string name="pref_group_setup">Translation Setup</string>
      <string name="pref_translate_from">Translate From</string>
      <string name="pref_translate_to">Translate To</string>
-@@ -73,12 +73,281 @@
+@@ -73,12 +73,293 @@
      <string name="repository_add_error">Could not add this repository. Check your connection and try again.</string>
      <string name="repository_refresh_error">Repository added, but extension listings could not be refreshed. Refresh the Extensions screen.</string>
      <string name="chapter_group_version">Group/version: %1$s</string>
@@ -64611,9 +67238,21 @@ index 7ed4795..e6599f3 100644
 +    <string name="library_work_separate">Separate editions</string>
 +    <string name="library_work_separate_failed">Could not separate the editions. Try again.</string>
 +    <string name="library_work_allow_grouping">Allow automatic grouping again</string>
++
++    <string name="sandbox_settings_title">Isolated source settings</string>
++    <string name="sandbox_settings_explanation">These settings belong only to this extension. Changes are checked in the isolated process. Some custom controls and login actions still require adaptation.</string>
++    <string name="sandbox_settings_loading">Loading isolated settings…</string>
++    <string name="sandbox_settings_failed">Could not load or change isolated settings</string>
++    <string name="sandbox_settings_retry">Tap to try again. Compatibility mode was not enabled.</string>
++    <string name="sandbox_settings_rejected">The source did not accept this setting. The previous value was preserved.</string>
++    <string name="sandbox_settings_action_unavailable">This custom action is not available in isolation yet.</string>
++    <string name="sandbox_settings_private">Private value; open to edit</string>
++    <string name="sandbox_settings_import">Import previous source settings</string>
++    <string name="sandbox_settings_import_summary">Use compatible settings restored from a backup or from compatibility mode.</string>
++    <string name="sandbox_settings_import_warning">This shares previous settings for this source, including any sign-in data, with the selected extension. Only supported fields are imported. The previous settings are preserved. Continue only if you trust this extension.</string>
  </resources>
 diff --git a/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml b/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
-index d1748bc..de89abe 100644
+index d1748bc..753d93f 100644
 --- a/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
 +++ b/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
 @@ -10,7 +10,7 @@
@@ -64625,7 +67264,7 @@ index d1748bc..de89abe 100644
      <string name="pref_group_setup">Configuração da tradução</string>
      <string name="pref_translate_from">Traduzir de</string>
      <string name="pref_translate_to">Traduzir para</string>
-@@ -73,12 +73,281 @@
+@@ -73,12 +73,293 @@
      <string name="repository_add_error">Não foi possível adicionar o repositório. Confira a conexão e tente novamente.</string>
      <string name="repository_refresh_error">Repositório adicionado, mas não foi possível atualizar as extensões. Atualize a tela Extensões.</string>
      <string name="chapter_group_version">Grupo/versão: %1$s</string>
@@ -64908,6 +67547,18 @@ index d1748bc..de89abe 100644
 +    <string name="library_work_separate">Separar edições</string>
 +    <string name="library_work_separate_failed">Não foi possível separar as edições. Tente novamente.</string>
 +    <string name="library_work_allow_grouping">Permitir agrupamento automático novamente</string>
++
++    <string name="sandbox_settings_title">Configurações da fonte isolada</string>
++    <string name="sandbox_settings_explanation">Estas configurações pertencem apenas a esta extensão. As alterações são verificadas no processo isolado. Alguns controles personalizados e ações de login ainda precisam de adaptação.</string>
++    <string name="sandbox_settings_loading">Carregando configurações isoladas…</string>
++    <string name="sandbox_settings_failed">Não foi possível carregar ou alterar as configurações isoladas</string>
++    <string name="sandbox_settings_retry">Toque para tentar novamente. O modo de compatibilidade não foi ativado.</string>
++    <string name="sandbox_settings_rejected">A fonte não aceitou esta configuração. O valor anterior foi preservado.</string>
++    <string name="sandbox_settings_action_unavailable">Esta ação personalizada ainda não está disponível no isolamento.</string>
++    <string name="sandbox_settings_private">Valor privado; abra para editar</string>
++    <string name="sandbox_settings_import">Importar configurações anteriores da fonte</string>
++    <string name="sandbox_settings_import_summary">Usar configurações compatíveis restauradas de um backup ou do modo de compatibilidade.</string>
++    <string name="sandbox_settings_import_warning">Esta ação compartilha configurações anteriores desta fonte, inclusive eventuais dados de acesso, com a extensão selecionada. Apenas os campos compatíveis são importados. As configurações anteriores são preservadas. Continue apenas se confiar nesta extensão.</string>
  </resources>
 diff --git a/i18n/src/commonMain/moko-resources/base/strings.xml b/i18n/src/commonMain/moko-resources/base/strings.xml
 index c0832ba..ebf8f48 100644

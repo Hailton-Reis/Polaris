@@ -1,0 +1,10 @@
+{
+  "same_production_overlay_inputs_as_858_test_run": true,
+  "changes_since_jvm_suite": [
+    "app/src/androidTest/java/eu/kanade/tachiyomi/extension/sandbox/SandboxSettingsAndroidTest.kt",
+    "app/src/debug/java/eu/kanade/tachiyomi/polaris/SandboxSettingsTestActivity.kt"
+  ],
+  "reason": "Only the non-exported debug Activity fixture and Android instrumentation test changed; final Android run must retest actual visible-switch input",
+  "unit_build_manifest_sha256": "37996a6ae34b9ae0714f8dc98fe7c8af47625b0ad144011d488004eb6448376e",
+  "final_build_manifest_sha256": "b23131918728385e008cce47b3875a9b2148e6cacc1a0b43ddb8b68e6d479b51"
+}

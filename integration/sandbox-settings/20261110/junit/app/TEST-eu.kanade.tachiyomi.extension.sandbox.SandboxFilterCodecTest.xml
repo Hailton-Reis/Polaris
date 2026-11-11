@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.tachiyomi.extension.sandbox.SandboxFilterCodecTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-11-10T22:28:21.041Z" hostname="7d7c5a6182d0" time="0.034">
+  <properties/>
+  <testcase name="invalid later state never partially mutates an earlier valid choice()" classname="eu.kanade.tachiyomi.extension.sandbox.SandboxFilterCodecTest" time="0.01"/>
+  <testcase name="nested selections are applied to original concrete worker classes()" classname="eu.kanade.tachiyomi.extension.sandbox.SandboxFilterCodecTest" time="0.013"/>
+  <testcase name="unrelated nonempty host lists cannot masquerade as source filters()" classname="eu.kanade.tachiyomi.extension.sandbox.SandboxFilterCodecTest" time="0.002"/>
+  <testcase name="stale schemas and swapped labels are rejected instead of silently ignoring filters()" classname="eu.kanade.tachiyomi.extension.sandbox.SandboxFilterCodecTest" time="0.002"/>
+  <testcase name="oversized and deeply nested filter trees are refused()" classname="eu.kanade.tachiyomi.extension.sandbox.SandboxFilterCodecTest" time="0.003"/>
+  <testcase name="quoted scalar and unknown payload fields are refused()" classname="eu.kanade.tachiyomi.extension.sandbox.SandboxFilterCodecTest" time="0.003"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

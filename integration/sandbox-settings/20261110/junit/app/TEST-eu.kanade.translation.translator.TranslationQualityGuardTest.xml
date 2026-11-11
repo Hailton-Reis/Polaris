@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.translation.translator.TranslationQualityGuardTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-11-10T22:28:42.932Z" hostname="7d7c5a6182d0" time="0.004">
+  <properties/>
+  <testcase name="blank translation is retried()" classname="eu.kanade.translation.translator.TranslationQualityGuardTest" time="0.001"/>
+  <testcase name="proper portuguese translation is accepted()" classname="eu.kanade.translation.translator.TranslationQualityGuardTest" time="0.001"/>
+  <testcase name="unchanged translation is retried()" classname="eu.kanade.translation.translator.TranslationQualityGuardTest" time="0.001"/>
+  <testcase name="short names do not trigger language heuristic()" classname="eu.kanade.translation.translator.TranslationQualityGuardTest" time="0.0"/>
+  <testcase name="same language pair does not retry unchanged text()" classname="eu.kanade.translation.translator.TranslationQualityGuardTest" time="0.0"/>
+  <testcase name="english result with strong source overlap is retried()" classname="eu.kanade.translation.translator.TranslationQualityGuardTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

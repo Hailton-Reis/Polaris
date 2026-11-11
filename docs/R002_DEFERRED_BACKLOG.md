@@ -2,6 +2,10 @@
 
 This document protects R001 from scope creep.
 
+## Sandbox preferences and filters P20261110.3
+
+[Basic typed preferences, stock host widgets and source filters](SANDBOX_PREFERENCIAS_FILTROS_P20261110_3.md) are implemented in development. Package/signer-scoped storage and explicit legacy import preserve native backup keys; restore now rejects non-native source preference namespaces. Real-provider compatibility, dynamic controls, login/WebView, cross-session cookies and novels remain open. Public beta.10 remains unchanged.
+
 ## Library review P20261110.2
 
 [Review findings and fixes](REVISAO_BIBLIOTECA_P20261110_2.md): shared numbering validation on reads and transactional commit, correct season/volume/part scope for adjacent ranges, non-favorite preference handling and per-edition parsing. Post-association criterion revalidation is implemented. Semantic renumbering, full real-provider/backup/reader flows, external-reader acceptance and ARM performance remain open.

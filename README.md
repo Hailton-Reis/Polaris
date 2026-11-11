@@ -142,3 +142,5 @@ Veja [como contribuir](CONTRIBUTING.md). Para problemas de armazenamento, inform
 ---
 
 Mantido por **Hailton Reis**. Licença **[Apache 2.0](LICENSE)** · **[Créditos e atribuições](NOTICE)**.
+
+A revisão de desenvolvimento [P20261110.3](docs/SANDBOX_PREFERENCIAS_FILTROS_P20261110_3.md) amplia a sandbox com preferências básicas e filtros. Login, fontes reais e aceite em ARM continuam pendentes; não é uma nova publicação para celulares.

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.translation.detection.DbnetStageMetricsTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-11-10T22:28:28.236Z" hostname="7d7c5a6182d0" time="0.006">
+  <properties/>
+  <testcase name="worker timing transport preserves stage outcome and rejects malformed payloads()" classname="eu.kanade.translation.detection.DbnetStageMetricsTest" time="0.001"/>
+  <testcase name="worker recorder marks a thrown stage failed and leaves later work unreached()" classname="eu.kanade.translation.detection.DbnetStageMetricsTest" time="0.002"/>
+  <testcase name="worker reply encoding exports the complete validated timing shape()" classname="eu.kanade.translation.detection.DbnetStageMetricsTest" time="0.001"/>
+  <testcase name="worker recorder marks a returned postprocessor failure failed()" classname="eu.kanade.translation.detection.DbnetStageMetricsTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

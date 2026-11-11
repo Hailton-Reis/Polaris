@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.translation.detection.DbnetReplyTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-11-10T22:28:28.195Z" hostname="7d7c5a6182d0" time="0.032">
+  <properties/>
+  <testcase name="timeout and late reply do not replace completed outcome()" classname="eu.kanade.translation.detection.DbnetReplyTest" time="0.007"/>
+  <testcase name="worker death unblocks caller with recoverable failure()" classname="eu.kanade.translation.detection.DbnetReplyTest" time="0.002"/>
+  <testcase name="duplicate reply is ignored()" classname="eu.kanade.translation.detection.DbnetReplyTest" time="0.003"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

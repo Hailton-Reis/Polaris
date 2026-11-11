@@ -1,0 +1,41 @@
+{
+  "regenerable_build_intermediates_only": [
+    {
+      "path": "/workspace/scratch/polaris-cloud-e7d774c/android-build/patched-yomotsu/app/build/intermediates/merged_native_libs",
+      "bytes": 476789520
+    },
+    {
+      "path": "/workspace/scratch/polaris-cloud-e7d774c/android-build/patched-yomotsu/app/build/intermediates/stripped_native_libs",
+      "bytes": 450496328
+    },
+    {
+      "path": "/workspace/scratch/polaris-cloud-e7d774c/android-build/patched-yomotsu/app/build/intermediates/dex",
+      "bytes": 123106140
+    },
+    {
+      "path": "/workspace/scratch/polaris-cloud-e7d774c/android-build/patched-yomotsu/app/build/intermediates/project_dex_archive",
+      "bytes": 32067268
+    },
+    {
+      "path": "/workspace/scratch/polaris-cloud-e7d774c/android-build/patched-yomotsu/app/build/intermediates/compile_app_classes_jar",
+      "bytes": 38348001
+    },
+    {
+      "path": "/workspace/scratch/polaris-cloud-e7d774c/android-build/patched-yomotsu/app/build/intermediates/compressed_assets",
+      "bytes": 30085091
+    },
+    {
+      "path": "/workspace/scratch/polaris-cloud-e7d774c/android-build/patched-yomotsu/app/build/intermediates/assets",
+      "bytes": 36314820
+    },
+    {
+      "path": "/workspace/scratch/polaris-cloud-e7d774c/android-build/patched-yomotsu/app/build/intermediates/merged_res",
+      "bytes": 15560340
+    },
+    {
+      "path": "/workspace/scratch/polaris-cloud-e7d774c/android-build/patched-yomotsu/app/build/intermediates/linked_resources_binary_format",
+      "bytes": 14378233
+    }
+  ],
+  "APK_guest_data_and_sources_preserved": true
+}

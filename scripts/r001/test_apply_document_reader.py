@@ -1,3 +1,5 @@
+import hashlib
+import json
 import os
 from pathlib import Path
 import subprocess
@@ -30,6 +32,11 @@ class DocumentOverlayTests(unittest.TestCase):
             subprocess.run([sys.executable, str(PROJECT / script), str(self.root)],
                            check=True, capture_output=True)
 
+    def verify_fixture_bytes(self):
+        expected = json.loads((PROJECT / 'integration/sandbox-settings/20261110/fixture/provenance.json').read_text())['sha256']
+        actual = self.root / 'app/src/androidTest/assets/polaris-sandbox/fixture.apk'
+        self.assertEqual(hashlib.sha256(actual.read_bytes()).hexdigest(), expected)
+
     def test_full_stack_application_and_idempotence(self):
         self.prepare()
         self.assertEqual(apply(self.root)['status'], 'APPLIED')
@@ -40,10 +47,14 @@ class DocumentOverlayTests(unittest.TestCase):
         subprocess.run(['git', '-C', str(self.root), 'diff', '--check'], check=True)
         self.assertFalse((self.root / 'data/src/main/sqldelight/tachiyomi/migrations/15.sqm').exists())
         about = self.root / 'app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt'
-        self.assertIn('P20261110.2', about.read_text())
+        self.assertIn('P20261110.3', about.read_text())
+        self.verify_fixture_bytes()
         self.assertTrue((self.root / 'app/src/main/java/eu/kanade/tachiyomi/source/selection/UnifiedWorkSearch.kt').exists())
         self.assertTrue((self.root / 'domain/src/main/java/tachiyomi/domain/manga/model/LibraryWork.kt').exists())
         self.assertTrue((self.root / 'domain/src/main/java/tachiyomi/domain/chapter/model/ChapterNumbering.kt').exists())
+        for name in ('SandboxFilterCodec.kt', 'SandboxPreferenceCodec.kt', 'SandboxPreferenceStore.kt', 'SandboxPreferenceUi.kt'):
+            self.assertTrue((self.root / 'app/src/main/java/eu/kanade/tachiyomi/extension/sandbox' / name).exists())
+        self.assertEqual(subprocess.check_output(['git', '-C', str(self.root), 'check-attr', 'text', '--', 'app/src/androidTest/assets/polaris-sandbox/fixture.apk'], text=True).strip().split(': ')[-1], 'unset')
         self.assertTrue((self.root / 'app/src/androidTest/java/eu/kanade/tachiyomi/polaris/LibraryConsolidationAndroidTest.kt').exists())
         self.assertFalse((self.root / 'app/src/main/java/eu/kanade/tachiyomi/data/profile/YomotsuLevelManager.kt').exists())
         self.assertFalse((self.root / 'app/src/main/res/drawable-nodpi/ic_yomotsu_logo.png').exists())
@@ -66,6 +77,7 @@ class DocumentOverlayTests(unittest.TestCase):
         self.prepare()
         self.assertEqual(apply(self.root)['status'], 'APPLIED')
         self.assertEqual(apply(self.root)['status'], 'ALREADY_APPLIED')
+        self.verify_fixture_bytes()
 
     def test_prerequisite_and_migration_gate(self):
         with self.assertRaisesRegex(ValueError, 'reader translation overlay'):

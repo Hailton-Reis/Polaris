@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.translation.translator.BrazilianPortugueseMachinePostEditorTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-11-10T22:28:42.804Z" hostname="7d7c5a6182d0" time="0.006">
+  <properties/>
+  <testcase name="corrects nightmare past tense()" classname="eu.kanade.translation.translator.BrazilianPortugueseMachinePostEditorTest" time="0.003"/>
+  <testcase name="does not change another target language()" classname="eu.kanade.translation.translator.BrazilianPortugueseMachinePostEditorTest" time="0.0"/>
+  <testcase name="localizes liege and naturalizes completed job()" classname="eu.kanade.translation.translator.BrazilianPortugueseMachinePostEditorTest" time="0.0"/>
+  <testcase name="uses established Shadow Monarch title()" classname="eu.kanade.translation.translator.BrazilianPortugueseMachinePostEditorTest" time="0.0"/>
+  <testcase name="preserves father and dad distinction()" classname="eu.kanade.translation.translator.BrazilianPortugueseMachinePostEditorTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

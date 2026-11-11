@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.translation.recognizer.SpeechBubbleBackgroundRegressionTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-11-10T22:28:33.683Z" hostname="7d7c5a6182d0" time="3.187">
+  <properties/>
+  <testcase name="grouped sampling uses original footprints instead of the enclosing corners()" classname="eu.kanade.translation.recognizer.SpeechBubbleBackgroundRegressionTest" time="0.423"/>
+  <testcase name="a tight dark outline is not the background of a white caption()" classname="eu.kanade.translation.recognizer.SpeechBubbleBackgroundRegressionTest" time="0.256"/>
+  <testcase name="wide white balloon line never samples the black page through gaps in peer masks()" classname="eu.kanade.translation.recognizer.SpeechBubbleBackgroundRegressionTest" time="0.975"/>
+  <testcase name="a middle line on a dark page stays in its translated paragraph()" classname="eu.kanade.translation.recognizer.SpeechBubbleBackgroundRegressionTest" time="0.97"/>
+  <testcase name="sampling follows the actual interior for dark and tinted balloons too()" classname="eu.kanade.translation.recognizer.SpeechBubbleBackgroundRegressionTest" time="0.56"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

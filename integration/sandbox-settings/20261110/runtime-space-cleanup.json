@@ -1,0 +1,16 @@
+{
+  "scope": "regenerable build intermediates only; no source, reports, APKs, SDK, model, signing key or guest data removed",
+  "total_bytes_removed": 1271295080,
+  "paths": [
+    "patched-yomotsu/app/build/intermediates/merged_native_libs",
+    "patched-yomotsu/app/build/intermediates/stripped_native_libs",
+    "patched-yomotsu/app/build/intermediates/dex",
+    "patched-yomotsu/app/build/intermediates/project_dex_archive",
+    "patched-yomotsu/app/build/intermediates/runtime_app_classes_jar",
+    "patched-yomotsu/app/build/intermediates/compile_app_classes_jar",
+    "patched-yomotsu/app/build/intermediates/compressed_assets",
+    "polaris-ocr-benchmark-v1/android/app/build/intermediates/merged_native_libs",
+    "polaris-ocr-benchmark-v1/android/app/build/intermediates/stripped_native_libs"
+  ],
+  "initial_emulator_preflight_failed_for_low_disk": true
+}

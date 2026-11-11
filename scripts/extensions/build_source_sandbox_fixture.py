@@ -24,6 +24,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     for name in ('android-root', 'output', 'sdk', 'java-home', 'gradle-home', 'kotlinc'):
         parser.add_argument('--' + name, type=Path, required=True)
+    parser.add_argument('--source', type=Path, default=SOURCE, help='Synthetic fixture Kotlin source')
     parser.add_argument('--write-asset', action='store_true',
                         help='Replace the synthetic Android test asset in android-root explicitly')
     args = parser.parse_args()
@@ -40,13 +41,19 @@ def main():
                  android_root / 'core/common/build/intermediates/compile_library_classes_jar/debug/bundleLibCompileToJarDebug/classes.jar']
     for group in GROUPS:
         classpath += sorted((cache / group).rglob('*.jar'))
+    # Preference schemas use AndroidX classes in the target app; no dependency is bundled in the fixture.
+    preference_aar = next((cache / 'androidx.preference/preference').rglob('*.aar'))
+    with zipfile.ZipFile(preference_aar) as archive:
+        dependency = output / 'preference-classes.jar'
+        dependency.write_bytes(archive.read('classes.jar'))
+    classpath.append(dependency)
     compiler_args = output / 'compiler.args'
     # Kotlin compiler argfile quoting is independent of shell quoting.
     def quoted(value):
         return '"' + str(value).replace('\\', '\\\\').replace('"', '\\"') + '"'
     compiler_args.write_text('\n'.join(map(quoted, [
         '-jvm-target', '17', '-classpath', os.pathsep.join(map(str, classpath)),
-        '-d', output / 'fixture.jar', SOURCE,
+        '-d', output / 'fixture.jar', args.source.resolve(),
     ])) + '\n')
     subprocess.run([str(args.kotlinc), '@' + str(compiler_args)], check=True,
                    env=dict(os.environ, JAVA_HOME=str(args.java_home)))
@@ -67,7 +74,7 @@ def main():
         asset.write_bytes(apk.read_bytes())
     provenance = {
         'scope': 'Synthetic current-Source-API implementation in a DEX zip; not a signed third-party extension or full-reader acceptance test.',
-        'source_sha256': hashlib.sha256(SOURCE.read_bytes()).hexdigest(),
+        'source_sha256': hashlib.sha256(args.source.read_bytes()).hexdigest(),
         'sha256': hashlib.sha256(apk.read_bytes()).hexdigest(),
         'bytes': apk.stat().st_size,
         'dex_sha256': hashlib.sha256((dex_dir / 'classes.dex').read_bytes()).hexdigest(),

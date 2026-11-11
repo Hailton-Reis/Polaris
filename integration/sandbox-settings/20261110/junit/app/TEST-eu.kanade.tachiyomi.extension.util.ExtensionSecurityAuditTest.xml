@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.tachiyomi.extension.util.ExtensionSecurityAuditTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-11-10T22:28:22.495Z" hostname="7d7c5a6182d0" time="0.025">
+  <properties/>
+  <testcase name="runtime execution and dynamically loaded code require quarantine()" classname="eu.kanade.tachiyomi.extension.util.ExtensionSecurityAuditTest" time="0.003"/>
+  <testcase name="an approval binds package and exact bytes and does not authorize a changed update()" classname="eu.kanade.tachiyomi.extension.util.ExtensionSecurityAuditTest" time="0.005"/>
+  <testcase name="unreadable or out of bounds code fails closed and cannot be approved()" classname="eu.kanade.tachiyomi.extension.util.ExtensionSecurityAuditTest" time="0.001"/>
+  <testcase name="all dex files are inspected and native code and sensitive declarations are surfaced()" classname="eu.kanade.tachiyomi.extension.util.ExtensionSecurityAuditTest" time="0.002"/>
+  <testcase name="ordinary HTTP references are not labeled dangerous solely by method name()" classname="eu.kanade.tachiyomi.extension.util.ExtensionSecurityAuditTest" time="0.001"/>
+  <testcase name="a package without inspectable dex is not silently accepted()" classname="eu.kanade.tachiyomi.extension.util.ExtensionSecurityAuditTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
