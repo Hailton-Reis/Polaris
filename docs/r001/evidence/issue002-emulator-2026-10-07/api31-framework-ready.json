@@ -1,0 +1,9 @@
+{
+  "args": [
+    "shell",
+    "getprop sys.boot_completed; service check package; service check activity; getprop ro.hw_timeout_multiplier"
+  ],
+  "returncode": 0,
+  "stdout": "1\nService package: found\nService activity: found\n10\n",
+  "stderr": ""
+}

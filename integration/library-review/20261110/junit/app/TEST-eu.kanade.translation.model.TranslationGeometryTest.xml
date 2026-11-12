@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.translation.model.TranslationGeometryTest" tests="12" skipped="0" failures="0" errors="0" timestamp="2026-11-10T20:37:15.198Z" hostname="7d7c5a6182d0" time="0.006">
+  <properties/>
+  <testcase name="cleanup region expands OCR bounds and stays inside page()" classname="eu.kanade.translation.model.TranslationGeometryTest" time="0.0"/>
+  <testcase name="clamped region that starts beyond page edge is moved fully inside()" classname="eu.kanade.translation.model.TranslationGeometryTest" time="0.0"/>
+  <testcase name="disjoint touching and invalid geometry have zero overlap()" classname="eu.kanade.translation.model.TranslationGeometryTest" time="0.0"/>
+  <testcase name="clamped sanitizes non finite geometry before rendering()" classname="eu.kanade.translation.model.TranslationGeometryTest" time="0.0"/>
+  <testcase name="layout region gives translation more room than cleanup region()" classname="eu.kanade.translation.model.TranslationGeometryTest" time="0.001"/>
+  <testcase name="clamped region never crosses right or bottom page edge()" classname="eu.kanade.translation.model.TranslationGeometryTest" time="0.0"/>
+  <testcase name="Y8 translation json remains compatible with Y9 geometry()" classname="eu.kanade.translation.model.TranslationGeometryTest" time="0.001"/>
+  <testcase name="layout saved by first Y9 falls back to safer geometry()" classname="eu.kanade.translation.model.TranslationGeometryTest" time="0.0"/>
+  <testcase name="clamped keeps an already valid region unchanged()" classname="eu.kanade.translation.model.TranslationGeometryTest" time="0.0"/>
+  <testcase name="IoU and directional coverage distinguish overlap from containment()" classname="eu.kanade.translation.model.TranslationGeometryTest" time="0.001"/>
+  <testcase name="current layout geometry keeps detected balloon region()" classname="eu.kanade.translation.model.TranslationGeometryTest" time="0.0"/>
+  <testcase name="inset keeps text away from rounded balloon edges()" classname="eu.kanade.translation.model.TranslationGeometryTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

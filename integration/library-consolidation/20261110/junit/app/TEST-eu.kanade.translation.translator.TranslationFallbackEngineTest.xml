@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.translation.translator.TranslationFallbackEngineTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-11-10T14:11:40.930Z" hostname="7d7c5a6182d0" time="0.011">
+  <properties/>
+  <testcase name="unknown fallback values resolve to none()" classname="eu.kanade.translation.translator.TranslationFallbackEngineTest" time="0.002"/>
+  <testcase name="only explicitly authorized no key fallbacks are available()" classname="eu.kanade.translation.translator.TranslationFallbackEngineTest" time="0.005"/>
+  <testcase name="none never resolves a fallback translator()" classname="eu.kanade.translation.translator.TranslationFallbackEngineTest" time="0.0"/>
+  <testcase name="explicit keyless online fallback never duplicates the primary()" classname="eu.kanade.translation.translator.TranslationFallbackEngineTest" time="0.0"/>
+  <testcase name="explicit local fallback resolves only when supported and different from primary()" classname="eu.kanade.translation.translator.TranslationFallbackEngineTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

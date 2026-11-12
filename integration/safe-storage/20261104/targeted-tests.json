@@ -1,0 +1,36 @@
+{
+  "storage_tests": 32,
+  "backup_codec_tests": 6,
+  "suites": [
+    {
+      "suite": "PrivateExtensionFilesTest",
+      "tests": 7,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "ExtensionInstallerDownloadTest",
+      "tests": 5,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "BackupArchiveWriterTest",
+      "tests": 9,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "BackupCreatorTransactionTest",
+      "tests": 11,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "BackupInteropTest",
+      "tests": 6,
+      "failed": 0,
+      "skipped": 0
+    }
+  ]
+}

@@ -1,0 +1,64 @@
+{
+  "status": "DEVELOPMENT_COMPONENT_VALIDATED_PENDING_DEVICE_ACCEPTANCE",
+  "revision": "P20261106.2",
+  "version": "0.1.0-beta.11",
+  "version_code": 112,
+  "published": false,
+  "public_release_unchanged": "v0.1.0-beta.10",
+  "source_patch_sha256": "7196a973627d0fa08d9d917718b165e10558dec53c0ed9dcd686ae04c5a1868b",
+  "compiled_overlay_files": 274,
+  "jvm": {
+    "total": 764,
+    "passed": 747,
+    "failed": 17,
+    "skipped": 0
+  },
+  "preexisting_failures": 17,
+  "new_tests_since_beta10": 26,
+  "new_regressions": 0,
+  "missing_baseline_cases": 0,
+  "baseline_report_provenance": "beta10 final-reports snapshot (732 cases) plus its archived RestoredRepositoryTrustTest (3) and NovelPluginPathsTest (3); complete baseline 738 cases matches beta10 final Gradle log",
+  "gradle_exit": 1,
+  "gradle_exit_reason": "Only app:testDebugUnitTest failed with the same 17 preexisting failures; assembleDebug and assembleDebugAndroidTest completed in the same graph",
+  "host_guards": {
+    "overlay": 4,
+    "universal_packager": 9,
+    "passed": 13
+  },
+  "android": {
+    "passed": 5,
+    "failed": 0,
+    "api": 26,
+    "abi": "x86_64",
+    "component_host": true,
+    "production_service_and_proxy": true,
+    "synthetic_compiled_source_api": true,
+    "full_reader_ui_acceptance": false,
+    "physical_arm_acceptance": false,
+    "host_uid": 10065,
+    "observed_worker_uid": 99000,
+    "elapsed_seconds": 15.753,
+    "selinux": "Enforcing"
+  },
+  "artifacts": [
+    {
+      "file": "app-debug.apk",
+      "bytes": 236896057,
+      "sha256": "9008121199c97954a210348a05538626ca158af7474b4ed1fa93981ede208888",
+      "scope": "x86_64 component instrumentation only; not a phone release"
+    },
+    {
+      "file": "app-debug-androidTest.apk",
+      "bytes": 499380,
+      "sha256": "6f6981d82e2a78f250a95ed4cbc43ecf8d0bfdc65820176aa20bda55ea1e504f",
+      "scope": "x86_64 component instrumentation only; not a phone release"
+    }
+  ],
+  "pending": [
+    "Real provider extensions, restored-library database/UI and page loading end to end",
+    "Physical ARM32/ARM64 and low-memory performance",
+    "Recent Android and broader third-party extension isolation compatibility",
+    "Mihon/Tachiyomi database/UI round trips; readers dropping memo cannot retain all merged editions",
+    "Global-search and already-duplicated library entries are not deduplicated in this step"
+  ]
+}

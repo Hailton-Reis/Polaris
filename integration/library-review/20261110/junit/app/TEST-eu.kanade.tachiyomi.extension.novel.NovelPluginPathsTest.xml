@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.tachiyomi.extension.novel.NovelPluginPathsTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-11-10T20:37:05.973Z" hostname="7d7c5a6182d0" time="0.007">
+  <properties/>
+  <testcase name="code downloads require HTTPS without embedded credentials()" classname="eu.kanade.tachiyomi.extension.novel.NovelPluginPathsTest" time="0.003"/>
+  <testcase name="repository identifiers cannot escape or choose a different file type()" classname="eu.kanade.tachiyomi.extension.novel.NovelPluginPathsTest" time="0.001"/>
+  <testcase name="ordinary and Unicode identifiers remain inside the chosen directory()" classname="eu.kanade.tachiyomi.extension.novel.NovelPluginPathsTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

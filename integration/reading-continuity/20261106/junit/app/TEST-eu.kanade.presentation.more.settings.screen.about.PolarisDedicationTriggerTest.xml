@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.presentation.more.settings.screen.about.PolarisDedicationTriggerTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-11-06T19:56:29.636Z" hostname="550a0106d184" time="0.013">
+  <properties/>
+  <testcase name="clock reset starts a fresh sequence()" classname="eu.kanade.presentation.more.settings.screen.about.PolarisDedicationTriggerTest" time="0.002"/>
+  <testcase name="distant taps cannot accumulate accidentally()" classname="eu.kanade.presentation.more.settings.screen.about.PolarisDedicationTriggerTest" time="0.003"/>
+  <testcase name="seven deliberate taps reveal the dedication()" classname="eu.kanade.presentation.more.settings.screen.about.PolarisDedicationTriggerTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

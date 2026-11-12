@@ -1,0 +1,209 @@
+INSTRUMENTATION_STATUS: numtests=12
+INSTRUMENTATION_STATUS: stream=
+eu.kanade.tachiyomi.extension.sandbox.ExtensionSandboxAndroidTest:
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=actualSourceRunsAtDifferentUidWithNoHostCanaryAccess
+INSTRUMENTATION_STATUS: class=eu.kanade.tachiyomi.extension.sandbox.ExtensionSandboxAndroidTest
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: numtests=12
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=actualSourceRunsAtDifferentUidWithNoHostCanaryAccess
+INSTRUMENTATION_STATUS: class=eu.kanade.tachiyomi.extension.sandbox.ExtensionSandboxAndroidTest
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: numtests=12
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=proxyNeverLoadsFixtureClassesInTheHostAndKeepsSourceIdentity
+INSTRUMENTATION_STATUS: class=eu.kanade.tachiyomi.extension.sandbox.ExtensionSandboxAndroidTest
+INSTRUMENTATION_STATUS: current=2
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: numtests=12
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=proxyNeverLoadsFixtureClassesInTheHostAndKeepsSourceIdentity
+INSTRUMENTATION_STATUS: class=eu.kanade.tachiyomi.extension.sandbox.ExtensionSandboxAndroidTest
+INSTRUMENTATION_STATUS: current=2
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: numtests=12
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=aPrivateNetworkRequestIsBlockedAndReportedWithoutHostExecution
+INSTRUMENTATION_STATUS: class=eu.kanade.tachiyomi.extension.sandbox.ExtensionSandboxAndroidTest
+INSTRUMENTATION_STATUS: current=3
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: numtests=12
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=aPrivateNetworkRequestIsBlockedAndReportedWithoutHostExecution
+INSTRUMENTATION_STATUS: class=eu.kanade.tachiyomi.extension.sandbox.ExtensionSandboxAndroidTest
+INSTRUMENTATION_STATUS: current=3
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: numtests=12
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=aStuckConstructorIsTerminatedAndANewApkSessionCanStart
+INSTRUMENTATION_STATUS: class=eu.kanade.tachiyomi.extension.sandbox.ExtensionSandboxAndroidTest
+INSTRUMENTATION_STATUS: current=4
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: numtests=12
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=aStuckConstructorIsTerminatedAndANewApkSessionCanStart
+INSTRUMENTATION_STATUS: class=eu.kanade.tachiyomi.extension.sandbox.ExtensionSandboxAndroidTest
+INSTRUMENTATION_STATUS: current=4
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: numtests=12
+INSTRUMENTATION_STATUS: stream=
+eu.kanade.tachiyomi.extension.sandbox.AutomaticLanguageAndroidTest:
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=bundledModelRecognizesEnglishAndLeavesPortugueseOrShortTextAlone
+INSTRUMENTATION_STATUS: class=eu.kanade.tachiyomi.extension.sandbox.AutomaticLanguageAndroidTest
+INSTRUMENTATION_STATUS: current=5
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: numtests=12
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=bundledModelRecognizesEnglishAndLeavesPortugueseOrShortTextAlone
+INSTRUMENTATION_STATUS: class=eu.kanade.tachiyomi.extension.sandbox.AutomaticLanguageAndroidTest
+INSTRUMENTATION_STATUS: current=5
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: numtests=12
+INSTRUMENTATION_STATUS: stream=
+eu.kanade.tachiyomi.polaris.LauncherIconAndroidTest:
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=iconSwitchKeepsOriginalActivityAndRepositoryLinksAvailable
+INSTRUMENTATION_STATUS: class=eu.kanade.tachiyomi.polaris.LauncherIconAndroidTest
+INSTRUMENTATION_STATUS: current=6
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: numtests=12
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=iconSwitchKeepsOriginalActivityAndRepositoryLinksAvailable
+INSTRUMENTATION_STATUS: class=eu.kanade.tachiyomi.polaris.LauncherIconAndroidTest
+INSTRUMENTATION_STATUS: current=6
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: numtests=12
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=unknownRestoredChoiceAndMissingEnabledAliasesRecoverToOriginal
+INSTRUMENTATION_STATUS: class=eu.kanade.tachiyomi.polaris.LauncherIconAndroidTest
+INSTRUMENTATION_STATUS: current=7
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: numtests=12
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=unknownRestoredChoiceAndMissingEnabledAliasesRecoverToOriginal
+INSTRUMENTATION_STATUS: class=eu.kanade.tachiyomi.polaris.LauncherIconAndroidTest
+INSTRUMENTATION_STATUS: current=7
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: numtests=12
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=everyChoiceHasExactlyOneVisibleLauncherAndInflatesItsIcon
+INSTRUMENTATION_STATUS: class=eu.kanade.tachiyomi.polaris.LauncherIconAndroidTest
+INSTRUMENTATION_STATUS: current=8
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: numtests=12
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=everyChoiceHasExactlyOneVisibleLauncherAndInflatesItsIcon
+INSTRUMENTATION_STATUS: class=eu.kanade.tachiyomi.polaris.LauncherIconAndroidTest
+INSTRUMENTATION_STATUS: current=8
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: numtests=12
+INSTRUMENTATION_STATUS: stream=
+eu.kanade.tachiyomi.polaris.ProfilePreferencesAndroidTest:
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=migrationKeepsPersonalNameAndBackupExcludesLocalImagePaths
+INSTRUMENTATION_STATUS: class=eu.kanade.tachiyomi.polaris.ProfilePreferencesAndroidTest
+INSTRUMENTATION_STATUS: current=9
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: numtests=12
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=migrationKeepsPersonalNameAndBackupExcludesLocalImagePaths
+INSTRUMENTATION_STATUS: class=eu.kanade.tachiyomi.polaris.ProfilePreferencesAndroidTest
+INSTRUMENTATION_STATUS: current=9
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: numtests=12
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=realAndroidImageDecoderAcceptsPngAndRejectsInvalidContent
+INSTRUMENTATION_STATUS: class=eu.kanade.tachiyomi.polaris.ProfilePreferencesAndroidTest
+INSTRUMENTATION_STATUS: current=10
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: numtests=12
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=realAndroidImageDecoderAcceptsPngAndRejectsInvalidContent
+INSTRUMENTATION_STATUS: class=eu.kanade.tachiyomi.polaris.ProfilePreferencesAndroidTest
+INSTRUMENTATION_STATUS: current=10
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: numtests=12
+INSTRUMENTATION_STATUS: stream=
+eu.kanade.tachiyomi.polaris.PersonalizationPreviewAndroidTest:
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=renderJourneyIconsAndThemesWithLargeText
+INSTRUMENTATION_STATUS: class=eu.kanade.tachiyomi.polaris.PersonalizationPreviewAndroidTest
+INSTRUMENTATION_STATUS: current=11
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: numtests=12
+INSTRUMENTATION_STATUS: stream=
+Error in renderJourneyIconsAndThemesWithLargeText(eu.kanade.tachiyomi.polaris.PersonalizationPreviewAndroidTest):
+java.lang.RuntimeException: Could not launch intent Intent { flg=0x10008000 cmp=app.mihon.tachiyomiat.dev/eu.kanade.tachiyomi.polaris.PolarisPersonalizationTestActivity (has extras) } within 45000 milliseconds. Perhaps the main thread has not gone idle within a reasonable amount of time? There could be an animation or something constantly repainting the screen. Or the activity is doing network calls on creation? See the threaddump logs. For your reference the last time the event queue was idle before your activity launch request was 1794264320751 and now the last time the queue went idle was: 1794264323161. If these numbers are the same your activity might be hogging the event queue.
+	at androidx.test.runner.MonitoringInstrumentation.startActivitySync(MonitoringInstrumentation.java:537)
+	at androidx.test.core.app.InstrumentationActivityInvoker.startActivity(InstrumentationActivityInvoker.java:419)
+	at androidx.test.core.app.InstrumentationActivityInvoker.startActivity(InstrumentationActivityInvoker.java:428)
+	at androidx.test.core.app.ActivityScenario.launchInternal(ActivityScenario.java:367)
+	at androidx.test.core.app.ActivityScenario.launch(ActivityScenario.java:237)
+	at eu.kanade.tachiyomi.polaris.PersonalizationPreviewAndroidTest.renderJourneyIconsAndThemesWithLargeText(PersonalizationPreviewAndroidTest.kt:38)
+
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=renderJourneyIconsAndThemesWithLargeText
+INSTRUMENTATION_STATUS: class=eu.kanade.tachiyomi.polaris.PersonalizationPreviewAndroidTest
+INSTRUMENTATION_STATUS: stack=java.lang.RuntimeException: Could not launch intent Intent { flg=0x10008000 cmp=app.mihon.tachiyomiat.dev/eu.kanade.tachiyomi.polaris.PolarisPersonalizationTestActivity (has extras) } within 45000 milliseconds. Perhaps the main thread has not gone idle within a reasonable amount of time? There could be an animation or something constantly repainting the screen. Or the activity is doing network calls on creation? See the threaddump logs. For your reference the last time the event queue was idle before your activity launch request was 1794264320751 and now the last time the queue went idle was: 1794264323161. If these numbers are the same your activity might be hogging the event queue.
+	at androidx.test.runner.MonitoringInstrumentation.startActivitySync(MonitoringInstrumentation.java:537)
+	at androidx.test.core.app.InstrumentationActivityInvoker.startActivity(InstrumentationActivityInvoker.java:419)
+	at androidx.test.core.app.InstrumentationActivityInvoker.startActivity(InstrumentationActivityInvoker.java:428)
+	at androidx.test.core.app.ActivityScenario.launchInternal(ActivityScenario.java:367)
+	at androidx.test.core.app.ActivityScenario.launch(ActivityScenario.java:237)
+	at eu.kanade.tachiyomi.polaris.PersonalizationPreviewAndroidTest.renderJourneyIconsAndThemesWithLargeText(PersonalizationPreviewAndroidTest.kt:38)
+
+INSTRUMENTATION_STATUS: current=11
+INSTRUMENTATION_STATUS_CODE: -2
+INSTRUMENTATION_STATUS: numtests=12
+INSTRUMENTATION_STATUS: stream=
+eu.kanade.tachiyomi.polaris.UnifiedWorkSearchAndroidTest:
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=restoredWorkAppearsOnceAndUnrelatedWorksRemainVisible
+INSTRUMENTATION_STATUS: class=eu.kanade.tachiyomi.polaris.UnifiedWorkSearchAndroidTest
+INSTRUMENTATION_STATUS: current=12
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: numtests=12
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=restoredWorkAppearsOnceAndUnrelatedWorksRemainVisible
+INSTRUMENTATION_STATUS: class=eu.kanade.tachiyomi.polaris.UnifiedWorkSearchAndroidTest
+INSTRUMENTATION_STATUS: current=12
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_RESULT: stream=
+
+Time: 218.051
+There was 1 failure:
+1) renderJourneyIconsAndThemesWithLargeText(eu.kanade.tachiyomi.polaris.PersonalizationPreviewAndroidTest)
+java.lang.RuntimeException: Could not launch intent Intent { flg=0x10008000 cmp=app.mihon.tachiyomiat.dev/eu.kanade.tachiyomi.polaris.PolarisPersonalizationTestActivity (has extras) } within 45000 milliseconds. Perhaps the main thread has not gone idle within a reasonable amount of time? There could be an animation or something constantly repainting the screen. Or the activity is doing network calls on creation? See the threaddump logs. For your reference the last time the event queue was idle before your activity launch request was 1794264320751 and now the last time the queue went idle was: 1794264323161. If these numbers are the same your activity might be hogging the event queue.
+	at androidx.test.runner.MonitoringInstrumentation.startActivitySync(MonitoringInstrumentation.java:537)
+	at androidx.test.core.app.InstrumentationActivityInvoker.startActivity(InstrumentationActivityInvoker.java:419)
+	at androidx.test.core.app.InstrumentationActivityInvoker.startActivity(InstrumentationActivityInvoker.java:428)
+	at androidx.test.core.app.ActivityScenario.launchInternal(ActivityScenario.java:367)
+	at androidx.test.core.app.ActivityScenario.launch(ActivityScenario.java:237)
+	at eu.kanade.tachiyomi.polaris.PersonalizationPreviewAndroidTest.renderJourneyIconsAndThemesWithLargeText(PersonalizationPreviewAndroidTest.kt:38)
+
+FAILURES!!!
+Tests run: 12,  Failures: 1
+
+
+INSTRUMENTATION_CODE: -1

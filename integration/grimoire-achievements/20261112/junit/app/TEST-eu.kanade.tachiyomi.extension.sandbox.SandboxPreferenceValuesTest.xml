@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.tachiyomi.extension.sandbox.SandboxPreferenceValuesTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-11-12T18:43:11.123Z" hostname="060411c85d3c" time="0.042">
+  <properties/>
+  <testcase name="obvious access values and private marked fields are omitted by nonprivate backup policy()" classname="eu.kanade.tachiyomi.extension.sandbox.SandboxPreferenceValuesTest" time="0.002"/>
+  <testcase name="wrong types nonfinite floats oversized values and arbitrary objects are refused()" classname="eu.kanade.tachiyomi.extension.sandbox.SandboxPreferenceValuesTest" time="0.002"/>
+  <testcase name="entry counts and total payload sizes stay bounded()" classname="eu.kanade.tachiyomi.extension.sandbox.SandboxPreferenceValuesTest" time="0.003"/>
+  <testcase name="memory editor returns copies and rejects invalid batches before writing()" classname="eu.kanade.tachiyomi.extension.sandbox.SandboxPreferenceValuesTest" time="0.002"/>
+  <testcase name="stored primitive types and string sets round trip without numeric coercion()" classname="eu.kanade.tachiyomi.extension.sandbox.SandboxPreferenceValuesTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

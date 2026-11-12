@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.translation.detection.DbnetCleanupMaskTest" tests="18" skipped="0" failures="0" errors="0" timestamp="2026-11-09T22:30:56.846Z" hostname="0d67ac30ae46" time="0.653">
+  <properties/>
+  <testcase name="high confidence sparse large glyph mask gains only one extra pixel inside permission()" classname="eu.kanade.translation.detection.DbnetCleanupMaskTest" time="0.026"/>
+  <testcase name="small residuals two pixels from a glyph are covered without escaping member permission()" classname="eu.kanade.translation.detection.DbnetCleanupMaskTest" time="0.001"/>
+  <testcase name="saved page aggregate mask budget fails closed without invoking legacy erasers()" classname="eu.kanade.translation.detection.DbnetCleanupMaskTest" time="0.001"/>
+  <testcase name="uncertain mask keeps the existing two pixel expansion()" classname="eu.kanade.translation.detection.DbnetCleanupMaskTest" time="0.001"/>
+  <testcase name="prepared mask ownership survives OCR normalization copy and filtering()" classname="eu.kanade.translation.detection.DbnetCleanupMaskTest" time="0.001"/>
+  <testcase name="null mask uses the exact legacy cleanup patches and masked blank translation erases nothing()" classname="eu.kanade.translation.detection.DbnetCleanupMaskTest" time="0.003"/>
+  <testcase name="DBNet pixel outside permission cannot seed dilation back inside()" classname="eu.kanade.translation.detection.DbnetCleanupMaskTest" time="0.001"/>
+  <testcase name="rotated member quad remains the exact permission instead of its group AABB()" classname="eu.kanade.translation.detection.DbnetCleanupMaskTest" time="0.001"/>
+  <testcase name="checkerboard source is rejected before intermediate runs exceed the page cap()" classname="eu.kanade.translation.detection.DbnetCleanupMaskTest" time="0.177"/>
+  <testcase name="invalid mask preparation falls back before translation side effects()" classname="eu.kanade.translation.detection.DbnetCleanupMaskTest" time="0.007"/>
+  <testcase name="mask round trips old JSON defaults null and corrupt optional payload fails closed()" classname="eu.kanade.translation.detection.DbnetCleanupMaskTest" time="0.005"/>
+  <testcase name="valid empty persisted mask stays a safe explicit no erase mask()" classname="eu.kanade.translation.detection.DbnetCleanupMaskTest" time="0.001"/>
+  <testcase name="associated group with no usable glyph mask fails the experimental page()" classname="eu.kanade.translation.detection.DbnetCleanupMaskTest" time="0.001"/>
+  <testcase name="non square native mask maps with detector input scale and ignores padding()" classname="eu.kanade.translation.detection.DbnetCleanupMaskTest" time="0.034"/>
+  <testcase name="one empty associated group rejects all prepared masks atomically()" classname="eu.kanade.translation.detection.DbnetCleanupMaskTest" time="0.001"/>
+  <testcase name="mask keeps glyphs inside translated member quads and removes outside pixels()" classname="eu.kanade.translation.detection.DbnetCleanupMaskTest" time="0.0"/>
+  <testcase name="dense mask is rejected instead of becoming a large rectangular cleanup fill()" classname="eu.kanade.translation.detection.DbnetCleanupMaskTest" time="0.002"/>
+  <testcase name="invalid dimensions ratio byte count and bounded work are rejected before use()" classname="eu.kanade.translation.detection.DbnetCleanupMaskTest" time="0.387"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

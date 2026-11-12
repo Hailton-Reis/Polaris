@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.tachiyomi.extension.preparation.PrivateExtensionSignatureTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-11-09T22:30:49.136Z" hostname="0d67ac30ae46" time="0.156">
+  <properties/>
+  <testcase name="an altered signed apk is rejected before replacement and working file survives()" classname="eu.kanade.tachiyomi.extension.preparation.PrivateExtensionSignatureTest" time="0.076"/>
+  <testcase name="signed fixture verifies under Android 8 and Android 14 signature rules()" classname="eu.kanade.tachiyomi.extension.preparation.PrivateExtensionSignatureTest" time="0.037"/>
+  <testcase name="verified bytes can replace the extension without changing the apk()" classname="eu.kanade.tachiyomi.extension.preparation.PrivateExtensionSignatureTest" time="0.009"/>
+  <testcase name="correct certificate cannot authorize a different package or an unreviewed key()" classname="eu.kanade.tachiyomi.extension.preparation.PrivateExtensionSignatureTest" time="0.031"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="tachiyomi.domain.chapter.model.ChapterVersionsTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-11-06T18:49:33.644Z" hostname="550a0106d184" time="0.069">
+  <properties/>
+  <testcase name="decimals parts volumes seasons and extras remain distinct()" classname="tachiyomi.domain.chapter.model.ChapterVersionsTest" time="0.006"/>
+  <testcase name="unknown number sentinel never merges unrelated entries()" classname="tachiyomi.domain.chapter.model.ChapterVersionsTest" time="0.037"/>
+  <testcase name="read and bookmark state survive choosing a different representative()" classname="tachiyomi.domain.chapter.model.ChapterVersionsTest" time="0.001"/>
+  <testcase name="unofficial substring is never treated as an official label()" classname="tachiyomi.domain.chapter.model.ChapterVersionsTest" time="0.006"/>
+  <testcase name="official and unofficial chapter zero are one logical chapter()" classname="tachiyomi.domain.chapter.model.ChapterVersionsTest" time="0.003"/>
+  <testcase name="downloaded or started editions win over a cosmetic label()" classname="tachiyomi.domain.chapter.model.ChapterVersionsTest" time="0.002"/>
+  <testcase name="edition suffix is hidden without removing meaningful title words()" classname="tachiyomi.domain.chapter.model.ChapterVersionsTest" time="0.002"/>
+  <testcase name="current reading edition is not replaced mid chapter()" classname="tachiyomi.domain.chapter.model.ChapterVersionsTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

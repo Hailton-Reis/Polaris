@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.tachiyomi.ui.documents.DocumentOrganizationTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-11-08T01:12:24.613Z" hostname="a1f1fc307d5f" time="0.185">
+  <properties/>
+  <testcase name="membership failure is reported to the import flow()" classname="eu.kanade.tachiyomi.ui.documents.DocumentOrganizationTest" time="0.01"/>
+  <testcase name="selected and newly typed categories are deduplicated without replacing category settings()" classname="eu.kanade.tachiyomi.ui.documents.DocumentOrganizationTest" time="0.006"/>
+  <testcase name="a deleted or system category is rejected before any category or membership is written()" classname="eu.kanade.tachiyomi.ui.documents.DocumentOrganizationTest" time="0.005"/>
+  <testcase name="format grouping can be disabled and a personal category can be created()" classname="eu.kanade.tachiyomi.ui.documents.DocumentOrganizationTest" time="0.003"/>
+  <testcase name="simultaneous additions reuse shared categories()" classname="eu.kanade.tachiyomi.ui.documents.DocumentOrganizationTest" time="0.013"/>
+  <testcase name="existing categories are reused across accents case and the supported interface languages()" classname="eu.kanade.tachiyomi.ui.documents.DocumentOrganizationTest" time="0.004"/>
+  <testcase name="two pdfs keep different user chosen content types and share the format category()" classname="eu.kanade.tachiyomi.ui.documents.DocumentOrganizationTest" time="0.018"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

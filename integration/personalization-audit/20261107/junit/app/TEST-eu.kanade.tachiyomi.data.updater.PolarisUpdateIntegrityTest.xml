@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.tachiyomi.data.updater.PolarisUpdateIntegrityTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-11-08T01:12:21.225Z" hostname="a1f1fc307d5f" time="0.012">
+  <properties/>
+  <testcase name="matching checksum accepts the downloaded file including uppercase digest()" classname="eu.kanade.tachiyomi.data.updater.PolarisUpdateIntegrityTest" time="0.004"/>
+  <testcase name="corrupted download is removed before installation can be offered()" classname="eu.kanade.tachiyomi.data.updater.PolarisUpdateIntegrityTest" time="0.005"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

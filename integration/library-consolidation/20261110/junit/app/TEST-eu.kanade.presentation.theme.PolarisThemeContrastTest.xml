@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.presentation.theme.PolarisThemeContrastTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-11-10T14:11:05.739Z" hostname="7d7c5a6182d0" time="0.034">
+  <properties/>
+  <testcase name="all new themes keep primary body and container text readable in light dark and AMOLED()" classname="eu.kanade.presentation.theme.PolarisThemeContrastTest" time="0.033"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

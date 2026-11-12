@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="mihon.core.migration.MigratorTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-11-10T20:37:33.178Z" hostname="7d7c5a6182d0" time="0.24">
+  <properties/>
+  <testcase name="withinRangeMigration()" classname="mihon.core.migration.MigratorTest" time="0.214"/>
+  <testcase name="largeMigration()" classname="mihon.core.migration.MigratorTest" time="0.005"/>
+  <testcase name="sameVersion()" classname="mihon.core.migration.MigratorTest" time="0.003"/>
+  <testcase name="smallMigration()" classname="mihon.core.migration.MigratorTest" time="0.004"/>
+  <testcase name="noMigrations()" classname="mihon.core.migration.MigratorTest" time="0.002"/>
+  <testcase name="initialVersion()" classname="mihon.core.migration.MigratorTest" time="0.005"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

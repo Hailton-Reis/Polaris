@@ -1,0 +1,2052 @@
+Starting a Gradle Daemon, 2 stopped Daemons could not be reused, use --status for details
+Configuration on demand is an incubating feature.
+Type-safe project accessors is an incubating feature.
+> Task :build-logic:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :build-logic:compileKotlin UP-TO-DATE
+> Task :build-logic:compileJava NO-SOURCE
+> Task :build-logic:pluginDescriptors UP-TO-DATE
+> Task :build-logic:processResources UP-TO-DATE
+> Task :build-logic:classes UP-TO-DATE
+> Task :build-logic:jar UP-TO-DATE
+> Task :domain:preBuild UP-TO-DATE
+> Task :domain:preDebugBuild UP-TO-DATE
+> Task :domain:generateDebugResources UP-TO-DATE
+> Task :domain:packageDebugResources UP-TO-DATE
+> Task :domain:processDebugNavigationResources UP-TO-DATE
+> Task :domain:parseDebugLocalResources UP-TO-DATE
+> Task :source-api:preBuild UP-TO-DATE
+> Task :source-api:preDebugBuild UP-TO-DATE
+> Task :source-api:generateDebugResources UP-TO-DATE
+> Task :source-api:packageDebugResources UP-TO-DATE
+> Task :source-api:processDebugNavigationResources UP-TO-DATE
+> Task :source-api:parseDebugLocalResources UP-TO-DATE
+> Task :i18n:androidPreBuild UP-TO-DATE
+> Task :i18n:preAndroidMainBuild UP-TO-DATE
+> Task :i18n:generateAndroidMainEmptyResourceFiles UP-TO-DATE
+> Task :i18n:generateAndroidMainLocalesConfig UP-TO-DATE
+> Task :i18n:generateMRcommonTest UP-TO-DATE
+> Task :i18n:generateMRandroidHostTest UP-TO-DATE
+> Task :i18n:generateMRcommonMain UP-TO-DATE
+> Task :i18n:generateMRandroidMain UP-TO-DATE
+> Task :i18n:packageAndroidMainResources UP-TO-DATE
+> Task :i18n:parseAndroidMainLocalResources UP-TO-DATE
+> Task :i18n:generateAndroidMainRFile UP-TO-DATE
+> Task :core:common:preBuild UP-TO-DATE
+> Task :core:common:preDebugBuild UP-TO-DATE
+> Task :core:common:generateDebugResources UP-TO-DATE
+> Task :core:common:packageDebugResources UP-TO-DATE
+> Task :core:common:processDebugNavigationResources UP-TO-DATE
+> Task :core:common:parseDebugLocalResources UP-TO-DATE
+> Task :core:common:generateDebugRFile UP-TO-DATE
+> Task :source-api:generateDebugRFile UP-TO-DATE
+> Task :domain:generateDebugRFile UP-TO-DATE
+> Task :i18n:kmpPartiallyResolvedDependenciesChecker
+> Task :i18n:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :i18n:compileAndroidMain UP-TO-DATE
+> Task :i18n:bundleAndroidMainClassesToCompileJar UP-TO-DATE
+> Task :core:common:compileDebugKotlin UP-TO-DATE
+> Task :core:common:javaPreCompileDebug UP-TO-DATE
+> Task :core:common:compileDebugJavaWithJavac NO-SOURCE
+> Task :core:common:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :source-api:compileDebugKotlin UP-TO-DATE
+> Task :source-api:javaPreCompileDebug UP-TO-DATE
+> Task :source-api:compileDebugJavaWithJavac NO-SOURCE
+> Task :source-api:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :domain:compileDebugKotlin UP-TO-DATE
+> Task :domain:javaPreCompileDebug UP-TO-DATE
+> Task :domain:compileDebugJavaWithJavac NO-SOURCE
+> Task :domain:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :domain:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :domain:preDebugUnitTestBuild UP-TO-DATE
+> Task :domain:generateDebugUnitTestStubRFile UP-TO-DATE
+> Task :domain:compileDebugUnitTestKotlin UP-TO-DATE
+> Task :domain:javaPreCompileDebugUnitTest UP-TO-DATE
+> Task :domain:compileDebugUnitTestJavaWithJavac NO-SOURCE
+> Task :domain:processDebugJavaRes UP-TO-DATE
+> Task :domain:processDebugUnitTestJavaRes UP-TO-DATE
+> Task :i18n:bundleAndroidMainClassesToRuntimeJar UP-TO-DATE
+> Task :i18n:processAndroidMainJavaRes UP-TO-DATE
+> Task :source-api:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :source-api:processDebugJavaRes UP-TO-DATE
+> Task :core:common:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :core:common:processDebugJavaRes UP-TO-DATE
+> Task :domain:testDebugUnitTest UP-TO-DATE
+> Task :data:generateDebugDatabaseInterface UP-TO-DATE
+> Task :data:preBuild UP-TO-DATE
+> Task :data:preDebugBuild UP-TO-DATE
+> Task :data:generateDebugResources UP-TO-DATE
+> Task :data:packageDebugResources UP-TO-DATE
+> Task :data:processDebugNavigationResources UP-TO-DATE
+> Task :data:parseDebugLocalResources UP-TO-DATE
+> Task :data:generateDebugRFile UP-TO-DATE
+> Task :data:compileDebugKotlin UP-TO-DATE
+> Task :data:javaPreCompileDebug UP-TO-DATE
+> Task :data:compileDebugJavaWithJavac NO-SOURCE
+> Task :data:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :data:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :data:preDebugUnitTestBuild UP-TO-DATE
+> Task :data:generateDebugUnitTestStubRFile UP-TO-DATE
+> Task :data:compileDebugUnitTestKotlin NO-SOURCE
+> Task :data:javaPreCompileDebugUnitTest UP-TO-DATE
+> Task :data:compileDebugUnitTestJavaWithJavac NO-SOURCE
+> Task :data:processDebugJavaRes UP-TO-DATE
+> Task :data:processDebugUnitTestJavaRes NO-SOURCE
+> Task :data:testDebugUnitTest NO-SOURCE
+> Task :source-api:preDebugUnitTestBuild UP-TO-DATE
+> Task :source-api:generateDebugUnitTestStubRFile UP-TO-DATE
+> Task :source-api:compileDebugUnitTestKotlin NO-SOURCE
+> Task :source-api:javaPreCompileDebugUnitTest UP-TO-DATE
+> Task :source-api:compileDebugUnitTestJavaWithJavac NO-SOURCE
+> Task :source-api:processDebugUnitTestJavaRes NO-SOURCE
+> Task :source-api:testDebugUnitTest NO-SOURCE
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preDebugBuild UP-TO-DATE
+> Task :app:compileDebugAidl UP-TO-DATE
+> Task :app:dataBindingMergeDependencyArtifactsDebug UP-TO-DATE
+> Task :app:generateDebugResources UP-TO-DATE
+> Task :app:prepareLibraryDefinitionsDebug UP-TO-DATE
+> Task :app:replaceDebugShortcutPlaceholder UP-TO-DATE
+> Task :core-metadata:preBuild UP-TO-DATE
+> Task :core-metadata:preDebugBuild UP-TO-DATE
+> Task :core-metadata:generateDebugResources UP-TO-DATE
+> Task :core-metadata:packageDebugResources UP-TO-DATE
+> Task :dbnet-native:preBuild UP-TO-DATE
+> Task :dbnet-native:preDebugBuild UP-TO-DATE
+> Task :dbnet-native:generateDebugResources UP-TO-DATE
+> Task :dbnet-native:packageDebugResources UP-TO-DATE
+> Task :i18n-at:generateMRcommonTest UP-TO-DATE
+> Task :i18n-at:generateMRandroidHostTest UP-TO-DATE
+> Task :i18n-at:generateMRcommonMain UP-TO-DATE
+> Task :i18n-at:generateMRandroidMain UP-TO-DATE
+> Task :i18n-at:androidPreBuild UP-TO-DATE
+> Task :i18n-at:preAndroidMainBuild UP-TO-DATE
+> Task :i18n-at:packageAndroidMainResources UP-TO-DATE
+> Task :ppocr-sdk:preBuild UP-TO-DATE
+> Task :ppocr-sdk:preDebugBuild UP-TO-DATE
+> Task :ppocr-sdk:generateDebugResources UP-TO-DATE
+> Task :ppocr-sdk:packageDebugResources UP-TO-DATE
+> Task :presentation-core:preBuild UP-TO-DATE
+> Task :presentation-core:preDebugBuild UP-TO-DATE
+> Task :presentation-core:generateDebugResources UP-TO-DATE
+> Task :presentation-core:packageDebugResources UP-TO-DATE
+> Task :presentation-widget:preBuild UP-TO-DATE
+> Task :presentation-widget:preDebugBuild UP-TO-DATE
+> Task :presentation-widget:generateDebugResources UP-TO-DATE
+> Task :presentation-widget:packageDebugResources UP-TO-DATE
+> Task :source-local:preBuild UP-TO-DATE
+> Task :source-local:preDebugBuild UP-TO-DATE
+> Task :source-local:generateDebugResources UP-TO-DATE
+> Task :source-local:packageDebugResources UP-TO-DATE
+> Task :telemetry:preBuild UP-TO-DATE
+> Task :telemetry:preDebugBuild UP-TO-DATE
+> Task :telemetry:generateDebugResources UP-TO-DATE
+> Task :telemetry:packageDebugResources UP-TO-DATE
+> Task :core:archive:preBuild UP-TO-DATE
+> Task :core:archive:preDebugBuild UP-TO-DATE
+> Task :core:archive:generateDebugResources UP-TO-DATE
+> Task :core:archive:packageDebugResources UP-TO-DATE
+> Task :core:viewmodel:preBuild UP-TO-DATE
+> Task :core:viewmodel:preDebugBuild UP-TO-DATE
+> Task :core:viewmodel:generateDebugResources UP-TO-DATE
+> Task :core:viewmodel:packageDebugResources UP-TO-DATE
+> Task :app:mergeDebugResources UP-TO-DATE
+> Task :app:dataBindingGenBaseClassesDebug UP-TO-DATE
+> Task :app:generateDebugBuildConfig UP-TO-DATE
+> Task :app:packageDebugResources UP-TO-DATE
+> Task :core-metadata:processDebugNavigationResources UP-TO-DATE
+> Task :dbnet-native:processDebugNavigationResources UP-TO-DATE
+> Task :i18n-at:generateAndroidMainEmptyResourceFiles UP-TO-DATE
+> Task :ppocr-sdk:processDebugNavigationResources UP-TO-DATE
+> Task :presentation-core:processDebugNavigationResources UP-TO-DATE
+> Task :presentation-widget:processDebugNavigationResources UP-TO-DATE
+> Task :source-local:processDebugNavigationResources UP-TO-DATE
+> Task :telemetry:processDebugNavigationResources UP-TO-DATE
+> Task :core:archive:processDebugNavigationResources UP-TO-DATE
+> Task :core:viewmodel:processDebugNavigationResources UP-TO-DATE
+> Task :app:processDebugNavigationResources UP-TO-DATE
+> Task :app:parseDebugLocalResources UP-TO-DATE
+> Task :core-metadata:parseDebugLocalResources UP-TO-DATE
+> Task :core-metadata:generateDebugRFile UP-TO-DATE
+> Task :dbnet-native:parseDebugLocalResources UP-TO-DATE
+> Task :dbnet-native:generateDebugRFile UP-TO-DATE
+> Task :i18n-at:parseAndroidMainLocalResources UP-TO-DATE
+> Task :i18n-at:generateAndroidMainRFile UP-TO-DATE
+> Task :ppocr-sdk:parseDebugLocalResources UP-TO-DATE
+> Task :ppocr-sdk:generateDebugRFile UP-TO-DATE
+> Task :presentation-core:parseDebugLocalResources UP-TO-DATE
+> Task :presentation-core:generateDebugRFile UP-TO-DATE
+> Task :presentation-widget:parseDebugLocalResources UP-TO-DATE
+> Task :presentation-widget:generateDebugRFile UP-TO-DATE
+> Task :source-local:parseDebugLocalResources UP-TO-DATE
+> Task :core:archive:parseDebugLocalResources UP-TO-DATE
+> Task :core:archive:generateDebugRFile UP-TO-DATE
+> Task :source-local:generateDebugRFile UP-TO-DATE
+> Task :telemetry:parseDebugLocalResources UP-TO-DATE
+> Task :telemetry:generateDebugRFile UP-TO-DATE
+> Task :core:viewmodel:parseDebugLocalResources UP-TO-DATE
+> Task :core:viewmodel:generateDebugRFile UP-TO-DATE
+> Task :app:generateDebugRFile UP-TO-DATE
+> Task :core-metadata:compileDebugKotlin UP-TO-DATE
+> Task :core-metadata:javaPreCompileDebug UP-TO-DATE
+> Task :core-metadata:compileDebugJavaWithJavac NO-SOURCE
+> Task :core-metadata:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :dbnet-native:compileDebugKotlin NO-SOURCE
+> Task :dbnet-native:javaPreCompileDebug UP-TO-DATE
+> Task :dbnet-native:compileDebugJavaWithJavac NO-SOURCE
+> Task :dbnet-native:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :i18n-at:kmpPartiallyResolvedDependenciesChecker
+> Task :i18n-at:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :i18n-at:compileAndroidMain UP-TO-DATE
+> Task :i18n-at:bundleAndroidMainClassesToCompileJar UP-TO-DATE
+> Task :ppocr-sdk:compileDebugKotlin UP-TO-DATE
+> Task :ppocr-sdk:javaPreCompileDebug UP-TO-DATE
+> Task :ppocr-sdk:compileDebugJavaWithJavac NO-SOURCE
+> Task :ppocr-sdk:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :presentation-core:compileDebugKotlin UP-TO-DATE
+> Task :presentation-core:javaPreCompileDebug UP-TO-DATE
+> Task :presentation-core:compileDebugJavaWithJavac NO-SOURCE
+> Task :presentation-core:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :presentation-widget:compileDebugKotlin UP-TO-DATE
+> Task :presentation-widget:javaPreCompileDebug UP-TO-DATE
+> Task :presentation-widget:compileDebugJavaWithJavac NO-SOURCE
+> Task :presentation-widget:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :core:archive:compileDebugKotlin UP-TO-DATE
+> Task :core:archive:javaPreCompileDebug UP-TO-DATE
+> Task :core:archive:compileDebugJavaWithJavac NO-SOURCE
+> Task :core:archive:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :source-local:compileDebugKotlin UP-TO-DATE
+> Task :source-local:javaPreCompileDebug UP-TO-DATE
+> Task :source-local:compileDebugJavaWithJavac NO-SOURCE
+> Task :source-local:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :telemetry:compileDebugKotlin UP-TO-DATE
+> Task :telemetry:javaPreCompileDebug UP-TO-DATE
+> Task :telemetry:compileDebugJavaWithJavac NO-SOURCE
+> Task :telemetry:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :core:viewmodel:compileDebugKotlin UP-TO-DATE
+> Task :core:viewmodel:javaPreCompileDebug UP-TO-DATE
+> Task :core:viewmodel:compileDebugJavaWithJavac NO-SOURCE
+> Task :core:viewmodel:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :app:compileDebugKotlin
+> Task :app:javaPreCompileDebug UP-TO-DATE
+> Task :app:compileDebugJavaWithJavac UP-TO-DATE
+> Task :core-metadata:writeDebugAarMetadata UP-TO-DATE
+> Task :data:writeDebugAarMetadata UP-TO-DATE
+> Task :dbnet-native:writeDebugAarMetadata UP-TO-DATE
+> Task :domain:writeDebugAarMetadata UP-TO-DATE
+> Task :i18n:writeAndroidMainAarMetadata UP-TO-DATE
+> Task :i18n-at:writeAndroidMainAarMetadata UP-TO-DATE
+> Task :ppocr-sdk:writeDebugAarMetadata UP-TO-DATE
+> Task :presentation-core:writeDebugAarMetadata UP-TO-DATE
+> Task :presentation-widget:writeDebugAarMetadata UP-TO-DATE
+> Task :source-api:writeDebugAarMetadata UP-TO-DATE
+> Task :source-local:writeDebugAarMetadata UP-TO-DATE
+> Task :telemetry:writeDebugAarMetadata UP-TO-DATE
+> Task :core:archive:writeDebugAarMetadata UP-TO-DATE
+> Task :core:common:writeDebugAarMetadata UP-TO-DATE
+> Task :core:viewmodel:writeDebugAarMetadata UP-TO-DATE
+> Task :app:checkDebugAarMetadata UP-TO-DATE
+> Task :app:mapDebugSourceSetPaths UP-TO-DATE
+> Task :app:compileDebugNavigationResources UP-TO-DATE
+> Task :app:createDebugCompatibleScreenManifests UP-TO-DATE
+> Task :app:extractDeepLinksDebug UP-TO-DATE
+> Task :core-metadata:extractDeepLinksDebug UP-TO-DATE
+> Task :core-metadata:processDebugManifest UP-TO-DATE
+> Task :data:extractDeepLinksDebug UP-TO-DATE
+> Task :data:processDebugManifest UP-TO-DATE
+> Task :dbnet-native:extractDeepLinksDebug UP-TO-DATE
+> Task :dbnet-native:processDebugManifest UP-TO-DATE
+> Task :domain:extractDeepLinksDebug UP-TO-DATE
+> Task :domain:processDebugManifest UP-TO-DATE
+> Task :i18n:processAndroidMainManifest UP-TO-DATE
+> Task :i18n-at:processAndroidMainManifest UP-TO-DATE
+> Task :ppocr-sdk:extractDeepLinksDebug UP-TO-DATE
+> Task :ppocr-sdk:processDebugManifest UP-TO-DATE
+> Task :presentation-core:extractDeepLinksDebug UP-TO-DATE
+> Task :presentation-core:processDebugManifest UP-TO-DATE
+> Task :presentation-widget:extractDeepLinksDebug UP-TO-DATE
+> Task :presentation-widget:processDebugManifest UP-TO-DATE
+> Task :source-api:extractDeepLinksDebug UP-TO-DATE
+> Task :source-api:processDebugManifest UP-TO-DATE
+> Task :source-local:extractDeepLinksDebug UP-TO-DATE
+> Task :source-local:processDebugManifest UP-TO-DATE
+> Task :telemetry:extractDeepLinksDebug UP-TO-DATE
+> Task :telemetry:processDebugManifest UP-TO-DATE
+> Task :core:archive:extractDeepLinksDebug UP-TO-DATE
+> Task :core:archive:processDebugManifest UP-TO-DATE
+> Task :core:common:extractDeepLinksDebug UP-TO-DATE
+> Task :core:common:processDebugManifest UP-TO-DATE
+> Task :core:viewmodel:extractDeepLinksDebug UP-TO-DATE
+> Task :core:viewmodel:processDebugManifest UP-TO-DATE
+> Task :app:processDebugMainManifest UP-TO-DATE
+> Task :app:processDebugManifest UP-TO-DATE
+> Task :app:processDebugManifestForPackage UP-TO-DATE
+> Task :core-metadata:mapDebugSourceSetPaths UP-TO-DATE
+> Task :core-metadata:compileDebugLibraryResources UP-TO-DATE
+> Task :data:mapDebugSourceSetPaths UP-TO-DATE
+> Task :data:compileDebugLibraryResources UP-TO-DATE
+> Task :dbnet-native:mapDebugSourceSetPaths UP-TO-DATE
+> Task :dbnet-native:compileDebugLibraryResources UP-TO-DATE
+> Task :domain:mapDebugSourceSetPaths UP-TO-DATE
+> Task :domain:compileDebugLibraryResources UP-TO-DATE
+> Task :i18n:mapAndroidMainSourceSetPaths UP-TO-DATE
+> Task :i18n:compileAndroidMainLibraryResources UP-TO-DATE
+> Task :i18n-at:mapAndroidMainSourceSetPaths UP-TO-DATE
+> Task :i18n-at:compileAndroidMainLibraryResources UP-TO-DATE
+> Task :ppocr-sdk:mapDebugSourceSetPaths UP-TO-DATE
+> Task :ppocr-sdk:compileDebugLibraryResources UP-TO-DATE
+> Task :presentation-core:mapDebugSourceSetPaths UP-TO-DATE
+> Task :presentation-core:compileDebugLibraryResources UP-TO-DATE
+> Task :presentation-widget:mapDebugSourceSetPaths UP-TO-DATE
+> Task :presentation-widget:compileDebugLibraryResources UP-TO-DATE
+> Task :source-api:mapDebugSourceSetPaths UP-TO-DATE
+> Task :source-api:compileDebugLibraryResources UP-TO-DATE
+> Task :source-local:mapDebugSourceSetPaths UP-TO-DATE
+> Task :source-local:compileDebugLibraryResources UP-TO-DATE
+> Task :telemetry:mapDebugSourceSetPaths UP-TO-DATE
+> Task :telemetry:compileDebugLibraryResources UP-TO-DATE
+> Task :core:archive:mapDebugSourceSetPaths UP-TO-DATE
+> Task :core:archive:compileDebugLibraryResources UP-TO-DATE
+> Task :core:common:mapDebugSourceSetPaths UP-TO-DATE
+> Task :core:common:compileDebugLibraryResources UP-TO-DATE
+> Task :core:viewmodel:mapDebugSourceSetPaths UP-TO-DATE
+> Task :core:viewmodel:compileDebugLibraryResources UP-TO-DATE
+> Task :app:processDebugResources UP-TO-DATE
+> Task :app:bundleDebugClassesToRuntimeJar
+> Task :app:bundleDebugClassesToCompileJar
+> Task :app:preDebugUnitTestBuild UP-TO-DATE
+> Task :app:compileDebugUnitTestKotlin UP-TO-DATE
+> Task :app:javaPreCompileDebugUnitTest UP-TO-DATE
+> Task :app:compileDebugUnitTestJavaWithJavac NO-SOURCE
+> Task :app:processDebugJavaRes UP-TO-DATE
+> Task :app:processDebugUnitTestJavaRes UP-TO-DATE
+> Task :core-metadata:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :core-metadata:processDebugJavaRes UP-TO-DATE
+> Task :dbnet-native:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :dbnet-native:processDebugJavaRes NO-SOURCE
+> Task :i18n-at:bundleAndroidMainClassesToRuntimeJar UP-TO-DATE
+> Task :i18n-at:processAndroidMainJavaRes UP-TO-DATE
+> Task :ppocr-sdk:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :ppocr-sdk:processDebugJavaRes UP-TO-DATE
+> Task :presentation-core:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :presentation-core:processDebugJavaRes UP-TO-DATE
+> Task :presentation-widget:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :presentation-widget:processDebugJavaRes UP-TO-DATE
+> Task :source-local:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :source-local:processDebugJavaRes UP-TO-DATE
+> Task :telemetry:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :telemetry:processDebugJavaRes UP-TO-DATE
+> Task :core:archive:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :core:archive:processDebugJavaRes UP-TO-DATE
+> Task :core:viewmodel:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :core:viewmodel:processDebugJavaRes UP-TO-DATE
+
+> Task :app:testDebugUnitTest
+
+ChapterRoutingTest > network request restores provider URL and memo without changing storage identity() PASSED
+
+ChapterRoutingTest > primary legacy chapter retains URL and provider metadata() PASSED
+
+LauncherIconSwitchTest > switch enables replacement before removing original() PASSED
+
+LauncherIconSwitchTest > failed cleanup restores an accessible default launcher() PASSED
+
+TranslationEngineSettingsVisibilityTest > offline and Google engines hide API settings() PASSED
+
+TranslationEngineSettingsVisibilityTest > LLM engines show shared API key and model settings() PASSED
+
+TranslationEngineSettingsVisibilityTest > LLM engines map to independent provider preferences() PASSED
+
+TranslationEngineSettingsVisibilityTest > DeepL shows only its own API key setting() PASSED
+
+PolarisDedicationTriggerTest > clock reset starts a fresh sequence() PASSED
+
+PolarisDedicationTriggerTest > distant taps cannot accumulate accidentally() PASSED
+
+PolarisDedicationTriggerTest > seven deliberate taps reveal the dedication() PASSED
+
+RepositoryCatalogTest > different branches hosts and unsafe URL forms are not conflated() PASSED
+
+RepositoryCatalogTest > search accepts accents case language and multiple terms() PASSED
+
+RepositoryCatalogTest > known legacy and redirected index URLs do not duplicate repositories() PASSED
+
+RepositoryCatalogTest > empty search returns the initial catalog without registering anything() PASSED
+
+RepositoryDiscoveryControllerTest > database read failure blocks additions and can be retried() PASSED
+
+RepositoryDiscoveryControllerTest > registration failure permits retry without claiming success() PASSED
+
+RepositoryDiscoveryControllerTest > listing refresh failure retains a successfully registered repository() PASSED
+
+RepositoryDiscoveryControllerTest > one direct add registers the chosen repository and ignores repeated clicks() PASSED
+
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+
+> Task :app:testDebugUnitTest
+
+SourcePreparationViewModelTest > partial catalog failures preserve available sources and restored source ids() PASSED
+
+SourcePreparationViewModelTest > repository review does not insert until explicit confirmation and certificate changes require new review() PASSED
+
+SourcePreparationViewModelTest > restored repositories and language preferences do not start downloads or change backup data() PASSED
+
+SourcePreparationViewModelTest > changed repository selection clears a previously loaded plan() PASSED
+
+SourcePreparationViewModelTest > metadata timeout is reported and does not leave the assistant busy() PASSED
+
+PolarisThemeContrastTest > all new themes keep primary body and container text readable in light dark and AMOLED() PASSED
+
+BackupInteropTest > Mihon pinned raw protobuf imports notes memo and repository signing identity() PASSED
+
+BackupInteropTest > Tachiyomi 0153 raw protobuf imports with empty repository defaults() PASSED
+
+BackupInteropTest > Mihon pinned gzip imports common fields without installed sources() PASSED
+
+BackupInteropTest > Tachiyomi 0153 gzip imports common fields without installed sources() PASSED
+
+BackupInteropTest > Polaris reexports imported Mihon data using the real protobuf codec() PASSED
+
+BackupInteropTest > Polaris reexports imported Tachiyomi data using the real protobuf codec() PASSED
+
+PreferenceRestoreSecurityTest > an internal permission absent on the device is not created by imported app state() PASSED
+
+PreferenceRestoreSecurityTest > a crafted backup cannot authorize extension trust or exact-byte security overrides() PASSED
+
+RestoredRepositoryTrustTest > an unchanged repository already reviewed on this device keeps its local trust() PASSED
+
+RestoredRepositoryTrustTest > restoring a new certificate preserves metadata but cannot authorize installed code() PASSED
+
+RestoredRepositoryTrustTest > a second import cannot launder a previously pending certificate into trusted state() PASSED
+
+BackupArchiveWriterTest > successful result requires closed output and exact verified payload() PASSED
+
+BackupArchiveWriterTest > extra or missing decompressed bytes fail verification() PASSED
+
+BackupArchiveWriterTest > write only destination is explicitly unverifiable() PASSED
+
+BackupArchiveWriterTest > trailing garbage or another gzip member is rejected like the actual backup decoder() PASSED
+
+BackupArchiveWriterTest > cancellation during copy or read back stays cancellation() PASSED
+
+BackupArchiveWriterTest > write failure closes the stream and cannot proceed to verification() PASSED
+
+BackupArchiveWriterTest > truncated gzip fails verification() PASSED
+
+BackupArchiveWriterTest > valid gzip carrying different bytes cannot be reported as success() PASSED
+
+BackupArchiveWriterTest > failed output close cannot be reported as verified() PASSED
+
+BackupCreatorTransactionTest > only a verified final document allows pruning the oldest copy() PASSED
+
+BackupCreatorTransactionTest > corrupt read back never prunes copies or records success() PASSED
+
+BackupCreatorTransactionTest > backups with same timestamp have distinct names and other app namespaces are unmanaged() PASSED
+
+BackupCreatorTransactionTest > unknown provider length cannot cause an existing document to be overwritten() PASSED
+
+BackupCreatorTransactionTest > cancelled creation preserves prior backups and cancellation identity() PASSED
+
+BackupCreatorTransactionTest > write only destination reports verification unavailable and preserves old copies() PASSED
+
+BackupCreatorTransactionTest > manual export never truncates or deletes a nonempty selected document() PASSED
+
+BackupCreatorTransactionTest > failed write preserves all four earlier copies and success timestamp() PASSED
+
+BackupCreatorTransactionTest > provider refusing final rename cannot trigger retention() PASSED
+
+BackupCreatorTransactionTest > two creator instances serialize writing and retain four complete archives() PASSED
+
+BackupCreatorTransactionTest > unreadable old files never displace valid backup copies() PASSED
+
+PortableMangaBackupTest > native reader that drops optional memo still has only valid source URLs() PASSED
+
+PortableMangaBackupTest > portable backups retain source references for the visible provider and old storage identity() PASSED
+
+PortableMangaBackupTest > ordinary backups remain byte-model compatible without a Polaris envelope() PASSED
+
+PortableMangaBackupTest > native migration keeps the new identity instead of attaching the old work snapshot() PASSED
+
+PortableMangaBackupTest > portable state edits affect matching logical chapter without inventing page equivalence() PASSED
+
+PortableMangaBackupTest > Polaris round trip preserves old identity all editions history and settings() PASSED
+
+PortableMangaBackupTest > external view has one real source with native URLs and logical read flags() PASSED
+
+PortableMangaBackupTest > portable settings edits survive returning to Polaris() PASSED
+
+PortableMangaBackupTest > new native chapters and additional history survive returning to Polaris() PASSED
+
+SourcePreferenceNamespaceTest > native signed long source keys remain portable() PASSED
+
+SourcePreferenceNamespaceTest > backups cannot select global settings sandbox files or paths() PASSED
+
+DownloadOriginRouteTest > a missing edition never sends its URL to an unrelated available root provider() PASSED
+
+DownloadOriginRouteTest > a missing old provider does not stop downloads from a recovered English edition() PASSED
+
+PolarisLevelManagerTest > a fresh install never gets download XP before its first reading() PASSED
+
+PolarisLevelManagerTest > titles use stable identifiers and legacy names cannot equip locked titles() PASSED
+
+PolarisLevelManagerTest > extreme imported counts remain finite and maximum level is two hundred() PASSED
+
+PolarisLevelManagerTest > merged editions count once and unknown chapters retain their own identity() PASSED
+
+PolarisLevelManagerTest > legacy XP survives migration but later downloads do not enter progression() PASSED
+
+PolarisLevelManagerTest > unknown URLs shared by legacy merged children remain distinct() PASSED
+
+ProfileImageStoreTest > only an owned canonical image can be deleted() PASSED
+
+ProfileImageStoreTest > invalid import keeps previous image closes input and removes partial file() PASSED
+
+ProfileImageStoreTest > directory failure still closes the supplied stream() PASSED
+
+ProfileImageStoreTest > oversized stream is rejected without allocating the whole image() PASSED
+
+TrackerOAuthGateTest > custom Hikka reference callbacks still require an explicit active flow() PASSED
+
+TrackerOAuthGateTest > pending login survives recreation but is excluded from backups() PASSED
+
+TrackerOAuthGateTest > unsolicited callbacks are rejected() PASSED
+
+TrackerOAuthGateTest > state is provider bound and accepted only once() PASSED
+
+TrackerOAuthGateTest > expired callbacks and clock rollback require a new login() PASSED
+
+AppUpdateRepositoryTest > updates are fetched from the official repository() PASSED
+
+PolarisApkDownloaderTest > incorrect partial response is never appended or offered for installation() PASSED
+
+PolarisApkDownloaderTest > legacy requests without a digest restart rather than merging unpinned bytes() PASSED
+
+PolarisApkDownloaderTest > server ignoring Range restarts cleanly without appending a second full APK() PASSED
+
+PolarisApkDownloaderTest > cancellation retains written bytes and the next attempt resumes them() PASSED
+
+PolarisApkDownloaderTest > 416 with a corrupt partial discards it and requests the full file() PASSED
+
+PolarisApkDownloaderTest > verified APK is reused when the install screen is reopened() PASSED
+
+PolarisApkDownloaderTest > interrupted transfer resumes with a new downloader instance and verifies the entire APK() PASSED
+
+PolarisApkDownloaderTest > another release cannot reuse stale partial bytes() PASSED
+
+PolarisApkDownloaderTest > checksum mismatch removes the candidate and leaves no installable APK() PASSED
+
+PolarisApkDownloaderTest > retryable HTTP error preserves a partial for the next worker attempt() PASSED
+
+PolarisApkDownloaderTest > 416 after receiving the final byte promotes only a matching digest() PASSED
+
+PolarisApkDownloaderTest > encoded response is rejected before it changes the partial() PASSED
+
+PolarisReleaseVersionTest > malformed and overflowing versions are rejected without crashing() PASSED
+
+PolarisReleaseVersionTest > build metadata and optional v prefix do not change precedence() PASSED
+
+PolarisReleaseVersionTest > semver orders numeric beta counters and stable promotion without downgrades() PASSED
+
+PolarisUpdateClientTest > newest unsupported release does not hide an older compatible update() PASSED
+
+PolarisUpdateClientTest > unsupported Android is distinguished from no update() PASSED
+
+PolarisUpdateClientTest > package identity and matching manifest version are required() PASSED
+
+PolarisUpdateClientTest > one universal asset is offered to both ARM systems using the existing manifest contract() PASSED
+
+PolarisUpdateClientTest > device ABI order selects a compatible published APK() PASSED
+
+PolarisUpdateClientTest > old versions and non increasing build codes never trigger downgrade() PASSED
+
+PolarisUpdateClientTest > beta channel is opt in and numeric beta ten is newer than beta two() PASSED
+
+PolarisUpdateClientTest > default channel ignores drafts and prereleases even when tag is mislabeled() PASSED
+
+PolarisUpdateClientTest > stable of the current beta can be offered when its build code is newer() PASSED
+
+PolarisUpdateClientTest > real manifest shape ignores extra packaging fields and nullable release notes() PASSED
+
+PolarisUpdateClientTest > unsafe APK assets and invalid checksums cannot be offered() PASSED
+
+PolarisUpdateClientTest > all pages are inspected instead of trusting GitHub listing order() PASSED
+
+PolarisUpdateClientTest > network failures and cancellation are not presented as no update() PASSED
+
+PolarisUpdateIntegrityTest > matching checksum accepts the downloaded file including uppercase digest() PASSED
+
+PolarisUpdateIntegrityTest > corrupted download is removed before installation can be offered() PASSED
+
+PolarisUpdatePreferencesTest > automatic checks default on while experimental releases require opt in() PASSED
+
+PolarisUpdatePreferencesTest > check intervals are independent by channel and handle clock rollback() PASSED
+
+PolarisUpdatePreferencesTest > manual checks bypass disabled automation and the daily interval() PASSED
+
+NovelPluginPathsTest > code downloads require HTTPS without embedded credentials() PASSED
+
+NovelPluginPathsTest > repository identifiers cannot escape or choose a different file type() PASSED
+
+NovelPluginPathsTest > ordinary and Unicode identifiers remain inside the chosen directory() PASSED
+
+EdgeTtsClientTest > generateSecMsGec produces 64 character uppercase hex SHA-256 token() PASSED
+
+NovelSpeechSanitizerTest > removes translator notes in brackets and parens() PASSED
+
+NovelSpeechSanitizerTest > normalizes asian and european dialogue quotes() PASSED
+
+NovelSpeechSanitizerTest > collapses repeated dots to single ellipsis() PASSED
+
+NovelSpeechSanitizerTest > strips markdown formatting() PASSED
+
+NovelSpeechSanitizerTest > removes visual dividers and decorative stars() PASSED
+
+ExtensionPreparationQueueTest > completion is emitted once per explicit batch and includes trust failures() PASSED
+
+ExtensionPreparationQueueTest > repository changes are checked again before queued work and retries() PASSED
+
+ExtensionPreparationQueueTest > retry only repeats failed items and never grants trust() PASSED
+
+ExtensionPreparationQueueTest > a timed out item does not prevent other items from finishing() PASSED
+
+ExtensionPreparationQueueTest > cancelling before dispatch still finishes the queue() PASSED
+
+ExtensionPreparationQueueTest > one exception fails only its item and a new batch starts cleanly() PASSED
+
+ExtensionPreparationQueueTest > at most two downloads run and each package is prepared once() PASSED
+
+ExtensionPreparationQueueTest > opening or restoring data never starts downloads and consent is mandatory() PASSED
+
+ExtensionPreparationQueueTest > cancellation preserves completed items and does not start queued ones() PASSED
+
+ExtensionPreparationQueueTest > duplicate packages invalid identities and insecure downloads are rejected before starting() PASSED
+
+PreparationPlanTest > restored repositories without a certificate and changed keys do not authorize preparation() PASSED
+
+PreparationPlanTest > exact duplicate metadata is deduplicated and latest version from one repository wins() PASSED
+
+PreparationPlanTest > restored source ids select exact sources without title matching or remapping() PASSED
+
+PreparationPlanTest > installed private versions are skipped and shared packages are never converted() PASSED
+
+PreparationPlanTest > same package from two repositories requires repository choice() PASSED
+
+PreparationPlanTest > conflicting download urls for the same version are not chosen arbitrarily() PASSED
+
+PreparationPlanTest > a newer package cannot silently switch an installed source to another selected repository() PASSED
+
+PreparationPlanTest > manual selection and adult content require explicit choices() PASSED
+
+PreparationPlanTest > matching a member language includes multilingual extensions() PASSED
+
+PreparationPlanTest > unsupported extension library versions are reported without attempting installation() PASSED
+
+PrivateExtensionSignatureTest > an altered signed apk is rejected before replacement and working file survives() PASSED
+
+PrivateExtensionSignatureTest > signed fixture verifies under Android 8 and Android 14 signature rules() PASSED
+
+PrivateExtensionSignatureTest > verified bytes can replace the extension without changing the apk() PASSED
+
+PrivateExtensionSignatureTest > correct certificate cannot authorize a different package or an unreviewed key() PASSED
+
+RepositoryReviewTest > background refresh cannot silently replace a restored signing certificate() PASSED
+
+RepositoryReviewTest > metadata changed after review is rejected without overwriting the stored repository() PASSED
+
+RepositoryReviewTest > reviewed metadata is inserted with its original certificate and identity() PASSED
+
+RepositoryReviewTest > network failures cannot register a repository() PASSED
+
+SandboxFilterCodecTest > invalid later state never partially mutates an earlier valid choice() PASSED
+
+SandboxFilterCodecTest > nested selections are applied to original concrete worker classes() PASSED
+
+SandboxFilterCodecTest > unrelated nonempty host lists cannot masquerade as source filters() PASSED
+
+SandboxFilterCodecTest > stale schemas and swapped labels are rejected instead of silently ignoring filters() PASSED
+
+SandboxFilterCodecTest > oversized and deeply nested filter trees are refused() PASSED
+
+SandboxFilterCodecTest > quoted scalar and unknown payload fields are refused() PASSED
+
+SandboxNetworkPolicyTest > response input is bounded before parsing or returning extension bytes() PASSED
+
+SandboxNetworkPolicyTest > URLs cannot request files content providers credentials or alternate ports() PASSED
+
+SandboxNetworkPolicyTest > DNS cannot route public names to local reserved or mixed addresses() PASSED
+
+SandboxNetworkPolicyTest > deep or oversized JSON is rejected before source metadata parsing() PASSED
+
+SandboxPreferenceValuesTest > obvious access values and private marked fields are omitted by nonprivate backup policy() PASSED
+
+SandboxPreferenceValuesTest > wrong types nonfinite floats oversized values and arbitrary objects are refused() PASSED
+
+SandboxPreferenceValuesTest > entry counts and total payload sizes stay bounded() PASSED
+
+SandboxPreferenceValuesTest > memory editor returns copies and rejects invalid batches before writing() PASSED
+
+SandboxPreferenceValuesTest > stored primitive types and string sets round trip without numeric coercion() PASSED
+
+ExtensionInstallerDownloadTest > repository revoked during transfer prevents private installation and preserves the old file() PASSED
+
+ExtensionInstallerDownloadTest > different package names with the same hash cannot cancel each other() PASSED
+
+ExtensionInstallerDownloadTest > completion of a cancelled attempt cannot remove the retry from active jobs() PASSED
+
+ExtensionInstallerDownloadTest > reviewed identity is passed to private validation without changing the selected installer() PASSED
+
+ExtensionInstallerDownloadTest > private download emits a terminal success and removes the consumed APK() PASSED
+
+ExtensionInstallerDownloadTest > cancellation interrupts a stalled response without replacing the working extension() PASSED
+
+ExtensionInstallerDownloadTest > HTTP failure completes the flow with error and cleans its download() PASSED
+
+ExtensionSecurityAuditTest > runtime execution and dynamically loaded code require quarantine() PASSED
+
+ExtensionSecurityAuditTest > an approval binds package and exact bytes and does not authorize a changed update() PASSED
+
+ExtensionSecurityAuditTest > unreadable or out of bounds code fails closed and cannot be approved() PASSED
+
+ExtensionSecurityAuditTest > all dex files are inspected and native code and sensitive declarations are surfaced() PASSED
+
+ExtensionSecurityAuditTest > ordinary HTTP references are not labeled dangerous solely by method name() PASSED
+
+ExtensionSecurityAuditTest > a package without inspectable dex is not silently accepted() PASSED
+
+PrivateExtensionFilesTest > cancelled copy preserves the old file and cleans the staged file() PASSED
+
+PrivateExtensionFilesTest > deletion waits for an ongoing replacement and cannot be undone by that copy() PASSED
+
+PrivateExtensionFilesTest > missing download cannot erase an installed extension() PASSED
+
+PrivateExtensionFilesTest > old bytes remain visible through validation and successful replacement is read only() PASSED
+
+PrivateExtensionFilesTest > failed initial installation leaves no loadable target() PASSED
+
+PrivateExtensionFilesTest > invalid staged package never replaces the old extension() PASSED
+
+PrivateExtensionFilesTest > failed atomic move preserves the old destination() PASSED
+
+AutomaticSourceCatalogTest > failed original preserves rows and can refresh a previously confirmed alternative() PASSED
+
+AutomaticSourceCatalogTest > Ragnarok aliases join forty Portuguese chapters with sixty English chapters() PASSED
+
+AutomaticSourceCatalogTest > individual timeout keeps stored editions without cancelling another provider() PASSED
+
+AutomaticSourceCatalogTest > bounded catalogs always retain the original provider() PASSED
+
+AutomaticSourceCatalogTest > restored work with missing source and no previous alternatives can recover() PASSED
+
+AutomaticSourceCatalogTest > foreground discovery combines verified editions into a single logical sequence() PASSED
+
+AutomaticSourceCatalogTest > catalog with working images outranks Portuguese catalog whose images fail() PASSED
+
+AutomaticSourceCatalogTest > healthy Portuguese edition outranks larger English catalog() PASSED
+
+AutomaticSourceCatalogTest > installing a new enabled provider schedules discovery without waiting a day() PASSED
+
+AutomaticSourceCatalogTest > first provider refresh never waits for a slow alternative or samples images() PASSED
+
+AutomaticSourceCatalogTest > explicit English pin prevents Portuguese search and health sampling() PASSED
+
+AutomaticSourceCatalogTest > parent cancellation is not converted into a successful partial refresh() PASSED
+
+AutomaticSourceCatalogTest > pin restricts network refresh while keeping original stored chapters() PASSED
+
+AutomaticSourceCatalogTest > hidden providers are not queried during discovery() PASSED
+
+AutomaticSourceCatalogTest > a remembered available provider does not prevent recovery when it now fails() PASSED
+
+AutomaticSourceCatalogTest > a real reader failure invalidates recent discovery and its sampled health() PASSED
+
+AutomaticSourceCatalogTest > background refresh never searches all extensions() PASSED
+
+AutomaticSourceCatalogTest > Portuguese editions lead while English fills the remaining chapters without a language filter change() PASSED
+
+AutomaticSourceCatalogTest > obsolete Portuguese backup recovers aliases and complements without a migration request() PASSED
+
+ChapterLoadFallbackTest > a failed page list tries an alternate and disposes only failed loaders() PASSED
+
+ChapterLoadFallbackTest > downloaded-only mode never opens a replacement over the network() PASSED
+
+ChapterLoadFallbackTest > fallback cannot switch chapter numbering or violate a fixed provider() PASSED
+
+ChapterLoadFallbackTest > cancellation never becomes a request to another provider() PASSED
+
+LibraryWorkConsolidatorTest > completed groups do not starve the next batch of restored duplicates() PASSED
+
+LibraryWorkConsolidatorTest > a known alias can join adjacent ranges from Portuguese and English() PASSED
+
+LibraryWorkConsolidatorTest > disjoint numbering is not assumed equivalent without catalogue corroboration() PASSED
+
+LibraryWorkConsolidatorTest > a failed native chapter query leaves original records unchanged() PASSED
+
+LibraryWorkConsolidatorTest > a stale plan retries fresh metadata and keeps a concurrent note() PASSED
+
+LibraryWorkConsolidatorTest > confirmed native editions are associated once without deleting favorites() PASSED
+
+LibraryWorkConsolidatorTest > conflicting per edition pins remain separate() PASSED
+
+LibraryWorkConsolidatorTest > explicit separation survives new reconciliation() PASSED
+
+LibraryWorkConsolidatorTest > unsupported catalogue IDs cannot corroborate adjacent non overlapping ranges() PASSED
+
+LibraryWorkTest > explicit conflicting pins prevent hiding either edition() PASSED
+
+LibraryWorkTest > scanlator filtering does not invalidate numbering established by the full native edition() PASSED
+
+LibraryWorkTest > a pinned English edition ranks ahead of Portuguese while preserving active reading() PASSED
+
+LibraryWorkTest > unknown chapters from different owners never share a sentinel URL identity() PASSED
+
+LibraryWorkTest > generic authors and a transitive author bridge cannot corroborate a library group() PASSED
+
+LibraryWorkTest > library exposes both native records after incompatible renumbering with unchanged counts() PASSED
+
+LibraryWorkTest > portable association resolves after destination local IDs change() PASSED
+
+LibraryWorkTest > numbering changes are revalidated and recover without changing association or progress() PASSED
+
+LibraryWorkTest > metadata guard rejects homonyms unrelated creators and sequel qualifiers() PASSED
+
+LibraryWorkTest > confirmed catalogue aliases retain adjacent Portuguese and English complements during reads() PASSED
+
+LibraryWorkTest > storage hint is removable and does not contain a page mapping() PASSED
+
+LibraryWorkTest > malformed or oversized membership payloads are rejected() PASSED
+
+LibraryWorkTest > group chapter query preserves original chapter IDs owner IDs and partial pages() PASSED
+
+LibraryWorkTest > large confirmed native editions keep all storage owners and logical chapter identities() PASSED
+
+LibraryWorkTest > an explicit separate flag invalidates even reciprocal imported membership() PASSED
+
+LibraryWorkTest > native mutation query never includes chapters from another edition() PASSED
+
+LibraryWorkTest > remote chapter adapter strips runtime and other host reserved metadata() PASSED
+
+LibraryWorkTest > explicit child query remains native while reader root lookup follows the association() PASSED
+
+LibraryWorkTest > partial reciprocal writes never hide another native record() PASSED
+
+LibraryWorkTest > chapter flow revalidates numbering even when manga metadata and row counts stay equal() PASSED
+
+LibraryWorkTest > malformed separation preference is not executable data() PASSED
+
+LibraryWorkTest > Portuguese edition ranks ahead of English without moving native chapters() PASSED
+
+LibraryWorkTest > missing unfavorited or changed members deactivate an association() PASSED
+
+LibraryWorkTest > library projects union categories logical reads bookmarks and newest history() PASSED
+
+SourceMatchingTest > catalogue corroboration cannot bridge adjacent numbers in different seasons volumes or parts() PASSED
+
+SourceMatchingTest > verified catalogue identity can bridge adjacent complementary ranges but cannot invent a large gap() PASSED
+
+SourceMatchingTest > different creators and remakes are not automatically merged() PASSED
+
+SourceMatchingTest > exact normalized title and creator corroborate a work() PASSED
+
+SourceMatchingTest > same title without creator is ambiguous() PASSED
+
+SourceMatchingTest > overlapping ordinary sequences are compatible() PASSED
+
+SourceMatchingTest > ambiguous reset or split numbering is rejected automatically() PASSED
+
+SourceMatchingTest > short CJK creator names remain valid corroboration() PASSED
+
+SourceMatchingTest > a library-only restore can use a corroborated work without inventing previous numbering() PASSED
+
+UnifiedWorkSearchTest > cancellation is not converted into a successful empty search() PASSED
+
+UnifiedWorkSearchTest > enrichment has a sixteen detail budget and two concurrent requests() PASSED
+
+UnifiedWorkSearchTest > metadata requests do not expose Polaris memo to a provider() PASSED
+
+UnifiedWorkSearchTest > alias discovery tries at most four empty providers and two names each() PASSED
+
+UnifiedWorkSearchTest > detail timeouts leave unknown editions separate and finish() PASSED
+
+UnifiedWorkSearchTest > metadata network failure retains all native results() PASSED
+
+UnifiedWorkSearchTest > details corroborate duplicate titles and keep wrong author separate() PASSED
+
+UnifiedWorkSearchTest > details for a different title cannot lend its creator to the search hit() PASSED
+
+UnifiedWorkSearchTest > localized alias can recover an empty provider and join the confirmed card() PASSED
+
+UnifiedWorkSearchTest > catalogue query reference has a safe initialized URL and title() PASSED
+
+WorkIdentityResolverTest > metadata can corroborate a library-only backup with a missing author() PASSED
+
+WorkIdentityResolverTest > ambiguous records or conflicting creators do not become an alias bridge() PASSED
+
+WorkIdentityResolverTest > small spelling variation requires creator agreement and keeps sequel qualifiers() PASSED
+
+WorkIdentityResolverTest > Portuguese English and Korean titles share a corroborated catalogue identity() PASSED
+
+WorkSearchGroupingTest > missing creator cannot borrow catalogue certainty from title alone() PASSED
+
+WorkSearchGroupingTest > candidate linking preserves notes glossary and existing candidate health without local IDs() PASSED
+
+WorkSearchGroupingTest > a restored favorite remains the original entry even when source is missing() PASSED
+
+WorkSearchGroupingTest > an exact source URL is the same saved record without creator metadata() PASSED
+
+WorkSearchGroupingTest > confirmed aliases yield one card and prefer Brazilian Portuguese for new work() PASSED
+
+WorkSearchGroupingTest > large unrelated result sets remain distinct and preserve a matching library entry() PASSED
+
+WorkSearchGroupingTest > global grouping rejects fuzzy spelling matches() PASSED
+
+WorkSearchGroupingTest > distinct URLs inside one provider need catalogue corroboration() PASSED
+
+WorkSearchGroupingTest > unknown and generic creators cannot collapse homonymous titles() PASSED
+
+WorkSearchGroupingTest > different known creators retain separate homonyms() PASSED
+
+WorkSearchGroupingTest > an ambiguous saved bridge cannot hide two separate result cards() PASSED
+
+WorkSearchGroupingTest > translation names alone are not guessed() PASSED
+
+WorkSearchGroupingTest > sequels parts and novel qualifiers remain distinct() PASSED
+
+WorkSearchGroupingTest > only bounded native candidates are attached and host metadata is not sent to a provider() PASSED
+
+WorkSearchGroupingTest > conflicting catalogue identities are ambiguous even with matching creator() PASSED
+
+WorkSearchGroupingTest > a previously pinned work memo is preserved byte for byte() PASSED
+
+WorkSearchGroupingTest > a multi author bridge cannot transitively merge unrelated works() PASSED
+
+WorkSearchGroupingTest > a novel local document or unknown medium is not reused as the comic favorite() PASSED
+
+WorkSearchGroupingTest > existing pinned favorite wins over language and older unpinned favorite() PASSED
+
+DocumentCacheBudgetTest > an arbitrary file cannot be registered as document cache() PASSED
+
+DocumentCacheBudgetTest > clear touches only managed directories and skips symbolic links() PASSED
+
+DocumentCacheBudgetTest > open files can exceed the target until their final lease closes() PASSED
+
+DocumentCacheBudgetTest > evicts least recently used cache files while retaining imported originals() PASSED
+
+DocumentOrganizationTest > membership failure is reported to the import flow() PASSED
+
+DocumentOrganizationTest > selected and newly typed categories are deduplicated without replacing category settings() PASSED
+
+DocumentOrganizationTest > a deleted or system category is rejected before any category or membership is written() PASSED
+
+DocumentOrganizationTest > format grouping can be disabled and a personal category can be created() PASSED
+
+DocumentOrganizationTest > simultaneous additions reuse shared categories() PASSED
+
+DocumentOrganizationTest > existing categories are reused across accents case and the supported interface languages() PASSED
+
+DocumentOrganizationTest > two pdfs keep different user chosen content types and share the format category() PASSED
+
+DocumentSearchTest > provider metadata cannot create an unbounded result list() PASSED
+
+DocumentSearchTest > one provider failure still returns the other provider results() PASSED
+
+DocumentSearchTest > doi lookup routes books to scholarly providers and encodes the identifier once() PASSED
+
+DocumentSearchTest > doi accepts explicit prefixes and preserves meaningful parentheses() PASSED
+
+DocumentSearchTest > title author and doi queries are encoded as provider parameters() PASSED
+
+DocumentSearchTest > book metadata never fabricates a direct full text download() PASSED
+
+DocumentSearchTest > custom search website encodes input and rejects invalid templates() PASSED
+
+DocumentSearchTest > document progress merges memo without overwriting unrelated state() PASSED
+
+DocumentSearchTest > crossref and europepmc results retain their origins and available links() PASSED
+
+DocumentSelectionTest > unsupported selection is rejected before any file copy() PASSED
+
+DocumentSelectionTest > a raw filesystem uri is not treated as permission to scan the phone() PASSED
+
+DocumentSelectionTest > selecting a phone file reads its description without opening or copying its contents() PASSED
+
+TextDocumentTest > epub rejects archive escape and ignores network resources() PASSED
+
+TextDocumentTest > large txt has multiple navigable sections with bounded text blocks() PASSED
+
+TextDocumentTest > epub follows spine order and preserves metadata text and local images() PASSED
+
+TextDocumentTest > entry resolution keeps plus signs decodes spaces and rejects remote or escaping paths() PASSED
+
+TextDocumentTest > long paragraphs are bounded without losing unicode or text() PASSED
+
+TextDocumentTest > zip renamed docx must contain the actual word document() PASSED
+
+TextDocumentTest > docx extracts body paragraphs line breaks tables and embedded images in order() PASSED
+
+TextDocumentTest > oversized section is rejected before it becomes a text view() PASSED
+
+TextDocumentTest > txt supports utf8 utf16 bom and windows1252() PASSED
+
+TextDocumentTest > bounded copy rejects overflow and pdf rendering has a bounded pixel budget() PASSED
+
+ReaderAutoScrollPreferencesTest > auto scroll speed uses the stable persisted key and default() PASSED
+
+ReaderAutoScrollPreferencesTest > auto scroll speed exposes the supported range and step() PASSED
+
+AutoScrollControllerTest > frame clock failure pauses without escaping() PASSED
+
+AutoScrollControllerTest > end callback failure remains paused without escaping() PASSED
+
+AutoScrollControllerTest > scrollability failure pauses without escaping() PASSED
+
+AutoScrollControllerTest > timestamp subtraction cannot overflow past the frame clamp() PASSED
+
+AutoScrollControllerTest > pause from final scrollability callback prevents the pending scroll() PASSED
+
+AutoScrollControllerTest > fractional distance produces six pixels across ten ten millisecond intervals() PASSED
+
+AutoScrollControllerTest > scroll callback failure pauses without escaping() PASSED
+
+AutoScrollControllerTest > frame gaps are clamped to one hundred milliseconds() PASSED
+
+AutoScrollControllerTest > end callback can start a new loop without old completion disabling it() PASSED
+
+AutoScrollControllerTest > end of content pauses once without scrolling() PASSED
+
+AutoScrollControllerTest > start owns one loop and pause cancels it and clears fractional distance() PASSED
+
+AutoScrollControllerTest > destroy is terminal and later starts are ignored() PASSED
+
+AutoScrollControllerTest > invalid speeds act as zero without poisoning later frames() PASSED
+
+AutoScrollControllerTest > end callback can toggle a new loop without old completion disabling it() PASSED
+
+AutoScrollControllerTest > toggle starts and pauses the same loop() PASSED
+
+AutoScrollControllerTest > unexpected callback failure pauses without escaping or reporting content end() PASSED
+
+AutoScrollControllerTest > initial state is disabled without requesting a frame() PASSED
+
+AutoScrollControllerTest > speed changes affect the next frame without restarting() PASSED
+
+WebtoonFrameInteractionContractTest > action down pauses before gesture detectors without consuming the event() PASSED
+
+DeviceWorkloadPolicyTest > a 32 bit process is constrained even when Android does not mark the phone low RAM() PASSED
+
+DeviceWorkloadPolicyTest > low RAM or small process heap also limits a 64 bit device() PASSED
+
+DeviceWorkloadPolicyTest > larger 64 bit devices keep concurrent image loading() PASSED
+
+AutomaticChapterLanguageTest > chapter sampling includes late pages and has a fixed text budget() PASSED
+
+AutomaticChapterLanguageTest > only confident English content enters automatic translation() PASSED
+
+EnglishDownloadTranslationPolicyTest > Portuguese and unknown sources are not guessed as English() PASSED
+
+EnglishDownloadTranslationPolicyTest > English source variants are eligible() PASSED
+
+EnglishDownloadTranslationPolicyTest > global off disables the English default() PASSED
+
+EnglishDownloadTranslationPolicyTest > configured source and target must permit English translation() PASSED
+
+EnglishDownloadTranslationPolicyTest > explicit work choices take priority() PASSED
+
+EnglishTranslationBootstrapTest > failed downloads close resources without probing or claiming readiness() PASSED
+
+EnglishTranslationBootstrapTest > existing resources can be verified offline without requesting a download() PASSED
+
+EnglishTranslationBootstrapTest > readiness waits for models and the SDK probe before closing the session() PASSED
+
+EnglishTranslationBootstrapTest > an empty SDK probe cannot be marked ready() PASSED
+
+EnglishTranslationBootstrapTest > cancellation releases the translator without running the probe() PASSED
+
+EnglishTranslationSetupHistoryTest > history uses request order instead of list order() PASSED
+
+EnglishTranslationSetupHistoryTest > an older success cannot hide a pending preparation() PASSED
+
+PendingDownloadTranslationsTest > duplicate clicks and simultaneous requests do not lose chapters() PASSED
+
+PendingDownloadTranslationsTest > enqueue failure preserves request for retry() PASSED
+
+PendingDownloadTranslationsTest > explicit chapter request survives restart and does not select other chapters() PASSED
+
+PendingDownloadTranslationsTest > cancellation prevents a later ordinary download from consuming the request() PASSED
+
+SourceTranslationLanguageTest > known metadata chooses the appropriate script without guessing mixed sources() PASSED
+
+SourceTranslationLanguageTest > asian automation is opt in and never retranslates the selected target language() PASSED
+
+TextTranslatorConfigurationTest > changing fallback engine invalidates cached translator configuration() PASSED
+
+TranslationCandidatePolicyTest > downloaded untranslated or failed chapters can be queued() PASSED
+
+TranslationCandidatePolicyTest > missing active or finished chapters are excluded() PASSED
+
+TranslationDeletionGateTest > deletion waits for the old writer before removal and restart() PASSED
+
+TranslationDeletionGateTest > failed removal releases the gate and resumes other queued work() PASSED
+
+TranslationDeletionGateTest > user pause during cleanup prevents an automatic restart() PASSED
+
+TranslationLaunchPolicyTest > explicit user action is independent of manga opt in() PASSED
+
+TranslationLaunchPolicyTest > download completion is allowed after manga opt in() PASSED
+
+TranslationLaunchPolicyTest > download completion is denied while manga opt in is disabled() PASSED
+
+TranslationStorageSampleTest > measure actual chapter serialization with authored multilingual text() PASSED
+
+TranslationFileIdentityTest > same chapter URL at different providers cannot share translated pages() PASSED
+
+TranslationFileIdentityTest > primary chapter names retain existing translation identity() PASSED
+
+TranslationFontTest > stored legacy comic value is normalized() PASSED
+
+TranslationFontTest > stored unknown value is normalized() PASSED
+
+TranslationFontTest > stable values preserve existing choices and reserve comic font() PASSED
+
+TranslationFontTest > settings order contains no legacy comic entry() PASSED
+
+TranslationProviderMediaShieldTest > translation directory is hidden from gallery before OCR files are created() PASSED
+
+DbnetCleanupMaskTest > high confidence sparse large glyph mask gains only one extra pixel inside permission() PASSED
+
+DbnetCleanupMaskTest > small residuals two pixels from a glyph are covered without escaping member permission() PASSED
+
+DbnetCleanupMaskTest > saved page aggregate mask budget fails closed without invoking legacy erasers() PASSED
+
+DbnetCleanupMaskTest > uncertain mask keeps the existing two pixel expansion() PASSED
+
+DbnetCleanupMaskTest > prepared mask ownership survives OCR normalization copy and filtering() PASSED
+
+DbnetCleanupMaskTest > null mask uses the exact legacy cleanup patches and masked blank translation erases nothing() PASSED
+
+DbnetCleanupMaskTest > DBNet pixel outside permission cannot seed dilation back inside() PASSED
+
+DbnetCleanupMaskTest > rotated member quad remains the exact permission instead of its group AABB() PASSED
+
+DbnetCleanupMaskTest > checkerboard source is rejected before intermediate runs exceed the page cap() PASSED
+
+DbnetCleanupMaskTest > invalid mask preparation falls back before translation side effects() PASSED
+
+DbnetCleanupMaskTest > mask round trips old JSON defaults null and corrupt optional payload fails closed() PASSED
+
+DbnetCleanupMaskTest > valid empty persisted mask stays a safe explicit no erase mask() PASSED
+
+DbnetCleanupMaskTest > associated group with no usable glyph mask fails the experimental page() PASSED
+
+DbnetCleanupMaskTest > non square native mask maps with detector input scale and ignores padding() PASSED
+
+DbnetCleanupMaskTest > one empty associated group rejects all prepared masks atomically() PASSED
+
+DbnetCleanupMaskTest > mask keeps glyphs inside translated member quads and removes outside pixels() PASSED
+
+DbnetCleanupMaskTest > dense mask is rejected instead of becoming a large rectangular cleanup fill() PASSED
+
+DbnetCleanupMaskTest > invalid dimensions ratio byte count and bounded work are rejected before use() PASSED
+
+DbnetFullPageMlKitCoordinatorTest > failure before selected ML Kit success invokes selected fallback once() PASSED
+
+DbnetFullPageMlKitCoordinatorTest > selected ML Kit success is reused unchanged when association later fails() PASSED
+
+DbnetFullPageMlKitCoordinatorTest > Paddle selection uses one owned ML Kit pass then one selected fallback() PASSED
+
+DbnetFullPageMlKitCoordinatorTest > owned ML Kit is lazy and released without releasing selected engine() PASSED
+
+DbnetGeometryTest > extremely narrow accepted input retains one resized pixel() PASSED
+
+DbnetGeometryTest > minimum rectangle follows rotated shape and ignores interior points() PASSED
+
+DbnetGeometryTest > resize upscales longest edge and pads right and bottom to 256() PASSED
+
+DbnetGeometryTest > unclip expands each edge by area times ratio divided by perimeter() PASSED
+
+DbnetGeometryTest > rejects nonpositive absurd and overflow dimensions before multiplication() PASSED
+
+DbnetGeometryTest > resize retains nominal ratio despite rounding and preserves portrait orientation() PASSED
+
+DbnetGeometryTest > empty singleton nonfinite and collinear geometry has no usable rectangle() PASSED
+
+DbnetLeaseTest > only the owner may stop a worker and repeated requests retain ownership() PASSED
+
+DbnetLeaseTest > unclaimed or absent identity cannot stop a worker() PASSED
+
+DbnetLineGroupingTest > splits two permissively linked one-line bubbles at a glyph-scale gap() PASSED
+
+DbnetLineGroupingTest > keeps nearby but separately aligned speech bubbles apart() PASSED
+
+DbnetLineGroupingTest > splits a permissively linked component at an anomalous MST gap() PASSED
+
+DbnetLineGroupingTest > orders groups and lines deterministically independent of detector order() PASSED
+
+DbnetLineGroupingTest > rejects detector output beyond the bounded line limit() PASSED
+
+DbnetLineGroupingTest > splits a three-line bridge by comparing its abnormal edge to the close pair() PASSED
+
+DbnetLineGroupingTest > splits a four-line bridge into its two close pairs() PASSED
+
+DbnetLineGroupingTest > merges aligned lines in one speech bubble and exposes their union geometry() PASSED
+
+DbnetLineGroupingTest > merges compatible rotated lines and retains their orientation() PASSED
+
+DbnetMlKitAssociationTest > association retains the exact detector mask metadata() PASSED
+
+DbnetMlKitAssociationTest > page dimensions geometry and text are validated independently() PASSED
+
+DbnetMlKitAssociationTest > meaningful unmatched ML Kit text cannot silently disappear() PASSED
+
+DbnetMlKitAssociationTest > one ML Kit block may own multiple DBNet lines in one group() PASSED
+
+DbnetMlKitAssociationTest > unmatched detector group is rejected as noise without losing assigned text() PASSED
+
+DbnetMlKitAssociationTest > same-geometry duplicate is emitted once but repeated text elsewhere is preserved() PASSED
+
+DbnetMlKitAssociationTest > multiple compatible ML Kit blocks become one coherent group block() PASSED
+
+DbnetMlKitAssociationTest > no usable association fails instead of producing a partial page() PASSED
+
+DbnetMlKitAssociationTest > ML Kit block spanning incompatible groups is ambiguous() PASSED
+
+DbnetMlKitAssociationTest > adjacent groups remain separate association owners() PASSED
+
+DbnetMlKitAssociationTest > partially recognized grouped region is rejected before cleanup can own every member() PASSED
+
+DbnetModelStoreTest > interrupted download removes partial and preserves cancellation() PASSED
+
+DbnetModelStoreTest > downloads exact verified bytes using bounded reads() PASSED
+
+DbnetModelStoreTest > pinned inpainter pair matches reviewed manifest() PASSED
+
+DbnetModelStoreTest > unsafe filenames are rejected before opening stream() PASSED
+
+DbnetModelStoreTest > pinned detector pair matches reviewed manifest() PASSED
+
+DbnetModelStoreTest > truncated oversized and wrong hash downloads never become model() PASSED
+
+DbnetModelStoreTest > first installation reports one download even when both assets are absent() PASSED
+
+DbnetModelStoreTest > corrupt existing model is replaced after verification() PASSED
+
+DbnetModelStoreTest > valid existing model causes no network access() PASSED
+
+DbnetNotificationTest > a broken notification cannot abort OCR or crash the main dispatcher() PASSED
+
+DbnetNotificationTest > feedback is queued on Main and never runs inline on the OCR caller() PASSED
+
+DbnetPageCoordinatorTest > Paddle fallback uses selected once and releases its one owned ML Kit session() PASSED
+
+DbnetPageCoordinatorTest > technical stage failure returns only selected fallback cleans once and emits one safe record() PASSED
+
+DbnetPageCoordinatorTest > each failed page stage is distinguished from later unreached stages and falls back once() PASSED
+
+DbnetPageCoordinatorTest > cancellation emits one record but never falls back or performs failure cleanup() PASSED
+
+DbnetPageCoordinatorTest > selected fallback failure is propagated once and still emits one record() PASSED
+
+DbnetPageCoordinatorTest > successful selected ML Kit page is the single association pass with no fallback() PASSED
+
+DbnetPageCoordinatorTest > association failure reuses completed selected ML Kit page and performs fallback cleanup() PASSED
+
+DbnetPageCoordinatorTest > successful page records actual stages worker timings counts and overlapping total() PASSED
+
+DbnetPageCoordinatorTest > disabled route stays lazy and emits no experimental diagnostic() PASSED
+
+DbnetPageCoordinatorTest > fallback time is included in monotonic total and cleanup callback failures stay isolated() PASSED
+
+DbnetPixelsTest > pixels become RGB planes in minus one to one range() PASSED
+
+DbnetPixelsTest > decode sample is positive bounded and preserves small images() PASSED
+
+DbnetPostprocessorTest > normal component is scored expanded and returned in original coordinates() PASSED
+
+DbnetPostprocessorTest > larger capacity DB buffer reads only actual channel zero grid() PASSED
+
+DbnetPostprocessorTest > native stroke mask uses strict point twelve threshold with exact grid and padded input mapping() PASSED
+
+DbnetPostprocessorTest > half and full masks are both accepted and do not change geometry() PASSED
+
+DbnetPostprocessorTest > differently sized DB grid scales x and y independently using padded input() PASSED
+
+DbnetPostprocessorTest > minimum side is measured before unclip with inclusive three pixel threshold() PASSED
+
+DbnetPostprocessorTest > diagonal pixels connect components but separated boxes keep row major order() PASSED
+
+DbnetPostprocessorTest > invalid output metadata and truncated buffers fail explicitly() PASSED
+
+DbnetPostprocessorTest > blank logits produce successful empty result() PASSED
+
+DbnetPostprocessorTest > nonfinite or non probability native mask fails without a partial result() PASSED
+
+DbnetPostprocessorTest > score is component mean rather than maximum() PASSED
+
+DbnetPostprocessorTest > nonfinite channel zero logits fail without partial regions() PASSED
+
+DbnetPostprocessorTest > region limit accepts 2048 but returns failure at 2049 instead of truncation() PASSED
+
+DbnetPostprocessorTest > only channel zero contributes geometry() PASSED
+
+DbnetPostprocessorTest > boxes entirely in padded area are removed after clipping() PASSED
+
+DbnetPostprocessorTest > zero logits are strictly excluded even when surrounded by positive logits() PASSED
+
+DbnetPostprocessorTest > border component is clipped to original image() PASSED
+
+DbnetPostprocessorTest > score uses sigmoid once and rejects mean probability below threshold() PASSED
+
+DbnetPreferencesTest > new detector preference is independent and off by default() PASSED
+
+DbnetReplyTest > timeout and late reply do not replace completed outcome() PASSED
+
+DbnetReplyTest > worker death unblocks caller with recoverable failure() PASSED
+
+DbnetReplyTest > duplicate reply is ignored() PASSED
+
+DbnetSessionTest > native error is recoverable and close releases once() PASSED
+
+DbnetSessionTest > native dynamic dimensions and tensors are preserved() PASSED
+
+DbnetSessionTest > closed session and invalid input never enter backend() PASSED
+
+DbnetSessionTest > model load failure is reported before inference() PASSED
+
+DbnetStageMetricsTest > worker timing transport preserves stage outcome and rejects malformed payloads() PASSED
+
+DbnetStageMetricsTest > worker recorder marks a thrown stage failed and leaves later work unreached() PASSED
+
+DbnetStageMetricsTest > worker reply encoding exports the complete validated timing shape() PASSED
+
+DbnetStageMetricsTest > worker recorder marks a returned postprocessor failure failed() PASSED
+
+DbnetWireTest > full native resolution mask remains within the transport bound() PASSED
+
+DbnetWireTest > malformed mask metadata and encoded length fail before mask decode() PASSED
+
+DbnetWireTest > geometry round trip preserves dimensions coordinates order and confidence() PASSED
+
+DbnetWireTest > malformed and oversized IPC output fails without partial regions() PASSED
+
+DbnetWireTest > empty valid detection is represented explicitly() PASSED
+
+ExperimentalDbnetOcrEngineTest > cancellation leaves concrete wrapper client enabled without fallback or failure cleanup() PASSED
+
+ExperimentalDbnetOcrEngineTest > invalid EXIF orientation falls back before experimental work() PASSED
+
+ExperimentalDbnetOcrEngineTest > compatible EXIF allows experimental work() PASSED
+
+ExperimentalDbnetOcrEngineTest > EXIF read cancellation propagates without selected fallback() PASSED
+
+ExperimentalDbnetOcrEngineTest > EXIF read failure falls back before experimental work() PASSED
+
+ExperimentalDbnetOcrEngineTest > technical failure closes and disables concrete wrapper then releases owned ML Kit after one fallback() PASSED
+
+ExperimentalDbnetOcrEngineTest > bounded EXIF input rejects over-limit and negative skips() PASSED
+
+ExperimentalDetectionRouteTest > model native and process failures each fall back exactly once() PASSED
+
+ExperimentalDetectionRouteTest > unsupported configuration keeps existing OCR and explains fallback() PASSED
+
+ExperimentalDetectionRouteTest > default invokes only existing OCR without detector initialization() PASSED
+
+ExperimentalDetectionRouteTest > experimental success bypasses existing detector() PASSED
+
+ExperimentalDetectionRouteTest > existing engine failure is not retried() PASSED
+
+ExperimentalDetectionRouteTest > cancellation propagates without fallback() PASSED
+
+ExperimentalDetectionRouteTest > fallback remains usable when experimental cleanup or warning fails() PASSED
+
+ExperimentalDetectionRouteTest > empty page uses existing OCR without disabling DBNet for the next page() PASSED
+
+InpainterConfigTest > default config aligns with yakuyomi benchmarks() PASSED
+
+InpainterConfigTest > boxfill config properties are retained() PASSED
+
+InpainterTest > maskArrFromPixels generates float mask() PASSED
+
+InpainterTest > inpainter lifecycle initializes and releases backend() PASSED
+
+InpainterTest > inpainter falls back gracefully when model path is null or method is boxfill() PASSED
+
+InpainterTest > aotArrToPixels reconstructs correct ARGB values() PASSED
+
+InpainterTest > aotImageChwFromPixels zeroes holes and normalizes valid pixels to minus one and one() PASSED
+
+InpainterTest > dilate expands binary mask correctly() PASSED
+
+InpainterTest > dilate with zero radius is no-op() PASSED
+
+TextDetectionTest > normalization copies mutable input and returned point lists() PASSED
+
+TextDetectionTest > rotates diamond corners while preserving each edge() PASSED
+
+TextDetectionTest > clips corners to image extent and rejects fully collapsed padding box() PASSED
+
+TextDetectionTest > rejects missing duplicate concave crossed and collinear corners() PASSED
+
+TextDetectionTest > rejects nonfinite points invalid confidence and invalid image size() PASSED
+
+TextDetectionTest > normalizes reversed cyclic corners without changing crop winding() PASSED
+
+TextDetectionTest > scales both axes before clipping and rejects invalid scaling() PASSED
+
+TranslationGlossaryManagerTest > unchanged ordinary terms are rejected() PASSED
+
+TranslationGlossaryManagerTest > parses several glossary separators in one paste() PASSED
+
+TranslationGlossaryManagerTest > protected name list accepts one unchanged name per line() PASSED
+
+TranslationGlossaryTest > prompt identifies entry types and excludes learned complete lines() PASSED
+
+TranslationGlossaryTest > protected names survive an engine changing token spacing() PASSED
+
+TranslationGlossaryTest > manual correction wins for the same complete speech even after punctuation changes() PASSED
+
+TranslationGlossaryTest > protected CJK names match attached particles while Latin words retain their boundaries() PASSED
+
+TranslationGlossaryTest > multiple protected titles and techniques are restored together() PASSED
+
+TranslationIntelligenceIntegrationTest > glossary revision invalidates stale cache and snapshot remains serializable() PASSED
+
+TranslationIntelligenceIntegrationTest > cache normalizes invisible Unicode characters in source and target() PASSED
+
+TranslationIntelligenceIntegrationTest > deleting machine output keeps vocabulary and corrections across source language scopes() PASSED
+
+PortugueseTextNormalizationTest > Portuguese glyph normalization is idempotent and preserves cedillas() PASSED
+
+PortugueseTextNormalizationTest > Unicode composition preserves paragraphs punctuation and other scripts() PASSED
+
+PortugueseTextNormalizationTest > decomposed Portuguese letters use their precomposed glyphs() PASSED
+
+TranslationBlockGrouperTest > strict mode groups PaddleOCR lines across a normal balloon gap() PASSED
+
+TranslationBlockGrouperTest > strict proximity fallback still groups split OCR lines() PASSED
+
+TranslationBlockGrouperTest > strict mode does not bridge separate detected regions through connector() PASSED
+
+TranslationBlockGrouperTest > strict mode keeps separate finished PaddleOCR balloons apart() PASSED
+
+TranslationBlockGrouperTest > finished sentences in separate detected regions remain separate() PASSED
+
+TranslationBlockGrouperTest > partially overlapping regions from the same detected balloon are grouped() PASSED
+
+TranslationBlockGrouperTest > translated connector can reveal a continuation after translation() PASSED
+
+TranslationBlockGrouperTest > nearby fragments from separate detected balloons remain separate() PASSED
+
+TranslationBlockGrouperTest > proximity fallback does not bridge a large vertical gap() PASSED
+
+TranslationBlockGrouperTest > strict mode still groups strongly overlapping balloon regions() PASSED
+
+TranslationBlockGrouperTest > wide gap without connector does not join separate balloons() PASSED
+
+TranslationBlockGrouperTest > separate experimental mask owners never fuse before or after translation() PASSED
+
+TranslationBlockGrouperTest > fragments detected inside the same balloon are grouped() PASSED
+
+TranslationBlockGrouperTest > strict mode groups nearby PaddleOCR fragments that form one unfinished sentence() PASSED
+
+TranslationBlockGrouperTest > fragment missed by detection joins balloon that contains its center() PASSED
+
+TranslationBlockGrouperTest > post translation grouping does not bridge detached balloons because source OCR is open ended() PASSED
+
+TranslationBlockGrouperTest > open ended OCR fragments remain one continuous paragraph() PASSED
+
+TranslationBlockGrouperTest > connector word bridges a wider OCR gap inside one sentence() PASSED
+
+TranslationBlockVisualGroupingTest > nearby aligned fragments with very different visual character size stay separate() PASSED
+
+TranslationBlockVisualGroupingTest > aligned open ended fragments at comic spacing merge when visual size matches() PASSED
+
+TranslationCandidatePolicyTest > large short dialogue inside a detected balloon is not removed as a sound effect() PASSED
+
+TranslationCandidatePolicyTest > normal captions and long dialogue do not become sound effects() PASSED
+
+TranslationCandidatePolicyTest > preserves meaningful single-character dialogue across scripts() PASSED
+
+TranslationCandidatePolicyTest > unboxed short oversized lettering retains existing sound-effect classification() PASSED
+
+TranslationCleanupCoverageTest > merge includes cleanup for an OCR fragment without saved cleanup geometry() PASSED
+
+TranslationCleanupCoverageTest > merging source fragments does not erase artwork in the gap between them() PASSED
+
+TranslationCleanupCoverageTest > grouped cleanup covers the corners of the wide final OCR fragment() PASSED
+
+TranslationCleanupCoverageTest > source footprints survive reanalysis serialization and a later merge() PASSED
+
+TranslationColorsTest > light colored balloon receives black text() PASSED
+
+TranslationColorsTest > dark balloon receives white text() PASSED
+
+TranslationGeometryTest > cleanup region expands OCR bounds and stays inside page() PASSED
+
+TranslationGeometryTest > clamped region that starts beyond page edge is moved fully inside() PASSED
+
+TranslationGeometryTest > disjoint touching and invalid geometry have zero overlap() PASSED
+
+TranslationGeometryTest > clamped sanitizes non finite geometry before rendering() PASSED
+
+TranslationGeometryTest > layout region gives translation more room than cleanup region() PASSED
+
+TranslationGeometryTest > clamped region never crosses right or bottom page edge() PASSED
+
+TranslationGeometryTest > Y8 translation json remains compatible with Y9 geometry() PASSED
+
+TranslationGeometryTest > layout saved by first Y9 falls back to safer geometry() PASSED
+
+TranslationGeometryTest > clamped keeps an already valid region unchanged() PASSED
+
+TranslationGeometryTest > IoU and directional coverage distinguish overlap from containment() PASSED
+
+TranslationGeometryTest > current layout geometry keeps detected balloon region() PASSED
+
+TranslationGeometryTest > inset keeps text away from rounded balloon edges() PASSED
+
+TranslationMultilineGroupingRegressionTest > multiline paragraph never pulls in a detached detected balloon() PASSED
+
+TranslationMultilineGroupingRegressionTest > multiline paragraph includes a short source fragment missed by balloon detection() PASSED
+
+TranslationMultilineGroupingRegressionTest > a translated paragraph never absorbs cleanup for a failed translation() PASSED
+
+TranslationMultilineGroupingRegressionTest > multiline comparison still rejects lettering of a genuinely different scale() PASSED
+
+TranslationMultilineGroupingRegressionTest > repeated merges do not make apparent glyph width progressively smaller() PASSED
+
+TranslationPageLayoutTest > adjacent columns reserve horizontal space without covering the other source() PASSED
+
+TranslationPageLayoutTest > untranslated neighbor reserves original text instead of having another overlay placed over it() PASSED
+
+TranslationPageLayoutTest > saved dark caption cannot draw its translation outside the bounded eraser() PASSED
+
+TranslationPageLayoutTest > measured white balloon keeps its established larger writing area() PASSED
+
+TranslationPageLayoutTest > mixed size OCR title boxes that overlap are partitioned by their source centers() PASSED
+
+TranslationPageLayoutTest > unrelated layouts and cleanup ownership remain unchanged() PASSED
+
+TranslationPageLayoutTest > three fragments remain non overlapping after all pairwise allocations() PASSED
+
+TranslationPageLayoutTest > stacked title fragments cannot share expanded vertical space() PASSED
+
+TranslationPostTranslationGroupingTest > translated connector never bridges two distinct detected balloons() PASSED
+
+TranslationRecoveryPolicyTest > narrow dialogue with strong balloon evidence is recovered() PASSED
+
+TranslationRecoveryPolicyTest > sound effects repeated letters and noise are not recovered() PASSED
+
+TranslationRecoveryPolicyTest > weak evidence stays available for manual translation() PASSED
+
+TranslationRecoveryPolicyTest > extremely narrow text and bad source metrics stay rejected() PASSED
+
+TranslationRecoveryPolicyTest > currently valid blocks keep their decision() PASSED
+
+TranslationSourceMetricsTest > credible glyph metrics and vertical or rotated text stay unchanged() PASSED
+
+TranslationSourceMetricsTest > first symbol outlier does not prevent grouping adjacent source lines() PASSED
+
+TranslationSourceMetricsTest > a punctuation sized first symbol cannot set the whole paragraph font ceiling() PASSED
+
+TranslationSourceMetricsTest > grouped source boxes never become one falsely tall line() PASSED
+
+TranslationFitPolicyTest > overflow handling expands usable area before reaching emergency font size() PASSED
+
+TranslationFitPolicyTest > difficult irregular region gets largest safe area() PASSED
+
+TranslationFitPolicyTest > large translation expansion enables safe fitting() PASSED
+
+TranslationFitPolicyTest > normal detected balloon keeps conservative margins() PASSED
+
+TranslationFontSizeSearchTest > selection stops at the readable floor when nothing fits() PASSED
+
+TranslationFontSizeSearchTest > returns the largest font size that fits() PASSED
+
+TranslationFontSizeSearchTest > returns null when even the minimum font size overflows() PASSED
+
+TranslationFontSizeSearchTest > selection keeps the largest fitting font above the floor() PASSED
+
+TranslationImageCropTest > saved translation keeps the original image even when the reader requests border crop() PASSED
+
+TranslationImageCropTest > translation arriving on an already cropped page requires one uncropped reload() PASSED
+
+TranslationImageCropTest > untranslated pages retain the user choice and uncropped pages need no extra decode() PASSED
+
+TranslationImageCropTest > recycled holder does not carry the prior page crop into its next binding() PASSED
+
+TranslationRotationFitTest > keeps the full text area when there is no rotation() PASSED
+
+TranslationRotationFitTest > reduces text area so a rotated paragraph remains inside its region() PASSED
+
+TranslationTextFitTest > an overflowing candidate cannot replace a fitting paragraph() PASSED
+
+TranslationTextFitTest > does not discard a larger intact word layout when boundaries are nonmonotonic() PASSED
+
+TranslationTextFitTest > last emergency envelope retains the largest safe writing area() PASSED
+
+TranslationTextFitTest > a first fitting envelope does not prevent a larger safe font() PASSED
+
+TranslationTextFitTest > prefers whole words over an unnecessarily split larger font() PASSED
+
+TranslationTextFitTest > only a detected balloon permits bounded growth() PASSED
+
+TranslationTextFitTest > retains fitting fallback when a word cannot fit even at the floor() PASSED
+
+TranslationTextFitTest > whole words still outrank a larger split word() PASSED
+
+TranslationTextFitTest > signals when another existing safe envelope can avoid a split() PASSED
+
+TranslationTextFitTest > uses larger font only when measured inside the same envelope() PASSED
+
+TranslationTextFitTest > font ties keep the more conservative envelope() PASSED
+
+TranslationTypographyTest > fonts with Portuguese glyphs do not receive supplementary spans() PASSED
+
+TranslationTypographyTest > cedilla supplements preserve the actual text and style only the unsupported characters() PASSED
+
+TranslationTypographyTest > a normal phrase does not change fonts merely because a supplement is available() PASSED
+
+TranslationViewportScaleTest > same pixel space preserves reader zoom() PASSED
+
+TranslationViewportScaleTest > downsampled translation coordinates are mapped to source pixels exactly once() PASSED
+
+TranslationViewportScaleTest > invalid page metadata does not introduce NaN or infinite scale() PASSED
+
+TranslationViewportTransformTest > incomplete or invalid geometry has no drawable viewport() PASSED
+
+TranslationViewportTransformTest > zoom and pan snapshot replaces both origin and scale without mutating the prior frame() PASSED
+
+TranslationViewportTransformTest > fitted portrait includes the black margin above the image once() PASSED
+
+TranslationViewportTransformTest > downsampled translation maps to the same displayed pixels as the source() PASSED
+
+CaptionSurfaceRegressionTest > white oval remains detected and retains its established useful layout() PASSED
+
+CaptionSurfaceRegressionTest > closed blue caption keeps a white foreground and writing inside its panel() PASSED
+
+CaptionSurfaceRegressionTest > open dark or colored panels constrain the fallback when only two sides are detected() PASSED
+
+FloatTensorOutputTest > CTC text confidence blank repeats and ties are bit identical() PASSED
+
+FloatTensorOutputTest > reuses the owned ORT array without a second full output allocation() PASSED
+
+FloatTensorOutputTest > sliced direct and read only buffers preserve exactly the tensor values() PASSED
+
+FloatTensorOutputTest > full and limited buffers keep the legacy rewind semantics() PASSED
+
+OcrEngineManagerTest > reuses a matching engine and releases it once() PASSED
+
+OcrEngineManagerTest > replacement waits until the active engine use completes() PASSED
+
+OcrEngineTypeTest > translation preferences keep ml kit as the backward compatible default() PASSED
+
+OcrEngineTypeTest > invalid stored preference is reset to ml kit() PASSED
+
+OcrEngineTypeTest > paddle is explicit and supports only english() PASSED
+
+OcrEngineTypeTest > ml kit is the default for unknown preference values() PASSED
+
+OcrEngineTypeTest > ml kit supports every existing source language() PASSED
+
+OcrStripPlanTest > equal text in adjacent lines survives the larger height tolerance() PASSED
+
+OcrStripPlanTest > duplicate OCR variants prefer the region with more edge clearance() PASSED
+
+OcrStripPlanTest > recorded chapter boundary with shorter OCR box retains the text once() PASSED
+
+OcrStripPlanTest > recorded narrow height disagreement does not repeat a recognized line() PASSED
+
+OcrStripPlanTest > measured Paddle Small overlap reproduces all benchmark lines in product reconciler() PASSED
+
+OcrStripPlanTest > measured ML Kit overlap reproduces all benchmark lines in product reconciler() PASSED
+
+OcrStripPlanTest > invalid or pathological dimensions fail before allocating pixels() PASSED
+
+OcrStripPlanTest > same-strip detections are preserved even when text and geometry match() PASSED
+
+OcrStripPlanTest > measured Paddle Tiny geometry preserves overlap without enabling that model() PASSED
+
+OcrStripPlanTest > identical words at different page positions are never globally deduplicated() PASSED
+
+OcrStripPlanTest > large enclosing detections cannot suppress a distinct repeated line() PASSED
+
+OcrStripPlanTest > regions cover entire tall pages with overlap and bounded decoded pixels() PASSED
+
+OcrStripPlanTest > benchmark dimensions use the same twelve original scale regions() PASSED
+
+OcrStripPlanTest > adjacent columns and separate lines survive overlap reconciliation() PASSED
+
+OcrStripPlanTest > ordinary pages and unsupported very wide pages keep existing recognition path() PASSED
+
+OcrStripPlanTest > overlap keeps complete last line instead of the edge fragment() PASSED
+
+PaddleOCRConfigTest > keeps mobile detector input capped instead of scanning full resolution pages() PASSED
+
+PaddleOcrRuntimeTest > fails before inference when opencv cannot be initialized() PASSED
+
+PaddleTextBlockMapperTest > maps a rotated quad to neutral geometry() PASSED
+
+PaddleTextBlockMapperTest > rejects implausibly sparse text boxes() PASSED
+
+PaddleTextBlockMapperTest > rejects low confidence paddle noise() PASSED
+
+PaddleTextBlockMapperTest > rejects malformed paddle results() PASSED
+
+RecognitionBatchPlannerTest > partitions recognition work into small ordered batches() PASSED
+
+RecognitionBatchPlannerTest > groups similar crop widths while retaining each source index() PASSED
+
+RecognitionBatchPlannerTest > invalid batch size falls back to one item per inference() PASSED
+
+SpeechBubbleBackgroundRegressionTest > grouped sampling uses original footprints instead of the enclosing corners() PASSED
+
+SpeechBubbleBackgroundRegressionTest > a tight dark outline is not the background of a white caption() PASSED
+
+SpeechBubbleBackgroundRegressionTest > wide white balloon line never samples the black page through gaps in peer masks() PASSED
+
+SpeechBubbleBackgroundRegressionTest > a middle line on a dark page stays in its translated paragraph() PASSED
+
+SpeechBubbleBackgroundRegressionTest > sampling follows the actual interior for dark and tinted balloons too() PASSED
+
+SpeechBubbleCornerBoundaryRegressionTest > diagonal boundary near another balloon limits only the invading corner() PASSED
+
+SpeechBubbleCornerBoundaryRegressionTest > unobstructed wide balloon retains its existing layout dimensions() PASSED
+
+SpeechBubbleCornerBoundaryRegressionTest > pixel rounding never replaces the constrained balloon with an unsafe fallback() PASSED
+
+SpeechBubbleOvalLayoutRegressionTest > narrow oval balloon keeps detected layout inside curved shoulders() PASSED
+
+SpeechBubbleParagraphGroupingTest > complete sentences inside one large balloon become one paragraph() PASSED
+
+SpeechBubblePrintedParagraphRegressionTest > printed neighboring lobes keep separate paragraphs and layout regions() PASSED
+
+SpeechBubblePrintedParagraphRegressionTest > grouping retains individually bounded cleanup masks() PASSED
+
+SpeechBubblePrintedParagraphRegressionTest > oval keeps useful paragraph space without crossing its curved boundary() PASSED
+
+SpeechBubblePrintedParagraphRegressionTest > cleanup near a curved shoulder covers source ink without erasing the outline() PASSED
+
+SpeechBubblePrintedParagraphRegressionTest > almost touching printed lines do not reject each others background collar() PASSED
+
+SpeechBubblePrintedParagraphRegressionTest > printed fragments inside one oval become a single paragraph() PASSED
+
+SpeechBubblePrintedParagraphRegressionTest > peer OCR box crossing a divider never hides the neighboring balloon contour() PASSED
+
+SpeechBubbleSeparationRegressionTest > nearby white balloons keep non overlapping layout regions() PASSED
+
+SpeechBubbleSizePolicyTest > accepts a large round balloon around a short OCR line() PASSED
+
+SpeechBubbleSizePolicyTest > rejects a large wide panel around a short OCR line() PASSED
+
+BrazilianPortugueseMachinePostEditorTest > corrects nightmare past tense() PASSED
+
+BrazilianPortugueseMachinePostEditorTest > does not change another target language() PASSED
+
+BrazilianPortugueseMachinePostEditorTest > localizes liege and naturalizes completed job() PASSED
+
+BrazilianPortugueseMachinePostEditorTest > uses established Shadow Monarch title() PASSED
+
+BrazilianPortugueseMachinePostEditorTest > preserves father and dad distinction() PASSED
+
+ComicTranslationPromptTest > normalizes non breaking spaces() PASSED
+
+ComicTranslationPromptTest > removes spaces before punctuation and collapses repeated spaces() PASSED
+
+ComicTranslationPromptTest > keeps ordinary text unchanged() PASSED
+
+ComicTranslationPromptTest > parses clean JSON response() PASSED
+
+ComicTranslationPromptTest > parses markdown wrapped JSON response() PASSED
+
+ComicTranslationPromptTest > normalizes invisible Unicode spaces between words() PASSED
+
+ComicTranslationPromptTest > salvages completed pages from truncated JSON response() PASSED
+
+ComicTranslationPromptTest > removes zero width formatting characters() PASSED
+
+ComicTranslationPromptTest > preserves intentional paragraph breaks() PASSED
+
+GeminiComicProtocolTest > splits requests by phrase count while preserving original block identity() PASSED
+
+GeminiComicProtocolTest > refuses a URL or credential as a model identifier() PASSED
+
+GeminiComicProtocolTest > rejects missing extra null blank or unaligned phrases() PASSED
+
+GeminiComicProtocolTest > accepts complete responses regardless of page key order and ignores thoughts() PASSED
+
+GeminiComicProtocolTest > rejects truncated or blocked responses even if JSON appears complete() PASSED
+
+GeminiComicProtocolTest > character budget separates long phrases without splitting a phrase() PASSED
+
+GeminiTranslatorConfigTest > normalizes Gemini model path for REST endpoint() PASSED
+
+GeminiTranslatorConfigTest > builds Gemini REST request without unsupported sampling parameters() PASSED
+
+GeminiTranslatorTest > gemini request chunks keep a chapter request below the per-call block limit() PASSED
+
+MachineTranslationContextTest > preserves short dialogue that can legitimately translate the same way() PASSED
+
+MachineTranslationContextTest > rejects output when translator removes a marker() PASSED
+
+MachineTranslationContextTest > builds chunks without changing text order() PASSED
+
+MachineTranslationContextTest > retries a substantive translation repeated for different source text() PASSED
+
+MachineTranslationContextTest > preserves a repeated translation when the original is also repeated() PASSED
+
+MachineTranslationContextTest > restores translated blocks from preserved markers() PASSED
+
+ReliableTextTranslatorTest > configured fallback receives only unresolved blocks after permanent failure() PASSED
+
+ReliableTextTranslatorTest > fallback failure preserves progress and never exposes raw fallback error() PASSED
+
+ReliableTextTranslatorTest > cancellation never retries or starts fallback() PASSED
+
+ReliableTextTranslatorTest > no fallback propagates permanent failure without clearing valid blocks() PASSED
+
+ReliableTextTranslatorTest > transient failure retries once before fallback using unresolved blocks() PASSED
+
+ReliableTextTranslatorTest > successful transient retry prevents fallback() PASSED
+
+TranslationFallbackEngineTest > unknown fallback values resolve to none() PASSED
+
+TranslationFallbackEngineTest > only explicitly authorized no key fallbacks are available() PASSED
+
+TranslationFallbackEngineTest > none never resolves a fallback translator() PASSED
+
+TranslationFallbackEngineTest > explicit keyless online fallback never duplicates the primary() PASSED
+
+TranslationFallbackEngineTest > explicit local fallback resolves only when supported and different from primary() PASSED
+
+TranslationProviderFailureTest > cancellation is propagated unchanged() PASSED
+
+TranslationProviderFailureTest > OpenRouter rejects blank model through typed boundary() PASSED
+
+TranslationProviderFailureTest > DeepL 456 reports exhausted quota() PASSED
+
+TranslationProviderFailureTest > Gemini rejects blank key before SDK use() PASSED
+
+TranslationProviderFailureTest > OpenRouter 401 is an invalid key without leaking response body() PASSED
+
+TranslationProviderFailureTest > OpenRouter 402 reports insufficient credits() PASSED
+
+TranslationProviderFailureTest > server response is retryable() PASSED
+
+TranslationProviderFailureTest > OpenRouter 404 reports missing model() PASSED
+
+TranslationProviderFailureTest > OpenRouter rejects blank key through typed boundary() PASSED
+
+TranslationProviderFailureTest > missing key and model use typed configuration failures() PASSED
+
+TranslationProviderFailureTest > Gemini invalid key message is classified without leaking cause text() PASSED
+
+TranslationProviderFailureTest > Gemini exhausted resource is classified as quota failure() PASSED
+
+TranslationProviderFailureTest > JSON parsing failure is a non retryable malformed response() PASSED
+
+TranslationProviderFailureTest > network IO reports retryable connection failure() PASSED
+
+TranslationProviderFailureTest > Gemini missing model message is classified() PASSED
+
+TranslationProviderFailureTest > DeepL rejects blank key through typed boundary() PASSED
+
+TranslationProviderFailureTest > HTTP 429 reports rate limit without immediate retry() PASSED
+
+TranslationQualityGuardTest > blank translation is retried() PASSED
+
+TranslationQualityGuardTest > proper portuguese translation is accepted() PASSED
+
+TranslationQualityGuardTest > unchanged translation is retried() PASSED
+
+TranslationQualityGuardTest > short names do not trigger language heuristic() PASSED
+
+TranslationQualityGuardTest > same language pair does not retry unchanged text() PASSED
+
+TranslationQualityGuardTest > english result with strong source overlap is retried() PASSED
+
+MigratorTest > withinRangeMigration() PASSED
+
+MigratorTest > largeMigration() PASSED
+
+MigratorTest > sameVersion() PASSED
+
+MigratorTest > smallMigration() PASSED
+
+MigratorTest > noMigrations() PASSED
+
+MigratorTest > initialVersion() PASSED
+
+TranslationFontMigrationTest > unknown font values migrate to Anime Ace() PASSED
+
+TranslationFontMigrationTest > unset preference remains at Anime Ace default() PASSED
+
+TranslationFontMigrationTest > supported font values remain unchanged() PASSED
+
+TranslationFontMigrationTest > legacy comic font value migrates to Anime Ace() PASSED
+
+UpdateMangaFromRemoteTest > details only refresh cannot remove or synchronize chapter editions() PASSED
+
+UpdateMangaFromRemoteTest > a source pin changed during network work is retained and stale synchronization aborts() PASSED
+
+TranslationLlmPreferencesTest > legacy shared values migrate only to the selected provider() PASSED
+
+TranslationLlmPreferencesTest > legacy migration never overwrites provider values() PASSED
+
+TranslationLlmPreferencesTest > Gemini and OpenRouter retain independent API keys and models() PASSED
+
+> Task :app:mergeDebugNativeDebugMetadata NO-SOURCE
+> Task :app:generateDebugAssets UP-TO-DATE
+> Task :core-metadata:generateDebugAssets UP-TO-DATE
+> Task :core-metadata:mergeDebugAssets UP-TO-DATE
+> Task :data:generateDebugAssets UP-TO-DATE
+> Task :data:mergeDebugAssets UP-TO-DATE
+> Task :dbnet-native:generateDebugAssets UP-TO-DATE
+> Task :dbnet-native:mergeDebugAssets UP-TO-DATE
+> Task :domain:generateDebugAssets UP-TO-DATE
+> Task :domain:mergeDebugAssets UP-TO-DATE
+> Task :i18n:generateAndroidMainAssets UP-TO-DATE
+> Task :i18n:mergeAndroidMainAssets UP-TO-DATE
+> Task :i18n-at:generateAndroidMainAssets UP-TO-DATE
+> Task :i18n-at:mergeAndroidMainAssets UP-TO-DATE
+> Task :ppocr-sdk:generateDebugAssets UP-TO-DATE
+> Task :ppocr-sdk:mergeDebugAssets UP-TO-DATE
+> Task :presentation-core:generateDebugAssets UP-TO-DATE
+> Task :presentation-core:mergeDebugAssets UP-TO-DATE
+> Task :presentation-widget:generateDebugAssets UP-TO-DATE
+> Task :presentation-widget:mergeDebugAssets UP-TO-DATE
+> Task :source-api:generateDebugAssets UP-TO-DATE
+> Task :source-api:mergeDebugAssets UP-TO-DATE
+> Task :source-local:generateDebugAssets UP-TO-DATE
+> Task :source-local:mergeDebugAssets UP-TO-DATE
+> Task :telemetry:generateDebugAssets UP-TO-DATE
+> Task :telemetry:mergeDebugAssets UP-TO-DATE
+> Task :core:archive:generateDebugAssets UP-TO-DATE
+> Task :core:archive:mergeDebugAssets UP-TO-DATE
+> Task :core:common:generateDebugAssets UP-TO-DATE
+> Task :core:common:mergeDebugAssets UP-TO-DATE
+> Task :core:viewmodel:generateDebugAssets UP-TO-DATE
+> Task :core:viewmodel:mergeDebugAssets UP-TO-DATE
+> Task :app:mergeDebugAssets UP-TO-DATE
+> Task :app:compressDebugAssets
+> Task :app:generateDebugGlobalSynthetics UP-TO-DATE
+> Task :app:l8DexDesugarLibDebug UP-TO-DATE
+> Task :app:mergeDebugJavaResource UP-TO-DATE
+> Task :app:checkDebugDuplicateClasses UP-TO-DATE
+> Task :app:desugarDebugFileDependencies UP-TO-DATE
+> Task :app:mergeExtDexDebug FROM-CACHE
+> Task :source-local:bundleLibRuntimeToDirDebug UP-TO-DATE
+> Task :core-metadata:bundleLibRuntimeToDirDebug UP-TO-DATE
+> Task :data:bundleLibRuntimeToDirDebug UP-TO-DATE
+> Task :presentation-widget:bundleLibRuntimeToDirDebug UP-TO-DATE
+> Task :domain:bundleLibRuntimeToDirDebug UP-TO-DATE
+> Task :source-api:bundleLibRuntimeToDirDebug UP-TO-DATE
+> Task :presentation-core:bundleLibRuntimeToDirDebug UP-TO-DATE
+> Task :telemetry:bundleLibRuntimeToDirDebug UP-TO-DATE
+> Task :core:common:bundleLibRuntimeToDirDebug UP-TO-DATE
+> Task :i18n:bundleLibRuntimeToDirAndroidMain UP-TO-DATE
+> Task :i18n-at:bundleLibRuntimeToDirAndroidMain UP-TO-DATE
+> Task :ppocr-sdk:bundleLibRuntimeToDirDebug UP-TO-DATE
+> Task :core:viewmodel:bundleLibRuntimeToDirDebug UP-TO-DATE
+> Task :core:archive:bundleLibRuntimeToDirDebug UP-TO-DATE
+> Task :dbnet-native:bundleLibRuntimeToDirDebug UP-TO-DATE
+> Task :app:mergeLibDexDebug FROM-CACHE
+> Task :app:dexBuilderDebug
+> Task :app:mergeProjectDexDebug
+> Task :app:mergeDebugJniLibFolders UP-TO-DATE
+> Task :core-metadata:mergeDebugJniLibFolders UP-TO-DATE
+> Task :core-metadata:mergeDebugNativeLibs NO-SOURCE
+> Task :core-metadata:copyDebugJniLibsProjectOnly UP-TO-DATE
+> Task :data:mergeDebugJniLibFolders UP-TO-DATE
+> Task :data:mergeDebugNativeLibs NO-SOURCE
+> Task :data:copyDebugJniLibsProjectOnly UP-TO-DATE
+> Task :dbnet-native:configureCMakeDebug[arm64-v8a]
+> Task :dbnet-native:buildCMakeDebug[arm64-v8a]
+> Task :dbnet-native:mergeDebugJniLibFolders UP-TO-DATE
+> Task :dbnet-native:mergeDebugNativeLibs UP-TO-DATE
+> Task :dbnet-native:copyDebugJniLibsProjectOnly UP-TO-DATE
+> Task :domain:mergeDebugJniLibFolders UP-TO-DATE
+> Task :domain:mergeDebugNativeLibs NO-SOURCE
+> Task :domain:copyDebugJniLibsProjectOnly UP-TO-DATE
+> Task :i18n:mergeAndroidMainJniLibFolders UP-TO-DATE
+> Task :i18n:mergeAndroidMainNativeLibs NO-SOURCE
+> Task :i18n:copyAndroidMainJniLibsProjectOnly UP-TO-DATE
+> Task :i18n-at:mergeAndroidMainJniLibFolders UP-TO-DATE
+> Task :i18n-at:mergeAndroidMainNativeLibs NO-SOURCE
+> Task :i18n-at:copyAndroidMainJniLibsProjectOnly UP-TO-DATE
+> Task :ppocr-sdk:mergeDebugJniLibFolders UP-TO-DATE
+> Task :ppocr-sdk:mergeDebugNativeLibs NO-SOURCE
+> Task :ppocr-sdk:copyDebugJniLibsProjectOnly UP-TO-DATE
+> Task :presentation-core:mergeDebugJniLibFolders UP-TO-DATE
+> Task :presentation-core:mergeDebugNativeLibs NO-SOURCE
+> Task :presentation-core:copyDebugJniLibsProjectOnly UP-TO-DATE
+> Task :presentation-widget:mergeDebugJniLibFolders UP-TO-DATE
+> Task :presentation-widget:mergeDebugNativeLibs NO-SOURCE
+> Task :presentation-widget:copyDebugJniLibsProjectOnly UP-TO-DATE
+> Task :source-api:mergeDebugJniLibFolders UP-TO-DATE
+> Task :source-api:mergeDebugNativeLibs NO-SOURCE
+> Task :source-api:copyDebugJniLibsProjectOnly UP-TO-DATE
+> Task :source-local:mergeDebugJniLibFolders UP-TO-DATE
+> Task :source-local:mergeDebugNativeLibs NO-SOURCE
+> Task :source-local:copyDebugJniLibsProjectOnly UP-TO-DATE
+> Task :telemetry:mergeDebugJniLibFolders UP-TO-DATE
+> Task :telemetry:mergeDebugNativeLibs NO-SOURCE
+> Task :telemetry:copyDebugJniLibsProjectOnly UP-TO-DATE
+> Task :core:archive:mergeDebugJniLibFolders UP-TO-DATE
+> Task :core:archive:mergeDebugNativeLibs NO-SOURCE
+> Task :core:archive:copyDebugJniLibsProjectOnly UP-TO-DATE
+> Task :core:common:mergeDebugJniLibFolders UP-TO-DATE
+> Task :core:common:mergeDebugNativeLibs NO-SOURCE
+> Task :core:common:copyDebugJniLibsProjectOnly UP-TO-DATE
+> Task :core:viewmodel:mergeDebugJniLibFolders UP-TO-DATE
+> Task :core:viewmodel:mergeDebugNativeLibs NO-SOURCE
+> Task :core:viewmodel:copyDebugJniLibsProjectOnly UP-TO-DATE
+> Task :app:mergeDebugNativeLibs
+> Task :app:stripDebugDebugSymbols
+> Task :app:validateSigningDebug UP-TO-DATE
+> Task :app:writeDebugAppMetadata UP-TO-DATE
+> Task :app:writeDebugSigningConfigVersions UP-TO-DATE
+> Task :app:packageDebug
+> Task :app:createDebugApkListingFileRedirect UP-TO-DATE
+> Task :app:assembleDebug
+> Task :app:preDebugAndroidTestBuild SKIPPED
+> Task :app:compileDebugAndroidTestAidl NO-SOURCE
+> Task :app:dataBindingMergeDependencyArtifactsDebugAndroidTest UP-TO-DATE
+> Task :app:generateDebugAndroidTestResources UP-TO-DATE
+> Task :app:mergeDebugAndroidTestResources UP-TO-DATE
+> Task :app:dataBindingGenBaseClassesDebugAndroidTest UP-TO-DATE
+> Task :app:mergeDebugAndroidTestManifest UP-TO-DATE
+> Task :app:processDebugAndroidTestManifest UP-TO-DATE
+> Task :app:generateDebugAndroidTestBuildConfig UP-TO-DATE
+> Task :app:packageDebugAndroidTestResources UP-TO-DATE
+> Task :app:processDebugAndroidTestNavigationResources UP-TO-DATE
+> Task :app:parseDebugAndroidTestLocalResources UP-TO-DATE
+> Task :app:generateDebugAndroidTestRFile UP-TO-DATE
+> Task :app:compileDebugAndroidTestKotlin UP-TO-DATE
+> Task :app:javaPreCompileDebugAndroidTest UP-TO-DATE
+> Task :app:compileDebugAndroidTestJavaWithJavac UP-TO-DATE
+> Task :app:generateDebugAndroidTestAssets UP-TO-DATE
+> Task :app:mergeDebugAndroidTestAssets
+> Task :app:compressDebugAndroidTestAssets
+> Task :app:generateDebugAndroidTestGlobalSynthetics UP-TO-DATE
+> Task :app:processDebugAndroidTestJavaRes UP-TO-DATE
+> Task :app:mergeDebugAndroidTestJavaResource UP-TO-DATE
+> Task :app:checkDebugAndroidTestDuplicateClasses UP-TO-DATE
+> Task :app:desugarDebugAndroidTestFileDependencies UP-TO-DATE
+> Task :app:mergeExtDexDebugAndroidTest UP-TO-DATE
+> Task :app:mergeLibDexDebugAndroidTest UP-TO-DATE
+> Task :app:checkDebugAndroidTestAarMetadata UP-TO-DATE
+> Task :app:mapDebugAndroidTestSourceSetPaths UP-TO-DATE
+> Task :app:compileDebugAndroidTestNavigationResources UP-TO-DATE
+> Task :app:processDebugAndroidTestResources UP-TO-DATE
+> Task :app:dexBuilderDebugAndroidTest UP-TO-DATE
+> Task :app:mergeProjectDexDebugAndroidTest UP-TO-DATE
+> Task :app:mergeDebugAndroidTestJniLibFolders UP-TO-DATE
+> Task :app:mergeDebugAndroidTestNativeLibs NO-SOURCE
+> Task :app:stripDebugAndroidTestDebugSymbols NO-SOURCE
+> Task :app:validateSigningDebugAndroidTest UP-TO-DATE
+> Task :app:writeDebugAndroidTestSigningConfigVersions UP-TO-DATE
+> Task :app:packageDebugAndroidTest
+> Task :app:createDebugAndroidTestApkListingFileRedirect UP-TO-DATE
+> Task :app:assembleDebugAndroidTest
+
+BUILD SUCCESSFUL in 3m 15s
+389 actionable tasks: 17 executed, 2 from cache, 370 up-to-date
+Consider enabling configuration cache to speed up this build: https://docs.gradle.org/9.6.1/userguide/configuration_cache_enabling.html

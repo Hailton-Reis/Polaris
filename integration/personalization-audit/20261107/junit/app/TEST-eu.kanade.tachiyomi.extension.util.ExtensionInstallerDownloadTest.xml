@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.tachiyomi.extension.util.ExtensionInstallerDownloadTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-11-08T01:12:21.960Z" hostname="a1f1fc307d5f" time="2.132">
+  <properties/>
+  <testcase name="repository revoked during transfer prevents private installation and preserves the old file()" classname="eu.kanade.tachiyomi.extension.util.ExtensionInstallerDownloadTest" time="0.638"/>
+  <testcase name="different package names with the same hash cannot cancel each other()" classname="eu.kanade.tachiyomi.extension.util.ExtensionInstallerDownloadTest" time="0.302"/>
+  <testcase name="completion of a cancelled attempt cannot remove the retry from active jobs()" classname="eu.kanade.tachiyomi.extension.util.ExtensionInstallerDownloadTest" time="0.263"/>
+  <testcase name="reviewed identity is passed to private validation without changing the selected installer()" classname="eu.kanade.tachiyomi.extension.util.ExtensionInstallerDownloadTest" time="0.232"/>
+  <testcase name="private download emits a terminal success and removes the consumed APK()" classname="eu.kanade.tachiyomi.extension.util.ExtensionInstallerDownloadTest" time="0.267"/>
+  <testcase name="cancellation interrupts a stalled response without replacing the working extension()" classname="eu.kanade.tachiyomi.extension.util.ExtensionInstallerDownloadTest" time="0.189"/>
+  <testcase name="HTTP failure completes the flow with error and cleans its download()" classname="eu.kanade.tachiyomi.extension.util.ExtensionInstallerDownloadTest" time="0.167"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

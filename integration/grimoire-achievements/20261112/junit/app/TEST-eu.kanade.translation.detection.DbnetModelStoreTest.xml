@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.translation.detection.DbnetModelStoreTest" tests="9" skipped="0" failures="0" errors="0" timestamp="2026-11-12T18:43:20.380Z" hostname="060411c85d3c" time="0.033">
+  <properties/>
+  <testcase name="interrupted download removes partial and preserves cancellation()" classname="eu.kanade.translation.detection.DbnetModelStoreTest" time="0.005"/>
+  <testcase name="downloads exact verified bytes using bounded reads()" classname="eu.kanade.translation.detection.DbnetModelStoreTest" time="0.005"/>
+  <testcase name="pinned inpainter pair matches reviewed manifest()" classname="eu.kanade.translation.detection.DbnetModelStoreTest" time="0.001"/>
+  <testcase name="unsafe filenames are rejected before opening stream()" classname="eu.kanade.translation.detection.DbnetModelStoreTest" time="0.001"/>
+  <testcase name="pinned detector pair matches reviewed manifest()" classname="eu.kanade.translation.detection.DbnetModelStoreTest" time="0.001"/>
+  <testcase name="truncated oversized and wrong hash downloads never become model()" classname="eu.kanade.translation.detection.DbnetModelStoreTest" time="0.004"/>
+  <testcase name="first installation reports one download even when both assets are absent()" classname="eu.kanade.translation.detection.DbnetModelStoreTest" time="0.002"/>
+  <testcase name="corrupt existing model is replaced after verification()" classname="eu.kanade.translation.detection.DbnetModelStoreTest" time="0.003"/>
+  <testcase name="valid existing model causes no network access()" classname="eu.kanade.translation.detection.DbnetModelStoreTest" time="0.002"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

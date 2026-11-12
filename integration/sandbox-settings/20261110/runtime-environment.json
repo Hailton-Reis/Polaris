@@ -1,0 +1,63 @@
+{
+  "scope": "software-emulated disposable API26 x86_64 VM; component host",
+  "initial_preflight": "Low free disk; removed regenerable build intermediates only; APKs, sources, SDK, models, signing keys and guest data preserved",
+  "boot_observation": "System UI ANR before instrumentation; screenshot inspected and window dumps retained",
+  "actions": [
+    "Tapped Close App at (300,830) during installation to restart System UI",
+    "Force-stopped background process of previously installed Polaris during installation, and again before instrumentation"
+  ],
+  "data_cleared": false,
+  "APK_verification": "maintained",
+  "SELinux": "Enforcing",
+  "physical_performance_acceptance": false,
+  "instrumentation_start_window": "Launcher; window-ready.txt",
+  "source_or_test_changed_for_vm_recovery": false,
+  "host_memory_preparation": {
+    "clean_build_file_cache_advice_bytes": 352618749,
+    "guest_data_preserved": true,
+    "oom_kills": 0,
+    "additional_clean_host_apk_cache_advice_bytes": 236348512,
+    "scope": "Earlier VM installs; final strengthened visual run used a resumed execution environment"
+  },
+  "harness_corrections": [
+    "Explicit Unit-returning JUnit methods; host Application dependency prepared for legacy restore helper",
+    "Preference root registered before extension setup; synthetic dependency configured after attaching its field",
+    "Mirror production preference-theme context in the debug fixture; require a visible checkable widget, inject a real touchscreen tap, verify visual and persisted state, and require screenshots"
+  ],
+  "visual_capture_recovery": "Emulator process was no longer running on resume; booted preserved guest data solely to retrieve the screenshot from the completed test, without rerunning instrumentation",
+  "previous_component_round": {
+    "passed": 29,
+    "failed": 0,
+    "seconds": 168.852,
+    "api": 26,
+    "abi": "x86_64",
+    "started_at_utc": "2026-11-10T22:38:35.763296+00:00",
+    "completed_at_utc": "2026-11-10T22:41:45.564251+00:00",
+    "start_window": "Launcher; window-ready.txt",
+    "APK_verification": "maintained",
+    "source_patch_matches_artifacts": true
+  },
+  "final_round": {
+    "passed": 29,
+    "failed": 0,
+    "seconds": 228.536,
+    "api": 26,
+    "abi": "x86_64",
+    "started_at_utc": "2026-11-11T18:45:47.903481+00:00",
+    "completed_at_utc": "2026-11-11T18:50:01.543106+00:00",
+    "start_window": "Launcher; window-ready.txt",
+    "end_window": "window-end.txt",
+    "APK_verification": "maintained",
+    "source_patch_matches_artifacts": true,
+    "visible_switch_and_real_touch": true,
+    "interface_recovery_during_instrumentation": false
+  },
+  "final_host_memory_events": {
+    "low": 0,
+    "high": 0,
+    "max": 0,
+    "oom": 0,
+    "oom_kill": 0,
+    "oom_group_kill": 0
+  }
+}

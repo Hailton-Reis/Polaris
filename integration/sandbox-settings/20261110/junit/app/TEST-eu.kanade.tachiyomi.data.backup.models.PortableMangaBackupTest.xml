@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.tachiyomi.data.backup.models.PortableMangaBackupTest" tests="9" skipped="0" failures="0" errors="0" timestamp="2026-11-10T22:28:19.205Z" hostname="7d7c5a6182d0" time="0.163">
+  <properties/>
+  <testcase name="native reader that drops optional memo still has only valid source URLs()" classname="eu.kanade.tachiyomi.data.backup.models.PortableMangaBackupTest" time="0.032"/>
+  <testcase name="portable backups retain source references for the visible provider and old storage identity()" classname="eu.kanade.tachiyomi.data.backup.models.PortableMangaBackupTest" time="0.029"/>
+  <testcase name="ordinary backups remain byte-model compatible without a Polaris envelope()" classname="eu.kanade.tachiyomi.data.backup.models.PortableMangaBackupTest" time="0.004"/>
+  <testcase name="native migration keeps the new identity instead of attaching the old work snapshot()" classname="eu.kanade.tachiyomi.data.backup.models.PortableMangaBackupTest" time="0.014"/>
+  <testcase name="portable state edits affect matching logical chapter without inventing page equivalence()" classname="eu.kanade.tachiyomi.data.backup.models.PortableMangaBackupTest" time="0.009"/>
+  <testcase name="Polaris round trip preserves old identity all editions history and settings()" classname="eu.kanade.tachiyomi.data.backup.models.PortableMangaBackupTest" time="0.007"/>
+  <testcase name="external view has one real source with native URLs and logical read flags()" classname="eu.kanade.tachiyomi.data.backup.models.PortableMangaBackupTest" time="0.005"/>
+  <testcase name="portable settings edits survive returning to Polaris()" classname="eu.kanade.tachiyomi.data.backup.models.PortableMangaBackupTest" time="0.009"/>
+  <testcase name="new native chapters and additional history survive returning to Polaris()" classname="eu.kanade.tachiyomi.data.backup.models.PortableMangaBackupTest" time="0.008"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

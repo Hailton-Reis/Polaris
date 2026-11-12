@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.tachiyomi.ui.reader.viewer.webtoon.WebtoonFrameInteractionContractTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-11-10T22:28:26.360Z" hostname="7d7c5a6182d0" time="0.001">
+  <properties/>
+  <testcase name="action down pauses before gesture detectors without consuming the event()" classname="eu.kanade.tachiyomi.ui.reader.viewer.webtoon.WebtoonFrameInteractionContractTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

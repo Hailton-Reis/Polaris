@@ -1,0 +1,82 @@
+{
+  "reviewed_after_final_35_test_run": true,
+  "api": 26,
+  "abi": "x86_64",
+  "native_icons": {
+    "source": "PackageManager resolveActivity/loadIcon, drawn to192px bitmap",
+    "mask": "stock adaptive rounded square",
+    "all_four_illustrations_distinct": true,
+    "faces_books_stars_visible": true,
+    "no_visible_artwork_clipping": true
+  },
+  "appearance": {
+    "points": 4500,
+    "selected": "AURORA",
+    "unlocked": [
+      "DEFAULT",
+      "AURORA",
+      "ORBIT"
+    ],
+    "locked": [
+      "CONSTELLATION"
+    ],
+    "illustrations_and_labels_visible": true,
+    "reward_help_matches_current_rules": true
+  },
+  "journey": {
+    "Boreal_copy_mentions_titles_and_alternate_icons": true,
+    "Amber_font_scale": 1.3,
+    "screen_is_scrollable": true
+  },
+  "settings": {
+    "enabled_switch_drawn": true,
+    "disabled_switch_drawn": true,
+    "dependent_field_updates": true,
+    "private_value_hidden": true,
+    "session_section_visible": true,
+    "clear_button_disabled_when_no_cookies": true
+  },
+  "limits": [
+    "Component activity previews; not full-app startup acceptance",
+    "No physical launcher or Android13+ monochrome acceptance",
+    "Session-clear dialog exercised by UiAutomation; no separate dialog screenshot archived"
+  ],
+  "captures": [
+    {
+      "path": "preview/appearance/appearance-aurora-light.png",
+      "sha256": "2e1535dfdac0518372095b66a70498acf69d816269c85e3a7f9d1da622022fc3"
+    },
+    {
+      "path": "preview/appearance/journey-amber-large.png",
+      "sha256": "7d4babb6aa5abf3600113a9a522ac7504763af13bfe54175305840443e6dd156"
+    },
+    {
+      "path": "preview/appearance/journey-north.png",
+      "sha256": "081c28cc6848b323e6ff75616cfd0efd0dd685b2c31e60a6c8e0b0bb94cc2800"
+    },
+    {
+      "path": "preview/icons/aurora.png",
+      "sha256": "b1335becddc7b3fb48514bbb3f0851a6da12e9e6389e48e992fc49c84c6ed6f2"
+    },
+    {
+      "path": "preview/icons/constellation.png",
+      "sha256": "0330851ebf941c81ae9bd747f9d47a5e4d40b7c47a71c53c8b04735cc559b977"
+    },
+    {
+      "path": "preview/icons/default.png",
+      "sha256": "37b82ac93f205d948fe05c0c562a76c1761922133801bfec958e408306846cd6"
+    },
+    {
+      "path": "preview/icons/orbit.png",
+      "sha256": "7342a8907f1a4c0b2f6641ff75f66b18ce8a2da17c2fe47bd755e12fbed15a94"
+    },
+    {
+      "path": "preview/settings/isolated-settings-disabled.png",
+      "sha256": "846d6d9402eb5a1083f4fb43ed7f4de084dade01705fd35ee1a3cdfbfd4f9820"
+    },
+    {
+      "path": "preview/settings/isolated-settings.png",
+      "sha256": "13b2856cb4d74f22489ed9cc9ca13c7a8e298efe43ef5e7dea4cf2fe494c79eb"
+    }
+  ]
+}

@@ -1,0 +1,377 @@
+--------- beginning of system
+10-07 13:31:13.551   447   447 I installd: installd firing up
+10-07 13:31:55.804   534   534 I PackageManager: No settings file; creating initial state
+10-07 13:32:19.901   534   534 I PackageManager: /product/overlay/SettingsProvider__auto_generated_rro_product.apk changed; collecting certs
+10-07 13:32:20.200   534   534 I PackageManager: /product/overlay/DisplayCutoutEmulationCorner changed; collecting certs
+10-07 13:32:20.296   534   534 I PackageManager: /product/overlay/EmulationPixel2XL changed; collecting certs
+10-07 13:32:20.381   534   534 I PackageManager: /product/overlay/EmulationPixel3XL changed; collecting certs
+10-07 13:32:20.461   534   534 I PackageManager: /product/overlay/StorageManager__auto_generated_rro_product.apk changed; collecting certs
+10-07 13:32:20.543   534   534 I PackageManager: /product/overlay/DisplayCutoutEmulationDouble changed; collecting certs
+10-07 13:32:20.579   534   534 I PackageManager: /product/overlay/Telecom__auto_generated_rro_product.apk changed; collecting certs
+10-07 13:32:20.611   534   534 I PackageManager: /product/overlay/DisplayCutoutEmulationHole changed; collecting certs
+10-07 13:32:20.658   534   534 I PackageManager: /product/overlay/SystemUIEmulationPixel4a changed; collecting certs
+10-07 13:32:20.707   534   534 I PackageManager: /product/overlay/BuiltInPrintService__auto_generated_rro_product.apk changed; collecting certs
+10-07 13:32:20.752   534   534 I PackageManager: /product/overlay/EmergencyInfo__auto_generated_rro_product.apk changed; collecting certs
+10-07 13:32:20.798   534   534 I PackageManager: /product/overlay/NavigationBarModeGesturalNarrowBack changed; collecting certs
+10-07 13:32:20.831   534   534 I PackageManager: /product/overlay/SystemUIEmulationPixel5 changed; collecting certs
+10-07 13:32:20.887   534   534 I PackageManager: /product/overlay/EmulationPixel4a changed; collecting certs
+10-07 13:32:20.919   534   534 I PackageManager: /product/overlay/SystemUIEmulationPixel2XL changed; collecting certs
+10-07 13:32:20.971   534   534 I PackageManager: /product/overlay/SystemUIEmulationPixel3 changed; collecting certs
+10-07 13:32:20.996   534   534 I PackageManager: /product/overlay/SettingsGoogle__auto_generated_rro_product.apk changed; collecting certs
+10-07 13:32:21.038   534   534 I PackageManager: /product/overlay/ManagedProvisioning__auto_generated_rro_product.apk changed; collecting certs
+10-07 13:32:21.078   534   534 I PackageManager: /product/overlay/EmulationPixel5 changed; collecting certs
+10-07 13:32:21.107   534   534 I PackageManager: /product/overlay/EmulationPixel4 changed; collecting certs
+10-07 13:32:21.169   534   534 I PackageManager: /product/overlay/OneHandedModeGestural changed; collecting certs
+10-07 13:32:21.189   534   534 I PackageManager: /product/overlay/GoogleWebViewOverlay.apk changed; collecting certs
+10-07 13:32:21.221   534   534 I PackageManager: /product/overlay/NavigationBarModeGesturalWideBack changed; collecting certs
+10-07 13:32:21.241   534   534 I PackageManager: /product/overlay/DisplayCutoutEmulationEmu01 changed; collecting certs
+10-07 13:32:21.266   534   534 I PackageManager: /product/overlay/framework-res__auto_generated_rro_product.apk changed; collecting certs
+10-07 13:32:21.288   534   534 I PackageManager: /product/overlay/DisplayCutoutEmulationWaterfall changed; collecting certs
+10-07 13:32:21.333   534   534 I PackageManager: /product/overlay/ContactsProvider__auto_generated_rro_product.apk changed; collecting certs
+10-07 13:32:21.366   534   534 I PackageManager: /product/overlay/SystemUIEmulationPixel3aXL changed; collecting certs
+10-07 13:32:21.386   534   534 I PackageManager: /product/overlay/SystemUIEmulationPixel4 changed; collecting certs
+10-07 13:32:21.409   534   534 I PackageManager: /product/overlay/EmulatorTetheringGoogleConfigOverlay.apk changed; collecting certs
+10-07 13:32:21.429   534   534 I PackageManager: /product/overlay/NavigationBarMode3Button changed; collecting certs
+10-07 13:32:21.458   534   534 I PackageManager: /product/overlay/SystemUIEmulationPixel4XL changed; collecting certs
+10-07 13:32:21.482   534   534 I PackageManager: /product/overlay/SystemUIEmulationPixel3XL changed; collecting certs
+10-07 13:32:21.499   534   534 I PackageManager: /product/overlay/NavigationBarModeGesturalExtraWideBack changed; collecting certs
+10-07 13:32:21.519   534   534 I PackageManager: /product/overlay/EmulatorConfigOverlay.apk changed; collecting certs
+10-07 13:32:21.538   534   534 I PackageManager: /product/overlay/NavigationBarMode2Button changed; collecting certs
+10-07 13:32:21.562   534   534 I PackageManager: /product/overlay/Traceur__auto_generated_rro_product.apk changed; collecting certs
+10-07 13:32:21.580   534   534 I PackageManager: /product/overlay/NfcNci__auto_generated_rro_product.apk changed; collecting certs
+10-07 13:32:21.600   534   534 I PackageManager: /product/overlay/GooglePermissionControllerOverlay.apk changed; collecting certs
+10-07 13:32:21.622   534   534 I PackageManager: /product/overlay/TelephonyProvider__auto_generated_rro_product.apk changed; collecting certs
+10-07 13:32:21.645   534   534 I PackageManager: /product/overlay/NavigationBarModeGestural changed; collecting certs
+10-07 13:32:21.662   534   534 I PackageManager: /product/overlay/EmulationPixel4XL changed; collecting certs
+10-07 13:32:21.678   534   534 I PackageManager: /product/overlay/DisplayCutoutEmulationTall changed; collecting certs
+10-07 13:32:21.700   534   534 I PackageManager: /product/overlay/PixelConfigOverlayCommon.apk changed; collecting certs
+10-07 13:32:21.718   534   534 I PackageManager: /product/overlay/FontNotoSerifSource changed; collecting certs
+10-07 13:32:21.737   534   534 I PackageManager: /product/overlay/SystemUIGoogle__auto_generated_rro_product.apk changed; collecting certs
+10-07 13:32:21.759   534   534 I PackageManager: /product/overlay/SystemUIEmulationPixel3a changed; collecting certs
+10-07 13:32:21.776   534   534 I PackageManager: /product/overlay/TeleService__auto_generated_rro_product.apk changed; collecting certs
+10-07 13:32:21.793   534   534 I PackageManager: /product/overlay/SimAppDialog__auto_generated_rro_product.apk changed; collecting certs
+10-07 13:32:21.811   534   534 I PackageManager: /product/overlay/GoogleConfigOverlay.apk changed; collecting certs
+10-07 13:32:21.879   534   534 I PackageManager: /vendor/overlay/SystemUIGoogle__auto_generated_rro_vendor.apk changed; collecting certs
+10-07 13:32:21.927   534   534 I PackageManager: /vendor/overlay/framework-res__auto_generated_rro_vendor.apk changed; collecting certs
+10-07 13:32:21.944   534   534 I PackageManager: /vendor/overlay/NexusLauncherRelease__auto_generated_rro_vendor.apk changed; collecting certs
+10-07 13:32:21.964   534   534 I PackageManager: /vendor/overlay/CarrierConfig__auto_generated_rro_vendor.apk changed; collecting certs
+10-07 13:32:21.980   534   534 I PackageManager: /vendor/overlay/TeleService__auto_generated_rro_vendor.apk changed; collecting certs
+10-07 13:32:22.001   534   534 I PackageManager: /vendor/overlay/SettingsProvider__auto_generated_rro_vendor.apk changed; collecting certs
+10-07 13:32:22.059   534   534 W PackageManager: Failed to parse /system/framework/x86_64: Missing base APK in /system/framework/x86_64
+10-07 13:32:22.060   534   534 W PackageManager: Failed to parse /system/framework/oat: Missing base APK in /system/framework/oat/x86_64
+10-07 13:32:22.338   534   534 I PackageManager: /system/framework/framework-res.apk changed; collecting certs
+10-07 13:32:22.364   534   534 W PackageManager: Adding duplicate shared id: 1000 name=android
+--------- beginning of main
+10-07 13:32:22.561   534   534 I PackageManager: New shared user android.uid.shared: id=10056
+10-07 13:32:22.566   534   534 I PackageManager: /system/priv-app/UserDictionaryProvider changed; collecting certs
+10-07 13:32:22.678   534   534 W PackageManager: Adding duplicate app id: 10056 name=com.android.providers.userdictionary
+10-07 13:32:22.726   534   534 I PackageManager: /system/priv-app/ONS changed; collecting certs
+10-07 13:32:22.922   534   534 W PackageManager: Adding duplicate shared id: 1001 name=com.android.ons
+10-07 13:32:23.088   534   534 I PackageManager: /system/priv-app/MmsService changed; collecting certs
+10-07 13:32:23.223   534   534 W PackageManager: Adding duplicate shared id: 1001 name=com.android.mms.service
+10-07 13:32:23.285   534   534 I PackageManager: /system/priv-app/DynamicSystemInstallationService changed; collecting certs
+10-07 13:32:23.438   534   534 W PackageManager: Adding duplicate shared id: 1000 name=com.android.dynsystem
+10-07 13:32:23.540   534   534 I PackageManager: /system/priv-app/GooglePackageInstaller changed; collecting certs
+10-07 13:32:23.734   534   534 I PackageManager: /system/priv-app/MusicFX changed; collecting certs
+10-07 13:32:24.035   534   534 I PackageManager: /system/priv-app/NetworkStackGoogle changed; collecting certs
+10-07 13:32:24.290   534   534 W PackageManager: Adding duplicate shared id: 1073 name=com.google.android.networkstack
+10-07 13:32:24.395   534   534 I PackageManager: New shared user android.uid.calendar: id=10059
+10-07 13:32:24.396   534   534 I PackageManager: /system/priv-app/CalendarProvider changed; collecting certs
+10-07 13:32:24.614   534   534 W PackageManager: Adding duplicate app id: 10059 name=com.android.providers.calendar
+10-07 13:32:24.659   534   534 I PackageManager: /system/priv-app/TagGoogle changed; collecting certs
+10-07 13:32:24.784   534   534 I PackageManager: /system/priv-app/VpnDialogs changed; collecting certs
+10-07 13:32:24.885   534   534 I PackageManager: /system/priv-app/DocumentsUIGoogle changed; collecting certs
+10-07 13:32:25.085   534   534 I PackageManager: New shared user android.media: id=10063
+10-07 13:32:25.089   534   534 I PackageManager: /system/priv-app/DownloadProviderUi changed; collecting certs
+10-07 13:32:25.151   534   534 W PackageManager: Adding duplicate app id: 10063 name=com.android.providers.downloads.ui
+10-07 13:32:25.201   534   534 I PackageManager: /system/priv-app/Telecom changed; collecting certs
+10-07 13:32:25.225   534   534 W PackageManager: Adding duplicate shared id: 1000 name=com.android.server.telecom
+10-07 13:32:25.236   534   534 I PackageManager: /system/priv-app/ProxyHandler changed; collecting certs
+10-07 13:32:25.257   534   534 I PackageManager: /system/priv-app/TelephonyProvider changed; collecting certs
+10-07 13:32:25.274   534   534 W PackageManager: Adding duplicate shared id: 1001 name=com.android.providers.telephony
+10-07 13:32:25.285   534   534 I PackageManager: /system/priv-app/NetworkPermissionConfigGoogle changed; collecting certs
+10-07 13:32:25.298   534   534 W PackageManager: Adding duplicate shared id: 1073 name=com.google.android.networkstack.permissionconfig
+10-07 13:32:25.309   534   534 I PackageManager: /system/priv-app/ExternalStorageProvider changed; collecting certs
+10-07 13:32:25.335   534   534 I PackageManager: /system/priv-app/CellBroadcastLegacyApp changed; collecting certs
+10-07 13:32:25.352   534   534 I PackageManager: /system/priv-app/BlockedNumberProvider changed; collecting certs
+10-07 13:32:25.367   534   534 W PackageManager: Adding duplicate app id: 10056 name=com.android.providers.blockednumber
+10-07 13:32:25.375   534   534 I PackageManager: /system/priv-app/ManagedProvisioning changed; collecting certs
+10-07 13:32:25.412   534   534 I PackageManager: /system/priv-app/SoundPicker changed; collecting certs
+10-07 13:32:25.428   534   534 W PackageManager: Adding duplicate app id: 10063 name=com.android.soundpicker
+10-07 13:32:25.439   534   534 I PackageManager: /system/priv-app/CallLogBackup changed; collecting certs
+10-07 13:32:25.454   534   534 W PackageManager: Adding duplicate app id: 10056 name=com.android.calllogbackup
+10-07 13:32:25.467   534   534 I PackageManager: /system/priv-app/BuiltInPrintService changed; collecting certs
+10-07 13:32:25.500   534   534 I PackageManager: /system/priv-app/SettingsProvider changed; collecting certs
+10-07 13:32:25.517   534   534 W PackageManager: Adding duplicate shared id: 1000 name=com.android.providers.settings
+10-07 13:32:25.526   534   534 I PackageManager: /system/priv-app/DownloadProvider changed; collecting certs
+10-07 13:32:25.545   534   534 W PackageManager: Adding duplicate app id: 10063 name=com.android.providers.downloads
+10-07 13:32:25.556   534   534 I PackageManager: /system/priv-app/MtpService changed; collecting certs
+10-07 13:32:25.572   534   534 W PackageManager: Adding duplicate app id: 10063 name=com.android.mtp
+10-07 13:32:25.582   534   534 I PackageManager: /system/priv-app/Traceur changed; collecting certs
+10-07 13:32:25.607   534   534 I PackageManager: /system/priv-app/SharedStorageBackup changed; collecting certs
+10-07 13:32:25.624   534   534 I PackageManager: /system/priv-app/ContactsProvider changed; collecting certs
+10-07 13:32:25.638   534   534 W PackageManager: Adding duplicate app id: 10056 name=com.android.providers.contacts
+10-07 13:32:25.649   534   534 I PackageManager: /system/priv-app/LocalTransport changed; collecting certs
+10-07 13:32:25.665   534   534 W PackageManager: Adding duplicate shared id: 1000 name=com.android.localtransport
+10-07 13:32:25.674   534   534 I PackageManager: /system/priv-app/FusedLocation changed; collecting certs
+10-07 13:32:25.690   534   534 W PackageManager: Adding duplicate shared id: 1000 name=com.android.location.fused
+10-07 13:32:25.698   534   534 I PackageManager: /system/priv-app/InputDevices changed; collecting certs
+10-07 13:32:25.714   534   534 W PackageManager: Adding duplicate shared id: 1000 name=com.android.inputdevices
+10-07 13:32:25.722   534   534 I PackageManager: /system/priv-app/BackupRestoreConfirmation changed; collecting certs
+10-07 13:32:25.741   534   534 I PackageManager: /system/priv-app/MediaProviderLegacy changed; collecting certs
+10-07 13:32:25.758   534   534 W PackageManager: Adding duplicate app id: 10063 name=com.android.providers.media
+10-07 13:32:25.768   534   534 I PackageManager: /system/priv-app/TeleService changed; collecting certs
+10-07 13:32:25.786   534   534 W PackageManager: Adding duplicate shared id: 1001 name=com.android.phone
+10-07 13:32:25.798   534   534 I PackageManager: /system/priv-app/Shell changed; collecting certs
+10-07 13:32:25.816   534   534 W PackageManager: Adding duplicate shared id: 2000 name=com.android.shell
+10-07 13:32:26.007   534   534 I PackageManager: /system/app/WallpaperBackup changed; collecting certs
+10-07 13:32:26.077   534   534 W PackageManager: Adding duplicate shared id: 1000 name=com.android.wallpaperbackup
+10-07 13:32:26.172   534   534 I PackageManager: /system/app/SecureElement changed; collecting certs
+10-07 13:32:26.323   534   534 W PackageManager: Adding duplicate shared id: 1068 name=com.android.se
+10-07 13:32:26.381   534   534 I PackageManager: /system/app/NfcNci changed; collecting certs
+10-07 13:32:26.515   534   534 W PackageManager: Adding duplicate shared id: 1027 name=com.android.nfc
+10-07 13:32:26.587   534   534 I PackageManager: /system/app/Stk changed; collecting certs
+10-07 13:32:26.705   534   534 W PackageManager: Adding duplicate shared id: 1001 name=com.android.stk
+10-07 13:32:26.814   534   534 I PackageManager: /system/app/GooglePrintRecommendationService changed; collecting certs
+10-07 13:32:26.922   534   534 I PackageManager: /system/app/CarrierDefaultApp changed; collecting certs
+10-07 13:32:27.013   534   534 I PackageManager: /system/app/BluetoothMidiService changed; collecting certs
+10-07 13:32:27.038   534   534 I PackageManager: /system/app/PrintSpooler changed; collecting certs
+10-07 13:32:27.057   534   534 I PackageManager: /system/app/KeyChain changed; collecting certs
+10-07 13:32:27.073   534   534 W PackageManager: Adding duplicate shared id: 1000 name=com.android.keychain
+10-07 13:32:27.079   534   534 I PackageManager: /system/app/EasterEgg changed; collecting certs
+10-07 13:32:27.094   534   534 I PackageManager: /system/app/PacProcessor changed; collecting certs
+10-07 13:32:27.111   534   534 I PackageManager: /system/app/PartnerBookmarksProvider changed; collecting certs
+10-07 13:32:27.131   534   534 I PackageManager: /system/app/LiveWallpapersPicker changed; collecting certs
+10-07 13:32:27.151   534   534 I PackageManager: /system/app/HTMLViewer changed; collecting certs
+10-07 13:32:27.164   534   534 I PackageManager: /system/app/CaptivePortalLoginGoogle changed; collecting certs
+10-07 13:32:27.186   534   534 I PackageManager: /system/app/GoogleExtShared changed; collecting certs
+10-07 13:32:27.208   534   534 I PackageManager: /system/app/CertInstaller changed; collecting certs
+10-07 13:32:27.224   534   534 I PackageManager: /system/app/BookmarkProvider changed; collecting certs
+10-07 13:32:27.241   534   534 I PackageManager: /system/app/BasicDreams changed; collecting certs
+10-07 13:32:27.258   534   534 I PackageManager: /system/app/CameraExtensionsProxy changed; collecting certs
+10-07 13:32:27.274   534   534 I PackageManager: /system/app/CompanionDeviceManager changed; collecting certs
+10-07 13:32:27.293   534   534 I PackageManager: /system/app/SimAppDialog changed; collecting certs
+10-07 13:32:27.310   534   534 I PackageManager: /system/app/Bluetooth changed; collecting certs
+10-07 13:32:27.329   534   534 W PackageManager: Adding duplicate shared id: 1002 name=com.android.bluetooth
+10-07 13:32:27.462   534   534 I PackageManager: /product/priv-app/GoogleOneTimeInitializer changed; collecting certs
+10-07 13:32:27.683   534   534 I PackageManager: /product/priv-app/SettingsIntelligenceGooglePrebuilt changed; collecting certs
+10-07 13:32:27.765   534   534 W PackageManager: Skipping provider name com.google.android.settings.intelligence (in package com.google.android.settings.intelligence): name already used by com.google.android.settings.intelligence
+10-07 13:32:27.781   534   534 I PackageManager: /product/priv-app/Contacts changed; collecting certs
+10-07 13:32:27.902   534   534 I PackageManager: /product/priv-app/GoogleRestorePrebuilt changed; collecting certs
+10-07 13:32:28.017   534   534 I PackageManager: /product/priv-app/ImsServiceEntitlement changed; collecting certs
+10-07 13:32:28.129   534   534 I PackageManager: /product/priv-app/ConfigUpdater changed; collecting certs
+10-07 13:32:28.251   534   534 I PackageManager: /product/priv-app/SetupWizardPrebuilt changed; collecting certs
+10-07 13:32:28.383   534   534 I PackageManager: /product/priv-app/PartnerSetupPrebuilt changed; collecting certs
+10-07 13:32:28.503   534   534 I PackageManager: /product/priv-app/Dialer changed; collecting certs
+10-07 13:32:28.687   534   534 I PackageManager: New shared user com.google.android.projection.gearhead: id=10098
+10-07 13:32:28.689   534   534 I PackageManager: /product/priv-app/AndroidAutoStubPrebuilt changed; collecting certs
+10-07 13:32:28.739   534   534 W PackageManager: Adding duplicate app id: 10098 name=com.google.android.projection.gearhead
+10-07 13:32:28.788   534   534 I PackageManager: /product/priv-app/WellbeingPrebuilt changed; collecting certs
+10-07 13:32:29.360   534   534 I PackageManager: /product/priv-app/PrebuiltBugle changed; collecting certs
+10-07 13:32:29.561   534   534 I PackageManager: /product/priv-app/Velvet changed; collecting certs
+10-07 13:32:29.969   534   534 I PackageManager: New shared user com.google.uid.shared: id=10102
+10-07 13:32:29.970   534   534 I PackageManager: /product/priv-app/PrebuiltGmsCore changed; collecting certs
+10-07 13:32:30.023   534   534 W PackageManager: Adding duplicate app id: 10102 name=com.google.android.gms
+10-07 13:32:30.161   534   534 I PackageManager: /product/app/TrichromeLibrary-Stub changed; collecting certs
+10-07 13:32:30.188   534   534 I PackageManager: getCompressedFiles[/product/app/TrichromeLibrary-Stub]: [/product/app/TrichromeLibrary/TrichromeLibrary.apk.gz]
+10-07 13:32:30.260   534   534 I PackageManager: /product/app/LicenseChecker changed; collecting certs
+10-07 13:32:30.359   534   534 I PackageManager: /product/app/PrebuiltGoogleTelemetryTvp changed; collecting certs
+10-07 13:32:30.470   534   534 I PackageManager: /product/app/SoundPickerPrebuilt changed; collecting certs
+10-07 13:32:30.548   534   534 I PackageManager: /product/app/NexusWallpapersStubPrebuilt2018 changed; collecting certs
+10-07 13:32:30.667   534   534 I PackageManager: /product/app/YouTubeMusicPrebuilt changed; collecting certs
+10-07 13:32:30.863   534   534 I PackageManager: /product/app/WebViewGoogle-Stub changed; collecting certs
+10-07 13:32:30.943   534   534 I PackageManager: getCompressedFiles[/product/app/WebViewGoogle-Stub]: [/product/app/WebViewGoogle/WebViewGoogle.apk.gz]
+10-07 13:32:30.991   534   534 I PackageManager: /product/app/GoogleContactsSyncAdapter changed; collecting certs
+10-07 13:32:31.122   534   534 I PackageManager: /product/app/WallpapersBReel2018 changed; collecting certs
+10-07 13:32:31.254   534   534 I PackageManager: /product/app/Drive changed; collecting certs
+10-07 13:32:31.493   534   534 I PackageManager: /product/app/LatinIMEGooglePrebuilt changed; collecting certs
+10-07 13:32:31.731   534   534 W PackageManager: Failed to parse /product/app/Chrome: Missing base APK in /product/app/Chrome
+10-07 13:32:31.742   534   534 I PackageManager: New shared user com.google.android.apps.maps: id=10114
+10-07 13:32:31.751   534   534 I PackageManager: /product/app/Maps changed; collecting certs
+10-07 13:32:31.879   534   534 W PackageManager: Adding duplicate app id: 10114 name=com.google.android.apps.maps
+10-07 13:32:32.091   534   534 I PackageManager: /product/app/ModuleMetadataGoogle changed; collecting certs
+10-07 13:32:32.164   534   534 W PackageManager: Failed to parse /product/app/TrichromeLibrary: Missing base APK in /product/app/TrichromeLibrary
+10-07 13:32:32.166   534   534 I PackageManager: /product/app/Camera2 changed; collecting certs
+10-07 13:32:32.303   534   534 W PackageManager: Failed to parse /product/app/WebViewGoogle: Missing base APK in /product/app/WebViewGoogle
+10-07 13:32:32.305   534   534 I PackageManager: New shared user com.google.android.calendar.uid.shared: id=10117
+10-07 13:32:32.311   534   534 I PackageManager: /product/app/CalendarGooglePrebuilt changed; collecting certs
+10-07 13:32:32.408   534   534 W PackageManager: Adding duplicate app id: 10117 name=com.google.android.calendar
+10-07 13:32:32.468   534   534 I PackageManager: /product/app/Photos changed; collecting certs
+10-07 13:32:32.627   534   534 I PackageManager: /product/app/GoogleTTS changed; collecting certs
+10-07 13:32:32.709   534   534 I PackageManager: /product/app/Chrome-Stub changed; collecting certs
+10-07 13:32:32.764   534   534 I PackageManager: getCompressedFiles[/product/app/Chrome-Stub]: [/product/app/Chrome/Chrome.apk.gz]
+10-07 13:32:32.805   534   534 I PackageManager: /product/app/PrebuiltGmail changed; collecting certs
+10-07 13:32:32.872   534   534 I PackageManager: /product/app/MarkupGoogle changed; collecting certs
+10-07 13:32:32.919   534   534 I PackageManager: /product/app/PrebuiltDeskClockGoogle changed; collecting certs
+10-07 13:32:32.943   534   534 I PackageManager: /product/app/YouTube changed; collecting certs
+10-07 13:32:33.179   534   534 I PackageManager: /system_ext/priv-app/MultiDisplayProvider changed; collecting certs
+10-07 13:32:33.241   534   534 W PackageManager: Adding duplicate shared id: 1000 name=com.android.emulator.multidisplay
+10-07 13:32:33.311   534   534 I PackageManager: /system_ext/priv-app/QuickAccessWallet changed; collecting certs
+10-07 13:32:33.428   534   534 I PackageManager: /system_ext/priv-app/WallpaperPickerGooglePrebuilt changed; collecting certs
+10-07 13:32:33.827   534   534 I PackageManager: New shared user com.android.emergency.uid: id=10127
+10-07 13:32:33.843   534   534 I PackageManager: /system_ext/priv-app/EmergencyInfo changed; collecting certs
+10-07 13:32:34.007   534   534 W PackageManager: Adding duplicate app id: 10127 name=com.android.emergency
+10-07 13:32:34.055   534   534 I PackageManager: /system_ext/priv-app/StorageManager changed; collecting certs
+10-07 13:32:34.201   534   534 I PackageManager: /system_ext/priv-app/EmulatorRadioConfig changed; collecting certs
+10-07 13:32:34.331   534   534 I PackageManager: /system_ext/priv-app/GoogleSdkSetup changed; collecting certs
+10-07 13:32:34.429   534   534 I PackageManager: /system_ext/priv-app/GoogleFeedback changed; collecting certs
+10-07 13:32:34.500   534   534 I PackageManager: /system_ext/priv-app/CarrierConfig changed; collecting certs
+10-07 13:32:34.549   534   534 I PackageManager: /system_ext/priv-app/NexusLauncherRelease changed; collecting certs
+10-07 13:32:34.605   534   534 I PackageManager: New shared user android.uid.systemui: id=10134
+10-07 13:32:34.606   534   534 I PackageManager: /system_ext/priv-app/SystemUIGoogle changed; collecting certs
+10-07 13:32:34.659   534   534 W PackageManager: Adding duplicate app id: 10134 name=com.android.systemui
+10-07 13:32:34.688   534   534 I PackageManager: /system_ext/priv-app/GoogleServicesFramework changed; collecting certs
+10-07 13:32:34.730   534   534 W PackageManager: Adding duplicate app id: 10102 name=com.google.android.gsf
+10-07 13:32:34.953   534   534 I PackageManager: /system_ext/priv-app/SettingsGoogle changed; collecting certs
+10-07 13:32:34.979   534   534 W PackageManager: Adding duplicate shared id: 1000 name=com.android.settings
+10-07 13:32:35.072   534   534 I PackageManager: /system_ext/app/Exo changed; collecting certs
+10-07 13:32:35.212   534   534 I PackageManager: /apex/com.android.tethering/priv-app/ServiceConnectivityResourcesGoogle changed; collecting certs
+10-07 13:32:35.326   534   534 I PackageManager: /apex/com.android.tethering/priv-app/TetheringGoogle changed; collecting certs
+10-07 13:32:35.345   534   534 W PackageManager: Adding duplicate shared id: 1073 name=com.google.android.networkstack.tethering
+10-07 13:32:35.680   534   534 I PackageManager: /apex/com.android.permission/priv-app/GooglePermissionController changed; collecting certs
+10-07 13:32:36.012   534   534 I PackageManager: /apex/com.android.cellbroadcast/priv-app/GoogleCellBroadcastServiceModule changed; collecting certs
+10-07 13:32:36.049   534   534 W PackageManager: Adding duplicate shared id: 1073 name=com.google.android.cellbroadcastservice
+10-07 13:32:36.140   534   534 I PackageManager: /apex/com.android.cellbroadcast/priv-app/GoogleCellBroadcastApp changed; collecting certs
+10-07 13:32:36.326   534   534 I PackageManager: /apex/com.android.mediaprovider/priv-app/MediaProviderGoogle changed; collecting certs
+10-07 13:32:36.415   534   534 I PackageManager: /apex/com.android.extservices/priv-app/GoogleExtServices changed; collecting certs
+10-07 13:32:36.547   534   534 I PackageManager: /apex/com.android.wifi/priv-app/ServiceWifiResourcesGoogle changed; collecting certs
+10-07 13:32:36.638   534   534 I PackageManager: /apex/com.android.wifi/app/OsuLoginGoogle changed; collecting certs
+10-07 13:32:36.706   534   534 I PackageManager: /apex/com.android.apex.cts.shim/priv-app/CtsShimPriv changed; collecting certs
+10-07 13:32:36.762   534   534 I PackageManager: /apex/com.android.apex.cts.shim/app/CtsShim changed; collecting certs
+10-07 13:32:36.956   534   534 I PackageManager: Finished scanning system apps. Time: 41115 ms, packageCount: 177 , timePerPackage: 232 , cached: 0
+10-07 13:32:36.977   534   534 I PackageManager: Uncompressing system stub; pkg: com.android.chrome
+10-07 13:32:36.979   534   534 I PackageManager: getCompressedFiles[/product/app/Chrome-Stub]: [/product/app/Chrome/Chrome.apk.gz]
+10-07 13:32:36.999   534   534 I PackageManager: Decompress file; src: /product/app/Chrome/Chrome.apk.gz, dst: /data/app/~~Nb8N-_xVXamTJGQqPFM_eg==/com.android.chrome-7TInGTaWhQ07tfxZlpSqJw==/Chrome.apk
+10-07 13:32:44.771   534   534 I PackageManager: /data/app/~~Nb8N-_xVXamTJGQqPFM_eg==/com.android.chrome-7TInGTaWhQ07tfxZlpSqJw== changed; collecting certs
+10-07 13:32:46.014   534   534 I PackageManager: Update system package com.android.chrome code path from /product/app/Chrome-Stub to /data/app/~~Nb8N-_xVXamTJGQqPFM_eg==/com.android.chrome-7TInGTaWhQ07tfxZlpSqJw==; Retain data and using new
+10-07 13:32:46.035   534   534 I PackageManager: Uncompressing system stub; pkg: com.google.android.webview
+10-07 13:32:46.037   534   534 I PackageManager: getCompressedFiles[/product/app/WebViewGoogle-Stub]: [/product/app/WebViewGoogle/WebViewGoogle.apk.gz]
+10-07 13:32:46.045   534   534 I PackageManager: Decompress file; src: /product/app/WebViewGoogle/WebViewGoogle.apk.gz, dst: /data/app/~~KLdfCSmBjNlMXV7CsKxlmA==/com.google.android.webview-kbrPCbpOQTdscT8oZDiTAw==/WebViewGoogle.apk
+10-07 13:33:14.420   534   534 I PackageManager: /data/app/~~KLdfCSmBjNlMXV7CsKxlmA==/com.google.android.webview-kbrPCbpOQTdscT8oZDiTAw== changed; collecting certs
+10-07 13:33:20.522   534   534 I PackageManager: Update system package com.google.android.webview code path from /product/app/WebViewGoogle-Stub to /data/app/~~KLdfCSmBjNlMXV7CsKxlmA==/com.google.android.webview-kbrPCbpOQTdscT8oZDiTAw==; Retain data and using new
+10-07 13:33:20.540   534   534 I PackageManager: Uncompressing system stub; pkg: com.google.android.trichromelibrary_447211487
+10-07 13:33:20.542   534   534 I PackageManager: getCompressedFiles[/product/app/TrichromeLibrary-Stub]: [/product/app/TrichromeLibrary/TrichromeLibrary.apk.gz]
+10-07 13:33:20.548   534   534 I PackageManager: Decompress file; src: /product/app/TrichromeLibrary/TrichromeLibrary.apk.gz, dst: /data/app/~~CDrOJ8ItSLXGp5QDNoNqoQ==/com.google.android.trichromelibrary_447211487-xJJpK2KFcVH2dFm6pUAZrg==/TrichromeLibrary.apk
+10-07 13:33:44.984   534   534 I PackageManager: /data/app/~~CDrOJ8ItSLXGp5QDNoNqoQ==/com.google.android.trichromelibrary_447211487-xJJpK2KFcVH2dFm6pUAZrg== changed; collecting certs
+10-07 13:33:49.326   534   534 I PackageManager: Update system package com.google.android.trichromelibrary_447211487 code path from /product/app/TrichromeLibrary-Stub to /data/app/~~CDrOJ8ItSLXGp5QDNoNqoQ==/com.google.android.trichromelibrary_447211487-xJJpK2KFcVH2dFm6pUAZrg==; Retain data and using new
+10-07 13:33:49.334   534   534 I PackageManager: Finished scanning non-system apps. Time: 72379 ms, packageCount: 0 , timePerPackage: 0 , cached: 0
+10-07 13:33:49.366   447   468 E installd: Invalid path /apex/com.android.cellbroadcast/priv-app/GoogleCellBroadcastServiceModule: No such process
+10-07 13:33:49.377   447   468 E installd: Invalid path /system_ext/priv-app/GoogleServicesFramework: No such file or directory
+10-07 13:33:49.383   447   468 E installd: Invalid path /system_ext/priv-app/SettingsGoogle: No such file or directory
+10-07 13:33:49.389   447   468 E installd: Invalid path /system/framework/framework-res.apk: No such file or directory
+10-07 13:33:49.398   534   534 I PackageManager: Time to scan packages: 113.557 seconds
+10-07 13:33:49.406   534   534 I PackageManager: Permission ownership changed. Updating all permissions.
+10-07 13:33:51.780   534   534 W PackageManager: There should probably be a verifier, but, none were found
+10-07 13:33:52.031   534   534 I PackageManager: Fix for b/169414761 is applied
+10-07 13:33:59.908   534   571 I PackageManager: Deferred reconcileAppsData finished 156 packages
+10-07 13:35:44.397   797   797 W PackageManager: Failed to parse /system/framework/x86_64: Missing base APK in /system/framework/x86_64
+10-07 13:35:44.399   797   797 W PackageManager: Failed to parse /system/framework/oat: Missing base APK in /system/framework/oat/x86_64
+10-07 13:35:45.181   797   797 W PackageManager: Skipping provider name com.google.android.settings.intelligence (in package com.google.android.settings.intelligence): name already used by com.google.android.settings.intelligence
+10-07 13:35:45.612   797   797 I PackageManager: getCompressedFiles[/product/app/TrichromeLibrary-Stub]: [/product/app/TrichromeLibrary/TrichromeLibrary.apk.gz]
+10-07 13:35:45.625   797   797 W PackageManager: Failed to scan /product/app/TrichromeLibrary-Stub: Package com.google.android.trichromelibrary_447211487 at /product/app/TrichromeLibrary-Stub ignored: updated version 447211487 better than this 447211487
+10-07 13:35:45.761   797   797 I PackageManager: getCompressedFiles[/product/app/WebViewGoogle-Stub]: [/product/app/WebViewGoogle/WebViewGoogle.apk.gz]
+10-07 13:35:45.768   797   797 W PackageManager: Failed to scan /product/app/WebViewGoogle-Stub: Package com.google.android.webview at /product/app/WebViewGoogle-Stub ignored: updated version 447211487 better than this 447211487
+10-07 13:35:45.840   797   797 W PackageManager: Failed to parse /product/app/Chrome: Missing base APK in /product/app/Chrome
+10-07 13:35:45.921   797   797 W PackageManager: Failed to parse /product/app/TrichromeLibrary: Missing base APK in /product/app/TrichromeLibrary
+10-07 13:35:45.922   797   797 W PackageManager: Failed to parse /product/app/WebViewGoogle: Missing base APK in /product/app/WebViewGoogle
+10-07 13:35:45.944   797   797 I PackageManager: getCompressedFiles[/product/app/Chrome-Stub]: [/product/app/Chrome/Chrome.apk.gz]
+10-07 13:35:45.947   797   797 W PackageManager: Failed to scan /product/app/Chrome-Stub: Package com.android.chrome at /product/app/Chrome-Stub ignored: updated version 447211487 better than this 447211487
+10-07 13:35:46.518   797   797 I PackageManager: Finished scanning system apps. Time: 3085 ms, packageCount: 174 , timePerPackage: 17 , cached: 202
+10-07 13:35:46.628   797   797 W PackageManager: Relax SCAN_REQUIRE_KNOWN requirement for package com.google.android.trichromelibrary_447211487
+10-07 13:35:46.679   797   797 W PackageManager: Relax SCAN_REQUIRE_KNOWN requirement for package com.google.android.webview
+10-07 13:35:46.742   797   797 W PackageManager: Relax SCAN_REQUIRE_KNOWN requirement for package com.android.chrome
+10-07 13:35:46.762   797   797 I PackageManager: Finished scanning non-system apps. Time: 244 ms, packageCount: 3 , timePerPackage: 81 , cached: 0
+10-07 13:35:46.794   797   797 I PackageManager: Time to scan packages: 3.361 seconds
+10-07 13:35:46.872   797   797 I PackageManager: Permission ownership changed. Updating all permissions.
+10-07 13:35:47.798   797   797 W PackageManager: There should probably be a verifier, but, none were found
+10-07 13:35:47.877   797   797 I PackageManager: Fix for b/169414761 is applied
+10-07 13:35:50.078   797   824 I PackageManager: Deferred reconcileAppsData finished 156 packages
+10-07 13:36:06.988   797   797 I PackageManager: Permission ownership changed. Updating all permissions.
+10-07 13:36:27.093   797   797 I PackageManager: Permission ownership changed. Updating all permissions.
+10-07 13:36:28.728   797   813 W PackageManager: Loading a package that does not exist for the calling user. package=null, user=0
+10-07 13:36:30.772   797   812 W PackageManager: Loading a package that does not exist for the calling user. package=null, user=0
+10-07 13:39:27.629   797   941 W PackageManager: Default package for ROLE_HOME is not set in RoleManager
+10-07 13:39:27.904   797  1737 W PackageManager: Default package for ROLE_HOME is not set in RoleManager
+10-07 13:39:27.962   797  1766 W PackageManager: Default package for ROLE_HOME is not set in RoleManager
+--------- beginning of crash
+10-07 13:41:43.290  2119  2173 E AndroidRuntime: FATAL EXCEPTION: GoogleApiHandler
+10-07 13:41:43.290  2119  2173 E AndroidRuntime: Process: com.google.android.syncadapters.contacts, PID: 2119
+10-07 13:41:43.290  2119  2173 E AndroidRuntime: java.lang.IllegalArgumentException: com.google.android.syncadapters.contacts: Targeting S+ (version 31 and above) requires that one of FLAG_IMMUTABLE or FLAG_MUTABLE be specified when creating a PendingIntent.
+10-07 13:41:43.290  2119  2173 E AndroidRuntime: Strongly consider using FLAG_IMMUTABLE, only use FLAG_MUTABLE if some functionality depends on the PendingIntent being mutable, e.g. if it needs to be used with inline replies or bubbles.
+10-07 13:41:43.290  2119  2173 E AndroidRuntime: 	at android.app.PendingIntent.checkFlags(PendingIntent.java:375)
+10-07 13:41:43.290  2119  2173 E AndroidRuntime: 	at android.app.PendingIntent.getActivityAsUser(PendingIntent.java:458)
+10-07 13:41:43.290  2119  2173 E AndroidRuntime: 	at android.app.PendingIntent.getActivity(PendingIntent.java:444)
+10-07 13:41:43.290  2119  2173 E AndroidRuntime: 	at android.app.PendingIntent.getActivity(PendingIntent.java:408)
+10-07 13:41:43.290  2119  2173 E AndroidRuntime: 	at com.google.android.gms.common.GoogleApiAvailabilityLight.getErrorResolutionPendingIntent(GoogleApiAvailabilityLight.java:25)
+10-07 13:41:43.290  2119  2173 E AndroidRuntime: 	at com.google.android.gms.common.GoogleApiAvailability.getErrorResolutionPendingIntent(GoogleApiAvailability.java:103)
+10-07 13:41:43.290  2119  2173 E AndroidRuntime: 	at com.google.android.gms.common.GoogleApiAvailabilityLight.getErrorResolutionPendingIntent(GoogleApiAvailabilityLight.java:21)
+10-07 13:41:43.290  2119  2173 E AndroidRuntime: 	at com.google.android.gms.common.GoogleApiAvailability.getErrorResolutionPendingIntent(GoogleApiAvailability.java:99)
+10-07 13:41:43.290  2119  2173 E AndroidRuntime: 	at com.google.android.gms.common.GoogleApiAvailability.getErrorResolutionPendingIntent(GoogleApiAvailability.java:102)
+10-07 13:41:43.290  2119  2173 E AndroidRuntime: 	at com.google.android.gms.common.GoogleApiAvailability.zza(GoogleApiAvailability.java:40)
+10-07 13:41:43.290  2119  2173 E AndroidRuntime: 	at com.google.android.gms.common.api.internal.GoogleApiManager.zzc(GoogleApiManager.java:213)
+10-07 13:41:43.290  2119  2173 E AndroidRuntime: 	at com.google.android.gms.common.api.internal.GoogleApiManager$zza.zza(GoogleApiManager.java:99)
+10-07 13:41:43.290  2119  2173 E AndroidRuntime: 	at com.google.android.gms.common.api.internal.GoogleApiManager$zza.onConnectionFailed(GoogleApiManager.java:75)
+10-07 13:41:43.290  2119  2173 E AndroidRuntime: 	at com.google.android.gms.common.api.internal.GoogleApiManager$zza.connect(GoogleApiManager.java:232)
+10-07 13:41:43.290  2119  2173 E AndroidRuntime: 	at com.google.android.gms.common.api.internal.GoogleApiManager$zza.zza(GoogleApiManager.java:125)
+10-07 13:41:43.290  2119  2173 E AndroidRuntime: 	at com.google.android.gms.common.api.internal.GoogleApiManager.handleMessage(GoogleApiManager.java:145)
+10-07 13:41:43.290  2119  2173 E AndroidRuntime: 	at android.os.Handler.dispatchMessage(Handler.java:102)
+10-07 13:41:43.290  2119  2173 E AndroidRuntime: 	at com.google.android.gms.internal.zzfng.zzb(TracingHandler.java:9)
+10-07 13:41:43.290  2119  2173 E AndroidRuntime: 	at com.google.android.gms.internal.zzfng.dispatchMessage(TracingHandler.java:7)
+10-07 13:41:43.290  2119  2173 E AndroidRuntime: 	at android.os.Looper.loopOnce(Looper.java:201)
+10-07 13:41:43.290  2119  2173 E AndroidRuntime: 	at android.os.Looper.loop(Looper.java:288)
+10-07 13:41:43.290  2119  2173 E AndroidRuntime: 	at android.os.HandlerThread.run(HandlerThread.java:67)
+10-07 13:47:12.404   797   827 W PackageManager: [Optimistic Bind] Failed to bind to: Intent { act=android.intent.action.RESOLVE_INSTANT_APP_PACKAGE cmp=com.google.android.gms/.chimera.PersistentBoundBrokerService }
+10-07 13:47:12.414   797   827 E PackageManager: Optimistic bind failed.
+10-07 13:47:12.414   797   827 E PackageManager: com.android.server.pm.InstantAppResolverConnection$ConnectionException
+10-07 13:47:12.414   797   827 E PackageManager: 	at com.android.server.pm.InstantAppResolverConnection.bind(InstantAppResolverConnection.java:231)
+10-07 13:47:12.414   797   827 E PackageManager: 	at com.android.server.pm.InstantAppResolverConnection.lambda$optimisticBind$0$InstantAppResolverConnection(InstantAppResolverConnection.java:255)
+10-07 13:47:12.414   797   827 E PackageManager: 	at com.android.server.pm.InstantAppResolverConnection$$ExternalSyntheticLambda0.run(Unknown Source:2)
+10-07 13:47:12.414   797   827 E PackageManager: 	at android.os.Handler.handleCallback(Handler.java:938)
+10-07 13:47:12.414   797   827 E PackageManager: 	at android.os.Handler.dispatchMessage(Handler.java:99)
+10-07 13:47:12.414   797   827 E PackageManager: 	at android.os.Looper.loopOnce(Looper.java:201)
+10-07 13:47:12.414   797   827 E PackageManager: 	at android.os.Looper.loop(Looper.java:288)
+10-07 13:47:12.414   797   827 E PackageManager: 	at android.os.HandlerThread.run(HandlerThread.java:67)
+10-07 13:48:01.961   797   849 I PackageManager: Integrity check passed for file:///data/app/vmdl303063897.tmp
+10-07 13:48:05.050   797   849 I PackageManager: Permission ownership changed. Updating all permissions.
+10-07 13:48:07.175   447   468 E installd: Couldn't opendir /data/app/vmdl303063897.tmp: No such file or directory
+10-07 13:48:07.177   447   468 E installd: Failed to delete /data/app/vmdl303063897.tmp: No such file or directory
+10-07 13:48:12.897   797   827 W PackageManager: Failed registering loading progress callback. Package is fully loaded.
+10-07 13:48:44.720   797   849 I PackageManager: Integrity check passed for file:///data/app/vmdl2107101824.tmp
+10-07 13:49:24.908   447   468 E installd: Couldn't opendir /data/app/vmdl2107101824.tmp: No such file or directory
+10-07 13:49:24.908   447   468 E installd: Failed to delete /data/app/vmdl2107101824.tmp: No such file or directory
+10-07 13:49:36.500   797   849 I PackageManager: Integrity check passed for file:///data/app/vmdl546847204.tmp
+10-07 13:50:01.420   797   827 W PackageManager: Failed registering loading progress callback. Package is fully loaded.
+10-07 13:50:47.687   447   468 E installd: Couldn't opendir /data/app/vmdl546847204.tmp: No such file or directory
+10-07 13:50:47.687   447   468 E installd: Failed to delete /data/app/vmdl546847204.tmp: No such file or directory
+10-07 13:50:57.101   797   827 W PackageManager: Failed registering loading progress callback. Package is fully loaded.
+10-07 13:53:13.225  5457  5502 E AndroidRuntime: FATAL EXCEPTION: GoogleApiHandler
+10-07 13:53:13.225  5457  5502 E AndroidRuntime: Process: com.google.android.syncadapters.contacts, PID: 5457
+10-07 13:53:13.225  5457  5502 E AndroidRuntime: java.lang.IllegalArgumentException: com.google.android.syncadapters.contacts: Targeting S+ (version 31 and above) requires that one of FLAG_IMMUTABLE or FLAG_MUTABLE be specified when creating a PendingIntent.
+10-07 13:53:13.225  5457  5502 E AndroidRuntime: Strongly consider using FLAG_IMMUTABLE, only use FLAG_MUTABLE if some functionality depends on the PendingIntent being mutable, e.g. if it needs to be used with inline replies or bubbles.
+10-07 13:53:13.225  5457  5502 E AndroidRuntime: 	at android.app.PendingIntent.checkFlags(PendingIntent.java:375)
+10-07 13:53:13.225  5457  5502 E AndroidRuntime: 	at android.app.PendingIntent.getActivityAsUser(PendingIntent.java:458)
+10-07 13:53:13.225  5457  5502 E AndroidRuntime: 	at android.app.PendingIntent.getActivity(PendingIntent.java:444)
+10-07 13:53:13.225  5457  5502 E AndroidRuntime: 	at android.app.PendingIntent.getActivity(PendingIntent.java:408)
+10-07 13:53:13.225  5457  5502 E AndroidRuntime: 	at com.google.android.gms.common.GoogleApiAvailabilityLight.getErrorResolutionPendingIntent(GoogleApiAvailabilityLight.java:25)
+10-07 13:53:13.225  5457  5502 E AndroidRuntime: 	at com.google.android.gms.common.GoogleApiAvailability.getErrorResolutionPendingIntent(GoogleApiAvailability.java:103)
+10-07 13:53:13.225  5457  5502 E AndroidRuntime: 	at com.google.android.gms.common.GoogleApiAvailabilityLight.getErrorResolutionPendingIntent(GoogleApiAvailabilityLight.java:21)
+10-07 13:53:13.225  5457  5502 E AndroidRuntime: 	at com.google.android.gms.common.GoogleApiAvailability.getErrorResolutionPendingIntent(GoogleApiAvailability.java:99)
+10-07 13:53:13.225  5457  5502 E AndroidRuntime: 	at com.google.android.gms.common.GoogleApiAvailability.getErrorResolutionPendingIntent(GoogleApiAvailability.java:102)
+10-07 13:53:13.225  5457  5502 E AndroidRuntime: 	at com.google.android.gms.common.GoogleApiAvailability.zza(GoogleApiAvailability.java:40)
+10-07 13:53:13.225  5457  5502 E AndroidRuntime: 	at com.google.android.gms.common.api.internal.GoogleApiManager.zzc(GoogleApiManager.java:213)
+10-07 13:53:13.225  5457  5502 E AndroidRuntime: 	at com.google.android.gms.common.api.internal.GoogleApiManager$zza.zza(GoogleApiManager.java:99)
+10-07 13:53:13.225  5457  5502 E AndroidRuntime: 	at com.google.android.gms.common.api.internal.GoogleApiManager$zza.onConnectionFailed(GoogleApiManager.java:75)
+10-07 13:53:13.225  5457  5502 E AndroidRuntime: 	at com.google.android.gms.common.api.internal.GoogleApiManager$zza.connect(GoogleApiManager.java:232)
+10-07 13:53:13.225  5457  5502 E AndroidRuntime: 	at com.google.android.gms.common.api.internal.GoogleApiManager$zza.zza(GoogleApiManager.java:125)
+10-07 13:53:13.225  5457  5502 E AndroidRuntime: 	at com.google.android.gms.common.api.internal.GoogleApiManager.handleMessage(GoogleApiManager.java:145)
+10-07 13:53:13.225  5457  5502 E AndroidRuntime: 	at android.os.Handler.dispatchMessage(Handler.java:102)
+10-07 13:53:13.225  5457  5502 E AndroidRuntime: 	at com.google.android.gms.internal.zzfng.zzb(TracingHandler.java:9)
+10-07 13:53:13.225  5457  5502 E AndroidRuntime: 	at com.google.android.gms.internal.zzfng.dispatchMessage(TracingHandler.java:7)
+10-07 13:53:13.225  5457  5502 E AndroidRuntime: 	at android.os.Looper.loopOnce(Looper.java:201)
+10-07 13:53:13.225  5457  5502 E AndroidRuntime: 	at android.os.Looper.loop(Looper.java:288)
+10-07 13:53:13.225  5457  5502 E AndroidRuntime: 	at android.os.HandlerThread.run(HandlerThread.java:67)
+10-07 13:54:19.666   797   849 I PackageManager: Integrity check passed for file:///data/app/vmdl48976178.tmp
+10-07 13:54:20.078   797   849 I PackageManager: Update package app.mihon.tachiyomiat.dev code path from /data/app/~~14hgC9dNIi8qGnP-c3N5IA==/app.mihon.tachiyomiat.dev-LgnxeEDymQZO_DujSWmFpA== to /data/app/~~zau4uG9qHEYywN2aSxJmLw==/app.mihon.tachiyomiat.dev-RCDrrnAt2X0rsa3J2JSEJw==; Retain data and using new
+10-07 13:54:20.710   797   849 I PackageManager: Permission ownership changed. Updating all permissions.
+10-07 13:54:22.506   447   468 E installd: Couldn't opendir /data/app/vmdl48976178.tmp: No such file or directory
+10-07 13:54:22.508   447   468 E installd: Failed to delete /data/app/vmdl48976178.tmp: No such file or directory

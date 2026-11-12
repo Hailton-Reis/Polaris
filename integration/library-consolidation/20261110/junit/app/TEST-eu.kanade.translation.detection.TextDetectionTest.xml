@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.translation.detection.TextDetectionTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-11-10T14:11:21.164Z" hostname="7d7c5a6182d0" time="0.006">
+  <properties/>
+  <testcase name="normalization copies mutable input and returned point lists()" classname="eu.kanade.translation.detection.TextDetectionTest" time="0.001"/>
+  <testcase name="rotates diamond corners while preserving each edge()" classname="eu.kanade.translation.detection.TextDetectionTest" time="0.0"/>
+  <testcase name="clips corners to image extent and rejects fully collapsed padding box()" classname="eu.kanade.translation.detection.TextDetectionTest" time="0.0"/>
+  <testcase name="rejects missing duplicate concave crossed and collinear corners()" classname="eu.kanade.translation.detection.TextDetectionTest" time="0.001"/>
+  <testcase name="rejects nonfinite points invalid confidence and invalid image size()" classname="eu.kanade.translation.detection.TextDetectionTest" time="0.0"/>
+  <testcase name="normalizes reversed cyclic corners without changing crop winding()" classname="eu.kanade.translation.detection.TextDetectionTest" time="0.0"/>
+  <testcase name="scales both axes before clipping and rejects invalid scaling()" classname="eu.kanade.translation.detection.TextDetectionTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

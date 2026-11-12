@@ -1,0 +1,9 @@
+{
+  "args": [
+    "install",
+    "/workspace/scratch/bab62ab08b4f/emulator-input/tachiyomi-all.mangaplus-v1.6.66.apk"
+  ],
+  "returncode": 0,
+  "stdout": "Performing Streamed Install\nSuccess\n",
+  "stderr": ""
+}

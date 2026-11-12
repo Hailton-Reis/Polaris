@@ -1,0 +1,60 @@
+{
+  "status": "SCOPED_CODEC_INTEROP_PASS",
+  "native_junit": {
+    "tests": 6,
+    "passed": 6,
+    "failed": 0,
+    "skipped": 0,
+    "log": "native-test.log",
+    "junit": "junit.xml",
+    "cases": [
+      "Mihon pinned raw protobuf imports notes memo and repository signing identity()",
+      "Tachiyomi 0153 raw protobuf imports with empty repository defaults()",
+      "Mihon pinned gzip imports common fields without installed sources()",
+      "Tachiyomi 0153 gzip imports common fields without installed sources()",
+      "Polaris reexports imported Mihon data using the real protobuf codec()",
+      "Polaris reexports imported Tachiyomi data using the real protobuf codec()"
+    ]
+  },
+  "external_reference_readers": {
+    "tachiyomi": "PASS",
+    "mihon": "PASS_COMMON_FIELDS_PLUS_CHECKED_NOTES_MEMO_REPOSITORY",
+    "comparison": "Semantic serialized values; unsupported Mihon nextUpdate excluded explicitly."
+  },
+  "fixture_generator": "Four fixtures reproduced byte for byte by the committed portable generator. Upstream DTO source Git blob hashes verified.",
+  "production_patch_unchanged_sections": 182,
+  "new_patch_sections": [
+    "a/app/src/test/java/eu/kanade/tachiyomi/data/backup/BackupInteropTest.kt b/app/src/test/java/eu/kanade/tachiyomi/data/backup/BackupInteropTest.kt",
+    "a/app/src/test/resources/backup-interop/mihon.proto b/app/src/test/resources/backup-interop/mihon.proto",
+    "a/app/src/test/resources/backup-interop/mihon.tachibk b/app/src/test/resources/backup-interop/mihon.tachibk",
+    "a/app/src/test/resources/backup-interop/tachiyomi.proto b/app/src/test/resources/backup-interop/tachiyomi.proto",
+    "a/app/src/test/resources/backup-interop/tachiyomi.tachibk b/app/src/test/resources/backup-interop/tachiyomi.tachibk"
+  ],
+  "source_to_build": {
+    "files": 187,
+    "status": "BYTE_IDENTICAL"
+  },
+  "patch_sha256": "e4de45128d1540b2a1899ba07a9f1ba434668223b24a847c5c06534ecdbfd3b9",
+  "prior_full_jvm_run": {
+    "tests": 635,
+    "passed": 618,
+    "preexisting_failures": 17,
+    "note": "Separate prior run; this round targeted6 new cases, not a new full regression comparison."
+  },
+  "new_apks_built": false,
+  "release_publication": false,
+  "beta9_status": "UNCHANGED_DRAFT_WITH_PRIOR_APKS",
+  "database_restore_acceptance": "PENDING",
+  "private_extension_provisioning_acceptance": "PENDING",
+  "unsupported_or_unverified": [
+    "Mihon nextUpdate scheduling field113 is not preserved by current Polaris DTO.",
+    "Legacy broken source/history tag0 cases and earlier/other forks not tested.",
+    "No SQLDelight restore/merge or installed-app UI acceptance."
+  ],
+  "overlay_host_checks": {
+    "tests": 4,
+    "passed": 4,
+    "failed": 0,
+    "scope": "Application, idempotence, CRLF and drift rejection."
+  }
+}

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.tachiyomi.extension.novel.tts.EdgeTtsClientTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-11-12T18:43:10.231Z" hostname="060411c85d3c" time="0.005">
+  <properties/>
+  <testcase name="generateSecMsGec produces 64 character uppercase hex SHA-256 token()" classname="eu.kanade.tachiyomi.extension.novel.tts.EdgeTtsClientTest" time="0.005"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.translation.recognizer.PaddleOCRConfigTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-11-11T20:05:59.210Z" hostname="b5ae99f6bd9c" time="0.001">
+  <properties/>
+  <testcase name="keeps mobile detector input capped instead of scanning full resolution pages()" classname="eu.kanade.translation.recognizer.PaddleOCRConfigTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

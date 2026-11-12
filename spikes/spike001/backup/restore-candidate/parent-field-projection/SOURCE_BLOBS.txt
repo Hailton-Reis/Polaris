@@ -1,0 +1,7 @@
+# Inspected PINNED upstream Yomotsu Git files (2026-10-19)
+# Commit 0fb80c439ef816eeb50674f1b90af39918b176d8
+app/src/main/java/eu/kanade/tachiyomi/data/backup/models/BackupManga.kt  (see GitHub revision)
+app/src/main/java/eu/kanade/tachiyomi/data/backup/models/BackupChapter.kt  e1828a3020a9a5767bb0332d5ee8b69e48476a32
+app/src/main/java/eu/kanade/tachiyomi/data/backup/models/BackupHistory.kt  b5a6c616ab2e2b104e488188d581504f8c32c1f4
+app/src/main/java/eu/kanade/tachiyomi/data/backup/models/BackupTracking.kt  56108e68e8b2235fe3058ebe07f80eb58cc48b95
+data/src/main/java/tachiyomi/data/DatabaseAdapter.kt (StringListColumnAdapter, MemoColumnAdapter)

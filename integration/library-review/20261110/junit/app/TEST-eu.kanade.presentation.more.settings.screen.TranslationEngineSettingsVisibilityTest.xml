@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.presentation.more.settings.screen.TranslationEngineSettingsVisibilityTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-11-10T20:36:55.153Z" hostname="7d7c5a6182d0" time="0.008">
+  <properties/>
+  <testcase name="offline and Google engines hide API settings()" classname="eu.kanade.presentation.more.settings.screen.TranslationEngineSettingsVisibilityTest" time="0.002"/>
+  <testcase name="LLM engines show shared API key and model settings()" classname="eu.kanade.presentation.more.settings.screen.TranslationEngineSettingsVisibilityTest" time="0.002"/>
+  <testcase name="LLM engines map to independent provider preferences()" classname="eu.kanade.presentation.more.settings.screen.TranslationEngineSettingsVisibilityTest" time="0.001"/>
+  <testcase name="DeepL shows only its own API key setting()" classname="eu.kanade.presentation.more.settings.screen.TranslationEngineSettingsVisibilityTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

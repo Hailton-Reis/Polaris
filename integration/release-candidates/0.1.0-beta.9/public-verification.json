@@ -1,0 +1,106 @@
+{
+  "status": "PASS",
+  "tag": "v0.1.0-beta.9",
+  "release_id": 434234234,
+  "url": "https://github.com/Hailton-Reis/Polaris/releases/tag/v0.1.0-beta.9",
+  "published_at": "2026-11-05T03:34:10Z",
+  "draft": false,
+  "prerelease": true,
+  "source_commit": "efc2543487f02ff15c3bc51f3ef0a25723809527",
+  "public_release_listing_contains_candidate": true,
+  "public_updater_manifest_verified": true,
+  "experimental_channel_required": true,
+  "downloads": [
+    {
+      "file": "Polaris-0.1.0-beta.9-arm64-v8a.apk",
+      "bytes": 199132104,
+      "sha256": "dfd7ce4e567db9036c6d72f50f67f9c11b48754de49a912089c42d712e6c43bb",
+      "status": "PASS",
+      "client_sent_authorization_header": false,
+      "method": "Full streamed public download; no APK stored on disk"
+    },
+    {
+      "file": "Polaris-0.1.0-beta.9-armeabi-v7a.apk",
+      "bytes": 159334281,
+      "sha256": "c916f3623bff124bc280c127672b96dc3aed40ee7277ee655484b25d50d0a4b6",
+      "status": "PASS",
+      "client_sent_authorization_header": false,
+      "method": "Full streamed public download; no APK stored on disk"
+    },
+    {
+      "file": "manifest.json",
+      "bytes": 1958,
+      "sha256": "89a1a6237576c9bea37e2eee5a3128f59e192c45601faabfcf156c4778b9ad9a",
+      "status": "PASS",
+      "client_sent_authorization_header": false,
+      "method": "Full streamed public download; no APK stored on disk"
+    },
+    {
+      "file": "SHA256SUMS.txt",
+      "bytes": 204,
+      "sha256": "4383487a8b5136e07d7ef1fc61ee2f9ea6b7c1a4f89cb6841b23a98172498127",
+      "status": "PASS",
+      "client_sent_authorization_header": false,
+      "method": "Full streamed public download; no APK stored on disk"
+    },
+    {
+      "file": "PRIMEIRO_TESTE.md",
+      "bytes": 3800,
+      "sha256": "f9084fbcdc26b4a50f6aaeab5a5a85460c1175151a92873792343b35779cde11",
+      "status": "PASS",
+      "client_sent_authorization_header": false,
+      "method": "Full streamed public download; no APK stored on disk"
+    },
+    {
+      "file": "RELEASE_NOTES.md",
+      "bytes": 9835,
+      "sha256": "eaa487ff1d833dda80d62d605d84e6529acb974a83240f60012239d34a0885ce",
+      "status": "PASS",
+      "client_sent_authorization_header": false,
+      "method": "Full streamed public download; no APK stored on disk"
+    },
+    {
+      "file": "VALIDACAO.json",
+      "bytes": 16591,
+      "sha256": "938966a3de2f93d11b8a06231f29f2b0f9c4bd9f3a8a08649564690dd44f869b",
+      "status": "PASS",
+      "client_sent_authorization_header": false,
+      "method": "Full streamed public download; no APK stored on disk"
+    }
+  ],
+  "ranges": [
+    {
+      "file": "Polaris-0.1.0-beta.9-arm64-v8a.apk",
+      "range": "bytes=0-1023",
+      "status": 206,
+      "content_range": "bytes 0-1023/199132104",
+      "bytes_verified": 1024,
+      "client_sent_authorization_header": false
+    },
+    {
+      "file": "Polaris-0.1.0-beta.9-arm64-v8a.apk",
+      "range": "bytes=1048576-1049599",
+      "status": 206,
+      "content_range": "bytes 1048576-1049599/199132104",
+      "bytes_verified": 1024,
+      "client_sent_authorization_header": false
+    },
+    {
+      "file": "Polaris-0.1.0-beta.9-armeabi-v7a.apk",
+      "range": "bytes=0-1023",
+      "status": 206,
+      "content_range": "bytes 0-1023/159334281",
+      "bytes_verified": 1024,
+      "client_sent_authorization_header": false
+    },
+    {
+      "file": "Polaris-0.1.0-beta.9-armeabi-v7a.apk",
+      "range": "bytes=1048576-1049599",
+      "status": 206,
+      "content_range": "bytes 1048576-1049599/159334281",
+      "bytes_verified": 1024,
+      "client_sent_authorization_header": false
+    }
+  ],
+  "scope": "Public distribution and metadata only; no Android update/install or full application acceptance."
+}

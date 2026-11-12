@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.translation.recognizer.RecognitionBatchPlannerTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-11-10T20:37:21.852Z" hostname="7d7c5a6182d0" time="0.003">
+  <properties/>
+  <testcase name="partitions recognition work into small ordered batches()" classname="eu.kanade.translation.recognizer.RecognitionBatchPlannerTest" time="0.002"/>
+  <testcase name="groups similar crop widths while retaining each source index()" classname="eu.kanade.translation.recognizer.RecognitionBatchPlannerTest" time="0.001"/>
+  <testcase name="invalid batch size falls back to one item per inference()" classname="eu.kanade.translation.recognizer.RecognitionBatchPlannerTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

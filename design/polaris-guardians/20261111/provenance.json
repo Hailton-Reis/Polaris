@@ -1,0 +1,42 @@
+{
+  "tool": "image_gen.imagegen",
+  "transparent_background": true,
+  "creative_processing": "Original generated illustrations retained; resource copies only resized and encoded as WebP using ImageMagick",
+  "resource_encoding": "512x512 WebP quality94; no additional Android dependency",
+  "adaptive_foreground_insets": "25% on each edge, independent of launcher density",
+  "files": [
+    {
+      "edition": "default",
+      "source": "design/polaris-guardians/20261111/originals/default.png",
+      "source_sha256": "62d3fe2bd4d00f1b3c981eab892d1baf2238db046ffe489e1be8d22d7260a90f",
+      "resource": "app/src/main/res/drawable-nodpi/ic_polaris_logo.webp",
+      "resource_sha256": "b3fb6db1b1f5b4c194bc2f765a46aca619e00115ea772a56775a49f39565ab02",
+      "resource_bytes": 93454
+    },
+    {
+      "edition": "aurora",
+      "source": "design/polaris-guardians/20261111/originals/aurora.png",
+      "source_sha256": "23a841859ec7ded9ae14136bdd4d1e32861fce3f1afcf2ee2fabd399c2aa4424",
+      "resource": "app/src/main/res/drawable-nodpi/ic_polaris_aurora.webp",
+      "resource_sha256": "110bf8df5ea97e549534f2de5ccb8c0f59f980e8b42794a0c9d6c8a45ebfb2fc",
+      "resource_bytes": 87030
+    },
+    {
+      "edition": "orbit",
+      "source": "design/polaris-guardians/20261111/originals/orbit.png",
+      "source_sha256": "fe9ebf60743148eec81b77f35c44f68b25a43bfca9bb2afe752b93d10e3320a6",
+      "resource": "app/src/main/res/drawable-nodpi/ic_polaris_orbit.webp",
+      "resource_sha256": "c0c80e298e3702391e8b21941c7d2621edc91e298f158fa09deb251cd913c7c9",
+      "resource_bytes": 93306
+    },
+    {
+      "edition": "constellation",
+      "source": "design/polaris-guardians/20261111/originals/constellation.png",
+      "source_sha256": "9b91c61d14d5ff3ae0d99c573e18c266fa143d4407e73ee041df6772eb9a285c",
+      "resource": "app/src/main/res/drawable-nodpi/ic_polaris_constellation.webp",
+      "resource_sha256": "ae484b3a09d7a980bc142855bd6a3d4f3886cc3eee4de340c3d7aa2d6ffe7639",
+      "resource_bytes": 92420
+    }
+  ],
+  "resource_total_bytes": 366210
+}

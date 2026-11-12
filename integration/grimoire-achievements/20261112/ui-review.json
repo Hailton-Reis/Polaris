@@ -1,0 +1,97 @@
+{
+  "reviewed_after_final_37_test_run": true,
+  "api": 26,
+  "abi": "x86_64",
+  "native_icons": {
+    "source": "PackageManager loadIcon, drawn to192px bitmap",
+    "mask": "stock adaptive rounded square",
+    "all_four_grimoires_distinct": true,
+    "three_four_five_clover_leaves_visible": true,
+    "default_rectangular_haze_removed": true,
+    "foreground_insets_percent": 22,
+    "no_visible_book_clipping": true
+  },
+  "appearance": {
+    "points": 450,
+    "selected": "AURORA / three leaves",
+    "unlocked": [
+      "DEFAULT",
+      "AURORA",
+      "ORBIT"
+    ],
+    "locked": [
+      "CONSTELLATION"
+    ],
+    "labels_and_artwork_fit": true,
+    "achievement_section_visible": true
+  },
+  "achievement_preview": {
+    "reward": "ORBIT / four leaves / Amado pela mana",
+    "availability": "unlocked",
+    "reading_points": [
+      450,
+      4500
+    ],
+    "library": [
+      25,
+      25
+    ],
+    "started": [
+      3,
+      10
+    ],
+    "completed": [
+      1,
+      5
+    ],
+    "only_collector_path_met": true,
+    "alternative_explanation_and_progress_visible": true
+  },
+  "limits": [
+    "Synthetic component previews; not full app startup/physical acceptance",
+    "Native zero-XP unlock is separately exercised by the production manager/storage test",
+    "Other masks and Android13+ themed icons not validated"
+  ],
+  "captures": [
+    {
+      "path": "preview/appearance/achievements-library.png",
+      "sha256": "bd3a95123ea7e408e8375d316bf1562173e6c954a66beb244b86b817a1c4a7b1"
+    },
+    {
+      "path": "preview/appearance/appearance-aurora-light.png",
+      "sha256": "5dc2c319c0570100b3ed76e2231e762424138ec6093d39361c0df6ed045c2c6f"
+    },
+    {
+      "path": "preview/appearance/journey-amber-large.png",
+      "sha256": "15d19b7c1207dc34b75c7c50d2a3a8199a02475ea94270464af894d0c07fefaf"
+    },
+    {
+      "path": "preview/appearance/journey-north.png",
+      "sha256": "b134c826d27aa2065a59914b9e714308d66590bf8d4280b80892adfc8819a199"
+    },
+    {
+      "path": "preview/icons/aurora.png",
+      "sha256": "8db6efd2d08315142b759e4244a6d88fa6c3cd1269410b2d9beee250acd28d69"
+    },
+    {
+      "path": "preview/icons/constellation.png",
+      "sha256": "5e9195574d91095046901df7a0e01e5b1d2d4a6a026f48d3f60d13151d2fa59d"
+    },
+    {
+      "path": "preview/icons/default.png",
+      "sha256": "a5da8348900ae82462ead60f5259bae54e17b5335643e433aa27fac7bdcf09d1"
+    },
+    {
+      "path": "preview/icons/orbit.png",
+      "sha256": "319283c1e99343566920e8742604e75db1c00019e24c3ff4eeef939a54c8b762"
+    },
+    {
+      "path": "preview/settings/isolated-settings-disabled.png",
+      "sha256": "f1f46a0e697d1ecafa22ec8a09519172d341c914b1f9cff24523d85a57714be1"
+    },
+    {
+      "path": "preview/settings/isolated-settings.png",
+      "sha256": "723a381da9b9a0bda87c49735270eeed340b2420d29601774913c2b8d1a4c72f"
+    }
+  ]
+}

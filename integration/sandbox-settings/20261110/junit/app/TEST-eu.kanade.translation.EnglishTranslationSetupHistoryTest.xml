@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.translation.EnglishTranslationSetupHistoryTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-11-10T22:28:26.430Z" hostname="7d7c5a6182d0" time="0.113">
+  <properties/>
+  <testcase name="history uses request order instead of list order()" classname="eu.kanade.translation.EnglishTranslationSetupHistoryTest" time="0.108"/>
+  <testcase name="an older success cannot hide a pending preparation()" classname="eu.kanade.translation.EnglishTranslationSetupHistoryTest" time="0.003"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

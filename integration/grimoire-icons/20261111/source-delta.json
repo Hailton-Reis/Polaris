@@ -1,0 +1,22 @@
+{
+  "baseline_revision": "P20261111.1",
+  "current_revision": "P20261111.2",
+  "added": [],
+  "modified": [
+    "app/src/main/java/eu/kanade/domain/ui/model/LauncherIcon.kt",
+    "app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt",
+    "app/src/main/res/drawable-nodpi/ic_polaris_aurora.webp",
+    "app/src/main/res/drawable-nodpi/ic_polaris_constellation.webp",
+    "app/src/main/res/drawable-nodpi/ic_polaris_logo.webp",
+    "app/src/main/res/drawable-nodpi/ic_polaris_orbit.webp",
+    "app/src/main/res/drawable/ic_polaris_constellation_background.xml",
+    "app/src/main/res/drawable/ic_polaris_orbit_background.xml",
+    "i18n-at/src/commonMain/moko-resources/base/strings.xml",
+    "i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml"
+  ],
+  "removed": [],
+  "matching_unchanged_paths": 384,
+  "cumulative_overlay_paths": 394,
+  "cumulative_absent_upstream_paths": 5,
+  "all_reward_logic_preferences_aliases_manifests_dependencies_SQL_Protobuf_cookie_and_library_sources_unchanged": true
+}

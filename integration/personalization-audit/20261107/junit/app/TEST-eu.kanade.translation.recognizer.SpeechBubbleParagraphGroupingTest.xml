@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.translation.recognizer.SpeechBubbleParagraphGroupingTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-11-08T01:12:43.006Z" hostname="a1f1fc307d5f" time="0.434">
+  <properties/>
+  <testcase name="complete sentences inside one large balloon become one paragraph()" classname="eu.kanade.translation.recognizer.SpeechBubbleParagraphGroupingTest" time="0.434"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

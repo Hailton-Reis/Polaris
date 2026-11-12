@@ -1,0 +1,33 @@
+[
+  {
+    "dependency": "com.google.mlkit:language-id:17.0.6",
+    "aar_bytes": 2335810,
+    "entries": [
+      {
+        "path": "assets/tflite_langid.tflite.jpg",
+        "bytes": 315520,
+        "compressed_bytes": 292329
+      },
+      {
+        "path": "jni/arm64-v8a/liblanguage_id_l2c_jni.so",
+        "bytes": 1019560,
+        "compressed_bytes": 437564
+      },
+      {
+        "path": "jni/armeabi-v7a/liblanguage_id_l2c_jni.so",
+        "bytes": 609636,
+        "compressed_bytes": 348162
+      },
+      {
+        "path": "jni/x86/liblanguage_id_l2c_jni.so",
+        "bytes": 1359352,
+        "compressed_bytes": 575631
+      },
+      {
+        "path": "jni/x86_64/liblanguage_id_l2c_jni.so",
+        "bytes": 1324488,
+        "compressed_bytes": 569382
+      }
+    ]
+  }
+]

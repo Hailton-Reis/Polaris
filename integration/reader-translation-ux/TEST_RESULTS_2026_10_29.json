@@ -1,0 +1,55 @@
+{
+  "date": "2026-10-29",
+  "pinned_yomotsu": "0fb80c439ef816eeb50674f1b90af39918b176d8",
+  "patch_sha256": "afff5569e753d1a460268e07fbaa0f32ee170fe1ed57dd939b8a5f1af7744ea3",
+  "assembly": "PASS; app:assembleDebug completed in final regression run",
+  "apk_x86_64_sha256": "a55a8045768497888bb8226def8c1f22ed69d9c546eebf9e89c7c07e7f3a8459",
+  "apk_signature_verification": "PASS",
+  "selected_translation_tests_in_final_run": {
+    "tests": 19,
+    "failures": 0,
+    "skipped": 0
+  },
+  "overlay_application_tests": {
+    "passed": 4,
+    "failed": 0,
+    "includes_crlf_checkout": true
+  },
+  "android_unit_comparison": {
+    "status": "NO_NEW_UNIT_REGRESSIONS",
+    "baseline": {
+      "total": 428,
+      "passed": 394,
+      "failed": 34,
+      "skipped": 0
+    },
+    "patched": {
+      "total": 433,
+      "passed": 399,
+      "failed": 34,
+      "skipped": 0
+    },
+    "preexisting_failures_still_present": 34,
+    "missing_baseline_tests": [],
+    "new_failures_or_skips": [],
+    "android_runtime_verified": false,
+    "gradle_exit_codes": {
+      "baseline": 1,
+      "patched": 1
+    },
+    "required_module_coverage": {
+      "domain": 58,
+      "app": 370
+    }
+  },
+  "checks": [
+    "bash -n build_issue002.sh",
+    "Python compile",
+    "source and repository git diff --check"
+  ],
+  "new_candidate_android_runtime": "PENDING; not installed on user AVD",
+  "previous_apk_single_source_translation": "User confirmed and provided Portuguese reader screenshots",
+  "two_source_runtime_gate": "Deferred; not certified",
+  "migration15_applied": false,
+  "backup_v2_enabled": false
+}

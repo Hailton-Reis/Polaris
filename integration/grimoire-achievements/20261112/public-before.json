@@ -1,0 +1,71 @@
+{
+  "release": {
+    "id": 436770743,
+    "tag_name": "v0.1.0-beta.10",
+    "name": "Polaris 0.1.0-beta.10 — APK universal e recuperação de fontes",
+    "body": "# Polaris 0.1.0-beta.10 — APK universal e recuperação de fontes\n\n**Pré-lançamento público para testes · P20261106.1 · código 111 · Android 8 ou superior.**\n\n## Baixar e instalar\n\nBaixe **Polaris-0.1.0-beta.10-universal.apk** (261,1 MB). É um único APK para ARM32 e ARM64: o Android escolhe as bibliotecas compatíveis na instalação. Não inclui x86/x86_64. Os recursos comuns são compartilhados no pacote; não há download de uma segunda versão.\n\nA assinatura e o identificador são os mesmos da beta.9 distribuída. Instale por cima do Polaris. **Guarde seu backup original**, sobretudo antes de testar restauração ou mescla de fontes. Não desinstale para contornar conflito de assinatura. Para localizar esta versão pelo app, ative **Receber atualizações experimentais**.\n\n## O que mudou desde a beta.9\n\n- Um APK universal substitui os dois downloads por arquitetura. O pacote é cerca de 97,3 MB menor que a soma dos dois APKs anteriores.\n- A lista de capítulos da fonte principal é salva antes da descoberta de alternativas, evitando esperar essa busca para mostrar o que já chegou.\n- Recuperação após restauração procura alternativas para fontes ausentes, inclusive em obras antigas/concluídas. Usa extensões autorizadas e habilitadas, confirma identidade e numeração e respeita a fonte fixada pela pessoa.\n- A descoberta verifica amostras de páginas e bytes de imagem. Entre fontes com amostra aprovada, prioriza português nos idiomas habilitados. Habilite português/português brasileiro nos filtros para incluí-los.\n- Quando a lista de páginas falha, o leitor pode tentar até três edições já confirmadas do mesmo capítulo, respeitando fonte fixa e modo somente baixados.\n- Menos carregamentos simultâneos, cache e threads do PaddleOCR em processos de 32 bits ou com pouca memória. Sobre mostra informações de compatibilidade para ajudar no diagnóstico.\n- Inspeção preventiva de extensões antes do carregamento, quarentena e aprovação vinculada à versão exata. Preferências internas de confiança não são importadas de backups; repositórios novos restaurados exigem revisão local.\n- Proteção de caminhos e exigência de HTTPS para downloads de plugins de novels.\n\nMantém o assistente de repositórios e instalação interna em lote, as melhorias anteriores de OCR/tipografia, a tradução no aparelho e os downloads recuperáveis de atualização. Nenhum novo modelo de OCR foi acrescentado nesta versão.\n\n## Limitações conhecidas\n\n**A sandbox completa de extensões ainda não está integrada.** As extensões atuais executam no modo de compatibilidade, no processo do aplicativo, com aviso. A inspeção preventiva pode bloquear código legítimo e não detecta todos os riscos; uma assinatura ou inspeção sem alertas não garante segurança. A prova de isolamento Android foi feita em componente separado, sem extensões reais.\n\n**A exportação de obras mescladas para Mihon/Tachiyomi ainda precisa de normalização e validação real.** Alguns capítulos alternativos usam URLs específicas do Polaris. O formato de backup continua existente, mas isso não garante que essas obras funcionem ao voltar para outro leitor. Preserve o backup original; o campo Mihon `nextUpdate` também não é preservado.\n\nO problema relatado no A12 ainda não teve sua causa confirmada nem aceite no aparelho. Não há medição que comprove ganho de velocidade ou memória nele. A amostragem de fontes não testa todos os capítulos nem a qualidade editorial. Falhas que surgem apenas em imagens posteriores ainda não têm recuperação completa. O fluxo com extensões reais, extensões já instaladas pelo Android, Android 14+ e migração por banco/UI continua em validação. A fila de preparação de extensões depende do processo e não retoma seus downloads depois que ele é encerrado.\n\n## Validação\n\n738 testes JVM: **721 aprovações e as mesmas 17 falhas preexistentes**, sem novas falhas, testes ausentes ou ignorados. Os 31 casos novos passaram. Também passaram 13 controles do empacotamento/overlay e seis verificações Android de um componente independente de isolamento. Esses resultados não representam uma suíte totalmente verde nem aceite do aplicativo completo em celulares.\n\nO APK foi conferido contra as 240 alterações de fonte compiladas e manteve a assinatura da beta.9. O manifesto oferece dois descritores de arquitetura apontando ao mesmo arquivo para compatibilidade com o atualizador antigo; há apenas um APK.\n\nSHA-256 do APK:\n`f1a556d2620a5984c76cebe2dc5a10e461d8d5a2feb6a91018371beaec0a90da`\n\n[Implementação e evidências](https://github.com/Hailton-Reis/Polaris/tree/v0.1.0-beta.10) · [Registro de testes](https://github.com/Hailton-Reis/Polaris/blob/v0.1.0-beta.10/integration/universal-recovery/20261106/TEST_RESULTS.json) · [Relatar problema](https://github.com/Hailton-Reis/Polaris/issues/new/choose)\n\nAo relatar problema, envie a versão copiada em Sobre, Android, aparelho, fonte/extensão e os passos para reproduzir.\n",
+    "draft": false,
+    "prerelease": true,
+    "target_commitish": "805f707e828dd20b6aee28468140f4c50a8d4f49",
+    "assets": [
+      {
+        "id": 717887857,
+        "name": "COMECE_AQUI.md",
+        "size": 1425,
+        "digest": "sha256:7092fcb963eab24d2dc0a3ac5bcf091b23214a1ac5a71baa26fc51916774d52f",
+        "state": "uploaded",
+        "content_type": "text/markdown; charset=utf-8"
+      },
+      {
+        "id": 717887926,
+        "name": "ISOLAMENTO_DE_EXTENSOES.md",
+        "size": 8138,
+        "digest": "sha256:588a69db739b61b4a82149f84fa46918eeae1d43f5b22ff8b7ce58a4cdbbfc30",
+        "state": "uploaded",
+        "content_type": "text/markdown; charset=utf-8"
+      },
+      {
+        "id": 717888194,
+        "name": "manifest.json",
+        "size": 2118,
+        "digest": "sha256:68a11dc88854f63e3c6d5b73f8d265435af040e4fa717b08c0b7ce9a4970431a",
+        "state": "uploaded",
+        "content_type": "application/json"
+      },
+      {
+        "id": 717887262,
+        "name": "Polaris-0.1.0-beta.10-universal.apk",
+        "size": 261130442,
+        "digest": "sha256:f1a556d2620a5984c76cebe2dc5a10e461d8d5a2feb6a91018371beaec0a90da",
+        "state": "uploaded",
+        "content_type": "application/vnd.android.package-archive"
+      },
+      {
+        "id": 717887996,
+        "name": "RELEASE_NOTES.md",
+        "size": 5040,
+        "digest": "sha256:8b5b37b20f7b01fb499798f9d52f068cd4aa285daa82db8ddc5090169308b3a8",
+        "state": "uploaded",
+        "content_type": "text/markdown; charset=utf-8"
+      },
+      {
+        "id": 717888076,
+        "name": "SHA256SUMS.txt",
+        "size": 102,
+        "digest": "sha256:ca042216f96af0e2ae825d74cfa13aa28f22a5669e3a501ca4a34845295f0726",
+        "state": "uploaded",
+        "content_type": "text/plain; charset=utf-8"
+      },
+      {
+        "id": 717888128,
+        "name": "VALIDACAO.json",
+        "size": 5418,
+        "digest": "sha256:a98a656dbf863f68ad574472a99f7597ceb56353a8cdb9fd6fec48cb676aadc4",
+        "state": "uploaded",
+        "content_type": "application/json"
+      }
+    ]
+  },
+  "main": "36c96df0212c54ebf43c1e9e854d10e62d55084b",
+  "tag": "6c20e9a08818c87f6ff00d15959d04e7325bdbb3"
+}

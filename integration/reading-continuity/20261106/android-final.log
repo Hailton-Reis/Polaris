@@ -1,0 +1,80 @@
+INSTRUMENTATION_STATUS: numtests=5
+INSTRUMENTATION_STATUS: stream=
+eu.kanade.tachiyomi.extension.sandbox.ExtensionSandboxAndroidTest:
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=actualSourceRunsAtDifferentUidWithNoHostCanaryAccess
+INSTRUMENTATION_STATUS: class=eu.kanade.tachiyomi.extension.sandbox.ExtensionSandboxAndroidTest
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: numtests=5
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=actualSourceRunsAtDifferentUidWithNoHostCanaryAccess
+INSTRUMENTATION_STATUS: class=eu.kanade.tachiyomi.extension.sandbox.ExtensionSandboxAndroidTest
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: numtests=5
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=proxyNeverLoadsFixtureClassesInTheHostAndKeepsSourceIdentity
+INSTRUMENTATION_STATUS: class=eu.kanade.tachiyomi.extension.sandbox.ExtensionSandboxAndroidTest
+INSTRUMENTATION_STATUS: current=2
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: numtests=5
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=proxyNeverLoadsFixtureClassesInTheHostAndKeepsSourceIdentity
+INSTRUMENTATION_STATUS: class=eu.kanade.tachiyomi.extension.sandbox.ExtensionSandboxAndroidTest
+INSTRUMENTATION_STATUS: current=2
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: numtests=5
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=aPrivateNetworkRequestIsBlockedAndReportedWithoutHostExecution
+INSTRUMENTATION_STATUS: class=eu.kanade.tachiyomi.extension.sandbox.ExtensionSandboxAndroidTest
+INSTRUMENTATION_STATUS: current=3
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: numtests=5
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=aPrivateNetworkRequestIsBlockedAndReportedWithoutHostExecution
+INSTRUMENTATION_STATUS: class=eu.kanade.tachiyomi.extension.sandbox.ExtensionSandboxAndroidTest
+INSTRUMENTATION_STATUS: current=3
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: numtests=5
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=aStuckConstructorIsTerminatedAndANewApkSessionCanStart
+INSTRUMENTATION_STATUS: class=eu.kanade.tachiyomi.extension.sandbox.ExtensionSandboxAndroidTest
+INSTRUMENTATION_STATUS: current=4
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: numtests=5
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=aStuckConstructorIsTerminatedAndANewApkSessionCanStart
+INSTRUMENTATION_STATUS: class=eu.kanade.tachiyomi.extension.sandbox.ExtensionSandboxAndroidTest
+INSTRUMENTATION_STATUS: current=4
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: numtests=5
+INSTRUMENTATION_STATUS: stream=
+eu.kanade.tachiyomi.extension.sandbox.AutomaticLanguageAndroidTest:
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=bundledModelRecognizesEnglishAndLeavesPortugueseOrShortTextAlone
+INSTRUMENTATION_STATUS: class=eu.kanade.tachiyomi.extension.sandbox.AutomaticLanguageAndroidTest
+INSTRUMENTATION_STATUS: current=5
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: numtests=5
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=bundledModelRecognizesEnglishAndLeavesPortugueseOrShortTextAlone
+INSTRUMENTATION_STATUS: class=eu.kanade.tachiyomi.extension.sandbox.AutomaticLanguageAndroidTest
+INSTRUMENTATION_STATUS: current=5
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_RESULT: stream=
+
+Time: 15.753
+
+OK (5 tests)
+
+
+INSTRUMENTATION_CODE: -1

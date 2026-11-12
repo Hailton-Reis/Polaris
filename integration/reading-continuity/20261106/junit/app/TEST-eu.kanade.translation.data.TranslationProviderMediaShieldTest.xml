@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.translation.data.TranslationProviderMediaShieldTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-11-06T19:56:56.741Z" hostname="550a0106d184" time="0.254">
+  <properties/>
+  <testcase name="translation directory is hidden from gallery before OCR files are created()" classname="eu.kanade.translation.data.TranslationProviderMediaShieldTest" time="0.253"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

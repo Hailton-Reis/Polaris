@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.tachiyomi.source.selection.SourceMatchingTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-11-06T16:22:26.900Z" hostname="550a0106d184" time="0.008">
+  <properties/>
+  <testcase name="different creators and remakes are not automatically merged()" classname="eu.kanade.tachiyomi.source.selection.SourceMatchingTest" time="0.001"/>
+  <testcase name="exact normalized title and creator corroborate a work()" classname="eu.kanade.tachiyomi.source.selection.SourceMatchingTest" time="0.001"/>
+  <testcase name="same title without creator is ambiguous()" classname="eu.kanade.tachiyomi.source.selection.SourceMatchingTest" time="0.002"/>
+  <testcase name="overlapping ordinary sequences are compatible()" classname="eu.kanade.tachiyomi.source.selection.SourceMatchingTest" time="0.001"/>
+  <testcase name="ambiguous reset or split numbering is rejected automatically()" classname="eu.kanade.tachiyomi.source.selection.SourceMatchingTest" time="0.001"/>
+  <testcase name="short CJK creator names remain valid corroboration()" classname="eu.kanade.tachiyomi.source.selection.SourceMatchingTest" time="0.001"/>
+  <testcase name="a library-only restore can use a corroborated work without inventing previous numbering()" classname="eu.kanade.tachiyomi.source.selection.SourceMatchingTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

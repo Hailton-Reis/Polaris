@@ -1,0 +1,431 @@
+Configuration on demand is an incubating feature.
+Type-safe project accessors is an incubating feature.
+> Task :build-logic:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :build-logic:compileKotlin UP-TO-DATE
+> Task :build-logic:compileJava NO-SOURCE
+> Task :build-logic:pluginDescriptors UP-TO-DATE
+> Task :build-logic:processResources UP-TO-DATE
+> Task :build-logic:classes UP-TO-DATE
+> Task :build-logic:jar UP-TO-DATE
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preDebugBuild UP-TO-DATE
+> Task :app:compileDebugAidl UP-TO-DATE
+> Task :app:dataBindingMergeDependencyArtifactsDebug UP-TO-DATE
+> Task :app:generateDebugResources UP-TO-DATE
+> Task :app:prepareLibraryDefinitionsDebug UP-TO-DATE
+> Task :app:replaceDebugShortcutPlaceholder UP-TO-DATE
+> Task :core-metadata:preBuild UP-TO-DATE
+> Task :core-metadata:preDebugBuild UP-TO-DATE
+> Task :core-metadata:generateDebugResources UP-TO-DATE
+> Task :core-metadata:packageDebugResources UP-TO-DATE
+> Task :data:preBuild UP-TO-DATE
+> Task :data:preDebugBuild UP-TO-DATE
+> Task :data:generateDebugResources UP-TO-DATE
+> Task :data:packageDebugResources UP-TO-DATE
+> Task :dbnet-native:preBuild UP-TO-DATE
+> Task :dbnet-native:preDebugBuild UP-TO-DATE
+> Task :dbnet-native:generateDebugResources UP-TO-DATE
+> Task :dbnet-native:packageDebugResources UP-TO-DATE
+> Task :domain:preBuild UP-TO-DATE
+> Task :domain:preDebugBuild UP-TO-DATE
+> Task :domain:generateDebugResources UP-TO-DATE
+> Task :domain:packageDebugResources UP-TO-DATE
+> Task :i18n:generateAndroidMainLocalesConfig UP-TO-DATE
+> Task :i18n:generateMRcommonTest UP-TO-DATE
+> Task :i18n:generateMRandroidHostTest UP-TO-DATE
+> Task :i18n:generateMRcommonMain UP-TO-DATE
+> Task :i18n:generateMRandroidMain UP-TO-DATE
+> Task :i18n:androidPreBuild UP-TO-DATE
+> Task :i18n:preAndroidMainBuild UP-TO-DATE
+> Task :i18n:packageAndroidMainResources UP-TO-DATE
+> Task :i18n-at:generateMRcommonTest UP-TO-DATE
+> Task :i18n-at:generateMRandroidHostTest UP-TO-DATE
+> Task :i18n-at:generateMRcommonMain UP-TO-DATE
+> Task :i18n-at:generateMRandroidMain UP-TO-DATE
+> Task :i18n-at:androidPreBuild UP-TO-DATE
+> Task :i18n-at:preAndroidMainBuild UP-TO-DATE
+> Task :i18n-at:packageAndroidMainResources UP-TO-DATE
+> Task :ppocr-sdk:preBuild UP-TO-DATE
+> Task :ppocr-sdk:preDebugBuild UP-TO-DATE
+> Task :ppocr-sdk:generateDebugResources UP-TO-DATE
+> Task :ppocr-sdk:packageDebugResources UP-TO-DATE
+> Task :presentation-core:preBuild UP-TO-DATE
+> Task :presentation-core:preDebugBuild UP-TO-DATE
+> Task :presentation-core:generateDebugResources UP-TO-DATE
+> Task :presentation-core:packageDebugResources UP-TO-DATE
+> Task :presentation-widget:preBuild UP-TO-DATE
+> Task :presentation-widget:preDebugBuild UP-TO-DATE
+> Task :presentation-widget:generateDebugResources UP-TO-DATE
+> Task :presentation-widget:packageDebugResources UP-TO-DATE
+> Task :source-api:preBuild UP-TO-DATE
+> Task :source-api:preDebugBuild UP-TO-DATE
+> Task :source-api:generateDebugResources UP-TO-DATE
+> Task :source-api:packageDebugResources UP-TO-DATE
+> Task :source-local:preBuild UP-TO-DATE
+> Task :source-local:preDebugBuild UP-TO-DATE
+> Task :source-local:generateDebugResources UP-TO-DATE
+> Task :source-local:packageDebugResources UP-TO-DATE
+> Task :telemetry:preBuild UP-TO-DATE
+> Task :telemetry:preDebugBuild UP-TO-DATE
+> Task :telemetry:generateDebugResources UP-TO-DATE
+> Task :telemetry:packageDebugResources UP-TO-DATE
+> Task :core:archive:preBuild UP-TO-DATE
+> Task :core:archive:preDebugBuild UP-TO-DATE
+> Task :core:archive:generateDebugResources UP-TO-DATE
+> Task :core:archive:packageDebugResources UP-TO-DATE
+> Task :core:common:preBuild UP-TO-DATE
+> Task :core:common:preDebugBuild UP-TO-DATE
+> Task :core:common:generateDebugResources UP-TO-DATE
+> Task :core:common:packageDebugResources UP-TO-DATE
+> Task :core:viewmodel:preBuild UP-TO-DATE
+> Task :core:viewmodel:preDebugBuild UP-TO-DATE
+> Task :core:viewmodel:generateDebugResources UP-TO-DATE
+> Task :core:viewmodel:packageDebugResources UP-TO-DATE
+> Task :app:mergeDebugResources UP-TO-DATE
+> Task :app:dataBindingGenBaseClassesDebug UP-TO-DATE
+> Task :app:generateDebugBuildConfig UP-TO-DATE
+> Task :app:packageDebugResources UP-TO-DATE
+> Task :core-metadata:processDebugNavigationResources UP-TO-DATE
+> Task :data:processDebugNavigationResources UP-TO-DATE
+> Task :dbnet-native:processDebugNavigationResources UP-TO-DATE
+> Task :domain:processDebugNavigationResources UP-TO-DATE
+> Task :i18n:generateAndroidMainEmptyResourceFiles UP-TO-DATE
+> Task :i18n-at:generateAndroidMainEmptyResourceFiles UP-TO-DATE
+> Task :ppocr-sdk:processDebugNavigationResources UP-TO-DATE
+> Task :presentation-core:processDebugNavigationResources UP-TO-DATE
+> Task :presentation-widget:processDebugNavigationResources UP-TO-DATE
+> Task :source-api:processDebugNavigationResources UP-TO-DATE
+> Task :source-local:processDebugNavigationResources UP-TO-DATE
+> Task :telemetry:processDebugNavigationResources UP-TO-DATE
+> Task :core:archive:processDebugNavigationResources UP-TO-DATE
+> Task :core:common:processDebugNavigationResources UP-TO-DATE
+> Task :core:viewmodel:processDebugNavigationResources UP-TO-DATE
+> Task :app:processDebugNavigationResources UP-TO-DATE
+> Task :app:parseDebugLocalResources UP-TO-DATE
+> Task :core-metadata:parseDebugLocalResources UP-TO-DATE
+> Task :source-api:parseDebugLocalResources UP-TO-DATE
+> Task :i18n:parseAndroidMainLocalResources UP-TO-DATE
+> Task :i18n:generateAndroidMainRFile UP-TO-DATE
+> Task :core:common:parseDebugLocalResources UP-TO-DATE
+> Task :core:common:generateDebugRFile UP-TO-DATE
+> Task :source-api:generateDebugRFile UP-TO-DATE
+> Task :core-metadata:generateDebugRFile UP-TO-DATE
+> Task :data:parseDebugLocalResources UP-TO-DATE
+> Task :domain:parseDebugLocalResources UP-TO-DATE
+> Task :domain:generateDebugRFile UP-TO-DATE
+> Task :data:generateDebugRFile UP-TO-DATE
+> Task :dbnet-native:parseDebugLocalResources UP-TO-DATE
+> Task :dbnet-native:generateDebugRFile UP-TO-DATE
+> Task :i18n-at:parseAndroidMainLocalResources UP-TO-DATE
+> Task :i18n-at:generateAndroidMainRFile UP-TO-DATE
+> Task :ppocr-sdk:parseDebugLocalResources UP-TO-DATE
+> Task :ppocr-sdk:generateDebugRFile UP-TO-DATE
+> Task :presentation-core:parseDebugLocalResources UP-TO-DATE
+> Task :presentation-core:generateDebugRFile UP-TO-DATE
+> Task :presentation-widget:parseDebugLocalResources UP-TO-DATE
+> Task :presentation-widget:generateDebugRFile UP-TO-DATE
+> Task :source-local:parseDebugLocalResources UP-TO-DATE
+> Task :core:archive:parseDebugLocalResources UP-TO-DATE
+> Task :core:archive:generateDebugRFile UP-TO-DATE
+> Task :source-local:generateDebugRFile UP-TO-DATE
+> Task :telemetry:parseDebugLocalResources UP-TO-DATE
+> Task :telemetry:generateDebugRFile UP-TO-DATE
+> Task :core:viewmodel:parseDebugLocalResources UP-TO-DATE
+> Task :core:viewmodel:generateDebugRFile UP-TO-DATE
+> Task :app:generateDebugRFile UP-TO-DATE
+> Task :i18n:kmpPartiallyResolvedDependenciesChecker
+> Task :i18n:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :i18n:compileAndroidMain UP-TO-DATE
+> Task :i18n:bundleAndroidMainClassesToCompileJar UP-TO-DATE
+> Task :core:common:compileDebugKotlin UP-TO-DATE
+> Task :core:common:javaPreCompileDebug UP-TO-DATE
+> Task :core:common:compileDebugJavaWithJavac NO-SOURCE
+> Task :core:common:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :source-api:compileDebugKotlin UP-TO-DATE
+> Task :source-api:javaPreCompileDebug UP-TO-DATE
+> Task :source-api:compileDebugJavaWithJavac NO-SOURCE
+> Task :source-api:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :core-metadata:compileDebugKotlin UP-TO-DATE
+> Task :core-metadata:javaPreCompileDebug UP-TO-DATE
+> Task :core-metadata:compileDebugJavaWithJavac NO-SOURCE
+> Task :core-metadata:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :data:generateDebugDatabaseInterface UP-TO-DATE
+> Task :domain:compileDebugKotlin
+> Task :domain:javaPreCompileDebug UP-TO-DATE
+> Task :domain:compileDebugJavaWithJavac NO-SOURCE
+> Task :domain:bundleLibCompileToJarDebug
+> Task :data:compileDebugKotlin UP-TO-DATE
+> Task :data:javaPreCompileDebug UP-TO-DATE
+> Task :data:compileDebugJavaWithJavac NO-SOURCE
+> Task :data:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :dbnet-native:compileDebugKotlin NO-SOURCE
+> Task :dbnet-native:javaPreCompileDebug UP-TO-DATE
+> Task :dbnet-native:compileDebugJavaWithJavac NO-SOURCE
+> Task :dbnet-native:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :i18n-at:kmpPartiallyResolvedDependenciesChecker
+> Task :i18n-at:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :i18n-at:compileAndroidMain UP-TO-DATE
+> Task :i18n-at:bundleAndroidMainClassesToCompileJar UP-TO-DATE
+> Task :ppocr-sdk:compileDebugKotlin UP-TO-DATE
+> Task :ppocr-sdk:javaPreCompileDebug UP-TO-DATE
+> Task :ppocr-sdk:compileDebugJavaWithJavac NO-SOURCE
+> Task :ppocr-sdk:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :presentation-core:compileDebugKotlin UP-TO-DATE
+> Task :presentation-core:javaPreCompileDebug UP-TO-DATE
+> Task :presentation-core:compileDebugJavaWithJavac NO-SOURCE
+> Task :presentation-core:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :presentation-widget:compileDebugKotlin UP-TO-DATE
+> Task :presentation-widget:javaPreCompileDebug UP-TO-DATE
+> Task :presentation-widget:compileDebugJavaWithJavac NO-SOURCE
+> Task :presentation-widget:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :core:archive:compileDebugKotlin UP-TO-DATE
+> Task :core:archive:javaPreCompileDebug UP-TO-DATE
+> Task :core:archive:compileDebugJavaWithJavac NO-SOURCE
+> Task :core:archive:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :source-local:compileDebugKotlin UP-TO-DATE
+> Task :source-local:javaPreCompileDebug UP-TO-DATE
+> Task :source-local:compileDebugJavaWithJavac NO-SOURCE
+> Task :source-local:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :telemetry:compileDebugKotlin UP-TO-DATE
+> Task :telemetry:javaPreCompileDebug UP-TO-DATE
+> Task :telemetry:compileDebugJavaWithJavac NO-SOURCE
+> Task :telemetry:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :core:viewmodel:compileDebugKotlin UP-TO-DATE
+> Task :core:viewmodel:javaPreCompileDebug UP-TO-DATE
+> Task :core:viewmodel:compileDebugJavaWithJavac NO-SOURCE
+> Task :core:viewmodel:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :app:compileDebugKotlin UP-TO-DATE
+> Task :app:javaPreCompileDebug UP-TO-DATE
+> Task :app:compileDebugJavaWithJavac UP-TO-DATE
+> Task :core-metadata:writeDebugAarMetadata UP-TO-DATE
+> Task :data:writeDebugAarMetadata UP-TO-DATE
+> Task :dbnet-native:writeDebugAarMetadata UP-TO-DATE
+> Task :domain:writeDebugAarMetadata UP-TO-DATE
+> Task :i18n:writeAndroidMainAarMetadata UP-TO-DATE
+> Task :i18n-at:writeAndroidMainAarMetadata UP-TO-DATE
+> Task :ppocr-sdk:writeDebugAarMetadata UP-TO-DATE
+> Task :presentation-core:writeDebugAarMetadata UP-TO-DATE
+> Task :presentation-widget:writeDebugAarMetadata UP-TO-DATE
+> Task :source-api:writeDebugAarMetadata UP-TO-DATE
+> Task :source-local:writeDebugAarMetadata UP-TO-DATE
+> Task :telemetry:writeDebugAarMetadata UP-TO-DATE
+> Task :core:archive:writeDebugAarMetadata UP-TO-DATE
+> Task :core:common:writeDebugAarMetadata UP-TO-DATE
+> Task :core:viewmodel:writeDebugAarMetadata UP-TO-DATE
+> Task :app:checkDebugAarMetadata UP-TO-DATE
+> Task :app:mapDebugSourceSetPaths UP-TO-DATE
+> Task :app:compileDebugNavigationResources UP-TO-DATE
+> Task :app:createDebugCompatibleScreenManifests UP-TO-DATE
+> Task :app:extractDeepLinksDebug UP-TO-DATE
+> Task :core-metadata:extractDeepLinksDebug UP-TO-DATE
+> Task :core-metadata:processDebugManifest UP-TO-DATE
+> Task :data:extractDeepLinksDebug UP-TO-DATE
+> Task :data:processDebugManifest UP-TO-DATE
+> Task :dbnet-native:extractDeepLinksDebug UP-TO-DATE
+> Task :dbnet-native:processDebugManifest UP-TO-DATE
+> Task :domain:extractDeepLinksDebug UP-TO-DATE
+> Task :domain:processDebugManifest UP-TO-DATE
+> Task :i18n:processAndroidMainManifest UP-TO-DATE
+> Task :i18n-at:processAndroidMainManifest UP-TO-DATE
+> Task :ppocr-sdk:extractDeepLinksDebug UP-TO-DATE
+> Task :ppocr-sdk:processDebugManifest UP-TO-DATE
+> Task :presentation-core:extractDeepLinksDebug UP-TO-DATE
+> Task :presentation-core:processDebugManifest UP-TO-DATE
+> Task :presentation-widget:extractDeepLinksDebug UP-TO-DATE
+> Task :presentation-widget:processDebugManifest UP-TO-DATE
+> Task :source-api:extractDeepLinksDebug UP-TO-DATE
+> Task :source-api:processDebugManifest UP-TO-DATE
+> Task :source-local:extractDeepLinksDebug UP-TO-DATE
+> Task :source-local:processDebugManifest UP-TO-DATE
+> Task :telemetry:extractDeepLinksDebug UP-TO-DATE
+> Task :telemetry:processDebugManifest UP-TO-DATE
+> Task :core:archive:extractDeepLinksDebug UP-TO-DATE
+> Task :core:archive:processDebugManifest UP-TO-DATE
+> Task :core:common:extractDeepLinksDebug UP-TO-DATE
+> Task :core:common:processDebugManifest UP-TO-DATE
+> Task :core:viewmodel:extractDeepLinksDebug UP-TO-DATE
+> Task :core:viewmodel:processDebugManifest UP-TO-DATE
+> Task :app:processDebugMainManifest UP-TO-DATE
+> Task :app:processDebugManifest UP-TO-DATE
+> Task :app:processDebugManifestForPackage UP-TO-DATE
+> Task :core-metadata:mapDebugSourceSetPaths UP-TO-DATE
+> Task :core-metadata:compileDebugLibraryResources UP-TO-DATE
+> Task :data:mapDebugSourceSetPaths UP-TO-DATE
+> Task :data:compileDebugLibraryResources UP-TO-DATE
+> Task :dbnet-native:mapDebugSourceSetPaths UP-TO-DATE
+> Task :dbnet-native:compileDebugLibraryResources UP-TO-DATE
+> Task :domain:mapDebugSourceSetPaths UP-TO-DATE
+> Task :domain:compileDebugLibraryResources UP-TO-DATE
+> Task :i18n:mapAndroidMainSourceSetPaths UP-TO-DATE
+> Task :i18n:compileAndroidMainLibraryResources UP-TO-DATE
+> Task :i18n-at:mapAndroidMainSourceSetPaths UP-TO-DATE
+> Task :i18n-at:compileAndroidMainLibraryResources UP-TO-DATE
+> Task :ppocr-sdk:mapDebugSourceSetPaths UP-TO-DATE
+> Task :ppocr-sdk:compileDebugLibraryResources UP-TO-DATE
+> Task :presentation-core:mapDebugSourceSetPaths UP-TO-DATE
+> Task :presentation-core:compileDebugLibraryResources UP-TO-DATE
+> Task :presentation-widget:mapDebugSourceSetPaths UP-TO-DATE
+> Task :presentation-widget:compileDebugLibraryResources UP-TO-DATE
+> Task :source-api:mapDebugSourceSetPaths UP-TO-DATE
+> Task :source-api:compileDebugLibraryResources UP-TO-DATE
+> Task :source-local:mapDebugSourceSetPaths UP-TO-DATE
+> Task :source-local:compileDebugLibraryResources UP-TO-DATE
+> Task :telemetry:mapDebugSourceSetPaths UP-TO-DATE
+> Task :telemetry:compileDebugLibraryResources UP-TO-DATE
+> Task :core:archive:mapDebugSourceSetPaths UP-TO-DATE
+> Task :core:archive:compileDebugLibraryResources UP-TO-DATE
+> Task :core:common:mapDebugSourceSetPaths UP-TO-DATE
+> Task :core:common:compileDebugLibraryResources UP-TO-DATE
+> Task :core:viewmodel:mapDebugSourceSetPaths UP-TO-DATE
+> Task :core:viewmodel:compileDebugLibraryResources UP-TO-DATE
+> Task :app:processDebugResources UP-TO-DATE
+> Task :app:bundleDebugClassesToRuntimeJar UP-TO-DATE
+> Task :app:bundleDebugClassesToCompileJar UP-TO-DATE
+> Task :app:preDebugUnitTestBuild UP-TO-DATE
+
+> Task :app:compileDebugUnitTestKotlin
+w: file:///workspace/scratch/polaris-cloud-e7d774c/android-build/patched-yomotsu/app/src/test/java/eu/kanade/tachiyomi/data/backup/BackupInteropTest.kt:74:54 Redundant call of conversion method.
+w: file:///workspace/scratch/polaris-cloud-e7d774c/android-build/patched-yomotsu/app/src/test/java/eu/kanade/tachiyomi/ui/reader/viewer/webtoon/AutoScrollControllerTest.kt:353:5 'lateinit' is unnecessary: definitely initialized in constructors.
+
+> Task :app:javaPreCompileDebugUnitTest UP-TO-DATE
+> Task :app:compileDebugUnitTestJavaWithJavac NO-SOURCE
+> Task :app:processDebugJavaRes UP-TO-DATE
+> Task :app:processDebugUnitTestJavaRes UP-TO-DATE
+> Task :core-metadata:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :core-metadata:processDebugJavaRes UP-TO-DATE
+> Task :data:bundleLibRuntimeToJarDebug
+> Task :data:processDebugJavaRes UP-TO-DATE
+> Task :dbnet-native:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :dbnet-native:processDebugJavaRes NO-SOURCE
+> Task :domain:bundleLibRuntimeToJarDebug
+> Task :domain:processDebugJavaRes UP-TO-DATE
+> Task :i18n:bundleAndroidMainClassesToRuntimeJar UP-TO-DATE
+> Task :i18n:processAndroidMainJavaRes UP-TO-DATE
+> Task :i18n-at:bundleAndroidMainClassesToRuntimeJar UP-TO-DATE
+> Task :i18n-at:processAndroidMainJavaRes UP-TO-DATE
+> Task :ppocr-sdk:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :ppocr-sdk:processDebugJavaRes UP-TO-DATE
+> Task :presentation-core:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :presentation-core:processDebugJavaRes UP-TO-DATE
+> Task :presentation-widget:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :presentation-widget:processDebugJavaRes UP-TO-DATE
+> Task :source-api:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :source-api:processDebugJavaRes UP-TO-DATE
+> Task :source-local:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :source-local:processDebugJavaRes UP-TO-DATE
+> Task :telemetry:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :telemetry:processDebugJavaRes UP-TO-DATE
+> Task :core:archive:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :core:archive:processDebugJavaRes UP-TO-DATE
+> Task :core:common:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :core:common:processDebugJavaRes UP-TO-DATE
+> Task :core:viewmodel:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :core:viewmodel:processDebugJavaRes UP-TO-DATE
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+
+> Task :app:testDebugUnitTest
+
+LibraryWorkConsolidatorTest > completed groups do not starve the next batch of restored duplicates() PASSED
+
+LibraryWorkConsolidatorTest > a known alias can join adjacent ranges from Portuguese and English() PASSED
+
+LibraryWorkConsolidatorTest > disjoint numbering is not assumed equivalent without catalogue corroboration() PASSED
+
+LibraryWorkConsolidatorTest > a failed native chapter query leaves original records unchanged() PASSED
+
+LibraryWorkConsolidatorTest > a stale plan retries fresh metadata and keeps a concurrent note() PASSED
+
+LibraryWorkConsolidatorTest > confirmed native editions are associated once without deleting favorites() PASSED
+
+LibraryWorkConsolidatorTest > conflicting per edition pins remain separate() PASSED
+
+LibraryWorkConsolidatorTest > explicit separation survives new reconciliation() PASSED
+
+LibraryWorkConsolidatorTest > unsupported catalogue IDs cannot corroborate adjacent non overlapping ranges() PASSED
+
+LibraryWorkTest > explicit conflicting pins prevent hiding either edition() PASSED
+
+LibraryWorkTest > scanlator filtering does not invalidate numbering established by the full native edition() PASSED
+
+LibraryWorkTest > a pinned English edition ranks ahead of Portuguese while preserving active reading() PASSED
+
+LibraryWorkTest > unknown chapters from different owners never share a sentinel URL identity() PASSED
+
+LibraryWorkTest > generic authors and a transitive author bridge cannot corroborate a library group() PASSED
+
+LibraryWorkTest > library exposes both native records after incompatible renumbering with unchanged counts() PASSED
+
+LibraryWorkTest > portable association resolves after destination local IDs change() PASSED
+
+LibraryWorkTest > numbering changes are revalidated and recover without changing association or progress() PASSED
+
+LibraryWorkTest > metadata guard rejects homonyms unrelated creators and sequel qualifiers() PASSED
+
+LibraryWorkTest > confirmed catalogue aliases retain adjacent Portuguese and English complements during reads() PASSED
+
+LibraryWorkTest > storage hint is removable and does not contain a page mapping() PASSED
+
+LibraryWorkTest > malformed or oversized membership payloads are rejected() PASSED
+
+LibraryWorkTest > group chapter query preserves original chapter IDs owner IDs and partial pages() PASSED
+
+LibraryWorkTest > large confirmed native editions keep all storage owners and logical chapter identities() PASSED
+
+LibraryWorkTest > an explicit separate flag invalidates even reciprocal imported membership() PASSED
+
+LibraryWorkTest > native mutation query never includes chapters from another edition() PASSED
+
+LibraryWorkTest > remote chapter adapter strips runtime and other host reserved metadata() PASSED
+
+LibraryWorkTest > explicit child query remains native while reader root lookup follows the association() PASSED
+
+LibraryWorkTest > partial reciprocal writes never hide another native record() PASSED
+
+LibraryWorkTest > chapter flow revalidates numbering even when manga metadata and row counts stay equal() PASSED
+
+LibraryWorkTest > malformed separation preference is not executable data() PASSED
+
+LibraryWorkTest > Portuguese edition ranks ahead of English without moving native chapters() PASSED
+
+LibraryWorkTest > missing unfavorited or changed members deactivate an association() PASSED
+
+LibraryWorkTest > library projects union categories logical reads bookmarks and newest history() PASSED
+
+SourceMatchingTest > catalogue corroboration cannot bridge adjacent numbers in different seasons volumes or parts() PASSED
+
+SourceMatchingTest > verified catalogue identity can bridge adjacent complementary ranges but cannot invent a large gap() PASSED
+
+SourceMatchingTest > different creators and remakes are not automatically merged() PASSED
+
+SourceMatchingTest > exact normalized title and creator corroborate a work() PASSED
+
+SourceMatchingTest > same title without creator is ambiguous() PASSED
+
+SourceMatchingTest > overlapping ordinary sequences are compatible() PASSED
+
+SourceMatchingTest > ambiguous reset or split numbering is rejected automatically() PASSED
+
+SourceMatchingTest > short CJK creator names remain valid corroboration() PASSED
+
+SourceMatchingTest > a library-only restore can use a corroborated work without inventing previous numbering() PASSED
+
+> Task :app:preDebugAndroidTestBuild SKIPPED
+> Task :app:compileDebugAndroidTestAidl NO-SOURCE
+> Task :app:dataBindingMergeDependencyArtifactsDebugAndroidTest UP-TO-DATE
+> Task :app:generateDebugAndroidTestResources UP-TO-DATE
+> Task :app:mergeDebugAndroidTestResources UP-TO-DATE
+> Task :app:dataBindingGenBaseClassesDebugAndroidTest UP-TO-DATE
+> Task :app:mergeDebugAndroidTestManifest
+> Task :app:processDebugAndroidTestManifest
+> Task :app:generateDebugAndroidTestBuildConfig
+> Task :app:packageDebugAndroidTestResources UP-TO-DATE
+> Task :app:processDebugAndroidTestNavigationResources UP-TO-DATE
+> Task :app:parseDebugAndroidTestLocalResources UP-TO-DATE
+> Task :app:generateDebugAndroidTestRFile UP-TO-DATE
+> Task :app:compileDebugAndroidTestKotlin
+
+[Incubating] Problems report is available at: file:///workspace/scratch/polaris-cloud-e7d774c/android-build/patched-yomotsu/build/reports/problems/problems-report.html
+
+BUILD SUCCESSFUL in 53s
+276 actionable tasks: 12 executed, 264 up-to-date
+Consider enabling configuration cache to speed up this build: https://docs.gradle.org/9.6.1/userguide/configuration_cache_enabling.html

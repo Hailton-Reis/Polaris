@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.translation.model.TranslationBlockGrouperTest" tests="18" skipped="0" failures="0" errors="0" timestamp="2026-11-10T22:28:28.448Z" hostname="7d7c5a6182d0" time="0.014">
+  <properties/>
+  <testcase name="strict mode groups PaddleOCR lines across a normal balloon gap()" classname="eu.kanade.translation.model.TranslationBlockGrouperTest" time="0.002"/>
+  <testcase name="strict proximity fallback still groups split OCR lines()" classname="eu.kanade.translation.model.TranslationBlockGrouperTest" time="0.0"/>
+  <testcase name="strict mode does not bridge separate detected regions through connector()" classname="eu.kanade.translation.model.TranslationBlockGrouperTest" time="0.0"/>
+  <testcase name="strict mode keeps separate finished PaddleOCR balloons apart()" classname="eu.kanade.translation.model.TranslationBlockGrouperTest" time="0.001"/>
+  <testcase name="finished sentences in separate detected regions remain separate()" classname="eu.kanade.translation.model.TranslationBlockGrouperTest" time="0.0"/>
+  <testcase name="partially overlapping regions from the same detected balloon are grouped()" classname="eu.kanade.translation.model.TranslationBlockGrouperTest" time="0.001"/>
+  <testcase name="translated connector can reveal a continuation after translation()" classname="eu.kanade.translation.model.TranslationBlockGrouperTest" time="0.001"/>
+  <testcase name="nearby fragments from separate detected balloons remain separate()" classname="eu.kanade.translation.model.TranslationBlockGrouperTest" time="0.0"/>
+  <testcase name="proximity fallback does not bridge a large vertical gap()" classname="eu.kanade.translation.model.TranslationBlockGrouperTest" time="0.001"/>
+  <testcase name="strict mode still groups strongly overlapping balloon regions()" classname="eu.kanade.translation.model.TranslationBlockGrouperTest" time="0.001"/>
+  <testcase name="wide gap without connector does not join separate balloons()" classname="eu.kanade.translation.model.TranslationBlockGrouperTest" time="0.0"/>
+  <testcase name="separate experimental mask owners never fuse before or after translation()" classname="eu.kanade.translation.model.TranslationBlockGrouperTest" time="0.001"/>
+  <testcase name="fragments detected inside the same balloon are grouped()" classname="eu.kanade.translation.model.TranslationBlockGrouperTest" time="0.0"/>
+  <testcase name="strict mode groups nearby PaddleOCR fragments that form one unfinished sentence()" classname="eu.kanade.translation.model.TranslationBlockGrouperTest" time="0.001"/>
+  <testcase name="fragment missed by detection joins balloon that contains its center()" classname="eu.kanade.translation.model.TranslationBlockGrouperTest" time="0.0"/>
+  <testcase name="post translation grouping does not bridge detached balloons because source OCR is open ended()" classname="eu.kanade.translation.model.TranslationBlockGrouperTest" time="0.001"/>
+  <testcase name="open ended OCR fragments remain one continuous paragraph()" classname="eu.kanade.translation.model.TranslationBlockGrouperTest" time="0.0"/>
+  <testcase name="connector word bridges a wider OCR gap inside one sentence()" classname="eu.kanade.translation.model.TranslationBlockGrouperTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

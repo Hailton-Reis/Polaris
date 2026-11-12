@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.tachiyomi.source.selection.WorkIdentityResolverTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-11-10T22:28:25.628Z" hostname="7d7c5a6182d0" time="0.014">
+  <properties/>
+  <testcase name="metadata can corroborate a library-only backup with a missing author()" classname="eu.kanade.tachiyomi.source.selection.WorkIdentityResolverTest" time="0.003"/>
+  <testcase name="ambiguous records or conflicting creators do not become an alias bridge()" classname="eu.kanade.tachiyomi.source.selection.WorkIdentityResolverTest" time="0.001"/>
+  <testcase name="small spelling variation requires creator agreement and keeps sequel qualifiers()" classname="eu.kanade.tachiyomi.source.selection.WorkIdentityResolverTest" time="0.001"/>
+  <testcase name="Portuguese English and Korean titles share a corroborated catalogue identity()" classname="eu.kanade.tachiyomi.source.selection.WorkIdentityResolverTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

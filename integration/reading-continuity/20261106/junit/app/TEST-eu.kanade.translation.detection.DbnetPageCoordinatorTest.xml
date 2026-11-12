@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.translation.detection.DbnetPageCoordinatorTest" tests="10" skipped="0" failures="1" errors="0" timestamp="2026-11-06T19:56:22.595Z" hostname="550a0106d184" time="0.13">
+  <properties/>
+  <testcase name="Paddle fallback uses selected once and releases its one owned ML Kit session()" classname="eu.kanade.translation.detection.DbnetPageCoordinatorTest" time="0.013">
+    <failure message="org.opentest4j.AssertionFailedError: expected: &lt;full-page ML Kit&gt; but was: &lt;selected Paddle page&gt;" type="org.opentest4j.AssertionFailedError">org.opentest4j.AssertionFailedError: expected: &lt;full-page ML Kit&gt; but was: &lt;selected Paddle page&gt;
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:1199)
+	at eu.kanade.translation.detection.DbnetPageCoordinatorTest$Paddle fallback uses selected once and releases its one owned ML Kit session$1$result$1.invokeSuspend(DbnetPageCoordinatorTest.kt:80)
+	at eu.kanade.translation.detection.DbnetPageCoordinatorTest$Paddle fallback uses selected once and releases its one owned ML Kit session$1$result$1.invoke(DbnetPageCoordinatorTest.kt)
+	at eu.kanade.translation.detection.DbnetPageCoordinatorTest$Paddle fallback uses selected once and releases its one owned ML Kit session$1$result$1.invoke(DbnetPageCoordinatorTest.kt)
+	at eu.kanade.translation.detection.DbnetPageCoordinator$execute$2.invokeSuspend(DbnetPageCoordinator.kt:30)
+	at eu.kanade.translation.detection.DbnetPageCoordinator$execute$2.invoke(DbnetPageCoordinator.kt)
+	at eu.kanade.translation.detection.DbnetPageCoordinator$execute$2.invoke(DbnetPageCoordinator.kt)
+	at eu.kanade.translation.detection.ExperimentalDetectionRoute.execute(ExperimentalDetectionRoute.kt:23)
+	at eu.kanade.translation.detection.DbnetPageCoordinator.execute(DbnetPageCoordinator.kt:25)
+	at eu.kanade.translation.detection.DbnetPageCoordinatorTest$Paddle fallback uses selected once and releases its one owned ML Kit session$1.invokeSuspend(DbnetPageCoordinatorTest.kt:76)
+	at eu.kanade.translation.detection.DbnetPageCoordinatorTest$Paddle fallback uses selected once and releases its one owned ML Kit session$1.invoke(DbnetPageCoordinatorTest.kt)
+	at eu.kanade.translation.detection.DbnetPageCoordinatorTest$Paddle fallback uses selected once and releases its one owned ML Kit session$1.invoke(DbnetPageCoordinatorTest.kt)
+	at kotlinx.coroutines.test.TestBuildersKt__TestBuildersKt$runTest$2$1$1.invokeSuspend(TestBuilders.kt:317)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:34)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+	at kotlinx.coroutines.test.TestDispatcher.processEvent$kotlinx_coroutines_test(TestDispatcher.kt:24)
+	at kotlinx.coroutines.test.TestCoroutineScheduler.tryRunNextTaskUnless$kotlinx_coroutines_test(TestCoroutineScheduler.kt:98)
+	at kotlinx.coroutines.test.TestBuildersKt__TestBuildersKt$runTest$2$1$workRunner$1.invokeSuspend(TestBuilders.kt:326)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:34)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:256)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:54)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlockingImpl(Builders.kt:30)
+	at kotlinx.coroutines.BuildersKt.runBlockingImpl(Unknown Source)
+	at kotlinx.coroutines.BuildersKt__Builders_concurrentKt.runBlockingK(Builders.concurrent.kt:172)
+	at kotlinx.coroutines.BuildersKt.runBlockingK(Unknown Source)
+	at kotlinx.coroutines.BuildersKt__Builders_concurrentKt.runBlockingK$default(Builders.concurrent.kt:157)
+	at kotlinx.coroutines.BuildersKt.runBlockingK$default(Unknown Source)
+	at kotlinx.coroutines.test.TestBuildersJvmKt.createTestResult(TestBuildersJvm.kt:10)
+	at kotlinx.coroutines.test.TestBuildersKt__TestBuildersKt.runTest-8Mi8wO0(TestBuilders.kt:309)
+	at kotlinx.coroutines.test.TestBuildersKt.runTest-8Mi8wO0(TestBuilders.kt:1)
+	at kotlinx.coroutines.test.TestBuildersKt__TestBuildersKt.runTest-8Mi8wO0(TestBuilders.kt:167)
+	at kotlinx.coroutines.test.TestBuildersKt.runTest-8Mi8wO0(TestBuilders.kt:1)
+	at kotlinx.coroutines.test.TestBuildersKt__TestBuildersKt.runTest-8Mi8wO0$default(TestBuilders.kt:159)
+	at kotlinx.coroutines.test.TestBuildersKt.runTest-8Mi8wO0$default(TestBuilders.kt:1)
+	at eu.kanade.translation.detection.DbnetPageCoordinatorTest.Paddle fallback uses selected once and releases its one owned ML Kit session(DbnetPageCoordinatorTest.kt:66)
+</failure>
+  </testcase>
+  <testcase name="technical stage failure returns only selected fallback cleans once and emits one safe record()" classname="eu.kanade.translation.detection.DbnetPageCoordinatorTest" time="0.008"/>
+  <testcase name="each failed page stage is distinguished from later unreached stages and falls back once()" classname="eu.kanade.translation.detection.DbnetPageCoordinatorTest" time="0.014"/>
+  <testcase name="cancellation emits one record but never falls back or performs failure cleanup()" classname="eu.kanade.translation.detection.DbnetPageCoordinatorTest" time="0.005"/>
+  <testcase name="selected fallback failure is propagated once and still emits one record()" classname="eu.kanade.translation.detection.DbnetPageCoordinatorTest" time="0.006"/>
+  <testcase name="successful selected ML Kit page is the single association pass with no fallback()" classname="eu.kanade.translation.detection.DbnetPageCoordinatorTest" time="0.003"/>
+  <testcase name="association failure reuses completed selected ML Kit page and performs fallback cleanup()" classname="eu.kanade.translation.detection.DbnetPageCoordinatorTest" time="0.044"/>
+  <testcase name="successful page records actual stages worker timings counts and overlapping total()" classname="eu.kanade.translation.detection.DbnetPageCoordinatorTest" time="0.013"/>
+  <testcase name="disabled route stays lazy and emits no experimental diagnostic()" classname="eu.kanade.translation.detection.DbnetPageCoordinatorTest" time="0.006"/>
+  <testcase name="fallback time is included in monotonic total and cleanup callback failures stay isolated()" classname="eu.kanade.translation.detection.DbnetPageCoordinatorTest" time="0.008"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

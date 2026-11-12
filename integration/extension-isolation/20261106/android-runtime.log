@@ -1,0 +1,2 @@
+INSTRUMENTATION_RESULT: result={"worker_uid":99000,"internet_permission":-1,"host_secret_read":false,"host_canary_written":false,"direct_network_connected":false,"host_uid":10065,"api":26,"passed_checks":6,"status":"PASS","scope":"Android isolation component proof; NOT an integrated extension sandbox"}
+INSTRUMENTATION_CODE: -1

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="tachiyomi.domain.chapter.model.ChapterOriginTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-11-08T00:51:41.198Z" hostname="a1f1fc307d5f" time="0.636">
+  <properties/>
+  <testcase name="signed source ids and Unicode URLs survive portable memo roundtrip()" classname="tachiyomi.domain.chapter.model.ChapterOriginTest" time="0.467"/>
+  <testcase name="per work pin survives backup memo without local database ids()" classname="tachiyomi.domain.chapter.model.ChapterOriginTest" time="0.027"/>
+  <testcase name="fixed source restricts the sequence and switching back preserves every record()" classname="tachiyomi.domain.chapter.model.ChapterOriginTest" time="0.057"/>
+  <testcase name="invalid origin metadata falls back without interpreting remote URLs()" classname="tachiyomi.domain.chapter.model.ChapterOriginTest" time="0.005"/>
+  <testcase name="available edition beats stale retained metadata while downloads remain usable()" classname="tachiyomi.domain.chapter.model.ChapterOriginTest" time="0.012"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

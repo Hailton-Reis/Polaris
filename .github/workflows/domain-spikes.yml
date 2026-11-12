@@ -1,0 +1,138 @@
+name: Domain spikes
+
+on:
+  push:
+    branches:
+      - main
+      - r001/multisource-foundation
+    paths:
+      - "spikes/spike001/**"
+      - "spikes/spike002/**"
+      - "spikes/spike003/**"
+      - "spikes/spike004/**"
+      - "spikes/spike005/**"
+      - "spikes/spike006/**"
+      - "spikes/spike007/**"
+      - "spikes/spike008/**"
+      - "spikes/spike009/**"
+      - "spikes/spike011/**"
+      - "spikes/spike012/**"
+      - "spikes/spike013/**"
+      - "spikes/spike014/**"
+      - "spikes/spike015/**"
+      - "spikes/spike016/**"
+      - "spikes/spike017/**"
+      - "spikes/spike018/**"
+      - "spikes/spike019/**"
+      - "spikes/spike020/**"
+      - "spikes/spike021/**"
+      - "spikes/spike022/**"
+      - "spikes/spike023/**"
+      - "spikes/spike024/**"
+      - "spikes/domain-lab/**"
+      - "spikes/backup-lab/**"
+      - "scripts/r001/**"
+      - ".github/workflows/domain-spikes.yml"
+  pull_request:
+    paths:
+      - "spikes/spike001/**"
+      - "spikes/spike002/**"
+      - "spikes/spike003/**"
+      - "spikes/spike004/**"
+      - "spikes/spike005/**"
+      - "spikes/spike006/**"
+      - "spikes/spike007/**"
+      - "spikes/spike008/**"
+      - "spikes/spike009/**"
+      - "spikes/spike011/**"
+      - "spikes/spike012/**"
+      - "spikes/spike013/**"
+      - "spikes/spike014/**"
+      - "spikes/spike015/**"
+      - "spikes/spike016/**"
+      - "spikes/spike017/**"
+      - "spikes/spike018/**"
+      - "spikes/spike019/**"
+      - "spikes/spike020/**"
+      - "spikes/spike021/**"
+      - "spikes/spike022/**"
+      - "spikes/spike023/**"
+      - "spikes/spike024/**"
+      - "spikes/domain-lab/**"
+      - "spikes/backup-lab/**"
+      - "scripts/r001/**"
+      - ".github/workflows/domain-spikes.yml"
+
+jobs:
+  domain-spikes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "9.6.1"
+      - name: Offline Python tooling regression tests
+        run: python3 -m unittest discover -s scripts/r001 -p 'test_*.py' -v
+      - name: Validate actual merged SQLDelight migration and queries (SQLite)
+        run: python3 -m unittest discover -s spikes/spike001/host-sqlite -p 'test_*.py' -v
+      - name: Verify orphan-source backup recovery SQL (host-only)
+        run: python3 -m unittest discover -s spikes/spike001/backup -p 'test_*.py' -v
+      - name: Validate pinned backup tag 107 and shared exporter/restorer field (Python host-only)
+        run: python3 -m unittest discover -s spikes/spike001/backup/proto-candidate -p 'test_*.py' -v
+      - name: Compile actual staged Backup and Polaris portable model with 4 host suites
+        run: bash spikes/spike001/backup/proto-candidate/run_model_validation.sh
+      - name: Check lossless full virtual-parent BackupManga split (host only)
+        run: bash spikes/spike001/backup/parent-candidate/run_tests.sh
+      - name: Verify unified full-parent atomic Kotlin transaction protocol (host only)
+        run: bash spikes/spike001/backup/parent-candidate/unified-transaction/run_tests.sh
+      - name: Reject unsafe v2 parent metadata restores and verify UUID replay plan (host only)
+        run: bash spikes/spike001/backup/parent-candidate/run_restore_plan_tests.sh
+      - name: Validate SHA-pinned Yomotsu BackupCreator staging (Python host-only)
+        run: python3 -m unittest discover -s spikes/spike001/backup/yomotsu-candidate -p 'test_creator_stage.py' -v
+      - name: Compile and test Yomotsu source-aware backup adapter (host-only)
+        run: bash spikes/spike001/backup/yomotsu-candidate/run_tests.sh
+      - name: Restore source-child snapshots before parent associations (host-only)
+        run: bash spikes/spike001/backup/restore-candidate/run_tests.sh
+      - name: Validate physical UUID restore ledger and unique source links (SQLite host-only)
+        run: python3 -m unittest discover -s spikes/spike001/backup/restore-candidate/atomic-sqlite -p 'test_*.py' -v
+      - name: Compile staged SQLDelight Kotlin atomic restore port (host-only)
+        run: bash spikes/spike001/backup/restore-candidate/sqldelight-port/run_kotlin_host.sh
+      - name: Verify strict Yomotsu source-child restore and portable coordinator (Kotlin host-only)
+        run: bash spikes/spike001/backup/restore-candidate/yomotsu-source-port/run_tests.sh
+      - name: Validate staged typed SQLDelight query syntax (SQLite host-only)
+        run: python3 -m unittest discover -s spikes/spike001/backup/restore-candidate/sqldelight-port/tests -p 'test_*.py' -v
+      - name: Run full-parent UUID metadata atomic SQLite rehearsal (host only)
+        run: bash spikes/spike001/backup/restore-candidate/full-parent-sqlite/run_tests.sh
+      - name: Verify pinned Yomotsu schema gap and native-shaped bridge (host only)
+        run: bash spikes/spike001/backup/restore-candidate/pinned-schema-bridge/run_tests.sh
+      - name: Reconcile staged Spike-001 migration14 with additive restore ledger (host only)
+        run: bash spikes/spike001/backup/restore-candidate/spike001-layering/run_tests.sh
+      - name: Detect upstream trigger timestamp/version mismatch on full-parent restore (host only)
+        run: bash spikes/spike001/backup/restore-candidate/parent-sqldelight-fields/run_tests.sh
+      - name: Verify pinned AndroidX SQLDelight deferred FK Kotlin transaction guard (host only)
+        run: bash spikes/spike001/backup/restore-candidate/pinned-driver-transaction/run_tests.sh
+      - name: Validate exact BackupManga-to-SQLDelight typed parent field projection (host only)
+        run: bash spikes/spike001/backup/restore-candidate/parent-field-projection/run_tests.sh
+      - name: Verify Kotlin parent projection through physical SQLite write and rollback (host only)
+        run: bash spikes/spike001/backup/restore-candidate/parent-relational-port/run_tests.sh
+      - name: Compile candidate fresh-parent Kotlin query adapter and cross-check SQL bindings (host only)
+        run: bash spikes/spike001/backup/restore-candidate/generated-adapter/run_host_contract.sh
+      - name: Install pinned Python Protobuf for decoded envelope proxy tests
+        run: python3 -m pip install -r spikes/spike001/backup/restore-candidate/v2-decoded-envelope/requirements_host.txt
+      - name: Validate decoder-bound v2 canonical envelope admission (host only)
+        run: bash spikes/spike001/backup/restore-candidate/v2-decoded-envelope/run_all.sh
+      - name: Verify decoder-bound v2 work survives Kotlin SQLDelight parent transaction (host only)
+        run: bash spikes/spike001/backup/restore-candidate/v2-decoded-envelope/run_bound_adapter_tests.sh
+      - name: Audit pre-migration legacy UUIDs and duplicate links (read-only host tests)
+        run: python3 -m unittest discover -s spikes/spike001/backup/restore-candidate/migration-audit -p 'test_*.py' -v
+      - name: Compile and run isolated backup/UUID host candidates
+        run: gradle -p spikes/backup-lab checkBackup --no-daemon --stacktrace
+      - name: Compile and run domain spikes
+        run: gradle -p spikes/domain-lab checkSpikes --no-daemon --stacktrace
+      - name: Compile real Spike-001 host invariants
+        run: gradle -p spikes/spike001/host-lab checkHost --no-daemon --stacktrace

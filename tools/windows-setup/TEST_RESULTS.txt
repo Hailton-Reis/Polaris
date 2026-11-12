@@ -1,0 +1,308 @@
+# HISTORICAL RECORD (before single-file launcher revision)
+# The 16 unittest results below were recorded for the earlier two-file CMD + PS1 package.
+# They do not certify the embedded single-file CMD on Windows.
+
+test_android_sdk_and_pinned_versions (test_setup.LauncherSafety.test_android_sdk_and_pinned_versions) ... ok
+test_check_mode_is_separate (test_setup.LauncherSafety.test_check_mode_is_separate) ... ok
+test_cmd_handles_failures (test_setup.LauncherSafety.test_cmd_handles_failures) ... ok
+test_cmd_uses_local_ps_file_and_not_untrusted_eval (test_setup.LauncherSafety.test_cmd_uses_local_ps_file_and_not_untrusted_eval) ... ok
+test_documentation_discloses_no_windows_validation (test_setup.LauncherSafety.test_documentation_discloses_no_windows_validation) ... ok
+test_existing_checkout_protected (test_setup.LauncherSafety.test_existing_checkout_protected) ... ok
+test_install_requires_confirmation (test_setup.LauncherSafety.test_install_requires_confirmation) ... ok
+test_installs_exact_official_packages (test_setup.LauncherSafety.test_installs_exact_official_packages) ... ok
+test_menu_has_all_actions (test_setup.LauncherSafety.test_menu_has_all_actions) ... ok
+test_no_android_or_backup_mutation (test_setup.LauncherSafety.test_no_android_or_backup_mutation) ... ok
+test_no_dangerous_persistent_env_update (test_setup.LauncherSafety.test_no_dangerous_persistent_env_update) ... ok
+test_other_project_install_is_optional_and_confirmed (test_setup.LauncherSafety.test_other_project_install_is_optional_and_confirmed) ... ok
+test_other_projects_are_read_only (test_setup.LauncherSafety.test_other_projects_are_read_only) ... ok
+test_repo_pins_and_build_scripts (test_setup.LauncherSafety.test_repo_pins_and_build_scripts) ... ok
+test_secure_sdk_bootstrap (test_setup.LauncherSafety.test_secure_sdk_bootstrap) ... ok
+test_shell_shim_is_private (test_setup.LauncherSafety.test_shell_shim_is_private) ... ok
+
+----------------------------------------------------------------------
+Ran 16 tests in 0.001s
+
+OK
+PowerShell lexical token errors: 0 unclosed bracket groups: 0
+
+# SOURCE-LEVEL VERIFICATION FOR SINGLE-FILE REVISION (2026-10-20)
+# 19/19 connector-side source invariants PASS:
+# - embedded payload byte-for-byte agrees with Polaris_Setup.ps1
+# - CMD extracts and removes temporary PowerShell
+# - nested PowerShell and batch exit codes propagated
+# - menu failures return non-zero at session end
+# - option 6 performs preflight, install, recheck, prepare, build
+# - installation remains confirmed, repo/SDK versions pinned, source paths protected
+# - no adb install or backup-v2 import
+# - documentation and generator updated
+# IMPORTANT: Not a Python unittest run, not a PowerShell execution, and not Windows SDK/Gradle/APK proof.
+# New test_setup.py contains 19 test cases; execute in a real environment with:
+#   py -3 -m unittest discover -s tools/windows-setup -p test_setup.py -v
+# Physical Windows validation, emulator/device and B01-B05 remain PENDING.
+
+# R001 FIX3 HOST - 2026-10-21
+# Runtime observation on user's Windows:
+# Git, Python, Temurin JDK 21 and Android Studio were installed/detected.
+# SDK commandline-tools bootstrap stopped at:
+# "Cannot overwrite variable Host because it is read-only or constant."
+# Root cause: PowerShell $host loop-local binding collided with built-in read-only $Host.
+# Fix: renamed SDK XML archive host-os node to $hostOsNode and added a reserved-variable regression test.
+# Test evidence: 23/23 Python source-contract tests PASSED on Linux using the reconstructed CMD,
+# generated PowerShell, test module and documentation. The Python module was also py_compile checked.
+# CMD/embedded PowerShell content parity PASS. Synced Google Drive file ID kept unchanged.
+# Does NOT prove Windows SDK installation, Android build, or B01-B05 runtime.
+
+# R001 FIX4 SDK SHA256 - 2026-10-21
+# User Windows observation: installed JDK21/Android Studio; 8 SDK requirements remain.
+# Previous command line tools bootstrap failed because Google's repository XML lacks an explicit
+# SHA-256 field in the format required by the original script.
+# Replaced XML-index dependency with officially published Google Command-line Tools 22.0
+# artifact: commandlinetools-win-15859902_latest.zip
+# Official SHA256: 90ae805d20434428bffcb699c290860f19bb5f66a67e6b330067e3de801fb04a
+# Reference: https://developer.android.com/studio
+# Download is verified before extraction; cached ZIP checked on reuse; no unsafe hash bypass.
+# Moved sdkmanager --licenses before package installation, requiring operator approval.
+# Verification: 24/24 Python unittest source-contract checks passed in Linux environment;
+# CMD embedded script parity and Google Drive file metadata/no-BOM verified.
+# NOT Windows execution proof, SDK installation success, build, APK output or Android B01–B05.
+
+# R001 FIX5 Android 37.0 - 2026-10-22
+# User Windows session: 20261022-145949-dd0765
+# Installed/detected: Git, Git Bash, Python3.13, Temurin JDK21, Android Studio, SDK root.
+# Command-line Tools Google 22.0 SHA256 verified; 8 of 8 licenses accepted.
+# Attempt to install packages failed before build:
+#   Warning: Failed to find package 'platforms;android-37'
+# Root cause: Google's published package path is platforms;android-37.0, not android-37.
+# FIX5: use exact platforms;android-37.0 with --channel=3, validate each source.properties
+# after installation even if sdkmanager returns 0; update Polaris local Python preflight path.
+# Upstream pinned Yomotsu build-logic compileSdk=37 retained unchanged.
+# Validation in Linux/container: 25/25 CMD source contract tests passed,
+# 8/8 local Python runner tests passed; embedded PS1 parity verified.
+# Published to original Google Drive 00_POLARIS_TUDO_EM_UM.cmd ID
+# 1NgW4w_sVL2EGfuVE9rOYahhSFMNxOZxP; original filename/id maintained, CRLF/no BOM.
+# Does NOT prove SDK actual successful installation or Gradle/Android APK build.
+
+# R001 FIX6 AUTO-SYNC - 2026-10-23
+# Proactive reliability hardening after FIX5; no newer user Windows runtime log received.
+# Root issue: a preexisting %USERPROFILE%/PolarisDev/Polaris checkout remained stale,
+# although the standalone CMD was synced, and could run older Python SDK checks.
+# Added clean-checkout git fetch + merge-base ancestry + merge --ff-only, with
+# refusal for dirty trees and diverged branches. No reset/clean/rebase/forced merge.
+# Added optional Start-Transcript / Stop-Transcript to capture external command output
+# in polaris-<session>.transcript.txt alongside historical .log and .json.
+# VALIDATION performed in Linux environment (NOT Windows execution):
+# 27/27 static unittest checks of Windows CMD/PowerShell source PASS,
+# 8/8 local Android Python runner unit tests PASS, py_compile PASS.
+# Isolated local Git simulation PASS: fast-forward succeeded, dirty files preserved/blocked.
+# Embedded CMD PowerShell source identity PASS.
+# Updated SAME original Google Drive filename/id (00_POLARIS_TUDO_EM_UM.cmd,
+# 1NgW4w_sVL2EGfuVE9rOYahhSFMNxOZxP), CRLF and BOM-free, 28853 bytes.
+# NOT YET PROVEN: Android SDK installation after FIX5, real Windows ff-only script execution,
+# Gradle baseline/Spike-001 APK, B01-B05 runtime acceptance.
+
+# R001 FIX7 REPEATABLE BUILD - 2026-10-23
+# Source audit: upstream pinned Yomotsu does not gitignore generated
+# app/src/main/res/mipmap-*/ic_launcher*.png; old build script wrote them directly
+# into the pinned baseline, causing a dirty checkout and subsequent rerun failures.
+# Correction: create disposable baseline-yomotsu and patched-yomotsu Git worktrees
+# inside the new evidence directory; branding and Spike-001 apply only there.
+# The original pinned checkout remains unchanged and is checked at the end.
+# New apks/SHA256SUMS.txt lists baseline and Spike-001 APK hashes on build success.
+# Tests run locally on Linux from GitHub sources:
+# 27/27 standalone CMD/PowerShell source tests PASS;
+# 11/11 Python local Android runner tests PASS (including real two-run Git worktree isolation);
+# build_issue002.sh bash -n PASS; Python py_compile PASS;
+# CMD embedding parity via generate_single_cmd.py --check PASS.
+# Total: 38/38 Python tests. Android SDK/Gradle execution NOT performed.
+# No new CMD was needed: FIX6 safely fetches this GitHub change into a clean local checkout.
+# Real APK output and Android source/runtime checks remain PENDING.
+
+# R001 SQLITE WINDOWS LOCK - 2026-10-23
+# User real Windows execution: 36 tests, errors=1, WinError 32 at tempfile cleanup:
+# C:\Users\Usuario\AppData\Local\Temp\...\shared.sqlite locked during shutil.rmtree.
+# The failure occurs in host SQLite test concurrency, before Gradle compilation.
+# Root cause: context manager on sqlite3.Connection does not call close().
+# Updated test_merge_insert_idempotency.py with contextlib.closing for backup,
+# concurrent worker, and final read connections, plus regression test.
+# Validation using actual committed staged SQL, migration14 and Kotlin reference:
+# 37/37 Python SQLite tests PASS on Linux Python 3.13.
+# 50 additional repeated SQLite concurrency test runs PASS in same environment.
+# Windows confirmation PENDING. APKs not built in this runtime.
+# FIX6 CMD can receive patch by safe git fetch + merge --ff-only; option 4 builds
+# without repeating already completed JDK/Android Studio/SDK installation.
+
+# R001 FIX8 SAFE-CLONE - 2026-10-23
+# User-provided Windows screenshot showed:
+#   [ERRO] Checkout Polaris tem alteracoes locais; sincronizacao bloqueada ...
+# This is a protection gate, not a reason to erase local files.
+# New Ensure-PolarisCheckout keeps dirty PolarisDev/Polaris unchanged.
+# It reports git status --porcelain, creates a uniquely named clean clone at
+# PolarisDev/PolarisBuildCopies/checkout-<datetime>-<id>, checks commit,
+# branch, origin, and clean tree, then builds using the isolated checkout.
+# No reset, clean, rebase, stash or deletion of the original directory.
+# Adds session-only PYTHONDONTWRITEBYTECODE=1 to reduce future pycache debris.
+# QA: 29/29 Windows CMD/PowerShell source-contract Python unit tests PASS,
+# generate_single_cmd.py --check PASS, py_compile PASS.
+# Isolated real-git simulation PASS: untracked user file in original preserved,
+# new clone clean and on expected branch (local repository simulation).
+# Same Google Drive file ID, name and parent preserved; CRLF, no BOM;
+# SHA256 e3127a00205a042b9d1cdd35e64fa4df274c28ffff3c9f0ea96a855352f4a617
+# (31,354 bytes); byte-identical with post-update Drive readback.
+# PENDING: running FIX8 on actual Windows, completing Gradle and producing APKs.
+
+# R001 WINDOWS LF/CRLF PATCH CONTRACT FIX - 2026-10-23
+# User actual Windows run, CMD FIX8:
+#   "BUILD FAILED in 3m 5s" then "Spike-001 applied successfully"
+#   "SPIKE001_FULL_APPLY_CONTRACT_FAILED: Patched ... DomainModule.kt differs from exact expected edits"
+# Build script permits nonzero baseline unit tasks and compares them later;
+# reaching Spike-001 patch implies baseline assemble proceeded.
+# Root cause: pathlib.Path.write_text default newline handling on Windows converts
+# Python LF strings into CRLF, while the full patch gate compares exact bytes.
+# Fixed apply_spike001.replace_once to write UTF-8 LF bytes with write_bytes.
+# Checker now normalizes only pristine pinned source read_text CRLF -> LF,
+# while patched bytes must still match EXACTLY (CRLF in patched output FAILS).
+# This does NOT relax the 28-literal-operation/18-added-file integrity gate.
+# Validation in Linux container using actual GitHub staged sources:
+# 13/13 full-apply Python tests PASS, including 3 CRLF regressions.
+# Against actual pinned Yomotsu commit's 7 Kotlin files:
+# REAL_PINNED_LF: PASS, 28 edits + 18 added files + 7 modified/replaced.
+# REAL_PINNED_WIN_CRLF simulated checkout: PASS, same exact footprint.
+# scripts/r001/build_issue002.sh bash -n PASS. Script now clearly labels
+# baseline assemble success vs potentially nonzero upstream unit tasks.
+# Windows Gradle patched APK compile, unit parity and Android runtime NOT VERIFIED.
+# CMD FIX8 needs NO REPLACEMENT: on option 4 it fetches latest Polaris in a clean
+# verified build clone, preserving user's modified checkout.
+
+# R001 FIX10 GIT DIFF WHITESPACE - 2026-10-23
+# User's real Windows screenshot from CMD FIX8 build attempt:
+#   warning: CRLF will be replaced by LF ... (informative, not fatal)
+#   app/src/main/java/eu/kanade/tachiyomi/ui/manga/MangaViewModel.kt:339: trailing whitespace.
+#   [FALHOU] build codigo 2, before patched Gradle APK assembly.
+# Root cause: vm replace_once literal in spikes/spike001/apply_spike001.py inserted
+# a whitespace-only line after ".getOrThrow()" in the virtual/non-virtual refresh branch.
+# Removed four spaces on this blank line; preserved 28 exact patch operations,
+# 18 staged files, Kotlin behavior and strict git diff --check.
+# Regression test now examines every literal replacement for trailing whitespace.
+# Local validation: 14/14 full-apply contract unittest PASS (Python);
+# actual staged patch against pinned-Yomotsu Kotlin fixture LF and CRLF: Git diff --check PASS,
+# and Python py_compile PASS. Validation performed in Linux, not native Windows.
+# IMPORTANT: no user checkout, SDK, CMD or evidence file was changed in this run.
+# CMD FIX8 safe-clone needs no update: option 4 retrieves latest GitHub branch
+# into a new isolated checkout. Existing failed evidence is retained.
+# Real Windows patched Gradle compile, two APKs and Android runtime remain PENDING.
+
+# FIRST_LOCAL_APK_BUILD_REPORTED_SUCCESS_2026_10_23
+# Evidence: screenshot of real Windows CMD FIX8 session, received 2026-10-23,
+# from PolarisLocal/evidence/issue002-20261023-190348.
+# Script printed [OK] Build finalizado and:
+#   APK_BUILDS_PASS_NO_NEW_UNIT_REGRESSIONS
+#   baseline: total=428, passed=394, failed=34, skipped=0
+#   patched: total=428, passed=394, failed=34, skipped=0
+#   Preexisting failures still present: 34; no new JUnit regressions detected.
+# A preceding Gradle BUILD FAILED in 2m35s belongs to the unit-test run,
+# NOT a contradiction of the successful assemble gates / final overall script status.
+# Build script copies baseline and patched debug APKs into evidence/apks/
+# and writes apks/SHA256SUMS.txt. Actual SHA-256 values were not present in screenshot.
+# NOTE: This is user-provided runtime evidence; assistant did not execute Windows build.
+# State: local baseline and Spike-001 APK build = PASS_REPORTED_ON_WINDOWS,
+#       A01 app launch = PENDING, B01-B05 device/emulator = PENDING,
+#       backup-v2 real Android restore = BLOCKED, Draft PR #1 remains Draft.
+# Next: read docs/r001/ISSUE002_DEVICE_RUNBOOK.md and test on a disposable
+# emulator / test phone, NEVER daily data app without a backup.
+
+# R001 EMULATOR A01/A02 PREPARATION - 2026-10-23
+# User chose Android Studio emulator after successful Windows baseline + Spike001 APK builds.
+# Added tools/local-android/polaris_emulator.py and test_polaris_emulator.py:
+#   8/EmulatorBaseline: validate latest complete build and both APK SHA256 hashes,
+#     install official emulator + Google APIs API35 x86_64 system image, create
+#     dedicated Polaris_R001_API35_x64 AVD, verify WHPX acceleration, boot and
+#     install/start baseline debug APK ONLY on matching emulator serial.
+#   9/EmulatorPatched: explicit separate consent after visual A01 check; install
+#     Spike-001 APK over baseline ONLY on the dedicated virtual device.
+#   Never selects physical devices or an unrelated preexisting AVD; no wipe,
+#   no uninstall, no silent overwrite of an existing name without ownership marker.
+#   JSON reports distinguish launch request from visual/runtime PASS.
+#   Build task #6 is unchanged and does NOT install APKs.
+# Test evidence on Linux: 31/31 Windows CMD/PowerShell source tests PASS,
+#   9/9 emulator helper mock/security unit tests PASS,
+#   generator --check PASS, py_compile PASS. TOTAL 40 Python tests.
+# CMD embedded PS source byte-exact; Drive original file ID kept unchanged,
+# BOM-free CRLF size 33361 SHA256 78629df7098bcb2ec22f222043b40197b819339035541aca2a45ca40ab07a7e7.
+# Does NOT prove x86_64 emulator creation, Windows Hypervisor Platform enabled,
+# A01/A02 actual UI launch, B01-B05, APK installer signing or data migrations
+# on user's Windows machine; all require operator execution and review.
+
+# R001 DUAL AVD / ABI APK FIX - 2026-10-25
+# Real Windows screenshot: after choosing A01, original CMD created a clean
+# Polaris checkout, but emulator driver said:
+# [ERRO EMULADOR] Nao encontrei build completo com baseline, Spike-001 e hashes validos.
+# Verified upstream pinned Yomotsu app/build.gradle.kts has ABI splits for
+# armeabi-v7a, arm64-v8a, x86, x86_64 AND universal. Original helper expected
+# exactly one *.apk in each variant directory; finished build had multiple.
+# FIX: verify sha256 of ALL APKs listed in apks/SHA256SUMS.txt, select exact
+# x86_64 APK (fallback unambiguous universal), refuse corrupted/ambiguous builds.
+# Feature: two independent, persistent Android Studio API35 AVDs:
+#   Polaris_R001_Yomotsu_API35_x64 (baseline only)
+#   Polaris_R001_Spike001_API35_x64 (patched only)
+# CMD option 8: original alone; option 9: patched alone; option 10: both
+# launched side by side (user snaps windows manually).
+# Each AVD's userdata, installed repos/extensions, library & settings persist
+# across normal shutdowns/restarts, without -wipe-data, -read-only or uninstall.
+# No cross-AVD credential sync; no automatic Google Drive upload of AVD user data.
+# All installs target emulator-NNNN serials verified against exact AVD names.
+# Local comparison template contains only pending B01-B05 results, never fake PASS.
+# Tests executed Linux/Python: 32/32 CMD source contract tests PASS;
+# 16/16 emulator helper tests PASS, multi-APK and SHA corruption cases covered.
+# python -m py_compile PASS, CMD embedded PS1 generator --check PASS.
+# Same Drive file ID/name retained; exact verified SHA256:
+# 31f02aa9a832c89647cc18268738beae1c0596614746512b931a1aeb772e0f36
+# size 33976 bytes; no BOM, Windows CRLF. Original user files preserved.
+# IMPORTANT: NOT YET PROVEN on Windows: simultaneous AVD launch, WHPX,
+# A01/A02 actual UI, repository configurations, B01-B05 runtime or backup v2.
+
+# R001 AUTOMATED READ-ONLY A01/A02 SMOKE - 2026-10-25
+# User screenshot: two separate Android Studio API35 emulator windows visibly
+# render Mihon/Yomotsu onboarding Welcome screen at the same time.
+# User requested automatic testing BEFORE configuring extensions/sources.
+# Added tools/local-android/polaris_smoke.py and test_polaris_smoke.py.
+# Added CMD option 11: explicit approval, check ONLY already-running
+# Polaris_R001_Yomotsu_API35_x64 and Polaris_R001_Spike001_API35_x64.
+# ADB read-only operations: getprop boot/API, pm path, pidof, dumpsys window,
+# dumpsys activity activities, recent AndroidRuntime:E logcat -d, exec-out
+# screencap -p. No click, app install/uninstall, app-data clear, force-stop,
+# background tests, source configuration, internet calls or GitHub/Drive uploads.
+# Writes local relatorios/smoke-A01-A02-<timestamp>-<id>:
+# report.json, report.html, baseline.png, spike001.png (with user approval).
+# Tests in Linux/Python 3.13: 33/33 Windows CMD/static contract tests PASSED,
+# 12/12 new AVD smoke Python unittest cases PASSED,
+# 16/16 existing dual emulator helper tests PASSED. TOTAL 61/61.
+# generator --check PASSED, py_compile PASSED, exact CMD PS1 parity PASSED.
+# SAME original Drive CMD file ID/name retained. CRLF, BOM-free, 35476 bytes.
+# SHA256 bee9ce6397f1f1850b083f737e8a71d6948aad5c3a1873d0742aaa864c2460f5.
+# Drive readback matched GitHub content byte-for-byte after CRLF translation.
+# Real Windows automatic smoke diagnostics NOT executed in this environment.
+# A01/A02 visually reached Welcome screen by user's screenshot, but functional
+# A01/A02, sources B01-B05 and backup v2 remain pending/blocked.
+
+
+# INTERNAL TRANSLATION REVIEW - 2026-11-02
+# Linux host verification: 33/33 Windows launcher static contract tests;
+# 51/51 local Android helper tests, including 12 translation capture tests;
+# 4/4 overlay application/idempotence/CRLF/drift checks; 15/15 build guards;
+# 6/6 packaging unit tests. These are not Windows runtime acceptance.
+# Android assembly completed for beta.5 / versionCode 106 / P20261102.2.
+# 531 unit tests: 497 pass, same 34 preexisting failures, no new regressions.
+# CMD options 12/13/14: long-strip comparison, FHD display, restore display.
+# No new Release or APK upload. Real chapter capture, Gemini API quality,
+# physical-device interaction and native Windows execution remain pending.
+
+
+# ML KIT / AUTOMATIC DISPLAY REVIEW - 2026-11-02
+# 55/55 local helper tests; 33/33 Windows source contract tests;
+# 4/4 overlay application/idempotence/CRLF/drift tests; 15/15 build guards;
+# 6/6 packaging unit tests. Windows/native emulator execution is pending.
+# Android beta.6 / code 107 / P20261102.3 assembled. 543 tests: 509 pass,
+# same 34 preexisting failures, no new regressions. All 12 new OCR-policy
+# and strip-planning/reconciliation tests passed. APK signatures match beta.3.
+# Startup actions 9/10 prepare FHD before Polaris launch; action 13 optional.
+# Gemini is outside current test round. No new public Release.

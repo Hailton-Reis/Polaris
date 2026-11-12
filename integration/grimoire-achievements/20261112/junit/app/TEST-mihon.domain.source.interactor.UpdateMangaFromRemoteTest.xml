@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="mihon.domain.source.interactor.UpdateMangaFromRemoteTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-11-12T18:43:40.036Z" hostname="060411c85d3c" time="0.335">
+  <properties/>
+  <testcase name="details only refresh cannot remove or synchronize chapter editions()" classname="mihon.domain.source.interactor.UpdateMangaFromRemoteTest" time="0.319"/>
+  <testcase name="a source pin changed during network work is retained and stale synchronization aborts()" classname="mihon.domain.source.interactor.UpdateMangaFromRemoteTest" time="0.016"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

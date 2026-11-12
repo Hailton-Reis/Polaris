@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.translation.presentation.TranslationFontSizeSearchTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-11-10T20:37:15.266Z" hostname="7d7c5a6182d0" time="0.004">
+  <properties/>
+  <testcase name="selection stops at the readable floor when nothing fits()" classname="eu.kanade.translation.presentation.TranslationFontSizeSearchTest" time="0.001"/>
+  <testcase name="returns the largest font size that fits()" classname="eu.kanade.translation.presentation.TranslationFontSizeSearchTest" time="0.001"/>
+  <testcase name="returns null when even the minimum font size overflows()" classname="eu.kanade.translation.presentation.TranslationFontSizeSearchTest" time="0.001"/>
+  <testcase name="selection keeps the largest fitting font above the floor()" classname="eu.kanade.translation.presentation.TranslationFontSizeSearchTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.translation.TranslationStorageSampleTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-11-10T20:37:13.340Z" hostname="7d7c5a6182d0" time="0.125">
+  <properties/>
+  <testcase name="measure actual chapter serialization with authored multilingual text()" classname="eu.kanade.translation.TranslationStorageSampleTest" time="0.124"/>
+  <system-out><![CDATA[POLARIS_STORAGE_SAMPLE language=en bytes=47772 pages=20 blocks=200
+POLARIS_STORAGE_SAMPLE language=ja bytes=51172 pages=20 blocks=200
+POLARIS_STORAGE_SAMPLE language=zh-CN bytes=48172 pages=20 blocks=200
+POLARIS_STORAGE_SAMPLE language=zh-TW bytes=48172 pages=20 blocks=200
+POLARIS_STORAGE_SAMPLE language=ko bytes=53172 pages=20 blocks=200
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

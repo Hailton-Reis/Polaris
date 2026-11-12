@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.tachiyomi.extension.sandbox.SandboxNetworkPolicyTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-11-10T22:28:21.075Z" hostname="7d7c5a6182d0" time="0.014">
+  <properties/>
+  <testcase name="response input is bounded before parsing or returning extension bytes()" classname="eu.kanade.tachiyomi.extension.sandbox.SandboxNetworkPolicyTest" time="0.001"/>
+  <testcase name="URLs cannot request files content providers credentials or alternate ports()" classname="eu.kanade.tachiyomi.extension.sandbox.SandboxNetworkPolicyTest" time="0.006"/>
+  <testcase name="DNS cannot route public names to local reserved or mixed addresses()" classname="eu.kanade.tachiyomi.extension.sandbox.SandboxNetworkPolicyTest" time="0.002"/>
+  <testcase name="deep or oversized JSON is rejected before source metadata parsing()" classname="eu.kanade.tachiyomi.extension.sandbox.SandboxNetworkPolicyTest" time="0.002"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

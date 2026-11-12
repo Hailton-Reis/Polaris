@@ -1,0 +1,76 @@
+{
+  "purpose": "Authored script recognition and glossary smoke tests, not a native OCR quality PASS",
+  "reference_pt": [
+    "A biblioteca abre amanhã.",
+    "Sora trará o livro azul.",
+    "Mantenha o nome Sora."
+  ],
+  "human_source_language_review": "PENDING",
+  "fixtures": [
+    {
+      "language": "en",
+      "source_lines": [
+        "The library opens tomorrow.",
+        "Sora will bring the blue book.",
+        "Please keep the name Sora unchanged."
+      ],
+      "glossary_source": "Sora",
+      "glossary_target": "Sora",
+      "cbz": "polaris-en.cbz",
+      "cbz_bytes": 33288,
+      "sha256": "44756bd4128f5bbec1a9250ad36bae6c7692dbe91212adfb2012b1847ae25695"
+    },
+    {
+      "language": "ja",
+      "source_lines": [
+        "図書館は明日開きます。",
+        "ソラは青い本を持ってきます。",
+        "ソラという名前は変えないでください。"
+      ],
+      "glossary_source": "ソラ",
+      "glossary_target": "Sora",
+      "cbz": "polaris-ja.cbz",
+      "cbz_bytes": 73221,
+      "sha256": "96e0d952121812c5e05d1a5caa655124ecc2f328d3dac7dee2a9479a8ab13ada"
+    },
+    {
+      "language": "zh-CN",
+      "source_lines": [
+        "图书馆明天开放。",
+        "小空会带来那本蓝色的书。",
+        "请保留小空这个名字。"
+      ],
+      "glossary_source": "小空",
+      "glossary_target": "Sora",
+      "cbz": "polaris-zh-CN.cbz",
+      "cbz_bytes": 36782,
+      "sha256": "e52f163029007c50a3993a9628a88888cedf8ae660800ca8bb610dcbf5a59bd1"
+    },
+    {
+      "language": "zh-TW",
+      "source_lines": [
+        "圖書館明天開放。",
+        "小空會帶來那本藍色的書。",
+        "請保留小空這個名字。"
+      ],
+      "glossary_source": "小空",
+      "glossary_target": "Sora",
+      "cbz": "polaris-zh-TW.cbz",
+      "cbz_bytes": 35988,
+      "sha256": "85fea6c483bf5c9eed1aba41b6ade4b6333b3954676b34b4b7f2b5e1c904e19a"
+    },
+    {
+      "language": "ko",
+      "source_lines": [
+        "도서관은 내일 문을 엽니다.",
+        "소라는 파란 책을 가져올 것입니다.",
+        "소라라는 이름은 바꾸지 마세요."
+      ],
+      "glossary_source": "소라",
+      "glossary_target": "Sora",
+      "cbz": "polaris-ko.cbz",
+      "cbz_bytes": 27631,
+      "sha256": "3ab230a826bb3fe7b5feafb5d5bca33d5598bcc392e95c17a071f82e45bfb5b9"
+    }
+  ]
+}

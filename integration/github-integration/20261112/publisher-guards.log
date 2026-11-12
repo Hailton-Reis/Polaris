@@ -1,0 +1,6 @@
+............
+----------------------------------------------------------------------
+Ran 12 tests in 0.015s
+
+OK
+{"status": "DRAFT_ASSETS_UPLOADED_NOT_PUBLISHED", "release_id": 123, "assets": [{"name": "Polaris-0.1.0-beta.8-universal.apk", "bytes": 40, "digest": "sha256:fbd8b6c5176af080133028a48a3431ab2bc4a334dd6ce773266dfbb78b4b59de"}, {"name": "manifest.json", "bytes": 636, "digest": "sha256:a4518fa686eae592bab90f2752cd503322b8e82c1499f76073c610382fc2b76b"}]}

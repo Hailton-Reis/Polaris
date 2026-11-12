@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.translation.detection.ExperimentalDbnetOcrEngineTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-11-10T20:37:14.901Z" hostname="7d7c5a6182d0" time="0.096">
+  <properties/>
+  <testcase name="cancellation leaves concrete wrapper client enabled without fallback or failure cleanup()" classname="eu.kanade.translation.detection.ExperimentalDbnetOcrEngineTest" time="0.061"/>
+  <testcase name="invalid EXIF orientation falls back before experimental work()" classname="eu.kanade.translation.detection.ExperimentalDbnetOcrEngineTest" time="0.011"/>
+  <testcase name="compatible EXIF allows experimental work()" classname="eu.kanade.translation.detection.ExperimentalDbnetOcrEngineTest" time="0.009"/>
+  <testcase name="EXIF read cancellation propagates without selected fallback()" classname="eu.kanade.translation.detection.ExperimentalDbnetOcrEngineTest" time="0.004"/>
+  <testcase name="EXIF read failure falls back before experimental work()" classname="eu.kanade.translation.detection.ExperimentalDbnetOcrEngineTest" time="0.003"/>
+  <testcase name="technical failure closes and disables concrete wrapper then releases owned ML Kit after one fallback()" classname="eu.kanade.translation.detection.ExperimentalDbnetOcrEngineTest" time="0.004"/>
+  <testcase name="bounded EXIF input rejects over-limit and negative skips()" classname="eu.kanade.translation.detection.ExperimentalDbnetOcrEngineTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

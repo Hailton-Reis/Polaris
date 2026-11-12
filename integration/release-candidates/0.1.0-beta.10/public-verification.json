@@ -1,0 +1,63 @@
+{
+  "status": "PUBLIC_PRERELEASE_DOWNLOADS_VERIFIED",
+  "verified_at": "2026-11-06T17:08:44.696831+00:00",
+  "assets": [
+    {
+      "file": "Polaris-0.1.0-beta.10-universal.apk",
+      "bytes": 261130442,
+      "sha256": "f1a556d2620a5984c76cebe2dc5a10e461d8d5a2feb6a91018371beaec0a90da",
+      "http_status": 200,
+      "request_authorization_header": false
+    },
+    {
+      "file": "COMECE_AQUI.md",
+      "bytes": 1425,
+      "sha256": "7092fcb963eab24d2dc0a3ac5bcf091b23214a1ac5a71baa26fc51916774d52f",
+      "http_status": 200,
+      "request_authorization_header": false
+    },
+    {
+      "file": "ISOLAMENTO_DE_EXTENSOES.md",
+      "bytes": 8138,
+      "sha256": "588a69db739b61b4a82149f84fa46918eeae1d43f5b22ff8b7ce58a4cdbbfc30",
+      "http_status": 200,
+      "request_authorization_header": false
+    },
+    {
+      "file": "RELEASE_NOTES.md",
+      "bytes": 5040,
+      "sha256": "8b5b37b20f7b01fb499798f9d52f068cd4aa285daa82db8ddc5090169308b3a8",
+      "http_status": 200,
+      "request_authorization_header": false
+    },
+    {
+      "file": "SHA256SUMS.txt",
+      "bytes": 102,
+      "sha256": "ca042216f96af0e2ae825d74cfa13aa28f22a5669e3a501ca4a34845295f0726",
+      "http_status": 200,
+      "request_authorization_header": false
+    },
+    {
+      "file": "VALIDACAO.json",
+      "bytes": 5418,
+      "sha256": "a98a656dbf863f68ad574472a99f7597ceb56353a8cdb9fd6fec48cb676aadc4",
+      "http_status": 200,
+      "request_authorization_header": false
+    },
+    {
+      "file": "manifest.json",
+      "bytes": 2118,
+      "sha256": "68a11dc88854f63e3c6d5b73f8d265435af040e4fa717b08c0b7ce9a4970431a",
+      "http_status": 200,
+      "request_authorization_header": false
+    }
+  ],
+  "public_range_request": {
+    "status": 206,
+    "start": 65536,
+    "end": 69631,
+    "local_bytes_equal": true
+  },
+  "updater_manifest_verified": true,
+  "experimental_channel_required": true
+}

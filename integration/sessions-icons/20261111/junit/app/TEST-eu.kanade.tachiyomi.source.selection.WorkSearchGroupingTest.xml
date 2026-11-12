@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.tachiyomi.source.selection.WorkSearchGroupingTest" tests="19" skipped="0" failures="0" errors="0" timestamp="2026-11-11T20:05:49.051Z" hostname="b5ae99f6bd9c" time="0.143">
+  <properties/>
+  <testcase name="missing creator cannot borrow catalogue certainty from title alone()" classname="eu.kanade.tachiyomi.source.selection.WorkSearchGroupingTest" time="0.001"/>
+  <testcase name="candidate linking preserves notes glossary and existing candidate health without local IDs()" classname="eu.kanade.tachiyomi.source.selection.WorkSearchGroupingTest" time="0.002"/>
+  <testcase name="a restored favorite remains the original entry even when source is missing()" classname="eu.kanade.tachiyomi.source.selection.WorkSearchGroupingTest" time="0.001"/>
+  <testcase name="an exact source URL is the same saved record without creator metadata()" classname="eu.kanade.tachiyomi.source.selection.WorkSearchGroupingTest" time="0.001"/>
+  <testcase name="confirmed aliases yield one card and prefer Brazilian Portuguese for new work()" classname="eu.kanade.tachiyomi.source.selection.WorkSearchGroupingTest" time="0.001"/>
+  <testcase name="large unrelated result sets remain distinct and preserve a matching library entry()" classname="eu.kanade.tachiyomi.source.selection.WorkSearchGroupingTest" time="0.109"/>
+  <testcase name="global grouping rejects fuzzy spelling matches()" classname="eu.kanade.tachiyomi.source.selection.WorkSearchGroupingTest" time="0.002"/>
+  <testcase name="distinct URLs inside one provider need catalogue corroboration()" classname="eu.kanade.tachiyomi.source.selection.WorkSearchGroupingTest" time="0.002"/>
+  <testcase name="unknown and generic creators cannot collapse homonymous titles()" classname="eu.kanade.tachiyomi.source.selection.WorkSearchGroupingTest" time="0.001"/>
+  <testcase name="different known creators retain separate homonyms()" classname="eu.kanade.tachiyomi.source.selection.WorkSearchGroupingTest" time="0.005"/>
+  <testcase name="an ambiguous saved bridge cannot hide two separate result cards()" classname="eu.kanade.tachiyomi.source.selection.WorkSearchGroupingTest" time="0.001"/>
+  <testcase name="translation names alone are not guessed()" classname="eu.kanade.tachiyomi.source.selection.WorkSearchGroupingTest" time="0.001"/>
+  <testcase name="sequels parts and novel qualifiers remain distinct()" classname="eu.kanade.tachiyomi.source.selection.WorkSearchGroupingTest" time="0.002"/>
+  <testcase name="only bounded native candidates are attached and host metadata is not sent to a provider()" classname="eu.kanade.tachiyomi.source.selection.WorkSearchGroupingTest" time="0.003"/>
+  <testcase name="conflicting catalogue identities are ambiguous even with matching creator()" classname="eu.kanade.tachiyomi.source.selection.WorkSearchGroupingTest" time="0.001"/>
+  <testcase name="a previously pinned work memo is preserved byte for byte()" classname="eu.kanade.tachiyomi.source.selection.WorkSearchGroupingTest" time="0.001"/>
+  <testcase name="a multi author bridge cannot transitively merge unrelated works()" classname="eu.kanade.tachiyomi.source.selection.WorkSearchGroupingTest" time="0.001"/>
+  <testcase name="a novel local document or unknown medium is not reused as the comic favorite()" classname="eu.kanade.tachiyomi.source.selection.WorkSearchGroupingTest" time="0.001"/>
+  <testcase name="existing pinned favorite wins over language and older unpinned favorite()" classname="eu.kanade.tachiyomi.source.selection.WorkSearchGroupingTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

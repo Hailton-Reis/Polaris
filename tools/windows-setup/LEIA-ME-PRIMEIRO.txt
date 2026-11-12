@@ -1,0 +1,56 @@
+POLARIS — CONFIGURADOR UNICO WINDOWS
+
+1. No GitHub, abra tools/windows-setup/00_POLARIS_TUDO_EM_UM.cmd e clique em Download raw.
+   Salve como 00_POLARIS_TUDO_EM_UM.cmd no seu computador. Nenhum outro arquivo e necessario para abrir o menu.
+2. De dois cliques nesse unico arquivo CMD.
+3. Escolha:
+   1 = Diagnostico (sem instalar; cria apenas log)
+   2 = Instalar ferramentas faltantes e SDK Android
+   3 = Clonar/preparar Polaris e Yomotsu fixado
+   4 = Compilar APKs originais + Spike-001, sem GitHub Actions
+   5 = Diagnostico informativo de Python, Node.js e .NET dos outros projetos
+   6 = Fazer tudo (diagnostico + 2 + diagnostico + 3 + 4; solicita confirmacao antes de instalar)
+   7 = Opcional: instalar Node.js LTS e .NET SDK 8 para outros projetos
+   8 = Criar/abrir emulador Android Studio dedicado e testar Yomotsu original
+   9 = Emular Polaris Spike-001 em AVD separado (configuracoes proprias)
+   10 = COMPARAR Yomotsu e Polaris lado a lado (2 AVDs, dados persistentes)
+   0 = Sair
+
+IMPORTANTE
+- A opcao 6 pode baixar muitos GB e exigir permissoes de administrador e aceite
+  de licencas Android. Nao execute em computador corporativo sem autorizacao.
+- Necessita Windows 10/11 64 bits, internet, espaco livre recomendavel >=25 GB.
+- Quando falta winget, instale o App Installer pela Microsoft Store.
+- Android Studio e SDK nao sao a mesma coisa: detectamos AMBOS.
+- O codigo fonte sempre e clonado em %USERPROFILE%\PolarisDev\Polaris.
+- Yomotsu fixado e evidencias ficam em %USERPROFILE%\PolarisDev\PolarisLocal.
+- Cada resultado cria log em %USERPROFILE%\PolarisDev\relatorios.
+- As opcoes 1 a 7 nao instalam APK. As opcoes 8 e 9 instalam SOMENTE no AVD de teste do Polaris; NUNCA em celular fisico.
+- Nenhum banco de dados de celular fisico, repositorio de outros projetos,
+  gravacao CameraGuard ou arquivos de producao sao alterados por este programa.
+- Nao usa GitHub Actions; nao mexe na migracao 15 nem desbloqueia backup v2.
+- Erros abortam em vez de apagar arquivos, fazer git reset ou ignorar hashes.
+- O CMD embute o PowerShell, extrai copia temporaria e remove-a no fim. O instalador nao exige ZIP.
+- Se uma opcao falhar, o CMD nao deve terminar como sucesso ao sair do menu.
+
+Arquivo necessario ao usuario:
+  00_POLARIS_TUDO_EM_UM.cmd     unico arquivo para dois cliques
+
+Arquivos internos de manutencao no GitHub (nao precisa baixar):
+  Polaris_Setup.ps1             fonte PowerShell que esta embutida no CMD
+  generate_single_cmd.py       sincroniza CMD com o PowerShell
+  COMO_FUNCIONA.md             guia tecnico
+  test_setup.py                testes estaticos
+
+O codigo usa winget (Git, Python, Temurin 21 e Android Studio), e para o
+SDK usa sdkmanager. Se Command-line Tools nao estiver instalado, tenta obter
+arquivo do indice OFICIAL do Google e verifica seu SHA256 antes de extrair;
+se a verificacao falhar, aborta e orienta instalar pelo Android Studio.
+
+Esta revisao de arquivo unico ainda exige validacao real em Windows 10/11.
+Testes estaticos nao comprovam funcionamento de winget, SDK, Gradle ou APK.
+Comece pela opcao 1. A opcao 6 instala, prepara e compila apos a confirmacao,
+mas NAO instala APK no celular nem libera backup v2.
+O emulador usa Android 15 API 35 x86_64, requer virtualizacao/WHPX e pode baixar arquivos grandes. Ele nao prova visualmente a interface sem inspecao do usuario.
+
+Emuladores A01/A02 em AVDs distintos; dados do usuario persistem em PolarisDev\emulador\avd, nao sincronizados automaticamente. Para comparacao use opcao 10. Nao use Wipe Data nem desinstale o aplicativo se quiser preservar configuracoes.

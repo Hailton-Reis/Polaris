@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.translation.model.TranslationPageLayoutTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-11-09T22:30:58.840Z" hostname="0d67ac30ae46" time="0.008">
+  <properties/>
+  <testcase name="adjacent columns reserve horizontal space without covering the other source()" classname="eu.kanade.translation.model.TranslationPageLayoutTest" time="0.001"/>
+  <testcase name="untranslated neighbor reserves original text instead of having another overlay placed over it()" classname="eu.kanade.translation.model.TranslationPageLayoutTest" time="0.0"/>
+  <testcase name="saved dark caption cannot draw its translation outside the bounded eraser()" classname="eu.kanade.translation.model.TranslationPageLayoutTest" time="0.001"/>
+  <testcase name="measured white balloon keeps its established larger writing area()" classname="eu.kanade.translation.model.TranslationPageLayoutTest" time="0.0"/>
+  <testcase name="mixed size OCR title boxes that overlap are partitioned by their source centers()" classname="eu.kanade.translation.model.TranslationPageLayoutTest" time="0.0"/>
+  <testcase name="unrelated layouts and cleanup ownership remain unchanged()" classname="eu.kanade.translation.model.TranslationPageLayoutTest" time="0.001"/>
+  <testcase name="three fragments remain non overlapping after all pairwise allocations()" classname="eu.kanade.translation.model.TranslationPageLayoutTest" time="0.0"/>
+  <testcase name="stacked title fragments cannot share expanded vertical space()" classname="eu.kanade.translation.model.TranslationPageLayoutTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

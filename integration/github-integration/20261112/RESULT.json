@@ -1,0 +1,16 @@
+{
+  "head": "cdf7dbeb72fc23aea31069a1b26cc3bc0247b1f0",
+  "main": "36c96df0212c54ebf43c1e9e854d10e62d55084b",
+  "patch_sha256": "f6dcd89ffd2c2e5c3588d8c5b5947dbf6b634d56e94ad609cef498c069a2cc98",
+  "conflicts": [
+    "README.md",
+    "CHANGELOG.md"
+  ],
+  "checked_at_utc": "2026-11-12T19:16:38.323282+00:00",
+  "resolution": "Merge main into engineering branch; retain development and public-release histories with explicit scopes",
+  "publisher_guards_passed": 12,
+  "publisher_tests_use_mock_uploads": true,
+  "publication_workflow_trigger": "workflow_dispatch only",
+  "Android_patch_unchanged": true,
+  "main_or_release_modified": false
+}

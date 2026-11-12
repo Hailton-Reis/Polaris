@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.tachiyomi.ui.documents.DocumentCacheBudgetTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-11-09T22:30:54.325Z" hostname="0d67ac30ae46" time="0.025">
+  <properties/>
+  <testcase name="an arbitrary file cannot be registered as document cache()" classname="eu.kanade.tachiyomi.ui.documents.DocumentCacheBudgetTest" time="0.006"/>
+  <testcase name="clear touches only managed directories and skips symbolic links()" classname="eu.kanade.tachiyomi.ui.documents.DocumentCacheBudgetTest" time="0.005"/>
+  <testcase name="open files can exceed the target until their final lease closes()" classname="eu.kanade.tachiyomi.ui.documents.DocumentCacheBudgetTest" time="0.01"/>
+  <testcase name="evicts least recently used cache files while retaining imported originals()" classname="eu.kanade.tachiyomi.ui.documents.DocumentCacheBudgetTest" time="0.002"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

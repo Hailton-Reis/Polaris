@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.translation.detection.ExperimentalDbnetOcrEngineTest" tests="7" skipped="0" failures="2" errors="0" timestamp="2026-11-06T19:56:22.726Z" hostname="550a0106d184" time="6.323">
+  <properties/>
+  <testcase name="cancellation leaves concrete wrapper client enabled without fallback or failure cleanup()" classname="eu.kanade.translation.detection.ExperimentalDbnetOcrEngineTest" time="6.166">
+    <failure message="org.opentest4j.AssertionFailedError: expected: &lt;0&gt; but was: &lt;1&gt;" type="org.opentest4j.AssertionFailedError">org.opentest4j.AssertionFailedError: expected: &lt;0&gt; but was: &lt;1&gt;
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:569)
+	at eu.kanade.translation.detection.ExperimentalDbnetOcrEngineTest.cancellation leaves concrete wrapper client enabled without fallback or failure cleanup(ExperimentalDbnetOcrEngineTest.kt:158)
+</failure>
+  </testcase>
+  <testcase name="invalid EXIF orientation falls back before experimental work()" classname="eu.kanade.translation.detection.ExperimentalDbnetOcrEngineTest" time="0.026"/>
+  <testcase name="compatible EXIF allows experimental work()" classname="eu.kanade.translation.detection.ExperimentalDbnetOcrEngineTest" time="0.055"/>
+  <testcase name="EXIF read cancellation propagates without selected fallback()" classname="eu.kanade.translation.detection.ExperimentalDbnetOcrEngineTest" time="0.02"/>
+  <testcase name="EXIF read failure falls back before experimental work()" classname="eu.kanade.translation.detection.ExperimentalDbnetOcrEngineTest" time="0.013"/>
+  <testcase name="technical failure closes and disables concrete wrapper then releases owned ML Kit after one fallback()" classname="eu.kanade.translation.detection.ExperimentalDbnetOcrEngineTest" time="0.015">
+    <failure message="org.opentest4j.AssertionFailedError: expected: &lt;1&gt; but was: &lt;0&gt;" type="org.opentest4j.AssertionFailedError">org.opentest4j.AssertionFailedError: expected: &lt;1&gt; but was: &lt;0&gt;
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:569)
+	at eu.kanade.translation.detection.ExperimentalDbnetOcrEngineTest$technical failure closes and disables concrete wrapper then releases owned ML Kit after one fallback$1.invokeSuspend(ExperimentalDbnetOcrEngineTest.kt:120)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:34)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:256)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:54)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlockingImpl(Builders.kt:30)
+	at kotlinx.coroutines.BuildersKt.runBlockingImpl(Unknown Source)
+	at kotlinx.coroutines.BuildersKt__Builders_concurrentKt.runBlockingK(Builders.concurrent.kt:172)
+	at kotlinx.coroutines.BuildersKt.runBlockingK(Unknown Source)
+	at kotlinx.coroutines.BuildersKt__Builders_concurrentKt.runBlockingK$default(Builders.concurrent.kt:157)
+	at kotlinx.coroutines.BuildersKt.runBlockingK$default(Unknown Source)
+	at eu.kanade.translation.detection.ExperimentalDbnetOcrEngineTest.technical failure closes and disables concrete wrapper then releases owned ML Kit after one fallback(ExperimentalDbnetOcrEngineTest.kt:88)
+</failure>
+  </testcase>
+  <testcase name="bounded EXIF input rejects over-limit and negative skips()" classname="eu.kanade.translation.detection.ExperimentalDbnetOcrEngineTest" time="0.002"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[WARNING: A Java agent has been loaded dynamically (/workspace/polaris-cloud-tools/gradle/caches/modules-2/files-2.1/net.bytebuddy/byte-buddy-agent/1.18.2/62f38a6faf7f069d661b79a07d566f504b0b20c4/byte-buddy-agent-1.18.2.jar)
+WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+WARNING: Dynamic loading of agents will be disallowed by default in a future release
+]]></system-err>
+</testsuite>

@@ -1,0 +1,22 @@
+[
+  {
+    "file": "mihon.proto",
+    "bytes": 1192,
+    "sha256": "30c4b6c20c41a2f75fe2917449d8cd91a4bbd9d43cb91069571273d735fcff6a"
+  },
+  {
+    "file": "mihon.tachibk",
+    "bytes": 664,
+    "sha256": "2194767c9ac1f2cd1d1a3a918f1d891abb69a16af06c2ffa6b09c10d2d864aea"
+  },
+  {
+    "file": "tachiyomi.proto",
+    "bytes": 982,
+    "sha256": "3fabd5e5ac8a2d5710b4ec8991814a2cc80ec2068c76dfae64b982e7d64766db"
+  },
+  {
+    "file": "tachiyomi.tachibk",
+    "bytes": 579,
+    "sha256": "b4bcb49736e30834d8db207a54a97fb13c99876827431549950ca8d973984cb3"
+  }
+]

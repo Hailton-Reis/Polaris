@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.translation.translator.MachineTranslationContextTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-11-10T14:11:40.884Z" hostname="7d7c5a6182d0" time="0.006">
+  <properties/>
+  <testcase name="preserves short dialogue that can legitimately translate the same way()" classname="eu.kanade.translation.translator.MachineTranslationContextTest" time="0.002"/>
+  <testcase name="rejects output when translator removes a marker()" classname="eu.kanade.translation.translator.MachineTranslationContextTest" time="0.0"/>
+  <testcase name="builds chunks without changing text order()" classname="eu.kanade.translation.translator.MachineTranslationContextTest" time="0.0"/>
+  <testcase name="retries a substantive translation repeated for different source text()" classname="eu.kanade.translation.translator.MachineTranslationContextTest" time="0.001"/>
+  <testcase name="preserves a repeated translation when the original is also repeated()" classname="eu.kanade.translation.translator.MachineTranslationContextTest" time="0.001"/>
+  <testcase name="restores translated blocks from preserved markers()" classname="eu.kanade.translation.translator.MachineTranslationContextTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest" tests="15" skipped="0" failures="0" errors="0" timestamp="2026-11-06T16:22:26.652Z" hostname="550a0106d184" time="0.197">
+  <properties/>
+  <testcase name="failed original preserves rows and can refresh a previously confirmed alternative()" classname="eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest" time="0.054"/>
+  <testcase name="individual timeout keeps stored editions without cancelling another provider()" classname="eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest" time="0.009"/>
+  <testcase name="bounded catalogs always retain the original provider()" classname="eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest" time="0.02"/>
+  <testcase name="restored work with missing source and no previous alternatives can recover()" classname="eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest" time="0.006"/>
+  <testcase name="foreground discovery combines verified editions into a single logical sequence()" classname="eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest" time="0.013"/>
+  <testcase name="catalog with working images outranks Portuguese catalog whose images fail()" classname="eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest" time="0.041"/>
+  <testcase name="healthy Portuguese edition outranks larger English catalog()" classname="eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest" time="0.01"/>
+  <testcase name="installing a new enabled provider schedules discovery without waiting a day()" classname="eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest" time="0.005"/>
+  <testcase name="first provider refresh never waits for a slow alternative or samples images()" classname="eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest" time="0.005"/>
+  <testcase name="explicit English pin prevents Portuguese search and health sampling()" classname="eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest" time="0.007"/>
+  <testcase name="parent cancellation is not converted into a successful partial refresh()" classname="eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest" time="0.004"/>
+  <testcase name="pin restricts network refresh while keeping original stored chapters()" classname="eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest" time="0.005"/>
+  <testcase name="hidden providers are not queried during discovery()" classname="eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest" time="0.004"/>
+  <testcase name="a remembered available provider does not prevent recovery when it now fails()" classname="eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest" time="0.005"/>
+  <testcase name="background refresh never searches all extensions()" classname="eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest" time="0.002"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

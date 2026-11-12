@@ -1,0 +1,25 @@
+11-06 23:22:41.800 I/TestRunner( 2851): run started: 5 tests
+11-06 23:22:41.839 I/TestRunner( 2851): started: actualSourceRunsAtDifferentUidWithNoHostCanaryAccess(eu.kanade.tachiyomi.extension.sandbox.ExtensionSandboxAndroidTest)
+11-06 23:22:42.428 I/ActivityManager( 1535): Start proc 2880:app.mihon.tachiyomiat.dev:extension_sandbox/u0i0 for service app.mihon.tachiyomiat.dev/eu.kanade.tachiyomi.extension.sandbox.ExtensionSandboxService
+11-06 23:22:44.655 I/PolarisSandboxProof( 2851): host_uid=10065 worker_uid=99000
+11-06 23:22:44.972 I/ActivityManager( 1535): Killing 2880:app.mihon.tachiyomiat.dev:extension_sandbox/u0a65i0 (adj 0): isolated not needed
+11-06 23:22:45.127 I/TestRunner( 2851): finished: actualSourceRunsAtDifferentUidWithNoHostCanaryAccess(eu.kanade.tachiyomi.extension.sandbox.ExtensionSandboxAndroidTest)
+11-06 23:22:45.177 I/TestRunner( 2851): started: proxyNeverLoadsFixtureClassesInTheHostAndKeepsSourceIdentity(eu.kanade.tachiyomi.extension.sandbox.ExtensionSandboxAndroidTest)
+11-06 23:22:45.594 I/ActivityManager( 1535): Start proc 2909:app.mihon.tachiyomiat.dev:extension_sandbox/u0i1 for service app.mihon.tachiyomiat.dev/eu.kanade.tachiyomi.extension.sandbox.ExtensionSandboxService
+11-06 23:22:46.577 I/ActivityManager( 1535): Killing 2909:app.mihon.tachiyomiat.dev:extension_sandbox/u0a65i1 (adj 0): isolated not needed
+11-06 23:22:46.843 I/ActivityManager( 1535): Start proc 2930:app.mihon.tachiyomiat.dev:extension_sandbox/u0i2 for service app.mihon.tachiyomiat.dev/eu.kanade.tachiyomi.extension.sandbox.ExtensionSandboxService
+11-06 23:22:47.868 I/ActivityManager( 1535): Killing 2930:app.mihon.tachiyomiat.dev:extension_sandbox/u0a65i2 (adj 0): isolated not needed
+11-06 23:22:47.991 I/TestRunner( 2851): finished: proxyNeverLoadsFixtureClassesInTheHostAndKeepsSourceIdentity(eu.kanade.tachiyomi.extension.sandbox.ExtensionSandboxAndroidTest)
+11-06 23:22:48.030 I/TestRunner( 2851): started: aPrivateNetworkRequestIsBlockedAndReportedWithoutHostExecution(eu.kanade.tachiyomi.extension.sandbox.ExtensionSandboxAndroidTest)
+11-06 23:22:48.210 I/ActivityManager( 1535): Start proc 2951:app.mihon.tachiyomiat.dev:extension_sandbox/u0i3 for service app.mihon.tachiyomiat.dev/eu.kanade.tachiyomi.extension.sandbox.ExtensionSandboxService
+11-06 23:22:49.378 I/ActivityManager( 1535): Killing 2951:app.mihon.tachiyomiat.dev:extension_sandbox/u0a65i3 (adj 0): isolated not needed
+11-06 23:22:49.541 I/TestRunner( 2851): finished: aPrivateNetworkRequestIsBlockedAndReportedWithoutHostExecution(eu.kanade.tachiyomi.extension.sandbox.ExtensionSandboxAndroidTest)
+11-06 23:22:49.617 I/TestRunner( 2851): started: aStuckConstructorIsTerminatedAndANewApkSessionCanStart(eu.kanade.tachiyomi.extension.sandbox.ExtensionSandboxAndroidTest)
+11-06 23:22:49.800 I/ActivityManager( 1535): Start proc 2974:app.mihon.tachiyomiat.dev:extension_sandbox/u0i4 for service app.mihon.tachiyomiat.dev/eu.kanade.tachiyomi.extension.sandbox.ExtensionSandboxService
+11-06 23:22:54.277 I/ActivityManager( 1535): Killing 2974:app.mihon.tachiyomiat.dev:extension_sandbox/u0a65i4 (adj 0): isolated not needed
+11-06 23:22:54.563 I/ActivityManager( 1535): Start proc 2991:app.mihon.tachiyomiat.dev:extension_sandbox/u0i5 for service app.mihon.tachiyomiat.dev/eu.kanade.tachiyomi.extension.sandbox.ExtensionSandboxService
+11-06 23:22:55.400 I/ActivityManager( 1535): Killing 2991:app.mihon.tachiyomiat.dev:extension_sandbox/u0a65i5 (adj 0): isolated not needed
+11-06 23:22:55.514 I/TestRunner( 2851): finished: aStuckConstructorIsTerminatedAndANewApkSessionCanStart(eu.kanade.tachiyomi.extension.sandbox.ExtensionSandboxAndroidTest)
+11-06 23:22:55.541 I/TestRunner( 2851): started: bundledModelRecognizesEnglishAndLeavesPortugueseOrShortTextAlone(eu.kanade.tachiyomi.extension.sandbox.AutomaticLanguageAndroidTest)
+11-06 23:22:57.498 I/TestRunner( 2851): finished: bundledModelRecognizesEnglishAndLeavesPortugueseOrShortTextAlone(eu.kanade.tachiyomi.extension.sandbox.AutomaticLanguageAndroidTest)
+11-06 23:22:57.547 I/TestRunner( 2851): run finished: 5 tests, 0 failed, 0 ignored

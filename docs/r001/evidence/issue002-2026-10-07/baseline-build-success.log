@@ -1,0 +1,467 @@
+Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/9.6.1/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+Configuration on demand is an incubating feature.
+Type-safe project accessors is an incubating feature.
+> Task :build-logic:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :build-logic:compileKotlin UP-TO-DATE
+> Task :build-logic:compileJava NO-SOURCE
+> Task :build-logic:pluginDescriptors UP-TO-DATE
+> Task :build-logic:processResources UP-TO-DATE
+> Task :build-logic:classes UP-TO-DATE
+> Task :build-logic:jar UP-TO-DATE
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preDebugBuild UP-TO-DATE
+> Task :app:mergeDebugNativeDebugMetadata NO-SOURCE
+> Task :app:compileDebugAidl UP-TO-DATE
+> Task :app:dataBindingMergeDependencyArtifactsDebug UP-TO-DATE
+> Task :app:generateDebugResources UP-TO-DATE
+> Task :app:prepareLibraryDefinitionsDebug UP-TO-DATE
+> Task :app:replaceDebugShortcutPlaceholder UP-TO-DATE
+> Task :core-metadata:preBuild UP-TO-DATE
+> Task :core-metadata:preDebugBuild UP-TO-DATE
+> Task :core-metadata:generateDebugResources UP-TO-DATE
+> Task :core-metadata:packageDebugResources UP-TO-DATE
+> Task :data:preBuild UP-TO-DATE
+> Task :data:preDebugBuild UP-TO-DATE
+> Task :data:generateDebugResources UP-TO-DATE
+> Task :data:packageDebugResources UP-TO-DATE
+> Task :dbnet-native:preBuild UP-TO-DATE
+> Task :dbnet-native:preDebugBuild UP-TO-DATE
+> Task :dbnet-native:generateDebugResources UP-TO-DATE
+> Task :dbnet-native:packageDebugResources UP-TO-DATE
+> Task :domain:preBuild UP-TO-DATE
+> Task :domain:preDebugBuild UP-TO-DATE
+> Task :domain:generateDebugResources UP-TO-DATE
+> Task :domain:packageDebugResources UP-TO-DATE
+> Task :i18n:generateAndroidMainLocalesConfig UP-TO-DATE
+> Task :i18n:generateMRcommonTest UP-TO-DATE
+> Task :i18n:generateMRandroidHostTest UP-TO-DATE
+> Task :i18n:generateMRcommonMain UP-TO-DATE
+> Task :i18n:generateMRandroidMain UP-TO-DATE
+> Task :i18n:androidPreBuild UP-TO-DATE
+> Task :i18n:preAndroidMainBuild UP-TO-DATE
+> Task :i18n:packageAndroidMainResources UP-TO-DATE
+> Task :i18n-at:generateMRcommonTest UP-TO-DATE
+> Task :i18n-at:generateMRandroidHostTest UP-TO-DATE
+> Task :i18n-at:generateMRcommonMain UP-TO-DATE
+> Task :i18n-at:generateMRandroidMain UP-TO-DATE
+> Task :i18n-at:androidPreBuild UP-TO-DATE
+> Task :i18n-at:preAndroidMainBuild UP-TO-DATE
+> Task :i18n-at:packageAndroidMainResources UP-TO-DATE
+> Task :ppocr-sdk:preBuild UP-TO-DATE
+> Task :ppocr-sdk:preDebugBuild UP-TO-DATE
+> Task :ppocr-sdk:generateDebugResources UP-TO-DATE
+> Task :ppocr-sdk:packageDebugResources UP-TO-DATE
+> Task :presentation-core:preBuild UP-TO-DATE
+> Task :presentation-core:preDebugBuild UP-TO-DATE
+> Task :presentation-core:generateDebugResources UP-TO-DATE
+> Task :presentation-core:packageDebugResources UP-TO-DATE
+> Task :presentation-widget:preBuild UP-TO-DATE
+> Task :presentation-widget:preDebugBuild UP-TO-DATE
+> Task :presentation-widget:generateDebugResources UP-TO-DATE
+> Task :presentation-widget:packageDebugResources UP-TO-DATE
+> Task :source-api:preBuild UP-TO-DATE
+> Task :source-api:preDebugBuild UP-TO-DATE
+> Task :source-api:generateDebugResources UP-TO-DATE
+> Task :source-api:packageDebugResources UP-TO-DATE
+> Task :source-local:preBuild UP-TO-DATE
+> Task :source-local:preDebugBuild UP-TO-DATE
+> Task :source-local:generateDebugResources UP-TO-DATE
+> Task :source-local:packageDebugResources UP-TO-DATE
+> Task :telemetry:preBuild UP-TO-DATE
+> Task :telemetry:preDebugBuild UP-TO-DATE
+> Task :telemetry:generateDebugResources UP-TO-DATE
+> Task :telemetry:packageDebugResources UP-TO-DATE
+> Task :core:archive:preBuild UP-TO-DATE
+> Task :core:archive:preDebugBuild UP-TO-DATE
+> Task :core:archive:generateDebugResources UP-TO-DATE
+> Task :core:archive:packageDebugResources UP-TO-DATE
+> Task :core:common:preBuild UP-TO-DATE
+> Task :core:common:preDebugBuild UP-TO-DATE
+> Task :core:common:generateDebugResources UP-TO-DATE
+> Task :core:common:packageDebugResources UP-TO-DATE
+> Task :core:viewmodel:preBuild UP-TO-DATE
+> Task :core:viewmodel:preDebugBuild UP-TO-DATE
+> Task :core:viewmodel:generateDebugResources UP-TO-DATE
+> Task :core:viewmodel:packageDebugResources UP-TO-DATE
+> Task :app:mergeDebugResources UP-TO-DATE
+> Task :app:dataBindingGenBaseClassesDebug UP-TO-DATE
+> Task :app:generateDebugBuildConfig
+> Task :app:packageDebugResources UP-TO-DATE
+> Task :core-metadata:processDebugNavigationResources UP-TO-DATE
+> Task :data:processDebugNavigationResources UP-TO-DATE
+> Task :dbnet-native:processDebugNavigationResources UP-TO-DATE
+> Task :domain:processDebugNavigationResources UP-TO-DATE
+> Task :i18n:generateAndroidMainEmptyResourceFiles UP-TO-DATE
+> Task :i18n-at:generateAndroidMainEmptyResourceFiles UP-TO-DATE
+> Task :ppocr-sdk:processDebugNavigationResources UP-TO-DATE
+> Task :presentation-core:processDebugNavigationResources UP-TO-DATE
+> Task :presentation-widget:processDebugNavigationResources UP-TO-DATE
+> Task :source-api:processDebugNavigationResources UP-TO-DATE
+> Task :source-local:processDebugNavigationResources UP-TO-DATE
+> Task :telemetry:processDebugNavigationResources UP-TO-DATE
+> Task :core:archive:processDebugNavigationResources UP-TO-DATE
+> Task :core:common:processDebugNavigationResources UP-TO-DATE
+> Task :core:viewmodel:processDebugNavigationResources UP-TO-DATE
+> Task :app:processDebugNavigationResources UP-TO-DATE
+> Task :app:parseDebugLocalResources UP-TO-DATE
+> Task :core-metadata:parseDebugLocalResources UP-TO-DATE
+> Task :source-api:parseDebugLocalResources UP-TO-DATE
+> Task :i18n:parseAndroidMainLocalResources UP-TO-DATE
+> Task :i18n:generateAndroidMainRFile UP-TO-DATE
+> Task :core:common:parseDebugLocalResources UP-TO-DATE
+> Task :core:common:generateDebugRFile UP-TO-DATE
+> Task :source-api:generateDebugRFile UP-TO-DATE
+> Task :core-metadata:generateDebugRFile UP-TO-DATE
+> Task :data:parseDebugLocalResources UP-TO-DATE
+> Task :domain:parseDebugLocalResources UP-TO-DATE
+> Task :domain:generateDebugRFile UP-TO-DATE
+> Task :data:generateDebugRFile UP-TO-DATE
+> Task :dbnet-native:parseDebugLocalResources UP-TO-DATE
+> Task :dbnet-native:generateDebugRFile UP-TO-DATE
+> Task :i18n-at:parseAndroidMainLocalResources UP-TO-DATE
+> Task :i18n-at:generateAndroidMainRFile UP-TO-DATE
+> Task :ppocr-sdk:parseDebugLocalResources UP-TO-DATE
+> Task :ppocr-sdk:generateDebugRFile UP-TO-DATE
+> Task :presentation-core:parseDebugLocalResources UP-TO-DATE
+> Task :presentation-core:generateDebugRFile UP-TO-DATE
+> Task :presentation-widget:parseDebugLocalResources UP-TO-DATE
+> Task :presentation-widget:generateDebugRFile UP-TO-DATE
+> Task :source-local:parseDebugLocalResources UP-TO-DATE
+> Task :core:archive:parseDebugLocalResources UP-TO-DATE
+> Task :core:archive:generateDebugRFile UP-TO-DATE
+> Task :source-local:generateDebugRFile UP-TO-DATE
+> Task :telemetry:parseDebugLocalResources UP-TO-DATE
+> Task :telemetry:generateDebugRFile UP-TO-DATE
+> Task :core:viewmodel:parseDebugLocalResources UP-TO-DATE
+> Task :core:viewmodel:generateDebugRFile UP-TO-DATE
+> Task :app:generateDebugRFile UP-TO-DATE
+> Task :i18n:kmpPartiallyResolvedDependenciesChecker
+> Task :i18n:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :i18n:compileAndroidMain UP-TO-DATE
+> Task :i18n:bundleAndroidMainClassesToCompileJar UP-TO-DATE
+> Task :core:common:compileDebugKotlin UP-TO-DATE
+> Task :core:common:javaPreCompileDebug UP-TO-DATE
+> Task :core:common:compileDebugJavaWithJavac NO-SOURCE
+> Task :core:common:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :source-api:compileDebugKotlin UP-TO-DATE
+> Task :source-api:javaPreCompileDebug UP-TO-DATE
+> Task :source-api:compileDebugJavaWithJavac NO-SOURCE
+> Task :source-api:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :core-metadata:compileDebugKotlin UP-TO-DATE
+> Task :core-metadata:javaPreCompileDebug UP-TO-DATE
+> Task :core-metadata:compileDebugJavaWithJavac NO-SOURCE
+> Task :core-metadata:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :data:generateDebugDatabaseInterface UP-TO-DATE
+> Task :domain:compileDebugKotlin UP-TO-DATE
+> Task :domain:javaPreCompileDebug UP-TO-DATE
+> Task :domain:compileDebugJavaWithJavac NO-SOURCE
+> Task :domain:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :data:compileDebugKotlin UP-TO-DATE
+> Task :data:javaPreCompileDebug UP-TO-DATE
+> Task :data:compileDebugJavaWithJavac NO-SOURCE
+> Task :data:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :dbnet-native:compileDebugKotlin NO-SOURCE
+> Task :dbnet-native:javaPreCompileDebug UP-TO-DATE
+> Task :dbnet-native:compileDebugJavaWithJavac NO-SOURCE
+> Task :dbnet-native:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :i18n-at:kmpPartiallyResolvedDependenciesChecker
+> Task :i18n-at:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :i18n-at:compileAndroidMain UP-TO-DATE
+> Task :i18n-at:bundleAndroidMainClassesToCompileJar UP-TO-DATE
+> Task :ppocr-sdk:compileDebugKotlin UP-TO-DATE
+> Task :ppocr-sdk:javaPreCompileDebug UP-TO-DATE
+> Task :ppocr-sdk:compileDebugJavaWithJavac NO-SOURCE
+> Task :ppocr-sdk:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :presentation-core:compileDebugKotlin UP-TO-DATE
+> Task :presentation-core:javaPreCompileDebug UP-TO-DATE
+> Task :presentation-core:compileDebugJavaWithJavac NO-SOURCE
+> Task :presentation-core:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :presentation-widget:compileDebugKotlin UP-TO-DATE
+> Task :presentation-widget:javaPreCompileDebug UP-TO-DATE
+> Task :presentation-widget:compileDebugJavaWithJavac NO-SOURCE
+> Task :presentation-widget:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :core:archive:compileDebugKotlin UP-TO-DATE
+> Task :core:archive:javaPreCompileDebug UP-TO-DATE
+> Task :core:archive:compileDebugJavaWithJavac NO-SOURCE
+> Task :core:archive:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :source-local:compileDebugKotlin UP-TO-DATE
+> Task :source-local:javaPreCompileDebug UP-TO-DATE
+> Task :source-local:compileDebugJavaWithJavac NO-SOURCE
+> Task :source-local:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :telemetry:compileDebugKotlin UP-TO-DATE
+> Task :telemetry:javaPreCompileDebug UP-TO-DATE
+> Task :telemetry:compileDebugJavaWithJavac NO-SOURCE
+> Task :telemetry:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :core:viewmodel:compileDebugKotlin UP-TO-DATE
+> Task :core:viewmodel:javaPreCompileDebug UP-TO-DATE
+> Task :core:viewmodel:compileDebugJavaWithJavac NO-SOURCE
+> Task :core:viewmodel:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :app:compileDebugKotlin
+w: file:///workspace/scratch/bab62ab08b4f/Yomotsu/app/src/main/java/eu/kanade/presentation/components/TabbedScreen.kt:70:17 'fun ScrollableTabRow(selectedTabIndex: Int, modifier: Modifier = ..., containerColor: Color = ..., contentColor: Color = ..., edgePadding: Dp = ..., indicator: ComposableFunction1<List<TabPosition>, Unit> = ..., divider: ComposableFunction0<Unit> = ..., tabs: ComposableFunction0<Unit>): Unit' is deprecated. Replaced with PrimaryScrollableTabRow and SecondaryScrollableTabRow tab variants.
+w: file:///workspace/scratch/bab62ab08b4f/Yomotsu/app/src/main/java/eu/kanade/presentation/components/TabbedScreen.kt:92:17 'fun TabRow(selectedTabIndex: Int, modifier: Modifier = ..., containerColor: Color = ..., contentColor: Color = ..., indicator: ComposableFunction1<List<TabPosition>, Unit> = ..., divider: ComposableFunction0<Unit> = ..., tabs: ComposableFunction0<Unit>): Unit' is deprecated. Replaced with PrimaryTabRow and SecondaryTabRow.
+w: file:///workspace/scratch/bab62ab08b4f/Yomotsu/app/src/main/java/eu/kanade/presentation/library/components/LibraryTabs.kt:29:5 'fun ScrollableTabRow(selectedTabIndex: Int, modifier: Modifier = ..., containerColor: Color = ..., contentColor: Color = ..., edgePadding: Dp = ..., indicator: ComposableFunction1<List<TabPosition>, Unit> = ..., divider: ComposableFunction0<Unit> = ..., tabs: ComposableFunction0<Unit>): Unit' is deprecated. Replaced with PrimaryScrollableTabRow and SecondaryScrollableTabRow tab variants.
+w: file:///workspace/scratch/bab62ab08b4f/Yomotsu/app/src/main/java/eu/kanade/presentation/more/profile/UserProfileScreen.kt:168:76 'val Icons.Outlined.ArrowBack: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Outlined.ArrowBack.
+w: file:///workspace/scratch/bab62ab08b4f/Yomotsu/app/src/main/java/eu/kanade/presentation/more/profile/UserProfileScreen.kt:271:44 'val Icons.Outlined.MenuBook: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Outlined.MenuBook.
+w: file:///workspace/scratch/bab62ab08b4f/Yomotsu/app/src/main/java/eu/kanade/presentation/more/settings/screen/TelegramCloudManagerScreen.kt:240:74 'val Icons.Outlined.MenuBook: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Outlined.MenuBook.
+w: file:///workspace/scratch/bab62ab08b4f/Yomotsu/app/src/main/java/eu/kanade/tachiyomi/data/backup/create/BackupCreator.kt:103:17 Elvis operator (?:) always returns the left operand of non-nullable type 'OutputStream'.
+w: file:///workspace/scratch/bab62ab08b4f/Yomotsu/app/src/main/java/eu/kanade/tachiyomi/data/download/DownloadManager.kt:224:9 This is a delicate API and its use requires care. Make sure you fully read and understand documentation of the declaration that is marked as a delicate API.
+w: file:///workspace/scratch/bab62ab08b4f/Yomotsu/app/src/main/java/eu/kanade/tachiyomi/data/download/DownloadManager.kt:251:9 This is a delicate API and its use requires care. Make sure you fully read and understand documentation of the declaration that is marked as a delicate API.
+w: file:///workspace/scratch/bab62ab08b4f/Yomotsu/app/src/main/java/eu/kanade/tachiyomi/data/download/Downloader.kt:120:9 This is a delicate API and its use requires care. Make sure you fully read and understand documentation of the declaration that is marked as a delicate API.
+w: file:///workspace/scratch/bab62ab08b4f/Yomotsu/app/src/main/java/eu/kanade/tachiyomi/data/library/LibraryUpdateNotifier.kt:211:13 This is a delicate API and its use requires care. Make sure you fully read and understand documentation of the declaration that is marked as a delicate API.
+w: file:///workspace/scratch/bab62ab08b4f/Yomotsu/app/src/main/java/eu/kanade/tachiyomi/data/notification/NotificationReceiver.kt:186:9 This is a delicate API and its use requires care. Make sure you fully read and understand documentation of the declaration that is marked as a delicate API.
+w: file:///workspace/scratch/bab62ab08b4f/Yomotsu/app/src/main/java/eu/kanade/tachiyomi/data/notification/NotificationReceiver.kt:212:9 This is a delicate API and its use requires care. Make sure you fully read and understand documentation of the declaration that is marked as a delicate API.
+w: file:///workspace/scratch/bab62ab08b4f/Yomotsu/app/src/main/java/eu/kanade/tachiyomi/data/profile/YomotsuAchievementManager.kt:13:28 'val Icons.Outlined.MenuBook: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Outlined.MenuBook.
+w: file:///workspace/scratch/bab62ab08b4f/Yomotsu/app/src/main/java/eu/kanade/tachiyomi/data/profile/YomotsuAchievementManager.kt:14:31 'val Icons.Outlined.LibraryBooks: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Outlined.LibraryBooks.
+w: file:///workspace/scratch/bab62ab08b4f/Yomotsu/app/src/main/java/eu/kanade/tachiyomi/data/telegram/TelegramCloudManager.kt:656:39 Unnecessary safe call on a non-null receiver of type 'ResponseBody'.
+w: file:///workspace/scratch/bab62ab08b4f/Yomotsu/app/src/main/java/eu/kanade/tachiyomi/data/telegram/TelegramCloudManager.kt:682:34 Elvis operator (?:) always returns the left operand of non-nullable type 'ResponseBody'.
+w: file:///workspace/scratch/bab62ab08b4f/Yomotsu/app/src/main/java/eu/kanade/tachiyomi/extension/novel/runtime/NovelNativeApi.kt:63:41 Unnecessary safe call on a non-null receiver of type 'ResponseBody'.
+w: file:///workspace/scratch/bab62ab08b4f/Yomotsu/app/src/main/java/eu/kanade/tachiyomi/extension/novel/translation/NovelTranslator.kt:120:45 Unnecessary safe call on a non-null receiver of type 'ResponseBody'.
+w: file:///workspace/scratch/bab62ab08b4f/Yomotsu/app/src/main/java/eu/kanade/tachiyomi/extension/novel/translation/NovelTranslator.kt:170:45 Unnecessary safe call on a non-null receiver of type 'ResponseBody'.
+w: file:///workspace/scratch/bab62ab08b4f/Yomotsu/app/src/main/java/eu/kanade/tachiyomi/extension/novel/tts/NovelAudioPlayer.kt:81:34 This declaration overrides a deprecated member but is not marked as deprecated itself. Add the '@Deprecated' annotation or suppress the diagnostic.
+w: file:///workspace/scratch/bab62ab08b4f/Yomotsu/app/src/main/java/eu/kanade/tachiyomi/extension/novel/tts/NovelAudioPlayer.kt:87:62 'constructor(p0: String!, p1: String!): Locale' is deprecated. Deprecated in Java.
+w: file:///workspace/scratch/bab62ab08b4f/Yomotsu/app/src/main/java/eu/kanade/tachiyomi/extension/novel/tts/NovelAudioPlayer.kt:173:50 'constructor(p0: String!, p1: String!): Locale' is deprecated. Deprecated in Java.
+w: file:///workspace/scratch/bab62ab08b4f/Yomotsu/app/src/main/java/eu/kanade/tachiyomi/extension/novel/tts/NovelAudioPlayer.kt:177:46 'constructor(p0: String!): Locale' is deprecated. Deprecated in Java.
+w: file:///workspace/scratch/bab62ab08b4f/Yomotsu/app/src/main/java/eu/kanade/tachiyomi/extension/novel/tts/NovelAudioPlayer.kt:178:35 'constructor(p0: String!): Locale' is deprecated. Deprecated in Java.
+w: file:///workspace/scratch/bab62ab08b4f/Yomotsu/app/src/main/java/eu/kanade/tachiyomi/ui/reader/NovelReaderActivity.kt:325:38 Unnecessary safe call on a non-null receiver of type 'NovelReaderActivity.ChapterItemState'.
+w: file:///workspace/scratch/bab62ab08b4f/Yomotsu/app/src/main/java/eu/kanade/tachiyomi/ui/reader/NovelReaderActivity.kt:401:100 Redundant call of conversion method.
+w: file:///workspace/scratch/bab62ab08b4f/Yomotsu/app/src/main/java/eu/kanade/tachiyomi/ui/reader/loader/HttpPageLoader.kt:134:13 This is a delicate API and its use requires care. Make sure you fully read and understand documentation of the declaration that is marked as a delicate API.
+w: file:///workspace/scratch/bab62ab08b4f/Yomotsu/app/src/main/java/eu/kanade/translation/ChapterTranslator.kt:237:44 This is a delicate API and its use requires care. Make sure you fully read and understand documentation of the declaration that is marked as a delicate API.
+w: file:///workspace/scratch/bab62ab08b4f/Yomotsu/app/src/main/java/eu/kanade/translation/ChapterTranslator.kt:240:13 This is a delicate API and its use requires care. Make sure you fully read and understand documentation of the declaration that is marked as a delicate API.
+w: file:///workspace/scratch/bab62ab08b4f/Yomotsu/app/src/main/java/eu/kanade/translation/TranslationManager.kt:548:9 This is a delicate API and its use requires care. Make sure you fully read and understand documentation of the declaration that is marked as a delicate API.
+w: file:///workspace/scratch/bab62ab08b4f/Yomotsu/app/src/main/java/eu/kanade/translation/TranslationManager.kt:556:9 This is a delicate API and its use requires care. Make sure you fully read and understand documentation of the declaration that is marked as a delicate API.
+w: file:///workspace/scratch/bab62ab08b4f/Yomotsu/app/src/main/java/eu/kanade/translation/memory/TranslationGlossary.kt:5:33 Non-public primary constructor is exposed via the generated 'copy()' method of the 'data' class.
+
+The generated 'copy()' will change its visibility in future releases.
+
+To suppress the warning do one of the following:
+- Annotate the data class with the '@ConsistentCopyVisibility' annotation.
+- Use the '-Xconsistent-data-class-copy-visibility' compiler flag.
+- Annotate the data class with the '@ExposedCopyVisibility' annotation 
+  (Discouraged, but can be used to keep binary compatibility).
+
+To learn more, see the documentation of the '@ConsistentCopyVisibility' and '@ExposedCopyVisibility' annotations.
+
+This will become an error in language version 2.5. See https://youtrack.jetbrains.com/issue/KT-11914.
+
+> Task :app:javaPreCompileDebug UP-TO-DATE
+> Task :app:compileDebugJavaWithJavac
+> Task :app:generateDebugAssets UP-TO-DATE
+> Task :core-metadata:generateDebugAssets UP-TO-DATE
+> Task :core-metadata:mergeDebugAssets UP-TO-DATE
+> Task :data:generateDebugAssets UP-TO-DATE
+> Task :data:mergeDebugAssets UP-TO-DATE
+> Task :dbnet-native:generateDebugAssets UP-TO-DATE
+> Task :dbnet-native:mergeDebugAssets UP-TO-DATE
+> Task :domain:generateDebugAssets UP-TO-DATE
+> Task :domain:mergeDebugAssets UP-TO-DATE
+> Task :i18n:generateAndroidMainAssets UP-TO-DATE
+> Task :i18n:mergeAndroidMainAssets UP-TO-DATE
+> Task :i18n-at:generateAndroidMainAssets UP-TO-DATE
+> Task :i18n-at:mergeAndroidMainAssets UP-TO-DATE
+> Task :ppocr-sdk:generateDebugAssets UP-TO-DATE
+> Task :ppocr-sdk:mergeDebugAssets UP-TO-DATE
+> Task :presentation-core:generateDebugAssets UP-TO-DATE
+> Task :presentation-core:mergeDebugAssets UP-TO-DATE
+> Task :presentation-widget:generateDebugAssets UP-TO-DATE
+> Task :presentation-widget:mergeDebugAssets UP-TO-DATE
+> Task :source-api:generateDebugAssets UP-TO-DATE
+> Task :source-api:mergeDebugAssets UP-TO-DATE
+> Task :source-local:generateDebugAssets UP-TO-DATE
+> Task :source-local:mergeDebugAssets UP-TO-DATE
+> Task :telemetry:generateDebugAssets UP-TO-DATE
+> Task :telemetry:mergeDebugAssets UP-TO-DATE
+> Task :core:archive:generateDebugAssets UP-TO-DATE
+> Task :core:archive:mergeDebugAssets UP-TO-DATE
+> Task :core:common:generateDebugAssets UP-TO-DATE
+> Task :core:common:mergeDebugAssets UP-TO-DATE
+> Task :core:viewmodel:generateDebugAssets UP-TO-DATE
+> Task :core:viewmodel:mergeDebugAssets UP-TO-DATE
+> Task :app:mergeDebugAssets UP-TO-DATE
+> Task :app:compressDebugAssets UP-TO-DATE
+> Task :app:generateDebugGlobalSynthetics UP-TO-DATE
+> Task :app:l8DexDesugarLibDebug UP-TO-DATE
+> Task :app:processDebugJavaRes UP-TO-DATE
+> Task :core-metadata:processDebugJavaRes UP-TO-DATE
+> Task :data:processDebugJavaRes UP-TO-DATE
+> Task :dbnet-native:processDebugJavaRes NO-SOURCE
+> Task :domain:processDebugJavaRes UP-TO-DATE
+> Task :i18n:processAndroidMainJavaRes UP-TO-DATE
+> Task :i18n-at:processAndroidMainJavaRes UP-TO-DATE
+> Task :ppocr-sdk:processDebugJavaRes UP-TO-DATE
+> Task :presentation-core:processDebugJavaRes UP-TO-DATE
+> Task :presentation-widget:processDebugJavaRes UP-TO-DATE
+> Task :source-api:processDebugJavaRes UP-TO-DATE
+> Task :source-local:processDebugJavaRes UP-TO-DATE
+> Task :telemetry:processDebugJavaRes UP-TO-DATE
+> Task :core:archive:processDebugJavaRes UP-TO-DATE
+> Task :core:common:processDebugJavaRes UP-TO-DATE
+> Task :core:viewmodel:processDebugJavaRes UP-TO-DATE
+> Task :app:mergeDebugJavaResource UP-TO-DATE
+> Task :app:checkDebugDuplicateClasses UP-TO-DATE
+> Task :app:desugarDebugFileDependencies UP-TO-DATE
+> Task :app:mergeExtDexDebug UP-TO-DATE
+> Task :source-local:bundleLibRuntimeToDirDebug UP-TO-DATE
+> Task :core-metadata:bundleLibRuntimeToDirDebug UP-TO-DATE
+> Task :data:bundleLibRuntimeToDirDebug UP-TO-DATE
+> Task :presentation-widget:bundleLibRuntimeToDirDebug UP-TO-DATE
+> Task :domain:bundleLibRuntimeToDirDebug UP-TO-DATE
+> Task :source-api:bundleLibRuntimeToDirDebug UP-TO-DATE
+> Task :presentation-core:bundleLibRuntimeToDirDebug UP-TO-DATE
+> Task :telemetry:bundleLibRuntimeToDirDebug UP-TO-DATE
+> Task :core:common:bundleLibRuntimeToDirDebug UP-TO-DATE
+> Task :i18n:bundleLibRuntimeToDirAndroidMain UP-TO-DATE
+> Task :i18n-at:bundleLibRuntimeToDirAndroidMain UP-TO-DATE
+> Task :ppocr-sdk:bundleLibRuntimeToDirDebug UP-TO-DATE
+> Task :core:viewmodel:bundleLibRuntimeToDirDebug UP-TO-DATE
+> Task :core:archive:bundleLibRuntimeToDirDebug UP-TO-DATE
+> Task :dbnet-native:bundleLibRuntimeToDirDebug UP-TO-DATE
+> Task :app:mergeLibDexDebug UP-TO-DATE
+> Task :core-metadata:writeDebugAarMetadata UP-TO-DATE
+> Task :data:writeDebugAarMetadata UP-TO-DATE
+> Task :dbnet-native:writeDebugAarMetadata UP-TO-DATE
+> Task :domain:writeDebugAarMetadata UP-TO-DATE
+> Task :i18n:writeAndroidMainAarMetadata UP-TO-DATE
+> Task :i18n-at:writeAndroidMainAarMetadata UP-TO-DATE
+> Task :ppocr-sdk:writeDebugAarMetadata UP-TO-DATE
+> Task :presentation-core:writeDebugAarMetadata UP-TO-DATE
+> Task :presentation-widget:writeDebugAarMetadata UP-TO-DATE
+> Task :source-api:writeDebugAarMetadata UP-TO-DATE
+> Task :source-local:writeDebugAarMetadata UP-TO-DATE
+> Task :telemetry:writeDebugAarMetadata UP-TO-DATE
+> Task :core:archive:writeDebugAarMetadata UP-TO-DATE
+> Task :core:common:writeDebugAarMetadata UP-TO-DATE
+> Task :core:viewmodel:writeDebugAarMetadata UP-TO-DATE
+> Task :app:checkDebugAarMetadata UP-TO-DATE
+> Task :app:mapDebugSourceSetPaths UP-TO-DATE
+> Task :app:compileDebugNavigationResources UP-TO-DATE
+> Task :app:createDebugCompatibleScreenManifests UP-TO-DATE
+> Task :app:extractDeepLinksDebug UP-TO-DATE
+> Task :core-metadata:extractDeepLinksDebug UP-TO-DATE
+> Task :core-metadata:processDebugManifest UP-TO-DATE
+> Task :data:extractDeepLinksDebug UP-TO-DATE
+> Task :data:processDebugManifest UP-TO-DATE
+> Task :dbnet-native:extractDeepLinksDebug UP-TO-DATE
+> Task :dbnet-native:processDebugManifest UP-TO-DATE
+> Task :domain:extractDeepLinksDebug UP-TO-DATE
+> Task :domain:processDebugManifest UP-TO-DATE
+> Task :i18n:processAndroidMainManifest UP-TO-DATE
+> Task :i18n-at:processAndroidMainManifest UP-TO-DATE
+> Task :ppocr-sdk:extractDeepLinksDebug UP-TO-DATE
+> Task :ppocr-sdk:processDebugManifest UP-TO-DATE
+> Task :presentation-core:extractDeepLinksDebug UP-TO-DATE
+> Task :presentation-core:processDebugManifest UP-TO-DATE
+> Task :presentation-widget:extractDeepLinksDebug UP-TO-DATE
+> Task :presentation-widget:processDebugManifest UP-TO-DATE
+> Task :source-api:extractDeepLinksDebug UP-TO-DATE
+> Task :source-api:processDebugManifest UP-TO-DATE
+> Task :source-local:extractDeepLinksDebug UP-TO-DATE
+> Task :source-local:processDebugManifest UP-TO-DATE
+> Task :telemetry:extractDeepLinksDebug UP-TO-DATE
+> Task :telemetry:processDebugManifest UP-TO-DATE
+> Task :core:archive:extractDeepLinksDebug UP-TO-DATE
+> Task :core:archive:processDebugManifest UP-TO-DATE
+> Task :core:common:extractDeepLinksDebug UP-TO-DATE
+> Task :core:common:processDebugManifest UP-TO-DATE
+> Task :core:viewmodel:extractDeepLinksDebug UP-TO-DATE
+> Task :core:viewmodel:processDebugManifest UP-TO-DATE
+> Task :app:processDebugMainManifest UP-TO-DATE
+> Task :app:processDebugManifest UP-TO-DATE
+> Task :app:processDebugManifestForPackage UP-TO-DATE
+> Task :core-metadata:mapDebugSourceSetPaths UP-TO-DATE
+> Task :core-metadata:compileDebugLibraryResources UP-TO-DATE
+> Task :data:mapDebugSourceSetPaths UP-TO-DATE
+> Task :data:compileDebugLibraryResources UP-TO-DATE
+> Task :dbnet-native:mapDebugSourceSetPaths UP-TO-DATE
+> Task :dbnet-native:compileDebugLibraryResources UP-TO-DATE
+> Task :domain:mapDebugSourceSetPaths UP-TO-DATE
+> Task :domain:compileDebugLibraryResources UP-TO-DATE
+> Task :i18n:mapAndroidMainSourceSetPaths UP-TO-DATE
+> Task :i18n:compileAndroidMainLibraryResources UP-TO-DATE
+> Task :i18n-at:mapAndroidMainSourceSetPaths UP-TO-DATE
+> Task :i18n-at:compileAndroidMainLibraryResources UP-TO-DATE
+> Task :ppocr-sdk:mapDebugSourceSetPaths UP-TO-DATE
+> Task :ppocr-sdk:compileDebugLibraryResources UP-TO-DATE
+> Task :presentation-core:mapDebugSourceSetPaths UP-TO-DATE
+> Task :presentation-core:compileDebugLibraryResources UP-TO-DATE
+> Task :presentation-widget:mapDebugSourceSetPaths UP-TO-DATE
+> Task :presentation-widget:compileDebugLibraryResources UP-TO-DATE
+> Task :source-api:mapDebugSourceSetPaths UP-TO-DATE
+> Task :source-api:compileDebugLibraryResources UP-TO-DATE
+> Task :source-local:mapDebugSourceSetPaths UP-TO-DATE
+> Task :source-local:compileDebugLibraryResources UP-TO-DATE
+> Task :telemetry:mapDebugSourceSetPaths UP-TO-DATE
+> Task :telemetry:compileDebugLibraryResources UP-TO-DATE
+> Task :core:archive:mapDebugSourceSetPaths UP-TO-DATE
+> Task :core:archive:compileDebugLibraryResources UP-TO-DATE
+> Task :core:common:mapDebugSourceSetPaths UP-TO-DATE
+> Task :core:common:compileDebugLibraryResources UP-TO-DATE
+> Task :core:viewmodel:mapDebugSourceSetPaths UP-TO-DATE
+> Task :core:viewmodel:compileDebugLibraryResources UP-TO-DATE
+> Task :app:processDebugResources
+> Task :app:dexBuilderDebug
+> Task :app:mergeProjectDexDebug
+> Task :app:mergeDebugJniLibFolders UP-TO-DATE
+> Task :core-metadata:mergeDebugJniLibFolders UP-TO-DATE
+> Task :core-metadata:mergeDebugNativeLibs NO-SOURCE
+> Task :core-metadata:copyDebugJniLibsProjectOnly UP-TO-DATE
+> Task :data:mergeDebugJniLibFolders UP-TO-DATE
+> Task :data:mergeDebugNativeLibs NO-SOURCE
+> Task :data:copyDebugJniLibsProjectOnly UP-TO-DATE
+> Task :dbnet-native:configureCMakeDebug[arm64-v8a]
+> Task :dbnet-native:buildCMakeDebug[arm64-v8a]
+> Task :dbnet-native:mergeDebugJniLibFolders UP-TO-DATE
+> Task :dbnet-native:mergeDebugNativeLibs UP-TO-DATE
+> Task :dbnet-native:copyDebugJniLibsProjectOnly UP-TO-DATE
+> Task :domain:mergeDebugJniLibFolders UP-TO-DATE
+> Task :domain:mergeDebugNativeLibs NO-SOURCE
+> Task :domain:copyDebugJniLibsProjectOnly UP-TO-DATE
+> Task :i18n:mergeAndroidMainJniLibFolders UP-TO-DATE
+> Task :i18n:mergeAndroidMainNativeLibs NO-SOURCE
+> Task :i18n:copyAndroidMainJniLibsProjectOnly UP-TO-DATE
+> Task :i18n-at:mergeAndroidMainJniLibFolders UP-TO-DATE
+> Task :i18n-at:mergeAndroidMainNativeLibs NO-SOURCE
+> Task :i18n-at:copyAndroidMainJniLibsProjectOnly UP-TO-DATE
+> Task :ppocr-sdk:mergeDebugJniLibFolders UP-TO-DATE
+> Task :ppocr-sdk:mergeDebugNativeLibs NO-SOURCE
+> Task :ppocr-sdk:copyDebugJniLibsProjectOnly UP-TO-DATE
+> Task :presentation-core:mergeDebugJniLibFolders UP-TO-DATE
+> Task :presentation-core:mergeDebugNativeLibs NO-SOURCE
+> Task :presentation-core:copyDebugJniLibsProjectOnly UP-TO-DATE
+> Task :presentation-widget:mergeDebugJniLibFolders UP-TO-DATE
+> Task :presentation-widget:mergeDebugNativeLibs NO-SOURCE
+> Task :presentation-widget:copyDebugJniLibsProjectOnly UP-TO-DATE
+> Task :source-api:mergeDebugJniLibFolders UP-TO-DATE
+> Task :source-api:mergeDebugNativeLibs NO-SOURCE
+> Task :source-api:copyDebugJniLibsProjectOnly UP-TO-DATE
+> Task :source-local:mergeDebugJniLibFolders UP-TO-DATE
+> Task :source-local:mergeDebugNativeLibs NO-SOURCE
+> Task :source-local:copyDebugJniLibsProjectOnly UP-TO-DATE
+> Task :telemetry:mergeDebugJniLibFolders UP-TO-DATE
+> Task :telemetry:mergeDebugNativeLibs NO-SOURCE
+> Task :telemetry:copyDebugJniLibsProjectOnly UP-TO-DATE
+> Task :core:archive:mergeDebugJniLibFolders UP-TO-DATE
+> Task :core:archive:mergeDebugNativeLibs NO-SOURCE
+> Task :core:archive:copyDebugJniLibsProjectOnly UP-TO-DATE
+> Task :core:common:mergeDebugJniLibFolders UP-TO-DATE
+> Task :core:common:mergeDebugNativeLibs NO-SOURCE
+> Task :core:common:copyDebugJniLibsProjectOnly UP-TO-DATE
+> Task :core:viewmodel:mergeDebugJniLibFolders UP-TO-DATE
+> Task :core:viewmodel:mergeDebugNativeLibs NO-SOURCE
+> Task :core:viewmodel:copyDebugJniLibsProjectOnly UP-TO-DATE
+> Task :app:mergeDebugNativeLibs UP-TO-DATE
+> Task :app:stripDebugDebugSymbols UP-TO-DATE
+> Task :app:validateSigningDebug UP-TO-DATE
+> Task :app:writeDebugAppMetadata UP-TO-DATE
+> Task :app:writeDebugSigningConfigVersions UP-TO-DATE
+> Task :app:packageDebug
+> Task :app:createDebugApkListingFileRedirect
+> Task :app:assembleDebug
+w: Detected multiple Kotlin daemon sessions at 
+
+[Incubating] Problems report is available at: file:///workspace/scratch/bab62ab08b4f/Yomotsu/build/reports/problems/problems-report.html
+
+BUILD SUCCESSFUL in 1m 51s
+325 actionable tasks: 12 executed, 313 up-to-date
+Consider enabling configuration cache to speed up this build: https://docs.gradle.org/9.6.1/userguide/configuration_cache_enabling.html

@@ -1,0 +1,50 @@
+{
+  "date": "2026-10-30",
+  "scope": "Overlay placement and English-source automatic download translation",
+  "pinned_yomotsu": "0fb80c439ef816eeb50674f1b90af39918b176d8",
+  "patch_sha256": "a037a6222862ea076c294d4c0b3f9f1010936bcb38efdb61d24c88085b686f13",
+  "assembly": "PASS: app:assembleDebug completed; overall Gradle exit1 from known unit failures",
+  "apk_signature_verification": "PASS",
+  "apk_x86_64_sha256": "a3e6b6869952b202245a4cacee2d5003a4bd4b591acf657739db7d39b01c58d2",
+  "selected_translation_tests": {
+    "tests": 27,
+    "failures": 0,
+    "skipped": 0
+  },
+  "overlay_application_tests": {
+    "passed": 4,
+    "failed": 0,
+    "crlf_simulation_included": true
+  },
+  "android_unit_comparison": {
+    "status": "NO_NEW_UNIT_REGRESSIONS",
+    "baseline": {
+      "total": 428,
+      "passed": 394,
+      "failed": 34,
+      "skipped": 0
+    },
+    "patched": {
+      "total": 441,
+      "passed": 407,
+      "failed": 34,
+      "skipped": 0
+    },
+    "preexisting_failures_still_present": 34,
+    "missing_baseline_tests": [],
+    "new_failures_or_skips": [],
+    "android_runtime_verified": false,
+    "gradle_exit_codes": {
+      "baseline": 1,
+      "patched": 1
+    },
+    "required_module_coverage": {
+      "domain": 58,
+      "app": 370
+    }
+  },
+  "visual_acceptance": "PENDING; arithmetic tests and compilation do not certify balloon placement",
+  "language_identification": "Source metadata, not chapter-content detection",
+  "migration15_applied": false,
+  "backup_v2_enabled": false
+}

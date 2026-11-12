@@ -1,0 +1,11 @@
+{
+  "scope": "Android isolated-process component proof; no integrated third-party extension executor or reader acceptance.",
+  "sources": {
+    "AndroidManifest.xml": "3c0832c27e05dcfeabe07f13d53a319b0c7af975be56fbcf234ae585731f3013",
+    "Probe.java": "7e146af856583091fdbe5ce72b8316cf08a5bef96ff6713c5a5b6c9bf214e514",
+    "IsolationService.java": "425d26600df423ad660077f5e47d88d1251ffed3db4bed06b3a6c0e7b65684c6"
+  },
+  "apk_sha256": "8895f5f9d221dac3638f0c6a0d8515952fceb785b9db1092803734914c994a11",
+  "apk_bytes": 16787,
+  "dexer_sha256": "873e0e9feda8762ead0ff1ce60c30cc2bf1c0859e139245a723248d998b009fa"
+}

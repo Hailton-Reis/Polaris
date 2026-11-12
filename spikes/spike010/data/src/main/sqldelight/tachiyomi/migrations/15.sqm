@@ -1,0 +1,109 @@
+CREATE TABLE polaris_works(
+    _id INTEGER NOT NULL PRIMARY KEY,
+    stable_key TEXT NOT NULL UNIQUE,
+    virtual_manga_id INTEGER NOT NULL UNIQUE,
+    preferred_title TEXT NOT NULL,
+    original_language TEXT,
+    target_language TEXT NOT NULL DEFAULT 'pt-BR',
+    auto_match_enabled INTEGER NOT NULL DEFAULT 1,
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL,
+    FOREIGN KEY(virtual_manga_id) REFERENCES mangas(_id) ON DELETE CASCADE
+);
+
+CREATE TABLE polaris_work_aliases(
+    _id INTEGER NOT NULL PRIMARY KEY,
+    work_id INTEGER NOT NULL,
+    language TEXT NOT NULL DEFAULT '',
+    alias TEXT NOT NULL,
+    normalized_alias TEXT NOT NULL,
+    origin TEXT NOT NULL,
+    confidence REAL NOT NULL DEFAULT 1.0,
+    FOREIGN KEY(work_id) REFERENCES polaris_works(_id) ON DELETE CASCADE,
+    UNIQUE(work_id, language, normalized_alias)
+);
+
+CREATE INDEX polaris_alias_normalized_index ON polaris_work_aliases(normalized_alias);
+
+CREATE TABLE polaris_external_ids(
+    work_id INTEGER NOT NULL,
+    namespace TEXT NOT NULL,
+    external_id TEXT NOT NULL,
+    FOREIGN KEY(work_id) REFERENCES polaris_works(_id) ON DELETE CASCADE,
+    PRIMARY KEY(work_id, namespace),
+    UNIQUE(namespace, external_id)
+);
+
+CREATE TABLE polaris_work_link_overrides(
+    _id INTEGER NOT NULL PRIMARY KEY,
+    left_source_id INTEGER NOT NULL,
+    left_source_work_key TEXT NOT NULL,
+    right_source_id INTEGER NOT NULL,
+    right_source_work_key TEXT NOT NULL,
+    decision INTEGER NOT NULL,
+    created_at INTEGER NOT NULL,
+    UNIQUE(left_source_id, left_source_work_key, right_source_id, right_source_work_key)
+);
+
+CREATE TABLE polaris_source_variants(
+    _id INTEGER NOT NULL PRIMARY KEY,
+    work_id INTEGER NOT NULL,
+    manga_id INTEGER NOT NULL UNIQUE,
+    language TEXT NOT NULL,
+    chapter_count INTEGER NOT NULL DEFAULT 0,
+    highest_chapter REAL,
+    number_offset REAL NOT NULL DEFAULT 0.0,
+    enabled INTEGER NOT NULL DEFAULT 1,
+    last_seen_at INTEGER,
+    last_success_at INTEGER,
+    FOREIGN KEY(work_id) REFERENCES polaris_works(_id) ON DELETE CASCADE,
+    FOREIGN KEY(manga_id) REFERENCES mangas(_id) ON DELETE CASCADE,
+    UNIQUE(work_id, manga_id)
+);
+
+CREATE INDEX polaris_variants_work_index ON polaris_source_variants(work_id);
+
+CREATE TABLE polaris_source_health(
+    source_id INTEGER NOT NULL PRIMARY KEY,
+    state INTEGER NOT NULL,
+    success_rate REAL NOT NULL DEFAULT 1.0,
+    average_latency_ms INTEGER NOT NULL DEFAULT 0,
+    consecutive_failures INTEGER NOT NULL DEFAULT 0,
+    total_successes INTEGER NOT NULL DEFAULT 0,
+    total_failures INTEGER NOT NULL DEFAULT 0,
+    last_success_at INTEGER,
+    last_failure_at INTEGER,
+    last_failure_kind INTEGER,
+    cooldown_until INTEGER,
+    updated_at INTEGER NOT NULL
+);
+
+CREATE TABLE polaris_canonical_chapters(
+    _id INTEGER NOT NULL PRIMARY KEY,
+    work_id INTEGER NOT NULL,
+    canonical_key TEXT NOT NULL,
+    season INTEGER,
+    chapter_number REAL,
+    part INTEGER,
+    kind INTEGER NOT NULL,
+    special_key TEXT,
+    read INTEGER NOT NULL DEFAULT 0,
+    bookmark INTEGER NOT NULL DEFAULT 0,
+    last_read_at INTEGER,
+    last_variant_chapter_id INTEGER,
+    FOREIGN KEY(work_id) REFERENCES polaris_works(_id) ON DELETE CASCADE,
+    FOREIGN KEY(last_variant_chapter_id) REFERENCES chapters(_id) ON DELETE SET NULL,
+    UNIQUE(work_id, canonical_key)
+);
+
+CREATE INDEX polaris_chapters_work_index ON polaris_canonical_chapters(work_id);
+
+CREATE TABLE polaris_chapter_variants(
+    canonical_chapter_id INTEGER NOT NULL,
+    source_variant_id INTEGER NOT NULL,
+    chapter_id INTEGER NOT NULL UNIQUE,
+    FOREIGN KEY(canonical_chapter_id) REFERENCES polaris_canonical_chapters(_id) ON DELETE CASCADE,
+    FOREIGN KEY(source_variant_id) REFERENCES polaris_source_variants(_id) ON DELETE CASCADE,
+    FOREIGN KEY(chapter_id) REFERENCES chapters(_id) ON DELETE CASCADE,
+    PRIMARY KEY(canonical_chapter_id, chapter_id)
+);

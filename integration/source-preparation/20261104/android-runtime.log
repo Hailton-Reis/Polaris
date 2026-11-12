@@ -1,0 +1,5 @@
+INSTRUMENTATION_RESULT: stream=PASS: signed APK verification, tamper rejection preserving old extension, package/certificate pinning, readonly atomic replacement
+
+INSTRUMENTATION_RESULT: android_api=26
+INSTRUMENTATION_RESULT: passed_checks=4
+INSTRUMENTATION_CODE: -1

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.translation.presentation.TranslationImageCropTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-11-10T22:28:28.684Z" hostname="7d7c5a6182d0" time="0.003">
+  <properties/>
+  <testcase name="saved translation keeps the original image even when the reader requests border crop()" classname="eu.kanade.translation.presentation.TranslationImageCropTest" time="0.001"/>
+  <testcase name="translation arriving on an already cropped page requires one uncropped reload()" classname="eu.kanade.translation.presentation.TranslationImageCropTest" time="0.001"/>
+  <testcase name="untranslated pages retain the user choice and uncropped pages need no extra decode()" classname="eu.kanade.translation.presentation.TranslationImageCropTest" time="0.0"/>
+  <testcase name="recycled holder does not carry the prior page crop into its next binding()" classname="eu.kanade.translation.presentation.TranslationImageCropTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

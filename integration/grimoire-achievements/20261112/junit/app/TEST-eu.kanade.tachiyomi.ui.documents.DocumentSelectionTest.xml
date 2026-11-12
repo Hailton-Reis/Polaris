@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.tachiyomi.ui.documents.DocumentSelectionTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-11-12T18:43:18.684Z" hostname="060411c85d3c" time="0.122">
+  <properties/>
+  <testcase name="unsupported selection is rejected before any file copy()" classname="eu.kanade.tachiyomi.ui.documents.DocumentSelectionTest" time="0.009"/>
+  <testcase name="a raw filesystem uri is not treated as permission to scan the phone()" classname="eu.kanade.tachiyomi.ui.documents.DocumentSelectionTest" time="0.005"/>
+  <testcase name="selecting a phone file reads its description without opening or copying its contents()" classname="eu.kanade.tachiyomi.ui.documents.DocumentSelectionTest" time="0.005"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

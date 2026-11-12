@@ -1,0 +1,372 @@
+--------- beginning of main
+11-10 14:01:12.856  1870  1916 D IccSmsInterfaceManager: [IccSmsInterfaceManager] Failed to add cdma broadcast subscription for MID range 4097 to 4097 from client com.android.cellbroadcastreceiver
+11-10 14:01:13.102  1870  1916 D IccSmsInterfaceManager: [IccSmsInterfaceManager] Calling setCdmaBroadcastConfig with 1 configurations
+11-10 14:01:13.118  1870  1916 D IccSmsInterfaceManager: [IccSmsInterfaceManager] Failed to add cdma broadcast subscription for MID range 4098 to 4098 from client com.android.cellbroadcastreceiver
+11-10 14:01:13.187  1870  2089 D IccSmsInterfaceManager: [IccSmsInterfaceManager] Calling setCdmaBroadcastConfig with 1 configurations
+11-10 14:01:13.189  2363  2363 I Dialer  : VvmOmtpService - onCellServiceConnected
+11-10 14:01:13.239  1870  2089 D IccSmsInterfaceManager: [IccSmsInterfaceManager] Failed to add cdma broadcast subscription for MID range 4099 to 4099 from client com.android.cellbroadcastreceiver
+11-10 14:01:13.383  1870  1916 D IccSmsInterfaceManager: [IccSmsInterfaceManager] Failed to remove cdma broadcast subscription for MID range 4100 to 4100 from client com.android.cellbroadcastreceiver
+11-10 14:01:13.639  2650  2656 I zygote64: WaitForGcToComplete blocked for 5.038s for cause ObjectsAllocated
+11-10 14:01:13.648  2363  2363 I Dialer  : VvmTaskReceiver - task received
+11-10 14:01:13.649  2363  2363 I Dialer  : VvmTaskReceiver - scheduling new job
+11-10 14:01:13.655  2363  2363 I Dialer  : TaskSchedulerJobService - scheduling job with 1 tasks
+11-10 14:01:13.663  2650  2650 D WM-Processor: Processor 95bb0259-82f0-431e-9699-c8c94cfedbd7 executed; reschedule = false
+11-10 14:01:13.665  2650  2650 D WM-GreedyScheduler: Stopping tracking for WorkGenerationalId(workSpecId=95bb0259-82f0-431e-9699-c8c94cfedbd7, generation=0)
+11-10 14:01:13.680  1870  2089 D IccSmsInterfaceManager: [IccSmsInterfaceManager] Calling setGsmBroadcastConfig with 1 configurations
+11-10 14:01:13.725  2650  2656 W zygote64: Suspending all threads took: 23.944ms
+11-10 14:01:13.772  1870  2089 D IccSmsInterfaceManager: [IccSmsInterfaceManager] Failed to add GSM cell broadcast subscription for MID range 4352 to 4354 from client com.android.cellbroadcastreceiver
+11-10 14:01:13.777  2650  2650 D WM-SystemJobService: 95bb0259-82f0-431e-9699-c8c94cfedbd7 executed on JobScheduler
+11-10 14:01:13.853  1870  1916 D IccSmsInterfaceManager: [IccSmsInterfaceManager] Calling setGsmBroadcastConfig with 1 configurations
+11-10 14:01:13.874  1870  1916 D IccSmsInterfaceManager: [IccSmsInterfaceManager] Failed to add GSM cell broadcast subscription for MID range 4356 to 4356 from client com.android.cellbroadcastreceiver
+11-10 14:01:13.959  2363  2363 I Dialer  : TaskSchedulerJobService - running job instantly.
+11-10 14:01:14.002  2363  2363 I Dialer  : TaskSchedulerJobService - job 9 scheduled
+11-10 14:01:14.015  1870  1916 D IccSmsInterfaceManager: [IccSmsInterfaceManager] Failed to remove GSM cell broadcast subscription for MID range 4355 to 4355 from client com.android.cellbroadcastreceiver
+11-10 14:01:14.200  2363  2363 I Dialer  : TaskSchedulerJobService - starting 9
+11-10 14:01:14.251  2363  2363 I Dialer  : VvmTaskExecutor - onStartJob
+11-10 14:01:14.252  2363  2363 I Dialer  : Task.createTask - create task:com.android.voicemail.impl.ActivationTask
+11-10 14:01:14.301  2363  2912 I Dialer  : VvmTaskExecutor - executing task com.android.voicemail.impl.ActivationTask@805cfcc
+11-10 14:01:14.324  2363  2363 I Dialer  : VvmTaskReceiver - task received
+11-10 14:01:14.341  1870  2089 D IccSmsInterfaceManager: [IccSmsInterfaceManager] Calling setGsmBroadcastConfig with 1 configurations
+11-10 14:01:14.353  1870  2089 D IccSmsInterfaceManager: [IccSmsInterfaceManager] Failed to add GSM cell broadcast subscription for MID range 4370 to 4370 from client com.android.cellbroadcastreceiver
+11-10 14:01:14.381  2363  2912 I Dialer  : PreOMigrationHandler - ComponentInfo{com.android.phone/com.android.services.telephony.TelephonyConnectionService}, [e2f7d48dd2b5ca523e7313cf4ba0f6ea830b6281], UserHandle{0} already migrated
+11-10 14:01:14.388  2363  2363 I Dialer  : VvmTaskReceiver - TaskExecutor already running
+11-10 14:01:14.389  2363  2363 I Dialer  : Task.createTask - create task:com.android.voicemail.impl.ActivationTask
+11-10 14:01:14.392  2363  2363 I Dialer  : TaskQueue.add - duplicated task added
+11-10 14:01:14.392  2363  2363 I Dialer  : VvmTaskExecutor - com.android.voicemail.impl.ActivationTask@391d215 added
+11-10 14:01:14.592  1870  1916 D IccSmsInterfaceManager: [IccSmsInterfaceManager] Calling setGsmBroadcastConfig with 1 configurations
+11-10 14:01:14.674  1870  1916 D IccSmsInterfaceManager: [IccSmsInterfaceManager] Failed to add GSM cell broadcast subscription for MID range 4371 to 4372 from client com.android.cellbroadcastreceiver
+11-10 14:01:14.885  1870  2089 D IccSmsInterfaceManager: [IccSmsInterfaceManager] Calling setGsmBroadcastConfig with 1 configurations
+11-10 14:01:14.994  1870  2089 D IccSmsInterfaceManager: [IccSmsInterfaceManager] Failed to add GSM cell broadcast subscription for MID range 4373 to 4378 from client com.android.cellbroadcastreceiver
+--------- beginning of system
+11-10 14:01:15.151  1549  1989 W ActivityManager: Slow operation: 71ms so far, now at getContentProviderImpl: after updateOomAdj
+11-10 14:01:15.151  1549  1989 W ActivityManager: Slow operation: 71ms so far, now at getContentProviderImpl: done!
+11-10 14:01:15.579  1870  1916 D IccSmsInterfaceManager: [IccSmsInterfaceManager] Calling setGsmBroadcastConfig with 1 configurations
+11-10 14:01:15.700  1870  1916 D IccSmsInterfaceManager: [IccSmsInterfaceManager] Failed to add GSM cell broadcast subscription for MID range 4379 to 4379 from client com.android.cellbroadcastreceiver
+11-10 14:01:15.960  1549  1748 D SntpClient: request time failed: java.net.SocketTimeoutException: Poll timed out
+11-10 14:01:16.193  2650  2795 D WM-GreedyScheduler: Cancelling work ID 95bb0259-82f0-431e-9699-c8c94cfedbd7
+11-10 14:01:16.461  1870  2089 D IccSmsInterfaceManager: [IccSmsInterfaceManager] Failed to remove GSM cell broadcast subscription for MID range 4380 to 4382 from client com.android.cellbroadcastreceiver
+11-10 14:01:16.521  1549  2414 D NetworkMonitor/NetworkAgentInfo [MOBILE (LTE) - 100]: PROBE_FALLBACK http://www.google.com/gen_204 Probably not a portal: exception java.net.SocketTimeoutException: failed to connect to www.google.com/2001:4860:4827:7700:: (port 80) from /fec0::15c8:99d:9d07:ffe9 (port 60352) after 10000ms
+11-10 14:01:16.539  1549  1757 D ConnectivityService: NetworkAgentInfo [MOBILE (LTE) - 100] validation failed
+11-10 14:01:16.642  1870  1916 D IccSmsInterfaceManager: [IccSmsInterfaceManager] Calling setGsmBroadcastConfig with 1 configurations
+11-10 14:01:16.692  1870  1916 D IccSmsInterfaceManager: [IccSmsInterfaceManager] Failed to add GSM cell broadcast subscription for MID range 4383 to 4383 from client com.android.cellbroadcastreceiver
+11-10 14:01:16.749  2363  2912 I Dialer  : VvmActivationTask - VVM content provider configured - vvm_type_cvvm
+11-10 14:01:16.789  2650  2795 D WM-SystemJobScheduler: Scheduling work ID 95bb0259-82f0-431e-9699-c8c94cfedbd7Job ID 3
+11-10 14:01:16.828  2363  2912 I Dialer  : OmtpVvmCarrierCfgHlpr - OmtpEvent:CONFIG_ACTIVATING
+11-10 14:01:16.842  1870  1916 D IccSmsInterfaceManager: [IccSmsInterfaceManager] Calling setGsmBroadcastConfig with 1 configurations
+11-10 14:01:16.850  1870  1916 D IccSmsInterfaceManager: [IccSmsInterfaceManager] Failed to add GSM cell broadcast subscription for MID range 4384 to 4385 from client com.android.cellbroadcastreceiver
+11-10 14:01:16.933  2650  2795 D WM-ConstraintTracker: StorageNotLowTracker: initial state = true
+11-10 14:01:16.934  2650  2795 D WM-BrdcstRcvrCnstrntTrc: StorageNotLowTracker: registering receiver
+11-10 14:01:17.157  1870  2089 D IccSmsInterfaceManager: [IccSmsInterfaceManager] Calling setGsmBroadcastConfig with 1 configurations
+11-10 14:01:17.184  1870  2089 D IccSmsInterfaceManager: [IccSmsInterfaceManager] Failed to add GSM cell broadcast subscription for MID range 4386 to 4391 from client com.android.cellbroadcastreceiver
+11-10 14:01:17.344  2363  2912 I Dialer  : TelephonyMangerCompat.setVisualVoicemailSmsFilterSettings - using TelephonyManager
+11-10 14:01:17.362  1549  1559 I zygote64: Background concurrent copying GC freed 41460(2MB) AllocSpace objects, 11(276KB) LOS objects, 42% free, 6MB/11MB, paused 15.794ms total 3.239s
+11-10 14:01:17.397  1870  1916 D IccSmsInterfaceManager: [IccSmsInterfaceManager] Calling setGsmBroadcastConfig with 1 configurations
+11-10 14:01:17.480  1870  1916 D IccSmsInterfaceManager: [IccSmsInterfaceManager] Failed to add GSM cell broadcast subscription for MID range 4392 to 4392 from client com.android.cellbroadcastreceiver
+11-10 14:01:17.597  2650  2650 D WM-WorkerWrapper: Starting work for eu.kanade.translation.EnglishTranslationSetupJob
+11-10 14:01:17.639  2363  2912 I Dialer  : TelephonyMangerCompat.sendVisualVoicemailSms - using TelephonyManager
+11-10 14:01:17.789  2650  2795 D WM-ConstraintTracker: NetworkStateTrackerPre28: initial state = NetworkState(isConnected=true, isValidated=false, isMetered=false, isNotRoaming=true, isBlocked=false)
+11-10 14:01:17.790  2650  2795 D WM-NetworkStateTracker: Registering network callback
+11-10 14:01:17.842  1549  2916 D NetworkMonitor/NetworkAgentInfo [MOBILE (LTE) - 100]: PROBE_DNS connectivitycheck.gstatic.com 257ms OK 142.251.150.120,2607:f8b0:4005:815::2003
+11-10 14:01:17.865  1870  1916 D IccSmsInterfaceManager: [IccSmsInterfaceManager] Failed to remove GSM cell broadcast subscription for MID range 4393 to 4395 from client com.android.cellbroadcastreceiver
+11-10 14:01:17.984  1549  2915 D NetworkMonitor/NetworkAgentInfo [MOBILE (LTE) - 100]: PROBE_DNS www.google.com 400ms OK 142.251.156.119,142.251.153.119,142.251.150.119,142.251.152.119,142.251.151.119,142.251.157.119,142.251.155.119,142.251.154.119,2001:4860:482b:7700::,2001:4860:482d:7700::,2001:4860:482a:7700::,2001:4860:482c:7700::,2001:4860:4829:7700::,2001:4860:4828:7700::,2001:4860:4826:7700::,2001:4860:4827:7700::
+11-10 14:01:18.151  1870  2088 D IccSmsInterfaceManager: [IccSmsInterfaceManager] Failed to remove GSM cell broadcast subscription for MID range 50 to 50 from client com.android.cellbroadcastreceiver
+11-10 14:01:18.159  2464  2904 D CellBroadcastConfigService: Enable CellBroadcast on sub 1
+11-10 14:01:18.298  1549  1630 W ActivityManager: Didn't see close of /data/anr/traces.txt for pid 2650. Attempting native stack collection.
+11-10 14:01:18.299  1549  1630 I zygote64: libdebuggerd_client: started dumping process 2650
+11-10 14:01:18.317  2650  2650 I libc    : Requested dump for tid 2650 (tachiyomiat.dev)
+11-10 14:01:18.360  1519  1519 I /system/bin/tombstoned: tombstoned registered intercept for pid 2650
+11-10 14:01:18.422  1549  1863 D ConnectivityService: requestNetwork for uid/pid:10065/2650 NetworkRequest [ TRACK_DEFAULT id=7, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VPN] ]
+11-10 14:01:18.441  2650  2795 D WM-BrdcstRcvrCnstrntTrc: BatteryNotLowTracker: unregistering receiver
+11-10 14:01:18.607  1549  1753 D WIFI_UT : got request NetworkRequest [ TRACK_DEFAULT id=7, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VPN] ] with score 20
+11-10 14:01:18.648  1549  1753 D WIFI    : got request NetworkRequest [ TRACK_DEFAULT id=7, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VPN] ] with score 20
+11-10 14:01:18.654  1870  1870 D PhoneSwitcherNetworkRequstListener: got request NetworkRequest [ TRACK_DEFAULT id=7, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VPN] ] with score 20
+11-10 14:01:18.734  1870  2088 D IccSmsInterfaceManager: [IccSmsInterfaceManager] Calling setCdmaBroadcastConfig with 1 configurations
+11-10 14:01:18.771  1549  2420 D NetworkMonitor/NetworkAgentInfo [WIFI () - 101]: PROBE_FALLBACK http://www.google.com/gen_204 Probably not a portal: exception java.net.SocketTimeoutException: failed to connect to www.google.com/2001:4860:482c:7700:: (port 80) from /fec0::85ed:a5d2:9349:aad9 (port 51820) after 10000ms
+11-10 14:01:18.849  1549  1757 D ConnectivityService: NetworkAgentInfo [WIFI () - 101] validation failed
+11-10 14:01:18.850  1870  2088 D IccSmsInterfaceManager: [IccSmsInterfaceManager] Failed to add cdma broadcast subscription for MID range 4096 to 4096 from client com.android.cellbroadcastreceiver
+11-10 14:01:18.878  2650  2661 W zygote64: Suspending all threads took: 230.958ms
+11-10 14:01:18.899  1549  1753 D WifiStateMachine: NETWORK_STATUS_UNWANTED_VALIDATION_FAILED
+11-10 14:01:18.939  2650  2919 D WM-NetworkStateTracker: Network capabilities changed: [ Transports: WIFI Capabilities: NOT_METERED&INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VPN&FOREGROUND LinkUpBandwidth>=1048576Kbps LinkDnBandwidth>=1048576Kbps SignalStrength: -50]
+11-10 14:01:19.353  1870  2174 D IccSmsInterfaceManager: [IccSmsInterfaceManager] Calling setCdmaBroadcastConfig with 1 configurations
+11-10 14:01:19.374  1870  2174 D IccSmsInterfaceManager: [IccSmsInterfaceManager] Failed to add cdma broadcast subscription for MID range 4097 to 4097 from client com.android.cellbroadcastreceiver
+11-10 14:01:19.582  2650  2748 D WM-GreedyScheduler: Constraints met: Scheduling work ID WorkGenerationalId(workSpecId=5fd758ab-5420-4878-b92b-af706629ad00, generation=0)
+11-10 14:01:19.682  1870  2174 D IccSmsInterfaceManager: [IccSmsInterfaceManager] Calling setCdmaBroadcastConfig with 1 configurations
+11-10 14:01:19.694  2650  2656 I zygote64: Wrote stack traces to '/data/anr/traces.txt'
+11-10 14:01:19.701  1870  2174 D IccSmsInterfaceManager: [IccSmsInterfaceManager] Failed to add cdma broadcast subscription for MID range 4098 to 4098 from client com.android.cellbroadcastreceiver
+11-10 14:01:19.786  1870  1885 I zygote64: Background concurrent copying GC freed 18497(1386KB) AllocSpace objects, 2(40KB) LOS objects, 49% free, 1602KB/3MB, paused 3.956ms total 1.823s
+11-10 14:01:19.903  1549  2926 D NetworkMonitor/NetworkAgentInfo [WIFI () - 101]: PROBE_DNS connectivitycheck.gstatic.com 84ms OK 142.251.150.120,2001:4860:4826:7800::
+11-10 14:01:19.922  1870  2174 D IccSmsInterfaceManager: [IccSmsInterfaceManager] Calling setCdmaBroadcastConfig with 1 configurations
+11-10 14:01:19.984  1870  2174 D IccSmsInterfaceManager: [IccSmsInterfaceManager] Failed to add cdma broadcast subscription for MID range 4099 to 4099 from client com.android.cellbroadcastreceiver
+11-10 14:01:20.053  1549  2925 D NetworkMonitor/NetworkAgentInfo [WIFI () - 101]: PROBE_DNS www.google.com 263ms OK 142.251.154.119,142.251.152.119,142.251.155.119,142.251.156.119,142.251.150.119,142.251.153.119,142.251.157.119,142.251.151.119,2001:4860:482b:7700::,2001:4860:4828:7700::,2001:4860:4826:7700::,2001:4860:482a:7700::,2001:4860:4827:7700::,2001:4860:4829:7700::,2001:4860:482d:7700::,2001:4860:482c:7700::
+11-10 14:01:20.315  1549  1630 E zygote64: libdebuggerd_client: received packet of unexpected length from tombstoned: expected 128, received -1
+11-10 14:01:20.361  1519  1519 I /system/bin/tombstoned: intercept for pid 2650 terminated due to input
+11-10 14:01:20.376  1870  2174 D IccSmsInterfaceManager: [IccSmsInterfaceManager] Failed to remove cdma broadcast subscription for MID range 4100 to 4100 from client com.android.cellbroadcastreceiver
+11-10 14:01:20.597  1549  1630 E ActivityManager: ANR in app.mihon.tachiyomiat.dev
+11-10 14:01:20.597  1549  1630 E ActivityManager: PID: 2650
+11-10 14:01:20.597  1549  1630 E ActivityManager: Reason: executing service app.mihon.tachiyomiat.dev/androidx.work.impl.background.systemjob.SystemJobService
+11-10 14:01:20.597  1549  1630 E ActivityManager: Load: 0.0 / 0.0 / 0.0
+11-10 14:01:20.597  1549  1630 E ActivityManager: CPU usage from 1ms to 12817ms later (2026-11-10 14:01:07.536 to 2026-11-10 14:01:20.353):
+11-10 14:01:20.597  1549  1630 E ActivityManager:   42% 1549/system_server: 12% user + 30% kernel / faults: 512 minor 1 major
+11-10 14:01:20.597  1549  1630 E ActivityManager:   30% 2650/app.mihon.tachiyomiat.dev: 15% user + 15% kernel / faults: 3055 minor 10 major
+11-10 14:01:20.597  1549  1630 E ActivityManager:   17% 1460/kworker/u5:0: 0% user + 17% kernel
+11-10 14:01:20.597  1549  1630 E ActivityManager:   15% 1870/com.android.phone: 5.9% user + 9.5% kernel / faults: 548 minor 1 major
+11-10 14:01:20.597  1549  1630 E ActivityManager:   11% 2720/com.android.systemui: 4.9% user + 6.8% kernel / faults: 3422 minor 3 major
+11-10 14:01:20.597  1549  1630 E ActivityManager:   10% 1474/kworker/u5:1: 0% user + 10% kernel
+11-10 14:01:20.597  1549  1630 E ActivityManager:   8.3% 2609/app_process: 0.3% user + 8% kernel
+11-10 14:01:20.597  1549  1630 E ActivityManager:   7.6% 1403/surfaceflinger: 3.6% user + 3.9% kernel / faults: 2 minor
+11-10 14:01:20.597  1549  1630 E ActivityManager:   5.2% 519/kswapd0: 0% user + 5.2% kernel
+11-10 14:01:20.597  1549  1630 E ActivityManager:   4.8% 1394/android.hardware.graphics.composer@2.1-service: 1.9% user + 2.9% kernel / faults: 4 minor
+11-10 14:01:20.597  1549  1630 E ActivityManager:   0.9% 2363/com.android.dialer: 0.4% user + 0.5% kernel / faults: 623 minor 9 major
+11-10 14:01:20.597  1549  1630 E ActivityManager:   3.8% 1396/android.hardware.sensors@1.0-service: 1.1% user + 2.6% kernel
+11-10 14:01:20.597  1549  1630 E ActivityManager:   3.1% 1329/servicemanager: 0.8% user + 2.2% kernel
+11-10 14:01:20.597  1549  1630 E ActivityManager:   2.7% 1378/adbd: 0.2% user + 2.4% kernel / faults: 138 minor
+11-10 14:01:20.597  1549  1630 E ActivityManager:   2.6% 1503/netd: 0.1% user + 2.4% kernel / faults: 244 minor
+11-10 14:01:20.597  1549  1630 E ActivityManager:   2.1% 7/rcu_preempt: 0% user + 2.1% kernel
+11-10 14:01:20.597  1549  1630 E ActivityManager:   1.6% 2287/android.process.acore: 0.6% user + 0.9% kernel / faults: 217 minor
+11-10 14:01:20.597  1549  1630 E ActivityManager:   0.3% 2464/com.android.cellbroadcastreceiver: 0% user + 0.2% kernel / faults: 28 minor
+11-10 14:01:20.597  1549  1630 E ActivityManager:   1.5% 1328/logd: 0.4% user + 1.1% kernel / faults: 25 minor
+11-10 14:01:20.597  1549  1630 E ActivityManager:   1.3% 1462/dmcrypt_write: 0% user + 1.3% kernel
+11-10 14:01:20.597  1549  1630 E ActivityManager:   1.3% 2415/android.process.media: 0.4% user + 0.8% kernel / faults: 49 minor
+11-10 14:01:20.597  1549  1630 E ActivityManager:   1.1% 653/kworker/u4:2: 0% user + 1.1% kernel
+11-10 14:01:20.597  1549  1630 E ActivityManager:   1% 3/ksoftirqd/0: 0% user + 1% kernel
+11-10 14:01:20.597  1549  1630 E ActivityManager:   0.9% 2184/com.android.providers.calendar: 0.3% user + 0.6% kernel / faults: 106 minor
+11-10 14:01:20.597  1549  1630 E ActivityManager:   0.7% 1402/lmkd: 0.3% user + 0.4% kernel
+11-10 14:01:20.597  1549  1630 E ActivityManager:   0.6% 12/ksoftirqd/1: 0% user + 0.6% kernel
+11-10 14:01:20.597  1549  1630 E ActivityManager:   0.5% 1414/logcat: 0.3% user + 0.2% kernel / faults: 2 minor
+11-10 14:01:20.597  1549  1630 E ActivityManager:   0.5% 1683/ipv6proxy: 0% user + 0.5% kernel
+11-10 14:01:20.597  1549  1630 E ActivityManager:   0.3% 1481/jbd2/dm-0-8: 0% user + 0.3% kernel
+11-10 14:01:20.597  1549  1630 E ActivityManager:   0.3% 1507/android.hardware.gnss@1.0-service: 0.1% user + 0.1% kernel
+11-10 14:01:20.597  1549  1630 E ActivityManager:   0.2% 6/kworker/u4:0: 0% user + 0.2% kernel
+11-10 14:01:20.597  1549  1630 E ActivityManager:   0.2% 1295/kworker/0:1H: 0% user + 0.2% kernel
+11-10 14:01:20.597  1549  1630 E ActivityManager:   0.2% 1509/rild: 0.1% user + 0% kernel
+11-10 14:01:20.597  1549  1630 E ActivityManager:   0.2% 2580/com.android.email: 0% user + 0.2% kernel / faults: 7 minor
+11-10 14:01:20.597  1549  1630 E ActivityManager:   0.1% 510/kworker/0:1: 0% user + 0.1% kernel
+11-10 14:01:20.597  1549  1630 E ActivityManager:   0.1% 677/hwrng: 0% user + 0.1% kernel
+11-10 14:01:20.597  1549  1630 E ActivityManager:   0.1% 1395/android.hardware.power@1.0-service: 0% user + 0.1% kernel
+11-10 14:01:20.597  1549  1630 E ActivityManager:   0.1% 2487/com.android.messaging: 0% user + 0.1% kernel
+11-10 14:01:20.597  1549  1630 E ActivityManager:   0% 1397/android.hardware.wifi@1.0-service: 0% user + 0% kernel
+11-10 14:01:20.597  1549  1630 E ActivityManager:   0% 1519/tombstoned: 0% user + 0% kernel
+11-10 14:01:20.597  1549  1630 E ActivityManager:   0% 2238/com.android.launcher3: 0% user + 0% kernel
+11-10 14:01:20.597  1549  1630 E ActivityManager:  +0% 2921/crash_dump64: 0% user + 0% kernel
+11-10 14:01:20.597  1549  1630 E ActivityManager:  +0% 2929/crash_dump64: 0% user + 0% kernel
+11-10 14:01:20.597  1549  1630 E ActivityManager: 100% TOTAL: 29% user + 67% kernel + 3.4% softirq
+11-10 14:01:20.597  1549  1630 E ActivityManager: CPU usage from 282460ms to 282460ms ago (1970-01-01 00:00:00.000 to 1970-01-01 00:00:00.000) with 0% awake:
+11-10 14:01:20.597  1549  1630 E ActivityManager: 0% TOTAL: 0% user + 0% kernel
+11-10 14:01:20.642  1870  2174 D IccSmsInterfaceManager: [IccSmsInterfaceManager] Calling setGsmBroadcastConfig with 1 configurations
+11-10 14:01:20.760  1549  1630 I ActivityManager: Killing 2650:app.mihon.tachiyomiat.dev/u0a65 (adj 100): bg anr
+11-10 14:01:20.886  1870  2174 D IccSmsInterfaceManager: [IccSmsInterfaceManager] Failed to add GSM cell broadcast subscription for MID range 4352 to 4354 from client com.android.cellbroadcastreceiver
+11-10 14:01:20.937  1549  1785 D ConnectivityService: ConnectivityService NetworkRequestInfo binderDied(NetworkRequest [ TRACK_DEFAULT id=7, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VPN] ], android.os.BinderProxy@10cc1f8)
+11-10 14:01:20.949  2929  2929 E DEBUG   : failed to open directory /proc/2650/fd: No such file or directory
+11-10 14:01:20.952  2929  2929 I crash_dump64: obtaining output fd from tombstoned
+11-10 14:01:20.960  1402  1402 E lowmemorykiller: Error writing /proc/2650/oom_score_adj; errno=22
+11-10 14:01:20.968  1519  1519 I /system/bin/tombstoned: received crash request for pid 2650
+11-10 14:01:20.981  1549  1757 D ConnectivityService: releasing NetworkRequest [ TRACK_DEFAULT id=7, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VPN] ] (CALLBACK_RELEASED)
+11-10 14:01:20.990  1549  1757 E ConnectivityService: RemoteException caught trying to send a callback msg for NetworkRequest [ TRACK_DEFAULT id=7, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VPN] ]
+11-10 14:01:21.075  1549  1549 W ActivityManager: Exception when unbinding service app.mihon.tachiyomiat.dev/androidx.work.impl.background.systemjob.SystemJobService
+11-10 14:01:21.075  1549  1549 W ActivityManager: android.os.DeadObjectException
+11-10 14:01:21.075  1549  1549 W ActivityManager: 	at android.os.BinderProxy.transactNative(Native Method)
+11-10 14:01:21.075  1549  1549 W ActivityManager: 	at android.os.BinderProxy.transact(Binder.java:748)
+11-10 14:01:21.075  1549  1549 W ActivityManager: 	at android.app.IApplicationThread$Stub$Proxy.scheduleUnbindService(IApplicationThread.java:1522)
+11-10 14:01:21.075  1549  1549 W ActivityManager: 	at com.android.server.am.ActiveServices.removeConnectionLocked(ActiveServices.java:2640)
+11-10 14:01:21.075  1549  1549 W ActivityManager: 	at com.android.server.am.ActiveServices.unbindServiceLocked(ActiveServices.java:1551)
+11-10 14:01:21.075  1549  1549 W ActivityManager: 	at com.android.server.am.ActivityManagerService.unbindService(ActivityManagerService.java:18306)
+11-10 14:01:21.075  1549  1549 W ActivityManager: 	at android.app.ContextImpl.unbindService(ContextImpl.java:1625)
+11-10 14:01:21.075  1549  1549 W ActivityManager: 	at com.android.server.job.JobServiceContext.closeAndCleanupJobLocked(JobServiceContext.java:717)
+11-10 14:01:21.075  1549  1549 W ActivityManager: 	at com.android.server.job.JobServiceContext.onServiceDisconnected(JobServiceContext.java:395)
+11-10 14:01:21.075  1549  1549 W ActivityManager: 	at android.app.LoadedApk$ServiceDispatcher.doDeath(LoadedApk.java:1650)
+11-10 14:01:21.075  1549  1549 W ActivityManager: 	at android.app.LoadedApk$ServiceDispatcher$RunConnection.run(LoadedApk.java:1665)
+11-10 14:01:21.075  1549  1549 W ActivityManager: 	at android.os.Handler.handleCallback(Handler.java:789)
+11-10 14:01:21.075  1549  1549 W ActivityManager: 	at android.os.Handler.dispatchMessage(Handler.java:98)
+11-10 14:01:21.075  1549  1549 W ActivityManager: 	at android.os.Looper.loop(Looper.java:164)
+11-10 14:01:21.075  1549  1549 W ActivityManager: 	at com.android.server.SystemServer.run(SystemServer.java:421)
+11-10 14:01:21.075  1549  1549 W ActivityManager: 	at com.android.server.SystemServer.main(SystemServer.java:260)
+11-10 14:01:21.075  1549  1549 W ActivityManager: 	at java.lang.reflect.Method.invoke(Native Method)
+11-10 14:01:21.075  1549  1549 W ActivityManager: 	at com.android.internal.os.Zygote$MethodAndArgsCaller.run(Zygote.java:240)
+11-10 14:01:21.075  1549  1549 W ActivityManager: 	at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:767)
+11-10 14:01:21.384  1870  2088 D IccSmsInterfaceManager: [IccSmsInterfaceManager] Calling setGsmBroadcastConfig with 1 configurations
+11-10 14:01:21.416  1870  2088 D IccSmsInterfaceManager: [IccSmsInterfaceManager] Failed to add GSM cell broadcast subscription for MID range 4356 to 4356 from client com.android.cellbroadcastreceiver
+11-10 14:01:21.723  1549  1634 W zygote64: Long monitor contention with owner Binder:1549_4 (1841) at void com.android.server.am.ActivityManagerService$AppDeathRecipient.binderDied()(ActivityManagerService.java:1642) waiters=0 in void com.android.server.am.ActivityManagerService.dispatchUidsChanged() for 384ms
+11-10 14:01:21.725  1549  1634 W Looper  : Dispatch took 386ms on android.ui, h=Handler (com.android.server.am.ActivityManagerService$UiHandler) {b3da5bb} cb=null msg=53
+11-10 14:01:21.726  1549  1785 W zygote64: Long monitor contention with owner Binder:1549_4 (1841) at void com.android.server.am.ActivityManagerService$AppDeathRecipient.binderDied()(ActivityManagerService.java:1642) waiters=1 in java.lang.String com.android.server.am.ActivityManagerService.checkContentProviderAccess(java.lang.String, int) for 302ms
+11-10 14:01:21.746  1870  1870 W zygote64: Long monitor contention with owner HwBinder:1870_1 (1980) at void com.android.internal.telephony.RIL.decrementWakeLock(com.android.internal.telephony.RILRequest)(RIL.java:3995) waiters=0 in void com.android.internal.telephony.RIL.acquireWakeLock(com.android.internal.telephony.RILRequest, int) for 162ms
+11-10 14:01:21.833  1870  2174 D IccSmsInterfaceManager: [IccSmsInterfaceManager] Failed to remove GSM cell broadcast subscription for MID range 4355 to 4355 from client com.android.cellbroadcastreceiver
+11-10 14:01:21.882  1870  2174 D IccSmsInterfaceManager: [IccSmsInterfaceManager] Calling setGsmBroadcastConfig with 1 configurations
+11-10 14:01:21.898  1870  2174 D IccSmsInterfaceManager: [IccSmsInterfaceManager] Failed to add GSM cell broadcast subscription for MID range 4370 to 4370 from client com.android.cellbroadcastreceiver
+11-10 14:01:21.950  1870  2088 D IccSmsInterfaceManager: [IccSmsInterfaceManager] Calling setGsmBroadcastConfig with 1 configurations
+11-10 14:01:21.962  1870  2088 D IccSmsInterfaceManager: [IccSmsInterfaceManager] Failed to add GSM cell broadcast subscription for MID range 4371 to 4372 from client com.android.cellbroadcastreceiver
+11-10 14:01:21.989  1519  1519 W /system/bin/tombstoned: crash socket received short read of length 0 (expected 8)
+11-10 14:01:22.011  1870  2088 D IccSmsInterfaceManager: [IccSmsInterfaceManager] Calling setGsmBroadcastConfig with 1 configurations
+11-10 14:01:22.025  1870  2088 D IccSmsInterfaceManager: [IccSmsInterfaceManager] Failed to add GSM cell broadcast subscription for MID range 4373 to 4378 from client com.android.cellbroadcastreceiver
+11-10 14:01:22.047  1549  1647 I BootReceiver: Copying /data/tombstones/tombstone_01 to DropBox (SYSTEM_TOMBSTONE)
+11-10 14:01:22.154  1870  2174 D IccSmsInterfaceManager: [IccSmsInterfaceManager] Calling setGsmBroadcastConfig with 1 configurations
+11-10 14:01:22.162  1870  2174 D IccSmsInterfaceManager: [IccSmsInterfaceManager] Failed to add GSM cell broadcast subscription for MID range 4379 to 4379 from client com.android.cellbroadcastreceiver
+11-10 14:01:22.366  1870  2174 D IccSmsInterfaceManager: [IccSmsInterfaceManager] Failed to remove GSM cell broadcast subscription for MID range 4380 to 4382 from client com.android.cellbroadcastreceiver
+11-10 14:01:22.470  1870  2174 D IccSmsInterfaceManager: [IccSmsInterfaceManager] Calling setGsmBroadcastConfig with 1 configurations
+11-10 14:01:22.518  1870  2174 D IccSmsInterfaceManager: [IccSmsInterfaceManager] Failed to add GSM cell broadcast subscription for MID range 4383 to 4383 from client com.android.cellbroadcastreceiver
+11-10 14:01:22.589  1870  1916 D IccSmsInterfaceManager: [IccSmsInterfaceManager] Calling setGsmBroadcastConfig with 1 configurations
+11-10 14:01:22.612  1870  1916 D IccSmsInterfaceManager: [IccSmsInterfaceManager] Failed to add GSM cell broadcast subscription for MID range 4384 to 4385 from client com.android.cellbroadcastreceiver
+11-10 14:01:22.695  2720  2720 W zygote64: Long monitor contention with owner AsyncTask #2 (2825) at boolean android.os.MessageQueue.enqueueMessage(android.os.Message, long)(MessageQueue.java:543) waiters=0 in android.os.Message android.os.MessageQueue.next() for 149ms
+11-10 14:01:22.734  1870  2174 D IccSmsInterfaceManager: [IccSmsInterfaceManager] Calling setGsmBroadcastConfig with 1 configurations
+11-10 14:01:22.752  1870  2174 D IccSmsInterfaceManager: [IccSmsInterfaceManager] Failed to add GSM cell broadcast subscription for MID range 4386 to 4391 from client com.android.cellbroadcastreceiver
+11-10 14:01:22.851  1870  2174 D IccSmsInterfaceManager: [IccSmsInterfaceManager] Calling setGsmBroadcastConfig with 1 configurations
+11-10 14:01:22.892  1870  2174 D IccSmsInterfaceManager: [IccSmsInterfaceManager] Failed to add GSM cell broadcast subscription for MID range 4392 to 4392 from client com.android.cellbroadcastreceiver
+11-10 14:01:23.115  1870  2174 D IccSmsInterfaceManager: [IccSmsInterfaceManager] Failed to remove GSM cell broadcast subscription for MID range 4393 to 4395 from client com.android.cellbroadcastreceiver
+11-10 14:01:23.269  1870  1916 D IccSmsInterfaceManager: [IccSmsInterfaceManager] Failed to remove GSM cell broadcast subscription for MID range 50 to 50 from client com.android.cellbroadcastreceiver
+11-10 14:01:23.352  2720  2732 I zygote64: NativeAllocBackground concurrent copying GC freed 16713(2MB) AllocSpace objects, 139(2MB) LOS objects, 49% free, 3MB/7MB, paused 28.382ms total 806.730ms
+11-10 14:01:25.135  2720  2726 I zygote64: Do partial code cache collection, code=58KB, data=54KB
+11-10 14:01:25.136  2720  2726 I zygote64: After code cache collection, code=58KB, data=54KB
+11-10 14:01:25.253  2720  2726 I zygote64: Increasing code cache capacity to 256KB
+11-10 14:01:25.352  2720  2732 I zygote64: NativeAllocBackground concurrent copying GC freed 5728(672KB) AllocSpace objects, 0(0B) LOS objects, 49% free, 4MB/8MB, paused 50.379ms total 147.489ms
+11-10 14:01:25.413  2415  2463 W MediaScanner: Error opening directory '/oem/media/', skipping: No such file or directory.
+11-10 14:01:25.525  2415  2463 V MediaProvider: pruneThumbnails 
+11-10 14:01:25.655  2720  2720 D         : HostConnection::get() New Host Connection established 0x7a642c888460, tid 2720
+11-10 14:01:25.676  2720  2720 D EGL_emulation: eglCreateContext: 0x7a642c9ecda0: maj 3 min 0 rcv 3
+11-10 14:01:25.696  2720  2720 D EGL_emulation: eglMakeCurrent: 0x7a642c9ecda0: ver 3 0 (tinfo 0x7a642ed92160)
+11-10 14:01:25.709  2415  2463 V MediaProvider: /pruneDeadThumbnailFiles... 
+11-10 14:01:25.973  1391  1391 D gralloc_ranchu: gralloc_alloc: Creating ashmem region of size 4612096
+11-10 14:01:26.210  2720  2720 D EGL_emulation: eglMakeCurrent: 0x7a642c9ecda0: ver 3 0 (tinfo 0x7a642ed92160)
+11-10 14:01:27.453  1391  1391 D gralloc_ranchu: gralloc_alloc: Creating ashmem region of size 4612096
+11-10 14:01:27.706  1391  1391 E hw-IPCThreadState: binder thread pool (1 threads) starved for 253 ms
+11-10 14:01:27.723  1396  1396 E hw-IPCThreadState: binder thread pool (2 threads) starved for 155 ms
+11-10 14:01:27.763  2720  2720 I Choreographer: Skipped 141 frames!  The application may be doing too much work on its main thread.
+11-10 14:01:27.915  2415  2463 V MediaProvider: pruneThumbnails 
+11-10 14:01:28.063  2415  2463 V MediaProvider: /pruneDeadThumbnailFiles... 
+11-10 14:01:28.131  1549  1650 W zygote64: Long monitor contention with owner Binder:1549_9 (2234) at int com.android.server.wm.WindowManagerService.relayoutWindow(com.android.server.wm.Session, android.view.IWindow, int, android.view.WindowManager$LayoutParams, int, int, int, int, android.graphics.Rect, android.graphics.Rect, android.graphics.Rect, android.graphics.Rect, android.graphics.Rect, android.graphics.Rect, android.graphics.Rect, android.util.MergedConfiguration, android.view.Surface)(WindowManagerService.java:1902) waiters=0 in void com.android.server.wm.WindowManagerService$H.handleMessage(android.os.Message) for 148ms
+11-10 14:01:28.153  2720  2720 D EGL_emulation: eglCreateContext: 0x7a642c9ed020: maj 3 min 0 rcv 3
+11-10 14:01:28.168  2720  2720 D EGL_emulation: eglMakeCurrent: 0x7a642c9ed020: ver 3 0 (tinfo 0x7a642ed92160)
+11-10 14:01:28.207  1549  1629 E memtrack: Couldn't load memtrack module
+11-10 14:01:28.208  1549  1629 W android.os.Debug: failed to get memory consumption info: -1
+11-10 14:01:28.240  1391  1391 D gralloc_ranchu: gralloc_alloc: Creating ashmem region of size 7958528
+11-10 14:01:28.424  2720  2720 D EGL_emulation: eglMakeCurrent: 0x7a642c9ed020: ver 3 0 (tinfo 0x7a642ed92160)
+11-10 14:01:28.980  1391  1391 D gralloc_ranchu: gralloc_alloc: Creating ashmem region of size 7958528
+11-10 14:01:29.036  2720  2720 I Choreographer: Skipped 74 frames!  The application may be doing too much work on its main thread.
+11-10 14:01:29.543  1549  2916 D NetworkMonitor/NetworkAgentInfo [MOBILE (LTE) - 100]: PROBE_HTTP http://connectivitycheck.gstatic.com/generate_204 Probably not a portal: exception java.net.SocketTimeoutException: failed to connect to connectivitycheck.gstatic.com/2607:f8b0:4005:815::2003 (port 80) from /fec0::15c8:99d:9d07:ffe9 (port 36011) after 10000ms
+11-10 14:01:34.109  1549  2926 D NetworkMonitor/NetworkAgentInfo [WIFI () - 101]: PROBE_HTTP http://connectivitycheck.gstatic.com/generate_204 Probably not a portal: exception java.net.SocketTimeoutException: failed to connect to connectivitycheck.gstatic.com/2001:4860:4826:7800:: (port 80) from /fec0::85ed:a5d2:9349:aad9 (port 58229) after 10000ms
+11-10 14:01:36.715  1401  1401 I boot-pipe: done populating /dev/random
+11-10 14:01:51.279  1549  1549 W ActivityManager: Slow operation: 158ms so far, now at startProcess: returned from zygote!
+11-10 14:01:51.279  1549  1549 W ActivityManager: Slow operation: 160ms so far, now at startProcess: done updating battery stats
+11-10 14:01:51.280  1549  1549 W ActivityManager: Slow operation: 160ms so far, now at startProcess: building log message
+11-10 14:01:51.281  1549  1549 I ActivityManager: Start proc 2936:app.mihon.tachiyomiat.dev/u0a65 for service app.mihon.tachiyomiat.dev/androidx.work.impl.background.systemjob.SystemJobService
+11-10 14:01:51.281  1549  1549 W ActivityManager: Slow operation: 161ms so far, now at startProcess: starting to update pids map
+11-10 14:01:51.282  1549  1549 W ActivityManager: Slow operation: 162ms so far, now at startProcess: done updating pids map
+11-10 14:01:51.282  1549  1549 W ActivityManager: Slow operation: 178ms so far, now at startProcess: done starting proc!
+11-10 14:01:51.311  1549  1634 W Looper  : Dispatch took 192ms on android.ui, h=Handler (com.android.server.am.ActivityManagerService$UiHandler) {b3da5bb} cb=null msg=53
+11-10 14:01:51.413  2936  2936 I zygote64: Late-enabling -Xcheck:jni
+11-10 14:01:51.580  2936  2936 W zygote64: Unexpected CPU variant for X86 using defaults: x86_64
+11-10 14:01:51.804  1549  1629 E memtrack: Couldn't load memtrack module
+11-10 14:01:51.804  1549  1629 W android.os.Debug: failed to get memory consumption info: -1
+11-10 14:01:52.951  2936  2936 W zygote64: Verification of okhttp3.OkHttpClient eu.kanade.tachiyomi.App.$r8$lambda$Pf2fJbsUMVLxhcKChCxA4Qf2cUM() took 290.271ms
+11-10 14:01:53.120  2936  2936 W zygote64: Verification of void eu.kanade.tachiyomi.App.<init>() took 168.325ms
+11-10 14:01:53.704  2936  2936 W zygote64: Verification of void eu.kanade.tachiyomi.App.initializeMigrator() took 477.561ms
+11-10 14:01:53.890  2936  2936 W zygote64: Verification of void eu.kanade.tachiyomi.App.setupNotificationChannels() took 169.595ms
+11-10 14:01:54.207  2936  2936 W zygote64: Verification of coil3.ImageLoader eu.kanade.tachiyomi.App.newImageLoader(android.content.Context) took 295.573ms
+11-10 14:01:55.618  2936  2936 W zygote64: Verification of void eu.kanade.tachiyomi.App.onCreate() took 1.409s
+11-10 14:01:56.897  2936  2936 D ShizukuProvider: Initialize Sui: false
+11-10 14:01:57.011  2936  2936 I zygote64: IncrementDisableThreadFlip blocked for 26.597ms
+11-10 14:01:57.237  2936  2952 I zygote64: Waiting for a blocking GC ProfileSaver
+11-10 14:01:57.244  2936  2952 I zygote64: WaitForGcToComplete blocked for 6.843ms for cause ProfileSaver
+11-10 14:01:57.975  2936  2936 V NativeCrypto: Registering org/conscrypt/NativeCrypto's 337 native methods...
+11-10 14:01:58.103  1549  1904 W zygote64: Long monitor contention with owner PackageInstaller (1713) at java.lang.String java.io.UnixFileSystem.resolve(java.lang.String, java.lang.String)(UnixFileSystem.java:-1) waiters=0 in android.content.pm.PackageInstaller$SessionInfo com.android.server.pm.PackageInstallerSession.generateInfo() for 21.396s
+11-10 14:01:58.190  1549  1666 W ActivityManager: Slow operation: 70ms so far, now at startProcess: returned from zygote!
+11-10 14:01:58.191  1549  1666 W ActivityManager: Slow operation: 70ms so far, now at startProcess: done updating battery stats
+11-10 14:01:58.191  1549  1666 W ActivityManager: Slow operation: 71ms so far, now at startProcess: building log message
+11-10 14:01:58.191  1549  1666 I ActivityManager: Start proc 2956:com.android.defcontainer/u0a7 for service com.android.defcontainer/.DefaultContainerService
+11-10 14:01:58.191  1549  1666 W ActivityManager: Slow operation: 71ms so far, now at startProcess: starting to update pids map
+11-10 14:01:58.192  1549  1666 W ActivityManager: Slow operation: 71ms so far, now at startProcess: done updating pids map
+11-10 14:01:58.192  1549  1666 W ActivityManager: Slow operation: 77ms so far, now at startProcess: done starting proc!
+11-10 14:01:58.240  2936  2936 D WM-WrkMgrInitializer: Initializing WorkManager with default configuration.
+11-10 14:01:58.247  2956  2956 W zygote64: Unexpected CPU variant for X86 using defaults: x86_64
+11-10 14:01:58.269  1549  1634 W Looper  : Dispatch took 141ms on android.ui, h=Handler (com.android.server.am.ActivityManagerService$UiHandler) {b3da5bb} cb=null msg=53
+11-10 14:01:58.437  1549  1841 W ActivityManager: Slow operation: 54ms so far, now at attachApplicationLocked: after mServices.attachApplicationLocked
+11-10 14:01:58.438  1549  1629 E memtrack: Couldn't load memtrack module
+11-10 14:01:58.438  1549  1629 W android.os.Debug: failed to get memory consumption info: -1
+11-10 14:01:58.673  1549  1629 E memtrack: Couldn't load memtrack module
+11-10 14:01:58.673  1549  1629 W android.os.Debug: failed to get memory consumption info: -1
+11-10 14:01:59.230  2936  2936 D WM-PackageManagerHelper: Skipping component enablement for androidx.work.impl.background.systemjob.SystemJobService
+11-10 14:01:59.230  2936  2936 D WM-Schedulers: Created SystemJobScheduler and enabled SystemJobService
+11-10 14:01:59.310  2936  2974 D WM-ForceStopRunnable: The default process name was not specified.
+11-10 14:01:59.313  2936  2974 D WM-ForceStopRunnable: Performing cleanup operations.
+11-10 14:02:00.955  1549  1666 W PackageParser: Unknown element under <manifest>: queries at /data/app/vmdl1330263211.tmp/base.apk Binary XML file line #26
+11-10 14:02:01.937  1549  1666 I PackageManager.DexOptimizer: Running dexopt (dexoptNeeded=1) on: /data/app/vmdl1330263211.tmp/base.apk pkg=app.mihon.tachiyomiat.dev isa=x86_64 dexoptFlags=boot_complete,debuggable,public target-filter=verify oatDir=/data/app/vmdl1330263211.tmp/oat sharedLibraries=null
+11-10 14:02:02.212  2936  2974 D WM-ForceStopRunnable: Found unfinished work, scheduling it.
+11-10 14:02:02.911  2936  2974 D WM-SystemJobScheduler: Scheduling work ID 5fd758ab-5420-4878-b92b-af706629ad00Job ID 5
+11-10 14:02:02.970  2936  2974 D WM-GreedyScheduler: Starting tracking for 5fd758ab-5420-4878-b92b-af706629ad00
+11-10 14:02:03.721  2975  2975 W dex2oat : Unexpected CPU variant for X86 using defaults: x86_64
+11-10 14:02:03.810  2975  2975 I dex2oat : /system/bin/dex2oat --input-vdex-fd=-1 --output-vdex-fd=10 --compiler-filter=verify --debuggable --classpath-dir=/data/app/vmdl1330263211.tmp
+11-10 14:02:03.819  2936  2974 D WM-ConstraintTracker: StorageNotLowTracker: initial state = true
+11-10 14:02:03.820  2936  2974 D WM-BrdcstRcvrCnstrntTrc: StorageNotLowTracker: registering receiver
+11-10 14:02:04.000  2936  2976 D WM-ConstraintTracker: NetworkStateTrackerPre28: initial state = NetworkState(isConnected=true, isValidated=false, isMetered=false, isNotRoaming=true, isBlocked=false)
+11-10 14:02:04.001  2936  2976 D WM-NetworkStateTracker: Registering network callback
+11-10 14:02:04.214  1549  1841 D ConnectivityService: requestNetwork for uid/pid:10065/2936 NetworkRequest [ TRACK_DEFAULT id=8, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VPN] ]
+11-10 14:02:04.229  1549  1753 D WIFI_UT : got request NetworkRequest [ TRACK_DEFAULT id=8, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VPN] ] with score 20
+11-10 14:02:04.233  1549  1753 D WIFI    : got request NetworkRequest [ TRACK_DEFAULT id=8, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VPN] ] with score 20
+11-10 14:02:04.300  2936  2978 D WM-NetworkStateTracker: Network capabilities changed: [ Transports: WIFI Capabilities: NOT_METERED&INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VPN&FOREGROUND LinkUpBandwidth>=1048576Kbps LinkDnBandwidth>=1048576Kbps SignalStrength: -50]
+11-10 14:02:04.312  1870  1870 D PhoneSwitcherNetworkRequstListener: got request NetworkRequest [ TRACK_DEFAULT id=8, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VPN] ] with score 20
+11-10 14:02:04.506  2936  2974 D WM-PackageManagerHelper: Skipping component enablement for androidx.work.impl.background.systemalarm.RescheduleReceiver
+11-10 14:02:04.522  2936  2976 D WM-GreedyScheduler: Constraints met: Scheduling work ID WorkGenerationalId(workSpecId=5fd758ab-5420-4878-b92b-af706629ad00, generation=0)
+11-10 14:02:04.923  2936  2974 D WM-Processor: Processor: processing WorkGenerationalId(workSpecId=5fd758ab-5420-4878-b92b-af706629ad00, generation=0)
+11-10 14:02:06.598  2936  2984 D TransportRuntime.JobInfoScheduler: Upload for context TransportContext(cct, DEFAULT, MSRodHRwczovL2ZpcmViYXNlbG9nZ2luZy5nb29nbGVhcGlzLmNvbS92MGNjL2xvZy9iYXRjaD9mb3JtYXQ9anNvbl9wcm90bzNc) is already scheduled. Returning...
+11-10 14:02:06.704  2936  2936 W zygote64: Verification of java.util.List tachiyomi.core.common.util.system.ImageUtil.getSplitData(android.graphics.BitmapFactory$Options) took 107.293ms
+11-10 14:02:06.716  2936  2984 D TransportRuntime.JobInfoScheduler: Upload for context TransportContext(cct, VERY_LOW, MSRodHRwczovL2ZpcmViYXNlbG9nZ2luZy5nb29nbGVhcGlzLmNvbS92MGNjL2xvZy9iYXRjaD9mb3JtYXQ9anNvbl9wcm90bzNc) is already scheduled. Returning...
+11-10 14:02:06.820  2936  2954 W LibraryVersion: Failed to get app version for libraryName: shared-installation-id
+11-10 14:02:07.977  2936  2981 D NetworkSecurityConfig: Using Network Security Config from resource network_security_config debugBuild: true
+11-10 14:02:09.106  1549  1549 W JobServiceContext: Time-out while trying to bind db6d536 #u0a65/5 app.mihon.tachiyomiat.dev/androidx.work.impl.background.systemjob.SystemJobService, dropping.
+11-10 14:02:09.283  2936  2954 W LibraryVersion: Failed to get app version for libraryName: shared-remote-config
+11-10 14:02:09.471  2936  2947 W zygote64: Suspending all threads took: 13.180ms
+11-10 14:02:10.346  2936  2987 W zygote64: Verification of void com.google.android.gms.common.stats.ConnectionTracker.<clinit>() took 150.664ms
+11-10 14:02:10.525  2936  2987 W zygote64: Verification of boolean com.google.android.gms.common.stats.ConnectionTracker.zze(android.content.Context, android.content.Intent, android.content.ServiceConnection, int, java.util.concurrent.Executor) took 157.015ms
+11-10 14:02:10.544  2936  2989 I MLKitRemoteConfigSaver: remote config settings file not yet present: /data/user/0/app.mihon.tachiyomiat.dev/no_backup/com.google.mlkit.RemoteConfig
+11-10 14:02:10.545  2936  2989 D MLKit RemoteConfigRestC: Getting installation id...
+11-10 14:02:10.570  2936  2989 I MLKitInstallationIdSaver: Installation id file not yet present: /data/user/0/app.mihon.tachiyomiat.dev/no_backup/com.google.mlkit.InstallationId
+11-10 14:02:10.607  2936  2989 D MLKitInstallationIdGenerator: Generated installation id: eSCdPwDTXF-hWvcaht73pC
+11-10 14:02:11.583  2936  2936 D App     : Migration from 112 to 112
+11-10 14:02:11.746  2936  2987 W GooglePlayServicesUtil: app.mihon.tachiyomiat.dev requires the Google Play Store, but it is missing.
+11-10 14:02:11.838  2936  2987 W GoogleApiManager: The service for com.google.android.gms.common.internal.service.zap is not available: ConnectionResult{statusCode=SERVICE_INVALID, resolution=null, message=null}
+11-10 14:02:12.101  2936  2936 I Choreographer: Skipped 886 frames!  The application may be doing too much work on its main thread.
+11-10 14:02:13.653  2936  2941 I zygote64: Do partial code cache collection, code=30KB, data=20KB
+11-10 14:02:13.757  2936  2941 I zygote64: After code cache collection, code=30KB, data=20KB
+11-10 14:02:13.762  2936  2941 I zygote64: Increasing code cache capacity to 128KB
+11-10 14:02:14.103  2936  2982 W zygote64: Long monitor contention with owner pool-4-thread-1 (2990) at java.lang.String java.lang.Runtime.nativeLoad(java.lang.String, java.lang.ClassLoader, java.lang.String)(Runtime.java:-2) waiters=0 in void java.lang.Runtime.loadLibrary0(java.lang.ClassLoader, java.lang.String) for 2.240s
+11-10 14:02:14.414  2936  2981 W zygote64: Verification of java.util.List eu.kanade.tachiyomi.extension.util.ExtensionLoader.getSignatures(android.content.pm.PackageInfo) took 152.979ms
+11-10 14:02:14.419  2936  2990 E native  : E0000 00:00:1794319334.373904    2990 dictionary.cc:255] Failed to load a new file: /data/user/0/app.mihon.tachiyomiat.dev/no_backup/com.google.mlkit.translate.models/en_pt/merged_dict_en_pt_25_both.bin
+11-10 14:02:14.421  2936  2990 E native  : E0000 00:00:1794319334.420328    2990 dictionary.cc:256] Dictionary build date: 0
+11-10 14:02:14.422  2936  2990 E native  : E0000 00:00:1794319334.421829    2990 translate_api.cc:97] Error loading dictionary: 1
+11-10 14:02:14.422  2936  2990 E native  : E0000 00:00:1794319334.422123    2990 translate_api.cc:98] dictionary_dir = /data/user/0/app.mihon.tachiyomiat.dev/no_backup/com.google.mlkit.translate.models/en_pt
+11-10 14:02:14.422  2936  2990 E native  : E0000 00:00:1794319334.422240    2990 translate_api.cc:99] secondary_dictionary_dir = 
+11-10 14:02:14.422  2936  2990 E native  : E0000 00:00:1794319334.422323    2990 translate_api.cc:100] source_language = en
+11-10 14:02:14.422  2936  2990 E native  : E0000 00:00:1794319334.422412    2990 translate_api.cc:101] target_language = pt
+11-10 14:02:14.422  2936  2990 E native  : E0000 00:00:1794319334.422497    2990 translate_api.cc:102] nmt_rr = 
+11-10 14:02:14.422  2936  2990 E native  : E0000 00:00:1794319334.422581    2990 translate_api.cc:103] secondary_nmt_rr = 
+11-10 14:02:14.422  2936  2990 E native  : E0000 00:00:1794319334.422660    2990 translate_api.cc:104] fallback_pbmt = /data/user/0/app.mihon.tachiyomiat.dev/no_backup/com.google.mlkit.translate.models/en_pt/fallback_to_pb_en_pt.pb.bin
+11-10 14:02:14.422  2936  2990 E native  : E0000 00:00:1794319334.422741    2990 translate_api.cc:105] secondary_fallback_pbmt = 
+11-10 14:02:14.422  2936  2990 E native  : E0000 00:00:1794319334.422819    2990 translate_api.cc:106] stt_rr = 
+11-10 14:02:14.422  2936  2990 E native  : E0000 00:00:1794319334.422896    2990 translate_api.cc:107] secondary_stt_rr = 
+11-10 14:02:14.531  2936  2981 W zygote64: Verification of boolean eu.kanade.tachiyomi.extension.util.ExtensionLoader.isPackageAnExtension(android.content.pm.PackageInfo) took 115.685ms
+11-10 14:02:14.680  1549  1559 I zygote64: Background concurrent copying GC freed 57594(3MB) AllocSpace objects, 16(896KB) LOS objects, 42% free, 6MB/10MB, paused 794us total 248.585ms
+11-10 14:02:14.927  2936  2981 W zygote64: Verification of java.lang.Object eu.kanade.tachiyomi.extension.util.ExtensionLoader.loadExtension(android.content.Context, eu.kanade.tachiyomi.extension.util.ExtensionLoader$ExtensionInfo, kotlin.coroutines.Continuation) took 395.510ms
+11-10 14:02:15.144  2936  2947 I zygote64: ThreadFlipBegin blocked for 241.080ms
+11-10 14:02:16.818  2936  3006 W zygote64: Long monitor contention with owner pool-2-thread-1 (2989) at void okhttp3.internal.concurrent.TaskQueue.schedule(okhttp3.internal.concurrent.Task, long)(TaskQueue.kt:243) waiters=0 in void okhttp3.internal.concurrent.TaskRunner$runnable$1.run() for 117ms
+11-10 14:02:17.050  1549  1904 D WificondControl: Scan result ready event
+11-10 14:02:17.576  2936  2947 W zygote64: Suspending all threads took: 8.680ms
+11-10 14:02:17.893  2936  2936 D WM-WorkerWrapper: Starting work for eu.kanade.translation.EnglishTranslationSetupJob
+11-10 14:02:18.277  2936  2936 D WM-SystemJobService: onStartJob for WorkGenerationalId(workSpecId=5fd758ab-5420-4878-b92b-af706629ad00, generation=0)
+11-10 14:02:18.284  2936  2987 W GooglePlayServicesUtil: app.mihon.tachiyomiat.dev requires the Google Play Store, but it is missing.
+11-10 14:02:18.332  2936  2987 W GoogleApiManager: The service for com.google.android.gms.common.internal.service.zap is not available: ConnectionResult{statusCode=SERVICE_INVALID, resolution=null, message=null}
+11-10 14:02:18.554  2936  3017 D ProfileInstaller: Installing profile for app.mihon.tachiyomiat.dev
+11-10 14:02:18.710  2936  2976 D WM-Processor: Work WorkGenerationalId(workSpecId=5fd758ab-5420-4878-b92b-af706629ad00, generation=0) is already enqueued for processing
+11-10 14:02:19.320  2936  2984 D TransportRuntime.SQLiteEventStore: Storing event with priority=VERY_LOW, name=FIREBASE_ML_SDK for destination cct
+11-10 14:02:19.643  2936  2984 D TransportRuntime.JobInfoScheduler: Upload for context TransportContext(cct, VERY_LOW, MSRodHRwczovL2ZpcmViYXNlbG9nZ2luZy5nb29nbGVhcGlzLmNvbS92MGNjL2xvZy9iYXRjaD9mb3JtYXQ9anNvbl9wcm90bzNc) is already scheduled. Returning...
+11-10 14:02:19.861  2936  2984 D TransportRuntime.SQLiteEventStore: Storing event with priority=VERY_LOW, name=FIREBASE_ML_SDK for destination cct
+11-10 14:02:20.109  2936  2984 D TransportRuntime.JobInfoScheduler: Upload for context TransportContext(cct, VERY_LOW, MSRodHRwczovL2ZpcmViYXNlbG9nZ2luZy5nb29nbGVhcGlzLmNvbS92MGNjL2xvZy9iYXRjaD9mb3JtYXQ9anNvbl9wcm90bzNc) is already scheduled. Returning...
+11-10 14:02:20.471  2936  2984 D TransportRuntime.SQLiteEventStore: Storing event with priority=VERY_LOW, name=FIREBASE_ML_SDK for destination cct
+11-10 14:02:20.522  2936  2941 I zygote64: Do partial code cache collection, code=61KB, data=37KB
+11-10 14:02:20.591  2936  2941 I zygote64: After code cache collection, code=60KB, data=37KB
+11-10 14:02:20.591  2936  2941 I zygote64: Increasing code cache capacity to 256KB
+11-10 14:02:20.669  2936  2984 D TransportRuntime.JobInfoScheduler: Upload for context TransportContext(cct, VERY_LOW, MSRodHRwczovL2ZpcmViYXNlbG9nZ2luZy5nb29nbGVhcGlzLmNvbS92MGNjL2xvZy9iYXRjaD9mb3JtYXQ9anNvbl9wcm90bzNc) is already scheduled. Returning...
+11-10 14:02:20.745  1549  1629 E memtrack: Couldn't load memtrack module
+11-10 14:02:20.748  1549  1629 W android.os.Debug: failed to get memory consumption info: -1
+11-10 14:02:20.961  2936  2984 D TransportRuntime.SQLiteEventStore: Storing event with priority=VERY_LOW, name=FIREBASE_ML_SDK for destination cct
+11-10 14:02:21.077  2936  2984 D TransportRuntime.JobInfoScheduler: Upload for context TransportContext(cct, VERY_LOW, MSRodHRwczovL2ZpcmViYXNlbG9nZ2luZy5nb29nbGVhcGlzLmNvbS92MGNjL2xvZy9iYXRjaD9mb3JtYXQ9anNvbl9wcm90bzNc) is already scheduled. Returning...
+11-10 14:02:21.922  2363  2912 I Dialer  : OmtpVvmCarrierCfgHlpr - OmtpEvent:CONFIG_STATUS_SMS_TIME_OUT
+11-10 14:02:21.929  2363  2363 I Dialer  : RetryPolicy - discarding deferred status: configuration_state=4
+11-10 14:02:21.949  2363  2363 I Dialer  : VvmTaskExecutor - no more tasks, stopping service if no task are added in 5000 millis

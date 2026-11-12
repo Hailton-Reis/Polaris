@@ -1,0 +1,174 @@
+{
+  "date": "2026-10-31",
+  "scope": "Preserve original image coordinates on translated pages by suppressing decoder border crop; reload already cropped open pages when translation arrives",
+  "pinned_yomotsu": "0fb80c439ef816eeb50674f1b90af39918b176d8",
+  "patch_sha256": "971e394a0b3b4b26223c970b63da886067f813f986decca913910aeee1fcf86b",
+  "assembly": "PASS: app:assembleDebug completed; overall Gradle exit 1 from known unit failures",
+  "apk_signature_verification": "PASS",
+  "apk_x86_64_sha256": "b110468bc973114e7b9c2be995fb4a0391bac8bc52dcdf8fcd5fb6daab9b3a82",
+  "selected_tests": {
+    "tests": 45,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "selected_test_suites": {
+    "EnglishDownloadTranslationPolicyTest": {
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "PendingDownloadTranslationsTest": {
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "TranslationLaunchPolicyTest": {
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "TranslationTextFitTest": {
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "TranslationFontSizeSearchTest": {
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "TranslationFitPolicyTest": {
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "TranslationViewportScaleTest": {
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "RepositoryCatalogTest": {
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "RepositoryDiscoveryControllerTest": {
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "TranslationViewportTransformTest": {
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "TranslationImageCropTest": {
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "overlay_application_tests": {
+    "passed": 4,
+    "failed": 0,
+    "crlf_simulation_included": true
+  },
+  "targeted_formatting": "PASS: targeted Spotless formatter ran for 7 Kotlin files; final owner-binding guard uses the same existing formatting",
+  "android_unit_comparison": {
+    "status": "NO_NEW_UNIT_REGRESSIONS",
+    "baseline": {
+      "total": 428,
+      "passed": 394,
+      "failed": 34,
+      "skipped": 0
+    },
+    "patched": {
+      "total": 457,
+      "passed": 423,
+      "failed": 34,
+      "skipped": 0
+    },
+    "preexisting_failures_still_present": 34,
+    "missing_baseline_tests": [],
+    "new_failures_or_skips": [],
+    "android_runtime_verified": false,
+    "gradle_exit_codes": {
+      "baseline": 1,
+      "patched": 1
+    },
+    "required_module_coverage": {
+      "domain": 58,
+      "app": 370
+    }
+  },
+  "repository_catalog": {
+    "entries": 2,
+    "search": "Bundled local catalog only; no internet-wide search",
+    "http_and_declared_metadata_checks": "PASS for both modern indexes at the time of check; see REPOSITORY_INDEX_CHECKS_2026_10_30.json",
+    "android_registration_and_installation": "PENDING on Windows test device",
+    "extension_apk_audit": false
+  },
+  "visual_acceptance": "PENDING for automatic crop handling in P20261031.2; manual crop-off workaround confirmed in P20261031.1",
+  "language_identification": "Source metadata, not chapter-content detection",
+  "installed_user_version": "Polaris P20261031.1 confirmed by About screenshots, showing local build 31/10/2026 20:31",
+  "multi_source_runtime_acceptance": "PENDING, separate from these candidate improvements",
+  "migration15_applied": false,
+  "backup_v2_enabled": false,
+  "candidate_revision": "Polaris P20261031.2",
+  "embedded_revision_verification": "PASS: Polaris P20261031.2 found in assembled APK DEX",
+  "candidate_revision_semantics": "Explicit overlay code revision; same-code rebuild retains revision and changes debug build date; not an automatic Android versionCode increment",
+  "user_runtime_evidence": {
+    "installed_revision_confirmed": "Polaris P20261031.1",
+    "paginated_without_zoom": "Displaced overlays with border crop on; screenshots of chapter 1.3 pages 2,3,4",
+    "long_strip": "Aligned screenshots of corresponding pages",
+    "crop_off_control": "User confirmed crop was on and turning it off aligned the saved translation without re-OCR",
+    "new_candidate_automatic_behavior_verified": false
+  },
+  "crop_behavior": "Translated pages keep original borders; untranslated pages follow the saved preference; no crop-origin remapping is implemented",
+  "full_build_completion": {
+    "status": "ASSEMBLY_AND_UNIT_REPORTS_COMPLETE",
+    "apks": [
+      "app-universal-debug.apk",
+      "app-armeabi-v7a-debug.apk",
+      "app-x86_64-debug.apk",
+      "app-x86-debug.apk",
+      "app-arm64-v8a-debug.apk"
+    ],
+    "unit_tests": 457
+  },
+  "build_profile": {
+    "profile": "auto",
+    "detected_cpus": 2,
+    "detected_memory_bytes": 8589934592,
+    "max_workers": 2,
+    "gradle_heap_gib": 3,
+    "cache": true,
+    "incremental": true,
+    "daemon": true,
+    "parallel": true,
+    "kotlin_compiler": "in-process",
+    "gradle_arguments": [
+      "--build-cache",
+      "--daemon",
+      "--parallel",
+      "-Pkotlin.incremental=true",
+      "-Pkotlin.compiler.execution.strategy=in-process",
+      "--console=plain",
+      "--stacktrace",
+      "--max-workers=2",
+      "-Dorg.gradle.jvmargs=-Xmx3g -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8"
+    ]
+  }
+}

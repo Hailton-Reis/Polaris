@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.translation.detection.InpainterTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-11-06T19:56:58.218Z" hostname="550a0106d184" time="0.009">
+  <properties/>
+  <testcase name="maskArrFromPixels generates float mask()" classname="eu.kanade.translation.detection.InpainterTest" time="0.003"/>
+  <testcase name="inpainter lifecycle initializes and releases backend()" classname="eu.kanade.translation.detection.InpainterTest" time="0.001"/>
+  <testcase name="inpainter falls back gracefully when model path is null or method is boxfill()" classname="eu.kanade.translation.detection.InpainterTest" time="0.001"/>
+  <testcase name="aotArrToPixels reconstructs correct ARGB values()" classname="eu.kanade.translation.detection.InpainterTest" time="0.001"/>
+  <testcase name="aotImageChwFromPixels zeroes holes and normalizes valid pixels to minus one and one()" classname="eu.kanade.translation.detection.InpainterTest" time="0.0"/>
+  <testcase name="dilate expands binary mask correctly()" classname="eu.kanade.translation.detection.InpainterTest" time="0.0"/>
+  <testcase name="dilate with zero radius is no-op()" classname="eu.kanade.translation.detection.InpainterTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -14,6 +14,10 @@
   <a href="docs/ARMAZENAMENTO.md"><strong>Armazenamento</strong></a>
 </p>
 
+**Pré-lançamento público atual: [beta.10 / P20261106.1 / código 111](https://github.com/Hailton-Reis/Polaris/releases/tag/v0.1.0-beta.10).** Um APK universal ARM32/ARM64, recuperação de fontes e inspeção preventiva de extensões. [Publicação, downloads e limites](integration/release-candidates/0.1.0-beta.10/README.md). Na beta.10 publicada, a sandbox e a normalização de capítulos mesclados para outros leitores ainda não estão integradas. A [próxima revisão em desenvolvimento](integration/reading-continuity/20261106/README.md) implementa isolamento optativo experimental e a projeção de backup, com aceite nos aparelhos e em leitores externos ainda pendente; preserve o backup original. Esta branch contém a engenharia; a apresentação atual fica em [main](https://github.com/Hailton-Reis/Polaris).
+
+**Revisão em desenvolvimento P20261112.1:** [conquistas de leitura, biblioteca, exploração e conclusão](docs/CONQUISTAS_GRIMORIOS_P20261112_1.md) liberam a coleção ilustrada de grimórios e trevos. As [sessões HTTP isoladas](docs/SESSOES_E_ICONES_P20261111_1.md), [preferências e filtros da sandbox](docs/SANDBOX_PREFERENCIAS_FILTROS_P20261110_3.md), [biblioteca unificada](docs/BIBLIOTECA_UNIFICADA_P20261110_1.md) e [busca por obra](docs/BUSCA_UNIFICADA_P20261109_1.md) continuam em avaliação. Login por navegador, fontes e bibliotecas reais, aparelhos e leitores externos permanecem pendentes. Essa revisão ainda não é uma nova Release.
+
 <table>
   <tr>
     <td width="33%" valign="top"><strong>01 · Leia</strong><br><br>Quadrinhos, livros e artigos. Leitura por páginas ou por texto, com retomada de posição.</td>
@@ -30,7 +34,7 @@ A leitura básica funciona no aparelho, sem exigir um servidor pessoal. Arquivos
 
 **Em desenvolvimento · Android 8+ · ARM64 e ARM32 · Foco em português brasileiro**
 
-**Beta público atual: [0.1.0-beta.10 · P20261106.1](https://github.com/Hailton-Reis/Polaris/releases/tag/v0.1.0-beta.10).** APK universal ARM32/ARM64, recuperação de fontes após backups, preferência por português entre alternativas verificadas e inspeção preventiva de extensões. A versão é um pré-lançamento para testes; ainda não há versão estável.
+**Nome e ícone no Android:** a beta.10 pública usa a identidade Polaris e preserva a assinatura anterior. As versões históricas mantêm seus arquivos originais.
 
 ## Inglês como prioridade
 
@@ -126,11 +130,13 @@ O painel **Dados e armazenamento → Armazenamento do Polaris** ajuda a separar 
 
 O beta público atual é **`0.1.0-beta.10` · revisão `P20261106.1` · versionCode `111`**. Ele reúne um APK universal, recuperação de fontes, perfis com menos concorrência em processos limitados e inspeção preventiva/quarentena de extensões. Mantém o assistente de fontes, OCR e download de atualização recuperável da beta.9. PaddleOCR continua opcional em inglês.
 
+[Registro de publicação da beta.10](integration/release-candidates/0.1.0-beta.10/README.md). A revisão `P20261112.1` (beta.11 em desenvolvimento, sem publicação) acrescenta conquistas para liberar os grimórios de três, quatro e cinco folhas, preservando as sessões HTTP, biblioteca unificada, busca e continuidade entre fontes. [Escopo e limites](docs/CONQUISTAS_GRIMORIOS_P20261112_1.md). A implementação está em avaliação na [branch de engenharia](https://github.com/Hailton-Reis/Polaris/tree/r001/multisource-foundation).
+
 **[Baixar e ver as notas da beta.10](https://github.com/Hailton-Reis/Polaris/releases/tag/v0.1.0-beta.10)** · **[Primeiro teste](https://github.com/Hailton-Reis/Polaris/releases/download/v0.1.0-beta.10/COMECE_AQUI.md)**. Baixe o único APK universal para ARM32 e ARM64; o Android escolhe a arquitetura compatível durante a instalação. Não é necessário montar partes ou escolher entre duas versões.
 
-**A sandbox completa ainda não está integrada:** extensões atuais executam no processo do aplicativo, com aviso de compatibilidade. A inspeção não garante ausência de código malicioso. **A exportação de obras mescladas para outros leitores ainda precisa de ajuste e teste real.** Preserve o backup original. A causa da falha de capítulos relatada no A12 e qualquer ganho de desempenho nesse aparelho ainda precisam de confirmação.
+**Na beta.10 publicada, a sandbox completa ainda não está integrada:** extensões executam no processo do aplicativo, com aviso de compatibilidade. A inspeção não garante ausência de código malicioso. A revisão em desenvolvimento implementa isolamento optativo e projeção nativa de backup; a ida/volta por banco/interface de outros leitores continua pendente. Preserve o backup original. A causa da falha de capítulos relatada no A12 e qualquer ganho de desempenho nesse aparelho ainda precisam de confirmação.
 
-A comparação final executou **738 testes JVM: 721 aprovações e as mesmas 17 falhas preexistentes**, sem novas falhas ou casos ausentes/ignorados. Os 31 casos novos passaram, além de 13 controles do empacotamento/overlay e seis controles Android de isolamento em componente independente. Isso não equivale a uma suíte totalmente verde, sandbox integrada ou aceite em aparelhos. A [implementação](https://github.com/Hailton-Reis/Polaris/tree/v0.1.0-beta.10) e a [evidência](https://github.com/Hailton-Reis/Polaris/blob/v0.1.0-beta.10/integration/universal-recovery/20261106/TEST_RESULTS.json) estão identificadas pela versão. Ainda não há lançamento estável.
+A comparação da beta.10 executou **738 testes JVM: 721 aprovações e as mesmas 17 falhas preexistentes**, sem novas falhas ou casos ausentes/ignorados. Os 31 casos novos passaram, além de 13 controles do empacotamento/overlay e seis controles Android de isolamento em componente independente. Isso não equivale a uma suíte totalmente verde, sandbox integrada ou aceite em aparelhos. A [implementação](https://github.com/Hailton-Reis/Polaris/tree/v0.1.0-beta.10) e a [evidência](https://github.com/Hailton-Reis/Polaris/blob/v0.1.0-beta.10/integration/universal-recovery/20261106/TEST_RESULTS.json) estão identificadas pela versão. Ainda não há lançamento estável.
 
 O resultado em inglês foi confirmado pelo mantenedor em um candidato anterior. Japonês, chinês simplificado/tradicional e coreano continuam com validação de OCR e tradução nas imagens pendente, incluindo japonês vertical. A automação global desses idiomas é opcional neste estágio; PaddleOCR permanece apenas em inglês.
 
@@ -148,7 +154,7 @@ A matriz inicial reúne **A12, S20 FE, S8+ e provável A52**. Android, arquitetu
 
 A base Android vem do ecossistema **Yomotsu / Mihon**, com conceitos de múltiplas fontes do **TachiyomiSY**. A integração mantém um upstream fixado e camadas revisáveis. A branch `main` apresenta o projeto; a implementação em avaliação fica em `r001/multisource-foundation`.
 
-[Registros de compilação e testes](https://github.com/Hailton-Reis/Polaris/blob/r001/multisource-foundation/integration/document-reader/TEST_RESULTS.json) distinguem testes automatizados de aceite nos aparelhos. Existem falhas preexistentes no projeto-base; uma comparação sem novas regressões não significa que todos os testes estão verdes.
+[Registros de compilação e testes](integration/grimoire-achievements/20261112/README.md) distinguem validação por componentes de aceite nos aparelhos. A revisão de desenvolvimento P20261112.1 tem 880 testes JVM e 37 testes Android aprovados no emulador; isso não substitui aceite físico ou o fluxo completo com fontes reais. Os resultados históricos de cada versão permanecem arquivados.
 
 A beta.10 mantém o assistente de fontes, acrescenta recuperação de catálogos e inspeção preventiva de extensões e oferece um APK universal ARM. O aceite completo com extensões reais, aparelhos e migração de backups continua pendente.
 
@@ -159,3 +165,7 @@ Veja [como contribuir](CONTRIBUTING.md). Para problemas de armazenamento, inform
 ---
 
 Mantido por **Hailton Reis**. Licença **[Apache 2.0](LICENSE)** · **[Créditos e atribuições](NOTICE)**.
+
+A revisão de desenvolvimento [P20261110.3](docs/SANDBOX_PREFERENCIAS_FILTROS_P20261110_3.md) amplia a sandbox com preferências básicas e filtros. Login, fontes reais e aceite em ARM continuam pendentes; não é uma nova publicação para celulares.
+
+A coleção atual de [grimórios e trevos](design/polaris-grimoires/20261111/README.md) evolui do Grimório Polaris até o trevo de cinco folhas, com alternativas liberadas por pontos de leitura ou conquistas da biblioteca. As [sessões HTTP por extensão](docs/SESSOES_E_ICONES_P20261111_1.md) continuam integradas à revisão em desenvolvimento. A beta.10 pública permanece igual; login por navegador e aceite nos aparelhos seguem pendentes.

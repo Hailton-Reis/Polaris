@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.tachiyomi.data.updater.PolarisReleaseVersionTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-11-10T22:28:20.449Z" hostname="7d7c5a6182d0" time="0.006">
+  <properties/>
+  <testcase name="malformed and overflowing versions are rejected without crashing()" classname="eu.kanade.tachiyomi.data.updater.PolarisReleaseVersionTest" time="0.002"/>
+  <testcase name="build metadata and optional v prefix do not change precedence()" classname="eu.kanade.tachiyomi.data.updater.PolarisReleaseVersionTest" time="0.0"/>
+  <testcase name="semver orders numeric beta counters and stable promotion without downgrades()" classname="eu.kanade.tachiyomi.data.updater.PolarisReleaseVersionTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.tachiyomi.data.backup.create.BackupArchiveWriterTest" tests="9" skipped="0" failures="0" errors="0" timestamp="2026-11-12T18:43:05.877Z" hostname="060411c85d3c" time="0.091">
+  <properties/>
+  <testcase name="successful result requires closed output and exact verified payload()" classname="eu.kanade.tachiyomi.data.backup.create.BackupArchiveWriterTest" time="0.014"/>
+  <testcase name="extra or missing decompressed bytes fail verification()" classname="eu.kanade.tachiyomi.data.backup.create.BackupArchiveWriterTest" time="0.007"/>
+  <testcase name="write only destination is explicitly unverifiable()" classname="eu.kanade.tachiyomi.data.backup.create.BackupArchiveWriterTest" time="0.004"/>
+  <testcase name="trailing garbage or another gzip member is rejected like the actual backup decoder()" classname="eu.kanade.tachiyomi.data.backup.create.BackupArchiveWriterTest" time="0.005"/>
+  <testcase name="cancellation during copy or read back stays cancellation()" classname="eu.kanade.tachiyomi.data.backup.create.BackupArchiveWriterTest" time="0.006"/>
+  <testcase name="write failure closes the stream and cannot proceed to verification()" classname="eu.kanade.tachiyomi.data.backup.create.BackupArchiveWriterTest" time="0.002"/>
+  <testcase name="truncated gzip fails verification()" classname="eu.kanade.tachiyomi.data.backup.create.BackupArchiveWriterTest" time="0.003"/>
+  <testcase name="valid gzip carrying different bytes cannot be reported as success()" classname="eu.kanade.tachiyomi.data.backup.create.BackupArchiveWriterTest" time="0.002"/>
+  <testcase name="failed output close cannot be reported as verified()" classname="eu.kanade.tachiyomi.data.backup.create.BackupArchiveWriterTest" time="0.003"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

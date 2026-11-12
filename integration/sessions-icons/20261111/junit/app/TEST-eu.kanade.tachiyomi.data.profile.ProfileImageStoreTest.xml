@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.tachiyomi.data.profile.ProfileImageStoreTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-11-11T20:05:39.703Z" hostname="b5ae99f6bd9c" time="0.088">
+  <properties/>
+  <testcase name="only an owned canonical image can be deleted()" classname="eu.kanade.tachiyomi.data.profile.ProfileImageStoreTest" time="0.011"/>
+  <testcase name="invalid import keeps previous image closes input and removes partial file()" classname="eu.kanade.tachiyomi.data.profile.ProfileImageStoreTest" time="0.002"/>
+  <testcase name="directory failure still closes the supplied stream()" classname="eu.kanade.tachiyomi.data.profile.ProfileImageStoreTest" time="0.02"/>
+  <testcase name="oversized stream is rejected without allocating the whole image()" classname="eu.kanade.tachiyomi.data.profile.ProfileImageStoreTest" time="0.05"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,7 @@
+{
+  "status": "IDENTICAL_LOGICAL_PAYLOAD",
+  "entries": 2192,
+  "before_bytes": 267508727,
+  "after_bytes": 261130442,
+  "method": "Normal Gradle packageDebug after removing generated incremental packaging cache; no manual ZIP repack or re-signing."
+}

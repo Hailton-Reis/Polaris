@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.translation.recognizer.SpeechBubbleSizePolicyTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-11-08T01:12:47.556Z" hostname="a1f1fc307d5f" time="0.002">
+  <properties/>
+  <testcase name="accepts a large round balloon around a short OCR line()" classname="eu.kanade.translation.recognizer.SpeechBubbleSizePolicyTest" time="0.0"/>
+  <testcase name="rejects a large wide panel around a short OCR line()" classname="eu.kanade.translation.recognizer.SpeechBubbleSizePolicyTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

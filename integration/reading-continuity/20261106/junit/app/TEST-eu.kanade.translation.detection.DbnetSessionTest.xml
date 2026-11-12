@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.translation.detection.DbnetSessionTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-11-06T19:56:58.107Z" hostname="550a0106d184" time="0.015">
+  <properties/>
+  <testcase name="native error is recoverable and close releases once()" classname="eu.kanade.translation.detection.DbnetSessionTest" time="0.003"/>
+  <testcase name="native dynamic dimensions and tensors are preserved()" classname="eu.kanade.translation.detection.DbnetSessionTest" time="0.003"/>
+  <testcase name="closed session and invalid input never enter backend()" classname="eu.kanade.translation.detection.DbnetSessionTest" time="0.001"/>
+  <testcase name="model load failure is reported before inference()" classname="eu.kanade.translation.detection.DbnetSessionTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

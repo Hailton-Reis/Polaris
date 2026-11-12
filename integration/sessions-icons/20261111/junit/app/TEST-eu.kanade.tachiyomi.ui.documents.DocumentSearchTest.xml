@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.tachiyomi.ui.documents.DocumentSearchTest" tests="9" skipped="0" failures="0" errors="0" timestamp="2026-11-11T20:05:49.406Z" hostname="b5ae99f6bd9c" time="0.08">
+  <properties/>
+  <testcase name="provider metadata cannot create an unbounded result list()" classname="eu.kanade.tachiyomi.ui.documents.DocumentSearchTest" time="0.007"/>
+  <testcase name="one provider failure still returns the other provider results()" classname="eu.kanade.tachiyomi.ui.documents.DocumentSearchTest" time="0.042"/>
+  <testcase name="doi lookup routes books to scholarly providers and encodes the identifier once()" classname="eu.kanade.tachiyomi.ui.documents.DocumentSearchTest" time="0.007"/>
+  <testcase name="doi accepts explicit prefixes and preserves meaningful parentheses()" classname="eu.kanade.tachiyomi.ui.documents.DocumentSearchTest" time="0.0"/>
+  <testcase name="title author and doi queries are encoded as provider parameters()" classname="eu.kanade.tachiyomi.ui.documents.DocumentSearchTest" time="0.008"/>
+  <testcase name="book metadata never fabricates a direct full text download()" classname="eu.kanade.tachiyomi.ui.documents.DocumentSearchTest" time="0.001"/>
+  <testcase name="custom search website encodes input and rejects invalid templates()" classname="eu.kanade.tachiyomi.ui.documents.DocumentSearchTest" time="0.004"/>
+  <testcase name="document progress merges memo without overwriting unrelated state()" classname="eu.kanade.tachiyomi.ui.documents.DocumentSearchTest" time="0.002"/>
+  <testcase name="crossref and europepmc results retain their origins and available links()" classname="eu.kanade.tachiyomi.ui.documents.DocumentSearchTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

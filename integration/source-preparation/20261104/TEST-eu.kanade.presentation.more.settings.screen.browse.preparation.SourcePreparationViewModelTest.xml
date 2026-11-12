@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.presentation.more.settings.screen.browse.preparation.SourcePreparationViewModelTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-11-05T00:00:56.478Z" hostname="081e2fea02e9" time="2.506">
+  <properties/>
+  <testcase name="partial catalog failures preserve available sources and restored source ids()" classname="eu.kanade.presentation.more.settings.screen.browse.preparation.SourcePreparationViewModelTest" time="2.201"/>
+  <testcase name="repository review does not insert until explicit confirmation and certificate changes require new review()" classname="eu.kanade.presentation.more.settings.screen.browse.preparation.SourcePreparationViewModelTest" time="0.068"/>
+  <testcase name="restored repositories and language preferences do not start downloads or change backup data()" classname="eu.kanade.presentation.more.settings.screen.browse.preparation.SourcePreparationViewModelTest" time="0.107"/>
+  <testcase name="changed repository selection clears a previously loaded plan()" classname="eu.kanade.presentation.more.settings.screen.browse.preparation.SourcePreparationViewModelTest" time="0.076"/>
+  <testcase name="metadata timeout is reported and does not leave the assistant busy()" classname="eu.kanade.presentation.more.settings.screen.browse.preparation.SourcePreparationViewModelTest" time="0.046"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

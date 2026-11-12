@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.translation.recognizer.FloatTensorOutputTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-11-12T18:43:27.180Z" hostname="060411c85d3c" time="0.06">
+  <properties/>
+  <testcase name="CTC text confidence blank repeats and ties are bit identical()" classname="eu.kanade.translation.recognizer.FloatTensorOutputTest" time="0.013"/>
+  <testcase name="reuses the owned ORT array without a second full output allocation()" classname="eu.kanade.translation.recognizer.FloatTensorOutputTest" time="0.043"/>
+  <testcase name="sliced direct and read only buffers preserve exactly the tensor values()" classname="eu.kanade.translation.recognizer.FloatTensorOutputTest" time="0.001"/>
+  <testcase name="full and limited buffers keep the legacy rewind semantics()" classname="eu.kanade.translation.recognizer.FloatTensorOutputTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,6 @@
+{
+  "matched": true,
+  "coordinates": 380,
+  "graph_source": "full-test-fake-store-failure.log: app dependencies resolved in final production-code assembly graph; later changes only JVM and Android test fixtures",
+  "graph_sha256": "df14ae22dc278b1e19206609f04379a97a13192f1d7ffb6e744ba9f3b629ec20"
+}

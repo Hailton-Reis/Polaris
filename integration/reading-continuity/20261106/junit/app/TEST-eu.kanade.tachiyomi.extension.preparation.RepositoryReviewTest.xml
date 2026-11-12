@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.tachiyomi.extension.preparation.RepositoryReviewTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-11-06T19:56:46.823Z" hostname="550a0106d184" time="0.588">
+  <properties/>
+  <testcase name="background refresh cannot silently replace a restored signing certificate()" classname="eu.kanade.tachiyomi.extension.preparation.RepositoryReviewTest" time="0.47"/>
+  <testcase name="metadata changed after review is rejected without overwriting the stored repository()" classname="eu.kanade.tachiyomi.extension.preparation.RepositoryReviewTest" time="0.032"/>
+  <testcase name="reviewed metadata is inserted with its original certificate and identity()" classname="eu.kanade.tachiyomi.extension.preparation.RepositoryReviewTest" time="0.028"/>
+  <testcase name="network failures cannot register a repository()" classname="eu.kanade.tachiyomi.extension.preparation.RepositoryReviewTest" time="0.023"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

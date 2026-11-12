@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.translation.model.TranslationSourceMetricsTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-11-09T22:30:59.009Z" hostname="0d67ac30ae46" time="0.003">
+  <properties/>
+  <testcase name="credible glyph metrics and vertical or rotated text stay unchanged()" classname="eu.kanade.translation.model.TranslationSourceMetricsTest" time="0.001"/>
+  <testcase name="first symbol outlier does not prevent grouping adjacent source lines()" classname="eu.kanade.translation.model.TranslationSourceMetricsTest" time="0.001"/>
+  <testcase name="a punctuation sized first symbol cannot set the whole paragraph font ceiling()" classname="eu.kanade.translation.model.TranslationSourceMetricsTest" time="0.001"/>
+  <testcase name="grouped source boxes never become one falsely tall line()" classname="eu.kanade.translation.model.TranslationSourceMetricsTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

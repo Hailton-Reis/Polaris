@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.translation.memory.TranslationIntelligenceIntegrationTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-11-09T22:30:58.720Z" hostname="0d67ac30ae46" time="0.044">
+  <properties/>
+  <testcase name="glossary revision invalidates stale cache and snapshot remains serializable()" classname="eu.kanade.translation.memory.TranslationIntelligenceIntegrationTest" time="0.023"/>
+  <testcase name="cache normalizes invisible Unicode characters in source and target()" classname="eu.kanade.translation.memory.TranslationIntelligenceIntegrationTest" time="0.002"/>
+  <testcase name="deleting machine output keeps vocabulary and corrections across source language scopes()" classname="eu.kanade.translation.memory.TranslationIntelligenceIntegrationTest" time="0.017"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

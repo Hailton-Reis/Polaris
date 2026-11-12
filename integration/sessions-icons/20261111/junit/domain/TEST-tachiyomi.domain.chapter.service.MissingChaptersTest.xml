@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="tachiyomi.domain.chapter.service.MissingChaptersTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-11-10T20:36:47.671Z" hostname="7d7c5a6182d0" time="0.005">
+  <properties/>
+  <testcase name="missingChaptersCount returns number of missing chapters()" classname="tachiyomi.domain.chapter.service.MissingChaptersTest" time="0.001"/>
+  <testcase name="missingChaptersCount returns 0 when all unknown chapter numbers()" classname="tachiyomi.domain.chapter.service.MissingChaptersTest" time="0.0"/>
+  <testcase name="calculateChapterGap returns 0 if either are not valid chapter numbers()" classname="tachiyomi.domain.chapter.service.MissingChaptersTest" time="0.001"/>
+  <testcase name="calculateChapterGap returns difference()" classname="tachiyomi.domain.chapter.service.MissingChaptersTest" time="0.0"/>
+  <testcase name="missingChaptersCount handles repeated base chapter numbers()" classname="tachiyomi.domain.chapter.service.MissingChaptersTest" time="0.0"/>
+  <testcase name="missingChaptersCount returns 0 when empty list()" classname="tachiyomi.domain.chapter.service.MissingChaptersTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

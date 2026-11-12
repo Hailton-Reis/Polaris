@@ -1,0 +1,27 @@
+{
+  "scope": "Software-emulated disposable API26 x86_64 VM; component host",
+  "emulator_acceleration": "TCG software; no KVM",
+  "display": "720x1600, density320",
+  "preflight": "Gradle stopped, regenerable task cache/native/dex/resource intermediates removed for disk headroom; APKs, sources, SDK, models, keys, Maven dependencies, JUnit and guest data preserved",
+  "data_cleared": false,
+  "APK_verification_disabled": false,
+  "SELinux": "Enforcing",
+  "boot_observation": "System UI ANR during boot, inspected screenshot boot-anr.png; tapped Close App at (300,830) before instrumentation",
+  "install_observation": "Large APK verification completed under dex2oat verify; System UI ANR recurred during installation, screenshot install-anr.png inspected and Close App tapped before instrumentation",
+  "actions_before_tests": [
+    "Force-stopped previous background Polaris after boot and after APK installation",
+    "Waited for Launcher focus and absence of ANR before launching tests"
+  ],
+  "instrumentation_start_window": "Launcher; window-ready-2.txt",
+  "source_changed_for_VM_recovery": false,
+  "full_app_or_physical_performance_acceptance": false,
+  "interface_recovery_during_instrumentation": false,
+  "final_host_memory_events": {
+    "low": 0,
+    "high": 0,
+    "max": 0,
+    "oom": 0,
+    "oom_kill": 0,
+    "oom_group_kill": 0
+  }
+}

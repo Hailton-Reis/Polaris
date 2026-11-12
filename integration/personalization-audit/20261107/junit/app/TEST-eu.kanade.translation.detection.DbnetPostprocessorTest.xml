@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.translation.detection.DbnetPostprocessorTest" tests="18" skipped="0" failures="0" errors="0" timestamp="2026-11-08T01:12:29.005Z" hostname="a1f1fc307d5f" time="0.473">
+  <properties/>
+  <testcase name="normal component is scored expanded and returned in original coordinates()" classname="eu.kanade.translation.detection.DbnetPostprocessorTest" time="0.041"/>
+  <testcase name="larger capacity DB buffer reads only actual channel zero grid()" classname="eu.kanade.translation.detection.DbnetPostprocessorTest" time="0.052"/>
+  <testcase name="native stroke mask uses strict point twelve threshold with exact grid and padded input mapping()" classname="eu.kanade.translation.detection.DbnetPostprocessorTest" time="0.001"/>
+  <testcase name="half and full masks are both accepted and do not change geometry()" classname="eu.kanade.translation.detection.DbnetPostprocessorTest" time="0.021"/>
+  <testcase name="differently sized DB grid scales x and y independently using padded input()" classname="eu.kanade.translation.detection.DbnetPostprocessorTest" time="0.008"/>
+  <testcase name="minimum side is measured before unclip with inclusive three pixel threshold()" classname="eu.kanade.translation.detection.DbnetPostprocessorTest" time="0.01"/>
+  <testcase name="diagonal pixels connect components but separated boxes keep row major order()" classname="eu.kanade.translation.detection.DbnetPostprocessorTest" time="0.011"/>
+  <testcase name="invalid output metadata and truncated buffers fail explicitly()" classname="eu.kanade.translation.detection.DbnetPostprocessorTest" time="0.067"/>
+  <testcase name="blank logits produce successful empty result()" classname="eu.kanade.translation.detection.DbnetPostprocessorTest" time="0.004"/>
+  <testcase name="nonfinite or non probability native mask fails without a partial result()" classname="eu.kanade.translation.detection.DbnetPostprocessorTest" time="0.0"/>
+  <testcase name="score is component mean rather than maximum()" classname="eu.kanade.translation.detection.DbnetPostprocessorTest" time="0.006"/>
+  <testcase name="nonfinite channel zero logits fail without partial regions()" classname="eu.kanade.translation.detection.DbnetPostprocessorTest" time="0.01"/>
+  <testcase name="region limit accepts 2048 but returns failure at 2049 instead of truncation()" classname="eu.kanade.translation.detection.DbnetPostprocessorTest" time="0.22"/>
+  <testcase name="only channel zero contributes geometry()" classname="eu.kanade.translation.detection.DbnetPostprocessorTest" time="0.004"/>
+  <testcase name="boxes entirely in padded area are removed after clipping()" classname="eu.kanade.translation.detection.DbnetPostprocessorTest" time="0.001"/>
+  <testcase name="zero logits are strictly excluded even when surrounded by positive logits()" classname="eu.kanade.translation.detection.DbnetPostprocessorTest" time="0.002"/>
+  <testcase name="border component is clipped to original image()" classname="eu.kanade.translation.detection.DbnetPostprocessorTest" time="0.004"/>
+  <testcase name="score uses sigmoid once and rejects mean probability below threshold()" classname="eu.kanade.translation.detection.DbnetPostprocessorTest" time="0.004"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

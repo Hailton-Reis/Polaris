@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.tachiyomi.source.selection.LibraryWorkTest" tests="24" skipped="0" failures="0" errors="0" timestamp="2026-11-10T22:28:23.261Z" hostname="7d7c5a6182d0" time="1.612">
+  <properties/>
+  <testcase name="explicit conflicting pins prevent hiding either edition()" classname="eu.kanade.tachiyomi.source.selection.LibraryWorkTest" time="0.002"/>
+  <testcase name="scanlator filtering does not invalidate numbering established by the full native edition()" classname="eu.kanade.tachiyomi.source.selection.LibraryWorkTest" time="0.119"/>
+  <testcase name="a pinned English edition ranks ahead of Portuguese while preserving active reading()" classname="eu.kanade.tachiyomi.source.selection.LibraryWorkTest" time="0.078"/>
+  <testcase name="unknown chapters from different owners never share a sentinel URL identity()" classname="eu.kanade.tachiyomi.source.selection.LibraryWorkTest" time="0.089"/>
+  <testcase name="generic authors and a transitive author bridge cannot corroborate a library group()" classname="eu.kanade.tachiyomi.source.selection.LibraryWorkTest" time="0.001"/>
+  <testcase name="library exposes both native records after incompatible renumbering with unchanged counts()" classname="eu.kanade.tachiyomi.source.selection.LibraryWorkTest" time="0.038"/>
+  <testcase name="portable association resolves after destination local IDs change()" classname="eu.kanade.tachiyomi.source.selection.LibraryWorkTest" time="0.001"/>
+  <testcase name="numbering changes are revalidated and recover without changing association or progress()" classname="eu.kanade.tachiyomi.source.selection.LibraryWorkTest" time="0.033"/>
+  <testcase name="metadata guard rejects homonyms unrelated creators and sequel qualifiers()" classname="eu.kanade.tachiyomi.source.selection.LibraryWorkTest" time="0.001"/>
+  <testcase name="confirmed catalogue aliases retain adjacent Portuguese and English complements during reads()" classname="eu.kanade.tachiyomi.source.selection.LibraryWorkTest" time="0.027"/>
+  <testcase name="storage hint is removable and does not contain a page mapping()" classname="eu.kanade.tachiyomi.source.selection.LibraryWorkTest" time="0.001"/>
+  <testcase name="malformed or oversized membership payloads are rejected()" classname="eu.kanade.tachiyomi.source.selection.LibraryWorkTest" time="0.003"/>
+  <testcase name="group chapter query preserves original chapter IDs owner IDs and partial pages()" classname="eu.kanade.tachiyomi.source.selection.LibraryWorkTest" time="0.05"/>
+  <testcase name="large confirmed native editions keep all storage owners and logical chapter identities()" classname="eu.kanade.tachiyomi.source.selection.LibraryWorkTest" time="0.843"/>
+  <testcase name="an explicit separate flag invalidates even reciprocal imported membership()" classname="eu.kanade.tachiyomi.source.selection.LibraryWorkTest" time="0.002"/>
+  <testcase name="native mutation query never includes chapters from another edition()" classname="eu.kanade.tachiyomi.source.selection.LibraryWorkTest" time="0.039"/>
+  <testcase name="remote chapter adapter strips runtime and other host reserved metadata()" classname="eu.kanade.tachiyomi.source.selection.LibraryWorkTest" time="0.001"/>
+  <testcase name="explicit child query remains native while reader root lookup follows the association()" classname="eu.kanade.tachiyomi.source.selection.LibraryWorkTest" time="0.021"/>
+  <testcase name="partial reciprocal writes never hide another native record()" classname="eu.kanade.tachiyomi.source.selection.LibraryWorkTest" time="0.0"/>
+  <testcase name="chapter flow revalidates numbering even when manga metadata and row counts stay equal()" classname="eu.kanade.tachiyomi.source.selection.LibraryWorkTest" time="0.098"/>
+  <testcase name="malformed separation preference is not executable data()" classname="eu.kanade.tachiyomi.source.selection.LibraryWorkTest" time="0.037"/>
+  <testcase name="Portuguese edition ranks ahead of English without moving native chapters()" classname="eu.kanade.tachiyomi.source.selection.LibraryWorkTest" time="0.017"/>
+  <testcase name="missing unfavorited or changed members deactivate an association()" classname="eu.kanade.tachiyomi.source.selection.LibraryWorkTest" time="0.001"/>
+  <testcase name="library projects union categories logical reads bookmarks and newest history()" classname="eu.kanade.tachiyomi.source.selection.LibraryWorkTest" time="0.026"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.translation.AutomaticChapterLanguageTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-11-10T14:11:17.445Z" hostname="7d7c5a6182d0" time="0.018">
+  <properties/>
+  <testcase name="chapter sampling includes late pages and has a fixed text budget()" classname="eu.kanade.translation.AutomaticChapterLanguageTest" time="0.017"/>
+  <testcase name="only confident English content enters automatic translation()" classname="eu.kanade.translation.AutomaticChapterLanguageTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

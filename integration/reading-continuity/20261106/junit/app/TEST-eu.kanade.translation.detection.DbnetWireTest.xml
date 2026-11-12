@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.translation.detection.DbnetWireTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-11-06T19:56:58.135Z" hostname="550a0106d184" time="0.007">
+  <properties/>
+  <testcase name="full native resolution mask remains within the transport bound()" classname="eu.kanade.translation.detection.DbnetWireTest" time="0.001"/>
+  <testcase name="malformed mask metadata and encoded length fail before mask decode()" classname="eu.kanade.translation.detection.DbnetWireTest" time="0.0"/>
+  <testcase name="geometry round trip preserves dimensions coordinates order and confidence()" classname="eu.kanade.translation.detection.DbnetWireTest" time="0.001"/>
+  <testcase name="malformed and oversized IPC output fails without partial regions()" classname="eu.kanade.translation.detection.DbnetWireTest" time="0.001"/>
+  <testcase name="empty valid detection is represented explicitly()" classname="eu.kanade.translation.detection.DbnetWireTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

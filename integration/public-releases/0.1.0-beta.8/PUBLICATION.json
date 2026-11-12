@@ -1,0 +1,65 @@
+{
+  "status": "PUBLIC_PRERELEASE_DOWNLOADS_VERIFIED",
+  "tag": "v0.1.0-beta.8",
+  "url": "https://github.com/Hailton-Reis/Polaris/releases/tag/v0.1.0-beta.8",
+  "published_at": "2026-11-03T14:17:47Z",
+  "client_sent_authorization_header": false,
+  "assets": [
+    {
+      "file": "manifest.json",
+      "bytes": 1564,
+      "sha256": "8998a60ed2a0a59b444268271024becee4c250c376125048f85d0766a24685ee",
+      "http_status": 200
+    },
+    {
+      "file": "SHA256SUMS.txt",
+      "bytes": 204,
+      "sha256": "1500e67ab2453879796ee9344fb64de1f43dcd3d0d53892682aa72036c8d610c",
+      "http_status": 200
+    },
+    {
+      "file": "PRIMEIRO_TESTE.md",
+      "bytes": 1507,
+      "sha256": "001723fd41aa57273029ac955829cb2fd3f18369c299fa79c5cc2ae59cd69084",
+      "http_status": 200
+    },
+    {
+      "file": "RELEASE_NOTES.md",
+      "bytes": 5962,
+      "sha256": "daf91c36d420429102be387e605df3f68724beea945e8c9b03276d83b49d48e3",
+      "http_status": 200
+    },
+    {
+      "file": "VALIDACAO.json",
+      "bytes": 8068,
+      "sha256": "9312da1095cef46d097119a8bc01792979a89e11d268b716462dbf76be553262",
+      "http_status": 200
+    },
+    {
+      "file": "Polaris-0.1.0-beta.8-arm64-v8a.apk",
+      "bytes": 194508943,
+      "sha256": "7a5b60ae1c86b4435ea801ca90fffd81c23e57773dba18ef082c14e7ec37077c",
+      "http_status": 200
+    },
+    {
+      "file": "Polaris-0.1.0-beta.8-armeabi-v7a.apk",
+      "bytes": 154711120,
+      "sha256": "629f1f60badfb751c5205cdb244dc472c1cb0a9b78e2e0d8fedfb67749877669",
+      "http_status": 200
+    }
+  ],
+  "repository": "Hailton-Reis/Polaris",
+  "source_commit": "4108405f57eee47daf3ec3a8e44c4f8e8005c7c5",
+  "verified_implementation_commit": "929121df753af8db069777bd2a4249aa72e5ebf7",
+  "publisher_workflow": "https://github.com/Hailton-Reis/Polaris/actions/runs/41651681618",
+  "publisher_safety_tests": 8,
+  "temporary_transport_ref_removed": true,
+  "signer_sha256": "3ae747069cc9015ca1777f94fd56b030501f45d6af380426a572ad60e94d8227",
+  "physical_device_acceptance": "PENDING",
+  "unit_comparison": {
+    "total": 589,
+    "passed": 555,
+    "preexisting_failures": 34,
+    "new_failures": 0
+  }
+}

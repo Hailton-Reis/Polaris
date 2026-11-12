@@ -1,0 +1,70 @@
+{
+  "tool": "image_gen.imagegen",
+  "transparent_background": true,
+  "creative_processing": "Original generated illustrations retained; resource copies only resized and encoded as WebP with ImageMagick",
+  "resource_encoding": "512x512 WebP quality94; no additional Android dependency",
+  "adaptive_foreground_insets": "22% on each edge",
+  "inspiration": "Fantasy clover-grimoire progression requested by the user, inspired by Black Clover; new Polaris illustrations",
+  "files": [
+    {
+      "edition": "default",
+      "label_pt_BR": "Grimório Polaris",
+      "leaves": 0,
+      "unlock_xp": 0,
+      "legacy_alias_key": "DEFAULT",
+      "source": "design/polaris-grimoires/20261111/originals/default.png",
+      "source_sha256": "cf1b7fe9fa9765103675cf793a6b8efa4ae190c9a0fc216efcf589ef69e31d4b",
+      "resource": "app/src/main/res/drawable-nodpi/ic_polaris_logo.webp",
+      "resource_sha256": "e1268bf99831c4e4cc1c6b383bccd839c37dec93613589915271769d3c363fe1",
+      "resource_bytes": 81474
+    },
+    {
+      "edition": "three",
+      "label_pt_BR": "Trevo de três folhas",
+      "leaves": 3,
+      "unlock_xp": 900,
+      "legacy_alias_key": "AURORA",
+      "source": "design/polaris-grimoires/20261111/originals/three.png",
+      "source_sha256": "ee6ab525d9f3c5cd74e9048819571927bfea4e919dbe28e45f71261e826a7825",
+      "resource": "app/src/main/res/drawable-nodpi/ic_polaris_aurora.webp",
+      "resource_sha256": "e5bc4a4fa0bb5979be8653098e14cc96bfcdc405a7dbe577a873bded245843af",
+      "resource_bytes": 110248
+    },
+    {
+      "edition": "four",
+      "label_pt_BR": "Amado pela mana",
+      "leaves": 4,
+      "unlock_xp": 4500,
+      "legacy_alias_key": "ORBIT",
+      "source": "design/polaris-grimoires/20261111/originals/four.png",
+      "source_sha256": "b3fbaa6de14479bcfec6ba8b62252401ccf9ef0cd255541db9a46126e3b3dd6b",
+      "resource": "app/src/main/res/drawable-nodpi/ic_polaris_orbit.webp",
+      "resource_sha256": "06fefa25f8352fc0a185e89346cf675feef1219b049e9c660bb716849455df7c",
+      "resource_bytes": 121260
+    },
+    {
+      "edition": "five",
+      "label_pt_BR": "Trevo de cinco folhas",
+      "leaves": 5,
+      "unlock_xp": 9000,
+      "legacy_alias_key": "CONSTELLATION",
+      "source": "design/polaris-grimoires/20261111/originals/five.png",
+      "source_sha256": "ba7e3f12bf93cb3467e4402a2f750cdd701c008ef6306a44627749fd9e3046e0",
+      "resource": "app/src/main/res/drawable-nodpi/ic_polaris_constellation.webp",
+      "resource_sha256": "4f5a83463b616be37182b68b4550f648051ef46712230c454c820c259e14bac8",
+      "resource_bytes": 101372
+    }
+  ],
+  "resource_total_bytes": 414354,
+  "default_cleanup": "image_gen.imagegen edit removed all outer haze; first generation retained in history/",
+  "edit_history": [
+    {
+      "tool": "image_gen.imagegen",
+      "input": "design/polaris-grimoires/20261111/history/default-before-alpha-cleanup.png",
+      "input_sha256": "8b5cd182efcf2c31f1e92d6aec8ed9769e5afe2ddc16fc82b83d03c330cdb961",
+      "result": "design/polaris-grimoires/20261111/originals/default.png",
+      "result_sha256": "cf1b7fe9fa9765103675cf793a6b8efa4ae190c9a0fc216efcf589ef69e31d4b",
+      "instruction": "Remove outer haze with transparent cutout; preserve painted book"
+    }
+  ]
+}

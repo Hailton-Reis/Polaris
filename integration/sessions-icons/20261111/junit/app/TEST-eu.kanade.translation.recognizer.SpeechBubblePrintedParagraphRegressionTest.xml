@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.translation.recognizer.SpeechBubblePrintedParagraphRegressionTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-11-11T20:06:07.561Z" hostname="b5ae99f6bd9c" time="5.065">
+  <properties/>
+  <testcase name="printed neighboring lobes keep separate paragraphs and layout regions()" classname="eu.kanade.translation.recognizer.SpeechBubblePrintedParagraphRegressionTest" time="0.873"/>
+  <testcase name="grouping retains individually bounded cleanup masks()" classname="eu.kanade.translation.recognizer.SpeechBubblePrintedParagraphRegressionTest" time="0.095"/>
+  <testcase name="oval keeps useful paragraph space without crossing its curved boundary()" classname="eu.kanade.translation.recognizer.SpeechBubblePrintedParagraphRegressionTest" time="0.51"/>
+  <testcase name="cleanup near a curved shoulder covers source ink without erasing the outline()" classname="eu.kanade.translation.recognizer.SpeechBubblePrintedParagraphRegressionTest" time="0.598"/>
+  <testcase name="almost touching printed lines do not reject each others background collar()" classname="eu.kanade.translation.recognizer.SpeechBubblePrintedParagraphRegressionTest" time="1.7"/>
+  <testcase name="printed fragments inside one oval become a single paragraph()" classname="eu.kanade.translation.recognizer.SpeechBubblePrintedParagraphRegressionTest" time="0.705"/>
+  <testcase name="peer OCR box crossing a divider never hides the neighboring balloon contour()" classname="eu.kanade.translation.recognizer.SpeechBubblePrintedParagraphRegressionTest" time="0.58"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

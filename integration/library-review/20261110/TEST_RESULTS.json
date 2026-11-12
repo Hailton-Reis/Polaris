@@ -1,0 +1,73 @@
+{
+  "status": "DEVELOPMENT_REVIEW_COMPONENT_VALIDATED_PENDING_EXTERNAL_ACCEPTANCE",
+  "revision": "P20261110.2",
+  "version": "0.1.0-beta.11",
+  "version_code": 112,
+  "published": false,
+  "public_release_unchanged": "v0.1.0-beta.10",
+  "checked_at_utc": "2026-11-10T20:53:01.364276+00:00",
+  "engineering_parent": "324f170e20a48c345617a5cd8c58d8fc630d788d",
+  "jvm": {
+    "total": 845,
+    "passed": 845,
+    "failed": 0,
+    "skipped": 0
+  },
+  "baseline_jvm": {
+    "total": 837,
+    "passed": 837,
+    "failed": 0,
+    "skipped": 0
+  },
+  "new_cases": 8,
+  "missing_baseline_cases": 0,
+  "gradle_exit": 0,
+  "host_guards": {
+    "overlay_passed": 4,
+    "packager_passed": 9
+  },
+  "android": {
+    "passed": 21,
+    "failed": 0,
+    "new_real_database_cases": 4,
+    "api": 26,
+    "abi": "x86_64",
+    "component_host": true,
+    "current_numbering_revalidation": true,
+    "transactional_numbering_guard": true,
+    "non_favorite_preference_changes": true,
+    "physical_ARM_acceptance": false,
+    "external_reader_acceptance": false,
+    "full_app_startup_and_download_reader_acceptance": false
+  },
+  "artifacts": [
+    {
+      "file": "app-debug.apk",
+      "bytes": 236336644,
+      "sha256": "46d0af830267d86e5d3cdd6c38665ef998943cc6a20bb0886ba6387544898264",
+      "packaged_abis": [
+        "x86_64"
+      ],
+      "scope": "debug x86_64 component fixture; not a phone release"
+    },
+    {
+      "file": "app-debug-androidTest.apk",
+      "bytes": 547817,
+      "sha256": "7a30814f025e030925498aa9fb45a30ab6685728a3544be5c28921d7b50b0ef1",
+      "packaged_abis": [],
+      "scope": "debug x86_64 component fixture; not a phone release"
+    }
+  ],
+  "source_patch_sha256": "59e8d428c12f122f5c7b78c46dcaecb57cd868cc3906279a8ba392d6445eb8aa",
+  "matching_overlay_paths": 370,
+  "changes_backup_or_SQL_schema": false,
+  "new_dependencies": 0,
+  "new_OCR_models": 0,
+  "pending": [
+    "Real provider and personal-backup full workflow, actual download directories and reader/manga-screen navigation",
+    "Semantic renumbering with still-compatible labels cannot always be inferred from metadata",
+    "Physical A12/ARM32 and S20FE/ARM64 performance, including filtered-query costs",
+    "Database/UI round trips through external Mihon/Tachiyomi readers",
+    "Experimental sandbox preference/login/novel adaptation and release build acceptance remain outside this library review"
+  ]
+}

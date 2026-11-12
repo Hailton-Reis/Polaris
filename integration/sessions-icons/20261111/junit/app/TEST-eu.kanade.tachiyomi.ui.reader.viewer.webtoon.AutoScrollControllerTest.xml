@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.tachiyomi.ui.reader.viewer.webtoon.AutoScrollControllerTest" tests="18" skipped="0" failures="0" errors="0" timestamp="2026-11-11T20:05:50.046Z" hostname="b5ae99f6bd9c" time="0.115">
+  <properties/>
+  <testcase name="frame clock failure pauses without escaping()" classname="eu.kanade.tachiyomi.ui.reader.viewer.webtoon.AutoScrollControllerTest" time="0.011"/>
+  <testcase name="end callback failure remains paused without escaping()" classname="eu.kanade.tachiyomi.ui.reader.viewer.webtoon.AutoScrollControllerTest" time="0.005"/>
+  <testcase name="scrollability failure pauses without escaping()" classname="eu.kanade.tachiyomi.ui.reader.viewer.webtoon.AutoScrollControllerTest" time="0.005"/>
+  <testcase name="timestamp subtraction cannot overflow past the frame clamp()" classname="eu.kanade.tachiyomi.ui.reader.viewer.webtoon.AutoScrollControllerTest" time="0.007"/>
+  <testcase name="pause from final scrollability callback prevents the pending scroll()" classname="eu.kanade.tachiyomi.ui.reader.viewer.webtoon.AutoScrollControllerTest" time="0.003"/>
+  <testcase name="fractional distance produces six pixels across ten ten millisecond intervals()" classname="eu.kanade.tachiyomi.ui.reader.viewer.webtoon.AutoScrollControllerTest" time="0.004"/>
+  <testcase name="scroll callback failure pauses without escaping()" classname="eu.kanade.tachiyomi.ui.reader.viewer.webtoon.AutoScrollControllerTest" time="0.002"/>
+  <testcase name="frame gaps are clamped to one hundred milliseconds()" classname="eu.kanade.tachiyomi.ui.reader.viewer.webtoon.AutoScrollControllerTest" time="0.003"/>
+  <testcase name="end callback can start a new loop without old completion disabling it()" classname="eu.kanade.tachiyomi.ui.reader.viewer.webtoon.AutoScrollControllerTest" time="0.004"/>
+  <testcase name="end of content pauses once without scrolling()" classname="eu.kanade.tachiyomi.ui.reader.viewer.webtoon.AutoScrollControllerTest" time="0.003"/>
+  <testcase name="start owns one loop and pause cancels it and clears fractional distance()" classname="eu.kanade.tachiyomi.ui.reader.viewer.webtoon.AutoScrollControllerTest" time="0.004"/>
+  <testcase name="destroy is terminal and later starts are ignored()" classname="eu.kanade.tachiyomi.ui.reader.viewer.webtoon.AutoScrollControllerTest" time="0.024"/>
+  <testcase name="invalid speeds act as zero without poisoning later frames()" classname="eu.kanade.tachiyomi.ui.reader.viewer.webtoon.AutoScrollControllerTest" time="0.007"/>
+  <testcase name="end callback can toggle a new loop without old completion disabling it()" classname="eu.kanade.tachiyomi.ui.reader.viewer.webtoon.AutoScrollControllerTest" time="0.004"/>
+  <testcase name="toggle starts and pauses the same loop()" classname="eu.kanade.tachiyomi.ui.reader.viewer.webtoon.AutoScrollControllerTest" time="0.002"/>
+  <testcase name="unexpected callback failure pauses without escaping or reporting content end()" classname="eu.kanade.tachiyomi.ui.reader.viewer.webtoon.AutoScrollControllerTest" time="0.003"/>
+  <testcase name="initial state is disabled without requesting a frame()" classname="eu.kanade.tachiyomi.ui.reader.viewer.webtoon.AutoScrollControllerTest" time="0.002"/>
+  <testcase name="speed changes affect the next frame without restarting()" classname="eu.kanade.tachiyomi.ui.reader.viewer.webtoon.AutoScrollControllerTest" time="0.003"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,13 @@
+{
+  "matched": true,
+  "files": [
+    "app/build.gradle.kts",
+    "gradle/libs.versions.toml",
+    "app/src/main/AndroidManifest.xml",
+    "app/src/debug/AndroidManifest.xml"
+  ],
+  "SQL_and_Protobuf_paths_matched": 3,
+  "new_dependencies": 0,
+  "new_OCR_models": 0,
+  "previous_advisory_lookup_repeated": false
+}

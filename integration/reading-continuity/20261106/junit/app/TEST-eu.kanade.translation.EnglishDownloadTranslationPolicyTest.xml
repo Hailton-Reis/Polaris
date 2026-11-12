@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.translation.EnglishDownloadTranslationPolicyTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-11-06T19:56:55.227Z" hostname="550a0106d184" time="0.013">
+  <properties/>
+  <testcase name="Portuguese and unknown sources are not guessed as English()" classname="eu.kanade.translation.EnglishDownloadTranslationPolicyTest" time="0.003"/>
+  <testcase name="English source variants are eligible()" classname="eu.kanade.translation.EnglishDownloadTranslationPolicyTest" time="0.001"/>
+  <testcase name="global off disables the English default()" classname="eu.kanade.translation.EnglishDownloadTranslationPolicyTest" time="0.0"/>
+  <testcase name="configured source and target must permit English translation()" classname="eu.kanade.translation.EnglishDownloadTranslationPolicyTest" time="0.004"/>
+  <testcase name="explicit work choices take priority()" classname="eu.kanade.translation.EnglishDownloadTranslationPolicyTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

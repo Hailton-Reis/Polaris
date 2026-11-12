@@ -1,0 +1,5 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="test.polaris.preparation.probe" android:versionCode="1" android:versionName="1.0">
+<uses-sdk android:minSdkVersion="26" android:targetSdkVersion="28"/>
+<application android:label="Polaris component probe"/>
+<instrumentation android:name="test.polaris.preparation.probe.Probe" android:targetPackage="test.polaris.preparation.probe"/>
+</manifest>

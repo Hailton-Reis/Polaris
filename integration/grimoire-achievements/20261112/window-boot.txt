@@ -1,0 +1,85 @@
+WINDOW MANAGER WINDOWS (dumpsys window windows)
+  Window #0 Window{4308129 u0 DockedStackDivider}:
+    mDisplayId=0 stackId=0 mSession=Session{1041f2d 1799:u0a10022} mClient=android.os.BinderProxy@dc7f1f3
+    mOwnerUid=10022 mShowToOwnerOnly=false package=com.android.systemui appop=NONE
+    mAttrs=WM.LayoutParams{(0,0)(fillx96) ty=2034 fl=#21840028 pfl=0x40 fmt=-3 vsysui=0x700 colorMode=0}
+    Requested w=0 h=0 mLayoutSeq=-1
+    mBaseLayer=21000 mSubLayer=0 mAnimLayer=21005+0=21005 mLastLayer=0
+    mToken=WindowToken{361efd1 android.os.BinderProxy@ecc3eb0}
+    mViewVisibility=0x4 mHaveFrame=false mObscured=false
+    mSeq=0 mSystemUiVisibility=0x0
+    mRelayoutCalled=false mLayoutNeeded=false
+    mGivenContentInsets=[0,0][0,0] mGivenVisibleInsets=[0,0][0,0]
+    mFullConfiguration={1.0 ?mcc?mnc [en_US] ldltr sw360dp w360dp h776dp 320dpi nrml long port finger -keyb/v/h tball/v appBounds=Rect(0, 0 - 720, 1600) s.5}
+    mLastReportedConfiguration={0.0 ?mcc?mnc ?localeList ?layoutDir ?swdp ?wdp ?hdp ?density ?lsize ?long ?ldr ?wideColorGamut ?orien ?uimode ?night ?touch ?keyb/?/? ?nav/?}
+    mHasSurface=false mShownPosition=[0,0] isReadyForDisplay()=false hasSavedSurface()=false mWindowRemovalAllowed=false
+    mFrame=[0,0][0,0] last=[0,0][0,0]
+    Frames: containing=[0,0][0,0] parent=[0,0][0,0]
+        display=[0,0][0,0] overscan=[0,0][0,0]
+        content=[0,0][0,0] visible=[0,0][0,0]
+        decor=[0,0][0,0]
+        outset=[0,0][0,0]
+    Cur insets: overscan=[0,0][0,0] content=[0,0][0,0] visible=[0,0][0,0] stable=[0,0][0,0] surface=[0,0][0,0] outsets=[0,0][0,0]
+    Lst insets: overscan=[0,0][0,0] content=[0,0][0,0] visible=[0,0][0,0] stable=[0,0][0,0] physical=[0,0][0,0] outset=[0,0][0,0]
+    WindowStateAnimator{46afa36 DockedStackDivider}:
+      mDrawState=NO_SURFACE       mLastHidden=false
+      mSystemDecorRect=[0,0][0,0] last=[0,0][0,0] mHasClipRect=false mLastClipRect=[0,0][0,0]
+      mShownAlpha=0.0 mAlpha=1.0 mLastAlpha=0.0
+  Window #1 Window{2aa86b7 u0 com.android.settings/com.android.settings.FallbackHome}:
+    mDisplayId=0 stackId=0 mSession=Session{5f3419 1895:1000} mClient=android.os.BinderProxy@85a4d51
+    mOwnerUid=1000 mShowToOwnerOnly=true package=com.android.settings appop=NONE
+    mAttrs=WM.LayoutParams{(0,0)(fillxfill) sim=#20 ty=1 fl=#81910180 pfl=0x20000 fmt=-2 wanim=0x10302f6 vsysui=0x600 needsMenuKey=2 colorMode=0}
+    Requested w=720 h=1600 mLayoutSeq=14
+    mBaseLayer=21000 mSubLayer=0 mAnimLayer=21000+0=21000 mLastLayer=21000
+    mToken=AppWindowToken{5cc8785 token=Token{192bd0 ActivityRecord{aeddf93 u0 com.android.settings/.FallbackHome t1}}}
+    mAppToken=AppWindowToken{5cc8785 token=Token{192bd0 ActivityRecord{aeddf93 u0 com.android.settings/.FallbackHome t1}}}
+     isAnimatingWithSavedSurface()=false mAppDied=false
+    mViewVisibility=0x0 mHaveFrame=true mObscured=false
+    mSeq=0 mSystemUiVisibility=0x600
+    mGivenContentInsets=[0,0][0,0] mGivenVisibleInsets=[0,0][0,0]
+    mFullConfiguration={1.0 ?mcc?mnc [en_US] ldltr sw360dp w360dp h776dp 320dpi nrml long port finger -keyb/v/h tball/v appBounds=Rect(0, 0 - 720, 1600) s.5}
+    mLastReportedConfiguration={1.0 ?mcc?mnc [en_US] ldltr sw360dp w360dp h776dp 320dpi nrml long port finger -keyb/v/h tball/v appBounds=Rect(0, 0 - 720, 1600) s.5}
+    mHasSurface=true mShownPosition=[0,0] isReadyForDisplay()=true hasSavedSurface()=false mWindowRemovalAllowed=false
+    mFrame=[0,0][720,1600] last=[0,0][720,1600]
+    Frames: containing=[0,0][720,1600] parent=[0,0][720,1600]
+        display=[0,0][720,1600] overscan=[0,0][720,1600]
+        content=[0,0][720,1600] visible=[0,0][720,1600]
+        decor=[0,0][720,1600]
+        outset=[0,0][0,0]
+    Cur insets: overscan=[0,0][0,0] content=[0,0][0,0] visible=[0,0][0,0] stable=[0,0][0,0] surface=[0,0][0,0] outsets=[0,0][0,0]
+    Lst insets: overscan=[0,0][0,0] content=[0,0][0,0] visible=[0,0][0,0] stable=[0,0][0,0] physical=[0,0][0,0] outset=[0,0][0,0]
+    WindowStateAnimator{58d2d37 com.android.settings/com.android.settings.FallbackHome}:
+      mSurface=Surface(name=com.android.settings/com.android.settings.FallbackHome)
+      Surface: shown=true layer=21000 alpha=1.0 rect=(0.0,0.0) 720.0 x 1600.0 transform=(1.0, 0.0, 0.0, 1.0)
+      mDrawState=HAS_DRAWN       mLastHidden=false
+      mSystemDecorRect=[0,0][720,1600] last=[0,0][0,0] mHasClipRect=false mLastClipRect=[0,0][720,1600]
+    mLastFreezeDuration=+11s986ms
+
+  mGlobalConfiguration={1.0 ?mcc?mnc [en_US] ldltr sw360dp w360dp h776dp 320dpi nrml long port finger -keyb/v/h tball/v appBounds=Rect(0, 0 - 720, 1600) s.5}
+  mHasPermanentDpad=false
+  mCurrentFocus=Window{2aa86b7 u0 com.android.settings/com.android.settings.FallbackHome}
+  mFocusedApp=AppWindowToken{5cc8785 token=Token{192bd0 ActivityRecord{aeddf93 u0 com.android.settings/.FallbackHome t1}}}
+  mInTouchMode=true mLayoutSeq=14
+  mLastDisplayFreezeDuration=+5s182ms due to Window{2aa86b7 u0 com.android.settings/com.android.settings.FallbackHome}
+  mLastWakeLockHoldingWindow=Window{2aa86b7 u0 com.android.settings/com.android.settings.FallbackHome} mLastWakeLockObscuringWindow=null
+  SnapshotCache
+  mSystemDecorLayer=0 mScreenRect=[0,0][720,1600]
+  mTraversalScheduled=false
+  mHoldScreenWindow=Window{2aa86b7 u0 com.android.settings/com.android.settings.FallbackHome}
+  mObscuringWindow=null
+  mWallpaperTarget=Window{2aa86b7 u0 com.android.settings/com.android.settings.FallbackHome}
+  mLastWallpaperX=-1.0 mLastWallpaperY=-1.0
+  mSystemBooted=true mDisplayEnabled=false
+  mTransactionSequence=24
+  mDisplayFrozen=false windows=0 client=false apps=0 waitingForConfig=false
+  mRotation=0 mAltOrientation=false
+  mLastWindowForcedOrientation=-1 mLastOrientation=-1
+  mDeferredRotationPauseCount=0
+  Animation settings: disabled=false window=1.0 transition=1.0 animator=1.0
+  mSkipAppTransitionAnimation=false
+  mLayoutToAnim:
+    mNextAppTransition=TRANSIT_UNSET
+    mAppTransitionState=APP_STATE_IDLE
+    mLastUsedAppTransition=TRANSIT_WALLPAPER_OPEN
+    mLastOpeningApp=AppWindowToken{5cc8785 token=Token{192bd0 ActivityRecord{aeddf93 u0 com.android.settings/.FallbackHome t1}}}
+    mLastClosingApp=null

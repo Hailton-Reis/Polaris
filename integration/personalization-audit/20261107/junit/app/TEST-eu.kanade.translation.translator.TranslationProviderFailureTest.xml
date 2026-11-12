@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.translation.translator.TranslationProviderFailureTest" tests="17" skipped="0" failures="0" errors="0" timestamp="2026-11-08T01:12:47.641Z" hostname="a1f1fc307d5f" time="0.038">
+  <properties/>
+  <testcase name="cancellation is propagated unchanged()" classname="eu.kanade.translation.translator.TranslationProviderFailureTest" time="0.004"/>
+  <testcase name="OpenRouter rejects blank model through typed boundary()" classname="eu.kanade.translation.translator.TranslationProviderFailureTest" time="0.008"/>
+  <testcase name="DeepL 456 reports exhausted quota()" classname="eu.kanade.translation.translator.TranslationProviderFailureTest" time="0.001"/>
+  <testcase name="Gemini rejects blank key before SDK use()" classname="eu.kanade.translation.translator.TranslationProviderFailureTest" time="0.005"/>
+  <testcase name="OpenRouter 401 is an invalid key without leaking response body()" classname="eu.kanade.translation.translator.TranslationProviderFailureTest" time="0.0"/>
+  <testcase name="OpenRouter 402 reports insufficient credits()" classname="eu.kanade.translation.translator.TranslationProviderFailureTest" time="0.0"/>
+  <testcase name="server response is retryable()" classname="eu.kanade.translation.translator.TranslationProviderFailureTest" time="0.0"/>
+  <testcase name="OpenRouter 404 reports missing model()" classname="eu.kanade.translation.translator.TranslationProviderFailureTest" time="0.001"/>
+  <testcase name="OpenRouter rejects blank key through typed boundary()" classname="eu.kanade.translation.translator.TranslationProviderFailureTest" time="0.004"/>
+  <testcase name="missing key and model use typed configuration failures()" classname="eu.kanade.translation.translator.TranslationProviderFailureTest" time="0.0"/>
+  <testcase name="Gemini invalid key message is classified without leaking cause text()" classname="eu.kanade.translation.translator.TranslationProviderFailureTest" time="0.001"/>
+  <testcase name="Gemini exhausted resource is classified as quota failure()" classname="eu.kanade.translation.translator.TranslationProviderFailureTest" time="0.001"/>
+  <testcase name="JSON parsing failure is a non retryable malformed response()" classname="eu.kanade.translation.translator.TranslationProviderFailureTest" time="0.001"/>
+  <testcase name="network IO reports retryable connection failure()" classname="eu.kanade.translation.translator.TranslationProviderFailureTest" time="0.0"/>
+  <testcase name="Gemini missing model message is classified()" classname="eu.kanade.translation.translator.TranslationProviderFailureTest" time="0.0"/>
+  <testcase name="DeepL rejects blank key through typed boundary()" classname="eu.kanade.translation.translator.TranslationProviderFailureTest" time="0.004"/>
+  <testcase name="HTTP 429 reports rate limit without immediate retry()" classname="eu.kanade.translation.translator.TranslationProviderFailureTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

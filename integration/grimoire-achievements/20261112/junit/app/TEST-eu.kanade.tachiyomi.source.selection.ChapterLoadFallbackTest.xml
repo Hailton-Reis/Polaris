@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.tachiyomi.source.selection.ChapterLoadFallbackTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-11-12T18:43:15.051Z" hostname="060411c85d3c" time="0.029">
+  <properties/>
+  <testcase name="a failed page list tries an alternate and disposes only failed loaders()" classname="eu.kanade.tachiyomi.source.selection.ChapterLoadFallbackTest" time="0.016"/>
+  <testcase name="downloaded-only mode never opens a replacement over the network()" classname="eu.kanade.tachiyomi.source.selection.ChapterLoadFallbackTest" time="0.005"/>
+  <testcase name="fallback cannot switch chapter numbering or violate a fixed provider()" classname="eu.kanade.tachiyomi.source.selection.ChapterLoadFallbackTest" time="0.001"/>
+  <testcase name="cancellation never becomes a request to another provider()" classname="eu.kanade.tachiyomi.source.selection.ChapterLoadFallbackTest" time="0.003"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

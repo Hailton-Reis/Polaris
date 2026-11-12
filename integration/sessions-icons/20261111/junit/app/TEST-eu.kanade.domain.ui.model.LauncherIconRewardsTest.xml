@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.domain.ui.model.LauncherIconRewardsTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-11-11T20:05:28.841Z" hostname="b5ae99f6bd9c" time="0.035">
+  <properties/>
+  <testcase name="existing alternate icon is retained without granting all other rewards()" classname="eu.kanade.domain.ui.model.LauncherIconRewardsTest" time="0.018"/>
+  <testcase name="milestones unlock at ten fifty and one hundred read chapter points()" classname="eu.kanade.domain.ui.model.LauncherIconRewardsTest" time="0.001"/>
+  <testcase name="earned choices remain available after restoring older progress and selecting costs no points()" classname="eu.kanade.domain.ui.model.LauncherIconRewardsTest" time="0.0"/>
+  <testcase name="portable profile value is bounded and malformed data cannot remove original choice()" classname="eu.kanade.domain.ui.model.LauncherIconRewardsTest" time="0.012"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

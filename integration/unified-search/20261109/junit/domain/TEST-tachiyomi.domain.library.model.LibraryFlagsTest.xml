@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="tachiyomi.domain.library.model.LibraryFlagsTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-11-08T00:51:46.447Z" hostname="a1f1fc307d5f" time="0.083">
+  <properties/>
+  <testcase name="Test Flag plus operator (LibrarySort)()" classname="tachiyomi.domain.library.model.LibraryFlagsTest" time="0.052"/>
+  <testcase name="Test Flag plus operator with old flag as base()" classname="tachiyomi.domain.library.model.LibraryFlagsTest" time="0.015"/>
+  <testcase name="Test Flag plus operator()" classname="tachiyomi.domain.library.model.LibraryFlagsTest" time="0.002"/>
+  <testcase name="Check the amount of flags()" classname="tachiyomi.domain.library.model.LibraryFlagsTest" time="0.011"/>
+  <testcase name="Test default flags()" classname="tachiyomi.domain.library.model.LibraryFlagsTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

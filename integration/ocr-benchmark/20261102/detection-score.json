@@ -1,0 +1,281 @@
+{
+  "scope": "Detection-only, accepted pre-unclip boxes, synthetic line truth; no recognition quality implied",
+  "iou_threshold": 0.3,
+  "expected_lines": 38,
+  "whole": {
+    "raw_boxes": 13,
+    "matched_lines": 0
+  },
+  "strips": {
+    "raw_boxes": 60,
+    "matched_lines": 38
+  },
+  "ground_truth": [
+    {
+      "text": "POLARIS - LONG STRIP OCR",
+      "x": 60,
+      "y": 86,
+      "width": 399,
+      "height": 21
+    },
+    {
+      "text": "Synthetic control, not a quality score",
+      "x": 60,
+      "y": 130,
+      "width": 535,
+      "height": 28
+    },
+    {
+      "text": "Scene 01 begins here.",
+      "x": 110,
+      "y": 1968,
+      "width": 324,
+      "height": 28
+    },
+    {
+      "text": "Keep every single word.",
+      "x": 110,
+      "y": 2022,
+      "width": 348,
+      "height": 28
+    },
+    {
+      "text": "This is the final line.",
+      "x": 109,
+      "y": 2076,
+      "width": 292,
+      "height": 22
+    },
+    {
+      "text": "Scene 02 begins here.",
+      "x": 110,
+      "y": 3632,
+      "width": 324,
+      "height": 28
+    },
+    {
+      "text": "Keep every single word.",
+      "x": 110,
+      "y": 3686,
+      "width": 348,
+      "height": 28
+    },
+    {
+      "text": "This is the final line.",
+      "x": 109,
+      "y": 3740,
+      "width": 292,
+      "height": 22
+    },
+    {
+      "text": "Scene 03 begins here.",
+      "x": 110,
+      "y": 5296,
+      "width": 324,
+      "height": 28
+    },
+    {
+      "text": "Keep every single word.",
+      "x": 110,
+      "y": 5350,
+      "width": 348,
+      "height": 28
+    },
+    {
+      "text": "This is the final line.",
+      "x": 109,
+      "y": 5404,
+      "width": 292,
+      "height": 22
+    },
+    {
+      "text": "Scene 04 begins here.",
+      "x": 110,
+      "y": 6960,
+      "width": 324,
+      "height": 28
+    },
+    {
+      "text": "Keep every single word.",
+      "x": 110,
+      "y": 7014,
+      "width": 348,
+      "height": 28
+    },
+    {
+      "text": "This is the final line.",
+      "x": 109,
+      "y": 7068,
+      "width": 292,
+      "height": 22
+    },
+    {
+      "text": "Scene 05 begins here.",
+      "x": 110,
+      "y": 8624,
+      "width": 324,
+      "height": 28
+    },
+    {
+      "text": "Keep every single word.",
+      "x": 110,
+      "y": 8678,
+      "width": 348,
+      "height": 28
+    },
+    {
+      "text": "This is the final line.",
+      "x": 109,
+      "y": 8732,
+      "width": 292,
+      "height": 22
+    },
+    {
+      "text": "Scene 06 begins here.",
+      "x": 110,
+      "y": 10288,
+      "width": 324,
+      "height": 28
+    },
+    {
+      "text": "Keep every single word.",
+      "x": 110,
+      "y": 10342,
+      "width": 348,
+      "height": 28
+    },
+    {
+      "text": "This is the final line.",
+      "x": 109,
+      "y": 10396,
+      "width": 292,
+      "height": 22
+    },
+    {
+      "text": "Scene 07 begins here.",
+      "x": 110,
+      "y": 11952,
+      "width": 324,
+      "height": 28
+    },
+    {
+      "text": "Keep every single word.",
+      "x": 110,
+      "y": 12006,
+      "width": 348,
+      "height": 28
+    },
+    {
+      "text": "This is the final line.",
+      "x": 109,
+      "y": 12060,
+      "width": 292,
+      "height": 22
+    },
+    {
+      "text": "Scene 08 begins here.",
+      "x": 110,
+      "y": 13616,
+      "width": 324,
+      "height": 28
+    },
+    {
+      "text": "Keep every single word.",
+      "x": 110,
+      "y": 13670,
+      "width": 348,
+      "height": 28
+    },
+    {
+      "text": "This is the final line.",
+      "x": 109,
+      "y": 13724,
+      "width": 292,
+      "height": 22
+    },
+    {
+      "text": "Scene 09 begins here.",
+      "x": 110,
+      "y": 15280,
+      "width": 324,
+      "height": 28
+    },
+    {
+      "text": "Keep every single word.",
+      "x": 110,
+      "y": 15334,
+      "width": 348,
+      "height": 28
+    },
+    {
+      "text": "This is the final line.",
+      "x": 109,
+      "y": 15388,
+      "width": 292,
+      "height": 22
+    },
+    {
+      "text": "Scene 10 begins here.",
+      "x": 110,
+      "y": 16944,
+      "width": 324,
+      "height": 28
+    },
+    {
+      "text": "Keep every single word.",
+      "x": 110,
+      "y": 16998,
+      "width": 348,
+      "height": 28
+    },
+    {
+      "text": "This is the final line.",
+      "x": 109,
+      "y": 17052,
+      "width": 292,
+      "height": 22
+    },
+    {
+      "text": "Scene 11 begins here.",
+      "x": 110,
+      "y": 18608,
+      "width": 324,
+      "height": 28
+    },
+    {
+      "text": "Keep every single word.",
+      "x": 110,
+      "y": 18662,
+      "width": 348,
+      "height": 28
+    },
+    {
+      "text": "This is the final line.",
+      "x": 109,
+      "y": 18716,
+      "width": 292,
+      "height": 22
+    },
+    {
+      "text": "I",
+      "x": 165,
+      "y": 618,
+      "width": 25,
+      "height": 47
+    },
+    {
+      "text": "NO!",
+      "x": 410,
+      "y": 987,
+      "width": 124,
+      "height": 49
+    },
+    {
+      "text": "A caption outside the balloons.",
+      "x": 80,
+      "y": 1405,
+      "width": 449,
+      "height": 28
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="tachiyomi.domain.manga.interactor.FetchIntervalTest" tests="10" skipped="0" failures="0" errors="0" timestamp="2026-11-10T20:36:49.753Z" hostname="7d7c5a6182d0" time="0.106">
+  <properties/>
+  <testcase name="returns interval of 1 day when chapters are released every 1 day()" classname="tachiyomi.domain.manga.interactor.FetchIntervalTest" time="0.036"/>
+  <testcase name="returns interval based on more recent chapters()" classname="tachiyomi.domain.manga.interactor.FetchIntervalTest" time="0.001"/>
+  <testcase name="returns interval based on smaller subset of recent chapters if very few chapters()" classname="tachiyomi.domain.manga.interactor.FetchIntervalTest" time="0.001"/>
+  <testcase name="returns interval of 2 days when chapters are released just below every 2 days()" classname="tachiyomi.domain.manga.interactor.FetchIntervalTest" time="0.001"/>
+  <testcase name="returns interval of 2 days when chapters are released every 2 days()" classname="tachiyomi.domain.manga.interactor.FetchIntervalTest" time="0.001"/>
+  <testcase name="returns interval of 1 day when delta is less than 1 day()" classname="tachiyomi.domain.manga.interactor.FetchIntervalTest" time="0.002"/>
+  <testcase name="returns interval of 7 days when multiple chapters in 2 days()" classname="tachiyomi.domain.manga.interactor.FetchIntervalTest" time="0.001"/>
+  <testcase name="returns interval with floored value when interval is decimal()" classname="tachiyomi.domain.manga.interactor.FetchIntervalTest" time="0.001"/>
+  <testcase name="returns interval of 7 days when multiple chapters in 1 day()" classname="tachiyomi.domain.manga.interactor.FetchIntervalTest" time="0.001"/>
+  <testcase name="returns default interval of 7 days when not enough distinct days()" classname="tachiyomi.domain.manga.interactor.FetchIntervalTest" time="0.003"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

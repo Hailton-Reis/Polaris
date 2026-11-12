@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.translation.TextTranslatorConfigurationTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-11-06T19:56:55.796Z" hostname="550a0106d184" time="0.646">
+  <properties/>
+  <testcase name="changing fallback engine invalidates cached translator configuration()" classname="eu.kanade.translation.TextTranslatorConfigurationTest" time="0.645"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

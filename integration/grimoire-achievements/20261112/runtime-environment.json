@@ -1,0 +1,24 @@
+{
+  "scope": "Software-emulated disposable API26 x86_64 VM; component host",
+  "emulator_acceleration": "TCG software; no KVM",
+  "display": "720x1600, density320",
+  "preflight": "Gradle stopped and regenerable native/build intermediates removed for headroom; APKs, sources, models, SDK, signing keys, Maven dependencies, JUnit and guest data preserved",
+  "data_cleared": false,
+  "APK_verification_disabled": false,
+  "SELinux": "Enforcing",
+  "boot_observation": "Boot reached Launcher without an observed ANR in window-boot-ready.txt",
+  "installation_observation": "After APK verification/install, System UI ANR observed in window-before-instrumentation.txt; screenshot inspected; Close App tapped at (300,830) before instrumentation",
+  "previous_background_app_force_stopped_before_tests": true,
+  "instrumentation_start_window": "Launcher; window-ready.txt",
+  "source_changed_for_VM_recovery": false,
+  "interface_recovery_during_instrumentation": false,
+  "full_app_or_physical_performance_acceptance": false,
+  "final_host_memory_events": {
+    "low": 0,
+    "high": 0,
+    "max": 0,
+    "oom": 0,
+    "oom_kill": 0,
+    "oom_group_kill": 0
+  }
+}

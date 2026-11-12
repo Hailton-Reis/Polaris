@@ -1,0 +1,34 @@
+{
+  "scope": "disposable software-emulated API26 VM before instrumentation; not a physical-device performance result",
+  "observed": [
+    "System UI ANR during boot; window dump archived",
+    "Background SystemJobService ANR in already installed Polaris package while replacement APK was being installed; logcat archived"
+  ],
+  "actions": [
+    "Close App tapped at (300,830) for boot System UI ANR",
+    "Force-stop app.mihon.tachiyomiat.dev background process before instrumentation; no app data cleared"
+  ],
+  "screen_during_install": "Home rendered normally after Close App; no ANR dialog in screen-during-install.png",
+  "SELinux": "Enforcing",
+  "APK_verification": "maintained",
+  "app_or_test_source_changed_for_recovery": false,
+  "full_app_startup_performance_acceptance": false,
+  "first_component_round": {
+    "passed": 17,
+    "subsequent_source_change": "pinned source language priority, covered by new JVM case; final artifacts recompiled"
+  },
+  "final_boot": {
+    "observed": "System UI ANR repeated before instrumentation; window-final-boot.txt",
+    "actions": [
+      "Force-stop previously installed app background work during replacement APK install",
+      "Tap Close App at (300,830) for System UI"
+    ]
+  },
+  "final_round": {
+    "passed": 17,
+    "failed": 0,
+    "seconds": 159.488,
+    "final_active_window": "Launcher; no ANR window at instrumentation start or completion",
+    "source_or_test_changed_to_recover_vm": false
+  }
+}

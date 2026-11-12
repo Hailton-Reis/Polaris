@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.tachiyomi.source.selection.LibraryWorkConsolidatorTest" tests="9" skipped="0" failures="0" errors="0" timestamp="2026-11-10T20:37:08.454Z" hostname="7d7c5a6182d0" time="0.587">
+  <properties/>
+  <testcase name="completed groups do not starve the next batch of restored duplicates()" classname="eu.kanade.tachiyomi.source.selection.LibraryWorkConsolidatorTest" time="0.378"/>
+  <testcase name="a known alias can join adjacent ranges from Portuguese and English()" classname="eu.kanade.tachiyomi.source.selection.LibraryWorkConsolidatorTest" time="0.036"/>
+  <testcase name="disjoint numbering is not assumed equivalent without catalogue corroboration()" classname="eu.kanade.tachiyomi.source.selection.LibraryWorkConsolidatorTest" time="0.019"/>
+  <testcase name="a failed native chapter query leaves original records unchanged()" classname="eu.kanade.tachiyomi.source.selection.LibraryWorkConsolidatorTest" time="0.055"/>
+  <testcase name="a stale plan retries fresh metadata and keeps a concurrent note()" classname="eu.kanade.tachiyomi.source.selection.LibraryWorkConsolidatorTest" time="0.013"/>
+  <testcase name="confirmed native editions are associated once without deleting favorites()" classname="eu.kanade.tachiyomi.source.selection.LibraryWorkConsolidatorTest" time="0.015"/>
+  <testcase name="conflicting per edition pins remain separate()" classname="eu.kanade.tachiyomi.source.selection.LibraryWorkConsolidatorTest" time="0.009"/>
+  <testcase name="explicit separation survives new reconciliation()" classname="eu.kanade.tachiyomi.source.selection.LibraryWorkConsolidatorTest" time="0.01"/>
+  <testcase name="unsupported catalogue IDs cannot corroborate adjacent non overlapping ranges()" classname="eu.kanade.tachiyomi.source.selection.LibraryWorkConsolidatorTest" time="0.043"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

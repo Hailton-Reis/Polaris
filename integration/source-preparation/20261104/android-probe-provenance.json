@@ -1,0 +1,11 @@
+{
+  "scope": "Actual compiled signature/file helpers only; no full-reader, wizard UI, real-extension or database acceptance.",
+  "classes": {
+    "eu/kanade/tachiyomi/extension/util/PrivateExtensionFiles.class": "304a07d2654c0e83c3d3745dd3de3acef34e1770a9b78197314aac53f6714d5e",
+    "eu/kanade/tachiyomi/extension/util/PrivateExtensionSignature.class": "9c01ec60805d9c9b0abf52d6d8e34706ceb15d0532fce07ec72019b530d2ab44"
+  },
+  "apksig_sha256": "562cd0a88890960d2ece48e116c61f12872222f1dcc306890799382bc019b201",
+  "dexer_sha256": "873e0e9feda8762ead0ff1ce60c30cc2bf1c0859e139245a723248d998b009fa",
+  "apk_sha256": "b673e744be4bc10acb261dabc310cb0e98275fd968cc5a07fe73bc6b1f29a539",
+  "apk_bytes": 3064339
+}

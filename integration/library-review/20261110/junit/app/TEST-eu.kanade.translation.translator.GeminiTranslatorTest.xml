@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.translation.translator.GeminiTranslatorTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-11-10T20:37:33.058Z" hostname="7d7c5a6182d0" time="0.0">
+  <properties/>
+  <testcase name="gemini request chunks keep a chapter request below the per-call block limit()" classname="eu.kanade.translation.translator.GeminiTranslatorTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

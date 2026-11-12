@@ -1,0 +1,32 @@
+{
+  "date_utc": "2026-11-04",
+  "requested_source": {
+    "repository_index": "https://raw.githubusercontent.com/Awerkori/extensoes/repo/index.pb",
+    "source": "MangaCloud EN",
+    "id": "8787213233662904706",
+    "url": "https://mangacloud.org"
+  },
+  "measured_source": "Public Asura chapter40: same scenes visually matched to user references; different segmentation, no identity/hash comparison to MangaCloud originals",
+  "models": [
+    {
+      "file": "det/inference.onnx",
+      "bytes": 9880512,
+      "sha256": "d73e0058b7a8086bbd57f3d10b8bcd4ff95363f67e06e2762b5e814fe9c9410e"
+    },
+    {
+      "file": "rec/inference.onnx",
+      "bytes": 21159378,
+      "sha256": "5435fd747c9e0efe15a96d0b378d5bd157e9492ed8fd80edf08f30d02fa24634"
+    },
+    {
+      "file": "rec/inference.yml",
+      "bytes": 150579,
+      "sha256": "ab078671bb49f06228eadccd34f1bb501e157f7a047095ffb943ba81512c77d1"
+    }
+  ],
+  "paddle_runtime": "Existing PP-OCRv6 Small detector+recognizer; ONNX Runtime CPU/Linux desktop port, single thread; not the Android Paddle binary.",
+  "mlkit_runtime": "Actual product MlKitOcrEngine on AOSP API26 x86_64, software emulation. Installed APK SHA256 a9cffcfd319c40acfb1dc6dc50a0f9eb7cd6f6cd68d69a7c0249556b56fc64fb",
+  "speed_comparison": "Not valid across these runtimes; no physical ARM timing or memory acceptance",
+  "inputs": "No chapter images, crops, complete OCR or transcripts redistributed by this report.",
+  "whole_chapter_truth": "Not available; CER is scoped to 11 manually transcribed diagnostic regions, 465 normalized characters."
+}

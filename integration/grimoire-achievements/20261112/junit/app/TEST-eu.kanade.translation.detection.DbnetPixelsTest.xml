@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.translation.detection.DbnetPixelsTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-11-12T18:43:20.481Z" hostname="060411c85d3c" time="0.002">
+  <properties/>
+  <testcase name="pixels become RGB planes in minus one to one range()" classname="eu.kanade.translation.detection.DbnetPixelsTest" time="0.0"/>
+  <testcase name="decode sample is positive bounded and preserves small images()" classname="eu.kanade.translation.detection.DbnetPixelsTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

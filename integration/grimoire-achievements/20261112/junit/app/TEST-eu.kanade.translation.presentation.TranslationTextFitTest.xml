@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.translation.presentation.TranslationTextFitTest" tests="11" skipped="0" failures="0" errors="0" timestamp="2026-11-12T18:43:21.566Z" hostname="060411c85d3c" time="0.011">
+  <properties/>
+  <testcase name="an overflowing candidate cannot replace a fitting paragraph()" classname="eu.kanade.translation.presentation.TranslationTextFitTest" time="0.002"/>
+  <testcase name="does not discard a larger intact word layout when boundaries are nonmonotonic()" classname="eu.kanade.translation.presentation.TranslationTextFitTest" time="0.001"/>
+  <testcase name="last emergency envelope retains the largest safe writing area()" classname="eu.kanade.translation.presentation.TranslationTextFitTest" time="0.0"/>
+  <testcase name="a first fitting envelope does not prevent a larger safe font()" classname="eu.kanade.translation.presentation.TranslationTextFitTest" time="0.0"/>
+  <testcase name="prefers whole words over an unnecessarily split larger font()" classname="eu.kanade.translation.presentation.TranslationTextFitTest" time="0.001"/>
+  <testcase name="only a detected balloon permits bounded growth()" classname="eu.kanade.translation.presentation.TranslationTextFitTest" time="0.001"/>
+  <testcase name="retains fitting fallback when a word cannot fit even at the floor()" classname="eu.kanade.translation.presentation.TranslationTextFitTest" time="0.0"/>
+  <testcase name="whole words still outrank a larger split word()" classname="eu.kanade.translation.presentation.TranslationTextFitTest" time="0.0"/>
+  <testcase name="signals when another existing safe envelope can avoid a split()" classname="eu.kanade.translation.presentation.TranslationTextFitTest" time="0.003"/>
+  <testcase name="uses larger font only when measured inside the same envelope()" classname="eu.kanade.translation.presentation.TranslationTextFitTest" time="0.001"/>
+  <testcase name="font ties keep the more conservative envelope()" classname="eu.kanade.translation.presentation.TranslationTextFitTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

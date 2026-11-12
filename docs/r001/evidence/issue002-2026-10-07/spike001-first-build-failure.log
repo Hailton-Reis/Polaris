@@ -1,0 +1,9 @@
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':app:packageDebug' (registered by plugin 'com.android.internal.application').
+> A failure occurred while executing com.android.build.gradle.tasks.PackageAndroidArtifact$IncrementalSplitterRunnable
+   > Could not find EOCD in '/workspace/scratch/bab62ab08b4f/Yomotsu-spike001/app/build/intermediates/linked_resources_binary_format/debug/processDebugResources/linked-resources-binary-format-x86Debug.ap_'
+
+
+BUILD FAILED in 3m 58s

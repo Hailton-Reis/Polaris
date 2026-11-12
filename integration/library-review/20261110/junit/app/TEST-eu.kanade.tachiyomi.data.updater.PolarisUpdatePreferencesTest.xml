@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.tachiyomi.data.updater.PolarisUpdatePreferencesTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-11-10T20:37:05.968Z" hostname="7d7c5a6182d0" time="0.004">
+  <properties/>
+  <testcase name="automatic checks default on while experimental releases require opt in()" classname="eu.kanade.tachiyomi.data.updater.PolarisUpdatePreferencesTest" time="0.001"/>
+  <testcase name="check intervals are independent by channel and handle clock rollback()" classname="eu.kanade.tachiyomi.data.updater.PolarisUpdatePreferencesTest" time="0.001"/>
+  <testcase name="manual checks bypass disabled automation and the daily interval()" classname="eu.kanade.tachiyomi.data.updater.PolarisUpdatePreferencesTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -2,6 +2,60 @@
 
 Este arquivo registra a evolução real do código. **Revisões de desenvolvimento não são lançamentos públicos.** As datas abaixo usam America/Fortaleza, exceto quando houver indicação de UTC. O histórico de distribuição fica em [Releases](https://github.com/Hailton-Reis/Polaris/releases).
 
+## Desenvolvimento · P20261112.1 — 12/11/2026
+
+**Estado:** revisão da beta.11/código112, sem lançamento. A beta.10 pública permanece intacta.
+
+- Doze conquistas em quatro caminhos alternativos: pontos de leitura, obras na biblioteca, obras iniciadas e obras concluídas lidas. Uma condição basta para liberar cada grimório.
+- Progresso e disponibilidade na Jornada e na Aparência; marcos permanentes e restauração de cosméticos sem revogar conquistas locais por um backup mais antigo.
+- Contagem sobre a biblioteca lógica sem consultas extras às fontes; publicação em andamento não é conclusão. Formato de backup existente preservado.
+- Refinamento das artes: recorte transparente do grimório inicial e livros maiores nos atalhos. Recursos somam 414.354 bytes.
+
+[Critérios e limites](docs/CONQUISTAS_GRIMORIOS_P20261112_1.md), [evidências](integration/grimoire-achievements/20261112/README.md).
+
+## Desenvolvimento · P20261111.2 — 11/11/2026
+
+**Estado:** revisão da beta.11/código112, sem lançamento. A beta.10 pública permanece intacta.
+
+- Nova coleção de quatro ícones ilustrados: Grimório Polaris, trevo de três folhas, quatro folhas amado pela mana e cinco folhas com visual sombrio.
+- Nomes e fundos acompanham as artes; aliases, seleção salva, desbloqueios e marcos de 900/4.500/9.000 pontos são preservados.
+- Originais gerados e hashes arquivados. Recursos Android somam 443.012 bytes; sem dependências, modelos ou esquemas novos.
+
+[Artes e regras](design/polaris-grimoires/20261111/README.md), [implementação e limites](docs/ICONES_GRIMORIOS_P20261111_2.md).
+
+## Desenvolvimento · P20261111.1 — 11/11/2026
+
+**Estado:** revisão da beta.11/código 112, sem lançamento. A beta.10 pública permanece intacta.
+
+- Substitui os quatro ícones geométricos por ilustrações de coruja, raposa boreal, dragão e lobo estelar. O original fica disponível; alternativas liberam por pontos de leitura, sem gasto e preservando escolhas anteriores.
+- Mantém cookies HTTP separados por pacote/assinatura, compartilhados pelo intermediário de rede e pelas imagens. Cookies persistentes usam cifragem autenticada do Android Keystore; temporários permanecem na memória.
+- Acrescenta limpeza confirmada da sessão da extensão, revogando clientes antigos e respostas atrasadas. Não importa o navegador global nem inclui cookies no backup da biblioteca.
+- Mantém as preferências básicas e filtros isolados da revisão P20261110.3. Login por WebView, controles personalizados, fontes reais, aceite ARM e ida/volta em leitores externos continuam pendentes.
+
+[Comportamento e limites](docs/SESSOES_E_ICONES_P20261111_1.md), [artes](design/polaris-guardians/20261111/README.md) e [validação](integration/sessions-icons/20261111/README.md).
+
+## Desenvolvimento · P20261110.2 — 10/11/2026
+
+**Estado:** revisão da beta.11/código 112, sem lançamento. A beta.10 pública permanece intacta.
+
+- Revalida os capítulos nativos de associações existentes nas consultas e antes de gravar o vínculo. Incompatibilidades deixam as edições visíveis separadamente, com recuperação automática quando voltam a ser compatíveis.
+- Exige a mesma temporada, volume e parte para complementar faixas adjacentes; usa critérios compartilhados de catálogo e numeração.
+- Corrige separar/permitir novamente quando a obra principal está fora dos favoritos, preservando a escolha de mantê-la fora da biblioteca.
+- Prepara metadados e perfis de numeração uma vez por edição, reduzindo trabalho repetido por capítulo.
+
+[Revisão, evidências e limites](docs/REVISAO_BIBLIOTECA_P20261110_2.md). Não há promessa de identificar toda renumeração nem de desempenho já aprovado nos aparelhos.
+
+## Desenvolvimento · P20261110.1 — 10/11/2026
+
+**Estado:** revisão da beta.11/código 112, sem lançamento. A beta.10 pública permanece intacta.
+
+- Associação conservadora das edições favoritas já existentes e apresentação de uma entrada com capítulos complementares, categorias e progresso lógico.
+- Preservação dos registros nativos, IDs, histórico, notas, glossários, rastreadores, pastas de download e formato de backup.
+- Acesso às edições vinculadas, separação reversível e respeito à escolha de não associar automaticamente.
+- Encaminhamento do leitor, downloads e traduções para a edição original; restauração e atualização limitadas ao registro da fonte.
+
+[Comportamento, evidências e limites](docs/BIBLIOTECA_UNIFICADA_P20261110_1.md). Aceite com provedores reais, downloads e aparelhos ARM ainda pendente.
+
 ## 0.1.0-beta.10 · P20261106.1 — 06/11/2026
 
 **Estado:** pré-lançamento público para testes; versionCode 111; Android 8+, um APK universal ARM32/ARM64 de 261.130.442 bytes, com a assinatura anterior.

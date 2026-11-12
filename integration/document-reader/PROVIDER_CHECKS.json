@@ -1,0 +1,65 @@
+{
+  "checked_utc": "2026-11-01T00:59:43.172755+00:00",
+  "metadata_endpoints": [
+    {
+      "provider": "crossref",
+      "status": "200",
+      "exit": 0,
+      "seconds": 0.62,
+      "returned_records": 2
+    },
+    {
+      "provider": "europepmc",
+      "status": "200",
+      "exit": 0,
+      "seconds": 1.39,
+      "returned_records": 2
+    },
+    {
+      "provider": "gutendex",
+      "status": "200",
+      "exit": 0,
+      "seconds": 0.4,
+      "returned_records": 6
+    },
+    {
+      "provider": "openlibrary",
+      "status": "200",
+      "exit": 0,
+      "seconds": 0.51,
+      "returned_records": 2
+    }
+  ],
+  "doi_endpoint_checks": [
+    {
+      "provider_query": "crossref-doi",
+      "status": "200",
+      "exit": 0,
+      "seconds": 1.02,
+      "returned_records": 1
+    },
+    {
+      "provider_query": "europepmc-doi",
+      "status": "200",
+      "exit": 0,
+      "seconds": 1.54,
+      "returned_records": 1
+    }
+  ],
+  "europe_pmc_author_queries": [
+    {
+      "query": "AUTH:\"Doudna\"",
+      "hitCount": 545
+    },
+    {
+      "query": "AUTH:\"Doudna JA\"",
+      "hitCount": 504
+    },
+    {
+      "query": "AUTH:\"Jennifer Doudna\"",
+      "hitCount": 474
+    }
+  ],
+  "implemented_author_field": "AUTH",
+  "full_text_download_and_android_import_verified": false
+}

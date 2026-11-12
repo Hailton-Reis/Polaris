@@ -1,0 +1,138 @@
+{
+  "status": "PUBLISHED_PRERELEASE_VERIFIED",
+  "repository": "Hailton-Reis/Polaris",
+  "tag": "v0.1.0-beta.10",
+  "revision": "P20261106.1",
+  "version_code": 111,
+  "release_id": 436770743,
+  "url": "https://github.com/Hailton-Reis/Polaris/releases/tag/v0.1.0-beta.10",
+  "draft": false,
+  "prerelease": true,
+  "published_at": "2026-11-06T17:08:09Z",
+  "source_commit": "805f707e828dd20b6aee28468140f4c50a8d4f49",
+  "verified_implementation_commit": "c708f1beadf8bf2c4ea462b927e4d861dd44cea5",
+  "source_patch_sha256": "6500245f46a764435d607c5a8bc46e7447494d351ca31773ff036b159b4487f4",
+  "publisher_commit": "56109ae7d089e576276d96eea1b815134238db9f",
+  "publisher_workflow": "https://github.com/Hailton-Reis/Polaris/actions/runs/42258615138",
+  "publisher_result": "success",
+  "publisher_safety_tests": 12,
+  "reassembled_exact_assets": 7,
+  "transport_commit": "b96c9c736e871aef3565890c1602c2bb962b0976",
+  "temporary_transport_ref_removed": true,
+  "workflow_log_sha256": "45cebecd9c5f0ab2ddf062de3dbe1b9a6c60538b63a12dcf3643cea4706976d3",
+  "canceled_initial_dispatch": {
+    "run_id": 42258581898,
+    "reason": "Mistyped transport SHA; canceled before upload and redispatched from git rev-parse HEAD."
+  },
+  "distribution": "universal-arm",
+  "apk_files": 1,
+  "artifacts": [
+    {
+      "abi": "arm64-v8a",
+      "file": "Polaris-0.1.0-beta.10-universal.apk",
+      "bytes": 261130442,
+      "sha256": "f1a556d2620a5984c76cebe2dc5a10e461d8d5a2feb6a91018371beaec0a90da",
+      "parts": [
+        {
+          "file": "Polaris-0.1.0-beta.10-universal.apk.001",
+          "bytes": 98000000,
+          "sha256": "5b551d4b4da762fe0cdc5e1555aee3e1c02b7d62d58d2393e3fd9924167351ac"
+        },
+        {
+          "file": "Polaris-0.1.0-beta.10-universal.apk.002",
+          "bytes": 98000000,
+          "sha256": "dec4c8c10ef5e574d0bfe6eb94a7994e3768ef8221a4f7669e34c152899f644d"
+        },
+        {
+          "file": "Polaris-0.1.0-beta.10-universal.apk.003",
+          "bytes": 65130442,
+          "sha256": "d24110e0f7fc703207d9011f43b8123de4a04630832f92ec78295161be8149f0"
+        }
+      ]
+    },
+    {
+      "abi": "armeabi-v7a",
+      "file": "Polaris-0.1.0-beta.10-universal.apk",
+      "bytes": 261130442,
+      "sha256": "f1a556d2620a5984c76cebe2dc5a10e461d8d5a2feb6a91018371beaec0a90da",
+      "parts": [
+        {
+          "file": "Polaris-0.1.0-beta.10-universal.apk.001",
+          "bytes": 98000000,
+          "sha256": "5b551d4b4da762fe0cdc5e1555aee3e1c02b7d62d58d2393e3fd9924167351ac"
+        },
+        {
+          "file": "Polaris-0.1.0-beta.10-universal.apk.002",
+          "bytes": 98000000,
+          "sha256": "dec4c8c10ef5e574d0bfe6eb94a7994e3768ef8221a4f7669e34c152899f644d"
+        },
+        {
+          "file": "Polaris-0.1.0-beta.10-universal.apk.003",
+          "bytes": 65130442,
+          "sha256": "d24110e0f7fc703207d9011f43b8123de4a04630832f92ec78295161be8149f0"
+        }
+      ]
+    }
+  ],
+  "files": [
+    {
+      "file": "COMECE_AQUI.md",
+      "bytes": 1425,
+      "sha256": "7092fcb963eab24d2dc0a3ac5bcf091b23214a1ac5a71baa26fc51916774d52f"
+    },
+    {
+      "file": "ISOLAMENTO_DE_EXTENSOES.md",
+      "bytes": 8138,
+      "sha256": "588a69db739b61b4a82149f84fa46918eeae1d43f5b22ff8b7ce58a4cdbbfc30"
+    },
+    {
+      "file": "RELEASE_NOTES.md",
+      "bytes": 5040,
+      "sha256": "8b5b37b20f7b01fb499798f9d52f068cd4aa285daa82db8ddc5090169308b3a8"
+    },
+    {
+      "file": "SHA256SUMS.txt",
+      "bytes": 102,
+      "sha256": "ca042216f96af0e2ae825d74cfa13aa28f22a5669e3a501ca4a34845295f0726"
+    },
+    {
+      "file": "VALIDACAO.json",
+      "bytes": 5418,
+      "sha256": "a98a656dbf863f68ad574472a99f7597ceb56353a8cdb9fd6fec48cb676aadc4"
+    },
+    {
+      "file": "manifest.json",
+      "bytes": 2118,
+      "sha256": "68a11dc88854f63e3c6d5b73f8d265435af040e4fa717b08c0b7ce9a4970431a"
+    }
+  ],
+  "public_full_downloads_verified": 7,
+  "public_range_request": {
+    "status": 206,
+    "start": 65536,
+    "end": 69631,
+    "local_bytes_equal": true
+  },
+  "public_updater_manifest_verified": true,
+  "experimental_channel_required": true,
+  "public_beta9_inventory_preserved": true,
+  "signer_sha256": "3ae747069cc9015ca1777f94fd56b030501f45d6af380426a572ad60e94d8227",
+  "authorization": "Maintainer explicitly requested public deployment in this conversation on 2026-11-06.",
+  "known_limits": {
+    "production_extension_sandbox": "NOT_INTEGRATED",
+    "physical_A12_acceptance": "PENDING",
+    "mixed_source_backup_external_reader_export": "REQUIRES_NORMALIZATION_AND_REAL_UI_VALIDATION",
+    "later_individual_image_failure_recovery": "INCOMPLETE",
+    "all_forks_backup_compatibility": false,
+    "full_application_real_extension_wizard": "PENDING",
+    "measured_A12_performance": "NOT_MEASURED",
+    "physical_update_install_and_data_continuity": "PENDING"
+  },
+  "unit_tests": {
+    "total": 738,
+    "passed": 721,
+    "preexisting_failures": 17,
+    "new_failures": 0
+  },
+  "recorded_at": "2026-11-06T17:09:55.972645+00:00"
+}

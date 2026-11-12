@@ -1,0 +1,295 @@
+INSTRUMENTATION_STATUS: numtests=16
+INSTRUMENTATION_STATUS: stream=
+eu.kanade.translation.presentation.PortugueseTypographyAndroidTest:
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=widerSafeEnvelopesCanIncreaseReadablePortugueseWithoutClipping
+INSTRUMENTATION_STATUS: class=eu.kanade.translation.presentation.PortugueseTypographyAndroidTest
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: numtests=16
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=widerSafeEnvelopesCanIncreaseReadablePortugueseWithoutClipping
+INSTRUMENTATION_STATUS: class=eu.kanade.translation.presentation.PortugueseTypographyAndroidTest
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: numtests=16
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=cedillasMatchTheSelectedComicCapHeightInsteadOfTheSystemLowercase
+INSTRUMENTATION_STATUS: class=eu.kanade.translation.presentation.PortugueseTypographyAndroidTest
+INSTRUMENTATION_STATUS: current=2
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: numtests=16
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=cedillasMatchTheSelectedComicCapHeightInsteadOfTheSystemLowercase
+INSTRUMENTATION_STATUS: class=eu.kanade.translation.presentation.PortugueseTypographyAndroidTest
+INSTRUMENTATION_STATUS: current=2
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: numtests=16
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=portugueseAccentsStayInsideTheMeasuredParagraphWithEveryBundledFont
+INSTRUMENTATION_STATUS: class=eu.kanade.translation.presentation.PortugueseTypographyAndroidTest
+INSTRUMENTATION_STATUS: current=3
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: numtests=16
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=portugueseAccentsStayInsideTheMeasuredParagraphWithEveryBundledFont
+INSTRUMENTATION_STATUS: class=eu.kanade.translation.presentation.PortugueseTypographyAndroidTest
+INSTRUMENTATION_STATUS: current=3
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: numtests=16
+INSTRUMENTATION_STATUS: stream=
+eu.kanade.translation.presentation.PortugueseRealPageTypographyTest:
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=drawComicPortugueseOnTheReportedTextOnArtworkCase
+INSTRUMENTATION_STATUS: class=eu.kanade.translation.presentation.PortugueseRealPageTypographyTest
+INSTRUMENTATION_STATUS: current=4
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: numtests=16
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=drawComicPortugueseOnTheReportedTextOnArtworkCase
+INSTRUMENTATION_STATUS: class=eu.kanade.translation.presentation.PortugueseRealPageTypographyTest
+INSTRUMENTATION_STATUS: current=4
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: numtests=16
+INSTRUMENTATION_STATUS: stream=
+eu.kanade.translation.presentation.TranslationTextFitAndroidTest:
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=crowdedAndRotatedTextStaysInsideTheOriginalEnvelope
+INSTRUMENTATION_STATUS: class=eu.kanade.translation.presentation.TranslationTextFitAndroidTest
+INSTRUMENTATION_STATUS: current=5
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: numtests=16
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=crowdedAndRotatedTextStaysInsideTheOriginalEnvelope
+INSTRUMENTATION_STATUS: class=eu.kanade.translation.presentation.TranslationTextFitAndroidTest
+INSTRUMENTATION_STATUS: current=5
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: numtests=16
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=growsOnlyInsideTheExistingSafeEnvelope
+INSTRUMENTATION_STATUS: class=eu.kanade.translation.presentation.TranslationTextFitAndroidTest
+INSTRUMENTATION_STATUS: current=6
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: numtests=16
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=growsOnlyInsideTheExistingSafeEnvelope
+INSTRUMENTATION_STATUS: class=eu.kanade.translation.presentation.TranslationTextFitAndroidTest
+INSTRUMENTATION_STATUS: current=6
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: numtests=16
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=arrependimentosStaysWholeWithEveryBundledFont
+INSTRUMENTATION_STATUS: class=eu.kanade.translation.presentation.TranslationTextFitAndroidTest
+INSTRUMENTATION_STATUS: current=7
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: numtests=16
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=arrependimentosStaysWholeWithEveryBundledFont
+INSTRUMENTATION_STATUS: class=eu.kanade.translation.presentation.TranslationTextFitAndroidTest
+INSTRUMENTATION_STATUS: current=7
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: numtests=16
+INSTRUMENTATION_STATUS: stream=
+eu.kanade.translation.presentation.TranslationSurfaceLayoutTest:
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=portugueseComicTextPreservesTheDarkCaptionAtTwoZoomLevels
+INSTRUMENTATION_STATUS: class=eu.kanade.translation.presentation.TranslationSurfaceLayoutTest
+INSTRUMENTATION_STATUS: current=8
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: numtests=16
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=portugueseComicTextPreservesTheDarkCaptionAtTwoZoomLevels
+INSTRUMENTATION_STATUS: class=eu.kanade.translation.presentation.TranslationSurfaceLayoutTest
+INSTRUMENTATION_STATUS: current=8
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: numtests=16
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=whiteBalloonContourAndArtworkRemainUntouched
+INSTRUMENTATION_STATUS: class=eu.kanade.translation.presentation.TranslationSurfaceLayoutTest
+INSTRUMENTATION_STATUS: current=9
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: numtests=16
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=whiteBalloonContourAndArtworkRemainUntouched
+INSTRUMENTATION_STATUS: class=eu.kanade.translation.presentation.TranslationSurfaceLayoutTest
+INSTRUMENTATION_STATUS: current=9
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: numtests=16
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=darkCaptionTextAndCleanupStayInsideThePanelAtTwoZoomLevels
+INSTRUMENTATION_STATUS: class=eu.kanade.translation.presentation.TranslationSurfaceLayoutTest
+INSTRUMENTATION_STATUS: current=10
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: numtests=16
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=darkCaptionTextAndCleanupStayInsideThePanelAtTwoZoomLevels
+INSTRUMENTATION_STATUS: class=eu.kanade.translation.presentation.TranslationSurfaceLayoutTest
+INSTRUMENTATION_STATUS: current=10
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: numtests=16
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=legacyCleanupDoesNotAddPaddingOutsideItsMeasuredBounds
+INSTRUMENTATION_STATUS: class=eu.kanade.translation.presentation.TranslationSurfaceLayoutTest
+INSTRUMENTATION_STATUS: current=11
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: numtests=16
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=legacyCleanupDoesNotAddPaddingOutsideItsMeasuredBounds
+INSTRUMENTATION_STATUS: class=eu.kanade.translation.presentation.TranslationSurfaceLayoutTest
+INSTRUMENTATION_STATUS: current=11
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: numtests=16
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=mixedSizeTitleTranslationsHaveSeparateRenderedWritingAreas
+INSTRUMENTATION_STATUS: class=eu.kanade.translation.presentation.TranslationSurfaceLayoutTest
+INSTRUMENTATION_STATUS: current=12
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: numtests=16
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=mixedSizeTitleTranslationsHaveSeparateRenderedWritingAreas
+INSTRUMENTATION_STATUS: class=eu.kanade.translation.presentation.TranslationSurfaceLayoutTest
+INSTRUMENTATION_STATUS: current=12
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: numtests=16
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=portugueseComicTextPreservesTheWhiteBalloonContour
+INSTRUMENTATION_STATUS: class=eu.kanade.translation.presentation.TranslationSurfaceLayoutTest
+INSTRUMENTATION_STATUS: current=13
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: numtests=16
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=portugueseComicTextPreservesTheWhiteBalloonContour
+INSTRUMENTATION_STATUS: class=eu.kanade.translation.presentation.TranslationSurfaceLayoutTest
+INSTRUMENTATION_STATUS: current=13
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: numtests=16
+INSTRUMENTATION_STATUS: stream=
+eu.kanade.translation.recognizer.DbnetCleanupMaskLayoutTest:
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=initializationError
+INSTRUMENTATION_STATUS: class=eu.kanade.translation.recognizer.DbnetCleanupMaskLayoutTest
+INSTRUMENTATION_STATUS: current=14
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: numtests=16
+INSTRUMENTATION_STATUS: stream=
+Error in initializationError(eu.kanade.translation.recognizer.DbnetCleanupMaskLayoutTest):
+java.lang.RuntimeException: Failed loading specified test class 'eu.kanade.translation.recognizer.DbnetCleanupMaskLayoutTest'
+	at androidx.test.internal.runner.DirectTestLoader.doCreateRunner(DirectTestLoader.java:50)
+	at androidx.test.internal.runner.TestLoader.getRunnersFor(TestLoader.java:64)
+	at androidx.test.internal.runner.TestRequestBuilder.build(TestRequestBuilder.java:842)
+	at androidx.test.runner.AndroidJUnitRunner.buildRequest(AndroidJUnitRunner.java:663)
+	at androidx.test.runner.AndroidJUnitRunner.onStart(AndroidJUnitRunner.java:437)
+	at android.app.Instrumentation$InstrumentationThread.run(Instrumentation.java:2074)
+Caused by: java.lang.ClassNotFoundException: eu.kanade.translation.recognizer.DbnetCleanupMaskLayoutTest
+	at java.lang.Class.classForName(Native Method)
+	at java.lang.Class.forName(Class.java:453)
+	at androidx.test.internal.runner.DirectTestLoader.doCreateRunner(DirectTestLoader.java:44)
+	... 5 more
+Caused by: java.lang.ClassNotFoundException: Didn't find class "eu.kanade.translation.recognizer.DbnetCleanupMaskLayoutTest" on path: DexPathList[[zip file "/data/app/app.mihon.tachiyomiat.dev.test-KQbMJMvNIqpfzxEP5xWOpA==/base.apk", zip file "/data/app/app.mihon.tachiyomiat.dev-NzHcQtK5TPlYYWHJ5D48Kw==/base.apk"],nativeLibraryDirectories=[/data/app/app.mihon.tachiyomiat.dev.test-KQbMJMvNIqpfzxEP5xWOpA==/lib/x86_64, /data/app/app.mihon.tachiyomiat.dev-NzHcQtK5TPlYYWHJ5D48Kw==/lib/x86_64, /data/app/app.mihon.tachiyomiat.dev.test-KQbMJMvNIqpfzxEP5xWOpA==/base.apk!/lib/x86_64, /data/app/app.mihon.tachiyomiat.dev-NzHcQtK5TPlYYWHJ5D48Kw==/base.apk!/lib/x86_64, /system/lib64, /vendor/lib64]]
+	at dalvik.system.BaseDexClassLoader.findClass(BaseDexClassLoader.java:93)
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:379)
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:312)
+	... 8 more
+
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=initializationError
+INSTRUMENTATION_STATUS: class=eu.kanade.translation.recognizer.DbnetCleanupMaskLayoutTest
+INSTRUMENTATION_STATUS: stack=java.lang.RuntimeException: Failed loading specified test class 'eu.kanade.translation.recognizer.DbnetCleanupMaskLayoutTest'
+	at androidx.test.internal.runner.DirectTestLoader.doCreateRunner(DirectTestLoader.java:50)
+	at androidx.test.internal.runner.TestLoader.getRunnersFor(TestLoader.java:64)
+	at androidx.test.internal.runner.TestRequestBuilder.build(TestRequestBuilder.java:842)
+	at androidx.test.runner.AndroidJUnitRunner.buildRequest(AndroidJUnitRunner.java:663)
+	at androidx.test.runner.AndroidJUnitRunner.onStart(AndroidJUnitRunner.java:437)
+	at android.app.Instrumentation$InstrumentationThread.run(Instrumentation.java:2074)
+Caused by: java.lang.ClassNotFoundException: eu.kanade.translation.recognizer.DbnetCleanupMaskLayoutTest
+	at java.lang.Class.classForName(Native Method)
+	at java.lang.Class.forName(Class.java:453)
+	at androidx.test.internal.runner.DirectTestLoader.doCreateRunner(DirectTestLoader.java:44)
+	... 5 more
+Caused by: java.lang.ClassNotFoundException: Didn't find class "eu.kanade.translation.recognizer.DbnetCleanupMaskLayoutTest" on path: DexPathList[[zip file "/data/app/app.mihon.tachiyomiat.dev.test-KQbMJMvNIqpfzxEP5xWOpA==/base.apk", zip file "/data/app/app.mihon.tachiyomiat.dev-NzHcQtK5TPlYYWHJ5D48Kw==/base.apk"],nativeLibraryDirectories=[/data/app/app.mihon.tachiyomiat.dev.test-KQbMJMvNIqpfzxEP5xWOpA==/lib/x86_64, /data/app/app.mihon.tachiyomiat.dev-NzHcQtK5TPlYYWHJ5D48Kw==/lib/x86_64, /data/app/app.mihon.tachiyomiat.dev.test-KQbMJMvNIqpfzxEP5xWOpA==/base.apk!/lib/x86_64, /data/app/app.mihon.tachiyomiat.dev-NzHcQtK5TPlYYWHJ5D48Kw==/base.apk!/lib/x86_64, /system/lib64, /vendor/lib64]]
+	at dalvik.system.BaseDexClassLoader.findClass(BaseDexClassLoader.java:93)
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:379)
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:312)
+	... 8 more
+
+INSTRUMENTATION_STATUS: current=14
+INSTRUMENTATION_STATUS_CODE: -2
+INSTRUMENTATION_STATUS: numtests=16
+INSTRUMENTATION_STATUS: stream=
+eu.kanade.translation.recognizer.OcrStripImageTest:
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=rotatedExifDoesNotUseRawRegionCoordinates
+INSTRUMENTATION_STATUS: class=eu.kanade.translation.recognizer.OcrStripImageTest
+INSTRUMENTATION_STATUS: current=15
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: numtests=16
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=rotatedExifDoesNotUseRawRegionCoordinates
+INSTRUMENTATION_STATUS: class=eu.kanade.translation.recognizer.OcrStripImageTest
+INSTRUMENTATION_STATUS: current=15
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: numtests=16
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=regionsPreserveCoordinatesAndPixelBudgetAndCloseOnFailure
+INSTRUMENTATION_STATUS: class=eu.kanade.translation.recognizer.OcrStripImageTest
+INSTRUMENTATION_STATUS: current=16
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: numtests=16
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=regionsPreserveCoordinatesAndPixelBudgetAndCloseOnFailure
+INSTRUMENTATION_STATUS: class=eu.kanade.translation.recognizer.OcrStripImageTest
+INSTRUMENTATION_STATUS: current=16
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_RESULT: stream=
+
+Time: 397.373
+There was 1 failure:
+1) initializationError(eu.kanade.translation.recognizer.DbnetCleanupMaskLayoutTest)
+java.lang.RuntimeException: Failed loading specified test class 'eu.kanade.translation.recognizer.DbnetCleanupMaskLayoutTest'
+	at androidx.test.internal.runner.DirectTestLoader.doCreateRunner(DirectTestLoader.java:50)
+	at androidx.test.internal.runner.TestLoader.getRunnersFor(TestLoader.java:64)
+	at androidx.test.internal.runner.TestRequestBuilder.build(TestRequestBuilder.java:842)
+	at androidx.test.runner.AndroidJUnitRunner.buildRequest(AndroidJUnitRunner.java:663)
+	at androidx.test.runner.AndroidJUnitRunner.onStart(AndroidJUnitRunner.java:437)
+	at android.app.Instrumentation$InstrumentationThread.run(Instrumentation.java:2074)
+Caused by: java.lang.ClassNotFoundException: eu.kanade.translation.recognizer.DbnetCleanupMaskLayoutTest
+	at java.lang.Class.classForName(Native Method)
+	at java.lang.Class.forName(Class.java:453)
+	at androidx.test.internal.runner.DirectTestLoader.doCreateRunner(DirectTestLoader.java:44)
+	... 5 more
+Caused by: java.lang.ClassNotFoundException: Didn't find class "eu.kanade.translation.recognizer.DbnetCleanupMaskLayoutTest" on path: DexPathList[[zip file "/data/app/app.mihon.tachiyomiat.dev.test-KQbMJMvNIqpfzxEP5xWOpA==/base.apk", zip file "/data/app/app.mihon.tachiyomiat.dev-NzHcQtK5TPlYYWHJ5D48Kw==/base.apk"],nativeLibraryDirectories=[/data/app/app.mihon.tachiyomiat.dev.test-KQbMJMvNIqpfzxEP5xWOpA==/lib/x86_64, /data/app/app.mihon.tachiyomiat.dev-NzHcQtK5TPlYYWHJ5D48Kw==/lib/x86_64, /data/app/app.mihon.tachiyomiat.dev.test-KQbMJMvNIqpfzxEP5xWOpA==/base.apk!/lib/x86_64, /data/app/app.mihon.tachiyomiat.dev-NzHcQtK5TPlYYWHJ5D48Kw==/base.apk!/lib/x86_64, /system/lib64, /vendor/lib64]]
+	at dalvik.system.BaseDexClassLoader.findClass(BaseDexClassLoader.java:93)
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:379)
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:312)
+	... 8 more
+
+FAILURES!!!
+Tests run: 16,  Failures: 1
+
+
+INSTRUMENTATION_CODE: -1

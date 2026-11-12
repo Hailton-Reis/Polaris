@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.translation.PendingDownloadTranslationsTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-11-11T20:05:50.482Z" hostname="b5ae99f6bd9c" time="0.033">
+  <properties/>
+  <testcase name="duplicate clicks and simultaneous requests do not lose chapters()" classname="eu.kanade.translation.PendingDownloadTranslationsTest" time="0.028"/>
+  <testcase name="enqueue failure preserves request for retry()" classname="eu.kanade.translation.PendingDownloadTranslationsTest" time="0.001"/>
+  <testcase name="explicit chapter request survives restart and does not select other chapters()" classname="eu.kanade.translation.PendingDownloadTranslationsTest" time="0.001"/>
+  <testcase name="cancellation prevents a later ordinary download from consuming the request()" classname="eu.kanade.translation.PendingDownloadTranslationsTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
