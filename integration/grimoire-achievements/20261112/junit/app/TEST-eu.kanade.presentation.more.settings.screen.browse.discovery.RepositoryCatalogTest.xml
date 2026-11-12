@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.presentation.more.settings.screen.browse.discovery.RepositoryCatalogTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-11-12T18:42:58.857Z" hostname="060411c85d3c" time="0.025">
+  <properties/>
+  <testcase name="different branches hosts and unsafe URL forms are not conflated()" classname="eu.kanade.presentation.more.settings.screen.browse.discovery.RepositoryCatalogTest" time="0.007"/>
+  <testcase name="search accepts accents case language and multiple terms()" classname="eu.kanade.presentation.more.settings.screen.browse.discovery.RepositoryCatalogTest" time="0.013"/>
+  <testcase name="known legacy and redirected index URLs do not duplicate repositories()" classname="eu.kanade.presentation.more.settings.screen.browse.discovery.RepositoryCatalogTest" time="0.001"/>
+  <testcase name="empty search returns the initial catalog without registering anything()" classname="eu.kanade.presentation.more.settings.screen.browse.discovery.RepositoryCatalogTest" time="0.002"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

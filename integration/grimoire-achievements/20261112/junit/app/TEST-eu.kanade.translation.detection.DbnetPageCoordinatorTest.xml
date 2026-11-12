@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.translation.detection.DbnetPageCoordinatorTest" tests="10" skipped="0" failures="0" errors="0" timestamp="2026-11-12T18:43:20.418Z" hostname="060411c85d3c" time="0.063">
+  <properties/>
+  <testcase name="Paddle fallback uses selected once and releases its one owned ML Kit session()" classname="eu.kanade.translation.detection.DbnetPageCoordinatorTest" time="0.011"/>
+  <testcase name="technical stage failure returns only selected fallback cleans once and emits one safe record()" classname="eu.kanade.translation.detection.DbnetPageCoordinatorTest" time="0.003"/>
+  <testcase name="each failed page stage is distinguished from later unreached stages and falls back once()" classname="eu.kanade.translation.detection.DbnetPageCoordinatorTest" time="0.004"/>
+  <testcase name="cancellation emits one record but never falls back or performs failure cleanup()" classname="eu.kanade.translation.detection.DbnetPageCoordinatorTest" time="0.003"/>
+  <testcase name="selected fallback failure is propagated once and still emits one record()" classname="eu.kanade.translation.detection.DbnetPageCoordinatorTest" time="0.003"/>
+  <testcase name="successful selected ML Kit page is the single association pass with no fallback()" classname="eu.kanade.translation.detection.DbnetPageCoordinatorTest" time="0.024"/>
+  <testcase name="association failure reuses completed selected ML Kit page and performs fallback cleanup()" classname="eu.kanade.translation.detection.DbnetPageCoordinatorTest" time="0.003"/>
+  <testcase name="successful page records actual stages worker timings counts and overlapping total()" classname="eu.kanade.translation.detection.DbnetPageCoordinatorTest" time="0.005"/>
+  <testcase name="disabled route stays lazy and emits no experimental diagnostic()" classname="eu.kanade.translation.detection.DbnetPageCoordinatorTest" time="0.003"/>
+  <testcase name="fallback time is included in monotonic total and cleanup callback failures stay isolated()" classname="eu.kanade.translation.detection.DbnetPageCoordinatorTest" time="0.003"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.tachiyomi.data.backup.PreferenceRestoreSecurityTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-11-12T18:43:05.188Z" hostname="060411c85d3c" time="0.355">
+  <properties/>
+  <testcase name="an internal permission absent on the device is not created by imported app state()" classname="eu.kanade.tachiyomi.data.backup.PreferenceRestoreSecurityTest" time="0.307"/>
+  <testcase name="a crafted backup cannot authorize extension trust or exact-byte security overrides()" classname="eu.kanade.tachiyomi.data.backup.PreferenceRestoreSecurityTest" time="0.046"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

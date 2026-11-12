@@ -1,0 +1,25 @@
+{
+  "passed": 6,
+  "failed": 0,
+  "skipped": 0,
+  "reports": [
+    {
+      "class": "eu.kanade.domain.ui.model.LauncherIconRewardsTest",
+      "tests": 4,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "class": "eu.kanade.domain.ui.model.LauncherIconSwitchTest",
+      "tests": 2,
+      "failed": 0,
+      "skipped": 0
+    }
+  ],
+  "previous_full_suite": {
+    "revision": "P20261111.1",
+    "JVM_passed": 872,
+    "Android_passed": 35,
+    "rerun_in_this_stage": false
+  }
+}

@@ -1,0 +1,18 @@
+[
+  {
+    "file": "app-debug.apk",
+    "bytes": 236373079,
+    "sha256": "db0c0d7255e7eeca8b5dcd0fafff34d9709b1c6e03e3cbe5899a386e004d9485",
+    "packaged_abis": [
+      "x86_64"
+    ],
+    "scope": "Debug x86_64 component fixture; not a phone release"
+  },
+  {
+    "file": "app-debug-androidTest.apk",
+    "bytes": 650776,
+    "sha256": "83d8e80748566f6c40885b26a2ecbf89879023a2417b7c77b38a2b72613f738e",
+    "packaged_abis": [],
+    "scope": "Debug x86_64 component fixture; not a phone release"
+  }
+]

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.translation.recognizer.SpeechBubbleCornerBoundaryRegressionTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-11-12T18:43:31.133Z" hostname="060411c85d3c" time="2.116">
+  <properties/>
+  <testcase name="diagonal boundary near another balloon limits only the invading corner()" classname="eu.kanade.translation.recognizer.SpeechBubbleCornerBoundaryRegressionTest" time="0.908"/>
+  <testcase name="unobstructed wide balloon retains its existing layout dimensions()" classname="eu.kanade.translation.recognizer.SpeechBubbleCornerBoundaryRegressionTest" time="0.607"/>
+  <testcase name="pixel rounding never replaces the constrained balloon with an unsafe fallback()" classname="eu.kanade.translation.recognizer.SpeechBubbleCornerBoundaryRegressionTest" time="0.598"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

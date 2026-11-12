@@ -2,6 +2,10 @@
 
 This document protects R001 from scope creep.
 
+## Grimoire achievements P20261112.1
+
+[Local achievements](CONQUISTAS_GRIMORIOS_P20261112_1.md) add alternative library-size, exploration and completion milestones to reading-point unlocks. They reuse existing library emissions and portable preferences, preserving earned cosmetic choices on older restores. Artwork alpha cleanup and adaptive sizing are included. Physical devices, recent Android masks, external reader round trips and the existing authentication backlog remain open.
+
 ## Isolated HTTP sessions and illustrated icon rewards P20261111.1
 
 [Scoped HTTP session storage and illustrated icon rewards](SESSOES_E_ICONES_P20261111_1.md) are implemented in development. Persistent cookies use authenticated Keystore encryption, temporary cookies stay in host memory, and clearing a principal revokes older clients. Artwork replaces the four geometric launcher marks, with reading-point milestones and retained previous choices. Browser profile/login integration and real-provider/ARM acceptance remain open; HTTP cookie persistence does not close generic WebView authentication.

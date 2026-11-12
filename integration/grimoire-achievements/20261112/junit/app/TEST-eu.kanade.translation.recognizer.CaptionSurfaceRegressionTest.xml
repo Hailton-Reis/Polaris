@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.translation.recognizer.CaptionSurfaceRegressionTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-11-12T18:43:21.664Z" hostname="060411c85d3c" time="5.514">
+  <properties/>
+  <testcase name="white oval remains detected and retains its established useful layout()" classname="eu.kanade.translation.recognizer.CaptionSurfaceRegressionTest" time="0.768"/>
+  <testcase name="closed blue caption keeps a white foreground and writing inside its panel()" classname="eu.kanade.translation.recognizer.CaptionSurfaceRegressionTest" time="0.453"/>
+  <testcase name="open dark or colored panels constrain the fallback when only two sides are detected()" classname="eu.kanade.translation.recognizer.CaptionSurfaceRegressionTest" time="4.292"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

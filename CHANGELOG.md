@@ -2,6 +2,27 @@
 
 Este arquivo registra a evolução real do código. **Revisões de desenvolvimento não são lançamentos públicos.** As datas abaixo usam America/Fortaleza, exceto quando houver indicação de UTC. O histórico de distribuição fica em [Releases](https://github.com/Hailton-Reis/Polaris/releases).
 
+## Desenvolvimento · P20261112.1 — 12/11/2026
+
+**Estado:** revisão da beta.11/código112, sem lançamento. A beta.10 pública permanece intacta.
+
+- Doze conquistas em quatro caminhos alternativos: pontos de leitura, obras na biblioteca, obras iniciadas e obras concluídas lidas. Uma condição basta para liberar cada grimório.
+- Progresso e disponibilidade na Jornada e na Aparência; marcos permanentes e restauração de cosméticos sem revogar conquistas locais por um backup mais antigo.
+- Contagem sobre a biblioteca lógica sem consultas extras às fontes; publicação em andamento não é conclusão. Formato de backup existente preservado.
+- Refinamento das artes: recorte transparente do grimório inicial e livros maiores nos atalhos. Recursos somam 414.354 bytes.
+
+[Critérios e limites](docs/CONQUISTAS_GRIMORIOS_P20261112_1.md), [evidências](integration/grimoire-achievements/20261112/README.md).
+
+## Desenvolvimento · P20261111.2 — 11/11/2026
+
+**Estado:** revisão da beta.11/código112, sem lançamento. A beta.10 pública permanece intacta.
+
+- Nova coleção de quatro ícones ilustrados: Grimório Polaris, trevo de três folhas, quatro folhas amado pela mana e cinco folhas com visual sombrio.
+- Nomes e fundos acompanham as artes; aliases, seleção salva, desbloqueios e marcos de 900/4.500/9.000 pontos são preservados.
+- Originais gerados e hashes arquivados. Recursos Android somam 443.012 bytes; sem dependências, modelos ou esquemas novos.
+
+[Artes e regras](design/polaris-grimoires/20261111/README.md), [implementação e limites](docs/ICONES_GRIMORIOS_P20261111_2.md).
+
 ## Desenvolvimento · P20261111.1 — 11/11/2026
 
 **Estado:** revisão da beta.11/código 112, sem lançamento. A beta.10 pública permanece intacta.

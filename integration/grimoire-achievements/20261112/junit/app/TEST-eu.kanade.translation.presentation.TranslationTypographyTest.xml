@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.translation.presentation.TranslationTypographyTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-11-12T18:43:21.578Z" hostname="060411c85d3c" time="0.04">
+  <properties/>
+  <testcase name="fonts with Portuguese glyphs do not receive supplementary spans()" classname="eu.kanade.translation.presentation.TranslationTypographyTest" time="0.033"/>
+  <testcase name="cedilla supplements preserve the actual text and style only the unsupported characters()" classname="eu.kanade.translation.presentation.TranslationTypographyTest" time="0.006"/>
+  <testcase name="a normal phrase does not change fonts merely because a supplement is available()" classname="eu.kanade.translation.presentation.TranslationTypographyTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

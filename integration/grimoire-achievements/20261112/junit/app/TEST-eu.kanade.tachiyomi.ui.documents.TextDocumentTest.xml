@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.tachiyomi.ui.documents.TextDocumentTest" tests="10" skipped="0" failures="0" errors="0" timestamp="2026-11-12T18:43:18.807Z" hostname="060411c85d3c" time="0.229">
+  <properties/>
+  <testcase name="epub rejects archive escape and ignores network resources()" classname="eu.kanade.tachiyomi.ui.documents.TextDocumentTest" time="0.132"/>
+  <testcase name="large txt has multiple navigable sections with bounded text blocks()" classname="eu.kanade.tachiyomi.ui.documents.TextDocumentTest" time="0.002"/>
+  <testcase name="epub follows spine order and preserves metadata text and local images()" classname="eu.kanade.tachiyomi.ui.documents.TextDocumentTest" time="0.004"/>
+  <testcase name="entry resolution keeps plus signs decodes spaces and rejects remote or escaping paths()" classname="eu.kanade.tachiyomi.ui.documents.TextDocumentTest" time="0.002"/>
+  <testcase name="long paragraphs are bounded without losing unicode or text()" classname="eu.kanade.tachiyomi.ui.documents.TextDocumentTest" time="0.001"/>
+  <testcase name="zip renamed docx must contain the actual word document()" classname="eu.kanade.tachiyomi.ui.documents.TextDocumentTest" time="0.002"/>
+  <testcase name="docx extracts body paragraphs line breaks tables and embedded images in order()" classname="eu.kanade.tachiyomi.ui.documents.TextDocumentTest" time="0.004"/>
+  <testcase name="oversized section is rejected before it becomes a text view()" classname="eu.kanade.tachiyomi.ui.documents.TextDocumentTest" time="0.055"/>
+  <testcase name="txt supports utf8 utf16 bom and windows1252()" classname="eu.kanade.tachiyomi.ui.documents.TextDocumentTest" time="0.007"/>
+  <testcase name="bounded copy rejects overflow and pdf rendering has a bounded pixel budget()" classname="eu.kanade.tachiyomi.ui.documents.TextDocumentTest" time="0.002"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

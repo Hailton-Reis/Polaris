@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="tachiyomi.domain.translation.OcrExperimentPreferencesTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-11-10T20:36:49.982Z" hostname="7d7c5a6182d0" time="0.254">
+  <properties/>
+  <testcase name="DBNet alone remains a deliberate opt in()" classname="tachiyomi.domain.translation.OcrExperimentPreferencesTest" time="0.119"/>
+  <testcase name="restoring a prerequisite does not silently reenable a child()" classname="tachiyomi.domain.translation.OcrExperimentPreferencesTest" time="0.031"/>
+  <testcase name="legacy everything enabled preserves the chosen OCR and long page opt in()" classname="tachiyomi.domain.translation.OcrExperimentPreferencesTest" time="0.013"/>
+  <testcase name="turning off an experiment does not enable another one()" classname="tachiyomi.domain.translation.OcrExperimentPreferencesTest" time="0.01"/>
+  <testcase name="removing the English prerequisite turns off both dependent experiments()" classname="tachiyomi.domain.translation.OcrExperimentPreferencesTest" time="0.015"/>
+  <testcase name="choosing DBNet and strips are mutually exclusive through their preference callbacks()" classname="tachiyomi.domain.translation.OcrExperimentPreferencesTest" time="0.009"/>
+  <testcase name="unsupported DBNet architecture preserves the selected OCR and strips()" classname="tachiyomi.domain.translation.OcrExperimentPreferencesTest" time="0.042"/>
+  <testcase name="prerequisite reconciliation never changes translation or language choices()" classname="tachiyomi.domain.translation.OcrExperimentPreferencesTest" time="0.01"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,80 @@
+INSTRUMENTATION_STATUS: numtests=5
+INSTRUMENTATION_STATUS: stream=
+eu.kanade.tachiyomi.polaris.LauncherIconAndroidTest:
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=iconSwitchKeepsOriginalActivityAndRepositoryLinksAvailable
+INSTRUMENTATION_STATUS: class=eu.kanade.tachiyomi.polaris.LauncherIconAndroidTest
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: numtests=5
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=iconSwitchKeepsOriginalActivityAndRepositoryLinksAvailable
+INSTRUMENTATION_STATUS: class=eu.kanade.tachiyomi.polaris.LauncherIconAndroidTest
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: numtests=5
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=lockedChoiceDoesNotModifyAnyLauncherOrStoredSelection
+INSTRUMENTATION_STATUS: class=eu.kanade.tachiyomi.polaris.LauncherIconAndroidTest
+INSTRUMENTATION_STATUS: current=2
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: numtests=5
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=lockedChoiceDoesNotModifyAnyLauncherOrStoredSelection
+INSTRUMENTATION_STATUS: class=eu.kanade.tachiyomi.polaris.LauncherIconAndroidTest
+INSTRUMENTATION_STATUS: current=2
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: numtests=5
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=unknownRestoredChoiceAndMissingEnabledAliasesRecoverToOriginal
+INSTRUMENTATION_STATUS: class=eu.kanade.tachiyomi.polaris.LauncherIconAndroidTest
+INSTRUMENTATION_STATUS: current=3
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: numtests=5
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=unknownRestoredChoiceAndMissingEnabledAliasesRecoverToOriginal
+INSTRUMENTATION_STATUS: class=eu.kanade.tachiyomi.polaris.LauncherIconAndroidTest
+INSTRUMENTATION_STATUS: current=3
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: numtests=5
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=everyChoiceHasExactlyOneVisibleLauncherAndInflatesItsIcon
+INSTRUMENTATION_STATUS: class=eu.kanade.tachiyomi.polaris.LauncherIconAndroidTest
+INSTRUMENTATION_STATUS: current=4
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: numtests=5
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=everyChoiceHasExactlyOneVisibleLauncherAndInflatesItsIcon
+INSTRUMENTATION_STATUS: class=eu.kanade.tachiyomi.polaris.LauncherIconAndroidTest
+INSTRUMENTATION_STATUS: current=4
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: numtests=5
+INSTRUMENTATION_STATUS: stream=
+eu.kanade.tachiyomi.polaris.PersonalizationPreviewAndroidTest:
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=renderJourneyIconsAndThemesWithLargeText
+INSTRUMENTATION_STATUS: class=eu.kanade.tachiyomi.polaris.PersonalizationPreviewAndroidTest
+INSTRUMENTATION_STATUS: current=5
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: numtests=5
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=renderJourneyIconsAndThemesWithLargeText
+INSTRUMENTATION_STATUS: class=eu.kanade.tachiyomi.polaris.PersonalizationPreviewAndroidTest
+INSTRUMENTATION_STATUS: current=5
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_RESULT: stream=
+
+Time: 48.882
+
+OK (5 tests)
+
+
+INSTRUMENTATION_CODE: -1

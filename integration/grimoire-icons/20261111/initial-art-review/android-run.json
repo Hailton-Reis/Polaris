@@ -1,0 +1,16 @@
+{
+  "started_at_utc": "2026-11-11T22:12:08.469024+00:00",
+  "classes": [
+    "eu.kanade.tachiyomi.polaris.LauncherIconAndroidTest",
+    "eu.kanade.tachiyomi.polaris.PersonalizationPreviewAndroidTest"
+  ],
+  "expected_tests": 5,
+  "artifacts": {
+    "outputs/apk/debug/app-debug.apk": "8e45a825d9a2e84461270a2585e6be1ad23a35cb705fe01700c80211da6ff8fe",
+    "outputs/apk/androidTest/debug/app-debug-androidTest.apk": "fb52607ac5c513cc5197bdcaa1a3c2a4f076d918e7116a7735d3f240b51b835c"
+  },
+  "patch_sha256": "a2e3095bdb3f4f5ea648327b6936ddc2e3e72917049f5d6109cb9d96045d0fbe",
+  "completed_at_utc": "2026-11-11T22:13:20.826532+00:00",
+  "passed": 5,
+  "failed": 0
+}

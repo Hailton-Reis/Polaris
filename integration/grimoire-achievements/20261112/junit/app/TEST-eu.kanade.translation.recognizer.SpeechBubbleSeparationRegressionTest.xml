@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.translation.recognizer.SpeechBubbleSeparationRegressionTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-11-12T18:43:39.003Z" hostname="060411c85d3c" time="0.577">
+  <properties/>
+  <testcase name="nearby white balloons keep non overlapping layout regions()" classname="eu.kanade.translation.recognizer.SpeechBubbleSeparationRegressionTest" time="0.576"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

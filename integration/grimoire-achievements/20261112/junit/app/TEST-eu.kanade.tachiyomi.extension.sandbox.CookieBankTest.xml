@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.tachiyomi.extension.sandbox.CookieBankTest" tests="10" skipped="0" failures="0" errors="0" timestamp="2026-11-12T18:43:10.765Z" hostname="060411c85d3c" time="0.325">
+  <properties/>
+  <testcase name="independent response names merge and expiration deletes only the matching cookie()" classname="eu.kanade.tachiyomi.extension.sandbox.CookieBankTest" time="0.025"/>
+  <testcase name="session cookies survive worker client replacement without entering disk state()" classname="eu.kanade.tachiyomi.extension.sandbox.CookieBankTest" time="0.002"/>
+  <testcase name="stored codec rejects wrong scalar types extra fields and oversized lists()" classname="eu.kanade.tachiyomi.extension.sandbox.CookieBankTest" time="0.003"/>
+  <testcase name="expired saved entries are removed rather than revived after reload()" classname="eu.kanade.tachiyomi.extension.sandbox.CookieBankTest" time="0.001"/>
+  <testcase name="same-name cookies for a deeper path precede the root session()" classname="eu.kanade.tachiyomi.extension.sandbox.CookieBankTest" time="0.003"/>
+  <testcase name="storage failure keeps memory usable reports failure and does not claim disk persistence()" classname="eu.kanade.tachiyomi.extension.sandbox.CookieBankTest" time="0.006"/>
+  <testcase name="persistent cookies restore and preserve secure httpOnly path and host flags()" classname="eu.kanade.tachiyomi.extension.sandbox.CookieBankTest" time="0.004"/>
+  <testcase name="clear revokes old clients and ignores delayed authenticated responses()" classname="eu.kanade.tachiyomi.extension.sandbox.CookieBankTest" time="0.002"/>
+  <testcase name="count and escaped byte budgets bound memory and persistent payloads()" classname="eu.kanade.tachiyomi.extension.sandbox.CookieBankTest" time="0.27"/>
+  <testcase name="foreign cookie origins do not override a host-only session()" classname="eu.kanade.tachiyomi.extension.sandbox.CookieBankTest" time="0.003"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

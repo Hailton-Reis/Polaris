@@ -1,6 +1,6 @@
 # Compatibilidade de backups e preparação de fontes
 
-Requisito do produto: facilitar repositórios e instalar extensões privadamente sem prejudicar importação/exportação de backups Tachiyomi, Mihon e variantes compatíveis. A revisão P20261111.1 está em desenvolvimento, posterior à beta.10 pública. Este documento fixa o contrato de compatibilidade. O assistente está descrito em [Assistente de fontes](ASSISTENTE_DE_FONTES_BETA9.md); os testes do fluxo não declaram a restauração em banco aprovada.
+Requisito do produto: facilitar repositórios e instalar extensões privadamente sem prejudicar importação/exportação de backups Tachiyomi, Mihon e variantes compatíveis. A revisão P20261112.1 está em desenvolvimento, posterior à beta.10 pública. Este documento fixa o contrato de compatibilidade. O assistente está descrito em [Assistente de fontes](ASSISTENTE_DE_FONTES_BETA9.md); os testes do fluxo não declaram a restauração em banco aprovada.
 
 ## Estrutura preservada
 
@@ -51,3 +51,7 @@ A seção de configurações de fontes da restauração aceita apenas nomes nati
 ## Sessões e recompensas P20261111.1
 
 [Cookies persistentes isolados](SESSOES_E_ICONES_P20261111_1.md) não integram o backup da biblioteca: os arquivos são privados por extensão/assinatura e cifrados com uma chave local. Restaurar uma biblioteca não transfere automaticamente logins de navegador ou cookies. O progresso de leitura continua no campo existente; as opções de ícone liberadas usam uma preferência StringSet comum adicional. Ícones já escolhidos/restaurados continuam disponíveis. Não há alteração de esquema Protobuf/SQL nem dependência obrigatória desses cosméticos para ler os registros nativos em outro aplicativo.
+
+## Conquistas P20261112.1
+
+Os [marcos de conquistas](CONQUISTAS_GRIMORIOS_P20261112_1.md) usam String e StringSet comuns no backup, sem campo Protobuf obrigatório ou mudança SQL. A restauração no Polaris combina maiores marcos e desbloqueios conhecidos para manter conquistas locais diante de configurações mais antigas. Outros leitores podem ignorar/descartar essas preferências cosméticas; a biblioteca nativa permanece independente delas. Tipos incorretos nos campos cosméticos são ignorados. O aceite externo por banco/interface continua pendente.

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.translation.TranslationDeletionGateTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-11-12T18:43:19.666Z" hostname="060411c85d3c" time="0.017">
+  <properties/>
+  <testcase name="deletion waits for the old writer before removal and restart()" classname="eu.kanade.translation.TranslationDeletionGateTest" time="0.006"/>
+  <testcase name="failed removal releases the gate and resumes other queued work()" classname="eu.kanade.translation.TranslationDeletionGateTest" time="0.006"/>
+  <testcase name="user pause during cleanup prevents an automatic restart()" classname="eu.kanade.translation.TranslationDeletionGateTest" time="0.003"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

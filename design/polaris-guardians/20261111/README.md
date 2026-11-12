@@ -1,5 +1,7 @@
 # Guardiões de Polaris — ícones ilustrados
 
+Coleção histórica P20261111.1 preservada. A revisão seguinte adota a [coleção de grimórios e trevos](../../polaris-grimoires/20261111/README.md).
+
 Quatro ilustrações originais geradas com `image_gen.imagegen`, com fundo transparente, rosto expressivo, livro e estrela de Polaris. As artes originais foram preservadas; as cópias Android somente foram redimensionadas e codificadas em WebP, sem redesenho por formas geométricas. [Proveniência e hashes](provenance.json).
 
 | Ícone | Guardião | Liberação |

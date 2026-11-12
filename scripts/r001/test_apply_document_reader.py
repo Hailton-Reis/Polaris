@@ -38,7 +38,7 @@ class DocumentOverlayTests(unittest.TestCase):
         self.assertEqual(hashlib.sha256(actual.read_bytes()).hexdigest(), expected)
 
     def verify_generated_icons(self):
-        provenance = json.loads((PROJECT / 'design/polaris-guardians/20261111/provenance.json').read_text())
+        provenance = json.loads((PROJECT / 'design/polaris-grimoires/20261111/provenance.json').read_text())
         for icon in provenance['files']:
             original = PROJECT / icon['source']
             resource = self.root / icon['resource']
@@ -57,7 +57,7 @@ class DocumentOverlayTests(unittest.TestCase):
         subprocess.run(['git', '-C', str(self.root), 'diff', '--check'], check=True)
         self.assertFalse((self.root / 'data/src/main/sqldelight/tachiyomi/migrations/15.sqm').exists())
         about = self.root / 'app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt'
-        self.assertIn('P20261111.1', about.read_text())
+        self.assertIn('P20261112.1', about.read_text())
         self.verify_fixture_bytes()
         self.verify_generated_icons()
         self.assertTrue((self.root / 'app/src/main/java/eu/kanade/tachiyomi/source/selection/UnifiedWorkSearch.kt').exists())

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.translation.TranslationCandidatePolicyTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-11-12T18:43:19.633Z" hostname="060411c85d3c" time="0.032">
+  <properties/>
+  <testcase name="downloaded untranslated or failed chapters can be queued()" classname="eu.kanade.translation.TranslationCandidatePolicyTest" time="0.002"/>
+  <testcase name="missing active or finished chapters are excluded()" classname="eu.kanade.translation.TranslationCandidatePolicyTest" time="0.027"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

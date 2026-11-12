@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.translation.detection.ExperimentalDetectionRouteTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-11-12T18:43:21.242Z" hostname="060411c85d3c" time="0.042">
+  <properties/>
+  <testcase name="model native and process failures each fall back exactly once()" classname="eu.kanade.translation.detection.ExperimentalDetectionRouteTest" time="0.002"/>
+  <testcase name="unsupported configuration keeps existing OCR and explains fallback()" classname="eu.kanade.translation.detection.ExperimentalDetectionRouteTest" time="0.021"/>
+  <testcase name="default invokes only existing OCR without detector initialization()" classname="eu.kanade.translation.detection.ExperimentalDetectionRouteTest" time="0.003"/>
+  <testcase name="experimental success bypasses existing detector()" classname="eu.kanade.translation.detection.ExperimentalDetectionRouteTest" time="0.003"/>
+  <testcase name="existing engine failure is not retried()" classname="eu.kanade.translation.detection.ExperimentalDetectionRouteTest" time="0.004"/>
+  <testcase name="cancellation propagates without fallback()" classname="eu.kanade.translation.detection.ExperimentalDetectionRouteTest" time="0.003"/>
+  <testcase name="fallback remains usable when experimental cleanup or warning fails()" classname="eu.kanade.translation.detection.ExperimentalDetectionRouteTest" time="0.002"/>
+  <testcase name="empty page uses existing OCR without disabling DBNet for the next page()" classname="eu.kanade.translation.detection.ExperimentalDetectionRouteTest" time="0.003"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

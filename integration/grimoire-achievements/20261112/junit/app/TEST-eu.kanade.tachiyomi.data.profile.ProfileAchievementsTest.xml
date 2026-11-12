@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="eu.kanade.tachiyomi.data.profile.ProfileAchievementsTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-11-12T18:42:58.534Z" hostname="060411c85d3c" time="0.23">
+  <properties/>
+  <testcase name="non favorites do not enter library milestones and restored progress round trips()" classname="eu.kanade.tachiyomi.data.profile.ProfileAchievementsTest" time="0.132"/>
+  <testcase name="finishers require read known chapters and completed metadata across linked editions()" classname="eu.kanade.tachiyomi.data.profile.ProfileAchievementsTest" time="0.007"/>
+  <testcase name="logical editions and duplicate projection rows do not multiply library achievements()" classname="eu.kanade.tachiyomi.data.profile.ProfileAchievementsTest" time="0.001"/>
+  <testcase name="caught up ongoing unknown empty and partially read works are not finished()" classname="eu.kanade.tachiyomi.data.profile.ProfileAchievementsTest" time="0.001"/>
+  <testcase name="malformed portable values are bounded and original launcher remains available()" classname="eu.kanade.tachiyomi.data.profile.ProfileAchievementsTest" time="0.056"/>
+  <testcase name="milestones survive deletion and repeated add remove does not accumulate fake counts()" classname="eu.kanade.tachiyomi.data.profile.ProfileAchievementsTest" time="0.001"/>
+  <testcase name="each non-reading route independently unlocks at its boundary()" classname="eu.kanade.tachiyomi.data.profile.ProfileAchievementsTest" time="0.001"/>
+  <testcase name="all four paths are alternatives not cumulative requirements()" classname="eu.kanade.tachiyomi.data.profile.ProfileAchievementsTest" time="0.008"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

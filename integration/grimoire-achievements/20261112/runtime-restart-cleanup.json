@@ -1,0 +1,17 @@
+{
+  "regenerable_build_intermediates_only": [
+    {
+      "path": "/workspace/scratch/polaris-cloud-e7d774c/android-build/patched-yomotsu/app/build/intermediates/merged_native_libs",
+      "bytes": 476789520
+    },
+    {
+      "path": "/workspace/scratch/polaris-cloud-e7d774c/android-build/patched-yomotsu/app/build/intermediates/stripped_native_libs",
+      "bytes": 450496328
+    },
+    {
+      "path": "/workspace/scratch/polaris-cloud-e7d774c/android-build/patched-yomotsu/app/build/intermediates/dex",
+      "bytes": 123256896
+    }
+  ],
+  "APK_guest_data_and_sources_preserved": true
+}

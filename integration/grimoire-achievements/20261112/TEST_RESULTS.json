@@ -1,0 +1,77 @@
+{
+  "status": "ACHIEVEMENTS_AND_GRIMOIRE_COMPONENT_VALIDATED_PENDING_EXTERNAL_ACCEPTANCE",
+  "revision": "P20261112.1",
+  "version": "0.1.0-beta.11",
+  "version_code": 112,
+  "published": false,
+  "public_release_unchanged": "v0.1.0-beta.10",
+  "checked_at_utc": "2026-11-12T19:04:59.473476+00:00",
+  "engineering_parent": "fdc768eeaff480dda64108b0a1d88b593aa81670",
+  "JVM": {
+    "total": 880,
+    "passed": 880,
+    "failed": 0,
+    "skipped": 0
+  },
+  "baseline_JVM": {
+    "total": 872,
+    "passed": 872,
+    "failed": 0,
+    "skipped": 0
+  },
+  "new_JVM_cases": 8,
+  "Android": {
+    "passed": 37,
+    "failed": 0,
+    "new_achievement_cases": 2,
+    "api": 26,
+    "abi": "x86_64",
+    "component_host": true,
+    "zero_XP_library_unlock": true,
+    "permanent_unlock_after_removal": true,
+    "native_preference_backup_creation_Protobuf_and_restore": true,
+    "older_restore_preserves_milestones": true,
+    "wrong_restore_type_ignored": true,
+    "four_native_launcher_aliases_and_illustrations": true,
+    "MainActivity_and_links_preserved": true,
+    "achievement_UI_preview": true,
+    "all_previous_cookie_preferences_filters_search_library_components_retained": true,
+    "physical_ARM_acceptance": false,
+    "external_Mihon_reader_acceptance": false,
+    "Android13_monochrome_acceptance": false,
+    "full_app_startup_and_download_reader_acceptance": false
+  },
+  "host_guards": {
+    "overlay_passed": 4,
+    "packager_passed": 9
+  },
+  "artifacts": [
+    {
+      "file": "app-debug.apk",
+      "bytes": 236373079,
+      "sha256": "db0c0d7255e7eeca8b5dcd0fafff34d9709b1c6e03e3cbe5899a386e004d9485",
+      "packaged_abis": [
+        "x86_64"
+      ],
+      "scope": "Debug x86_64 component fixture; not a phone release"
+    },
+    {
+      "file": "app-debug-androidTest.apk",
+      "bytes": 650776,
+      "sha256": "83d8e80748566f6c40885b26a2ecbf89879023a2417b7c77b38a2b72613f738e",
+      "packaged_abis": [],
+      "scope": "Debug x86_64 component fixture; not a phone release"
+    }
+  ],
+  "patch_sha256": "f6dcd89ffd2c2e5c3588d8c5b5947dbf6b634d56e94ad609cef498c069a2cc98",
+  "matching_overlay_paths": 398,
+  "generated_icon_resource_bytes": 414354,
+  "new_dependencies": 0,
+  "new_OCR_models": 0,
+  "changes_backup_or_SQL_schema": false,
+  "pending": [
+    "Physical A12/ARM32, S20FE/ARM64 and recent Android masks/themed icons",
+    "Existing WebView/provider/reader/external-backup acceptance backlog",
+    "Phone release build/distribution preserving ID and signature"
+  ]
+}

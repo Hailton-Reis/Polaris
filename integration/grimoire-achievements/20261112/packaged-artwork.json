@@ -1,0 +1,33 @@
+{
+  "all_four_current_resources_embedded_byte_exact": true,
+  "files": [
+    {
+      "edition": "default",
+      "apk_entry": "res/drawable-nodpi-v4/ic_polaris_logo.webp",
+      "bytes": 81474,
+      "sha256": "e1268bf99831c4e4cc1c6b383bccd839c37dec93613589915271769d3c363fe1",
+      "matches_generated_resource": true
+    },
+    {
+      "edition": "three",
+      "apk_entry": "res/drawable-nodpi-v4/ic_polaris_aurora.webp",
+      "bytes": 110248,
+      "sha256": "e5bc4a4fa0bb5979be8653098e14cc96bfcdc405a7dbe577a873bded245843af",
+      "matches_generated_resource": true
+    },
+    {
+      "edition": "four",
+      "apk_entry": "res/drawable-nodpi-v4/ic_polaris_orbit.webp",
+      "bytes": 121260,
+      "sha256": "06fefa25f8352fc0a185e89346cf675feef1219b049e9c660bb716849455df7c",
+      "matches_generated_resource": true
+    },
+    {
+      "edition": "five",
+      "apk_entry": "res/drawable-nodpi-v4/ic_polaris_constellation.webp",
+      "bytes": 101372,
+      "sha256": "4f5a83463b616be37182b68b4550f648051ef46712230c454c820c259e14bac8",
+      "matches_generated_resource": true
+    }
+  ]
+}
