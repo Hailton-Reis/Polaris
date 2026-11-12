@@ -14,9 +14,9 @@ Rascunhos são ignorados. No canal padrão, tanto a marcação `prerelease` do G
 
 ## Acesso ao GitHub
 
-O endereço consultado é `Hailton-Reis/Polaris`, sem token de acesso embutido no aplicativo. O repositório e a [Release beta.3](https://github.com/Hailton-Reis/Polaris/releases/tag/v0.1.0-beta.3) agora são **públicos**. Ela contém dois APKs, manifesto, hashes, guia e exemplos. O download pelo navegador do celular não exige uma conta do GitHub.
+O endereço consultado é `Hailton-Reis/Polaris`, sem token de acesso embutido no aplicativo. O repositório e a [Release beta.10](https://github.com/Hailton-Reis/Polaris/releases/tag/v0.1.0-beta.10) agora são **públicos**. Ela contém um APK universal ARM32/ARM64, manifesto, hashes, roteiro e relatório de validação. Os dois descritores de arquitetura no manifesto apontam para o mesmo arquivo; apenas um download é necessário. O download pelo navegador do celular não exige uma conta do GitHub.
 
-O aplicativo está configurado para consultar esse repositório. As versões beta dependem da opção **Receber atualizações experimentais**, desativada por padrão. Acesso público não equivale a validação de atualização no aparelho: consulta, download e instalação com a assinatura original ainda precisam desse teste. Instalar a própria beta.3 também não cria uma versão posterior para o atualizador oferecer.
+O aplicativo está configurado para consultar esse repositório. As versões beta dependem da opção **Receber atualizações experimentais**, desativada por padrão. Acesso público não equivale a validação de atualização no aparelho: consulta, download e instalação com a assinatura original ainda precisam desse teste. Uma instalação anterior pode encontrar a beta.10 ao ativar o canal experimental; instalar a própria beta.10 não cria uma versão posterior para o atualizador oferecer.
 
 Falhas de rede e limites do GitHub são diferenciados de uma consulta concluída. Uma eventual indisponibilidade ou restrição futura do repositório também deve ser informada, em vez de ser apresentada como ausência de atualização.
 
@@ -34,7 +34,7 @@ Cada Release precisa ter um **`manifest.json`** junto dos APKs. O exportador do 
 
 O manifesto de atualização tem limite de 64 KiB. Releases sem os metadados ou sem APK compatível não são oferecidas. Se apenas houver atualização que exige Android mais novo, a consulta informa a incompatibilidade do sistema.
 
-O `application_id` e a chave de assinatura precisam permanecer os mesmos entre beta e estável para atualizar a mesma instalação. Eles não devem ser trocados ao mudar de canal. O Android continua verificando a assinatura durante a instalação. Os APKs de nuvem não substituem os APKs assinados pela máquina original do mantenedor.
+O `application_id` e a chave de assinatura precisam permanecer os mesmos entre beta e estável para atualizar a mesma instalação. Eles não devem ser trocados ao mudar de canal. O Android continua verificando a assinatura durante a instalação. Os APKs desta distribuição foram conferidos com a mesma assinatura da beta.8; uma compilação própria pode ter outra chave.
 
 ## Publicação pelo mantenedor
 
@@ -49,10 +49,14 @@ O primeiro beta foi publicado em 01/11/2026 e depois aberto ao público pelo man
 
 ## Espaço utilizado
 
-Consultar não baixa o APK. Quando o usuário aceita o download, o arquivo `update.apk` ocupa espaço no cache externo do aplicativo, além da instalação existente. Esse cache não faz parte da meta de 256 MiB do cache regenerável de documentos. Uma tentativa com hash incorreto remove o arquivo inválido. O espaço exigido pelo instalador do Android também precisa ser considerado.
+Consultar não baixa o APK. Ao aceitar, o download é gerenciado fora da tela e pode repetir falhas transitórias, retomar bytes parciais quando o servidor permite e oferecer novamente a instalação pela tela ou notificação. O arquivo é verificado por SHA-256 antes do instalador Android.
+
+A atualização usa o APK inteiro, sem patches entre versões. A retomada reaproveita bytes do mesmo arquivo, não transforma um APK antigo no novo. O download e o espaço temporário do instalador somam-se à instalação existente. A beta.8 pode precisar de atualização manual inicial para receber esse downloader.
 
 ## Estado de validação
 
-O candidato P20261101.3 compilou com os APKs ARM verificados. Os 20 testes novos de versões, canais, seleção de APK, metadados, falhas, intervalo de consultas e integridade do arquivo passaram. A comparação completa teve 491 aprovações e as mesmas 34 falhas preexistentes, sem novas regressões. Compilar e executar esses testes não valida uma atualização real. A consulta em rede pública, o download e a instalação sobre a assinatura original permanecem pendentes nos aparelhos.
+A beta.10 / P20261106.1 tem um APK universal ARM32/ARM64 conferido por tamanho, SHA-256 e assinatura. A comparação final executou 738 testes JVM: 721 aprovações e as mesmas 17 falhas preexistentes, sem novas regressões. Os testes de versão, canal, seleção, metadados e integridade continuam incluídos. Os checks antigos do PR ainda têm pendências registradas no protótipo de backup e no preparo do SDK.
 
-[Evidência da revisão](https://github.com/Hailton-Reis/Polaris/blob/c54644cf396c816ebeb45bbfa5c619b570984523/integration/internal-beta/TEST_RESULTS.json).
+O APK universal mantém a identidade e a assinatura da beta.9 distribuída. Compilação, hashes e testes JVM não validam uma atualização real: retomada entre redes, instalação e preservação dos dados ainda exigem aceite nos aparelhos.
+
+[Notas e evidência da beta.10](versoes/0.1.0-beta.10.md).

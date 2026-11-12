@@ -52,6 +52,6 @@ Os exemplos preparados ajudam a começar. Páginas reais autorizadas e revisão 
 
 ## Múltiplas fontes
 
-O objetivo é associar variantes de uma mesma obra, preservar a identidade do capítulo e selecionar fontes apropriadas. O aceite completo com duas fontes, a ponte de tradução canônica e a evolução de backup seguem os critérios próprios da engenharia. Não são declarados concluídos por esta página ou pelo pacote de leitura local.
+A beta.8 integra agrupamento de edições, seleção automática de catálogos compatíveis e fonte fixa por obra, com testes de provedores simulados. O aceite completo com duas fontes, a ponte de tradução canônica e a evolução de backup seguem os critérios próprios da engenharia. Não são declarados concluídos por esta página ou pelo pacote de leitura local.
 
 Um servidor pessoal continua opcional; o projeto não deve depender dele para a leitura básica.

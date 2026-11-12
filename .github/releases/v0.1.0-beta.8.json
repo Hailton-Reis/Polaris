@@ -1,0 +1,74 @@
+{
+  "source_commit": "4108405f57eee47daf3ec3a8e44c4f8e8005c7c5",
+  "version_code": 109,
+  "application_id": "app.mihon.tachiyomiat.dev",
+  "minimum_android_api": 26,
+  "signer_sha256": "3ae747069cc9015ca1777f94fd56b030501f45d6af380426a572ad60e94d8227",
+  "repository": "Hailton-Reis/Polaris",
+  "tag": "v0.1.0-beta.8",
+  "artifacts": [
+    {
+      "abi": "arm64-v8a",
+      "file": "Polaris-0.1.0-beta.8-arm64-v8a.apk",
+      "bytes": 194508943,
+      "sha256": "7a5b60ae1c86b4435ea801ca90fffd81c23e57773dba18ef082c14e7ec37077c",
+      "parts": [
+        {
+          "file": "Polaris-0.1.0-beta.8-arm64-v8a.apk.001",
+          "bytes": 98000000,
+          "sha256": "eb3bd4e20f7adb56a418eacbd0f570a5b5e01dcfd1490fdc482da8dea515d0d3"
+        },
+        {
+          "file": "Polaris-0.1.0-beta.8-arm64-v8a.apk.002",
+          "bytes": 96508943,
+          "sha256": "2e3eb6e3a4f2724ca54b297a0b19f0c58a236d53081af4a3c626b3a607849c74"
+        }
+      ]
+    },
+    {
+      "abi": "armeabi-v7a",
+      "file": "Polaris-0.1.0-beta.8-armeabi-v7a.apk",
+      "bytes": 154711120,
+      "sha256": "629f1f60badfb751c5205cdb244dc472c1cb0a9b78e2e0d8fedfb67749877669",
+      "parts": [
+        {
+          "file": "Polaris-0.1.0-beta.8-armeabi-v7a.apk.001",
+          "bytes": 98000000,
+          "sha256": "67c0611fc283cfa54e9dd3b3d1c068ca67bf8bf5d9790bff2ab17542d6b9ce7b"
+        },
+        {
+          "file": "Polaris-0.1.0-beta.8-armeabi-v7a.apk.002",
+          "bytes": 56711120,
+          "sha256": "b57cc50452a0f448d31295f4350a7f7ded63008394e5a9dcd688797fbe19d81e"
+        }
+      ]
+    }
+  ],
+  "files": [
+    {
+      "file": "manifest.json",
+      "bytes": 1564,
+      "sha256": "8998a60ed2a0a59b444268271024becee4c250c376125048f85d0766a24685ee"
+    },
+    {
+      "file": "SHA256SUMS.txt",
+      "bytes": 204,
+      "sha256": "1500e67ab2453879796ee9344fb64de1f43dcd3d0d53892682aa72036c8d610c"
+    },
+    {
+      "file": "PRIMEIRO_TESTE.md",
+      "bytes": 1507,
+      "sha256": "001723fd41aa57273029ac955829cb2fd3f18369c299fa79c5cc2ae59cd69084"
+    },
+    {
+      "file": "RELEASE_NOTES.md",
+      "bytes": 5962,
+      "sha256": "daf91c36d420429102be387e605df3f68724beea945e8c9b03276d83b49d48e3"
+    },
+    {
+      "file": "VALIDACAO.json",
+      "bytes": 8068,
+      "sha256": "9312da1095cef46d097119a8bc01792979a89e11d268b716462dbf76be553262"
+    }
+  ]
+}

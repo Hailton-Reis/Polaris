@@ -8,7 +8,8 @@
 </p>
 
 <p align="center">
-  <a href="docs/COMECE_AQUI.md"><strong>Comece aqui →</strong></a> &nbsp; · &nbsp;
+  <a href="https://github.com/Hailton-Reis/Polaris/releases/tag/v0.1.0-beta.10"><strong>Baixar beta.10 →</strong></a> &nbsp; · &nbsp;
+  <a href="docs/COMECE_AQUI.md"><strong>Comece aqui</strong></a> &nbsp; · &nbsp;
   <a href="CHANGELOG.md"><strong>Versões e novidades</strong></a> &nbsp; · &nbsp;
   <a href="docs/ARMAZENAMENTO.md"><strong>Armazenamento</strong></a>
 </p>
@@ -33,11 +34,11 @@ A leitura básica funciona no aparelho, sem exigir um servidor pessoal. Arquivos
 
 **Em desenvolvimento · Android 8+ · ARM64 e ARM32 · Foco em português brasileiro**
 
-**Nome e ícone no Android:** os APKs públicos beta.9 usam a identidade Polaris e preservam a assinatura da beta.8. Os APKs históricos da beta.3 continuam com o nome Yomotsu; os arquivos antigos não mudam com a edição da página de Release.
+**Nome e ícone no Android:** a beta.10 pública usa a identidade Polaris e preserva a assinatura anterior. As versões históricas mantêm seus arquivos originais.
 
 ## Inglês como prioridade
 
-**O reconhecimento de texto em inglês já acompanha o APK.** O Polaris usa a biblioteca latina embarcada do ML Kit para ler o texto das imagens.
+**O reconhecimento de texto em inglês já acompanha o APK.** O Polaris inclui OCR ML Kit e PaddleOCR para inglês; os demais idiomas suportados usam ML Kit. OCR lê a imagem; o mecanismo de tradução trabalha com o texto reconhecido.
 
 Para **traduzir inglês → português**, o SDK precisa preparar seus recursos de tradução. O novo candidato acrescenta:
 
@@ -57,7 +58,23 @@ O candidato consulta as Releases do **Polaris** ao abrir o aplicativo, com limit
 
 **Receber atualizações experimentais** começa desativado. Ative para encontrar betas e outras prévias publicadas; desligar não rebaixa a instalação. Baixar e instalar continuam sendo escolhas suas.
 
-**O repositório e o [primeiro beta público](https://github.com/Hailton-Reis/Polaris/releases/tag/v0.1.0-beta.3) estão disponíveis**, com APKs ARM64 e ARM32 para baixar pelo navegador, sem login no GitHub. A atualização real no aparelho ainda precisa de validação. [Canais, compatibilidade e publicação →](docs/ATUALIZACOES.md)
+**O repositório e o [beta.10 público](https://github.com/Hailton-Reis/Polaris/releases/tag/v0.1.0-beta.10) estão disponíveis**, com um APK universal para ARM64 e ARM32 (261,1 MB), disponível pelo navegador sem login no GitHub. A atualização real no aparelho ainda precisa de validação. [Canais, compatibilidade e publicação →](docs/ATUALIZACOES.md)
+
+## Prepare as fontes pelo aplicativo
+
+Depois da configuração inicial, use **Preparar fontes**; o guia também fica em **Navegar → Extensões → ⋮**. A introdução explica os riscos de código de terceiros, permite importar um backup primeiro e pode ser adiada.
+
+Revise um repositório sugerido ou informe um link HTTPS. Confira endereço e certificado, selecione fontes da biblioteca, idiomas ou uma lista manual e confirme o lote. O Polaris prepara as extensões **dentro do próprio aplicativo**, com progresso, cancelamento e repetição das falhas. Não é preciso confirmar uma instalação Android para cada nova extensão desse fluxo. As extensões já instaladas pelo Android são preservadas.
+
+A fila depende do processo do aplicativo e não retoma downloads de extensões após seu encerramento. **Guarde o backup original.** O formato e os identificadores continuam existentes, mas capítulos mesclados podem usar URLs específicas do Polaris, cuja exportação para Mihon/Tachiyomi ainda precisa de normalização. APKs privados não acompanham o backup: instale as fontes no outro leitor. A migração real em banco e o percurso completo no celular continuam pendentes. [Roteiro e limites](docs/versoes/0.1.0-beta.10.md).
+
+## Uma sequência, com fontes por obra
+
+Capítulo 0 Official e capítulo 0 Unofficial agora ocupam uma única posição na leitura. A mesma identidade atende retomada, próximos capítulos, downloads e contagens. As edições e seus arquivos permanecem guardados; partes, decimais, volumes, temporadas e extras identificados continuam separados.
+
+Em **Opções de capítulos → Fontes desta obra**, deixe **Automático** ou escolha uma fonte fixa para aquela obra. A descoberta compara extensões instaladas e habilitadas nos idiomas selecionados, confirmando título, autoria e numeração. Verifica amostras de páginas e bytes de imagem e, entre as alternativas aprovadas, prioriza português; a fonte fixada é respeitada. Não testa todos os capítulos nem mede a qualidade editorial da tradução.
+
+A descoberta usa metadados e amostras limitadas, sem instalar extensões nem baixar capítulos completos de todos os catálogos. Após restaurar um backup, também pode recuperar fontes de obras antigas e concluídas. A escolha da fonte também preserva o escopo do glossário. [Comportamento e limites](https://github.com/Hailton-Reis/Polaris/blob/v0.1.0-beta.10/docs/UNIVERSAL_FONTES_SEGURANCA_P20261106_1.md).
 
 ## Seu arquivo, sua classificação
 
@@ -111,9 +128,15 @@ O painel **Dados e armazenamento → Armazenamento do Polaris** ajuda a separar 
 
 ## Onde o projeto está
 
-O beta público disponível é **`0.1.0-beta.10` · revisão `P20261106.1` · versionCode `111`**. [Notas e registro de publicação](integration/release-candidates/0.1.0-beta.10/README.md). A revisão `P20261112.1` (beta.11 em desenvolvimento, sem publicação) acrescenta conquistas para liberar os grimórios de três, quatro e cinco folhas, preservando as sessões HTTP, biblioteca unificada, busca e continuidade entre fontes. [Escopo e limites](docs/CONQUISTAS_GRIMORIOS_P20261112_1.md). A implementação está em avaliação na [branch de engenharia](https://github.com/Hailton-Reis/Polaris/tree/r001/multisource-foundation).
+O beta público atual é **`0.1.0-beta.10` · revisão `P20261106.1` · versionCode `111`**. Ele reúne um APK universal, recuperação de fontes, perfis com menos concorrência em processos limitados e inspeção preventiva/quarentena de extensões. Mantém o assistente de fontes, OCR e download de atualização recuperável da beta.9. PaddleOCR continua opcional em inglês.
 
-**O [primeiro beta público](https://github.com/Hailton-Reis/Polaris/releases/tag/v0.1.0-beta.3) está disponível; ainda não há lançamento estável.** O pacote de teste e a compilação não equivalem a aprovação do consumo, da compatibilidade ou da qualidade em todos os idiomas.
+[Registro de publicação da beta.10](integration/release-candidates/0.1.0-beta.10/README.md). A revisão `P20261112.1` (beta.11 em desenvolvimento, sem publicação) acrescenta conquistas para liberar os grimórios de três, quatro e cinco folhas, preservando as sessões HTTP, biblioteca unificada, busca e continuidade entre fontes. [Escopo e limites](docs/CONQUISTAS_GRIMORIOS_P20261112_1.md). A implementação está em avaliação na [branch de engenharia](https://github.com/Hailton-Reis/Polaris/tree/r001/multisource-foundation).
+
+**[Baixar e ver as notas da beta.10](https://github.com/Hailton-Reis/Polaris/releases/tag/v0.1.0-beta.10)** · **[Primeiro teste](https://github.com/Hailton-Reis/Polaris/releases/download/v0.1.0-beta.10/COMECE_AQUI.md)**. Baixe o único APK universal para ARM32 e ARM64; o Android escolhe a arquitetura compatível durante a instalação. Não é necessário montar partes ou escolher entre duas versões.
+
+**Na beta.10 publicada, a sandbox completa ainda não está integrada:** extensões executam no processo do aplicativo, com aviso de compatibilidade. A inspeção não garante ausência de código malicioso. A revisão em desenvolvimento implementa isolamento optativo e projeção nativa de backup; a ida/volta por banco/interface de outros leitores continua pendente. Preserve o backup original. A causa da falha de capítulos relatada no A12 e qualquer ganho de desempenho nesse aparelho ainda precisam de confirmação.
+
+A comparação da beta.10 executou **738 testes JVM: 721 aprovações e as mesmas 17 falhas preexistentes**, sem novas falhas ou casos ausentes/ignorados. Os 31 casos novos passaram, além de 13 controles do empacotamento/overlay e seis controles Android de isolamento em componente independente. Isso não equivale a uma suíte totalmente verde, sandbox integrada ou aceite em aparelhos. A [implementação](https://github.com/Hailton-Reis/Polaris/tree/v0.1.0-beta.10) e a [evidência](https://github.com/Hailton-Reis/Polaris/blob/v0.1.0-beta.10/integration/universal-recovery/20261106/TEST_RESULTS.json) estão identificadas pela versão. Ainda não há lançamento estável.
 
 O resultado em inglês foi confirmado pelo mantenedor em um candidato anterior. Japonês, chinês simplificado/tradicional e coreano continuam com validação de OCR e tradução nas imagens pendente, incluindo japonês vertical. A automação global desses idiomas é opcional neste estágio; PaddleOCR permanece apenas em inglês.
 
@@ -131,9 +154,9 @@ A matriz inicial reúne **A12, S20 FE, S8+ e provável A52**. Android, arquitetu
 
 A base Android vem do ecossistema **Yomotsu / Mihon**, com conceitos de múltiplas fontes do **TachiyomiSY**. A integração mantém um upstream fixado e camadas revisáveis. A branch `main` apresenta o projeto; a implementação em avaliação fica em `r001/multisource-foundation`.
 
-[Registros de compilação e testes](https://github.com/Hailton-Reis/Polaris/blob/r001/multisource-foundation/integration/internal-beta/TEST_RESULTS.json) distinguem testes automatizados de aceite nos aparelhos. Os resultados históricos incluem falhas do projeto-base, corrigidas na auditoria P20261107.1. A revisão atual tem seu próprio registro de testes; isso não substitui o aceite nos aparelhos.
+[Registros de compilação e testes](integration/grimoire-achievements/20261112/README.md) distinguem validação por componentes de aceite nos aparelhos. A revisão de desenvolvimento P20261112.1 tem 880 testes JVM e 37 testes Android aprovados no emulador; isso não substitui aceite físico ou o fluxo completo com fontes reais. Os resultados históricos de cada versão permanecem arquivados.
 
-Seleção inteligente entre fontes, correlação de obras e progresso canônico permanecem como objetivos sujeitos à sua própria validação. O aceite completo com duas fontes continua pendente.
+A beta.10 mantém o assistente de fontes, acrescenta recuperação de catálogos e inspeção preventiva de extensões e oferece um APK universal ARM. O aceite completo com extensões reais, aparelhos e migração de backups continua pendente.
 
 Veja [como contribuir](CONTRIBUTING.md). Para problemas de armazenamento, informe tamanhos antes/depois. Para tradução, diferencie o texto que o OCR reconheceu do resultado traduzido.
 

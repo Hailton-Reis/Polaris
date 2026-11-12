@@ -127,3 +127,18 @@ Esta atualização registra os pontos encontrados. Não declara os ajustes acima
 O candidato P20261101.2 acrescenta uma verificação local e, quando necessário, preparação automática de inglês → português. Isso pode antecipar o armazenamento dos recursos de tradução para a primeira conexão adequada, antes de o usuário traduzir um capítulo. A opção pode ser desativada; o reconhecimento latino já estava incluído no APK.
 
 A condição de armazenamento do Android usada pelo agendamento não reserva um número preciso de bytes. Ela não resolve, por si, os pontos sobre importação, temporários e consumo total identificados nesta análise. Veja [o fluxo e suas limitações](INGLES_E_TRADUCAO.md).
+
+
+## Beta.8: pacote e catálogos de fontes
+
+Os APKs publicados da beta.8 têm **194.508.943 bytes em ARM64** e **154.711.120 bytes em ARM32**. O acréscimo em relação à beta.7 é de **1.676.188 bytes por APK (1,60 MiB)**. Assets e bibliotecas nativas comparados permanecem idênticos; nenhum modelo novo foi incluído. Esses são tamanhos de download, não a ocupação instalada no Android.
+
+A descoberta automática consulta metadados de catálogos; não baixa imagens de todos os provedores. Até quatro catálogos ficam ativos por obra, mas edições já vistas permanecem no banco para preservar histórico e downloads. Isso não representa uma quota de tamanho do banco. Um cenário artificial de mil capítulos nas mesmas quatro fontes soma cerca de 0,85 MiB apenas em JSON de origem e acréscimo de URLs; campos das edições, páginas/índices/WAL do SQLite e metadados específicos da extensão ficam fora dessa estimativa.
+
+Traduções de edições alternativas usam identidades separadas para evitar aplicar texto/coordenadas de uma fonte em outra imagem. A exclusão do download pela lista remove suas edições e traduções, preservando o vocabulário. O fluxo completo continua dependendo de medição física.
+
+[Análise da beta.8](https://github.com/Hailton-Reis/Polaris/blob/v0.1.0-beta.8/docs/SEQUENCIA_E_FONTES_P20261103_1.md) · [Parâmetros da estimativa](https://github.com/Hailton-Reis/Polaris/blob/v0.1.0-beta.8/integration/document-reader/source-storage-estimate_P20261103_1.json).
+
+## Beta.9 / P20261104.4 — distribuição de 05/11/2026 UTC
+
+Os APKs completos têm **199.132.104 bytes em ARM64** e **159.334.281 bytes em ARM32**. Isso mede o download, não a instalação. O assistente também baixa APKs de extensões, guardados internamente; a quantidade e o espaço dependem da seleção. A fila possui dois downloads simultâneos, mas não é uma quota de armazenamento. Os modelos, fontes e bibliotecas nativas permanecem iguais à revisão interna anterior; acrescentou-se a biblioteca Java de verificação de assinatura. [Notas e limites](versoes/0.1.0-beta.9.md).

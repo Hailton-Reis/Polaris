@@ -56,6 +56,58 @@ Este arquivo registra a evolução real do código. **Revisões de desenvolvimen
 
 [Comportamento, evidências e limites](docs/BIBLIOTECA_UNIFICADA_P20261110_1.md). Aceite com provedores reais, downloads e aparelhos ARM ainda pendente.
 
+## 0.1.0-beta.10 · P20261106.1 — 06/11/2026
+
+**Estado:** pré-lançamento público para testes; versionCode 111; Android 8+, um APK universal ARM32/ARM64 de 261.130.442 bytes, com a assinatura anterior.
+
+- Recursos comuns compartilhados no APK; Android seleciona as bibliotecas nativas compatíveis na instalação.
+- Lista de capítulos principal salva antes da descoberta de alternativas. Recuperação de fontes após restauração, inclusive obras antigas/concluídas, com amostragem de páginas/imagens e preferência por português entre fontes habilitadas e verificadas.
+- Tentativas de outra edição confirmada quando a lista de páginas falha; fonte fixa, modo somente baixados e progresso preservados.
+- Menor concorrência/cache em processos com memória limitada e diagnóstico de ABI/processo no Sobre.
+- Inspeção preventiva, quarentena e aprovação por versão exata; confiança interna não importada de backups. A sandbox completa ainda não está integrada.
+
+738 testes JVM: 721 aprovações e as mesmas 17 falhas preexistentes. 31 casos novos, 13 controles de empacotamento/overlay e seis controles Android isolados passaram. Sem aceite completo em celulares; falha do A12 ainda sem causa confirmada. A exportação de capítulos mesclados para Mihon/Tachiyomi precisa de normalização e teste real: **preserve o backup original**.
+
+[Baixar beta.10](https://github.com/Hailton-Reis/Polaris/releases/tag/v0.1.0-beta.10) · [Notas e limites](docs/versoes/0.1.0-beta.10.md).
+
+## 0.1.0-beta.9 · P20261104.4 — 05/11/2026 (UTC)
+
+**Estado:** pré-lançamento público para testes; versionCode 110; Android 8+, ARM32 e ARM64. Publicado com aceitação física, assistente completo e migração real em banco ainda pendentes.
+
+- Assistente para revisar repositórios e preparar extensões internas em lote, com escolha por biblioteca/idiomas, progresso, cancelamento e repetição das falhas.
+- Verificação criptográfica, identidade/certificado vinculados à seleção e proteção contra troca silenciosa de chave de repositório.
+- Correções de cedilha Anime Ace, encaixe, caixas escuras e deduplicação das bordas do OCR por faixas.
+- Opções dependentes coerentes de OCR e download de atualização recuperável com SHA-256.
+- Formato de backup e identificadores preservados; seis testes de codec e duas leituras independentes passaram. Sem garantia para todos os forks; o campo Mihon `nextUpdate` não é preservado.
+
+707 testes JVM: 690 aprovações e as mesmas 17 falhas preexistentes, sem regressões novas. 16 controles Android de tipografia e quatro de segurança passaram em componentes isolados. Isso não aprova o aplicativo completo em celulares. APKs: 199.132.104 bytes ARM64 e 159.334.281 bytes ARM32, com a assinatura da beta.8.
+
+[Baixar beta.9](https://github.com/Hailton-Reis/Polaris/releases/tag/v0.1.0-beta.9) · [Notas, benchmark e limites](docs/versoes/0.1.0-beta.9.md).
+
+## 0.1.0-beta.8 · P20261103.1 — 03/11/2026
+
+**Estado:** pré-lançamento público para testes; versionCode 109; Android 8+, ARM32 e ARM64. Instalação/atualização e consumo em aparelhos físicos continuam pendentes de aceite.
+
+- Uma sequência lógica agrupa Official/Unofficial, preservando progresso e arquivos. Partes, decimais, volumes, temporadas e extras identificados permanecem separados.
+- Escolha automática entre catálogos de fontes compatíveis e fonte fixa por obra.
+- Retomada, leitor, próximos downloads, atualizações e contagens adotam a mesma identidade de capítulo.
+- Cache e traduções separados por edição; escopo do glossário mantido por obra.
+- Dedicatória escondida no Sobre e correções de identidade, leitura e OCR acumuladas desde a beta.3.
+
+589 testes JVM: 555 aprovações e as mesmas 34 falhas preexistentes, sem regressões novas. Todos os 42 testes novos passaram. APKs com a mesma assinatura da beta.3 distribuída; acréscimo de 1,60 MiB por APK versus beta.7, sem modelo novo. Descoberta foi testada com provedores simulados; fontes reais e aparelhos permanecem em validação.
+
+[Baixar beta.8](https://github.com/Hailton-Reis/Polaris/releases/tag/v0.1.0-beta.8) · [Notas e validação](docs/versoes/0.1.0-beta.8.md).
+
+## Revisões internas beta.5, beta.6 e beta.7 — 02/11/2026
+
+Estas revisões não foram publicadas como Releases. Suas mudanças integram a beta.8:
+
+- **beta.5 / P20261102.2 / código 106:** edição avançada de tradução desligada por padrão e ferramentas de diagnóstico de leitura.
+- **beta.6 / P20261102.3 / código 107:** melhorias de retenção de texto reconhecido e OCR por regiões sobrepostas em páginas longas, inicialmente com ML Kit em inglês.
+- **beta.7 / P20261102.4 / código 108:** caminho regional compartilhado por ML Kit e Paddle Small em inglês, com controles de geometria e decodificação limitada. O rascunho permaneceu sem APKs publicados.
+
+As comparações do benchmark usaram controles sintéticos; não aprovam a qualidade de todos os capítulos reais. Nenhum modelo Tiny foi adicionado ao aplicativo.
+
 ## 0.1.0-beta.4 · P20261102.1 — 02/11/2026 (UTC)
 
 **Estado:** candidato compilado; versionCode 105. Os APKs da beta.4 ainda não foram publicados nas Releases. Conferência visual no A12 pendente.
