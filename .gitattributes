@@ -21,3 +21,7 @@ integration/signing-recovery/**/*.log -whitespace
 # Preserve numeric sandbox build and regression evidence.
 integration/sandbox-numeric/**/*.log -whitespace
 integration/sandbox-numeric/**/*.zip binary
+
+# Preserve dynamic preference evidence bytes.
+integration/sandbox-dynamic/**/*.log -whitespace
+integration/sandbox-dynamic/**/*.zip binary

@@ -11,7 +11,7 @@ import tempfile
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[2]
-REVISION = 'P20261113.4'
+REVISION = 'P20261113.5'
 VERSION = '0.1.0-beta.11'
 VERSION_CODE = 112
 ARM_ABIS = ['arm64-v8a', 'armeabi-v7a']

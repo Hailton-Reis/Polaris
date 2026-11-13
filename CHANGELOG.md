@@ -2,6 +2,16 @@
 
 Este arquivo registra a evolução real do código. **Revisões de desenvolvimento não são lançamentos públicos.** As datas abaixo usam America/Fortaleza, exceto quando houver indicação de UTC. O histórico de distribuição fica em [Releases](https://github.com/Hailton-Reis/Polaris/releases).
 
+## Desenvolvimento · P20261113.5 — 13/11/2026
+
+**Estado:** continuação da beta.11/código 112; sem novo APK ou lançamento.
+
+- Listas simples e múltiplas preparam opções síncronas no worker e abrem diálogos próprios do host. A gravação reconstrói opções/listeners em worker novo e rejeita formulários desatualizados.
+- Preparação limita HTTP a GET/HEAD e exige snapshot de preferências inalterado. Ações consumidoras, callbacks assíncronos, escrita na preparação e interfaces personalizadas permanecem pendentes.
+- App e instrumentação compilados; 845 testes do app aprovados (12 novos), quatro de overlay e 16 de empacotamento. Seis cenários Android compilados, aguardando dispositivo. Com domain UP-TO-DATE, relatórios somam 930 sem falhas/skips.
+
+[Escopo e limites](docs/SANDBOX_DINAMICO_P20261113_5.md) · [Evidência](integration/sandbox-dynamic/20261113/README.md).
+
 ## Desenvolvimento · P20261113.4 — 13/11/2026
 
 **Estado:** continuação da beta.11/código 112, sem lançamento. O APK interno anterior permanece P20261113.3.
