@@ -11,7 +11,7 @@ import tempfile
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[2]
-REVISION = 'P20261113.2'
+REVISION = 'P20261113.3'
 VERSION = '0.1.0-beta.11'
 VERSION_CODE = 112
 ARM_ABIS = ['arm64-v8a', 'armeabi-v7a']
@@ -73,7 +73,21 @@ def verify_branding(apk, apksigner):
                              dump('xmltree', '--file', 'AndroidManifest.xml'))
 
 
-def package(apks, output, comparison, apksigner):
+def validate_update_identity(application_id, signer, previous):
+    previous_id = previous.get('application_id')
+    previous_signer = previous.get('signer_sha256')
+    if not isinstance(previous_id, str) or not previous_id:
+        raise ValueError('Previous manifest has no valid application ID')
+    if not isinstance(previous_signer, str) or not re.fullmatch(r'[0-9a-fA-F]{64}', previous_signer):
+        raise ValueError('Previous manifest has no valid signing certificate')
+    if application_id != previous_id:
+        raise ValueError('Application ID differs from the previous installation')
+    if signer.lower() != previous_signer.lower():
+        raise ValueError('Signing certificate differs from the previous installation; do not uninstall to bypass this')
+    return {'status': 'SAME_ID_AND_SIGNER', 'previous_version': previous.get('version')}
+
+
+def package(apks, output, comparison, apksigner, previous_manifest=None):
     if output.exists():
         raise ValueError('Choose a new beta output directory; existing files are never replaced')
     evidence = json.loads(comparison.read_text())
@@ -82,6 +96,14 @@ def package(apks, output, comparison, apksigner):
     metadata = json.loads((apks / 'output-metadata.json').read_text())
     if metadata.get('variantName') != 'debug':
         raise ValueError('Expected the tested debug candidate')
+    previous = None
+    compatibility = {'status': 'NOT_CHECKED'}
+    if previous_manifest is not None:
+        if previous_manifest.stat().st_size > 64 * 1024:
+            raise ValueError('Previous manifest exceeds the update metadata limit')
+        previous = json.loads(previous_manifest.read_text())
+        if not isinstance(previous, dict):
+            raise ValueError('Previous manifest must be an object')
     selected = []
     signer_hash = None
     entries = [e for e in metadata['elements'] if not e.get('filters')]
@@ -100,6 +122,8 @@ def package(apks, output, comparison, apksigner):
         if signer_hash is not None and cert != signer_hash:
             raise ValueError('Beta APKs must use the same signing certificate')
         signer_hash = cert
+        if previous is not None:
+            compatibility = validate_update_identity(metadata['applicationId'], cert, previous)
         with zipfile.ZipFile(apk) as archive:
             if not any(REVISION.encode() in archive.read(n) for n in archive.namelist() if n.endswith('.dex')):
                 raise ValueError('Beta revision missing from APK')
@@ -129,7 +153,8 @@ def package(apks, output, comparison, apksigner):
                     'artifacts': artifacts, 'unit_comparison': evidence,
                     'display_name': 'Polaris', 'branding_verified': True,
                     'physical_device_acceptance': 'PENDING', 'cjk_ocr_quality': 'PENDING',
-                    'distribution': 'universal-arm', 'apk_files': 1}
+                    'distribution': 'universal-arm', 'apk_files': 1,
+                    'update_compatibility': compatibility}
         (temporary / 'manifest.json').write_text(json.dumps(manifest, indent=2) + '\n', encoding='utf-8')
         (temporary / 'SHA256SUMS.txt').write_text(''.join(
             f"{a['sha256']}  {a['file']}\n" for a in {a['file']: a for a in artifacts}.values()), encoding='utf-8')
@@ -146,6 +171,8 @@ def main():
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--comparison', type=Path, required=True)
     parser.add_argument('--apksigner', type=Path)
+    parser.add_argument('--previous-manifest', type=Path,
+                        help='Require the same application ID and signing certificate as this prior release')
     args = parser.parse_args()
     signer = args.apksigner
     if signer is None:
@@ -157,7 +184,7 @@ def main():
         if not candidates:
             parser.error('Android build-tools apksigner is missing')
         signer = sorted(candidates, key=lambda p: tuple(int(x) for x in re.findall(r'\d+', p.parent.name)))[-1]
-    result = package(args.apks, args.output, args.comparison, signer)
+    result = package(args.apks, args.output, args.comparison, signer, args.previous_manifest)
     print(f"INTERNAL_BETA_CANDIDATE_EXPORTED: {args.output} (one universal ARM32/ARM64 APK)")
 
 

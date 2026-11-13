@@ -59,3 +59,7 @@ outras frentes abertas.
 ## Continuação P20261113.2
 
 A [revisão de backups](../integration/backup-safety/20261113/README.md) corrige o reconhecimento de nomes com datas impossíveis e amplia o ensaio JVM para 43 casos. O aviso de login passa a descrever o limite dos cookies transferidos, sem prometer mediação de toda a rede do WebView. O build Android continua bloqueado por HTTP503.
+
+## Continuação P20261113.3
+
+A [compilação real e 906 testes JVM](../integration/build-validation/20261113/README.md) passaram. O bloqueio anterior de dependências foi resolvido. Transferência de cookies agora preserva respostas concorrentes e interrompe conflitos sem gravação parcial; login espera os callbacks de preparação, verifica perfil e usa IO para armazenamento. Falta aceite Android/ARM. A geração do APK parou por espaço; a chave original não foi localizada e a chave debug deste ambiente não atualiza a beta.10.

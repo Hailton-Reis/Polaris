@@ -2,6 +2,17 @@
 
 Este arquivo registra a evolução real do código. **Revisões de desenvolvimento não são lançamentos públicos.** As datas abaixo usam America/Fortaleza, exceto quando houver indicação de UTC. O histórico de distribuição fica em [Releases](https://github.com/Hailton-Reis/Polaris/releases).
 
+## Desenvolvimento · P20261113.3 — 13/11/2026
+
+**Estado:** candidata beta.11/código112, sem lançamento. Compilação Android e 906/906 testes JVM passaram; APK bloqueado por espaço e assinatura original não localizada.
+
+- Transferência de cookies preserva atualizações HTTP concorrentes e rejeita conflitos de forma atômica. Login aguarda a preparação de cookies, confere o perfil e move armazenamento cifrado para IO.
+- Dependências do widget alinhadas às versões já usadas pelo app e WebKit declarado diretamente. Testes locais usam o transporte JVM oficial do OkHttp; produção mantém Android.
+- Exportador verifica identidade/assinatura contra manifesto anterior quando solicitado; quatro regressões novas e 47 testes focados passaram, além de quatro de overlay e 13 de empacotamento.
+- Nenhum dos 880 casos históricos desapareceu;26 casos novos passaram. Sem aceite de aparelho ou APK concluído. A chave criada neste ambiente difere da assinatura da beta.10; não distribuir como atualização.
+
+[Evidências e bloqueios](integration/build-validation/20261113/README.md).
+
 ## Desenvolvimento · P20261113.2 — 13/11/2026
 
 **Estado:** candidata da beta.11/código112; sem publicação. Compilação Android continua bloqueada por Google Maven HTTP503.
@@ -244,7 +255,7 @@ Sete testes novos passaram. A comparação completa terminou com 505 testes: 471
 - Ajustes de posicionamento, automação de downloads em inglês e respeito à escolha por obra.
 - Catálogo inicial de repositórios e apresentação mais clara dos grupos/versões dos capítulos.
 
-[Código de 29/10](https://github.com/Hailton-Reis/Polaris/commit/87c5ce7) · [Tradução em inglês](https://github.com/Hailton-Reis/Polaris/commit/e8ef402) · [Descoberta e capítulos](https://github.com/Hailton-Reis/Polaris/commit/582e8c4)
+[Código de 29/10](https://github.com/Hailton-Reis/Polaris/commit/87c5ce7) · [Tradução em inglês](https://github.com/Hailton-Reis/Polaris/commit/e 8ef402) · [Descoberta e capítulos](https://github.com/Hailton-Reis/Polaris/commit/582e8c4)
 
 ## Como registrar as próximas versões
 

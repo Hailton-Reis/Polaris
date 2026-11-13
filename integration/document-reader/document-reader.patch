@@ -9,8 +9,19 @@ index 11bdccf..443b668 100644
 +
 +# Android test fixtures must preserve ZIP/DEX bytes.
 +*.apk binary
+diff --git a/.gitignore b/.gitignore
+index 79aff85..c2e70c6 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -15,3 +15,6 @@ local.properties
+ 
+ # macOS specific files
+ .DS_Store
++
++# Generated native build state
++**/.cxx/
 diff --git a/app/build.gradle.kts b/app/build.gradle.kts
-index 63e2698..4707afe 100644
+index 63e2698..6e17ac9 100644
 --- a/app/build.gradle.kts
 +++ b/app/build.gradle.kts
 @@ -25,21 +25,23 @@ if (Config.includeTelemetry) {
@@ -58,7 +69,7 @@ index 63e2698..4707afe 100644
      packaging {
          jniLibs {
              keepDebugSymbols += listOf("libandroidx.graphics.path", "libarchive-jni", "libconscrypt_jni", "libimagedecoder", "libquickjs", "libsqlite3x").map { "**/$it.so" }
-@@ -135,9 +137,13 @@ kotlin {
+@@ -135,20 +137,24 @@ kotlin {
  baselineProfile { baselineProfileOutputDir = "baselineProfiles"; mergeIntoMain = true }
  
  dependencies {
@@ -72,7 +83,11 @@ index 63e2698..4707afe 100644
      androidTestImplementation("androidx.test:runner:1.6.2")
      androidTestImplementation("androidx.test.ext:junit:1.2.1")
      implementation(projects.ppocrSdk)
-@@ -148,7 +154,7 @@ dependencies {
+     // Telegram TDLib (MTProto)
+     implementation("com.github.tdlibx:td:1.8.6")
+-    implementation(libs.androidx.activity.compose); implementation(libs.androidx.compose.foundation); implementation(libs.androidx.compose.material3); implementation(libs.androidx.compose.materialIcons); implementation(libs.androidx.compose.animation); implementation(libs.androidx.compose.animationGraphics); debugImplementation(libs.androidx.compose.uiTooling); implementation(libs.androidx.compose.uiToolingPreview); implementation(libs.androidx.compose.uiUtil); implementation(libs.androidx.interpolator); implementation(libs.androidx.paging.runtime); implementation(libs.androidx.paging.compose); implementation(libs.androidx.sqlite.bundled); implementation(libs.kotlin.reflect); implementation(libs.bundles.kotlinx.coroutines); implementation(libs.sqldelight.async); implementation(libs.kotlinx.datetime); implementation(libs.androidx.annotation); implementation(libs.androidx.appCompat); implementation(libs.androidx.biometric); implementation(libs.androidx.constraintLayout); implementation(libs.androidx.core); implementation(libs.androidx.coreSplashScreen); implementation(libs.androidx.recyclerView); implementation(libs.androidx.viewPager); implementation(libs.androidx.profileInstaller); implementation(libs.bundles.androidx.lifecycle); implementation(libs.androidx.work); implementation(libs.rxJava); implementation(libs.bundles.okhttp); implementation(libs.okio); implementation(libs.conscrypt); implementation(libs.bundles.serialization); implementation(libs.jsoup); implementation(libs.diskLruCache); implementation(libs.unifile); implementation(libs.androidx.preference); implementation(libs.injekt); implementation(libs.bundles.coil)
++    implementation(libs.androidx.activity.compose); implementation(libs.androidx.compose.foundation); implementation(libs.androidx.compose.material3); implementation(libs.androidx.compose.materialIcons); implementation(libs.androidx.compose.animation); implementation(libs.androidx.compose.animationGraphics); debugImplementation(libs.androidx.compose.uiTooling); implementation(libs.androidx.compose.uiToolingPreview); implementation(libs.androidx.compose.uiUtil); implementation(libs.androidx.interpolator); implementation(libs.androidx.paging.runtime); implementation(libs.androidx.paging.compose); implementation(libs.androidx.sqlite.bundled); implementation(libs.kotlin.reflect); implementation(libs.bundles.kotlinx.coroutines); implementation(libs.sqldelight.async); implementation(libs.kotlinx.datetime); implementation(libs.androidx.annotation); implementation(libs.androidx.appCompat); implementation(libs.androidx.webkit); implementation(libs.androidx.biometric); implementation(libs.androidx.constraintLayout); implementation(libs.androidx.core); implementation(libs.androidx.coreSplashScreen); implementation(libs.androidx.recyclerView); implementation(libs.androidx.viewPager); implementation(libs.androidx.profileInstaller); implementation(libs.bundles.androidx.lifecycle); implementation(libs.androidx.work); implementation(libs.rxJava); implementation(libs.bundles.okhttp); implementation(libs.okio); implementation(libs.conscrypt); implementation(libs.bundles.serialization); implementation(libs.jsoup); implementation(libs.diskLruCache); implementation(libs.unifile); implementation(libs.androidx.preference); implementation(libs.injekt); implementation(libs.bundles.coil)
+     implementation(libs.subsamplingScaleImageView) { exclude(module = "image-decoder") }
      implementation(libs.quickJs)
      implementation(libs.image.decoder); implementation(libs.material); implementation(libs.flexibleAdapter); implementation(libs.photoView)
      implementation(libs.directionalViewPager) { exclude(group = "androidx.viewpager", module = "viewpager") }
@@ -81,6 +96,22 @@ index 63e2698..4707afe 100644
  }
  
  androidComponents {
+@@ -163,3 +169,15 @@ androidComponents {
+     }
+     onVariants(selector().withFlavor("default" to "standard")) { it.packaging.resources.excludes.add("META-INF/*.version") }
+ }
++
++// Local unit tests have no Android Application/asset loader. Use OkHttp's real JVM
++// implementation (including its public-suffix database), not the Android asset loader.
++// Production compile/runtime configurations keep the Android implementation.
++configurations.configureEach {
++    if (name.endsWith("UnitTestRuntimeClasspath")) {
++        resolutionStrategy.dependencySubstitution {
++            substitute(module("com.squareup.okhttp3:okhttp-android"))
++                .using(module("com.squareup.okhttp3:okhttp-jvm:${libs.versions.okhttp.get()}"))
++        }
++    }
++}
 diff --git a/app/src/androidTest/assets/polaris-sandbox/fixture.apk b/app/src/androidTest/assets/polaris-sandbox/fixture.apk
 new file mode 100644
 index 0000000000000000000000000000000000000000..756ba1654f9751120ee3d10438aaa3b5c891e0f8
@@ -10022,7 +10053,7 @@ index a198c3f..9a3e84f 100644
                      preference = translationPreferences.translationEngineTemperature(),
                      title = stringResource(ATMR.strings.pref_engine_temperature),
 diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
-index 7f411fd..97ddc9f 100644
+index 7f411fd..1bbaa1b 100644
 --- a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
 +++ b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
 @@ -1,15 +1,18 @@
@@ -10087,7 +10118,7 @@ index 7f411fd..97ddc9f 100644
  
      // Identifies this overlay independently of the pinned upstream COMMIT_SHA.
 -    private const val POLARIS_READER_REVISION = "P20261031.2"
-+    private const val POLARIS_READER_REVISION = "P20261113.2"
++    private const val POLARIS_READER_REVISION = "P20261113.3"
  
      @Composable
      override fun Content() {
@@ -22261,10 +22292,10 @@ index 0000000..e998eaf
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/BrowserCookieSession.kt b/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/BrowserCookieSession.kt
 new file mode 100644
-index 0000000..ea51c1e
+index 0000000..282ddab
 --- /dev/null
 +++ b/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/BrowserCookieSession.kt
-@@ -0,0 +1,84 @@
+@@ -0,0 +1,86 @@
 +package eu.kanade.tachiyomi.extension.sandbox
 +
 +import okhttp3.Cookie
@@ -22345,7 +22376,9 @@ index 0000000..ea51c1e
 +                .values
 +                .map { copyCookie(it, it.domain, expired = true, hostOnly = it.hostOnly) }
 +        // A jar issued before clearSession is revoked by CookieBank and ignores this write.
-+        jar.saveFromResponse(origin, removed + current.values)
++        if (jar is RevocableCookieJar)
++            jar.saveBrowserResponse(origin, initial.values.toList(), removed + current.values)
++        else jar.saveFromResponse(origin, removed + current.values)
 +        check((jar as? RevocableCookieJar)?.isActive() != false) { "Login session revoked" }
 +    }
 +}
@@ -23423,10 +23456,10 @@ index 0000000..4115985
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxCookieStore.kt b/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxCookieStore.kt
 new file mode 100644
-index 0000000..3f8cd83
+index 0000000..b629545
 --- /dev/null
 +++ b/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxCookieStore.kt
-@@ -0,0 +1,338 @@
+@@ -0,0 +1,381 @@
 +package eu.kanade.tachiyomi.extension.sandbox
 +
 +import android.content.Context
@@ -23481,6 +23514,10 @@ index 0000000..3f8cd83
 +
 +internal interface RevocableCookieJar : CookieJar {
 +    fun isActive(): Boolean
++
++    fun saveBrowserResponse(url: HttpUrl, initial: List<Cookie>, cookies: List<Cookie>) {
++        saveFromResponse(url, cookies)
++    }
 +}
 +
 +internal interface CookieStorage {
@@ -23553,6 +23590,45 @@ index 0000000..3f8cd83
 +        val issued = generation
 +        return object : RevocableCookieJar {
 +            override fun isActive() = synchronized(this@CookieBank) { issued == generation }
++
++            override fun saveBrowserResponse(
++                url: HttpUrl,
++                initial: List<Cookie>,
++                cookies: List<Cookie>,
++            ) {
++                synchronized(this@CookieBank) {
++                    SandboxNetworkPolicy.requireUrl(url.toString())
++                    check(issued == generation) { "Login session revoked" }
++                    require(initial.size <= CookieCodec.MAX_COOKIES)
++                    require(cookies.size <= CookieCodec.MAX_COOKIES * 2)
++                    load()
++                    trim()
++                    val before = initial.associateBy(::key)
++                    val desired =
++                        cookies
++                            .map { candidate ->
++                                require(CookieCodec.valid(candidate))
++                                requireNotNull(Cookie.parse(url, candidate.toString()))
++                            }
++                            .associateBy(::key)
++                    val updates = mutableListOf<Cookie>()
++                    fun same(a: Cookie?, b: Cookie?) = a?.toString() == b?.toString()
++                    // Check every touched key before changing any value. Concurrent unrelated
++                    // responses survive; changing the same credential requires a fresh login.
++                    desired.forEach { (id, cookie) ->
++                        val expected = before[id]
++                        val wanted = cookie.takeIf { it.expiresAt > clock() }
++                        if (!same(expected, wanted)) {
++                            val current = values[id]
++                            check(same(current, expected) || same(current, wanted)) {
++                                "Session changed while signing in; reopen login"
++                            }
++                            if (!same(current, wanted)) updates += cookie
++                        }
++                    }
++                    saveFromResponse(url, updates)
++                }
++            }
 +
 +            override fun loadForRequest(url: HttpUrl): List<Cookie> =
 +                synchronized(this@CookieBank) {
@@ -24393,10 +24469,10 @@ index 0000000..a3cd212
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxLoginActivity.kt b/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxLoginActivity.kt
 new file mode 100644
-index 0000000..29c1fab
+index 0000000..29dd1bf
 --- /dev/null
 +++ b/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxLoginActivity.kt
-@@ -0,0 +1,242 @@
+@@ -0,0 +1,276 @@
 +package eu.kanade.tachiyomi.extension.sandbox
 +
 +import android.content.Context
@@ -24414,6 +24490,7 @@ index 0000000..29c1fab
 +import android.widget.Toast
 +import androidx.appcompat.app.AlertDialog
 +import androidx.fragment.app.FragmentActivity
++import androidx.lifecycle.lifecycleScope
 +import androidx.webkit.CookieManagerCompat
 +import androidx.webkit.ProfileStore
 +import androidx.webkit.WebStorageCompat
@@ -24421,6 +24498,10 @@ index 0000000..29c1fab
 +import androidx.webkit.WebViewFeature
 +import java.io.ByteArrayInputStream
 +import java.util.UUID
++import kotlinx.coroutines.CancellationException
++import kotlinx.coroutines.Dispatchers
++import kotlinx.coroutines.launch
++import kotlinx.coroutines.withContext
 +import tachiyomi.core.common.i18n.stringResource
 +import tachiyomi.domain.source.service.SourceManager
 +import tachiyomi.i18n.at.ATMR
@@ -24437,6 +24518,7 @@ index 0000000..29c1fab
 +    private var bridge: BrowserCookieSession? = null
 +    private val visited = linkedSetOf<String>()
 +    private var saving = false
++    private var saveButton: Button? = null
 +
 +    override fun onCreate(savedInstanceState: Bundle?) {
 +        super.onCreate(savedInstanceState)
@@ -24485,7 +24567,9 @@ index 0000000..29c1fab
 +            web = browser
 +            WebViewCompat.setProfile(browser, name) // Before settings, scripts or any navigation.
 +            profileAttached = true
-+            val manager = WebViewCompat.getProfile(browser).cookieManager
++            val profile = WebViewCompat.getProfile(browser)
++            check(profile.name == name)
++            val manager = profile.cookieManager
 +            manager.setAcceptCookie(true)
 +            manager.setAcceptThirdPartyCookies(browser, false)
 +            val layout = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
@@ -24497,6 +24581,8 @@ index 0000000..29c1fab
 +            )
 +            layout.addView(
 +                Button(this).apply {
++                    saveButton = this
++                    isEnabled = false
 +                    text = stringResource(ATMR.strings.sandbox_login_done)
 +                    setOnClickListener { save() }
 +                }
@@ -24550,16 +24636,32 @@ index 0000000..29c1fab
 +            visited += start.toString()
 +            // Set-Cookie callbacks must finish before the first request, including HttpOnly
 +            // cookies.
-+            val cookies = session.seed(start)
-+            fun seed(index: Int) {
-+                if (isFinishing || isDestroyed) return
-+                if (index == cookies.size) browser.loadUrl(start.toString())
-+                else
-+                    manager.setCookie(start.toString(), cookies[index].toString()) {
-+                        seed(index + 1)
++            lifecycleScope.launch {
++                try {
++                    val cookies = withContext(Dispatchers.IO) { session.seed(start) }
++                    fun seed(index: Int) {
++                        if (isFinishing || isDestroyed) return
++                        if (index == cookies.size) {
++                            saveButton?.isEnabled = true
++                            browser.loadUrl(start.toString())
++                        } else
++                            manager.setCookie(start.toString(), cookies[index].toString()) {
++                                accepted ->
++                                if (accepted) seed(index + 1)
++                                else {
++                                    message(ATMR.strings.sandbox_login_failed)
++                                    finish()
++                                }
++                            }
 +                    }
++                    seed(0)
++                } catch (cancelled: CancellationException) {
++                    throw cancelled
++                } catch (_: Exception) {
++                    message(ATMR.strings.sandbox_login_failed)
++                    finish()
++                }
 +            }
-+            seed(0)
 +        } catch (_: Exception) {
 +            message(ATMR.strings.sandbox_login_unavailable)
 +            finish()
@@ -24567,18 +24669,25 @@ index 0000000..29c1fab
 +    }
 +
 +    private fun save() {
-+        if (saving) return
-+        saving = true
++        if (saving || saveButton?.isEnabled != true) return
 +        val browser = web ?: return
++        saving = true
++        saveButton?.isEnabled = false
 +        browser.stopLoading()
-+        try {
-+            val manager = WebViewCompat.getProfile(browser).cookieManager
-+            val snapshots = visited.associateWith { CookieManagerCompat.getCookieInfo(manager, it) }
-+            requireNotNull(bridge).complete(snapshots)
-+            finish()
-+        } catch (_: Exception) {
-+            saving = false
-+            message(ATMR.strings.sandbox_login_failed)
++        lifecycleScope.launch {
++            try {
++                val manager = WebViewCompat.getProfile(browser).cookieManager
++                val snapshots =
++                    visited.associateWith { CookieManagerCompat.getCookieInfo(manager, it) }
++                withContext(Dispatchers.IO) { requireNotNull(bridge).complete(snapshots) }
++                finish()
++            } catch (cancelled: CancellationException) {
++                throw cancelled
++            } catch (_: Exception) {
++                saving = false
++                saveButton?.isEnabled = true
++                message(ATMR.strings.sandbox_login_failed)
++            }
 +        }
 +    }
 +
@@ -24604,6 +24713,7 @@ index 0000000..29c1fab
 +            }
 +        }
 +        web = null
++        saveButton = null
 +        profileName?.let { name ->
 +            active -= name
 +            // Providers may defer actual deletion until the next process; stale cleanup retries.
@@ -66961,10 +67071,10 @@ index 0000000..ecfb1ae
 +}
 diff --git a/app/src/test/java/eu/kanade/tachiyomi/extension/sandbox/CookieBankTest.kt b/app/src/test/java/eu/kanade/tachiyomi/extension/sandbox/CookieBankTest.kt
 new file mode 100644
-index 0000000..9b8f701
+index 0000000..fecdf98
 --- /dev/null
 +++ b/app/src/test/java/eu/kanade/tachiyomi/extension/sandbox/CookieBankTest.kt
-@@ -0,0 +1,210 @@
+@@ -0,0 +1,278 @@
 +package eu.kanade.tachiyomi.extension.sandbox
 +
 +import java.io.IOException
@@ -67173,6 +67283,74 @@ index 0000000..9b8f701
 +                }
 +                .isFailure
 +        )
++    }
++
++    @Test
++    fun `unchanged browser cookies cannot roll back a newer HTTP session`() {
++        val bank = CookieBank(Storage()) { now }
++        val http = bank.newSessionJar()
++        val before = cookie("login", "before")
++        http.saveFromResponse(url, listOf(before))
++        val browser = BrowserCookieSession(url.toString(), bank.newSessionJar())
++        browser.seed()
++        http.saveFromResponse(url, listOf(cookie("login", "newer")))
++        browser.complete(mapOf(url.toString() to listOf(before.toString())))
++        assertEquals("newer", http.loadForRequest(url).single().value)
++    }
++
++    @Test
++    fun `conflicting browser login rejects all changes instead of mixing accounts`() {
++        val bank = CookieBank(Storage()) { now }
++        val http = bank.newSessionJar()
++        http.saveFromResponse(url, listOf(cookie("login", "before")))
++        val browser = BrowserCookieSession(url.toString(), bank.newSessionJar())
++        browser.seed()
++        http.saveFromResponse(url, listOf(cookie("login", "newer")))
++        assertThrows(IllegalStateException::class.java) {
++            browser.complete(
++                mapOf(
++                    url.toString() to
++                        listOf(
++                            cookie("extra", "browser-only").toString(),
++                            cookie("login", "different-account").toString(),
++                        )
++                )
++            )
++        }
++        assertEquals(listOf("login"), http.loadForRequest(url).map { it.name })
++        assertEquals("newer", http.loadForRequest(url).single().value)
++    }
++
++    @Test
++    fun `new browser cookies preserve unrelated concurrent refreshes`() {
++        val bank = CookieBank(Storage()) { now }
++        val http = bank.newSessionJar()
++        val before = cookie("preferences", "before")
++        http.saveFromResponse(url, listOf(before))
++        val browser = BrowserCookieSession(url.toString(), bank.newSessionJar())
++        browser.seed()
++        http.saveFromResponse(url, listOf(cookie("preferences", "newer")))
++        browser.complete(
++            mapOf(
++                url.toString() to listOf(before.toString(), cookie("login", "browser").toString())
++            )
++        )
++        val values = http.loadForRequest(url).associate { it.name to it.value }
++        assertEquals(mapOf("preferences" to "newer", "login" to "browser"), values)
++    }
++
++    @Test
++    fun `browser removal cannot erase a session refreshed after opening`() {
++        val bank = CookieBank(Storage()) { now }
++        val http = bank.newSessionJar()
++        http.saveFromResponse(url, listOf(cookie("login", "before")))
++        val browser = BrowserCookieSession(url.toString(), bank.newSessionJar())
++        browser.seed()
++        http.saveFromResponse(url, listOf(cookie("login", "newer")))
++        assertThrows(IllegalStateException::class.java) {
++            browser.complete(mapOf(url.toString() to emptyList()))
++        }
++        assertEquals("newer", http.loadForRequest(url).single().value)
 +    }
 +}
 diff --git a/app/src/test/java/eu/kanade/tachiyomi/extension/sandbox/SandboxFilterCodecTest.kt b/app/src/test/java/eu/kanade/tachiyomi/extension/sandbox/SandboxFilterCodecTest.kt
@@ -78354,6 +78532,27 @@ index c0832ba..ebf8f48 100644
  
      <!-- Generic strings -->
      <string name="on">On</string>
+diff --git a/presentation-widget/build.gradle.kts b/presentation-widget/build.gradle.kts
+index 9793514..074bd01 100644
+--- a/presentation-widget/build.gradle.kts
++++ b/presentation-widget/build.gradle.kts
+@@ -18,6 +18,16 @@ dependencies {
+     implementation(libs.androidx.glance.appWidget)
+     implementation(libs.material)
+ 
++    constraints {
++        // Match the application's catalog instead of compiling Material's older transitive APIs.
++        implementation(libs.androidx.appCompat) {
++            because("Widgets must compile against the AppCompat version already used by Polaris")
++        }
++        implementation(libs.androidx.core) {
++            because("Widgets must compile against the Core version already used by Polaris")
++        }
++    }
++
+     implementation(libs.kotlinx.datetime)
+ 
+     implementation(libs.coil.core)
 diff --git a/source-api/src/main/kotlin/eu/kanade/tachiyomi/source/online/HttpSource.kt b/source-api/src/main/kotlin/eu/kanade/tachiyomi/source/online/HttpSource.kt
 index 95b9d61..f899979 100644
 --- a/source-api/src/main/kotlin/eu/kanade/tachiyomi/source/online/HttpSource.kt

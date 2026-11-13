@@ -1,7 +1,7 @@
 from pathlib import Path
 import tempfile
 import unittest
-from package_internal_beta import package, signer_digest, validate_branding, verify_universal_architectures
+from package_internal_beta import package, signer_digest, validate_branding, verify_universal_architectures, validate_update_identity
 import zipfile
 
 
@@ -86,3 +86,25 @@ resource 0x7f080104 drawable/ic_polaris_splash"""
             validate_branding("application-label:'Polaris'", self.resources.replace('drawable/ic_polaris_splash',
                                                                                    'drawable/ic_yomotsu_splash'),
                               self.manifest)
+
+
+class UpdateIdentityTests(unittest.TestCase):
+    def test_same_id_and_original_signer_allow_update_metadata(self):
+        old = {'application_id': 'polaris.app', 'signer_sha256': 'A' * 64, 'version': '0.1.0-beta.10'}
+        self.assertEqual('SAME_ID_AND_SIGNER', validate_update_identity('polaris.app', 'a' * 64, old)['status'])
+
+    def test_rebuilt_apk_with_another_key_is_not_an_update(self):
+        old = {'application_id': 'polaris.app', 'signer_sha256': 'a' * 64}
+        with self.assertRaisesRegex(ValueError, 'Signing certificate differs'):
+            validate_update_identity('polaris.app', 'b' * 64, old)
+
+    def test_different_package_is_not_an_update_even_with_same_key(self):
+        old = {'application_id': 'polaris.app', 'signer_sha256': 'a' * 64}
+        with self.assertRaisesRegex(ValueError, 'Application ID differs'):
+            validate_update_identity('polaris.other', 'a' * 64, old)
+
+    def test_missing_or_invalid_previous_identity_is_rejected(self):
+        for old in [{}, {'application_id': ''}, {'application_id': 1},
+                    {'application_id': 'polaris.app', 'signer_sha256': 'not-a-hash'}]:
+            with self.subTest(old=old), self.assertRaises(ValueError):
+                validate_update_identity('polaris.app', 'a' * 64, old)

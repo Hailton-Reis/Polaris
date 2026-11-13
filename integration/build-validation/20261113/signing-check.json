@@ -1,0 +1,13 @@
+{
+  "status": "BLOCKED_CERTIFICATE_MISMATCH",
+  "expected_public_beta10_certificate": "3ae747069cc9015ca1777f94fd56b030501f45d6af380426a572ad60e94d8227",
+  "new_task_debug_certificate": "b565caf954e0b207cacb3eff93068ca05cc01130d00001348b0e77a628615310",
+  "scope": "Public certificate of the locally generated debug keystore; no APK produced",
+  "original_private_key_found": false,
+  "original_key_search": [
+    "connected Drive metadata and Polaris source folders",
+    "repository filenames/history and build documentation"
+  ],
+  "private_material_exported": false,
+  "guard_message": "Signing certificate differs from the previous installation; do not uninstall to bypass this"
+}

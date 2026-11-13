@@ -1,0 +1,48 @@
+{
+  "revision": "P20261113.3",
+  "version": "0.1.0-beta.11",
+  "version_code": 112,
+  "android_compile": "PASSED",
+  "unit_tests": {
+    "app": {
+      "total": 821,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 821
+    },
+    "domain": {
+      "total": 85,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 85
+    }
+  },
+  "junit_xml_files": 159,
+  "focused_jvm": {
+    "red": {
+      "passed": 43,
+      "failed": 4
+    },
+    "green": {
+      "passed": 47,
+      "failed": 0,
+      "skipped": 0
+    }
+  },
+  "overlay_tests": 4,
+  "packaging_tests": 13,
+  "apk_assembly": "FAILED_DISK_CAPACITY",
+  "apk_produced": false,
+  "original_signing_key_found": false,
+  "local_debug_certificate_matches_beta10": false,
+  "android_runtime_verified": false,
+  "physical_arm_acceptance": "PENDING",
+  "release_published": false,
+  "baseline_origin": "Archived P20261112.1 reports, not rerun",
+  "baseline_tests": 880,
+  "missing_baseline_tests": 0,
+  "new_unit_cases": 26,
+  "data_and_source_api_tests": "NO-SOURCE"
+}
