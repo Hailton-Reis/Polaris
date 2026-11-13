@@ -1,0 +1,29 @@
+{
+  "status": "INTERNAL_BETA_CANDIDATE_VERIFIED",
+  "version": "0.1.0-beta.11",
+  "version_code": 112,
+  "revision": "P20261113.3",
+  "apk_bytes": 272970356,
+  "apk_sha256": "ada69c1e08a679489575a0622e43a8825de5e443083d978281c1d2a688631c98",
+  "signer_sha256": "3ae747069cc9015ca1777f94fd56b030501f45d6af380426a572ad60e94d8227",
+  "update_compatibility": {
+    "status": "SAME_ID_AND_SIGNER",
+    "previous_version": "0.1.0-beta.10"
+  },
+  "abis": [
+    "arm64-v8a",
+    "armeabi-v7a"
+  ],
+  "branding_verified": true,
+  "android_assembly_exit_code": 0,
+  "unit_tests_previously_passed": 906,
+  "unit_tests_rerun_this_continuation": false,
+  "application_code_changed_since_unit_run": false,
+  "overlay_tests_passed": 4,
+  "packaging_tests_passed": 16,
+  "packaging_regressions_reproduced": 3,
+  "ndk_host_libraries_restored": true,
+  "physical_device_update_test": "PENDING",
+  "release_published": false,
+  "secrets_published": false
+}

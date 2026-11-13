@@ -1,0 +1,5 @@
+Public extract: selected Gradle outcomes only. Full log retained locally.
+> Task :app:compileDebugKotlin
+> Task :app:testDebugUnitTest
+> Task :app:testDebugUnitTest FAILED
+BUILD FAILED in 1m 32s

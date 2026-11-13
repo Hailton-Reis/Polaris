@@ -2,9 +2,89 @@
 
 Este arquivo registra a evolução real do código. **Revisões de desenvolvimento não são lançamentos públicos.** As datas abaixo usam America/Fortaleza, exceto quando houver indicação de UTC. O histórico de distribuição fica em [Releases](https://github.com/Hailton-Reis/Polaris/releases).
 
+## Desenvolvimento · P20261113.7 — 13/11/2026
+
+**Estado:** candidata beta.11/código 112, sem novo APK ou lançamento. Conta/login Google/nuvem adiados pelo usuário.
+
+- Novas importações idênticas reutilizam a publicação verificada; nome igual com bytes diferentes continua separado. O prefixo de pasta é legível e o marcador não interfere nos metadados nativos.
+- Falha no registro da biblioteca pode ser retomada sem outra cópia. Favoritos existentes conservam identidade, organização e progresso; cópias editadas não são sobrescritas.
+- Três falhas reproduzidas antes da correção; 879 testes do app passaram (18 novos), mais 85 de domain já aprovados/UP-TO-DATE. App e instrumentação compilados, quatro testes de overlay e 16 de empacotamento aprovados. Dois cenários Android aguardam dispositivo.
+
+[Escopo e limites](docs/IMPORTACAO_REPETIDA_P20261113_7.md) · [Evidências](integration/document-import/20261113/README.md).
+
+## Desenvolvimento · P20261113.6 — 13/11/2026
+
+**Estado:** continuação da beta.11/código 112, sem outro APK ou lançamento.
+
+- Login copia também cookies existentes em /account e outros caminhos para o perfil exclusivo, restringindo domínios ao host escolhido. Colisões são recusadas.
+- Consultas locais cobrem os caminhos iniciais e páginas navegadas. Snapshots parciais não apagam sessões não observadas; capturas contraditórias não gravam. Limites e revogação mantidos.
+- Quatro falhas reproduzidas antes da correção; 63 focados e 861 testes do app aprovados (16 novos), além de quatro de overlay e 16 de empacotamento. App/instrumentação compilados; três cenários Android aguardam aparelho. Com domain UP-TO-DATE, relatórios somam 946 sem falhas/skips.
+
+[Escopo e limites](docs/LOGIN_COOKIES_P20261113_6.md) · [Evidência](integration/login-cookies/20261113/README.md).
+
+## Desenvolvimento · P20261113.5 — 13/11/2026
+
+**Estado:** continuação da beta.11/código 112; sem novo APK ou lançamento.
+
+- Listas simples e múltiplas preparam opções síncronas no worker e abrem diálogos próprios do host. A gravação reconstrói opções/listeners em worker novo e rejeita formulários desatualizados.
+- Preparação limita HTTP a GET/HEAD e exige snapshot de preferências inalterado. Ações consumidoras, callbacks assíncronos, escrita na preparação e interfaces personalizadas permanecem pendentes.
+- App e instrumentação compilados; 845 testes do app aprovados (12 novos), quatro de overlay e 16 de empacotamento. Seis cenários Android compilados, aguardando dispositivo. Com domain UP-TO-DATE, relatórios somam 930 sem falhas/skips.
+
+[Escopo e limites](docs/SANDBOX_DINAMICO_P20261113_5.md) · [Evidência](integration/sandbox-dynamic/20261113/README.md).
+
+## Desenvolvimento · P20261113.4 — 13/11/2026
+
+**Estado:** continuação da beta.11/código 112, sem lançamento. O APK interno anterior permanece P20261113.3.
+
+- Controles SeekBarPreference em configurações de fontes isoladas, com gravação assíncrona e callbacks no worker. Aceitam faixas negativas/fixas e conservam o incremento de teclado do AndroidX.
+- Contrato de tela compartilhado entre validação, edição e importação explícita: tipos estritos, limites com proteção de overflow e rejeição de formulário antigo quando opções mudam.
+- 833 testes do app passaram, incluindo 12 novos; relatórios com domain somam 918 sem falhas/skips. Compilação real do app e de instrumentação aprovada, quatro testes de overlay e 16 de empacotamento aprovados.
+- Fixture sintética ampliada e três cenários Android compilados. Sem dispositivo/emulador conectado para executá-los.
+
+[Comportamento e limites](docs/SANDBOX_CONTROLES_P20261113_4.md) · [Evidências](integration/sandbox-numeric/20261113/README.md).
+
+## Continuação · P20261113.3 — recuperação da assinatura — 13/11/2026
+
+- Keystore original recuperado por transporte criptografado; certificado exportado diretamente confere com a beta.10. Configuração local privada e ignorada pelo Git; nenhum material secreto publicado.
+- APK interno universal ARM32/ARM64 gerado e verificado com a assinatura original da beta.10 (272.970.356 bytes). Sem lançamento público ou aceite de atualização no aparelho.
+- Empacotamento exclui intermediários de emulador e o verificador de marca distingue os ícones de conquistas dos atributos da application. Três regressões reproduzidas, 16 testes de empacotamento e quatro de overlay aprovados.
+
+[Recuperação e validação](integration/signing-recovery/20261113/README.md).
+
+## Desenvolvimento · P20261113.3 — 13/11/2026
+
+**Estado:** candidata beta.11/código 112, sem lançamento. Compilação Android e 906/906 testes JVM passaram; APK bloqueado por espaço e assinatura original não localizada.
+
+- Transferência de cookies preserva atualizações HTTP concorrentes e rejeita conflitos de forma atômica. Login aguarda a preparação de cookies, confere o perfil e move armazenamento cifrado para IO.
+- Dependências do widget alinhadas às versões já usadas pelo app e WebKit declarado diretamente. Testes locais usam o transporte JVM oficial do OkHttp; produção mantém Android.
+- Exportador verifica identidade/assinatura contra manifesto anterior quando solicitado; quatro regressões novas e 47 testes focados passaram, além de quatro de overlay e 13 de empacotamento.
+- Nenhum dos 880 casos históricos desapareceu;26 casos novos passaram. Sem aceite de aparelho ou APK concluído. A chave criada neste ambiente difere da assinatura da beta.10; não distribuir como atualização.
+
+[Evidências e bloqueios](integration/build-validation/20261113/README.md).
+
+## Desenvolvimento · P20261113.2 — 13/11/2026
+
+**Estado:** candidata da beta.11/código 112; sem publicação. Compilação Android continua bloqueada por Google Maven HTTP503.
+
+- A limpeza automática preserva arquivos cujos nomes contêm datas impossíveis. Nomes antigos e atuais com datas válidas continuam aceitos.
+- 43 testes JVM focados passaram: 26 anteriores, nove existentes de integridade da escrita, dois de namespaces de fontes e seis novos de retenção. Dois casos reproduziram a falha antes da correção.
+- O aviso de login descreve o escopo dos cookies, sem prometer mediação completa da rede do WebView.
+
+[Evidências e limites](integration/backup-safety/20261113/README.md).
+
+## Desenvolvimento · P20261113.1 — 13/11/2026
+
+**Estado:** candidata da beta.11/código 112, sem lançamento; compilação Android bloqueada no download de dependências Google (HTTP503). A beta.10 pública permanece igual.
+
+- Primeira integração de login HTTPS para fontes isoladas, com perfil WebView separado, confirmação e transferência limitada de cookies. Sem fallback ao navegador global. OAuth externo/Cloudflare genérico e aceite real continuam pendentes.
+- Verificação consultiva de espaço durante a importação e antes da cópia para biblioteca em volume local, preservando original e cancelamento.
+- 26 testes JVM focados, quatro verificações de aplicação do overlay e nove de empacotamento passaram. Isso não aprova a atividade Android nem todo o aplicativo.
+
+[Escopo e limites](docs/LOGIN_E_ARMAZENAMENTO_P20261113_1.md) · [Checklist da beta.11](docs/BETA11_CHECKLIST.md).
+
 ## Desenvolvimento · P20261112.1 — 12/11/2026
 
-**Estado:** revisão da beta.11/código112, sem lançamento. A beta.10 pública permanece intacta.
+**Estado:** revisão da beta.11/código 112, sem lançamento. A beta.10 pública permanece intacta.
 
 - Doze conquistas em quatro caminhos alternativos: pontos de leitura, obras na biblioteca, obras iniciadas e obras concluídas lidas. Uma condição basta para liberar cada grimório.
 - Progresso e disponibilidade na Jornada e na Aparência; marcos permanentes e restauração de cosméticos sem revogar conquistas locais por um backup mais antigo.
@@ -15,7 +95,7 @@ Este arquivo registra a evolução real do código. **Revisões de desenvolvimen
 
 ## Desenvolvimento · P20261111.2 — 11/11/2026
 
-**Estado:** revisão da beta.11/código112, sem lançamento. A beta.10 pública permanece intacta.
+**Estado:** revisão da beta.11/código 112, sem lançamento. A beta.10 pública permanece intacta.
 
 - Nova coleção de quatro ícones ilustrados: Grimório Polaris, trevo de três folhas, quatro folhas amado pela mana e cinco folhas com visual sombrio.
 - Nomes e fundos acompanham as artes; aliases, seleção salva, desbloqueios e marcos de 900/4.500/9.000 pontos são preservados.
@@ -224,7 +304,7 @@ Sete testes novos passaram. A comparação completa terminou com 505 testes: 471
 - Ajustes de posicionamento, automação de downloads em inglês e respeito à escolha por obra.
 - Catálogo inicial de repositórios e apresentação mais clara dos grupos/versões dos capítulos.
 
-[Código de 29/10](https://github.com/Hailton-Reis/Polaris/commit/87c5ce7) · [Tradução em inglês](https://github.com/Hailton-Reis/Polaris/commit/e8ef402) · [Descoberta e capítulos](https://github.com/Hailton-Reis/Polaris/commit/582e8c4)
+[Código de 29/10](https://github.com/Hailton-Reis/Polaris/commit/87c5ce7) · [Tradução em inglês](https://github.com/Hailton-Reis/Polaris/commit/e 8ef402) · [Descoberta e capítulos](https://github.com/Hailton-Reis/Polaris/commit/582e8c4)
 
 ## Como registrar as próximas versões
 

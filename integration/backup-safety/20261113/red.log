@@ -1,0 +1,95 @@
+╷
+├─ JUnit Platform Suite ✔
+├─ JUnit Jupiter ✔
+│  ├─ BrowserCookieSessionTest ✔
+│  │  ├─ temporary browser cookies remain temporary() ✔
+│  │  ├─ invalid snapshot origins reject the whole import() ✔
+│  │  ├─ oversized or malformed browser output never partially commits() ✔
+│  │  ├─ cleared sessions cannot be restored by a browser still open() ✔
+│  │  ├─ HTTP sources cannot create browser sessions() ✔
+│  │  ├─ removed seeded cookies expire with their original domain identity() ✔
+│  │  ├─ only the selected HTTPS origin is accepted() ✔
+│  │  ├─ cancelling without completion writes nothing() ✔
+│  │  ├─ cookie attributes and host boundary survive browser import() ✔
+│  │  └─ partitioned cookies never become unpartitioned credentials() ✔
+│  ├─ CookieBankTest ✔
+│  │  ├─ independent response names merge and expiration deletes only the matching cookie... ✔
+│  │  ├─ session cookies survive worker client replacement without entering disk state() ✔
+│  │  ├─ stored codec rejects wrong scalar types extra fields and oversized lists() ✔
+│  │  ├─ expired saved entries are removed rather than revived after reload() ✔
+│  │  ├─ same-name cookies for a deeper path precede the root session() ✔
+│  │  ├─ storage failure keeps memory usable reports failure and does not claim disk pers... ✔
+│  │  ├─ persistent cookies restore and preserve secure httpOnly path and host flags() ✔
+│  │  ├─ clear revokes old clients and ignores delayed authenticated responses() ✔
+│  │  ├─ count and escaped byte budgets bound memory and persistent payloads() ✔
+│  │  └─ foreign cookie origins do not override a host-only session() ✔
+│  ├─ DocumentImportSpaceTest ✔
+│  │  ├─ insufficient space rejects the next chunk before writing() ✔
+│  │  ├─ file limit holds even when storage is plentiful() ✔
+│  │  ├─ unknown capacity empty inputs and overflow never appear as available space() ✔
+│  │  ├─ cancellation stops before more bytes are read or written() ✔
+│  │  ├─ copy preserves bytes and leaves streams owned by caller() ✔
+│  │  └─ capacity is checked again as a stream grows() ✔
+│  ├─ BackupRetentionTest ✔
+│  │  ├─ foreign and unfinished files never displace verified backups() ✔
+│  │  ├─ retention preserves malformed named files even when readable() ✘ expected: <true> but was: <false>
+│  │  ├─ impossible calendar dates never identify a managed backup() ✘ 2026-02-29_10-00 ==> expected: <false> but was: <true>
+│  │  ├─ cleanup requires a verified managed current copy and a positive limit() ✔
+│  │  ├─ both historical and current backup names remain recognized() ✔
+│  │  └─ only oldest verified copies are selected after keeping current() ✔
+│  ├─ BackupArchiveWriterTest ✔
+│  │  ├─ successful result requires closed output and exact verified payload() ✔
+│  │  ├─ extra or missing decompressed bytes fail verification() ✔
+│  │  ├─ write only destination is explicitly unverifiable() ✔
+│  │  ├─ trailing garbage or another gzip member is rejected like the actual backup decod... ✔
+│  │  ├─ cancellation during copy or read back stays cancellation() ✔
+│  │  ├─ write failure closes the stream and cannot proceed to verification() ✔
+│  │  ├─ truncated gzip fails verification() ✔
+│  │  ├─ valid gzip carrying different bytes cannot be reported as success() ✔
+│  │  └─ failed output close cannot be reported as verified() ✔
+│  └─ SourcePreferenceNamespaceTest ✔
+│     ├─ native signed long source keys remain portable() ✔
+│     └─ backups cannot select global settings sandbox files or paths() ✔
+└─ JUnit Vintage ✔
+
+Failures (2):
+  JUnit Jupiter:BackupRetentionTest:retention preserves malformed named files even when readable()
+    MethodSource [className = 'eu.kanade.tachiyomi.data.backup.create.BackupRetentionTest', methodName = 'retention preserves malformed named files even when readable', methodParameterTypes = '']
+    => org.opentest4j.AssertionFailedError: expected: <true> but was: <false>
+       org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+       org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+       org.junit.jupiter.api.AssertTrue.failNotTrue(AssertTrue.java:63)
+       org.junit.jupiter.api.AssertTrue.assertTrue(AssertTrue.java:36)
+       org.junit.jupiter.api.AssertTrue.assertTrue(AssertTrue.java:31)
+       org.junit.jupiter.api.Assertions.assertTrue(Assertions.java:183)
+       eu.kanade.tachiyomi.data.backup.create.BackupRetentionTest.retention preserves malformed named files even when readable(BackupRetentionTest.kt:27)
+       java.base/java.lang.reflect.Method.invoke(Method.java:580)
+       java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+       java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+  JUnit Jupiter:BackupRetentionTest:impossible calendar dates never identify a managed backup()
+    MethodSource [className = 'eu.kanade.tachiyomi.data.backup.create.BackupRetentionTest', methodName = 'impossible calendar dates never identify a managed backup', methodParameterTypes = '']
+    => org.opentest4j.AssertionFailedError: 2026-02-29_10-00 ==> expected: <false> but was: <true>
+       org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+       org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+       org.junit.jupiter.api.AssertFalse.failNotFalse(AssertFalse.java:63)
+       org.junit.jupiter.api.AssertFalse.assertFalse(AssertFalse.java:36)
+       org.junit.jupiter.api.Assertions.assertFalse(Assertions.java:239)
+       eu.kanade.tachiyomi.data.backup.create.BackupRetentionTest.impossible calendar dates never identify a managed backup(BackupRetentionTest.kt:22)
+       java.base/java.lang.reflect.Method.invoke(Method.java:580)
+       java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+       java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+Test run finished after 1125 ms
+[         9 containers found      ]
+[         0 containers skipped    ]
+[         9 containers started    ]
+[         0 containers aborted    ]
+[         9 containers successful ]
+[         0 containers failed     ]
+[        43 tests found           ]
+[         0 tests skipped         ]
+[        43 tests started         ]
+[         0 tests aborted         ]
+[        41 tests successful      ]
+[         2 tests failed          ]
+

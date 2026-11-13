@@ -1,0 +1,21 @@
+test_existing_output_is_never_overwritten (test_package_internal_beta.BetaPackagingTests.test_existing_output_is_never_overwritten) ... ok
+test_missing_or_multiple_signers_are_rejected (test_package_internal_beta.BetaPackagingTests.test_missing_or_multiple_signers_are_rejected) ... ok
+test_sdk_36_and_37_certificate_formats_are_accepted (test_package_internal_beta.BetaPackagingTests.test_sdk_36_and_37_certificate_formats_are_accepted) ... ok
+test_alias_without_application_does_not_establish_branding (test_package_internal_beta.CompiledBrandingTests.test_alias_without_application_does_not_establish_branding) ... ok
+test_compiled_polaris_branding_is_accepted (test_package_internal_beta.CompiledBrandingTests.test_compiled_polaris_branding_is_accepted) ... ok
+test_correct_alias_cannot_hide_missing_application_round_icon (test_package_internal_beta.CompiledBrandingTests.test_correct_alias_cannot_hide_missing_application_round_icon) ... ok
+test_reward_launcher_aliases_do_not_replace_application_icons (test_package_internal_beta.CompiledBrandingTests.test_reward_launcher_aliases_do_not_replace_application_icons) ... ok
+test_upstream_label_is_rejected_even_if_apk_filename_says_polaris (test_package_internal_beta.CompiledBrandingTests.test_upstream_label_is_rejected_even_if_apk_filename_says_polaris) ... ok
+test_wrong_round_icon_or_missing_splash_is_rejected (test_package_internal_beta.CompiledBrandingTests.test_wrong_round_icon_or_missing_splash_is_rejected) ... ok
+test_a_mislabeled_single_architecture_or_accidental_emulator_build_is_rejected (test_package_internal_beta.UniversalPackagingTests.test_a_mislabeled_single_architecture_or_accidental_emulator_build_is_rejected) ... ok
+test_both_arm_architectures_share_one_asset_tree (test_package_internal_beta.UniversalPackagingTests.test_both_arm_architectures_share_one_asset_tree) ... ok
+test_missing_32_bit_reader_or_ocr_dependency_is_rejected (test_package_internal_beta.UniversalPackagingTests.test_missing_32_bit_reader_or_ocr_dependency_is_rejected) ... ok
+test_different_package_is_not_an_update_even_with_same_key (test_package_internal_beta.UpdateIdentityTests.test_different_package_is_not_an_update_even_with_same_key) ... ok
+test_missing_or_invalid_previous_identity_is_rejected (test_package_internal_beta.UpdateIdentityTests.test_missing_or_invalid_previous_identity_is_rejected) ... ok
+test_rebuilt_apk_with_another_key_is_not_an_update (test_package_internal_beta.UpdateIdentityTests.test_rebuilt_apk_with_another_key_is_not_an_update) ... ok
+test_same_id_and_original_signer_allow_update_metadata (test_package_internal_beta.UpdateIdentityTests.test_same_id_and_original_signer_allow_update_metadata) ... ok
+
+----------------------------------------------------------------------
+Ran 16 tests in 0.009s
+
+OK

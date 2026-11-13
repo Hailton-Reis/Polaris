@@ -1,0 +1,23 @@
+{
+  "scope": "JVM policies only; Android UI/Keystore/WebView not tested",
+  "sources": {
+    "/workspace/work/cookie-concurrency-red/CookieCore.kt": "e3d7f9800e4c74faf762e55a0d86f904db433224d398be598448c6cd75b6694f",
+    "/workspace/work/yomotsu/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/BrowserCookieSession.kt": "7b1ee442ee5d37bef871c72c379b2eb8edf732dc1944a6ff4478b50391079766",
+    "/workspace/work/yomotsu/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxNetworkPolicy.kt": "a36e58753b8095b227444ad72d6bbad16cf4c85a1ee71d1bc34059eab5581dcb",
+    "/workspace/work/yomotsu/app/src/test/java/eu/kanade/tachiyomi/extension/sandbox/BrowserCookieSessionTest.kt": "6d78360e633ae43fe8891c0966b9fa0f5ed83378ab71ebb409feee252fa347af",
+    "/workspace/work/yomotsu/app/src/test/java/eu/kanade/tachiyomi/extension/sandbox/CookieBankTest.kt": "238a893d3b7f31503b68f051a9e06ab753767848279339178cf59d864598c595",
+    "/workspace/work/yomotsu/app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentImportSpace.kt": "53fb8708a1f86cbee79515e9e4b7e1a065421cf559713206bb0f395ae7e17ad2",
+    "/workspace/work/yomotsu/app/src/test/java/eu/kanade/tachiyomi/ui/documents/DocumentImportSpaceTest.kt": "be9b2b9627842b3c51127ceb06d3f113c54c0f7ea6b7e020d8df49f8200cc4c4",
+    "/workspace/work/yomotsu/app/src/main/java/eu/kanade/tachiyomi/data/backup/create/BackupRetention.kt": "d9a18f74cace19d5b4a89c39aec736638577c5f00372ca9854554bee994a37a6",
+    "/workspace/work/yomotsu/app/src/main/java/eu/kanade/tachiyomi/data/backup/create/BackupArchiveWriter.kt": "ecf27d98538faff5cede5f057afc8262fe2a937e2fef6cdfce364dfc7c1ddbfe",
+    "/workspace/work/yomotsu/app/src/main/java/eu/kanade/tachiyomi/data/backup/restore/restorers/SourcePreferenceNamespace.kt": "2b8fb763ebca0b81631b419f8221b4cf99e7c85a12c44e48dab3c3ac3a517890",
+    "/workspace/work/yomotsu/app/src/test/java/eu/kanade/tachiyomi/data/backup/create/BackupRetentionTest.kt": "137cc929f27ef6ca69918cf2da768885d4e875842a8e9c518f5f0a063d4d2537",
+    "/workspace/work/yomotsu/app/src/test/java/eu/kanade/tachiyomi/data/backup/create/BackupArchiveWriterTest.kt": "0566f0ebc63a4b4d16d3b33398fc70574a38cc55b3ab07133c39cbb825e222ad",
+    "/workspace/work/yomotsu/app/src/test/java/eu/kanade/tachiyomi/data/backup/restore/SourcePreferenceNamespaceTest.kt": "af85fe25679849f6885135a3e5b1e44a8da9da7c976e8232bfbaba762188d2cf"
+  },
+  "dependencies": {
+    "okhttp-jvm.jar": "b15e605ca0a4b12c62ea7f657dad413c236c947e875854767349cdbe20df473c",
+    "okio-jvm.jar": "b97b640557a650d15411f2be29aef558c4e422a83653cb18ba494311dbed18be",
+    "junit-console.jar": "097022055fe55a34b33b868be077629190d4a1c66c571478338686074ccf6e97"
+  }
+}

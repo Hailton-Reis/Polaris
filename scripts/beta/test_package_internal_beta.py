@@ -1,7 +1,7 @@
 from pathlib import Path
 import tempfile
 import unittest
-from package_internal_beta import package, signer_digest, validate_branding, verify_universal_architectures
+from package_internal_beta import package, signer_digest, validate_branding, verify_universal_architectures, validate_update_identity
 import zipfile
 
 
@@ -86,3 +86,41 @@ resource 0x7f080104 drawable/ic_polaris_splash"""
             validate_branding("application-label:'Polaris'", self.resources.replace('drawable/ic_polaris_splash',
                                                                                    'drawable/ic_yomotsu_splash'),
                               self.manifest)
+
+
+    def test_reward_launcher_aliases_do_not_replace_application_icons(self):
+        manifest = self.manifest + "\n E: activity-alias (line=80)\n  A: http://schemas.android.com/apk/res/android:icon(0x01010002)=@0x7f100009\n  A: http://schemas.android.com/apk/res/android:roundIcon(0x0101052c)=@0x7f100009"
+        self.assertTrue(validate_branding("application-label:'Polaris'", self.resources, manifest)['compiled_resources_verified'])
+
+    def test_correct_alias_cannot_hide_missing_application_round_icon(self):
+        manifest = self.manifest.split('\n A: http://schemas.android.com/apk/res/android:roundIcon')[0]
+        manifest += "\n E: activity-alias\n  A: http://schemas.android.com/apk/res/android:roundIcon(0x0101052c)=@0x7f100003"
+        with self.assertRaisesRegex(ValueError, 'roundIcon'):
+            validate_branding("application-label:'Polaris'", self.resources, manifest)
+
+    def test_alias_without_application_does_not_establish_branding(self):
+        manifest = self.manifest.replace('E: application', 'E: activity-alias')
+        with self.assertRaisesRegex(ValueError, 'application'):
+            validate_branding("application-label:'Polaris'", self.resources, manifest)
+
+
+class UpdateIdentityTests(unittest.TestCase):
+    def test_same_id_and_original_signer_allow_update_metadata(self):
+        old = {'application_id': 'polaris.app', 'signer_sha256': 'A' * 64, 'version': '0.1.0-beta.10'}
+        self.assertEqual('SAME_ID_AND_SIGNER', validate_update_identity('polaris.app', 'a' * 64, old)['status'])
+
+    def test_rebuilt_apk_with_another_key_is_not_an_update(self):
+        old = {'application_id': 'polaris.app', 'signer_sha256': 'a' * 64}
+        with self.assertRaisesRegex(ValueError, 'Signing certificate differs'):
+            validate_update_identity('polaris.app', 'b' * 64, old)
+
+    def test_different_package_is_not_an_update_even_with_same_key(self):
+        old = {'application_id': 'polaris.app', 'signer_sha256': 'a' * 64}
+        with self.assertRaisesRegex(ValueError, 'Application ID differs'):
+            validate_update_identity('polaris.other', 'a' * 64, old)
+
+    def test_missing_or_invalid_previous_identity_is_rejected(self):
+        for old in [{}, {'application_id': ''}, {'application_id': 1},
+                    {'application_id': 'polaris.app', 'signer_sha256': 'not-a-hash'}]:
+            with self.subTest(old=old), self.assertRaises(ValueError):
+                validate_update_identity('polaris.app', 'a' * 64, old)

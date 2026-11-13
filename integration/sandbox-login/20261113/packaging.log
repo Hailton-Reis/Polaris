@@ -1,0 +1,14 @@
+test_existing_output_is_never_overwritten (test_package_internal_beta.BetaPackagingTests.test_existing_output_is_never_overwritten) ... ok
+test_missing_or_multiple_signers_are_rejected (test_package_internal_beta.BetaPackagingTests.test_missing_or_multiple_signers_are_rejected) ... ok
+test_sdk_36_and_37_certificate_formats_are_accepted (test_package_internal_beta.BetaPackagingTests.test_sdk_36_and_37_certificate_formats_are_accepted) ... ok
+test_compiled_polaris_branding_is_accepted (test_package_internal_beta.CompiledBrandingTests.test_compiled_polaris_branding_is_accepted) ... ok
+test_upstream_label_is_rejected_even_if_apk_filename_says_polaris (test_package_internal_beta.CompiledBrandingTests.test_upstream_label_is_rejected_even_if_apk_filename_says_polaris) ... ok
+test_wrong_round_icon_or_missing_splash_is_rejected (test_package_internal_beta.CompiledBrandingTests.test_wrong_round_icon_or_missing_splash_is_rejected) ... ok
+test_a_mislabeled_single_architecture_or_accidental_emulator_build_is_rejected (test_package_internal_beta.UniversalPackagingTests.test_a_mislabeled_single_architecture_or_accidental_emulator_build_is_rejected) ... ok
+test_both_arm_architectures_share_one_asset_tree (test_package_internal_beta.UniversalPackagingTests.test_both_arm_architectures_share_one_asset_tree) ... ok
+test_missing_32_bit_reader_or_ocr_dependency_is_rejected (test_package_internal_beta.UniversalPackagingTests.test_missing_32_bit_reader_or_ocr_dependency_is_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 0.007s
+
+OK

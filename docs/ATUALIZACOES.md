@@ -39,7 +39,7 @@ O `application_id` e a chave de assinatura precisam permanecer os mesmos entre b
 ## Publicação pelo mantenedor
 
 1. Concluir os testes pendentes, incluindo armazenamento e instalação, antes de distribuir o candidato.
-2. Gerar os APKs ARM e o `manifest.json` pelo exportador atualizado, usando a assinatura original.
+2. Gerar os APKs ARM e o `manifest.json` pelo exportador atualizado, usando a assinatura original. Na beta.11, fornecer `--previous-manifest integration/release-candidates/0.1.0-beta.10/manifest.json` para exigir o mesmo identificador e certificado. Sem essa opção, a compatibilidade fica `NOT_CHECKED`.
 3. Conferir que versão, código, identificador, Android mínimo, nomes, tamanhos e hashes correspondem aos arquivos finais.
 4. Anexar **`manifest.json` e os APKs** à mesma Release, com tag `v<version>`. As notas devem explicar mudanças, limitações e validação.
 5. Para um beta, marcar a Release como **pré-lançamento**; mantê-la em rascunho enquanto não estiver liberada. Um rascunho não vira atualização disponível no aplicativo.
@@ -60,3 +60,9 @@ A beta.10 / P20261106.1 tem um APK universal ARM32/ARM64 conferido por tamanho, 
 O APK universal mantém a identidade e a assinatura da beta.9 distribuída. Compilação, hashes e testes JVM não validam uma atualização real: retomada entre redes, instalação e preservação dos dados ainda exigem aceite nos aparelhos.
 
 [Notas e evidência da beta.10](versoes/0.1.0-beta.10.md).
+
+Na candidata P20261113.3, o guard confirmou que o certificado debug deste ambiente diverge da beta.10. O arquivo da chave original não foi encontrado nas fontes acessíveis; o certificado público não o substitui. Não publicar essa compilação como atualização nem desinstalar para contornar o conflito. [Registro atual](../integration/build-validation/20261113/README.md).
+
+A [recuperação da assinatura original](../integration/signing-recovery/20261113/README.md) foi concluída após o registro anterior: o keystore recuperado corresponde ao certificado público da beta.10 e foi configurado somente no ambiente privado. A atualização real no aparelho continua pendente.
+
+A mesma continuação gerou e verificou o APK universal beta.11/P20261113.3 (272.970.356 bytes, ARM32/ARM64, código 112). O exportador confirmou SAME_ID_AND_SIGNER contra a beta.10 e 16 testes de empacotamento passaram após correção do verificador de aliases. Ainda é candidata interna; não houve Release pública nem aceite de atualização no aparelho.

@@ -1,0 +1,23 @@
+{
+  "revision": "P20261113.2",
+  "version": "0.1.0-beta.11",
+  "version_code": 112,
+  "published": false,
+  "JVM": {
+    "passed": 43,
+    "failed": 0,
+    "skipped": 0,
+    "new_backup_cases": 6
+  },
+  "red_before_fix": {
+    "passed": 41,
+    "failed": 2
+  },
+  "overlay_tests": 4,
+  "packaging_tests": 9,
+  "Android_build": "BLOCKED_GOOGLE_MAVEN_HTTP503",
+  "Android_runtime": "NOT_RUN",
+  "ARM_acceptance": false,
+  "external_reader_roundtrip": "PENDING",
+  "overlay_sha256": "e25e1f5af10cdbbb751bc39eca8582dfe50d2b08b9c4d5bc0c9f66ba7e0a5280"
+}

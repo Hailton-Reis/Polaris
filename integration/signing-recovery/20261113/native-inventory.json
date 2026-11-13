@@ -1,0 +1,130 @@
+{
+  "arm64-v8a": {
+    "libandroidx.graphics.path.so": {
+      "bytes": 10096,
+      "sha256": "41e9a793c43a0f4fddb19e33f346bace464f30f888ba7b9eaf96294ea115bfb6"
+    },
+    "libarchive-jni.so": {
+      "bytes": 2031592,
+      "sha256": "92332de41e661c2a5ce05df65c8a0a6367a99a2cb201e3b3eec7039c9cbc669e"
+    },
+    "libc++_shared.so": {
+      "bytes": 6238016,
+      "sha256": "546b32b0e19e6872f42238d751ad9a6f0f73ee55562ce1ffb394df9892ddcb4a"
+    },
+    "libconscrypt_jni.so": {
+      "bytes": 2871488,
+      "sha256": "0b9ac95fe4e7ef7404cb015b54a58d4a31194fb8d0249da83c47468590dcc60b"
+    },
+    "libimagedecoder.so": {
+      "bytes": 5137072,
+      "sha256": "379f979c3df11717c12e28746cce7bfaa97e99e140b1e8c56134608c11b3bed3"
+    },
+    "liblanguage_id_l2c_jni.so": {
+      "bytes": 1019560,
+      "sha256": "4479b044bbdad9a938fea15698dfa3473e73bd6bab9f8e0468fc3cc6069c137e"
+    },
+    "libmlkit_google_ocr_pipeline.so": {
+      "bytes": 11064544,
+      "sha256": "fa41d509a661e8aa8b3e3ac1a28541f8823f308414fcad733fe26d61feea2646"
+    },
+    "libonnxruntime.so": {
+      "bytes": 17908496,
+      "sha256": "11ef853b751532dc827bd7799f557f9495e2ee7523b9b355753fc0344576bd5e"
+    },
+    "libonnxruntime4j_jni.so": {
+      "bytes": 100632,
+      "sha256": "f657216254a2f88fcbd89c5e73a2f7ae5a8145d092f8700951aedba8e4a60ef2"
+    },
+    "libopencv_java4.so": {
+      "bytes": 17189512,
+      "sha256": "82ac6774835e26fbaba896bf2f6f61e81200dfdb5fe55a53e43b54241de41a0a"
+    },
+    "libquickjs.so": {
+      "bytes": 988408,
+      "sha256": "286c96e2dda9d062f1437b1d519421cb606a21eb9079d9ecbb84b88f9984f028"
+    },
+    "libsqliteJni.so": {
+      "bytes": 1281456,
+      "sha256": "9d3ad85cca0b7b02e0fe31beec3f17c86cccdebf62e1d1c47ac46743f4967a99"
+    },
+    "libtdjni.so": {
+      "bytes": 21735672,
+      "sha256": "7c1751197b35a64261e3b3f21764874c9ee8795e4b6118c23a74499426c44b91"
+    },
+    "libtranslate_jni.so": {
+      "bytes": 16361048,
+      "sha256": "35b3d0366291347e3f25e80e809ee398d716aea49cd03278007fedd526a1496f"
+    },
+    "libyomotsu_dbnet.so": {
+      "bytes": 15942352,
+      "sha256": "cf74b3f661492676562a4f3e24ac470bbad57de4e18202caf1e6b707b4edee97"
+    },
+    "libzstd-kmp.so": {
+      "bytes": 731872,
+      "sha256": "10ec47f13bee884450b0911066019ba7aa6b4164a4c1f8c33c9d30dd3fd8868a"
+    }
+  },
+  "armeabi-v7a": {
+    "libandroidx.graphics.path.so": {
+      "bytes": 7252,
+      "sha256": "41399eba6fc2a60f6f14642375c1824f3cf25eb8fec7397d753730a3ceda3e2b"
+    },
+    "libarchive-jni.so": {
+      "bytes": 1580400,
+      "sha256": "d8168c8e2e82fd7795ba8e0631fd3ca6a7614dec36e9e168c77eac0e38628cb9"
+    },
+    "libc++_shared.so": {
+      "bytes": 4173552,
+      "sha256": "737d3b160f68bb499fd50c661b7d98b828f525da961188daac72a65cf518de44"
+    },
+    "libconscrypt_jni.so": {
+      "bytes": 1854120,
+      "sha256": "f636e341b0e41e527a057a4d8d2423aad1c9533597daa955fabe5335b4ef79c9"
+    },
+    "libimagedecoder.so": {
+      "bytes": 4048884,
+      "sha256": "efbf4ab9a9453b9fdf24ee050c6fe4340c1bf8096bc107e40a9c00e911360ffe"
+    },
+    "liblanguage_id_l2c_jni.so": {
+      "bytes": 609636,
+      "sha256": "1c1a8baa63ecc473e611902a8aa010fa526f2a35594c302836f7279d1c73aa17"
+    },
+    "libmlkit_google_ocr_pipeline.so": {
+      "bytes": 6781940,
+      "sha256": "06b9e2f587e401c6446aa0db344bb31b622957a2d04aa4eac03cde8b3a6ed78a"
+    },
+    "libonnxruntime.so": {
+      "bytes": 13039136,
+      "sha256": "2e55ddb9df17bba226a2b3eb4ccd7029010c7631cee93a69a00f928c0e955972"
+    },
+    "libonnxruntime4j_jni.so": {
+      "bytes": 73676,
+      "sha256": "8b53e40fc127190b18e69a524371cd4ce9b52e059354d8fe8f228a345bb8355d"
+    },
+    "libopencv_java4.so": {
+      "bytes": 10438812,
+      "sha256": "d018a025126bc15015b54d045bfce54ce6fff35e6556d30007da89ef36d79f96"
+    },
+    "libquickjs.so": {
+      "bytes": 626060,
+      "sha256": "5782df6a4e8ba113dc8a5dc034a81752fbeaac15534b9cfadd24684a036a6d60"
+    },
+    "libsqliteJni.so": {
+      "bytes": 1254892,
+      "sha256": "d1bcd83899465f738a7e155007f318be8331bbae97b942cce5d29c24b633501e"
+    },
+    "libtdjni.so": {
+      "bytes": 15383664,
+      "sha256": "56bcd646dae3442a2aeefee3ce28b72c14dc257488d267d4ed76e7e01e08f158"
+    },
+    "libtranslate_jni.so": {
+      "bytes": 11608808,
+      "sha256": "cdf803c7a17cadf5f53314365dd3c999746d98c510863c636de62c7acd8cb016"
+    },
+    "libzstd-kmp.so": {
+      "bytes": 566996,
+      "sha256": "4b30671d21e9c6953dc84e4b4602e33b88740d61417af96dbc4ddf44b22a8e15"
+    }
+  }
+}

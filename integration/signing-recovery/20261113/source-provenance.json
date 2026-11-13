@@ -1,0 +1,18 @@
+{
+  "canonical_overlay_git_sha": "82f3c216bac174b3721ffd6717f65118c2b15622",
+  "canonical_overlay_sha256": "f335ef03e3c8183728868e957c4f46e54fe856cf9488a6fe69ca1b0f690dddb7",
+  "app_gradle_sha256": "8ef16c51c29b24cceec604f5115d7d563ba88ba57dbf16c8cabd48841b0fd90b",
+  "source_revision": "P20261113.3",
+  "application_changes_since_906_tests": false,
+  "changes_since_906_tests": [
+    "local private signing configuration",
+    "universal ARM packaging excludes emulator native libraries"
+  ],
+  "overlay_validation": {
+    "passed": 4,
+    "failed": 0,
+    "skipped": 0
+  },
+  "exporter_sha256": "37d25d1573c9af07a9f06d11e534f23e2fddf23ca768ee87606e3b0ac6befd8c",
+  "exporter_tests_sha256": "b29dd4594b740563e1c9fd41714b331006e84428e8527e5ebd2f30b015b679ee"
+}

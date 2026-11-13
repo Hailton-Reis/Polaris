@@ -1,0 +1,41 @@
+{
+  "revision": "P20261113.5",
+  "status": "ANDROID_COMPILE_AND_UNIT_PASS_DEVICE_PENDING",
+  "unit_tests": {
+    "app": {
+      "total": 845,
+      "failed": 0,
+      "skipped": 0,
+      "passed": 845
+    },
+    "domain": {
+      "total": 85,
+      "failed": 0,
+      "skipped": 0,
+      "passed": 85
+    }
+  },
+  "unit_execution": {
+    "app": "fresh",
+    "domain": "up-to-date"
+  },
+  "new_unit_tests": 12,
+  "junit_xml_files": 161,
+  "missing_baseline_cases": 0,
+  "android_app_compile": true,
+  "android_test_compile": true,
+  "new_android_cases_compiled": 6,
+  "android_cases_executed_this_revision": 0,
+  "connected_android_devices": 0,
+  "overlay_tests_passed": 4,
+  "packaging_tests_passed": 16,
+  "preparation_http_methods": [
+    "GET",
+    "HEAD"
+  ],
+  "preparation_callbacks": "synchronous, returns false, unchanged scoped preference snapshot",
+  "preparation_replayed_on_save": true,
+  "new_apk_built": false,
+  "prior_internal_apk_revision": "P20261113.3",
+  "release_published": false
+}

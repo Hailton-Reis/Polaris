@@ -1,0 +1,63 @@
+{
+  "status": "INTERNAL_BETA_CANDIDATE",
+  "version": "0.1.0-beta.11",
+  "version_code": 112,
+  "revision": "P20261113.3",
+  "minimum_android_api": 26,
+  "application_id": "app.mihon.tachiyomiat.dev",
+  "signer_sha256": "3ae747069cc9015ca1777f94fd56b030501f45d6af380426a572ad60e94d8227",
+  "artifacts": [
+    {
+      "abi": "arm64-v8a",
+      "file": "Polaris-0.1.0-beta.11-universal.apk",
+      "bytes": 272970356,
+      "sha256": "ada69c1e08a679489575a0622e43a8825de5e443083d978281c1d2a688631c98"
+    },
+    {
+      "abi": "armeabi-v7a",
+      "file": "Polaris-0.1.0-beta.11-universal.apk",
+      "bytes": 272970356,
+      "sha256": "ada69c1e08a679489575a0622e43a8825de5e443083d978281c1d2a688631c98"
+    }
+  ],
+  "unit_comparison": {
+    "status": "NO_NEW_UNIT_REGRESSIONS",
+    "baseline": {
+      "total": 880,
+      "passed": 880,
+      "failed": 0,
+      "skipped": 0
+    },
+    "patched": {
+      "total": 906,
+      "passed": 906,
+      "failed": 0,
+      "skipped": 0
+    },
+    "preexisting_failures_still_present": 0,
+    "missing_baseline_tests": [],
+    "new_failures_or_skips": [],
+    "android_runtime_verified": false,
+    "gradle_exit_codes": {
+      "baseline": 0,
+      "patched": 0
+    },
+    "required_module_coverage": {
+      "app": 795,
+      "domain": 85
+    },
+    "baseline_origin": "Archived P20261112.1 JUnit reports; not rerun in this environment",
+    "current_origin": "Fresh full Gradle execution, P20261113.3",
+    "new_cases": 26
+  },
+  "display_name": "Polaris",
+  "branding_verified": true,
+  "physical_device_acceptance": "PENDING",
+  "cjk_ocr_quality": "PENDING",
+  "distribution": "universal-arm",
+  "apk_files": 1,
+  "update_compatibility": {
+    "status": "SAME_ID_AND_SIGNER",
+    "previous_version": "0.1.0-beta.10"
+  }
+}

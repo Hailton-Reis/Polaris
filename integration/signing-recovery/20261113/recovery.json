@@ -1,0 +1,12 @@
+{
+  "status": "ORIGINAL_SIGNER_RECOVERED",
+  "encrypted_transport_sha256": "e98328cc459c01882ec2242dd8aef69fcd60673663305b34b6306bed151e3532",
+  "signer_sha256": "3ae747069cc9015ca1777f94fd56b030501f45d6af380426a572ad60e94d8227",
+  "matches_public_beta10": true,
+  "private_key_mode": "0o600",
+  "private_material_published": false,
+  "exporter_update_identity_check": {
+    "status": "SAME_ID_AND_SIGNER",
+    "previous_version": "0.1.0-beta.10"
+  }
+}

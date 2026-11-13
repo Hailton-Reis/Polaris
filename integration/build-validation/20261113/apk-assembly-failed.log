@@ -1,0 +1,560 @@
+Picked up JAVA_TOOL_OPTIONS: -Duser.home=/workspace/work/java-user -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Dhttps.proxyHost=proxy -Dhttps.proxyPort=8080 -Dhttp.proxyHost=proxy -Dhttp.proxyPort=8080
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/9.6.1/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+Configuration on demand is an incubating feature.
+Type-safe project accessors is an incubating feature.
+> Task :build-logic:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :build-logic:compileKotlin UP-TO-DATE
+> Task :build-logic:compileJava NO-SOURCE
+> Task :build-logic:pluginDescriptors UP-TO-DATE
+> Task :build-logic:processResources UP-TO-DATE
+> Task :build-logic:classes UP-TO-DATE
+> Task :build-logic:jar UP-TO-DATE
+Observed package id 'platforms;android-37.0' in inconsistent location '/workspace/work/android-sdk/platforms/android-37.0-2' (Expected '/workspace/work/android-sdk/platforms/android-37.0')
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preDebugBuild UP-TO-DATE
+> Task :app:mergeDebugNativeDebugMetadata NO-SOURCE
+> Task :app:compileDebugAidl UP-TO-DATE
+> Task :app:dataBindingMergeDependencyArtifactsDebug UP-TO-DATE
+> Task :app:generateDebugResources UP-TO-DATE
+> Task :app:prepareLibraryDefinitionsDebug UP-TO-DATE
+> Task :app:replaceDebugShortcutPlaceholder UP-TO-DATE
+> Task :core-metadata:preBuild UP-TO-DATE
+> Task :core-metadata:preDebugBuild UP-TO-DATE
+> Task :core-metadata:generateDebugResources UP-TO-DATE
+> Task :core-metadata:packageDebugResources UP-TO-DATE
+> Task :data:preBuild UP-TO-DATE
+> Task :data:preDebugBuild UP-TO-DATE
+> Task :data:generateDebugResources UP-TO-DATE
+> Task :data:packageDebugResources UP-TO-DATE
+> Task :dbnet-native:preBuild UP-TO-DATE
+> Task :dbnet-native:preDebugBuild UP-TO-DATE
+> Task :dbnet-native:generateDebugResources UP-TO-DATE
+> Task :dbnet-native:packageDebugResources UP-TO-DATE
+> Task :domain:preBuild UP-TO-DATE
+> Task :domain:preDebugBuild UP-TO-DATE
+> Task :domain:generateDebugResources UP-TO-DATE
+> Task :domain:packageDebugResources UP-TO-DATE
+> Task :i18n:generateAndroidMainLocalesConfig UP-TO-DATE
+> Task :i18n:generateMRcommonTest UP-TO-DATE
+> Task :i18n:generateMRandroidHostTest UP-TO-DATE
+> Task :i18n:generateMRcommonMain UP-TO-DATE
+> Task :i18n:generateMRandroidMain UP-TO-DATE
+> Task :i18n:androidPreBuild UP-TO-DATE
+> Task :i18n:preAndroidMainBuild UP-TO-DATE
+> Task :i18n:packageAndroidMainResources UP-TO-DATE
+> Task :i18n-at:generateMRcommonTest UP-TO-DATE
+> Task :i18n-at:generateMRandroidHostTest UP-TO-DATE
+> Task :i18n-at:generateMRcommonMain UP-TO-DATE
+> Task :i18n-at:generateMRandroidMain UP-TO-DATE
+> Task :i18n-at:androidPreBuild UP-TO-DATE
+> Task :i18n-at:preAndroidMainBuild UP-TO-DATE
+> Task :i18n-at:packageAndroidMainResources UP-TO-DATE
+> Task :ppocr-sdk:preBuild UP-TO-DATE
+> Task :ppocr-sdk:preDebugBuild UP-TO-DATE
+> Task :ppocr-sdk:generateDebugResources UP-TO-DATE
+> Task :ppocr-sdk:packageDebugResources UP-TO-DATE
+> Task :presentation-core:preBuild UP-TO-DATE
+> Task :presentation-core:preDebugBuild UP-TO-DATE
+> Task :presentation-core:generateDebugResources UP-TO-DATE
+> Task :presentation-core:packageDebugResources UP-TO-DATE
+> Task :presentation-widget:preBuild UP-TO-DATE
+> Task :presentation-widget:preDebugBuild UP-TO-DATE
+> Task :presentation-widget:generateDebugResources UP-TO-DATE
+> Task :presentation-widget:packageDebugResources UP-TO-DATE
+> Task :source-api:preBuild UP-TO-DATE
+> Task :source-api:preDebugBuild UP-TO-DATE
+> Task :source-api:generateDebugResources UP-TO-DATE
+> Task :source-api:packageDebugResources UP-TO-DATE
+> Task :source-local:preBuild UP-TO-DATE
+> Task :source-local:preDebugBuild UP-TO-DATE
+> Task :source-local:generateDebugResources UP-TO-DATE
+> Task :source-local:packageDebugResources UP-TO-DATE
+> Task :telemetry:preBuild UP-TO-DATE
+> Task :telemetry:preDebugBuild UP-TO-DATE
+> Task :telemetry:generateDebugResources UP-TO-DATE
+> Task :telemetry:packageDebugResources UP-TO-DATE
+> Task :core:archive:preBuild UP-TO-DATE
+> Task :core:archive:preDebugBuild UP-TO-DATE
+> Task :core:archive:generateDebugResources UP-TO-DATE
+> Task :core:archive:packageDebugResources UP-TO-DATE
+> Task :core:common:preBuild UP-TO-DATE
+> Task :core:common:preDebugBuild UP-TO-DATE
+> Task :core:common:generateDebugResources UP-TO-DATE
+> Task :core:common:packageDebugResources UP-TO-DATE
+> Task :core:viewmodel:preBuild UP-TO-DATE
+> Task :core:viewmodel:preDebugBuild UP-TO-DATE
+> Task :core:viewmodel:generateDebugResources UP-TO-DATE
+> Task :core:viewmodel:packageDebugResources UP-TO-DATE
+> Task :app:mergeDebugResources UP-TO-DATE
+> Task :app:dataBindingGenBaseClassesDebug UP-TO-DATE
+> Task :app:generateDebugBuildConfig
+> Task :app:packageDebugResources UP-TO-DATE
+> Task :core-metadata:processDebugNavigationResources UP-TO-DATE
+> Task :data:processDebugNavigationResources UP-TO-DATE
+> Task :dbnet-native:processDebugNavigationResources UP-TO-DATE
+> Task :domain:processDebugNavigationResources UP-TO-DATE
+> Task :i18n:generateAndroidMainEmptyResourceFiles UP-TO-DATE
+> Task :i18n-at:generateAndroidMainEmptyResourceFiles UP-TO-DATE
+> Task :ppocr-sdk:processDebugNavigationResources UP-TO-DATE
+> Task :presentation-core:processDebugNavigationResources UP-TO-DATE
+> Task :presentation-widget:processDebugNavigationResources UP-TO-DATE
+> Task :source-api:processDebugNavigationResources UP-TO-DATE
+> Task :source-local:processDebugNavigationResources UP-TO-DATE
+> Task :telemetry:processDebugNavigationResources UP-TO-DATE
+> Task :core:archive:processDebugNavigationResources UP-TO-DATE
+> Task :core:common:processDebugNavigationResources UP-TO-DATE
+> Task :core:viewmodel:processDebugNavigationResources UP-TO-DATE
+> Task :app:processDebugNavigationResources UP-TO-DATE
+> Task :app:parseDebugLocalResources UP-TO-DATE
+> Task :core-metadata:parseDebugLocalResources UP-TO-DATE
+> Task :source-api:parseDebugLocalResources UP-TO-DATE
+> Task :i18n:parseAndroidMainLocalResources UP-TO-DATE
+> Task :i18n:generateAndroidMainRFile UP-TO-DATE
+> Task :core:common:parseDebugLocalResources UP-TO-DATE
+> Task :core:common:generateDebugRFile UP-TO-DATE
+> Task :source-api:generateDebugRFile UP-TO-DATE
+> Task :core-metadata:generateDebugRFile UP-TO-DATE
+> Task :data:parseDebugLocalResources UP-TO-DATE
+> Task :domain:parseDebugLocalResources UP-TO-DATE
+> Task :domain:generateDebugRFile UP-TO-DATE
+> Task :data:generateDebugRFile UP-TO-DATE
+> Task :dbnet-native:parseDebugLocalResources UP-TO-DATE
+> Task :dbnet-native:generateDebugRFile UP-TO-DATE
+> Task :i18n-at:parseAndroidMainLocalResources UP-TO-DATE
+> Task :i18n-at:generateAndroidMainRFile UP-TO-DATE
+> Task :ppocr-sdk:parseDebugLocalResources UP-TO-DATE
+> Task :ppocr-sdk:generateDebugRFile UP-TO-DATE
+> Task :presentation-core:parseDebugLocalResources UP-TO-DATE
+> Task :presentation-core:generateDebugRFile UP-TO-DATE
+> Task :presentation-widget:parseDebugLocalResources UP-TO-DATE
+> Task :presentation-widget:generateDebugRFile UP-TO-DATE
+> Task :source-local:parseDebugLocalResources UP-TO-DATE
+> Task :core:archive:parseDebugLocalResources UP-TO-DATE
+> Task :core:archive:generateDebugRFile UP-TO-DATE
+> Task :source-local:generateDebugRFile UP-TO-DATE
+> Task :telemetry:parseDebugLocalResources UP-TO-DATE
+> Task :telemetry:generateDebugRFile UP-TO-DATE
+> Task :core:viewmodel:parseDebugLocalResources UP-TO-DATE
+> Task :core:viewmodel:generateDebugRFile UP-TO-DATE
+> Task :app:generateDebugRFile UP-TO-DATE
+> Task :i18n:kmpPartiallyResolvedDependenciesChecker
+> Task :i18n:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :i18n:compileAndroidMain UP-TO-DATE
+> Task :i18n:bundleAndroidMainClassesToCompileJar UP-TO-DATE
+> Task :core:common:compileDebugKotlin UP-TO-DATE
+> Task :core:common:javaPreCompileDebug UP-TO-DATE
+> Task :core:common:compileDebugJavaWithJavac NO-SOURCE
+> Task :core:common:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :source-api:compileDebugKotlin UP-TO-DATE
+> Task :source-api:javaPreCompileDebug UP-TO-DATE
+> Task :source-api:compileDebugJavaWithJavac NO-SOURCE
+> Task :source-api:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :core-metadata:compileDebugKotlin UP-TO-DATE
+> Task :core-metadata:javaPreCompileDebug UP-TO-DATE
+> Task :core-metadata:compileDebugJavaWithJavac NO-SOURCE
+> Task :core-metadata:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :data:generateDebugDatabaseInterface UP-TO-DATE
+> Task :domain:compileDebugKotlin UP-TO-DATE
+> Task :domain:javaPreCompileDebug UP-TO-DATE
+> Task :domain:compileDebugJavaWithJavac NO-SOURCE
+> Task :domain:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :data:compileDebugKotlin UP-TO-DATE
+> Task :data:javaPreCompileDebug UP-TO-DATE
+> Task :data:compileDebugJavaWithJavac NO-SOURCE
+> Task :data:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :dbnet-native:compileDebugKotlin NO-SOURCE
+> Task :dbnet-native:javaPreCompileDebug UP-TO-DATE
+> Task :dbnet-native:compileDebugJavaWithJavac NO-SOURCE
+> Task :dbnet-native:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :i18n-at:kmpPartiallyResolvedDependenciesChecker
+> Task :i18n-at:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :i18n-at:compileAndroidMain UP-TO-DATE
+> Task :i18n-at:bundleAndroidMainClassesToCompileJar UP-TO-DATE
+> Task :ppocr-sdk:compileDebugKotlin UP-TO-DATE
+> Task :ppocr-sdk:javaPreCompileDebug UP-TO-DATE
+> Task :ppocr-sdk:compileDebugJavaWithJavac NO-SOURCE
+> Task :ppocr-sdk:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :presentation-core:compileDebugKotlin UP-TO-DATE
+> Task :presentation-core:javaPreCompileDebug UP-TO-DATE
+> Task :presentation-core:compileDebugJavaWithJavac NO-SOURCE
+> Task :presentation-core:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :presentation-widget:compileDebugKotlin UP-TO-DATE
+> Task :presentation-widget:javaPreCompileDebug UP-TO-DATE
+> Task :presentation-widget:compileDebugJavaWithJavac NO-SOURCE
+> Task :presentation-widget:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :core:archive:compileDebugKotlin UP-TO-DATE
+> Task :core:archive:javaPreCompileDebug UP-TO-DATE
+> Task :core:archive:compileDebugJavaWithJavac NO-SOURCE
+> Task :core:archive:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :source-local:compileDebugKotlin UP-TO-DATE
+> Task :source-local:javaPreCompileDebug UP-TO-DATE
+> Task :source-local:compileDebugJavaWithJavac NO-SOURCE
+> Task :source-local:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :telemetry:compileDebugKotlin UP-TO-DATE
+> Task :telemetry:javaPreCompileDebug UP-TO-DATE
+> Task :telemetry:compileDebugJavaWithJavac NO-SOURCE
+> Task :telemetry:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :core:viewmodel:compileDebugKotlin UP-TO-DATE
+> Task :core:viewmodel:javaPreCompileDebug UP-TO-DATE
+> Task :core:viewmodel:compileDebugJavaWithJavac NO-SOURCE
+> Task :core:viewmodel:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :app:javaPreCompileDebug UP-TO-DATE
+> Task :app:generateDebugAssets UP-TO-DATE
+> Task :core-metadata:generateDebugAssets UP-TO-DATE
+> Task :core-metadata:mergeDebugAssets
+> Task :data:generateDebugAssets UP-TO-DATE
+> Task :data:mergeDebugAssets
+> Task :dbnet-native:generateDebugAssets UP-TO-DATE
+> Task :dbnet-native:mergeDebugAssets
+> Task :domain:generateDebugAssets UP-TO-DATE
+> Task :domain:mergeDebugAssets
+> Task :i18n:generateAndroidMainAssets UP-TO-DATE
+> Task :i18n:mergeAndroidMainAssets
+> Task :i18n-at:generateAndroidMainAssets UP-TO-DATE
+> Task :i18n-at:mergeAndroidMainAssets
+> Task :ppocr-sdk:generateDebugAssets UP-TO-DATE
+> Task :ppocr-sdk:mergeDebugAssets
+> Task :presentation-core:generateDebugAssets UP-TO-DATE
+> Task :presentation-core:mergeDebugAssets
+> Task :presentation-widget:generateDebugAssets UP-TO-DATE
+> Task :presentation-widget:mergeDebugAssets
+> Task :source-api:generateDebugAssets UP-TO-DATE
+> Task :source-api:mergeDebugAssets
+> Task :source-local:generateDebugAssets UP-TO-DATE
+> Task :source-local:mergeDebugAssets
+> Task :telemetry:generateDebugAssets UP-TO-DATE
+> Task :telemetry:mergeDebugAssets
+> Task :core:archive:generateDebugAssets UP-TO-DATE
+> Task :core:archive:mergeDebugAssets
+> Task :core:common:generateDebugAssets UP-TO-DATE
+> Task :core:common:mergeDebugAssets
+> Task :core:viewmodel:generateDebugAssets UP-TO-DATE
+> Task :core:viewmodel:mergeDebugAssets
+> Task :app:mergeDebugAssets
+> Task :app:compressDebugAssets
+> Task :app:generateDebugGlobalSynthetics
+> Task :app:l8DexDesugarLibDebug
+> Task :core-metadata:processDebugJavaRes UP-TO-DATE
+> Task :data:processDebugJavaRes UP-TO-DATE
+> Task :dbnet-native:processDebugJavaRes NO-SOURCE
+> Task :domain:processDebugJavaRes UP-TO-DATE
+> Task :i18n:processAndroidMainJavaRes UP-TO-DATE
+> Task :i18n-at:processAndroidMainJavaRes UP-TO-DATE
+> Task :ppocr-sdk:processDebugJavaRes UP-TO-DATE
+> Task :presentation-core:processDebugJavaRes UP-TO-DATE
+> Task :presentation-widget:processDebugJavaRes UP-TO-DATE
+> Task :source-api:processDebugJavaRes UP-TO-DATE
+> Task :source-local:processDebugJavaRes UP-TO-DATE
+> Task :telemetry:processDebugJavaRes UP-TO-DATE
+> Task :core:archive:processDebugJavaRes UP-TO-DATE
+> Task :core:common:processDebugJavaRes UP-TO-DATE
+> Task :core:viewmodel:processDebugJavaRes UP-TO-DATE
+> Task :app:compileDebugKotlin
+> Task :app:checkDebugDuplicateClasses
+> Task :app:desugarDebugFileDependencies
+
+> Task :app:compileDebugKotlin
+w: file:///workspace/work/yomotsu/app/src/main/java/eu/kanade/tachiyomi/data/backup/create/BackupCreator.kt:106:51 Elvis operator (?:) always returns the left operand of non-nullable type 'InputStream'.
+w: file:///workspace/work/yomotsu/app/src/main/java/eu/kanade/tachiyomi/data/backup/create/BackupCreator.kt:119:25 Elvis operator (?:) always returns the left operand of non-nullable type 'OutputStream'.
+w: file:///workspace/work/yomotsu/app/src/main/java/eu/kanade/tachiyomi/data/backup/create/BackupCreator.kt:123:51 Elvis operator (?:) always returns the left operand of non-nullable type 'InputStream'.
+w: file:///workspace/work/yomotsu/app/src/main/java/eu/kanade/tachiyomi/data/backup/create/BackupCreator.kt:135:53 Elvis operator (?:) always returns the left operand of non-nullable type 'InputStream'.
+w: file:///workspace/work/yomotsu/app/src/main/java/eu/kanade/tachiyomi/data/notification/NotificationReceiver.kt:186:9 This is a delicate API and its use requires care. Make sure you fully read and understand documentation of the declaration that is marked as a delicate API.
+w: file:///workspace/work/yomotsu/app/src/main/java/eu/kanade/tachiyomi/data/notification/NotificationReceiver.kt:212:9 This is a delicate API and its use requires care. Make sure you fully read and understand documentation of the declaration that is marked as a delicate API.
+
+> Task :app:mergeExtDexDebug
+> Task :app:compileDebugJavaWithJavac
+> Task :app:processDebugJavaRes UP-TO-DATE
+> Task :app:mergeDebugJavaResource
+> Task :source-local:bundleLibRuntimeToDirDebug
+> Task :core-metadata:bundleLibRuntimeToDirDebug
+> Task :data:bundleLibRuntimeToDirDebug
+> Task :presentation-widget:bundleLibRuntimeToDirDebug
+> Task :domain:bundleLibRuntimeToDirDebug
+> Task :source-api:bundleLibRuntimeToDirDebug
+> Task :presentation-core:bundleLibRuntimeToDirDebug
+> Task :telemetry:bundleLibRuntimeToDirDebug
+> Task :core:common:bundleLibRuntimeToDirDebug
+> Task :i18n:bundleLibRuntimeToDirAndroidMain
+> Task :i18n-at:bundleLibRuntimeToDirAndroidMain
+> Task :ppocr-sdk:bundleLibRuntimeToDirDebug
+> Task :core:viewmodel:bundleLibRuntimeToDirDebug
+> Task :core:archive:bundleLibRuntimeToDirDebug
+> Task :dbnet-native:bundleLibRuntimeToDirDebug
+> Task :app:mergeLibDexDebug
+> Task :core-metadata:writeDebugAarMetadata UP-TO-DATE
+> Task :data:writeDebugAarMetadata UP-TO-DATE
+> Task :dbnet-native:writeDebugAarMetadata UP-TO-DATE
+> Task :domain:writeDebugAarMetadata UP-TO-DATE
+> Task :i18n:writeAndroidMainAarMetadata UP-TO-DATE
+> Task :i18n-at:writeAndroidMainAarMetadata UP-TO-DATE
+> Task :ppocr-sdk:writeDebugAarMetadata UP-TO-DATE
+> Task :presentation-core:writeDebugAarMetadata UP-TO-DATE
+> Task :presentation-widget:writeDebugAarMetadata UP-TO-DATE
+> Task :source-api:writeDebugAarMetadata UP-TO-DATE
+> Task :source-local:writeDebugAarMetadata UP-TO-DATE
+> Task :telemetry:writeDebugAarMetadata UP-TO-DATE
+> Task :core:archive:writeDebugAarMetadata UP-TO-DATE
+> Task :core:common:writeDebugAarMetadata UP-TO-DATE
+> Task :core:viewmodel:writeDebugAarMetadata UP-TO-DATE
+> Task :app:checkDebugAarMetadata UP-TO-DATE
+> Task :app:mapDebugSourceSetPaths UP-TO-DATE
+> Task :app:compileDebugNavigationResources UP-TO-DATE
+> Task :app:createDebugCompatibleScreenManifests
+> Task :app:extractDeepLinksDebug UP-TO-DATE
+> Task :core-metadata:extractDeepLinksDebug UP-TO-DATE
+> Task :core-metadata:processDebugManifest UP-TO-DATE
+> Task :data:extractDeepLinksDebug UP-TO-DATE
+> Task :data:processDebugManifest UP-TO-DATE
+> Task :dbnet-native:extractDeepLinksDebug UP-TO-DATE
+> Task :dbnet-native:processDebugManifest UP-TO-DATE
+> Task :domain:extractDeepLinksDebug UP-TO-DATE
+> Task :domain:processDebugManifest UP-TO-DATE
+> Task :i18n:processAndroidMainManifest UP-TO-DATE
+> Task :i18n-at:processAndroidMainManifest UP-TO-DATE
+> Task :ppocr-sdk:extractDeepLinksDebug UP-TO-DATE
+> Task :ppocr-sdk:processDebugManifest UP-TO-DATE
+> Task :presentation-core:extractDeepLinksDebug UP-TO-DATE
+> Task :presentation-core:processDebugManifest UP-TO-DATE
+> Task :presentation-widget:extractDeepLinksDebug UP-TO-DATE
+> Task :presentation-widget:processDebugManifest UP-TO-DATE
+> Task :source-api:extractDeepLinksDebug UP-TO-DATE
+> Task :source-api:processDebugManifest UP-TO-DATE
+> Task :source-local:extractDeepLinksDebug UP-TO-DATE
+> Task :source-local:processDebugManifest UP-TO-DATE
+> Task :telemetry:extractDeepLinksDebug UP-TO-DATE
+> Task :telemetry:processDebugManifest UP-TO-DATE
+> Task :core:archive:extractDeepLinksDebug UP-TO-DATE
+> Task :core:archive:processDebugManifest UP-TO-DATE
+> Task :core:common:extractDeepLinksDebug UP-TO-DATE
+> Task :core:common:processDebugManifest UP-TO-DATE
+> Task :core:viewmodel:extractDeepLinksDebug UP-TO-DATE
+> Task :core:viewmodel:processDebugManifest UP-TO-DATE
+> Task :app:processDebugMainManifest UP-TO-DATE
+> Task :app:processDebugManifest
+> Task :app:processDebugManifestForPackage
+> Task :core-metadata:mapDebugSourceSetPaths UP-TO-DATE
+> Task :core-metadata:compileDebugLibraryResources UP-TO-DATE
+> Task :data:mapDebugSourceSetPaths UP-TO-DATE
+> Task :data:compileDebugLibraryResources UP-TO-DATE
+> Task :dbnet-native:mapDebugSourceSetPaths UP-TO-DATE
+> Task :dbnet-native:compileDebugLibraryResources UP-TO-DATE
+> Task :domain:mapDebugSourceSetPaths UP-TO-DATE
+> Task :domain:compileDebugLibraryResources UP-TO-DATE
+> Task :i18n:mapAndroidMainSourceSetPaths UP-TO-DATE
+> Task :i18n:compileAndroidMainLibraryResources UP-TO-DATE
+> Task :i18n-at:mapAndroidMainSourceSetPaths UP-TO-DATE
+> Task :i18n-at:compileAndroidMainLibraryResources UP-TO-DATE
+> Task :ppocr-sdk:mapDebugSourceSetPaths UP-TO-DATE
+> Task :ppocr-sdk:compileDebugLibraryResources UP-TO-DATE
+> Task :presentation-core:mapDebugSourceSetPaths UP-TO-DATE
+> Task :presentation-core:compileDebugLibraryResources UP-TO-DATE
+> Task :presentation-widget:mapDebugSourceSetPaths UP-TO-DATE
+> Task :presentation-widget:compileDebugLibraryResources UP-TO-DATE
+> Task :source-api:mapDebugSourceSetPaths UP-TO-DATE
+> Task :source-api:compileDebugLibraryResources UP-TO-DATE
+> Task :source-local:mapDebugSourceSetPaths UP-TO-DATE
+> Task :source-local:compileDebugLibraryResources UP-TO-DATE
+> Task :telemetry:mapDebugSourceSetPaths UP-TO-DATE
+> Task :telemetry:compileDebugLibraryResources UP-TO-DATE
+> Task :core:archive:mapDebugSourceSetPaths UP-TO-DATE
+> Task :core:archive:compileDebugLibraryResources UP-TO-DATE
+> Task :core:common:mapDebugSourceSetPaths UP-TO-DATE
+> Task :core:common:compileDebugLibraryResources UP-TO-DATE
+> Task :core:viewmodel:mapDebugSourceSetPaths UP-TO-DATE
+> Task :core:viewmodel:compileDebugLibraryResources UP-TO-DATE
+> Task :app:processDebugResources
+> Task :app:dexBuilderDebug
+> Task :app:mergeDebugJniLibFolders
+> Task :core-metadata:mergeDebugJniLibFolders
+> Task :core-metadata:mergeDebugNativeLibs NO-SOURCE
+> Task :core-metadata:copyDebugJniLibsProjectOnly
+> Task :data:mergeDebugJniLibFolders
+> Task :data:mergeDebugNativeLibs NO-SOURCE
+> Task :data:copyDebugJniLibsProjectOnly
+
+> Task :dbnet-native:configureCMakeDebug[arm64-v8a]
+Warning: Observed package id 'platforms;android-37.0' in inconsistent location '/workspace/work/android-sdk/platforms/android-37.0-2' (Expected '/workspace/work/android-sdk/platforms/android-37.0')
+Warning: Observed package id 'platforms;android-37.0' in inconsistent location '/workspace/work/android-sdk/platforms/android-37.0-2' (Expected '/workspace/work/android-sdk/platforms/android-37.0')
+Checking the license for package CMake 3.22.1 in /workspace/work/android-sdk/licenses
+License for package CMake 3.22.1 accepted.
+Preparing "Install CMake 3.22.1 v.3.22.1".
+
+> Task :app:mergeProjectDexDebug
+
+> Task :dbnet-native:configureCMakeDebug[arm64-v8a]
+"Install CMake 3.22.1 v.3.22.1" ready.
+Installing CMake 3.22.1 in /workspace/work/android-sdk/cmake/3.22.1
+"Install CMake 3.22.1 v.3.22.1" complete.
+"Install CMake 3.22.1 v.3.22.1" finished.
+Warning: Observed package id 'platforms;android-37.0' in inconsistent location '/workspace/work/android-sdk/platforms/android-37.0-2' (Expected '/workspace/work/android-sdk/platforms/android-37.0')
+
+> Task :dbnet-native:buildCMakeDebug[arm64-v8a]
+> Task :dbnet-native:mergeDebugJniLibFolders
+> Task :domain:mergeDebugJniLibFolders
+> Task :domain:mergeDebugNativeLibs NO-SOURCE
+> Task :domain:copyDebugJniLibsProjectOnly
+> Task :i18n:mergeAndroidMainJniLibFolders
+> Task :i18n:mergeAndroidMainNativeLibs NO-SOURCE
+> Task :i18n:copyAndroidMainJniLibsProjectOnly
+> Task :i18n-at:mergeAndroidMainJniLibFolders
+> Task :i18n-at:mergeAndroidMainNativeLibs NO-SOURCE
+> Task :i18n-at:copyAndroidMainJniLibsProjectOnly
+> Task :ppocr-sdk:mergeDebugJniLibFolders
+> Task :ppocr-sdk:mergeDebugNativeLibs NO-SOURCE
+> Task :dbnet-native:mergeDebugNativeLibs
+> Task :ppocr-sdk:copyDebugJniLibsProjectOnly
+> Task :presentation-core:mergeDebugJniLibFolders
+> Task :presentation-core:mergeDebugNativeLibs NO-SOURCE
+> Task :presentation-core:copyDebugJniLibsProjectOnly
+> Task :presentation-widget:mergeDebugJniLibFolders
+> Task :presentation-widget:mergeDebugNativeLibs NO-SOURCE
+> Task :presentation-widget:copyDebugJniLibsProjectOnly
+> Task :source-api:mergeDebugJniLibFolders
+> Task :source-api:mergeDebugNativeLibs NO-SOURCE
+> Task :source-api:copyDebugJniLibsProjectOnly
+> Task :dbnet-native:copyDebugJniLibsProjectOnly
+> Task :source-local:mergeDebugJniLibFolders
+> Task :source-local:mergeDebugNativeLibs NO-SOURCE
+> Task :source-local:copyDebugJniLibsProjectOnly
+> Task :telemetry:mergeDebugJniLibFolders
+> Task :telemetry:mergeDebugNativeLibs NO-SOURCE
+> Task :telemetry:copyDebugJniLibsProjectOnly
+> Task :core:archive:mergeDebugJniLibFolders
+> Task :core:archive:mergeDebugNativeLibs NO-SOURCE
+> Task :core:archive:copyDebugJniLibsProjectOnly
+> Task :core:common:mergeDebugJniLibFolders
+> Task :core:common:mergeDebugNativeLibs NO-SOURCE
+> Task :core:common:copyDebugJniLibsProjectOnly
+> Task :core:viewmodel:mergeDebugJniLibFolders
+> Task :core:viewmodel:mergeDebugNativeLibs NO-SOURCE
+> Task :core:viewmodel:copyDebugJniLibsProjectOnly
+> Task :app:validateSigningDebug
+> Task :app:writeDebugAppMetadata
+> Task :app:writeDebugSigningConfigVersions
+> Task :app:mergeDebugNativeLibs
+> Task :app:stripDebugDebugSymbols FAILED
+
+[Incubating] Problems report is available at: file:///workspace/work/yomotsu/build/reports/problems/problems-report.html
+
+FAILURE: Build completed with 2 failures.
+
+1: Task failed with an exception.
+-----------
+* What went wrong:
+Execution failed for task ':app:stripDebugDebugSymbols' (registered by plugin 'com.android.internal.application').
+> A failure occurred while executing com.android.build.gradle.internal.tasks.StripDebugSymbolsDelegate
+   > There were multiple failures while executing work items
+      > A failure occurred while executing com.android.build.gradle.internal.tasks.StripDebugSymbolsRunnable
+         > Cannot create directory /workspace/work/yomotsu/app/build/intermediates/stripped_native_libs/debug/stripDebugDebugSymbols/out/lib/armeabi-v7a
+      > A failure occurred while executing com.android.build.gradle.internal.tasks.StripDebugSymbolsRunnable
+         > Cannot create directory /workspace/work/yomotsu/app/build/intermediates/stripped_native_libs/debug/stripDebugDebugSymbols/out/lib/armeabi-v7a
+      > A failure occurred while executing com.android.build.gradle.internal.tasks.StripDebugSymbolsRunnable
+         > Cannot create directory /workspace/work/yomotsu/app/build/intermediates/stripped_native_libs/debug/stripDebugDebugSymbols/out/lib/armeabi-v7a
+      > A failure occurred while executing com.android.build.gradle.internal.tasks.StripDebugSymbolsRunnable
+         > Cannot create directory /workspace/work/yomotsu/app/build/intermediates/stripped_native_libs/debug/stripDebugDebugSymbols/out/lib/armeabi-v7a
+      > A failure occurred while executing com.android.build.gradle.internal.tasks.StripDebugSymbolsRunnable
+         > Cannot create directory /workspace/work/yomotsu/app/build/intermediates/stripped_native_libs/debug/stripDebugDebugSymbols/out/lib/armeabi-v7a
+      > A failure occurred while executing com.android.build.gradle.internal.tasks.StripDebugSymbolsRunnable
+         > Cannot create directory /workspace/work/yomotsu/app/build/intermediates/stripped_native_libs/debug/stripDebugDebugSymbols/out/lib/armeabi-v7a
+      > A failure occurred while executing com.android.build.gradle.internal.tasks.StripDebugSymbolsRunnable
+         > Cannot create directory /workspace/work/yomotsu/app/build/intermediates/stripped_native_libs/debug/stripDebugDebugSymbols/out/lib/armeabi-v7a
+      > A failure occurred while executing com.android.build.gradle.internal.tasks.StripDebugSymbolsRunnable
+         > Cannot create directory /workspace/work/yomotsu/app/build/intermediates/stripped_native_libs/debug/stripDebugDebugSymbols/out/lib/armeabi-v7a
+      > A failure occurred while executing com.android.build.gradle.internal.tasks.StripDebugSymbolsRunnable
+         > Cannot create directory /workspace/work/yomotsu/app/build/intermediates/stripped_native_libs/debug/stripDebugDebugSymbols/out/lib/armeabi-v7a
+      > A failure occurred while executing com.android.build.gradle.internal.tasks.StripDebugSymbolsRunnable
+         > Cannot create directory /workspace/work/yomotsu/app/build/intermediates/stripped_native_libs/debug/stripDebugDebugSymbols/out/lib/armeabi-v7a
+      > A failure occurred while executing com.android.build.gradle.internal.tasks.StripDebugSymbolsRunnable
+         > Cannot create directory /workspace/work/yomotsu/app/build/intermediates/stripped_native_libs/debug/stripDebugDebugSymbols/out/lib/armeabi-v7a
+      > A failure occurred while executing com.android.build.gradle.internal.tasks.StripDebugSymbolsRunnable
+         > Cannot create directory /workspace/work/yomotsu/app/build/intermediates/stripped_native_libs/debug/stripDebugDebugSymbols/out/lib/armeabi-v7a
+      > A failure occurred while executing com.android.build.gradle.internal.tasks.StripDebugSymbolsRunnable
+         > Cannot create directory /workspace/work/yomotsu/app/build/intermediates/stripped_native_libs/debug/stripDebugDebugSymbols/out/lib/armeabi-v7a
+      > A failure occurred while executing com.android.build.gradle.internal.tasks.StripDebugSymbolsRunnable
+         > Cannot create directory /workspace/work/yomotsu/app/build/intermediates/stripped_native_libs/debug/stripDebugDebugSymbols/out/lib/armeabi-v7a
+      > A failure occurred while executing com.android.build.gradle.internal.tasks.StripDebugSymbolsRunnable
+         > Cannot create directory /workspace/work/yomotsu/app/build/intermediates/stripped_native_libs/debug/stripDebugDebugSymbols/out/lib/armeabi-v7a
+      > A failure occurred while executing com.android.build.gradle.internal.tasks.StripDebugSymbolsRunnable
+         > Cannot create directory /workspace/work/yomotsu/app/build/intermediates/stripped_native_libs/debug/stripDebugDebugSymbols/out/lib/x86
+      > A failure occurred while executing com.android.build.gradle.internal.tasks.StripDebugSymbolsRunnable
+         > Cannot create directory /workspace/work/yomotsu/app/build/intermediates/stripped_native_libs/debug/stripDebugDebugSymbols/out/lib/x86
+      > A failure occurred while executing com.android.build.gradle.internal.tasks.StripDebugSymbolsRunnable
+         > Cannot create directory /workspace/work/yomotsu/app/build/intermediates/stripped_native_libs/debug/stripDebugDebugSymbols/out/lib/x86
+      > A failure occurred while executing com.android.build.gradle.internal.tasks.StripDebugSymbolsRunnable
+         > Cannot create directory /workspace/work/yomotsu/app/build/intermediates/stripped_native_libs/debug/stripDebugDebugSymbols/out/lib/x86
+      > A failure occurred while executing com.android.build.gradle.internal.tasks.StripDebugSymbolsRunnable
+         > Cannot create directory /workspace/work/yomotsu/app/build/intermediates/stripped_native_libs/debug/stripDebugDebugSymbols/out/lib/x86
+      > A failure occurred while executing com.android.build.gradle.internal.tasks.StripDebugSymbolsRunnable
+         > Cannot create directory /workspace/work/yomotsu/app/build/intermediates/stripped_native_libs/debug/stripDebugDebugSymbols/out/lib/x86
+      > A failure occurred while executing com.android.build.gradle.internal.tasks.StripDebugSymbolsRunnable
+         > Cannot create directory /workspace/work/yomotsu/app/build/intermediates/stripped_native_libs/debug/stripDebugDebugSymbols/out/lib/x86
+      > A failure occurred while executing com.android.build.gradle.internal.tasks.StripDebugSymbolsRunnable
+         > Cannot create directory /workspace/work/yomotsu/app/build/intermediates/stripped_native_libs/debug/stripDebugDebugSymbols/out/lib/x86
+      > A failure occurred while executing com.android.build.gradle.internal.tasks.StripDebugSymbolsRunnable
+         > Cannot create directory /workspace/work/yomotsu/app/build/intermediates/stripped_native_libs/debug/stripDebugDebugSymbols/out/lib/x86
+      > A failure occurred while executing com.android.build.gradle.internal.tasks.StripDebugSymbolsRunnable
+         > Cannot create directory /workspace/work/yomotsu/app/build/intermediates/stripped_native_libs/debug/stripDebugDebugSymbols/out/lib/x86
+      > A failure occurred while executing com.android.build.gradle.internal.tasks.StripDebugSymbolsRunnable
+         > Cannot create directory /workspace/work/yomotsu/app/build/intermediates/stripped_native_libs/debug/stripDebugDebugSymbols/out/lib/x86
+      > A failure occurred while executing com.android.build.gradle.internal.tasks.StripDebugSymbolsRunnable
+         > Cannot create directory /workspace/work/yomotsu/app/build/intermediates/stripped_native_libs/debug/stripDebugDebugSymbols/out/lib/x86
+      > A failure occurred while executing com.android.build.gradle.internal.tasks.StripDebugSymbolsRunnable
+         > Cannot create directory /workspace/work/yomotsu/app/build/intermediates/stripped_native_libs/debug/stripDebugDebugSymbols/out/lib/x86
+      > A failure occurred while executing com.android.build.gradle.internal.tasks.StripDebugSymbolsRunnable
+         > Cannot create directory /workspace/work/yomotsu/app/build/intermediates/stripped_native_libs/debug/stripDebugDebugSymbols/out/lib/x86
+      > A failure occurred while executing com.android.build.gradle.internal.tasks.StripDebugSymbolsRunnable
+         > Cannot create directory /workspace/work/yomotsu/app/build/intermediates/stripped_native_libs/debug/stripDebugDebugSymbols/out/lib/x86
+      > A failure occurred while executing com.android.build.gradle.internal.tasks.StripDebugSymbolsRunnable
+         > Cannot create directory /workspace/work/yomotsu/app/build/intermediates/stripped_native_libs/debug/stripDebugDebugSymbols/out/lib/x86_64
+      > A failure occurred while executing com.android.build.gradle.internal.tasks.StripDebugSymbolsRunnable
+         > Cannot create directory /workspace/work/yomotsu/app/build/intermediates/stripped_native_libs/debug/stripDebugDebugSymbols/out/lib/x86_64
+      > A failure occurred while executing com.android.build.gradle.internal.tasks.StripDebugSymbolsRunnable
+         > Cannot create directory /workspace/work/yomotsu/app/build/intermediates/stripped_native_libs/debug/stripDebugDebugSymbols/out/lib/x86_64
+      > A failure occurred while executing com.android.build.gradle.internal.tasks.StripDebugSymbolsRunnable
+         > Cannot create directory /workspace/work/yomotsu/app/build/intermediates/stripped_native_libs/debug/stripDebugDebugSymbols/out/lib/x86_64
+      > A failure occurred while executing com.android.build.gradle.internal.tasks.StripDebugSymbolsRunnable
+         > Cannot create directory /workspace/work/yomotsu/app/build/intermediates/stripped_native_libs/debug/stripDebugDebugSymbols/out/lib/x86_64
+      > A failure occurred while executing com.android.build.gradle.internal.tasks.StripDebugSymbolsRunnable
+         > Cannot create directory /workspace/work/yomotsu/app/build/intermediates/stripped_native_libs/debug/stripDebugDebugSymbols/out/lib/x86_64
+      > A failure occurred while executing com.android.build.gradle.internal.tasks.StripDebugSymbolsRunnable
+         > Cannot create directory /workspace/work/yomotsu/app/build/intermediates/stripped_native_libs/debug/stripDebugDebugSymbols/out/lib/x86_64
+      > A failure occurred while executing com.android.build.gradle.internal.tasks.StripDebugSymbolsRunnable
+         > Cannot create directory /workspace/work/yomotsu/app/build/intermediates/stripped_native_libs/debug/stripDebugDebugSymbols/out/lib/x86_64
+      > A failure occurred while executing com.android.build.gradle.internal.tasks.StripDebugSymbolsRunnable
+         > Cannot create directory /workspace/work/yomotsu/app/build/intermediates/stripped_native_libs/debug/stripDebugDebugSymbols/out/lib/x86_64
+      > A failure occurred while executing com.android.build.gradle.internal.tasks.StripDebugSymbolsRunnable
+         > Cannot create directory /workspace/work/yomotsu/app/build/intermediates/stripped_native_libs/debug/stripDebugDebugSymbols/out/lib/x86_64
+      > A failure occurred while executing com.android.build.gradle.internal.tasks.StripDebugSymbolsRunnable
+         > Cannot create directory /workspace/work/yomotsu/app/build/intermediates/stripped_native_libs/debug/stripDebugDebugSymbols/out/lib/x86_64
+      > A failure occurred while executing com.android.build.gradle.internal.tasks.StripDebugSymbolsRunnable
+         > Cannot create directory /workspace/work/yomotsu/app/build/intermediates/stripped_native_libs/debug/stripDebugDebugSymbols/out/lib/x86_64
+      > A failure occurred while executing com.android.build.gradle.internal.tasks.StripDebugSymbolsRunnable
+         > Cannot create directory /workspace/work/yomotsu/app/build/intermediates/stripped_native_libs/debug/stripDebugDebugSymbols/out/lib/x86_64
+      > A failure occurred while executing com.android.build.gradle.internal.tasks.StripDebugSymbolsRunnable
+         > Cannot create directory /workspace/work/yomotsu/app/build/intermediates/stripped_native_libs/debug/stripDebugDebugSymbols/out/lib/x86_64
+      > A failure occurred while executing com.android.build.gradle.internal.tasks.StripDebugSymbolsRunnable
+         > Cannot create directory /workspace/work/yomotsu/app/build/intermediates/stripped_native_libs/debug/stripDebugDebugSymbols/out/lib/x86_64
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights from a Build Scan (powered by Develocity).
+> Get more help at https://help.gradle.org.
+==============================================================================
+
+2: Task failed with an exception.
+-----------
+* What went wrong:
+Failed to stop service 'org.jetbrains.kotlin.gradle.plugin.statistics.BuildFinishBuildService_673454461'.
+> /workspace/work/yomotsu/.kotlin/errors/errors-aded8b60-b6d8-441f-a188-63e710e05193-1794587488318.log (No such file or directory)
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights from a Build Scan (powered by Develocity).
+> Get more help at https://help.gradle.org.
+==============================================================================
+
+BUILD FAILED in 6m 40s
+323 actionable tasks: 89 executed, 234 up-to-date

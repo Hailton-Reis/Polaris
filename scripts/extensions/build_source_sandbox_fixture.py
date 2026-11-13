@@ -25,6 +25,7 @@ def main():
     for name in ('android-root', 'output', 'sdk', 'java-home', 'gradle-home', 'kotlinc'):
         parser.add_argument('--' + name, type=Path, required=True)
     parser.add_argument('--source', type=Path, default=SOURCE, help='Synthetic fixture Kotlin source')
+    parser.add_argument('--android-jar', type=Path, help='Installed platform android.jar override')
     parser.add_argument('--write-asset', action='store_true',
                         help='Replace the synthetic Android test asset in android-root explicitly')
     args = parser.parse_args()
@@ -34,7 +35,9 @@ def main():
         parser.error('Use an output outside the source checkouts')
     output.mkdir(parents=True, exist_ok=False)
     cache = args.gradle_home / 'caches/modules-2/files-2.1'
-    android = args.sdk / 'platforms/android-37.0/android.jar'
+    android = args.android_jar or args.sdk / 'platforms/android-37.0/android.jar'
+    if not android.is_file():
+        parser.error('Installed android.jar is missing; use --android-jar for its actual location')
     java = args.java_home / 'bin/java'
     classpath = [android,
                  android_root / 'source-api/build/intermediates/compile_library_classes_jar/debug/bundleLibCompileToJarDebug/classes.jar',
