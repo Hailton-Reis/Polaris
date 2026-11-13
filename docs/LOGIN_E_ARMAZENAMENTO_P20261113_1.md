@@ -15,7 +15,7 @@ O usuário confirma o site e escolhe explicitamente Usar sessão. Voltar/cancela
 CookieBank. Os pontos de entrada WebView por fonte também encaminham proxies isolados a essa
 atividade; a tela de configurações atualiza o estado ao retornar.
 
-A navegação e os recursos ficam limitados à origem HTTPS selecionada. Arquivos/content URIs,
+A navegação e os pedidos iniciais de recursos são conferidos contra a origem HTTPS selecionada. Essas callbacks não garantem controle de todos os redirecionamentos de subrecursos ou canais internos do Chromium. Arquivos/content URIs,
 permissões de câmera/microfone/localização, terceiros, janelas extras e rede de service workers
 não são habilitados. Não há ponte JavaScript para objetos do host. O navegador é uma superfície
 interativa do host, **fora do worker isolado**; sua rede usa o WebView, não o intermediário HTTP
@@ -55,3 +55,7 @@ de pico e aceite com provedores Android reais continuam pendentes.
 Ver [registro de evidências](../integration/sandbox-login/20261113/README.md).
 Nenhum APK de telefone foi publicado. O [checklist da beta](BETA11_CHECKLIST.md) mantém as
 outras frentes abertas.
+
+## Continuação P20261113.2
+
+A [revisão de backups](../integration/backup-safety/20261113/README.md) corrige o reconhecimento de nomes com datas impossíveis e amplia o ensaio JVM para 43 casos. O aviso de login passa a descrever o limite dos cookies transferidos, sem prometer mediação de toda a rede do WebView. O build Android continua bloqueado por HTTP503.

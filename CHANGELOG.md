@@ -2,6 +2,16 @@
 
 Este arquivo registra a evolução real do código. **Revisões de desenvolvimento não são lançamentos públicos.** As datas abaixo usam America/Fortaleza, exceto quando houver indicação de UTC. O histórico de distribuição fica em [Releases](https://github.com/Hailton-Reis/Polaris/releases).
 
+## Desenvolvimento · P20261113.2 — 13/11/2026
+
+**Estado:** candidata da beta.11/código112; sem publicação. Compilação Android continua bloqueada por Google Maven HTTP503.
+
+- A limpeza automática preserva arquivos cujos nomes contêm datas impossíveis. Nomes antigos e atuais com datas válidas continuam aceitos.
+- 43 testes JVM focados passaram: 26 anteriores, nove existentes de integridade da escrita, dois de namespaces de fontes e seis novos de retenção. Dois casos reproduziram a falha antes da correção.
+- O aviso de login descreve o escopo dos cookies, sem prometer mediação completa da rede do WebView.
+
+[Evidências e limites](integration/backup-safety/20261113/README.md).
+
 ## Desenvolvimento · P20261113.1 — 13/11/2026
 
 **Estado:** candidata da beta.11/código112, sem lançamento; compilação Android bloqueada no download de dependências Google (HTTP503). A beta.10 pública permanece igual.

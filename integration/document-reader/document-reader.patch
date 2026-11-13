@@ -10022,7 +10022,7 @@ index a198c3f..9a3e84f 100644
                      preference = translationPreferences.translationEngineTemperature(),
                      title = stringResource(ATMR.strings.pref_engine_temperature),
 diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
-index 7f411fd..8130ab4 100644
+index 7f411fd..97ddc9f 100644
 --- a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
 +++ b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
 @@ -1,15 +1,18 @@
@@ -10087,7 +10087,7 @@ index 7f411fd..8130ab4 100644
  
      // Identifies this overlay independently of the pinned upstream COMMIT_SHA.
 -    private const val POLARIS_READER_REVISION = "P20261031.2"
-+    private const val POLARIS_READER_REVISION = "P20261113.1"
++    private const val POLARIS_READER_REVISION = "P20261113.2"
  
      @Composable
      override fun Content() {
@@ -12783,15 +12783,17 @@ index 98036c0..5de6761 100644
  }
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/data/backup/create/BackupRetention.kt b/app/src/main/java/eu/kanade/tachiyomi/data/backup/create/BackupRetention.kt
 new file mode 100644
-index 0000000..f1ee4f9
+index 0000000..7e93785
 --- /dev/null
 +++ b/app/src/main/java/eu/kanade/tachiyomi/data/backup/create/BackupRetention.kt
-@@ -0,0 +1,31 @@
+@@ -0,0 +1,60 @@
 +package eu.kanade.tachiyomi.data.backup.create
 +
++import java.text.ParsePosition
 +import java.text.SimpleDateFormat
 +import java.util.Date
 +import java.util.Locale
++import java.util.TimeZone
 +import java.util.UUID
 +
 +internal object BackupRetention {
@@ -12802,16 +12804,43 @@ index 0000000..f1ee4f9
 +        return "${applicationId}_${date}_${UUID.randomUUID().toString().replace("-", "")}.tachibk"
 +    }
 +
-+    fun isManaged(applicationId: String, name: String): Boolean = Regex(
-+        "${Regex.escape(applicationId)}_\\d{4}-\\d{2}-\\d{2}_\\d{2}-\\d{2}" +
-+            "(?:-\\d{2}-\\d{3}_[a-f0-9]{32})?\\.tachibk",
-+    ).matches(name)
++    fun isManaged(applicationId: String, name: String): Boolean {
++        val match =
++            Regex(
++                    "${Regex.escape(applicationId)}_(\\d{4}-\\d{2}-\\d{2}_\\d{2}-\\d{2})" +
++                        "(?:-(\\d{2}-\\d{3})_[a-f0-9]{32})?\\.tachibk"
++                )
++                .matchEntire(name) ?: return false
++        val seconds = match.groupValues[2]
++        val timestamp = match.groupValues[1] + if (seconds.isEmpty()) "" else "-$seconds"
++        // A matching prefix is insufficient to claim ownership of an existing file.
++        // UTC validates calendar fields independently of the device's current timezone/DST.
++        val parser =
++            SimpleDateFormat(
++                    if (seconds.isEmpty()) "yyyy-MM-dd_HH-mm" else "yyyy-MM-dd_HH-mm-ss-SSS",
++                    Locale.ENGLISH,
++                )
++                .apply {
++                    isLenient = false
++                    timeZone = TimeZone.getTimeZone("UTC")
++                }
++        val position = ParsePosition(0)
++        return parser.parse(timestamp, position) != null && position.index == timestamp.length
++    }
 +
 +    /** Incomplete/unreadable copies never displace a known valid copy in the retention count. */
-+    fun deletions(applicationId: String, currentId: String, entries: List<Entry>, maximum: Int = 4): List<String> {
++    fun deletions(
++        applicationId: String,
++        currentId: String,
++        entries: List<Entry>,
++        maximum: Int = 4,
++    ): List<String> {
 +        require(maximum > 0)
-+        require(entries.any { it.id == currentId && it.verified && isManaged(applicationId, it.name) })
-+        return entries.distinctBy { it.id }
++        require(
++            entries.any { it.id == currentId && it.verified && isManaged(applicationId, it.name) }
++        )
++        return entries
++            .distinctBy { it.id }
 +            .filter { it.id != currentId && it.verified && isManaged(applicationId, it.name) }
 +            .sortedByDescending { it.name }
 +            .drop(maximum - 1)
@@ -64625,6 +64654,90 @@ index 0000000..57e51f4
 +        verify(exactly = 2) { timestamp.set(any()) }
 +    }
 +}
+diff --git a/app/src/test/java/eu/kanade/tachiyomi/data/backup/create/BackupRetentionTest.kt b/app/src/test/java/eu/kanade/tachiyomi/data/backup/create/BackupRetentionTest.kt
+new file mode 100644
+index 0000000..e44fc4b
+--- /dev/null
++++ b/app/src/test/java/eu/kanade/tachiyomi/data/backup/create/BackupRetentionTest.kt
+@@ -0,0 +1,78 @@
++package eu.kanade.tachiyomi.data.backup.create
++
++import java.util.Date
++import org.junit.jupiter.api.Assertions.*
++import org.junit.jupiter.api.Test
++
++class BackupRetentionTest {
++    private val app = "app.mihon.tachiyomiat.debug"
++    private val suffix = "0123456789abcdef0123456789abcdef"
++
++    private fun entry(id: String, date: String, verified: Boolean = true) =
++        BackupRetention.Entry(id, "${app}_${date}.tachibk", verified)
++
++    @Test
++    fun `both historical and current backup names remain recognized`() {
++        assertTrue(BackupRetention.isManaged(app, "${app}_2026-11-13_09-40.tachibk"))
++        assertTrue(BackupRetention.isManaged(app, "${app}_2024-02-29_23-59-59-999_$suffix.tachibk"))
++        assertTrue(BackupRetention.isManaged(app, BackupRetention.filename(app, Date(0))))
++    }
++
++    @Test
++    fun `impossible calendar dates never identify a managed backup`() {
++        for (date in
++            listOf(
++                "2026-02-29_10-00",
++                "2024-02-30_10-00",
++                "2026-13-01_10-00",
++                "2026-00-01_10-00",
++                "2026-11-00_10-00",
++                "2026-11-13_24-00",
++                "2026-11-13_10-60",
++                "2026-11-13_10-00-60-000_$suffix",
++            )) {
++            assertFalse(BackupRetention.isManaged(app, "${app}_${date}.tachibk"), date)
++        }
++    }
++
++    @Test
++    fun `retention preserves malformed named files even when readable`() {
++        val entries =
++            listOf(entry("current", "2026-11-13_10-00"), entry("invalid", "2026-02-30_10-00"))
++        assertTrue(BackupRetention.deletions(app, "current", entries, 1).isEmpty())
++    }
++
++    @Test
++    fun `foreign and unfinished files never displace verified backups`() {
++        val entries =
++            listOf(
++                entry("current", "2026-11-13_10-00"),
++                entry("old", "2026-11-12_10-00"),
++                entry("unverified", "2026-11-14_10-00", false),
++                BackupRetention.Entry("foreign", "other.app_2026-11-15_10-00.tachibk", true),
++                BackupRetention.Entry("pending", "${app}_2026-11-16_10-00.tachibk.pending", true),
++            )
++        assertTrue(BackupRetention.deletions(app, "current", entries, 2).isEmpty())
++    }
++
++    @Test
++    fun `only oldest verified copies are selected after keeping current`() {
++        val entries = (1..6).map { entry("$it", "2026-11-0${it}_10-00") }
++        assertEquals(listOf("2", "1"), BackupRetention.deletions(app, "6", entries, 4))
++        assertFalse("6" in BackupRetention.deletions(app, "6", entries, 1))
++    }
++
++    @Test
++    fun `cleanup requires a verified managed current copy and a positive limit`() {
++        val entries = listOf(entry("current", "2026-11-13_10-00", false))
++        assertThrows(IllegalArgumentException::class.java) {
++            BackupRetention.deletions(app, "current", entries)
++        }
++        assertThrows(IllegalArgumentException::class.java) {
++            BackupRetention.deletions(app, "missing", emptyList())
++        }
++        assertThrows(IllegalArgumentException::class.java) {
++            BackupRetention.deletions(app, "current", entries, 0)
++        }
++    }
++}
 diff --git a/app/src/test/java/eu/kanade/tachiyomi/data/backup/models/PortableMangaBackupTest.kt b/app/src/test/java/eu/kanade/tachiyomi/data/backup/models/PortableMangaBackupTest.kt
 new file mode 100644
 index 0000000..b7731ad
@@ -77554,7 +77667,7 @@ index 9839272..46e74da 100644
  junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }
  junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
 diff --git a/i18n-at/src/commonMain/moko-resources/base/strings.xml b/i18n-at/src/commonMain/moko-resources/base/strings.xml
-index 7ed4795..476971a 100644
+index 7ed4795..95a255e 100644
 --- a/i18n-at/src/commonMain/moko-resources/base/strings.xml
 +++ b/i18n-at/src/commonMain/moko-resources/base/strings.xml
 @@ -10,7 +10,7 @@
@@ -77886,13 +77999,13 @@ index 7ed4795..476971a 100644
 +    <string name="polaris_achievement_count_help">Linked editions count as one work. Starting means reading at least one chapter. Finishing requires a completed work with all known chapters read and completed status in its linked editions. Removing works or restoring older reading progress does not reduce recorded milestones.</string>
 +    <string name="sandbox_login_title">Sign in to this source</string>
 +    <string name="sandbox_login_summary">Open a separate browser session for this extension. Your normal browser session is not imported.</string>
-+    <string name="sandbox_login_confirm">This opens a Polaris browser outside the extension worker. Only this website is allowed. Choose Use session when finished to transfer its cookies to this extension. Cancel discards the browser session. External login providers and some challenges are not supported.</string>
++    <string name="sandbox_login_confirm">This opens a Polaris browser outside the extension worker. Only cookies for this website are transferred. Choose Use session when finished to transfer its cookies to this extension. Cancel discards the browser session. External login providers and some challenges are not supported.</string>
 +    <string name="sandbox_login_done">Use session</string>
 +    <string name="sandbox_login_unavailable">This login requires HTTPS and a WebView with separate profile and cookie attribute support. No shared browser was opened.</string>
 +    <string name="sandbox_login_failed">The session could not be transferred. Try again or cancel.</string>
  </resources>
 diff --git a/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml b/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
-index d1748bc..f8f18d5 100644
+index d1748bc..c4133bd 100644
 --- a/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
 +++ b/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
 @@ -10,7 +10,7 @@
@@ -78224,7 +78337,7 @@ index d1748bc..f8f18d5 100644
 +    <string name="polaris_achievement_count_help">Edições vinculadas contam como uma obra. Iniciar significa ler ao menos um capítulo. Finalizar exige uma obra concluída com todos os capítulos conhecidos lidos e situação concluída nas edições vinculadas. Remover obras ou restaurar progresso de leitura mais antigo não reduz os marcos já registrados.</string>
 +    <string name="sandbox_login_title">Entrar nesta fonte</string>
 +    <string name="sandbox_login_summary">Abre uma sessão de navegador separada para esta extensão, sem importar sua navegação habitual.</string>
-+    <string name="sandbox_login_confirm">Abre um navegador do Polaris fora do processo da extensão. Apenas este site é permitido. Ao terminar, escolha Usar sessão para transferir seus cookies para esta extensão. Cancelar descarta a sessão do navegador. Login por serviços externos e alguns desafios ainda não são compatíveis.</string>
++    <string name="sandbox_login_confirm">Abre um navegador do Polaris fora do processo da extensão. Apenas cookies deste site são transferidos. Ao terminar, escolha Usar sessão para transferir seus cookies para esta extensão. Cancelar descarta a sessão do navegador. Login por serviços externos e alguns desafios ainda não são compatíveis.</string>
 +    <string name="sandbox_login_done">Usar sessão</string>
 +    <string name="sandbox_login_unavailable">Este login exige HTTPS e WebView com perfis separados e atributos de cookies. Nenhum navegador compartilhado foi aberto.</string>
 +    <string name="sandbox_login_failed">Não foi possível transferir a sessão. Tente novamente ou cancele.</string>

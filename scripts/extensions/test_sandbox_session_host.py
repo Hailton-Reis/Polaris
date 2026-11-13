@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Compile production session/space policies and their JVM tests, without an Android runtime.
+"""Compile production session, space and backup safety policies and their JVM tests, without an Android runtime.
 
 Supply a Gradle lib directory containing Kotlin compiler/stdlib/serialization and a dependency
 folder with okhttp-jvm.jar (5.4.0), okio-jvm.jar (3.18.1), junit-console.jar (1.14.0).
@@ -26,7 +26,13 @@ def run(checkout: Path, kotlin_libs: Path, deps: Path, java: str, output: Path):
     files = [core, source / 'BrowserCookieSession.kt', source / 'SandboxNetworkPolicy.kt',
              tests / 'extension/sandbox/BrowserCookieSessionTest.kt', tests / 'extension/sandbox/CookieBankTest.kt',
              checkout / 'app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentImportSpace.kt',
-             tests / 'ui/documents/DocumentImportSpaceTest.kt']
+             tests / 'ui/documents/DocumentImportSpaceTest.kt',
+             checkout / 'app/src/main/java/eu/kanade/tachiyomi/data/backup/create/BackupRetention.kt',
+             checkout / 'app/src/main/java/eu/kanade/tachiyomi/data/backup/create/BackupArchiveWriter.kt',
+             checkout / 'app/src/main/java/eu/kanade/tachiyomi/data/backup/restore/restorers/SourcePreferenceNamespace.kt',
+             tests / 'data/backup/create/BackupRetentionTest.kt',
+             tests / 'data/backup/create/BackupArchiveWriterTest.kt',
+             tests / 'data/backup/restore/SourcePreferenceNamespaceTest.kt']
     dependencies = [deps / name for name in ('okhttp-jvm.jar', 'okio-jvm.jar', 'junit-console.jar')]
     assert all(p.is_file() for p in dependencies)
     import os
@@ -42,7 +48,10 @@ def run(checkout: Path, kotlin_libs: Path, deps: Path, java: str, output: Path):
          'org.junit.platform.console.ConsoleLauncher', 'execute', '--disable-banner', '--disable-ansi-colors',
          '--select-class', 'eu.kanade.tachiyomi.extension.sandbox.BrowserCookieSessionTest',
          '--select-class', 'eu.kanade.tachiyomi.extension.sandbox.CookieBankTest',
-         '--select-class', 'eu.kanade.tachiyomi.ui.documents.DocumentImportSpaceTest'],
+         '--select-class', 'eu.kanade.tachiyomi.ui.documents.DocumentImportSpaceTest',
+         '--select-class', 'eu.kanade.tachiyomi.data.backup.create.BackupRetentionTest',
+         '--select-class', 'eu.kanade.tachiyomi.data.backup.create.BackupArchiveWriterTest',
+         '--select-class', 'eu.kanade.tachiyomi.data.backup.restore.SourcePreferenceNamespaceTest'],
     ]
     for index, command in enumerate(commands):
         result = subprocess.run(command, capture_output=True, text=True)
