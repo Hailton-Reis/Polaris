@@ -29,3 +29,8 @@ integration/sandbox-dynamic/**/*.zip binary
 # Preserve captured login cookie verification output.
 integration/login-cookies/**/*.log -whitespace
 integration/login-cookies/**/*.zip binary
+
+# Preserve document import verification transcripts.
+integration/document-import/**/*.log -whitespace
+integration/document-import/**/*.xml -whitespace
+integration/document-import/**/*.zip binary

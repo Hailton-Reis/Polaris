@@ -1,0 +1,39 @@
+{
+  "revision": "P20261113.7",
+  "status": "IMPORTER_COMPILE_AND_UNIT_PASS_DEVICE_PENDING",
+  "unit_tests": {
+    "app": {
+      "total": 879,
+      "failed": 0,
+      "skipped": 0,
+      "passed": 879
+    },
+    "domain": {
+      "total": 85,
+      "failed": 0,
+      "skipped": 0,
+      "passed": 85
+    }
+  },
+  "unit_execution": {
+    "app": "fresh",
+    "domain": "up-to-date"
+  },
+  "new_unit_tests": 18,
+  "junit_xml_files": 163,
+  "red_regressions_reproduced": 3,
+  "missing_baseline_cases": 0,
+  "android_app_compile": true,
+  "android_test_compile": true,
+  "new_android_cases_compiled": 2,
+  "android_cases_executed_this_revision": 0,
+  "connected_android_devices": 0,
+  "overlay_tests_passed": 4,
+  "packaging_tests_passed": 16,
+  "account_cloud_sync": "DEFERRED_BY_USER",
+  "backup_format_changed": false,
+  "new_apk_built": false,
+  "prior_internal_apk_revision": "P20261113.3",
+  "release_published": false,
+  "public_evidence": "Selected task outcomes and readable test identities/results JSON; original logs, ZIP and XML retained locally."
+}

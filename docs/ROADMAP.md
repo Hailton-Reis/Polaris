@@ -6,6 +6,8 @@ O roadmap indica prioridades e critérios de verificação. Não representa praz
 
 O [checklist atual](BETA11_CHECKLIST.md) acompanha as frentes autorizadas em 13/11. Login e proteção de espaço têm uma primeira candidata; testes Android completos e publicação continuam pendentes.
 
+Conta do Polaris com login Google e sincronização em nuvem é uma evolução desejada, mas foi **adiada por decisão do usuário**. Não priorizar configuração de Google Cloud ou provisionamento de contas agora. O backup local existente é preservado.
+
 ## Estado da auditoria P20261107.1
 
 A [auditoria geral](AUDITORIA_GERAL_P20261107_1.md) separa implementação, prova por componentes e aceite externo. A Jornada Polaris, títulos decorativos, três ícones alternativos e três temas estão implementados na revisão de desenvolvimento. A beta.10 publicada não muda com esta revisão.
@@ -28,6 +30,8 @@ Antes de ampliar a distribuição, priorizar:
 - Validar a limpeza conjunta de download/tradução mantendo o vocabulário.
 
 A [análise crítica](ARMAZENAMENTO.md) explica o que motivou cada prioridade e qual evidência falta.
+
+A [continuação P20261113.7](IMPORTACAO_REPETIDA_P20261113_7.md) trata importações novas repetidas e retomada de publicação válida após falha de registro. Pastas antigas, staging abandonado e aceites físicos permanecem abertos.
 
 ## Rodada interna de leitura e tradução
 

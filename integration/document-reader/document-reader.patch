@@ -2736,10 +2736,10 @@ index 0000000..d97cf8e
 +}
 diff --git a/app/src/androidTest/java/eu/kanade/tachiyomi/storage/SafeStorageAndroidTest.kt b/app/src/androidTest/java/eu/kanade/tachiyomi/storage/SafeStorageAndroidTest.kt
 new file mode 100644
-index 0000000..7db9177
+index 0000000..d40ef80
 --- /dev/null
 +++ b/app/src/androidTest/java/eu/kanade/tachiyomi/storage/SafeStorageAndroidTest.kt
-@@ -0,0 +1,97 @@
+@@ -0,0 +1,207 @@
 +package eu.kanade.tachiyomi.storage
 +
 +import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -2751,6 +2751,9 @@ index 0000000..7db9177
 +import eu.kanade.tachiyomi.data.backup.models.Backup
 +import eu.kanade.tachiyomi.data.backup.models.BackupManga
 +import eu.kanade.tachiyomi.extension.util.PrivateExtensionFiles
++import java.io.File
++import java.io.IOException
++import java.nio.file.Files
 +import kotlinx.coroutines.CancellationException
 +import kotlinx.serialization.protobuf.ProtoBuf
 +import org.junit.After
@@ -2761,24 +2764,116 @@ index 0000000..7db9177
 +import org.junit.Assert.assertTrue
 +import org.junit.Test
 +import org.junit.runner.RunWith
-+import java.io.File
-+import java.io.IOException
-+import java.nio.file.Files
 +
-+/** Local Android filesystem/codec controls; no real extension code, remote provider or full-app acceptance. */
++/**
++ * Local Android filesystem/codec controls; no real extension code, remote provider or full-app
++ * acceptance.
++ */
 +@RunWith(AndroidJUnit4::class)
 +class SafeStorageAndroidTest {
 +    private val context = InstrumentationRegistry.getInstrumentation().targetContext
-+    private val folder = Files.createTempDirectory(context.cacheDir.toPath(), "polaris-storage-").toFile()
++    private val folder =
++        Files.createTempDirectory(context.cacheDir.toPath(), "polaris-storage-").toFile()
 +
-+    @After fun cleanup() {
++    @After
++    fun cleanup() {
 +        folder.walkBottomUp().forEach {
 +            it.setWritable(true)
 +            it.delete()
 +        }
 +    }
 +
-+    @Test fun atomicReplacementKeepsTheWorkingFileUntilValidationAndPublishesReadOnlyBytes() {
++    @Test
++    fun repeatedDocumentPublicationReusesTheNativeUniFileFolder() =
++        kotlinx.coroutines.runBlocking<Unit> {
++            val original =
++                File(folder, "original.pdf").apply { writeText("%PDF-1.4\nsynthetic input") }
++            val destination = File(folder, "library").apply { mkdir() }
++            val root = checkNotNull(UniFile.fromFile(destination))
++            val digest =
++                java.security.MessageDigest.getInstance("SHA-256")
++                    .digest(original.readBytes())
++                    .joinToString("") { "%02x".format(it) }
++            val identity =
++                eu.kanade.tachiyomi.ui.documents.DocumentImportPublication.Identity(
++                    digest,
++                    original.length(),
++                )
++            val names = mutableListOf<String>()
++            for (title in listOf("My document", "Renamed document")) {
++                eu.kanade.tachiyomi.ui.documents.DocumentImportPublication.publish(
++                    root,
++                    original,
++                    mihon.core.archive.DocumentFormat.PDF,
++                    identity,
++                    title,
++                    "Author",
++                    beforeCopy = {},
++                    checkActive = {},
++                ) {
++                    names += it
++                }
++            }
++            assertEquals(names[0], names[1])
++            assertEquals(1, destination.listFiles()!!.size)
++            val published = destination.listFiles()!!.single()
++            assertTrue(File(published, ".polaris-import").isFile)
++            assertEquals(
++                listOf("details.json"),
++                published.listFiles()!!.filter { it.extension == "json" }.map { it.name },
++            )
++            assertArrayEquals(original.readBytes(), File(published, "document.pdf").readBytes())
++        }
++
++    @Test
++    fun failedDocumentIndexingCanResumeWithoutAnotherNativeFileCopy() =
++        kotlinx.coroutines.runBlocking<Unit> {
++            val original =
++                File(folder, "original.pdf").apply { writeText("%PDF-1.4\nsynthetic input") }
++            val destination = File(folder, "library").apply { mkdir() }
++            val root = checkNotNull(UniFile.fromFile(destination))
++            val digest =
++                java.security.MessageDigest.getInstance("SHA-256")
++                    .digest(original.readBytes())
++                    .joinToString("") { "%02x".format(it) }
++            val identity =
++                eu.kanade.tachiyomi.ui.documents.DocumentImportPublication.Identity(
++                    digest,
++                    original.length(),
++                )
++            val failure = runCatching {
++                eu.kanade.tachiyomi.ui.documents.DocumentImportPublication.publish(
++                    root,
++                    original,
++                    mihon.core.archive.DocumentFormat.PDF,
++                    identity,
++                    "My document",
++                    "",
++                    beforeCopy = {},
++                    checkActive = {},
++                ) {
++                    throw IOException("Database unavailable")
++                }
++            }
++            assertTrue(failure.isFailure)
++            val name = destination.listFiles()!!.single().name
++            eu.kanade.tachiyomi.ui.documents.DocumentImportPublication.publish(
++                root,
++                original,
++                mihon.core.archive.DocumentFormat.PDF,
++                identity,
++                "Other title",
++                "",
++                beforeCopy = { throw IOException("A second copy must not be needed") },
++                checkActive = {},
++            ) {
++                assertEquals(name, it)
++            }
++            assertEquals(1, destination.listFiles()!!.size)
++        }
++
++    @Test
++    fun atomicReplacementKeepsTheWorkingFileUntilValidationAndPublishesReadOnlyBytes() {
 +        val target = File(folder, "source.ext").apply { writeText("working") }
 +        val source = File(folder, "download.apk").apply { writeText("replacement") }
 +        PrivateExtensionFiles.replace(source, target) { staged ->
@@ -2791,46 +2886,61 @@ index 0000000..7db9177
 +        assertTrue(folder.listFiles()!!.none { it.name.endsWith(".pending") })
 +    }
 +
-+    @Test fun rejectedOrCancelledCopiesPreserveTheExistingExtension() {
++    @Test
++    fun rejectedOrCancelledCopiesPreserveTheExistingExtension() {
 +        val target = File(folder, "source.ext").apply { writeText("working") }
 +        val source = File(folder, "download.apk").apply { writeBytes(ByteArray(180_000)) }
 +        assertThrows(IOException::class.java) {
-+            PrivateExtensionFiles.replace(source, target) { throw IOException("Rejected staged package") }
++            PrivateExtensionFiles.replace(source, target) {
++                throw IOException("Rejected staged package")
++            }
 +        }
 +        assertEquals("working", target.readText())
 +        var checks = 0
 +        assertThrows(CancellationException::class.java) {
-+            PrivateExtensionFiles.replace(source, target, { if (++checks == 3) throw CancellationException() }) {}
++            PrivateExtensionFiles.replace(
++                source,
++                target,
++                { if (++checks == 3) throw CancellationException() },
++            ) {}
 +        }
 +        assertEquals("working", target.readText())
 +        assertTrue(folder.listFiles()!!.none { it.name.endsWith(".pending") })
 +    }
 +
-+    @Test fun verifiedBackupSurvivesUniFileRenameAndDecodesFromTheFinalUri() {
-+        val encoded = ProtoBuf.encodeToByteArray(
-+            Backup.serializer(),
-+            Backup(listOf(BackupManga(1234567890123L, "/test", "Ação preservada"))),
-+        )
++    @Test
++    fun verifiedBackupSurvivesUniFileRenameAndDecodesFromTheFinalUri() {
++        val encoded =
++            ProtoBuf.encodeToByteArray(
++                Backup.serializer(),
++                Backup(listOf(BackupManga(1234567890123L, "/test", "Ação preservada"))),
++            )
 +        val pending = File(folder, "backup.tachibk.pending").apply { createNewFile() }
 +        val document = checkNotNull(UniFile.fromFile(pending))
-+        BackupArchiveWriter.writeVerified(encoded, { document.openOutputStream() }, { document.openInputStream() })
++        BackupArchiveWriter.writeVerified(
++            encoded,
++            { document.openOutputStream() },
++            { document.openInputStream() },
++        )
 +        assertTrue(document.renameTo("backup.tachibk"))
-+        BackupArchiveWriter.verify(encoded, { context.contentResolver.openInputStream(document.uri) })
++        BackupArchiveWriter.verify(
++            encoded,
++            { context.contentResolver.openInputStream(document.uri) },
++        )
 +        val decoded = BackupDecoder(context, ProtoBuf).decode(document.uri)
 +        assertEquals(1234567890123L, decoded.backupManga.single().source)
 +        assertEquals("Ação preservada", decoded.backupManga.single().title)
 +        assertFalse(pending.exists())
 +    }
 +
-+    @Test fun unreadableDestinationCannotBeReportedAsVerified() {
++    @Test
++    fun unreadableDestinationCannotBeReportedAsVerified() {
 +        val old = File(folder, "old.tachibk").apply { writeText("previous") }
 +        val fresh = File(folder, "new.tachibk")
 +        assertThrows(BackupReadbackUnavailable::class.java) {
 +            BackupArchiveWriter.writeVerified(
 +                "encoded input".encodeToByteArray(),
-+                {
-+                    fresh.outputStream()
-+                },
++                { fresh.outputStream() },
 +                { throw SecurityException("Read denied") },
 +            )
 +        }
@@ -10456,7 +10566,7 @@ index a198c3f..9a3e84f 100644
                      preference = translationPreferences.translationEngineTemperature(),
                      title = stringResource(ATMR.strings.pref_engine_temperature),
 diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
-index 7f411fd..1dae6ff 100644
+index 7f411fd..15a6db5 100644
 --- a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
 +++ b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
 @@ -1,15 +1,18 @@
@@ -10521,7 +10631,7 @@ index 7f411fd..1dae6ff 100644
  
      // Identifies this overlay independently of the pinned upstream COMMIT_SHA.
 -    private const val POLARIS_READER_REVISION = "P20261031.2"
-+    private const val POLARIS_READER_REVISION = "P20261113.6"
++    private const val POLARIS_READER_REVISION = "P20261113.7"
  
      @Composable
      override fun Content() {
@@ -30425,6 +30535,239 @@ index 03900aa..a478e8c 100644
          val isEmpty: Boolean
              get() = result.isEmpty()
      }
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentImportPublication.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentImportPublication.kt
+new file mode 100644
+index 0000000..dc34d3f
+--- /dev/null
++++ b/app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentImportPublication.kt
+@@ -0,0 +1,227 @@
++package eu.kanade.tachiyomi.ui.documents
++
++import com.hippo.unifile.UniFile
++import eu.kanade.tachiyomi.util.storage.DiskUtil
++import java.io.ByteArrayOutputStream
++import java.io.File
++import java.io.InputStream
++import java.io.OutputStream
++import java.security.MessageDigest
++import java.util.UUID
++import kotlinx.coroutines.sync.Mutex
++import kotlinx.coroutines.sync.withLock
++import kotlinx.serialization.json.*
++import mihon.core.archive.DocumentFormat
++import mihon.core.archive.DocumentLimits
++
++/** Content identity is independent of display title; published payloads survive failed indexing. */
++internal object DocumentImportPublication {
++    private val lock = Mutex()
++    private const val MARKER = ".polaris-import"
++
++    data class Identity(val sha256: String, val bytes: Long) {
++        init {
++            require(sha256.matches(Regex("[0-9a-f]{64}")))
++            require(bytes in 1..DocumentLimits.MAX_FILE_BYTES)
++        }
++
++        fun suffix(format: DocumentFormat) = "-${format.extension}-$sha256"
++
++        fun folder(format: DocumentFormat, title: String): String =
++            DiskUtil.buildValidFilename(title, maxBytes = 100).ifBlank { "document" } +
++                suffix(format)
++    }
++
++    private fun transfer(
++        input: InputStream,
++        output: OutputStream? = null,
++        checkActive: () -> Unit,
++    ): Identity {
++        val digest = MessageDigest.getInstance("SHA-256")
++        val buffer = ByteArray(32 * 1024)
++        var total = 0L
++        while (true) {
++            checkActive()
++            val count = input.read(buffer)
++            if (count < 0) break
++            if (count == 0) continue
++            require(count <= DocumentLimits.MAX_FILE_BYTES - total)
++            total += count
++            digest.update(buffer, 0, count)
++            output?.write(buffer, 0, count)
++        }
++        return Identity(digest.digest().joinToString("") { "%02x".format(it) }, total)
++    }
++
++    private fun readSmall(file: UniFile, limit: Int, checkActive: () -> Unit): ByteArray {
++        require(!file.isDirectory)
++        return checkNotNull(file.openInputStream()).use { input ->
++            val output = ByteArrayOutputStream()
++            val buffer = ByteArray(4096)
++            while (true) {
++                checkActive()
++                val size = input.read(buffer)
++                if (size < 0) break
++                if (size == 0) continue
++                require(size <= limit - output.size()) { "Import metadata exceeds limit" }
++                output.write(buffer, 0, size)
++            }
++            output.toByteArray()
++        }
++    }
++
++    private fun children(folder: UniFile) =
++        checkNotNull(folder.listFiles()) { "Document provider could not list the folder" }
++
++    private fun child(folder: UniFile, name: String): UniFile =
++        checkNotNull(folder.findFile(name)).also { require(it.name == name && !it.isDirectory) }
++
++    private fun createEmpty(folder: UniFile, name: String): UniFile =
++        checkNotNull(folder.createFile(name)).also {
++            require(it.name == name && !it.isDirectory && it.length() == 0L)
++            check(checkNotNull(it.openInputStream()).use { stream -> stream.read() } == -1) {
++                "Import target is not empty"
++            }
++        }
++
++    private fun writeMetadata(
++        folder: UniFile,
++        name: String,
++        bytes: ByteArray,
++        checkActive: () -> Unit,
++    ) {
++        val file = createEmpty(folder, name)
++        checkNotNull(file.openOutputStream()).use { it.write(bytes) }
++        check(readSmall(file, 16 * 1024, checkActive).contentEquals(bytes)) {
++            "Import metadata readback failed"
++        }
++    }
++
++    private fun verify(
++        folder: UniFile,
++        name: String,
++        format: DocumentFormat,
++        identity: Identity,
++        checkActive: () -> Unit,
++    ) {
++        require(folder.isDirectory && folder.name == name) { "Import destination changed" }
++        val marker =
++            Json.parseToJsonElement(
++                    readSmall(child(folder, MARKER), 4096, checkActive).decodeToString()
++                )
++                .jsonObject
++        require(marker.keys == setOf("version", "sha256", "bytes", "format"))
++        require(
++            !marker.getValue("version").jsonPrimitive.isString &&
++                marker.getValue("version").jsonPrimitive.int == 1
++        )
++        require(
++            marker.getValue("sha256").jsonPrimitive.isString &&
++                marker.getValue("sha256").jsonPrimitive.content == identity.sha256
++        )
++        require(
++            !marker.getValue("bytes").jsonPrimitive.isString &&
++                marker.getValue("bytes").jsonPrimitive.long == identity.bytes
++        )
++        require(
++            marker.getValue("format").jsonPrimitive.isString &&
++                marker.getValue("format").jsonPrimitive.content == format.extension
++        )
++        val payload = child(folder, "document.${format.extension}")
++        val actual =
++            checkNotNull(payload.openInputStream()).use { transfer(it, checkActive = checkActive) }
++        check(actual == identity) {
++            "Existing document content does not match; preserve it for review"
++        }
++        // LocalSource may replace details.json with ComicInfo.xml; user metadata stays untouched.
++
++    }
++
++    suspend fun <T> publish(
++        base: UniFile,
++        temporary: File,
++        format: DocumentFormat,
++        identity: Identity,
++        title: String,
++        author: String,
++        beforeCopy: () -> Unit,
++        checkActive: () -> Unit,
++        register: suspend (String) -> T,
++    ): T =
++        lock.withLock {
++            require(base.isDirectory)
++            checkActive()
++            val finalName = identity.folder(format, title)
++            val candidates =
++                children(base).filter { it.name.orEmpty().endsWith(identity.suffix(format)) }
++            check(candidates.size <= 1) {
++                "Multiple copies claim this content; preserve them for review"
++            }
++            candidates.singleOrNull()?.let { existing ->
++                val existingName = checkNotNull(existing.name)
++                verify(existing, existingName, format, identity, checkActive)
++                checkActive()
++                return@withLock register(existingName)
++            }
++            beforeCopy()
++            checkActive()
++            val stageName = ".import-${UUID.randomUUID()}"
++            val staging = checkNotNull(base.createDirectory(stageName))
++            var owned = false
++            var publicationAttempted = false
++            try {
++                require(
++                    staging.name == stageName && staging.isDirectory && children(staging).isEmpty()
++                ) {
++                    "Document provider did not create a new empty staging folder"
++                }
++                owned = true
++                val payload = createEmpty(staging, "document.${format.extension}")
++                val copied =
++                    temporary.inputStream().use { input ->
++                        checkNotNull(payload.openOutputStream()).use { output ->
++                            transfer(input, output, checkActive)
++                        }
++                    }
++                check(copied == identity) { "Temporary document changed during import" }
++                val persisted =
++                    checkNotNull(payload.openInputStream()).use {
++                        transfer(it, checkActive = checkActive)
++                    }
++                check(persisted == identity) { "Document provider failed content verification" }
++                val details =
++                    buildJsonObject {
++                            put("title", title)
++                            put("author", author)
++                        }
++                        .toString()
++                        .toByteArray()
++                writeMetadata(staging, "details.json", details, checkActive)
++                val marker =
++                    buildJsonObject {
++                            put("version", 1)
++                            put("sha256", identity.sha256)
++                            put("bytes", identity.bytes)
++                            put("format", format.extension)
++                        }
++                        .toString()
++                        .toByteArray()
++                writeMetadata(staging, MARKER, marker, checkActive)
++                checkActive()
++                check(children(base).none { it.name.orEmpty().endsWith(identity.suffix(format)) }) {
++                    "Import destination appeared concurrently"
++                }
++                // Once rename is attempted, an opaque provider may already have published the data.
++                // Preserve the complete copy even if it reports failure or indexing later throws.
++                publicationAttempted = true
++                check(staging.renameTo(finalName)) { "Cannot publish imported document" }
++                val published =
++                    checkNotNull(base.findFile(finalName)) { "Published import is not visible" }
++                verify(published, finalName, format, identity, checkActive)
++                checkActive()
++                register(finalName)
++            } finally {
++                if (owned && !publicationAttempted) staging.delete()
++            }
++        }
++}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentImportSpace.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentImportSpace.kt
 new file mode 100644
 index 0000000..47feeac
@@ -30475,68 +30818,75 @@ index 0000000..47feeac
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentImporter.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentImporter.kt
 new file mode 100644
-index 0000000..f68665a
+index 0000000..b78dec7
 --- /dev/null
 +++ b/app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentImporter.kt
-@@ -0,0 +1,214 @@
+@@ -0,0 +1,266 @@
 +package eu.kanade.tachiyomi.ui.documents
 +
 +import android.content.Context
 +import android.net.Uri
 +import android.provider.OpenableColumns
 +import eu.kanade.tachiyomi.network.NetworkHelper
-+import eu.kanade.tachiyomi.source.model.SManga
-+import eu.kanade.tachiyomi.util.storage.DiskUtil
++import java.io.File
++import java.io.InputStream
++import java.util.UUID
++import java.util.zip.ZipFile
++import kotlin.coroutines.coroutineContext
 +import kotlinx.coroutines.Dispatchers
 +import kotlinx.coroutines.ensureActive
 +import kotlinx.coroutines.withContext
 +import mihon.core.archive.DocumentFormat
 +import mihon.core.archive.DocumentLimits
 +import mihon.core.archive.TextDocument
-+import mihon.domain.manga.model.toDomainManga
 +import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 +import okhttp3.Request
-+import org.json.JSONObject
 +import tachiyomi.domain.category.repository.CategoryRepository
 +import tachiyomi.domain.library.service.LibraryPreferences
 +import tachiyomi.domain.manga.interactor.NetworkToLocalManga
-+import tachiyomi.domain.manga.model.MangaUpdate
 +import tachiyomi.domain.manga.repository.MangaRepository
 +import tachiyomi.domain.storage.service.StorageManager
-+import tachiyomi.source.local.LocalSource
 +import uy.kohesive.injekt.Injekt
 +import uy.kohesive.injekt.api.get
-+import java.io.File
-+import java.io.InputStream
-+import java.util.UUID
-+import java.util.zip.ZipFile
-+import kotlin.coroutines.coroutineContext
 +
 +data class LocalDocumentSelection(val name: String, val format: DocumentFormat)
 +
-+class DocumentImporter(private val context: Context) {
-+    suspend fun describeUri(uri: Uri): LocalDocumentSelection = withContext(Dispatchers.IO) {
-+        require(uri.scheme == "content") { "Select a document from the Android file picker" }
-+        val name =
-+            context.contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use { cursor ->
-+                if (cursor.moveToFirst()) cursor.getString(0) else null
-+            } ?: uri.lastPathSegment.orEmpty()
-+        val type = checkNotNull(DocumentFormat.fromName(name)) { "Unsupported document format" }
-+        LocalDocumentSelection(name, type)
-+    }
-+
-+    suspend fun fromUri(uri: Uri, options: DocumentImportOptions): Long = withContext(Dispatchers.IO) {
-+        val selection = describeUri(uri)
-+        checkNotNull(context.contentResolver.openInputStream(uri)).use { input ->
-+            storeDocument(
-+                input,
-+                selection.name,
-+                selection.format,
-+                selection.name.substringBeforeLast('.'),
-+                options = options,
-+            )
++class DocumentImporter(
++    private val context: Context,
++    private val resolveDirectory: () -> com.hippo.unifile.UniFile? = {
++        Injekt.get<StorageManager>().getLocalSourceDirectory()
++    },
++    private val registerDocument:
++        suspend (String, String, String, DocumentFormat, DocumentImportOptions) -> Long =
++        { folder, title, author, format, options ->
++            registerInLibrary(folder, title, author, format, options)
++        },
++) {
++    suspend fun describeUri(uri: Uri): LocalDocumentSelection =
++        withContext(Dispatchers.IO) {
++            require(uri.scheme == "content") { "Select a document from the Android file picker" }
++            val name =
++                context.contentResolver
++                    .query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)
++                    ?.use { cursor -> if (cursor.moveToFirst()) cursor.getString(0) else null }
++                    ?: uri.lastPathSegment.orEmpty()
++            val type = checkNotNull(DocumentFormat.fromName(name)) { "Unsupported document format" }
++            LocalDocumentSelection(name, type)
 +        }
-+    }
++
++    suspend fun fromUri(uri: Uri, options: DocumentImportOptions): Long =
++        withContext(Dispatchers.IO) {
++            val selection = describeUri(uri)
++            checkNotNull(context.contentResolver.openInputStream(uri)).use { input ->
++                storeDocument(
++                    input,
++                    selection.name,
++                    selection.format,
++                    selection.name.substringBeforeLast('.'),
++                    options = options,
++                )
++            }
++        }
 +
 +    suspend fun fromUrl(
 +        value: String,
@@ -30544,43 +30894,54 @@ index 0000000..f68665a
 +        expected: DocumentFormat? = null,
 +        author: String? = null,
 +        options: DocumentImportOptions,
-+    ): Long = withContext(
-+        Dispatchers.IO,
-+    ) {
-+        val url = value.trim().toHttpUrlOrNull() ?: error("Invalid document URL")
-+        require(url.username.isEmpty() && url.password.isEmpty())
-+        val client = Injekt.get<NetworkHelper>().client.newBuilder().callTimeout(
-+            120,
-+            java.util.concurrent.TimeUnit.SECONDS,
-+        ).build()
-+        client.newCall(
-+            Request.Builder().url(url).header("User-Agent", "Polaris-DocumentReader/1.0").build(),
-+        ).execute().use { response ->
-+            check(response.isSuccessful) { "Document HTTP ${response.code}" }
-+            val body = checkNotNull(response.body)
-+            require(body.contentLength() <= DocumentLimits.MAX_FILE_BYTES) {
-+                "Document exceeds the supported size limit"
-+            }
-+            val disposition = response.header("Content-Disposition").orEmpty()
-+            val filename =
-+                Regex("filename=\"?([^\";]+)", RegexOption.IGNORE_CASE).find(disposition)?.groupValues?.get(1)
-+                    ?: response.request.url.pathSegments.lastOrNull().orEmpty()
-+            val mime = body.contentType()?.toString()?.substringBefore(';')
-+            val type =
-+                expected ?: DocumentFormat.fromName(filename) ?: DocumentFormat.entries.firstOrNull { it.mime == mime }
-+                    ?: error("Link does not identify a supported document")
-+            body.byteStream().use { input ->
-+                storeDocument(
-+                    input,
-+                    filename.ifBlank { "document.${type.extension}" },
-+                    type,
-+                    title ?: filename.substringBeforeLast('.'),
-+                    author.orEmpty(),
-+                    options,
++    ): Long =
++        withContext(Dispatchers.IO) {
++            val url = value.trim().toHttpUrlOrNull() ?: error("Invalid document URL")
++            require(url.username.isEmpty() && url.password.isEmpty())
++            val client =
++                Injekt.get<NetworkHelper>()
++                    .client
++                    .newBuilder()
++                    .callTimeout(120, java.util.concurrent.TimeUnit.SECONDS)
++                    .build()
++            client
++                .newCall(
++                    Request.Builder()
++                        .url(url)
++                        .header("User-Agent", "Polaris-DocumentReader/1.0")
++                        .build()
 +                )
-+            }
++                .execute()
++                .use { response ->
++                    check(response.isSuccessful) { "Document HTTP ${response.code}" }
++                    val body = checkNotNull(response.body)
++                    require(body.contentLength() <= DocumentLimits.MAX_FILE_BYTES) {
++                        "Document exceeds the supported size limit"
++                    }
++                    val disposition = response.header("Content-Disposition").orEmpty()
++                    val filename =
++                        Regex("filename=\"?([^\";]+)", RegexOption.IGNORE_CASE)
++                            .find(disposition)
++                            ?.groupValues
++                            ?.get(1) ?: response.request.url.pathSegments.lastOrNull().orEmpty()
++                    val mime = body.contentType()?.toString()?.substringBefore(';')
++                    val type =
++                        expected
++                            ?: DocumentFormat.fromName(filename)
++                            ?: DocumentFormat.entries.firstOrNull { it.mime == mime }
++                            ?: error("Link does not identify a supported document")
++                    body.byteStream().use { input ->
++                        storeDocument(
++                            input,
++                            filename.ifBlank { "document.${type.extension}" },
++                            type,
++                            title ?: filename.substringBeforeLast('.'),
++                            author.orEmpty(),
++                            options,
++                        )
++                    }
++                }
 +        }
-+    }
 +
 +    private suspend fun storeDocument(
 +        input: InputStream,
@@ -30594,103 +30955,188 @@ index 0000000..f68665a
 +        var title = suggestedTitle.take(180).ifBlank { name }
 +        var author = suggestedAuthor.take(2000)
 +        try {
-+            temporary.outputStream().use { output ->
-+                val importContext = coroutineContext
-+                DocumentImportSpace.copy(
-+                    input,
-+                    output,
-+                    DocumentLimits.MAX_FILE_BYTES,
-+                    available = { context.cacheDir.usableSpace },
-+                    checkActive = { importContext.ensureActive() },
++            val importContext = coroutineContext
++            val digest = java.security.MessageDigest.getInstance("SHA-256")
++            val copied =
++                temporary.outputStream().use { output ->
++                    DocumentImportSpace.copy(
++                        java.security.DigestInputStream(input, digest),
++                        output,
++                        DocumentLimits.MAX_FILE_BYTES,
++                        available = { context.cacheDir.usableSpace },
++                        checkActive = { importContext.ensureActive() },
++                    )
++                }
++            val identity =
++                DocumentImportPublication.Identity(
++                    digest.digest().joinToString("") { "%02x".format(it) },
++                    copied,
 +                )
-+            }
 +            when (format) {
 +                DocumentFormat.PDF -> {
-+                    val header = ByteArray(5).also { bytes ->
-+                        temporary.inputStream().use { java.io.DataInputStream(it).readFully(bytes) }
-+                    }
-+                    require(header.contentEquals("%PDF-".toByteArray())) { "Link did not return a PDF" }
-+                }
-+                DocumentFormat.EPUB, DocumentFormat.DOCX, DocumentFormat.TXT -> TextDocument(
-+                    temporary,
-+                    format,
-+                ).use { doc ->
-+                    if (doc.title.isNotBlank()) title = doc.title.take(180)
-+                    if (doc.author.isNotBlank()) author = doc.author.take(2000)
-+                    doc.readSection(0)
-+                }
-+                DocumentFormat.ZIP, DocumentFormat.CBZ -> ZipFile(temporary).use { require(it.size() > 0) }
-+                else -> {
-+                    val header = temporary.inputStream().use { input ->
-+                        ByteArray(512).let { bytes ->
-+                            val size = input.read(bytes)
-+                            bytes.copyOf(size.coerceAtLeast(0))
++                    val header =
++                        ByteArray(5).also { bytes ->
++                            temporary.inputStream().use {
++                                java.io.DataInputStream(it).readFully(bytes)
++                            }
 +                        }
++                    require(header.contentEquals("%PDF-".toByteArray())) {
++                        "Link did not return a PDF"
 +                    }
-+                    val valid = when (format) {
-+                        DocumentFormat.CBR, DocumentFormat.RAR -> header.take(6).toByteArray()
-+                            .contentEquals(byteArrayOf(0x52, 0x61, 0x72, 0x21, 0x1a, 0x07))
-+                        DocumentFormat.CB7, DocumentFormat.SEVEN_ZIP -> header.take(6).toByteArray()
-+                            .contentEquals(byteArrayOf(0x37, 0x7a, 0xbc.toByte(), 0xaf.toByte(), 0x27, 0x1c))
-+                        DocumentFormat.CBT, DocumentFormat.TAR ->
-+                            header.size >= 265 &&
-+                                header.copyOfRange(257, 262).toString(Charsets.US_ASCII) == "ustar"
-+                        else -> false
++                }
++                DocumentFormat.EPUB,
++                DocumentFormat.DOCX,
++                DocumentFormat.TXT ->
++                    TextDocument(temporary, format).use { doc ->
++                        if (doc.title.isNotBlank()) title = doc.title.take(180)
++                        if (doc.author.isNotBlank()) author = doc.author.take(2000)
++                        doc.readSection(0)
 +                    }
++                DocumentFormat.ZIP,
++                DocumentFormat.CBZ -> ZipFile(temporary).use { require(it.size() > 0) }
++                else -> {
++                    val header =
++                        temporary.inputStream().use { input ->
++                            ByteArray(512).let { bytes ->
++                                val size = input.read(bytes)
++                                bytes.copyOf(size.coerceAtLeast(0))
++                            }
++                        }
++                    val valid =
++                        when (format) {
++                            DocumentFormat.CBR,
++                            DocumentFormat.RAR ->
++                                header
++                                    .take(6)
++                                    .toByteArray()
++                                    .contentEquals(byteArrayOf(0x52, 0x61, 0x72, 0x21, 0x1a, 0x07))
++                            DocumentFormat.CB7,
++                            DocumentFormat.SEVEN_ZIP ->
++                                header
++                                    .take(6)
++                                    .toByteArray()
++                                    .contentEquals(
++                                        byteArrayOf(
++                                            0x37,
++                                            0x7a,
++                                            0xbc.toByte(),
++                                            0xaf.toByte(),
++                                            0x27,
++                                            0x1c,
++                                        )
++                                    )
++                            DocumentFormat.CBT,
++                            DocumentFormat.TAR ->
++                                header.size >= 265 &&
++                                    header.copyOfRange(257, 262).toString(Charsets.US_ASCII) ==
++                                        "ustar"
++                            else -> false
++                        }
 +                    require(valid) { "Link did not return a supported archive" }
 +                }
 +            }
 +            if (options.title.isNotBlank()) title = options.title.trim().take(180)
 +            coroutineContext.ensureActive()
-+            val base =
-+                Injekt.get<StorageManager>().getLocalSourceDirectory()
-+                    ?: error("Choose the app storage folder in Settings")
-+            // A file-backed library exposes its volume capacity; SAF providers may not.
-+            // This is advisory, not a reservation or a guarantee about another volume.
-+            if (base.uri.scheme == "file") {
-+                base.uri.path?.let { path ->
-+                    DocumentImportSpace.requireAvailable(File(path).usableSpace, temporary.length())
-+                }
-+            }
-+            val id = UUID.randomUUID().toString().take(12)
-+            val safeTitle = DiskUtil.buildValidFilename(title).take(100).ifBlank { "document" }
-+            val folderName = "$safeTitle-$id"
-+            val staging = checkNotNull(base.createDirectory(".import-$id"))
-+            var published = false
-+            try {
-+                val target = checkNotNull(staging.createFile("document.${format.extension}"))
-+                temporary.inputStream().use { source ->
-+                    target.openOutputStream().use { output -> DocumentLimits.copy(source, output) }
-+                }
-+                val metadata = JSONObject().put("title", title).put("author", author).toString()
-+                checkNotNull(staging.createFile("details.json")).openOutputStream().use {
-+                    it.write(metadata.toByteArray())
-+                }
-+                coroutineContext.ensureActive()
-+                check(staging.renameTo(folderName)) { "Cannot publish imported document" }
-+                published = true
-+                val manga = SManga.create().apply {
-+                    this.title = title
-+                    this.author = author
-+                    url = folderName
-+                }.toDomainManga(LocalSource.ID)
-+                val saved = Injekt.get<NetworkToLocalManga>()(manga)
-+                DocumentOrganizer(Injekt.get<CategoryRepository>(), Injekt.get<MangaRepository>()) {
-+                    val sort = Injekt.get<LibraryPreferences>().sortingMode.get()
-+                    sort.type.flag or sort.direction.flag
-+                }.assign(saved.id, format, options)
-+                check(
-+                    Injekt.get<MangaRepository>().update(
-+                        MangaUpdate(saved.id, favorite = true, dateAdded = System.currentTimeMillis()),
-+                    ),
-+                )
-+                return saved.id
-+            } finally {
-+                if (!published) staging.delete()
++            val base = resolveDirectory() ?: error("Choose the app storage folder in Settings")
++            return DocumentImportPublication.publish(
++                base,
++                temporary,
++                format,
++                identity,
++                title,
++                author,
++                beforeCopy = {
++                    // Capacity is advisory and applies only when another physical copy is needed.
++                    if (base.uri.scheme == "file")
++                        base.uri.path?.let { path ->
++                            DocumentImportSpace.requireAvailable(
++                                File(path).usableSpace,
++                                temporary.length(),
++                            )
++                        }
++                },
++                checkActive = { importContext.ensureActive() },
++            ) { folder ->
++                registerDocument(folder, title, author, format, options)
 +            }
 +        } finally {
 +            temporary.delete()
 +        }
++    }
++
++    companion object {
++        private suspend fun registerInLibrary(
++            folderName: String,
++            title: String,
++            author: String,
++            format: DocumentFormat,
++            options: DocumentImportOptions,
++        ): Long {
++            val repository = Injekt.get<MangaRepository>()
++            return DocumentLibraryRegistration(
++                    repository,
++                    create = { Injekt.get<NetworkToLocalManga>()(it) },
++                    organize = { id, type, selected ->
++                        DocumentOrganizer(Injekt.get<CategoryRepository>(), repository) {
++                                val sort = Injekt.get<LibraryPreferences>().sortingMode.get()
++                                sort.type.flag or sort.direction.flag
++                            }
++                            .assign(id, type, selected)
++                    },
++                )
++                .include(folderName, title, author, format, options)
++        }
++    }
++}
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentLibraryRegistration.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentLibraryRegistration.kt
+new file mode 100644
+index 0000000..53490d6
+--- /dev/null
++++ b/app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentLibraryRegistration.kt
+@@ -0,0 +1,45 @@
++package eu.kanade.tachiyomi.ui.documents
++
++import mihon.core.archive.DocumentFormat
++import tachiyomi.domain.manga.model.Manga
++import tachiyomi.domain.manga.model.MangaUpdate
++import tachiyomi.domain.manga.repository.MangaRepository
++import tachiyomi.source.local.LocalSource
++
++/** Reusing an included document must not replace reading state, categories or date added. */
++internal class DocumentLibraryRegistration(
++    private val manga: MangaRepository,
++    private val create: suspend (Manga) -> Manga,
++    private val organize: suspend (Long, DocumentFormat, DocumentImportOptions) -> Unit,
++    private val clock: () -> Long = System::currentTimeMillis,
++) {
++    suspend fun include(
++        folder: String,
++        title: String,
++        author: String,
++        format: DocumentFormat,
++        options: DocumentImportOptions,
++    ): Long {
++        val existing = manga.getMangaByUrlAndSourceId(folder, LocalSource.ID)
++        if (existing?.favorite == true) return existing.id
++        val saved =
++            existing
++                ?: create(
++                    Manga.create()
++                        .copy(source = LocalSource.ID, url = folder, title = title, author = author)
++                )
++        organize(saved.id, format, options)
++        check(
++            manga.update(
++                MangaUpdate(
++                    saved.id,
++                    favorite = true,
++                    dateAdded = saved.dateAdded.takeIf { it > 0 } ?: clock(),
++                )
++            )
++        ) {
++            "Cannot finish document inclusion"
++        }
++        return saved.id
 +    }
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentOpenActivity.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentOpenActivity.kt
@@ -71913,6 +72359,427 @@ index 0000000..e0368d5
 +                { Long.MAX_VALUE },
 +                {},
 +            )
++        }
++    }
++}
+diff --git a/app/src/test/java/eu/kanade/tachiyomi/ui/documents/DocumentImportTransactionTest.kt b/app/src/test/java/eu/kanade/tachiyomi/ui/documents/DocumentImportTransactionTest.kt
+new file mode 100644
+index 0000000..d62c27a
+--- /dev/null
++++ b/app/src/test/java/eu/kanade/tachiyomi/ui/documents/DocumentImportTransactionTest.kt
+@@ -0,0 +1,308 @@
++package eu.kanade.tachiyomi.ui.documents
++
++import android.content.ContentResolver
++import android.content.Context
++import android.database.Cursor
++import android.net.Uri
++import com.hippo.unifile.UniFile
++import io.mockk.every
++import io.mockk.mockk
++import java.io.ByteArrayInputStream
++import java.io.File
++import java.io.IOException
++import java.nio.file.Files
++import kotlinx.coroutines.async
++import kotlinx.coroutines.test.runTest
++import org.junit.jupiter.api.Assertions.*
++import org.junit.jupiter.api.Test
++import org.junit.jupiter.api.assertThrows
++import org.junit.jupiter.api.io.TempDir
++
++/**
++ * Real importer and file streams; a UniFile adapter simulates Android document-provider failures.
++ */
++class DocumentImportTransactionTest {
++    @TempDir lateinit var directory: File
++    private val registered = linkedMapOf<String, Long>()
++    private var failRegistration = false
++    private var corruptReadback = false
++    private var unknownLength = false
++    private var falseAfterRename = false
++    private var cancelWrite = false
++    private var registrationCalls = 0
++    private var denyListing = false
++    private lateinit var library: File
++    private lateinit var original: File
++    private val options =
++        DocumentImportOptions(
++            DocumentKind.DOCUMENT,
++            "Documentos",
++            false,
++            "Formato",
++            title = "My document",
++        )
++
++    private fun document(initial: File): UniFile {
++        var file = initial
++        val node = mockk<UniFile>()
++        val uri = mockk<Uri>()
++        every { uri.scheme } returns "content"
++        every { node.uri } returns uri
++        every { node.name } answers { file.name }
++        every { node.isDirectory } answers { file.isDirectory }
++        every { node.length() } answers { if (unknownLength) 0L else file.length() }
++        every { node.listFiles() } answers
++            {
++                if (denyListing) null
++                else file.listFiles().orEmpty().map { document(it) }.toTypedArray()
++            }
++        every { node.findFile(any()) } answers
++            {
++                File(file, firstArg<String>()).takeIf { it.exists() }?.let(::document)
++            }
++        every { node.createDirectory(any()) } answers
++            {
++                File(file, firstArg<String>()).also { check(it.mkdir()) }.let(::document)
++            }
++        every { node.createFile(any()) } answers
++            {
++                File(file, firstArg<String>()).also { check(it.createNewFile()) }.let(::document)
++            }
++        every { node.openInputStream() } answers
++            {
++                if (corruptReadback && file.length() > 0 && file.name.startsWith("document."))
++                    ByteArrayInputStream(byteArrayOf(1, 2, 3))
++                else file.inputStream()
++            }
++        every { node.openOutputStream() } answers
++            {
++                if (cancelWrite)
++                    object : java.io.OutputStream() {
++                        override fun write(value: Int) {
++                            throw kotlinx.coroutines.CancellationException("Cancelled")
++                        }
++                    }
++                else file.outputStream()
++            }
++        every { node.renameTo(any()) } answers
++            {
++                val target = File(file.parentFile, firstArg<String>())
++                Files.move(file.toPath(), target.toPath())
++                file = target
++                !falseAfterRename
++            }
++        every { node.delete() } answers { file.deleteRecursively() }
++        return node
++    }
++
++    private fun setup(): Pair<DocumentImporter, Uri> {
++        library = File(directory, "library").also { it.mkdir() }
++        original =
++            File(directory, "note.pdf").also { it.writeText("%PDF-1.4\nsynthetic document\n") }
++        val cache = File(directory, "cache").also { it.mkdir() }
++        val resolver = mockk<ContentResolver>()
++        val context = mockk<Context>()
++        val uri = mockk<Uri>()
++        val cursor = mockk<Cursor>(relaxed = true)
++        every { uri.scheme } returns "content"
++        every { context.cacheDir } returns cache
++        every { context.contentResolver } returns resolver
++        every { resolver.query(uri, any(), any(), any(), any()) } returns cursor
++        every { cursor.moveToFirst() } returns true
++        every { cursor.getString(0) } returns "note.pdf"
++        every { resolver.openInputStream(uri) } answers { original.inputStream() }
++        val importer =
++            DocumentImporter(context, { document(library) }) { folder, _, _, _, _ ->
++                registrationCalls++
++                if (failRegistration) throw IOException("Database unavailable after publication")
++                registered.getOrPut(folder) { registered.size.toLong() + 1 }
++            }
++        return importer to uri
++    }
++
++    @Test
++    fun `including identical bytes twice reuses one physical publication and library id`() =
++        runTest {
++            val (importer, uri) = setup()
++            val first = importer.fromUri(uri, options)
++            val second = importer.fromUri(uri, options.copy(title = "Other title"))
++            assertEquals(first, second)
++            assertEquals(1, library.listFiles()!!.size)
++            assertEquals(1, registered.size)
++            assertEquals("%PDF-1.4\nsynthetic document\n", original.readText())
++        }
++
++    @Test
++    fun `retry after database failure reuses the valid published payload`() = runTest {
++        val (importer, uri) = setup()
++        failRegistration = true
++        assertThrows<IOException> { importer.fromUri(uri, options) }
++        val before =
++            library
++                .walkTopDown()
++                .filter { it.isFile }
++                .associate { it.relativeTo(library).path to it.readBytes().toList() }
++        failRegistration = false
++        importer.fromUri(uri, options)
++        assertEquals(1, library.listFiles()!!.size)
++        assertEquals(
++            before,
++            library
++                .walkTopDown()
++                .filter { it.isFile }
++                .associate { it.relativeTo(library).path to it.readBytes().toList() },
++        )
++    }
++
++    @Test
++    fun `a provider returning corrupt payload bytes is rejected before library registration`() =
++        runTest {
++            val (importer, uri) = setup()
++            corruptReadback = true
++            assertThrows<Exception> { importer.fromUri(uri, options) }
++            assertTrue(registered.isEmpty())
++            assertEquals("%PDF-1.4\nsynthetic document\n", original.readText())
++        }
++
++    @Test
++    fun `same display name with different bytes remains two distinct documents`() = runTest {
++        val (importer, uri) = setup()
++        val first = importer.fromUri(uri, options)
++        original.appendText("second edition")
++        assertNotEquals(first, importer.fromUri(uri, options))
++        assertEquals(2, library.listFiles()!!.size)
++    }
++
++    @Test
++    fun `concurrent identical imports publish only one copy`() = runTest {
++        val (importer, uri) = setup()
++        val jobs =
++            listOf(
++                async { importer.fromUri(uri, options) },
++                async { importer.fromUri(uri, options) },
++            )
++        assertEquals(jobs[0].await(), jobs[1].await())
++        assertEquals(1, library.listFiles()!!.size)
++        assertEquals(1, registered.size)
++    }
++
++    @Test
++    fun `a provider that renames but reports failure leaves one recoverable publication`() =
++        runTest {
++            val (importer, uri) = setup()
++            falseAfterRename = true
++            assertThrows<IllegalStateException> { importer.fromUri(uri, options) }
++            assertTrue(registered.isEmpty())
++            falseAfterRename = false
++            importer.fromUri(uri, options)
++            assertEquals(1, library.listFiles()!!.size)
++        }
++
++    @Test
++    fun `an edited published payload is preserved instead of overwritten on retry`() = runTest {
++        val (importer, uri) = setup()
++        importer.fromUri(uri, options)
++        val payload = File(library.listFiles()!!.single(), "document.pdf")
++        payload.writeText("%PDF-manual-edition")
++        assertThrows<IllegalStateException> { importer.fromUri(uri, options) }
++        assertEquals("%PDF-manual-edition", payload.readText())
++        assertEquals(1, registrationCalls)
++        assertEquals(1, library.listFiles()!!.size)
++    }
++
++    @Test
++    fun `reusing a publication preserves user metadata and extra cover files`() = runTest {
++        val (importer, uri) = setup()
++        val first = importer.fromUri(uri, options)
++        val folder = library.listFiles()!!.single()
++        val details = File(folder, "details.json")
++        val metadata = "{\"title\":\"Personal title\",\"author\":\"Personal author\"}"
++        details.writeText(metadata)
++        File(folder, "cover.jpg").writeText("my cover")
++        assertEquals(first, importer.fromUri(uri, options.copy(title = "Replacement")))
++        assertEquals(metadata, details.readText())
++        assertEquals("my cover", File(folder, "cover.jpg").readText())
++    }
++
++    @Test
++    fun `reusing verified content does not require space for another destination copy`() = runTest {
++        val (importer, uri) = setup()
++        val id = importer.fromUri(uri, options)
++        val digest =
++            java.security.MessageDigest.getInstance("SHA-256")
++                .digest(original.readBytes())
++                .joinToString("") { "%02x".format(it) }
++        val reused =
++            DocumentImportPublication.publish(
++                document(library),
++                original,
++                mihon.core.archive.DocumentFormat.PDF,
++                DocumentImportPublication.Identity(digest, original.length()),
++                "Other",
++                "",
++                beforeCopy = { throw IOException("No room for another copy") },
++                checkActive = {},
++            ) { folder ->
++                registered.getValue(folder)
++            }
++        assertEquals(id, reused)
++        assertEquals(1, library.listFiles()!!.size)
++    }
++
++    @Test
++    fun `cancellation before publication removes only our staging and temporary copy`() = runTest {
++        val (importer, uri) = setup()
++        cancelWrite = true
++        assertThrows<kotlinx.coroutines.CancellationException> { importer.fromUri(uri, options) }
++        assertTrue(library.listFiles()!!.isEmpty())
++        assertTrue(File(directory, "cache").listFiles()!!.isEmpty())
++        assertEquals("%PDF-1.4\nsynthetic document\n", original.readText())
++        assertTrue(registered.isEmpty())
++    }
++
++    @Test
++    fun `unknown provider lengths are verified by reading the content`() = runTest {
++        val (importer, uri) = setup()
++        unknownLength = true
++        assertEquals(importer.fromUri(uri, options), importer.fromUri(uri, options))
++        assertEquals(1, library.listFiles()!!.size)
++    }
++
++    @Test
++    fun `unknown import marker versions are preserved without registration or replacement`() =
++        runTest {
++            val (importer, uri) = setup()
++            importer.fromUri(uri, options)
++            val marker = File(library.listFiles()!!.single(), ".polaris-import")
++            marker.writeText(marker.readText().replace("\"version\":1", "\"version\":99"))
++            val before = marker.readText()
++            assertThrows<IllegalArgumentException> { importer.fromUri(uri, options) }
++            assertEquals(before, marker.readText())
++            assertEquals(1, registrationCalls)
++        }
++
++    @Test
++    fun `native conversion of details JSON to ComicInfo does not break later reuse`() = runTest {
++        val (importer, uri) = setup()
++        val id = importer.fromUri(uri, options)
++        val folder = library.listFiles()!!.single()
++        assertTrue(folder.name.startsWith("My document-"))
++        assertTrue(File(folder, "details.json").delete())
++        val xml = "<ComicInfo><Title>Personal title</Title></ComicInfo>"
++        File(folder, "ComicInfo.xml").writeText(xml)
++        assertEquals(id, importer.fromUri(uri, options.copy(title = "Renamed")))
++        assertEquals(xml, File(folder, "ComicInfo.xml").readText())
++        assertFalse(File(folder, "details.json").exists())
++        assertEquals(1, library.listFiles()!!.size)
++    }
++
++    @Test
++    fun `failure to enumerate the destination cannot be treated as an empty library`() = runTest {
++        val (importer, uri) = setup()
++        denyListing = true
++        assertThrows<IllegalStateException> { importer.fromUri(uri, options) }
++        assertTrue(library.listFiles()!!.isEmpty())
++        assertTrue(registered.isEmpty())
++        assertEquals("%PDF-1.4\nsynthetic document\n", original.readText())
++    }
++}
+diff --git a/app/src/test/java/eu/kanade/tachiyomi/ui/documents/DocumentLibraryRegistrationTest.kt b/app/src/test/java/eu/kanade/tachiyomi/ui/documents/DocumentLibraryRegistrationTest.kt
+new file mode 100644
+index 0000000..3264417
+--- /dev/null
++++ b/app/src/test/java/eu/kanade/tachiyomi/ui/documents/DocumentLibraryRegistrationTest.kt
+@@ -0,0 +1,101 @@
++package eu.kanade.tachiyomi.ui.documents
++
++import io.mockk.coEvery
++import io.mockk.coVerify
++import io.mockk.mockk
++import kotlinx.coroutines.test.runTest
++import mihon.core.archive.DocumentFormat
++import org.junit.jupiter.api.Assertions.*
++import org.junit.jupiter.api.Test
++import org.junit.jupiter.api.assertThrows
++import tachiyomi.domain.manga.model.Manga
++import tachiyomi.domain.manga.model.MangaUpdate
++import tachiyomi.domain.manga.repository.MangaRepository
++import tachiyomi.source.local.LocalSource
++
++class DocumentLibraryRegistrationTest {
++    private val repository = mockk<MangaRepository>()
++    private val options =
++        DocumentImportOptions(DocumentKind.DOCUMENT, "Documentos", false, "Formato")
++    private var created = 0
++    private var organized = 0
++    private val registration =
++        DocumentLibraryRegistration(
++            repository,
++            create = {
++                created++
++                it.copy(id = 18)
++            },
++            organize = { _, _, _ -> organized++ },
++            clock = { 1000L },
++        )
++    private val folder = "Polaris-document-pdf-" + "a".repeat(64)
++
++    @Test
++    fun `an existing favorite returns without replacing metadata categories or progress`() =
++        runTest {
++            val old =
++                Manga.create()
++                    .copy(
++                        id = 7,
++                        source = LocalSource.ID,
++                        url = folder,
++                        favorite = true,
++                        title = "Personal",
++                        dateAdded = 20,
++                        notes = "Keep",
++                        chapterFlags = 31,
++                    )
++            coEvery { repository.getMangaByUrlAndSourceId(folder, LocalSource.ID) } returns old
++            assertEquals(
++                7,
++                registration.include(folder, "Other", "Other", DocumentFormat.PDF, options),
++            )
++            assertEquals(0, created)
++            assertEquals(0, organized)
++            coVerify(exactly = 0) { repository.update(any()) }
++            coVerify(exactly = 0) { repository.setMangaCategories(any(), any()) }
++        }
++
++    @Test
++    fun `a partially included row is resumed with its identity and original date`() = runTest {
++        val old =
++            Manga.create()
++                .copy(id = 7, source = LocalSource.ID, url = folder, dateAdded = 20, notes = "Keep")
++        var update: MangaUpdate? = null
++        coEvery { repository.getMangaByUrlAndSourceId(folder, LocalSource.ID) } returns old
++        coEvery { repository.update(any()) } answers
++            {
++                update = firstArg()
++                true
++            }
++        assertEquals(7, registration.include(folder, "Other", "Other", DocumentFormat.PDF, options))
++        assertEquals(0, created)
++        assertEquals(1, organized)
++        assertEquals(true, update!!.favorite)
++        assertEquals(20L, update!!.dateAdded)
++        assertNull(update!!.title)
++        assertNull(update!!.notes)
++    }
++
++    @Test
++    fun `a new row is organized before it becomes a favorite`() = runTest {
++        coEvery { repository.getMangaByUrlAndSourceId(folder, LocalSource.ID) } returns null
++        coEvery { repository.update(any()) } answers
++            {
++                assertEquals(1, organized)
++                true
++            }
++        assertEquals(18, registration.include(folder, "New", "Author", DocumentFormat.PDF, options))
++        assertEquals(1, created)
++    }
++
++    @Test
++    fun `failed final registration is surfaced instead of claiming completion`() = runTest {
++        coEvery { repository.getMangaByUrlAndSourceId(folder, LocalSource.ID) } returns null
++        coEvery { repository.update(any()) } returns false
++        assertThrows<IllegalStateException> {
++            registration.include(folder, "New", "Author", DocumentFormat.PDF, options)
 +        }
 +    }
 +}
