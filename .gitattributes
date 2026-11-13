@@ -6,3 +6,7 @@ integration/document-reader/fixtures/*.pdf binary
 
 # Preserve the exact captured Android boot output, including trailing spaces.
 integration/library-consolidation/20261110/guest-install-logcat.txt -whitespace
+
+# Preserve raw compiler/test output without rewriting captured evidence.
+integration/sandbox-login/**/*.log -whitespace
+integration/backup-safety/**/*.log -whitespace
