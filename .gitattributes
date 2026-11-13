@@ -17,3 +17,7 @@ integration/build-validation/**/*.zip binary
 
 # Preserve signing recovery build/test logs without rewriting them.
 integration/signing-recovery/**/*.log -whitespace
+
+# Preserve numeric sandbox build and regression evidence.
+integration/sandbox-numeric/**/*.log -whitespace
+integration/sandbox-numeric/**/*.zip binary

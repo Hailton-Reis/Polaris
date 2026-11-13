@@ -33,7 +33,7 @@ class DocumentOverlayTests(unittest.TestCase):
                            check=True, capture_output=True)
 
     def verify_fixture_bytes(self):
-        expected = json.loads((PROJECT / 'integration/sandbox-settings/20261110/fixture/provenance.json').read_text())['sha256']
+        expected = json.loads((PROJECT / 'integration/sandbox-numeric/20261113/fixture/provenance.json').read_text())['sha256']
         actual = self.root / 'app/src/androidTest/assets/polaris-sandbox/fixture.apk'
         self.assertEqual(hashlib.sha256(actual.read_bytes()).hexdigest(), expected)
 
@@ -57,13 +57,13 @@ class DocumentOverlayTests(unittest.TestCase):
         subprocess.run(['git', '-C', str(self.root), 'diff', '--check'], check=True)
         self.assertFalse((self.root / 'data/src/main/sqldelight/tachiyomi/migrations/15.sqm').exists())
         about = self.root / 'app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt'
-        self.assertIn('P20261113.3', about.read_text())
+        self.assertIn('P20261113.4', about.read_text())
         self.verify_fixture_bytes()
         self.verify_generated_icons()
         self.assertTrue((self.root / 'app/src/main/java/eu/kanade/tachiyomi/source/selection/UnifiedWorkSearch.kt').exists())
         self.assertTrue((self.root / 'domain/src/main/java/tachiyomi/domain/manga/model/LibraryWork.kt').exists())
         self.assertTrue((self.root / 'domain/src/main/java/tachiyomi/domain/chapter/model/ChapterNumbering.kt').exists())
-        for name in ('SandboxFilterCodec.kt', 'SandboxPreferenceCodec.kt', 'SandboxPreferenceStore.kt', 'SandboxPreferenceUi.kt', 'SandboxCookieStore.kt'):
+        for name in ('SandboxFilterCodec.kt', 'SandboxPreferenceCodec.kt', 'SandboxPreferenceStore.kt', 'SandboxPreferenceUi.kt', 'SandboxPreferenceSchema.kt', 'SandboxCookieStore.kt'):
             self.assertTrue((self.root / 'app/src/main/java/eu/kanade/tachiyomi/extension/sandbox' / name).exists())
         self.assertTrue((self.root / 'app/src/main/java/eu/kanade/domain/ui/model/LauncherIconRewards.kt').exists())
         self.assertEqual(subprocess.check_output(['git', '-C', str(self.root), 'check-attr', 'text', '--', 'app/src/androidTest/assets/polaris-sandbox/fixture.apk'], text=True).strip().split(': ')[-1], 'unset')

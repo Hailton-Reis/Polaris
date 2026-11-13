@@ -2,6 +2,17 @@
 
 Este arquivo registra a evolução real do código. **Revisões de desenvolvimento não são lançamentos públicos.** As datas abaixo usam America/Fortaleza, exceto quando houver indicação de UTC. O histórico de distribuição fica em [Releases](https://github.com/Hailton-Reis/Polaris/releases).
 
+## Desenvolvimento · P20261113.4 — 13/11/2026
+
+**Estado:** continuação da beta.11/código 112, sem lançamento. O APK interno anterior permanece P20261113.3.
+
+- Controles SeekBarPreference em configurações de fontes isoladas, com gravação assíncrona e callbacks no worker. Aceitam faixas negativas/fixas e conservam o incremento de teclado do AndroidX.
+- Contrato de tela compartilhado entre validação, edição e importação explícita: tipos estritos, limites com proteção de overflow e rejeição de formulário antigo quando opções mudam.
+- 833 testes do app passaram, incluindo 12 novos; relatórios com domain somam 918 sem falhas/skips. Compilação real do app e de instrumentação aprovada, quatro testes de overlay e 16 de empacotamento aprovados.
+- Fixture sintética ampliada e três cenários Android compilados. Sem dispositivo/emulador conectado para executá-los.
+
+[Comportamento e limites](docs/SANDBOX_CONTROLES_P20261113_4.md) · [Evidências](integration/sandbox-numeric/20261113/README.md).
+
 ## Continuação · P20261113.3 — recuperação da assinatura — 13/11/2026
 
 - Keystore original recuperado por transporte criptografado; certificado exportado diretamente confere com a beta.10. Configuração local privada e ignorada pelo Git; nenhum material secreto publicado.
@@ -12,7 +23,7 @@ Este arquivo registra a evolução real do código. **Revisões de desenvolvimen
 
 ## Desenvolvimento · P20261113.3 — 13/11/2026
 
-**Estado:** candidata beta.11/código112, sem lançamento. Compilação Android e 906/906 testes JVM passaram; APK bloqueado por espaço e assinatura original não localizada.
+**Estado:** candidata beta.11/código 112, sem lançamento. Compilação Android e 906/906 testes JVM passaram; APK bloqueado por espaço e assinatura original não localizada.
 
 - Transferência de cookies preserva atualizações HTTP concorrentes e rejeita conflitos de forma atômica. Login aguarda a preparação de cookies, confere o perfil e move armazenamento cifrado para IO.
 - Dependências do widget alinhadas às versões já usadas pelo app e WebKit declarado diretamente. Testes locais usam o transporte JVM oficial do OkHttp; produção mantém Android.
@@ -23,7 +34,7 @@ Este arquivo registra a evolução real do código. **Revisões de desenvolvimen
 
 ## Desenvolvimento · P20261113.2 — 13/11/2026
 
-**Estado:** candidata da beta.11/código112; sem publicação. Compilação Android continua bloqueada por Google Maven HTTP503.
+**Estado:** candidata da beta.11/código 112; sem publicação. Compilação Android continua bloqueada por Google Maven HTTP503.
 
 - A limpeza automática preserva arquivos cujos nomes contêm datas impossíveis. Nomes antigos e atuais com datas válidas continuam aceitos.
 - 43 testes JVM focados passaram: 26 anteriores, nove existentes de integridade da escrita, dois de namespaces de fontes e seis novos de retenção. Dois casos reproduziram a falha antes da correção.
@@ -33,7 +44,7 @@ Este arquivo registra a evolução real do código. **Revisões de desenvolvimen
 
 ## Desenvolvimento · P20261113.1 — 13/11/2026
 
-**Estado:** candidata da beta.11/código112, sem lançamento; compilação Android bloqueada no download de dependências Google (HTTP503). A beta.10 pública permanece igual.
+**Estado:** candidata da beta.11/código 112, sem lançamento; compilação Android bloqueada no download de dependências Google (HTTP503). A beta.10 pública permanece igual.
 
 - Primeira integração de login HTTPS para fontes isoladas, com perfil WebView separado, confirmação e transferência limitada de cookies. Sem fallback ao navegador global. OAuth externo/Cloudflare genérico e aceite real continuam pendentes.
 - Verificação consultiva de espaço durante a importação e antes da cópia para biblioteca em volume local, preservando original e cancelamento.
@@ -43,7 +54,7 @@ Este arquivo registra a evolução real do código. **Revisões de desenvolvimen
 
 ## Desenvolvimento · P20261112.1 — 12/11/2026
 
-**Estado:** revisão da beta.11/código112, sem lançamento. A beta.10 pública permanece intacta.
+**Estado:** revisão da beta.11/código 112, sem lançamento. A beta.10 pública permanece intacta.
 
 - Doze conquistas em quatro caminhos alternativos: pontos de leitura, obras na biblioteca, obras iniciadas e obras concluídas lidas. Uma condição basta para liberar cada grimório.
 - Progresso e disponibilidade na Jornada e na Aparência; marcos permanentes e restauração de cosméticos sem revogar conquistas locais por um backup mais antigo.
@@ -54,7 +65,7 @@ Este arquivo registra a evolução real do código. **Revisões de desenvolvimen
 
 ## Desenvolvimento · P20261111.2 — 11/11/2026
 
-**Estado:** revisão da beta.11/código112, sem lançamento. A beta.10 pública permanece intacta.
+**Estado:** revisão da beta.11/código 112, sem lançamento. A beta.10 pública permanece intacta.
 
 - Nova coleção de quatro ícones ilustrados: Grimório Polaris, trevo de três folhas, quatro folhas amado pela mana e cinco folhas com visual sombrio.
 - Nomes e fundos acompanham as artes; aliases, seleção salva, desbloqueios e marcos de 900/4.500/9.000 pontos são preservados.

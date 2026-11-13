@@ -117,232 +117,247 @@ index 63e2698..da6087b 100644
 +}
 diff --git a/app/src/androidTest/assets/polaris-sandbox/fixture.apk b/app/src/androidTest/assets/polaris-sandbox/fixture.apk
 new file mode 100644
-index 0000000000000000000000000000000000000000..756ba1654f9751120ee3d10438aaa3b5c891e0f8
+index 0000000000000000000000000000000000000000..18c2ef12745915652c298ae03ff0bdedfa4df422
 GIT binary patch
-literal 25728
-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
+literal 27716
+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
 
 literal 0
 HcmV?d00001
@@ -838,10 +853,10 @@ index 0000000..c7bab9b
 +}
 diff --git a/app/src/androidTest/java/eu/kanade/tachiyomi/extension/sandbox/SandboxSettingsAndroidTest.kt b/app/src/androidTest/java/eu/kanade/tachiyomi/extension/sandbox/SandboxSettingsAndroidTest.kt
 new file mode 100644
-index 0000000..4ce14f2
+index 0000000..86f577d
 --- /dev/null
 +++ b/app/src/androidTest/java/eu/kanade/tachiyomi/extension/sandbox/SandboxSettingsAndroidTest.kt
-@@ -0,0 +1,466 @@
+@@ -0,0 +1,534 @@
 +package eu.kanade.tachiyomi.extension.sandbox
 +
 +import android.app.Application
@@ -977,6 +992,74 @@ index 0000000..4ce14f2
 +                    }
 +                    .isFailure
 +            )
++        }
++
++    @Test
++    fun numericPreferencesPersistAsIntegersAndRespectIsolatedCallbacks() =
++        runBlocking<Unit> {
++            val source = proxy("NumericSource")
++            val descriptor = node(source.preferenceSchema(), "requests")
++            assertEquals("range", descriptor.getValue("kind").jsonPrimitive.content)
++            assertEquals(-10, descriptor.getValue("min").jsonPrimitive.int)
++            assertEquals(10, descriptor.getValue("max").jsonPrimitive.int)
++            assertTrue(change(source, mapOf("requests" to 8)))
++            assertEquals(8, source.getSourcePreferences().getInt("requests", 0))
++            val callbackUid = source.getSourcePreferences().getLong("callback_uid", 0)
++            assertTrue(callbackUid % 100000 in 90000L..99999L)
++            val before = source.getSourcePreferences().all
++            assertFalse(change(source, mapOf("requests" to 6)))
++            assertEquals(before, source.getSourcePreferences().all)
++            assertTrue(runCatching { change(source, mapOf("requests" to 11)) }.isFailure)
++            assertTrue(runCatching { change(source, mapOf("requests" to 8L)) }.isFailure)
++            assertEquals(before, source.getSourcePreferences().all)
++            assertEquals(8, proxy("NumericSource").getSourcePreferences().getInt("requests", 0))
++        }
++
++    @Test
++    fun dynamicNumericBoundsRejectOldFormBeforeChangingStoredValues() =
++        runBlocking<Unit> {
++            val source = proxy("NumericSource")
++            val old = source.preferenceSchema().getValue("schema").jsonPrimitive.content
++            assertTrue(change(source, mapOf("mode" to "expanded")))
++            val fresh = source.preferenceSchema()
++            assertEquals(30, node(fresh, "requests").getValue("max").jsonPrimitive.int)
++            assertNotEquals(old, fresh.getValue("schema").jsonPrimitive.content)
++            val before = source.getSourcePreferences().all
++            assertTrue(
++                runCatching {
++                        source.changePreferences(
++                            old,
++                            SandboxPreferenceValues.encode(mapOf("requests" to 8)),
++                        )
++                    }
++                    .isFailure
++            )
++            assertEquals(before, source.getSourcePreferences().all)
++            assertTrue(change(source, mapOf("requests" to 20)))
++            assertEquals(20, source.getSourcePreferences().getInt("requests", 0))
++        }
++
++    @Test
++    fun explicitNumericImportKeepsIntegerTypeAndRejectsOutOfRangeLegacyValue() =
++        runBlocking<Unit> {
++            val legacy = context.getSharedPreferences("source_735114", 0)
++            val original = legacy.all
++            try {
++                SandboxPreferenceValues.write(legacy, mapOf("requests" to 8))
++                val source = proxy("NumericSource")
++                assertTrue(source.importLegacyPreferences(source.preferenceSchema()))
++                assertEquals(8, source.getSourcePreferences().getInt("requests", 0))
++                SandboxPreferenceValues.write(legacy, mapOf("requests" to 99))
++                val before = source.getSourcePreferences().all
++                assertTrue(
++                    runCatching { source.importLegacyPreferences(source.preferenceSchema()) }
++                        .isFailure
++                )
++                assertEquals(before, source.getSourcePreferences().all)
++                assertEquals(99, legacy.getInt("requests", 0))
++            } finally {
++                SandboxPreferenceValues.write(legacy, original)
++            }
 +        }
 +
 +    @Test
@@ -10056,7 +10139,7 @@ index a198c3f..9a3e84f 100644
                      preference = translationPreferences.translationEngineTemperature(),
                      title = stringResource(ATMR.strings.pref_engine_temperature),
 diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
-index 7f411fd..1bbaa1b 100644
+index 7f411fd..c0a00ae 100644
 --- a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
 +++ b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
 @@ -1,15 +1,18 @@
@@ -10121,7 +10204,7 @@ index 7f411fd..1bbaa1b 100644
  
      // Identifies this overlay independently of the pinned upstream COMMIT_SHA.
 -    private const val POLARIS_READER_REVISION = "P20261031.2"
-+    private const val POLARIS_READER_REVISION = "P20261113.3"
++    private const val POLARIS_READER_REVISION = "P20261113.4"
  
      @Composable
      override fun Content() {
@@ -23137,10 +23220,10 @@ index 0000000..486a3e2
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/IsolatedHttpSource.kt b/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/IsolatedHttpSource.kt
 new file mode 100644
-index 0000000..4115985
+index 0000000..0070177
 --- /dev/null
 +++ b/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/IsolatedHttpSource.kt
-@@ -0,0 +1,316 @@
+@@ -0,0 +1,313 @@
 +package eu.kanade.tachiyomi.extension.sandbox
 +
 +import android.content.Context
@@ -23208,10 +23291,7 @@ index 0000000..4115985
 +        fun collect(nodes: JsonArray) {
 +            nodes.forEach { node ->
 +                val item = node.jsonObject
-+                if (
-+                    item["kind"]?.jsonPrimitive?.content in
-+                        setOf("switch", "check", "list", "multi", "text")
-+                )
++                if (item["kind"]?.jsonPrimitive?.content in SandboxPreferenceSchema.editableKinds)
 +                    item["key"]?.jsonPrimitive?.content?.let(keys::add)
 +                (item["children"] as? JsonArray)?.let(::collect)
 +            }
@@ -24848,17 +24928,16 @@ index 0000000..60652dd
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxPreferenceCodec.kt b/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxPreferenceCodec.kt
 new file mode 100644
-index 0000000..9f67cab
+index 0000000..a6ff169
 --- /dev/null
 +++ b/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxPreferenceCodec.kt
-@@ -0,0 +1,298 @@
+@@ -0,0 +1,233 @@
 +package eu.kanade.tachiyomi.extension.sandbox
 +
 +import androidx.preference.*
 +import eu.kanade.tachiyomi.data.preference.SharedPreferencesDataStore
 +import eu.kanade.tachiyomi.source.ConfigurableSource
 +import eu.kanade.tachiyomi.source.online.HttpSource
-+import java.security.MessageDigest
 +import kotlinx.serialization.json.*
 +
 +/**
@@ -24908,9 +24987,10 @@ index 0000000..9f67cab
 +                    is ListPreference -> "list"
 +                    is MultiSelectListPreference -> "multi"
 +                    is EditTextPreference -> "text"
++                    is SeekBarPreference -> "range"
 +                    else -> "info"
 +                }
-+            val editable = kind in setOf("switch", "check", "list", "multi", "text")
++            val editable = kind in SandboxPreferenceSchema.editableKinds
 +            if (editable) require(key != null)
 +            val unsupportedAction =
 +                pref.intent != null ||
@@ -24956,6 +25036,14 @@ index 0000000..9f67cab
 +                        put("values", JsonArray(values.map { JsonPrimitive(text(it).orEmpty()) }))
 +                        put("value", JsonArray(pref.values.orEmpty().sorted().map(::JsonPrimitive)))
 +                    }
++                    is SeekBarPreference -> {
++                        put("min", pref.min)
++                        put("max", pref.max)
++                        put("increment", pref.seekBarIncrement)
++                        put("value", pref.value)
++                        put("adjustable", pref.isAdjustable)
++                        put("showValue", pref.showSeekBarValue)
++                    }
 +                    is EditTextPreference -> {
 +                        put("value", pref.text?.let(::JsonPrimitive) ?: JsonNull)
 +                        put("password", key?.let(SandboxPreferenceValues::sensitive) == true)
@@ -24970,106 +25058,32 @@ index 0000000..9f67cab
 +        require(nodes.toString().toByteArray().size <= 128 * 1024)
 +        return buildJsonObject {
 +            put("nodes", nodes)
-+            put("schema", token(nodes))
++            put("schema", SandboxPreferenceSchema.token(nodes))
 +        }
 +    }
 +
-+    fun validate(schema: JsonObject) {
-+        val nodes = schema.getValue("nodes").jsonArray
-+        require(nodes.toString().toByteArray().size <= 128 * 1024)
-+        require(schema.getValue("schema").jsonPrimitive.content == token(nodes))
-+        var count = 0
-+        val keys = mutableSetOf<String>()
-+        fun string(value: JsonElement) {
-+            require(value.jsonPrimitive.isString && value.jsonPrimitive.content.length <= 4096)
-+        }
-+        fun node(element: JsonElement, depth: Int) {
-+            require(depth <= 6 && ++count <= 256)
-+            val value = element.jsonObject
-+            val kind = value.getValue("kind").jsonPrimitive.content
-+            require(kind in setOf("group", "switch", "check", "text", "list", "multi", "info"))
-+            string(value.getValue("title"))
-+            value["summary"]?.let(::string)
-+            value["message"]?.let(::string)
-+            for (flag in listOf("enabled", "visible", "unsupportedAction")) require(
-+                !value.getValue(flag).jsonPrimitive.isString &&
-+                    value.getValue(flag).jsonPrimitive.booleanOrNull != null
-+            )
-+            value["key"]?.let { key ->
-+                string(key)
-+                require(
-+                    key.jsonPrimitive.content.length in 1..200 &&
-+                        keys.add(key.jsonPrimitive.content)
-+                )
-+            }
-+            if (kind in setOf("switch", "check", "text", "list", "multi"))
-+                require(value["key"] != null)
-+            if (kind in setOf("list", "multi")) {
-+                val entries = value.getValue("entries").jsonArray
-+                val values = value.getValue("values").jsonArray
-+                require(entries.size == values.size && entries.size <= 512)
-+                entries.forEach(::string)
-+                values.forEach(::string)
-+            }
-+            when (kind) {
-+                "group" -> value.getValue("children").jsonArray.forEach { node(it, depth + 1) }
-+                "switch",
-+                "check" ->
-+                    require(
-+                        !value.getValue("value").jsonPrimitive.isString &&
-+                            value.getValue("value").jsonPrimitive.booleanOrNull != null
-+                    )
-+                "text",
-+                "list" -> if (value.getValue("value") != JsonNull) string(value.getValue("value"))
-+                "multi" ->
-+                    value
-+                        .getValue("value")
-+                        .jsonArray
-+                        .also { require(it.size <= 256) }
-+                        .forEach(::string)
-+            }
-+            value["password"]?.let {
-+                require(!it.jsonPrimitive.isString && it.jsonPrimitive.booleanOrNull != null)
-+            }
-+        }
-+        nodes.forEach { node(it, 0) }
-+    }
-+
-+    private fun token(nodes: JsonArray): String {
-+        fun shape(element: JsonElement): JsonElement =
-+            when (element) {
-+                is JsonArray -> JsonArray(element.map(::shape))
-+                is JsonObject ->
-+                    JsonObject(
-+                        element
-+                            .filterKeys { it !in setOf("value", "summary", "enabled", "visible") }
-+                            .mapValues { (_, value) -> shape(value) }
-+                    )
-+                else -> element
-+            }
-+        return MessageDigest.getInstance("SHA-256")
-+            .digest(shape(nodes).toString().toByteArray())
-+            .joinToString("") { "%02x".format(it) }
-+    }
++    fun validate(schema: JsonObject) = SandboxPreferenceSchema.validate(schema)
 +
 +    fun importValues(screen: Screen, schemaToken: String, changes: JsonObject): Boolean {
 +        val descriptor = schema(screen)
 +        require(descriptor.getValue("schema").jsonPrimitive.content == schemaToken)
-+        val keys = mutableSetOf<String>()
++        val declared = mutableMapOf<String, JsonObject>()
 +        fun collect(array: JsonArray) {
 +            array.forEach { item ->
 +                val node = item.jsonObject
-+                if (
-+                    node["kind"]?.jsonPrimitive?.content in
-+                        setOf("switch", "check", "text", "list", "multi")
-+                )
-+                    node["key"]?.jsonPrimitive?.content?.let(keys::add)
++                if (node["kind"]?.jsonPrimitive?.content in SandboxPreferenceSchema.editableKinds)
++                    node["key"]?.jsonPrimitive?.content?.let { declared[it] = node }
 +                (node["children"] as? JsonArray)?.let(::collect)
 +            }
 +        }
 +        collect(descriptor.getValue("nodes").jsonArray)
 +        val incoming = SandboxPreferenceValues.decode(changes)
-+        require(incoming.keys.all { it in keys })
++        require(incoming.keys.all { it in declared })
++        incoming.forEach { (key, value) ->
++            val node = declared.getValue(key)
++            if (node.getValue("kind").jsonPrimitive.content == "range")
++                SandboxPreferenceSchema.range(node).requireValue(value)
++        }
 +        val current = screen.values.all
 +        val knownTypes = SandboxPreferenceValues.encode(current)
 +        incoming.forEach { (key, _) ->
@@ -25114,6 +25128,7 @@ index 0000000..9f67cab
 +                    "switch",
 +                    "check" -> require(value is Boolean)
 +                    "text" -> require(value is String)
++                    "range" -> SandboxPreferenceSchema.range(node).requireValue(value)
 +                    "list" ->
 +                        require(
 +                            value is String &&
@@ -25148,6 +25163,140 @@ index 0000000..9f67cab
 +        accepted.forEach { (key, value) -> next[key] = value }
 +        if (next != screen.values.all) SandboxPreferenceValues.write(screen.values, next)
 +        return accepted.size == planned.size
++    }
++}
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxPreferenceSchema.kt b/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxPreferenceSchema.kt
+new file mode 100644
+index 0000000..7a13b8c
+--- /dev/null
++++ b/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxPreferenceSchema.kt
+@@ -0,0 +1,128 @@
++package eu.kanade.tachiyomi.extension.sandbox
++
++import java.security.MessageDigest
++import kotlinx.serialization.json.*
++
++/** Bounded host/worker contract; contains no Android or extension UI objects. */
++internal object SandboxPreferenceSchema {
++    val editableKinds = setOf("switch", "check", "text", "list", "multi", "range")
++
++    fun validate(schema: JsonObject) {
++        val nodes = schema.getValue("nodes").jsonArray
++        require(nodes.toString().toByteArray().size <= 128 * 1024)
++        require(schema.getValue("schema").jsonPrimitive.content == token(nodes))
++        var count = 0
++        val keys = mutableSetOf<String>()
++        fun string(value: JsonElement) {
++            require(value.jsonPrimitive.isString && value.jsonPrimitive.content.length <= 4096)
++        }
++        fun node(element: JsonElement, depth: Int) {
++            require(depth <= 6 && ++count <= 256)
++            val value = element.jsonObject
++            val kind = value.getValue("kind").jsonPrimitive.content
++            require(kind in editableKinds + setOf("group", "info"))
++            string(value.getValue("title"))
++            value["summary"]?.let(::string)
++            value["message"]?.let(::string)
++            for (flag in listOf("enabled", "visible", "unsupportedAction")) require(
++                !value.getValue(flag).jsonPrimitive.isString &&
++                    value.getValue(flag).jsonPrimitive.booleanOrNull != null
++            )
++            value["key"]?.let { key ->
++                string(key)
++                require(
++                    key.jsonPrimitive.content.length in 1..200 &&
++                        keys.add(key.jsonPrimitive.content)
++                )
++            }
++            if (kind in editableKinds) require(value["key"] != null)
++            if (kind in setOf("list", "multi")) {
++                val entries = value.getValue("entries").jsonArray
++                val values = value.getValue("values").jsonArray
++                require(entries.size == values.size && entries.size <= 512)
++                entries.forEach(::string)
++                values.forEach(::string)
++            }
++            when (kind) {
++                "group" -> value.getValue("children").jsonArray.forEach { node(it, depth + 1) }
++                "switch",
++                "check" ->
++                    require(
++                        !value.getValue("value").jsonPrimitive.isString &&
++                            value.getValue("value").jsonPrimitive.booleanOrNull != null
++                    )
++                "range" -> range(value)
++                "text",
++                "list" -> if (value.getValue("value") != JsonNull) string(value.getValue("value"))
++                "multi" ->
++                    value
++                        .getValue("value")
++                        .jsonArray
++                        .also { require(it.size <= 256) }
++                        .forEach(::string)
++            }
++            value["password"]?.let {
++                require(!it.jsonPrimitive.isString && it.jsonPrimitive.booleanOrNull != null)
++            }
++        }
++        nodes.forEach { node(it, 0) }
++    }
++
++    fun token(nodes: JsonArray): String {
++        fun shape(element: JsonElement): JsonElement =
++            when (element) {
++                is JsonArray -> JsonArray(element.map(::shape))
++                is JsonObject ->
++                    JsonObject(
++                        element
++                            .filterKeys { it !in setOf("value", "summary", "enabled", "visible") }
++                            .mapValues { (_, value) -> shape(value) }
++                    )
++                else -> element
++            }
++        return MessageDigest.getInstance("SHA-256")
++            .digest(shape(nodes).toString().toByteArray())
++            .joinToString("") { "%02x".format(it) }
++    }
++
++    data class Range(
++        val min: Int,
++        val max: Int,
++        val increment: Int,
++        val value: Int,
++        val adjustable: Boolean,
++        val showValue: Boolean,
++    ) {
++        init {
++            val span = max.toLong() - min.toLong()
++            require(span in 0..1_000_000L) { "Unsupported preference range" }
++            require(increment.toLong() in 0..span)
++            require(value in min..max)
++        }
++
++        fun requireValue(candidate: Any) {
++            require(candidate is Int && candidate in min..max) { "Invalid preference range value" }
++        }
++    }
++
++    fun range(node: JsonObject): Range {
++        fun integer(key: String): Int {
++            val value = node.getValue(key).jsonPrimitive
++            require(!value.isString && value.intOrNull != null)
++            return value.int
++        }
++        fun flag(key: String): Boolean {
++            val value = node.getValue(key).jsonPrimitive
++            require(!value.isString && value.booleanOrNull != null)
++            return value.boolean
++        }
++        return Range(
++            integer("min"),
++            integer("max"),
++            integer("increment"),
++            integer("value"),
++            flag("adjustable"),
++            flag("showValue"),
++        )
 +    }
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxPreferenceStore.kt b/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxPreferenceStore.kt
@@ -25235,10 +25384,10 @@ index 0000000..7ff21bf
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxPreferenceUi.kt b/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxPreferenceUi.kt
 new file mode 100644
-index 0000000..2ef0cbe
+index 0000000..400bdae
 --- /dev/null
 +++ b/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxPreferenceUi.kt
-@@ -0,0 +1,347 @@
+@@ -0,0 +1,360 @@
 +package eu.kanade.tachiyomi.extension.sandbox
 +
 +import android.text.InputType
@@ -25419,6 +25568,19 @@ index 0000000..2ef0cbe
 +                                        ?.jsonPrimitive
 +                                        ?.content
 +                            }
++                        "range" ->
++                            SeekBarPreference(context).apply {
++                                val range = SandboxPreferenceSchema.range(node)
++                                // AndroidX clamps each bound against the existing opposite bound.
++                                if (range.max < min) min = range.min
++                                max = range.max
++                                min = range.min
++                                seekBarIncrement = range.increment
++                                value = range.value
++                                isAdjustable = range.adjustable
++                                showSeekBarValue = range.showValue
++                                updatesContinuously = false
++                            }
 +                        "multi" ->
 +                            MultiSelectListPreference(context).apply {
 +                                entries =
@@ -25461,7 +25623,7 @@ index 0000000..2ef0cbe
 +                    widget.dialogTitle = widget.title
 +                    widget.dialogMessage = node["message"]?.jsonPrimitive?.content
 +                }
-+                if (key != null && kind in setOf("text", "switch", "check", "list", "multi")) {
++                if (key != null && kind in SandboxPreferenceSchema.editableKinds) {
 +                    widget.setOnPreferenceChangeListener { _, value ->
 +                        value != null && change(key, value)
 +                    }
@@ -67569,6 +67731,200 @@ index 0000000..c3cd037
 +        }
 +        val valid = "{\"value\":\"[braces] {inside a string}\"}"
 +        assertNotNull(ExtensionSandboxProtocol.input(valid.toByteArray()))
++    }
++}
+diff --git a/app/src/test/java/eu/kanade/tachiyomi/extension/sandbox/SandboxPreferenceSchemaTest.kt b/app/src/test/java/eu/kanade/tachiyomi/extension/sandbox/SandboxPreferenceSchemaTest.kt
+new file mode 100644
+index 0000000..209dc83
+--- /dev/null
++++ b/app/src/test/java/eu/kanade/tachiyomi/extension/sandbox/SandboxPreferenceSchemaTest.kt
+@@ -0,0 +1,188 @@
++package eu.kanade.tachiyomi.extension.sandbox
++
++import kotlinx.serialization.json.*
++import org.junit.jupiter.api.Assertions.*
++import org.junit.jupiter.api.Test
++
++class SandboxPreferenceSchemaTest {
++    private fun range(min: Int = 2, max: Int = 30, value: Int = 8, increment: Int = 2) =
++        buildJsonObject {
++            put("kind", "range")
++            put("key", "requests")
++            put("title", "Requests")
++            put("enabled", true)
++            put("visible", true)
++            put("unsupportedAction", false)
++            put("min", min)
++            put("max", max)
++            put("increment", increment)
++            put("value", value)
++            put("adjustable", true)
++            put("showValue", true)
++        }
++
++    private fun changed(node: JsonObject, key: String, value: JsonElement) =
++        JsonObject(node + (key to value))
++
++    private fun schema(vararg nodes: JsonObject): JsonObject {
++        val array = JsonArray(nodes.toList())
++        return buildJsonObject {
++            put("nodes", array)
++            put("schema", SandboxPreferenceSchema.token(array))
++        }
++    }
++
++    @Test
++    fun `numeric descriptors are validated and preserve integer bounds and flags`() {
++        SandboxPreferenceSchema.validate(schema(range()))
++        val result = SandboxPreferenceSchema.range(range())
++        assertEquals(2, result.min)
++        assertEquals(30, result.max)
++        assertEquals(2, result.increment)
++        assertEquals(8, result.value)
++        assertTrue(result.adjustable)
++        assertTrue(result.showValue)
++        assertTrue("range" in SandboxPreferenceSchema.editableKinds)
++    }
++
++    @Test
++    fun `integer endpoints and drag values between keyboard increments are accepted`() {
++        val result = SandboxPreferenceSchema.range(range())
++        for (value in listOf(2, 3, 30)) result.requireValue(value)
++    }
++
++    @Test
++    fun `outside bounds and numeric coercions are refused`() {
++        val result = SandboxPreferenceSchema.range(range())
++        for (value in listOf<Any>(1, 31, "8", 8L, 8.0, true, setOf("8"))) {
++            assertThrows(IllegalArgumentException::class.java) { result.requireValue(value) }
++        }
++    }
++
++    @Test
++    fun `negative and fixed ranges are valid without unsigned conversion`() {
++        val negative = SandboxPreferenceSchema.range(range(-15, -3, -9, 3))
++        negative.requireValue(-15)
++        negative.requireValue(-3)
++        SandboxPreferenceSchema.validate(schema(range(7, 7, 7, 0)))
++    }
++
++    @Test
++    fun `range width is checked using longs so integer overflow cannot bypass bounds`() {
++        for (node in
++            listOf(
++                range(Int.MIN_VALUE, Int.MAX_VALUE, 0, 1),
++                range(4, 3, 4, 0),
++                range(0, 1_000_001, 0, 0),
++            )) {
++            assertThrows(IllegalArgumentException::class.java) {
++                SandboxPreferenceSchema.range(node)
++            }
++        }
++        SandboxPreferenceSchema.validate(
++            schema(range(Int.MIN_VALUE, Int.MIN_VALUE + 4, Int.MIN_VALUE, 1))
++        )
++        SandboxPreferenceSchema.validate(
++            schema(range(Int.MAX_VALUE - 4, Int.MAX_VALUE, Int.MAX_VALUE, 1))
++        )
++    }
++
++    @Test
++    fun `invalid current values or increments fail before rendering`() {
++        for (node in
++            listOf(
++                range(value = 1),
++                range(value = 31),
++                range(increment = -1),
++                range(increment = 29),
++            )) {
++            assertThrows(IllegalArgumentException::class.java) {
++                SandboxPreferenceSchema.validate(schema(node))
++            }
++        }
++    }
++
++    @Test
++    fun `descriptor integer fields reject strings floats booleans null and overflow`() {
++        for (key in listOf("min", "max", "increment", "value")) {
++            for (bad in
++                listOf(
++                    JsonPrimitive("8"),
++                    JsonPrimitive(8.5),
++                    JsonPrimitive(true),
++                    JsonNull,
++                    JsonPrimitive(Long.MAX_VALUE),
++                )) {
++                val node = changed(range(), key, bad)
++                assertThrows(IllegalArgumentException::class.java) {
++                    SandboxPreferenceSchema.validate(schema(node))
++                }
++            }
++        }
++    }
++
++    @Test
++    fun `range flags require booleans and required fields cannot be omitted`() {
++        for (key in listOf("adjustable", "showValue")) {
++            for (bad in listOf(JsonPrimitive("true"), JsonPrimitive(1), JsonNull)) {
++                assertThrows(IllegalArgumentException::class.java) {
++                    SandboxPreferenceSchema.validate(schema(changed(range(), key, bad)))
++                }
++            }
++        }
++        for (key in listOf("min", "max", "increment", "value", "adjustable", "showValue")) {
++            assertThrows(RuntimeException::class.java) {
++                SandboxPreferenceSchema.validate(schema(JsonObject(range() - key)))
++            }
++        }
++    }
++
++    @Test
++    fun `changing value summary or availability preserves the structural token`() {
++        val original = schema(range()).getValue("schema")
++        for ((key, value) in
++            mapOf(
++                "value" to JsonPrimitive(10),
++                "summary" to JsonPrimitive("new"),
++                "enabled" to JsonPrimitive(false),
++                "visible" to JsonPrimitive(false),
++            )) {
++            assertEquals(original, schema(changed(range(), key, value)).getValue("schema"))
++        }
++    }
++
++    @Test
++    fun `dynamic bounds increments and control kinds invalidate an old form token`() {
++        val original = schema(range()).getValue("schema")
++        for ((key, value) in
++            mapOf(
++                "min" to JsonPrimitive(4),
++                "max" to JsonPrimitive(20),
++                "increment" to JsonPrimitive(1),
++                "kind" to JsonPrimitive("text"),
++            )) {
++            assertNotEquals(original, schema(changed(range(), key, value)).getValue("schema"))
++        }
++    }
++
++    @Test
++    fun `changing bounds without updating the transmitted token is refused`() {
++        val original = schema(range())
++        val stale = JsonObject(original + ("nodes" to JsonArray(listOf(range(max = 20)))))
++        assertThrows(IllegalArgumentException::class.java) {
++            SandboxPreferenceSchema.validate(stale)
++        }
++    }
++
++    @Test
++    fun `duplicate keys and unknown widget kinds are refused`() {
++        assertThrows(IllegalArgumentException::class.java) {
++            SandboxPreferenceSchema.validate(schema(range(), range()))
++        }
++        assertThrows(IllegalArgumentException::class.java) {
++            SandboxPreferenceSchema.validate(
++                schema(changed(range(), "kind", JsonPrimitive("custom-view")))
++            )
++        }
 +    }
 +}
 diff --git a/app/src/test/java/eu/kanade/tachiyomi/extension/sandbox/SandboxPreferenceValuesTest.kt b/app/src/test/java/eu/kanade/tachiyomi/extension/sandbox/SandboxPreferenceValuesTest.kt
