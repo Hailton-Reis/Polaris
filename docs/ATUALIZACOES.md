@@ -62,3 +62,7 @@ O APK universal mantém a identidade e a assinatura da beta.9 distribuída. Comp
 [Notas e evidência da beta.10](versoes/0.1.0-beta.10.md).
 
 Na candidata P20261113.3, o guard confirmou que o certificado debug deste ambiente diverge da beta.10. O arquivo da chave original não foi encontrado nas fontes acessíveis; o certificado público não o substitui. Não publicar essa compilação como atualização nem desinstalar para contornar o conflito. [Registro atual](../integration/build-validation/20261113/README.md).
+
+A [recuperação da assinatura original](../integration/signing-recovery/20261113/README.md) foi concluída após o registro anterior: o keystore recuperado corresponde ao certificado público da beta.10 e foi configurado somente no ambiente privado. A atualização real no aparelho continua pendente.
+
+A mesma continuação gerou e verificou o APK universal beta.11/P20261113.3 (272.970.356 bytes, ARM32/ARM64, código 112). O exportador confirmou SAME_ID_AND_SIGNER contra a beta.10 e 16 testes de empacotamento passaram após correção do verificador de aliases. Ainda é candidata interna; não houve Release pública nem aceite de atualização no aparelho.

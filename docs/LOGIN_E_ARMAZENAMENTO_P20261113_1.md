@@ -1,6 +1,6 @@
 # Login e espaço de importação — P20261113.1
 
-Candidata da beta.11/código112. Desenvolvimento sobre 6952e5e; sem publicação.
+Candidata da beta.11/código 112. Desenvolvimento sobre 6952e5e; sem publicação.
 
 ## Login inicial de fontes isoladas
 
@@ -63,3 +63,7 @@ A [revisão de backups](../integration/backup-safety/20261113/README.md) corrige
 ## Continuação P20261113.3
 
 A [compilação real e 906 testes JVM](../integration/build-validation/20261113/README.md) passaram. O bloqueio anterior de dependências foi resolvido. Transferência de cookies agora preserva respostas concorrentes e interrompe conflitos sem gravação parcial; login espera os callbacks de preparação, verifica perfil e usa IO para armazenamento. Falta aceite Android/ARM. A geração do APK parou por espaço; a chave original não foi localizada e a chave debug deste ambiente não atualiza a beta.10.
+
+A [recuperação da assinatura original](../integration/signing-recovery/20261113/README.md) foi concluída após o registro anterior: o keystore recuperado corresponde ao certificado público da beta.10 e foi configurado somente no ambiente privado. A atualização real no aparelho continua pendente.
+
+A mesma continuação gerou e verificou o APK universal beta.11/P20261113.3 (272.970.356 bytes, ARM32/ARM64, código 112). O exportador confirmou SAME_ID_AND_SIGNER contra a beta.10 e 16 testes de empacotamento passaram após correção do verificador de aliases. Ainda é candidata interna; não houve Release pública nem aceite de atualização no aparelho.

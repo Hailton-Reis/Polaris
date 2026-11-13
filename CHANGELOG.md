@@ -2,6 +2,14 @@
 
 Este arquivo registra a evolução real do código. **Revisões de desenvolvimento não são lançamentos públicos.** As datas abaixo usam America/Fortaleza, exceto quando houver indicação de UTC. O histórico de distribuição fica em [Releases](https://github.com/Hailton-Reis/Polaris/releases).
 
+## Continuação · P20261113.3 — recuperação da assinatura — 13/11/2026
+
+- Keystore original recuperado por transporte criptografado; certificado exportado diretamente confere com a beta.10. Configuração local privada e ignorada pelo Git; nenhum material secreto publicado.
+- APK interno universal ARM32/ARM64 gerado e verificado com a assinatura original da beta.10 (272.970.356 bytes). Sem lançamento público ou aceite de atualização no aparelho.
+- Empacotamento exclui intermediários de emulador e o verificador de marca distingue os ícones de conquistas dos atributos da application. Três regressões reproduzidas, 16 testes de empacotamento e quatro de overlay aprovados.
+
+[Recuperação e validação](integration/signing-recovery/20261113/README.md).
+
 ## Desenvolvimento · P20261113.3 — 13/11/2026
 
 **Estado:** candidata beta.11/código112, sem lançamento. Compilação Android e 906/906 testes JVM passaram; APK bloqueado por espaço e assinatura original não localizada.

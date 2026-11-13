@@ -88,6 +88,22 @@ resource 0x7f080104 drawable/ic_polaris_splash"""
                               self.manifest)
 
 
+    def test_reward_launcher_aliases_do_not_replace_application_icons(self):
+        manifest = self.manifest + "\n E: activity-alias (line=80)\n  A: http://schemas.android.com/apk/res/android:icon(0x01010002)=@0x7f100009\n  A: http://schemas.android.com/apk/res/android:roundIcon(0x0101052c)=@0x7f100009"
+        self.assertTrue(validate_branding("application-label:'Polaris'", self.resources, manifest)['compiled_resources_verified'])
+
+    def test_correct_alias_cannot_hide_missing_application_round_icon(self):
+        manifest = self.manifest.split('\n A: http://schemas.android.com/apk/res/android:roundIcon')[0]
+        manifest += "\n E: activity-alias\n  A: http://schemas.android.com/apk/res/android:roundIcon(0x0101052c)=@0x7f100003"
+        with self.assertRaisesRegex(ValueError, 'roundIcon'):
+            validate_branding("application-label:'Polaris'", self.resources, manifest)
+
+    def test_alias_without_application_does_not_establish_branding(self):
+        manifest = self.manifest.replace('E: application', 'E: activity-alias')
+        with self.assertRaisesRegex(ValueError, 'application'):
+            validate_branding("application-label:'Polaris'", self.resources, manifest)
+
+
 class UpdateIdentityTests(unittest.TestCase):
     def test_same_id_and_original_signer_allow_update_metadata(self):
         old = {'application_id': 'polaris.app', 'signer_sha256': 'A' * 64, 'version': '0.1.0-beta.10'}

@@ -14,3 +14,6 @@ integration/backup-safety/**/*.log -whitespace
 # Preserve full build/test logs and the original XML report archive.
 integration/build-validation/**/*.log -whitespace
 integration/build-validation/**/*.zip binary
+
+# Preserve signing recovery build/test logs without rewriting them.
+integration/signing-recovery/**/*.log -whitespace

@@ -55,7 +55,13 @@ def validate_branding(badging, resources, manifest):
     if not labels or any(label != 'Polaris' for label in labels):
         raise ValueError('Compiled APK label must be Polaris in every locale')
     resource = re.search(r'resource\s+(0x[0-9a-fA-F]+)\s+(?:\S+:)?mipmap/ic_polaris_launcher\b', resources)
-    icons = re.findall(r':(?:icon|roundIcon)\([^)]*\)=@(0x[0-9a-fA-F]+)', manifest)
+    application = re.search(r'(?m)^[ \t]*E: application(?:[ \t]+[^\n]*)?\n', manifest)
+    if not application:
+        raise ValueError('Compiled manifest has no application element')
+    # aapt2 emits attributes before child elements. Reward launcher aliases have
+    # their own icons; only the application's direct attributes establish these defaults.
+    attributes = re.split(r'(?m)^[ \t]*E:', manifest[application.end():], maxsplit=1)[0]
+    icons = re.findall(r':(?:icon|roundIcon)\([^)]*\)=@(0x[0-9a-fA-F]+)', attributes)
     if not resource or len(icons) != 2 or any(icon != resource.group(1) for icon in icons):
         raise ValueError('Compiled application icon and roundIcon must use the Polaris launcher')
     for name in ['ic_polaris_foreground', 'ic_polaris_monochrome', 'ic_polaris_logo', 'ic_polaris_splash']:

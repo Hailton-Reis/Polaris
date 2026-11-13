@@ -21,7 +21,7 @@ index 79aff85..c2e70c6 100644
 +# Generated native build state
 +**/.cxx/
 diff --git a/app/build.gradle.kts b/app/build.gradle.kts
-index 63e2698..6e17ac9 100644
+index 63e2698..da6087b 100644
 --- a/app/build.gradle.kts
 +++ b/app/build.gradle.kts
 @@ -25,21 +25,23 @@ if (Config.includeTelemetry) {
@@ -60,7 +60,7 @@ index 63e2698..6e17ac9 100644
              isPseudoLocalesEnabled = true
          }
          val release = getByName("release") {
-@@ -99,7 +101,7 @@ android {
+@@ -99,9 +101,10 @@ android {
          getByName("preview").res.directories.add("src/debug/res")
          getByName("benchmark").res.directories.add("src/debug/res")
      }
@@ -68,8 +68,11 @@ index 63e2698..6e17ac9 100644
 +    splits { abi { isEnable = !polarisUniversalArm; isUniversalApk = true; reset(); include("armeabi-v7a", "arm64-v8a", "x86", "x86_64") } }
      packaging {
          jniLibs {
++            if (polarisUniversalArm) excludes += setOf("**/x86/**", "**/x86_64/**")
              keepDebugSymbols += listOf("libandroidx.graphics.path", "libarchive-jni", "libconscrypt_jni", "libimagedecoder", "libquickjs", "libsqlite3x").map { "**/$it.so" }
-@@ -135,20 +137,24 @@ kotlin {
+         }
+         resources {
+@@ -135,20 +138,24 @@ kotlin {
  baselineProfile { baselineProfileOutputDir = "baselineProfiles"; mergeIntoMain = true }
  
  dependencies {
@@ -96,7 +99,7 @@ index 63e2698..6e17ac9 100644
  }
  
  androidComponents {
-@@ -163,3 +169,15 @@ androidComponents {
+@@ -163,3 +170,15 @@ androidComponents {
      }
      onVariants(selector().withFlavor("default" to "standard")) { it.packaging.resources.excludes.add("META-INF/*.version") }
  }

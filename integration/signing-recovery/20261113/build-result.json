@@ -1,0 +1,18 @@
+{
+  "exit_code": 0,
+  "stopped_by_disk_guard": false,
+  "minimum_free_bytes": 343154688,
+  "command": [
+    "python3",
+    "/workspace/work/run-java-proxy.py",
+    "./gradlew",
+    "--no-daemon",
+    "--max-workers=2",
+    "--no-build-cache",
+    "-Dorg.gradle.jvmargs=-Xmx2g -XX:MaxMetaspaceSize=768m -Dfile.encoding=UTF-8",
+    "-Ppolaris.universalArm=true",
+    ":app:assembleDebug"
+  ],
+  "log": "/workspace/work/assemble-recovered-signing.log",
+  "original_signer_configured": true
+}
