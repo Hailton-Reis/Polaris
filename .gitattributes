@@ -25,3 +25,7 @@ integration/sandbox-numeric/**/*.zip binary
 # Preserve dynamic preference evidence bytes.
 integration/sandbox-dynamic/**/*.log -whitespace
 integration/sandbox-dynamic/**/*.zip binary
+
+# Preserve captured login cookie verification output.
+integration/login-cookies/**/*.log -whitespace
+integration/login-cookies/**/*.zip binary

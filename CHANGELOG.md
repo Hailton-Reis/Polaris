@@ -2,6 +2,16 @@
 
 Este arquivo registra a evolução real do código. **Revisões de desenvolvimento não são lançamentos públicos.** As datas abaixo usam America/Fortaleza, exceto quando houver indicação de UTC. O histórico de distribuição fica em [Releases](https://github.com/Hailton-Reis/Polaris/releases).
 
+## Desenvolvimento · P20261113.6 — 13/11/2026
+
+**Estado:** continuação da beta.11/código 112, sem outro APK ou lançamento.
+
+- Login copia também cookies existentes em /account e outros caminhos para o perfil exclusivo, restringindo domínios ao host escolhido. Colisões são recusadas.
+- Consultas locais cobrem os caminhos iniciais e páginas navegadas. Snapshots parciais não apagam sessões não observadas; capturas contraditórias não gravam. Limites e revogação mantidos.
+- Quatro falhas reproduzidas antes da correção; 63 focados e 861 testes do app aprovados (16 novos), além de quatro de overlay e 16 de empacotamento. App/instrumentação compilados; três cenários Android aguardam aparelho. Com domain UP-TO-DATE, relatórios somam 946 sem falhas/skips.
+
+[Escopo e limites](docs/LOGIN_COOKIES_P20261113_6.md) · [Evidência](integration/login-cookies/20261113/README.md).
+
 ## Desenvolvimento · P20261113.5 — 13/11/2026
 
 **Estado:** continuação da beta.11/código 112; sem novo APK ou lançamento.

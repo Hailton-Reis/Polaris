@@ -1,0 +1,88 @@
+╷
+├─ JUnit Platform Suite ✔
+├─ JUnit Jupiter ✔
+│  ├─ BrowserCookieSessionTest ✔
+│  │  ├─ different browser domain identities cannot collapse silently into one host cooki... ✔
+│  │  ├─ temporary browser cookies remain temporary() ✔
+│  │  ├─ invalid snapshot origins reject the whole import() ✔
+│  │  ├─ maximum bounded snapshot count can merge the same small cookie() ✔
+│  │  ├─ browser seeding narrows existing parent domain credentials to the selected host(... ✔
+│  │  ├─ repeated cookie observations still obey the aggregate byte limit() ✔
+│  │  ├─ oversized or malformed browser output never partially commits() ✔
+│  │  ├─ cleared sessions cannot be restored by a browser still open() ✔
+│  │  ├─ HTTP sources cannot create browser sessions() ✔
+│  │  ├─ removed seeded cookies expire with their original domain identity() ✔
+│  │  ├─ only the selected HTTPS origin is accepted() ✔
+│  │  ├─ cancelling without completion writes nothing() ✔
+│  │  ├─ identical max age observations and equivalent attributes merge once() ✔
+│  │  ├─ snapshot planning refuses foreign origins and oversized navigation histories() ✔
+│  │  ├─ expired browser capabilities cannot seed or transfer credentials() ✔
+│  │  ├─ cookie attributes and host boundary survive browser import() ✔
+│  │  ├─ partitioned cookies never become unpartitioned credentials() ✔
+│  │  ├─ a second seed cannot rebase the original login snapshot() ✔
+│  │  ├─ contradicting snapshots cannot choose an arbitrary session value() ✔
+│  │  └─ snapshot plan includes seeded account paths and strips query credentials() ✔
+│  ├─ CookieBankTest ✔
+│  │  ├─ independent response names merge and expiration deletes only the matching cookie... ✔
+│  │  ├─ new browser cookies preserve unrelated concurrent refreshes() ✔
+│  │  ├─ revocation denies the all path browser capability too() ✔
+│  │  ├─ session cookies survive worker client replacement without entering disk state() ✔
+│  │  ├─ stored codec rejects wrong scalar types extra fields and oversized lists() ✔
+│  │  ├─ browser removal cannot erase a session refreshed after opening() ✔
+│  │  ├─ expired saved entries are removed rather than revived after reload() ✔
+│  │  ├─ same-name cookies for a deeper path precede the root session() ✔
+│  │  ├─ storage failure keeps memory usable reports failure and does not claim disk pers... ✔
+│  │  ├─ absence in an unrelated path snapshot cannot delete a seeded account session() ✔
+│  │  ├─ conflicting browser login rejects all changes instead of mixing accounts() ✔
+│  │  ├─ browser initialization includes account cookies even when starting at the root() ✔
+│  │  ├─ all path browser enumeration never includes another host() ✔
+│  │  ├─ persistent cookies restore and preserve secure httpOnly path and host flags() ✔
+│  │  ├─ unchanged browser cookies cannot roll back a newer HTTP session() ✔
+│  │  ├─ seed collisions preserve both original scoped cookie identities() ✔
+│  │  ├─ clear revokes old clients and ignores delayed authenticated responses() ✔
+│  │  ├─ the snapshot plan can observe a removed account cookie without visiting its page... ✔
+│  │  ├─ count and escaped byte budgets bound memory and persistent payloads() ✔
+│  │  └─ foreign cookie origins do not override a host-only session() ✔
+│  ├─ DocumentImportSpaceTest ✔
+│  │  ├─ insufficient space rejects the next chunk before writing() ✔
+│  │  ├─ file limit holds even when storage is plentiful() ✔
+│  │  ├─ unknown capacity empty inputs and overflow never appear as available space() ✔
+│  │  ├─ cancellation stops before more bytes are read or written() ✔
+│  │  ├─ copy preserves bytes and leaves streams owned by caller() ✔
+│  │  └─ capacity is checked again as a stream grows() ✔
+│  ├─ BackupRetentionTest ✔
+│  │  ├─ foreign and unfinished files never displace verified backups() ✔
+│  │  ├─ retention preserves malformed named files even when readable() ✔
+│  │  ├─ impossible calendar dates never identify a managed backup() ✔
+│  │  ├─ cleanup requires a verified managed current copy and a positive limit() ✔
+│  │  ├─ both historical and current backup names remain recognized() ✔
+│  │  └─ only oldest verified copies are selected after keeping current() ✔
+│  ├─ BackupArchiveWriterTest ✔
+│  │  ├─ successful result requires closed output and exact verified payload() ✔
+│  │  ├─ extra or missing decompressed bytes fail verification() ✔
+│  │  ├─ write only destination is explicitly unverifiable() ✔
+│  │  ├─ trailing garbage or another gzip member is rejected like the actual backup decod... ✔
+│  │  ├─ cancellation during copy or read back stays cancellation() ✔
+│  │  ├─ write failure closes the stream and cannot proceed to verification() ✔
+│  │  ├─ truncated gzip fails verification() ✔
+│  │  ├─ valid gzip carrying different bytes cannot be reported as success() ✔
+│  │  └─ failed output close cannot be reported as verified() ✔
+│  └─ SourcePreferenceNamespaceTest ✔
+│     ├─ native signed long source keys remain portable() ✔
+│     └─ backups cannot select global settings sandbox files or paths() ✔
+└─ JUnit Vintage ✔
+
+Test run finished after 1055 ms
+[         9 containers found      ]
+[         0 containers skipped    ]
+[         9 containers started    ]
+[         0 containers aborted    ]
+[         9 containers successful ]
+[         0 containers failed     ]
+[        63 tests found           ]
+[         0 tests skipped         ]
+[        63 tests started         ]
+[         0 tests aborted         ]
+[        63 tests successful      ]
+[         0 tests failed          ]
+

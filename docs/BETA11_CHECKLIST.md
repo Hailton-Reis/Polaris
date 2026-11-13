@@ -6,7 +6,7 @@ Este checklist acompanha o trabalho autorizado em 13/11. Não é uma declaraçã
 | Frente | Estado |
 | --- | --- |
 | Jornada, XP, conquistas e grimórios | Implementados no checkpoint anterior |
-| Login de fontes isoladas | Integração compilada P20261113.3 e concorrência testada em JVM; login real pendente |
+| Login de fontes isoladas | Integração compilada; cookies por caminho/host e snapshots corrigidos P20261113.6. Login real pendente |
 | Sandbox: controles dinâmicos, provedores externos/OAuth e novels | Controle numérico e listas dinâmicas síncronas implementados P20261113.4/.5; ações personalizadas/assíncronas, OAuth e novels pendentes |
 | Biblioteca, fontes reais e backups entre leitores | Limpeza e gravação de backups verificadas em JVM; ida/volta e aceite completo pendentes |
 | Leitura, OCR e tradução nos aparelhos | Pendente, incluindo diagnóstico do A12 |
@@ -27,3 +27,5 @@ A continuação P20261113.4 acrescenta [controles numéricos isolados](SANDBOX_C
 P20261113.4: app e instrumentação compilados; 833 testes do app aprovados (12 novos), mais 85 de domain já aprovados e UP-TO-DATE. Nenhum caso anterior ausente. Três cenários Android aguardam execução em dispositivo. [Evidência](../integration/sandbox-numeric/20261113/README.md).
 
 P20261113.5: [listas dinâmicas síncronas](SANDBOX_DINAMICO_P20261113_5.md), GET/HEAD na preparação e opções reconferidas ao salvar. App/instrumentação compilados, 845 testes do app aprovados (12 novos); seis cenários Android aguardam dispositivo. Sem outro APK nesta etapa.
+
+P20261113.6: [cookies por caminho no login](LOGIN_COOKIES_P20261113_6.md), com cópia restrita ao host e snapshots consistentes. App/instrumentação compilados; 861 testes do app (16 novos) e 63 focados aprovados. Três cenários Android aguardam execução em aparelho/WebView.

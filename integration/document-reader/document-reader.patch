@@ -649,10 +649,10 @@ index 0000000..e5c1e2a
 +}
 diff --git a/app/src/androidTest/java/eu/kanade/tachiyomi/extension/sandbox/SandboxCookieAndroidTest.kt b/app/src/androidTest/java/eu/kanade/tachiyomi/extension/sandbox/SandboxCookieAndroidTest.kt
 new file mode 100644
-index 0000000..c7bab9b
+index 0000000..9654a79
 --- /dev/null
 +++ b/app/src/androidTest/java/eu/kanade/tachiyomi/extension/sandbox/SandboxCookieAndroidTest.kt
-@@ -0,0 +1,265 @@
+@@ -0,0 +1,408 @@
 +package eu.kanade.tachiyomi.extension.sandbox
 +
 +import androidx.preference.PreferenceFragmentCompat
@@ -735,6 +735,149 @@ index 0000000..c7bab9b
 +    @After
 +    fun deleteFixtures() {
 +        files.forEach(File::delete)
++    }
++
++    @Test
++    fun browserBridgePreservesEncryptedAccountPathCookiesAcrossHostRecreation() {
++        val identity = "$prefix:browser-account"
++        val first = store(identity)
++        val account = url.newBuilder().encodedPath("/account").build()
++        val scoped =
++            Cookie.Builder()
++                .name("account")
++                .value("synthetic-account")
++                .hostOnlyDomain(url.host)
++                .path("/account")
++                .secure()
++                .httpOnly()
++                .expiresAt(System.currentTimeMillis() + 3600000)
++                .build()
++        first
++            .newSessionJar()
++            .saveFromResponse(url, listOf(scoped, cookie("root", "synthetic-root")))
++        val browser = BrowserCookieSession(url.toString(), first.newSessionJar())
++        val seeded = browser.seed()
++        assertEquals(setOf("account", "root"), seeded.map { it.name }.toSet())
++        browser.complete(
++            browser.snapshotUrls(emptyList()).associateWith { value ->
++                seeded.filter { it.matches(value.toHttpUrl()) }.map { it.toString() }
++            }
++        )
++        val restored = store(identity)
++        assertEquals(
++            setOf("account", "root"),
++            restored.newSessionJar().loadForRequest(account).map { it.name }.toSet(),
++        )
++        assertEquals(listOf("root"), restored.newSessionJar().loadForRequest(url).map { it.name })
++    }
++
++    @Test
++    fun clearingTheHostStoreRevokesAnAccountPathLoginAlreadySeeded() {
++        val first = store("$prefix:browser-revoke")
++        val scoped =
++            Cookie.Builder()
++                .name("account")
++                .value("synthetic-account")
++                .hostOnlyDomain(url.host)
++                .path("/account")
++                .secure()
++                .httpOnly()
++                .build()
++        first.newSessionJar().saveFromResponse(url, listOf(scoped))
++        val browser = BrowserCookieSession(url.toString(), first.newSessionJar())
++        val seeded = browser.seed()
++        first.clear()
++        assertTrue(
++            runCatching {
++                    browser.complete(
++                        browser.snapshotUrls(emptyList()).associateWith { value ->
++                            seeded.filter { it.matches(value.toHttpUrl()) }.map { it.toString() }
++                        }
++                    )
++                }
++                .isFailure
++        )
++        assertEquals(0, first.status().persistent + first.status().temporary)
++    }
++
++    @Test
++    fun aDedicatedWebViewProfileReceivesTheAccountCookieWithoutSiblingDomainAccess() {
++        org.junit.Assume.assumeTrue(
++            androidx.webkit.WebViewFeature.isFeatureSupported(
++                androidx.webkit.WebViewFeature.MULTI_PROFILE
++            )
++        )
++        org.junit.Assume.assumeTrue(
++            androidx.webkit.WebViewFeature.isFeatureSupported(
++                androidx.webkit.WebViewFeature.GET_COOKIE_INFO
++            )
++        )
++        val site = "https://reader.example.com/".toHttpUrl()
++        val first = store("$prefix:webview-profile")
++        val scoped =
++            Cookie.Builder()
++                .name("account")
++                .value("synthetic-only")
++                .domain("example.com")
++                .path("/account")
++                .secure()
++                .httpOnly()
++                .build()
++        first.newSessionJar().saveFromResponse(site, listOf(scoped))
++        val seeded = BrowserCookieSession(site.toString(), first.newSessionJar()).seed().single()
++        assertTrue(seeded.hostOnly)
++        val name = "polaris_test_login_" + UUID.randomUUID().toString()
++        var web: android.webkit.WebView? = null
++        val accepted = java.util.concurrent.atomic.AtomicBoolean(false)
++        val ready = java.util.concurrent.CountDownLatch(1)
++        try {
++            instrumentation.runOnMainSync {
++                val browser = android.webkit.WebView(context).also { web = it }
++                androidx.webkit.WebViewCompat.setProfile(browser, name)
++                val profile = androidx.webkit.WebViewCompat.getProfile(browser)
++                assertEquals(name, profile.name)
++                profile.cookieManager.setCookie(site.toString(), seeded.toString()) {
++                    accepted.set(it)
++                    ready.countDown()
++                }
++            }
++            assertTrue(ready.await(10, java.util.concurrent.TimeUnit.SECONDS))
++            assertTrue(accepted.get())
++            instrumentation.runOnMainSync {
++                val manager =
++                    androidx.webkit.WebViewCompat.getProfile(requireNotNull(web)).cookieManager
++                assertTrue(
++                    androidx.webkit.CookieManagerCompat.getCookieInfo(manager, site.toString())
++                        .isEmpty()
++                )
++                assertEquals(
++                    1,
++                    androidx.webkit.CookieManagerCompat.getCookieInfo(
++                            manager,
++                            "https://reader.example.com/account",
++                        )
++                        .size,
++                )
++                assertTrue(
++                    androidx.webkit.CookieManagerCompat.getCookieInfo(
++                            manager,
++                            "https://sibling.example.com/account",
++                        )
++                        .isEmpty()
++                )
++            }
++        } finally {
++            instrumentation.runOnMainSync {
++                web?.let {
++                    runCatching {
++                        val profile = androidx.webkit.WebViewCompat.getProfile(it)
++                        if (profile.name == name) profile.cookieManager.removeAllCookies(null)
++                    }
++                    it.destroy()
++                }
++                runCatching { androidx.webkit.ProfileStore.getInstance().deleteProfile(name) }
++            }
++        }
 +    }
 +
 +    @Test
@@ -10313,7 +10456,7 @@ index a198c3f..9a3e84f 100644
                      preference = translationPreferences.translationEngineTemperature(),
                      title = stringResource(ATMR.strings.pref_engine_temperature),
 diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
-index 7f411fd..44facbc 100644
+index 7f411fd..1dae6ff 100644
 --- a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
 +++ b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
 @@ -1,15 +1,18 @@
@@ -10378,7 +10521,7 @@ index 7f411fd..44facbc 100644
  
      // Identifies this overlay independently of the pinned upstream COMMIT_SHA.
 -    private const val POLARIS_READER_REVISION = "P20261031.2"
-+    private const val POLARIS_READER_REVISION = "P20261113.5"
++    private const val POLARIS_READER_REVISION = "P20261113.6"
  
      @Composable
      override fun Content() {
@@ -22552,10 +22695,10 @@ index 0000000..e998eaf
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/BrowserCookieSession.kt b/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/BrowserCookieSession.kt
 new file mode 100644
-index 0000000..282ddab
+index 0000000..3a53fdf
 --- /dev/null
 +++ b/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/BrowserCookieSession.kt
-@@ -0,0 +1,86 @@
+@@ -0,0 +1,157 @@
 +package eu.kanade.tachiyomi.extension.sandbox
 +
 +import okhttp3.Cookie
@@ -22571,6 +22714,7 @@ index 0000000..282ddab
 +            require(it.isHttps) { "Browser login requires HTTPS" }
 +        }
 +    private val initial = linkedMapOf<Triple<String, String, String>, Cookie>()
++    private var seeded = false
 +
 +    private fun copyCookie(
 +        cookie: Cookie,
@@ -22599,22 +22743,64 @@ index 0000000..282ddab
 +            .getOrDefault(false)
 +
 +    fun seed(url: HttpUrl = origin): List<Cookie> {
++        check(!seeded) { "Browser seed must not replace its original HTTP snapshot" }
++        check((jar as? RevocableCookieJar)?.isActive() != false) { "Login session revoked" }
 +        require(accepts(url.toString()))
-+        return jar.loadForRequest(url).also { cookies ->
-+            cookies.forEach { initial[Triple(it.name, it.domain, it.path)] = it }
++        val cookies = (jar as? RevocableCookieJar)?.loadForBrowser(url) ?: jar.loadForRequest(url)
++        require(CookieCodec.encode(cookies).toString().toByteArray().size <= CookieCodec.MAX_BYTES)
++        val narrowed = linkedMapOf<Pair<String, String>, Cookie>()
++        cookies.forEach { cookie ->
++            require(cookie.matches(url.newBuilder().encodedPath(cookie.path).build()))
++            requireNotNull(Cookie.parse(url, cookie.toString()))
++            val target = cookie.name to cookie.path
++            require(target !in narrowed) { "Ambiguous cookies after narrowing the login host" }
++            narrowed[target] = copyCookie(cookie, origin.host)
 +        }
++        require(
++            CookieCodec.encode(narrowed.values).toString().toByteArray().size <=
++                CookieCodec.MAX_BYTES
++        )
++        check((jar as? RevocableCookieJar)?.isActive() != false) { "Login session revoked" }
++        cookies.forEach { initial[Triple(it.name, it.domain, it.path)] = it }
++        seeded = true
++        return narrowed.values.toList()
++    }
++
++    fun cookieUrl(value: String): String {
++        require(accepts(value))
++        return value.toHttpUrl().newBuilder().query(null).fragment(null).build().toString()
++    }
++
++    /** Local CookieManager queries, never navigation or remote requests. */
++    fun snapshotUrls(visited: Collection<String>): List<String> {
++        require(visited.size <= MAX_VISITED)
++        val urls = linkedSetOf(cookieUrl(origin.newBuilder().encodedPath("/").build().toString()))
++        initial.values.forEach {
++            urls += cookieUrl(origin.newBuilder().encodedPath(it.path).build().toString())
++        }
++        visited.forEach { urls += cookieUrl(it) }
++        require(urls.size <= MAX_SNAPSHOTS)
++        return urls.toList()
 +    }
 +
 +    /** Preserve attributes using GET_COOKIE_INFO; never infer expiry from a Cookie header. */
 +    fun complete(snapshots: Map<String, List<String>>) {
 +        check((jar as? RevocableCookieJar)?.isActive() != false) { "Login session revoked" }
-+        require(snapshots.size in 1..32 && snapshots.keys.all(::accepts))
-+        require(snapshots.values.sumOf { it.size } <= CookieCodec.MAX_COOKIES * 32)
++        require(snapshots.size in 1..MAX_SNAPSHOTS && snapshots.keys.all(::accepts))
++        require(snapshots.values.sumOf { it.size } <= CookieCodec.MAX_COOKIES * MAX_SNAPSHOTS)
 +        val current = linkedMapOf<Triple<String, String, String>, Cookie>()
++        val observed =
++            linkedMapOf<
++                Triple<String, String, String>,
++                Pair<Triple<String, String, String>, String>,
++            >()
++        var bytes = 0L
 +        snapshots.forEach { (value, headers) ->
 +            val url = value.toHttpUrl()
 +            headers.forEach cookie@{ header ->
-+                require(header.toByteArray().size <= 8192)
++                val size = header.toByteArray().size
++                bytes += size
++                require(size <= 8192 && bytes <= CookieCodec.MAX_BYTES.toLong() * MAX_SNAPSHOTS)
 +                // Partitioned browser state cannot be represented by OkHttp's unpartitioned jar.
 +                if (header.split(';').drop(1).any { it.trim().equals("Partitioned", true) })
 +                    return@cookie
@@ -22622,7 +22808,25 @@ index 0000000..282ddab
 +                require(CookieCodec.valid(parsed))
 +                // A login for one host never grants a parent-domain session to sibling sources.
 +                val cookie = copyCookie(parsed, origin.host)
-+                current[Triple(cookie.name, cookie.domain, cookie.path)] = cookie
++                val key = Triple(cookie.name, cookie.domain, cookie.path)
++                val original = Triple(parsed.name, parsed.domain, parsed.path)
++                observed[key]?.let { previous ->
++                    require(previous.first == original) { "Ambiguous browser cookie domains" }
++                    // Identical Max-Age headers share the first parsed expiry rather than drifting
++                    // with the clock between URL snapshots. Equivalent attributes are also
++                    // accepted.
++                    require(
++                        previous.second == header ||
++                            current.getValue(key).toString() == cookie.toString()
++                    ) {
++                        "Browser cookies changed while collecting the session"
++                    }
++                }
++                    ?: run {
++                        observed[key] = original to header
++                        current[key] = cookie
++                        require(current.size <= CookieCodec.MAX_COOKIES)
++                    }
 +            }
 +        }
 +        require(current.size <= CookieCodec.MAX_COOKIES)
@@ -22632,7 +22836,12 @@ index 0000000..282ddab
 +        )
 +        val removed =
 +            initial
-+                .filter { (key, _) -> key !in current }
++                .filter { (key, cookie) ->
++                    key !in current &&
++                        snapshots.keys.any { value ->
++                            copyCookie(cookie, origin.host).matches(value.toHttpUrl())
++                        }
++                }
 +                .values
 +                .map { copyCookie(it, it.domain, expired = true, hostOnly = it.hostOnly) }
 +        // A jar issued before clearSession is revoked by CookieBank and ignores this write.
@@ -22640,6 +22849,11 @@ index 0000000..282ddab
 +            jar.saveBrowserResponse(origin, initial.values.toList(), removed + current.values)
 +        else jar.saveFromResponse(origin, removed + current.values)
 +        check((jar as? RevocableCookieJar)?.isActive() != false) { "Login session revoked" }
++    }
++
++    companion object {
++        const val MAX_VISITED = 32
++        const val MAX_SNAPSHOTS = CookieCodec.MAX_COOKIES + MAX_VISITED + 1
 +    }
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/ExtensionSandboxProtocol.kt b/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/ExtensionSandboxProtocol.kt
@@ -23769,10 +23983,10 @@ index 0000000..2b0dce3
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxCookieStore.kt b/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxCookieStore.kt
 new file mode 100644
-index 0000000..b629545
+index 0000000..1dc8207
 --- /dev/null
 +++ b/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxCookieStore.kt
-@@ -0,0 +1,381 @@
+@@ -0,0 +1,400 @@
 +package eu.kanade.tachiyomi.extension.sandbox
 +
 +import android.content.Context
@@ -23827,6 +24041,9 @@ index 0000000..b629545
 +
 +internal interface RevocableCookieJar : CookieJar {
 +    fun isActive(): Boolean
++
++    /** Host browser initialization may need cookies outside the opening page's path. */
++    fun loadForBrowser(url: HttpUrl): List<Cookie> = loadForRequest(url)
 +
 +    fun saveBrowserResponse(url: HttpUrl, initial: List<Cookie>, cookies: List<Cookie>) {
 +        saveFromResponse(url, cookies)
@@ -23942,6 +24159,22 @@ index 0000000..b629545
 +                    saveFromResponse(url, updates)
 +                }
 +            }
++
++            override fun loadForBrowser(url: HttpUrl): List<Cookie> =
++                synchronized(this@CookieBank) {
++                    SandboxNetworkPolicy.requireUrl(url.toString())
++                    if (issued != generation) return@synchronized emptyList()
++                    load()
++                    trim()
++                    persist()
++                    // Keep OkHttp's domain/host-only/Secure checks, selecting each cookie's own
++                    // path.
++                    values.values
++                        .filter { cookie ->
++                            cookie.matches(url.newBuilder().encodedPath(cookie.path).build())
++                        }
++                        .sortedByDescending { it.path.length }
++                }
 +
 +            override fun loadForRequest(url: HttpUrl): List<Cookie> =
 +                synchronized(this@CookieBank) {
@@ -24784,10 +25017,10 @@ index 0000000..ae23456
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxLoginActivity.kt b/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxLoginActivity.kt
 new file mode 100644
-index 0000000..29dd1bf
+index 0000000..1fab867
 --- /dev/null
 +++ b/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxLoginActivity.kt
-@@ -0,0 +1,276 @@
+@@ -0,0 +1,281 @@
 +package eu.kanade.tachiyomi.extension.sandbox
 +
 +import android.content.Context
@@ -24943,7 +25176,8 @@ index 0000000..29dd1bf
 +                        if (session.accepts(request.url.toString())) null else blocked()
 +
 +                    override fun onPageFinished(view: WebView, url: String) {
-+                        if (session.accepts(url) && visited.size < 31) visited += url
++                        if (session.accepts(url) && visited.size < BrowserCookieSession.MAX_VISITED)
++                            visited += session.cookieUrl(url)
 +                    }
 +                }
 +            val start =
@@ -24991,9 +25225,13 @@ index 0000000..29dd1bf
 +        browser.stopLoading()
 +        lifecycleScope.launch {
 +            try {
-+                val manager = WebViewCompat.getProfile(browser).cookieManager
++                val profile = WebViewCompat.getProfile(browser)
++                check(profile.name == profileName)
++                val manager = profile.cookieManager
 +                val snapshots =
-+                    visited.associateWith { CookieManagerCompat.getCookieInfo(manager, it) }
++                    requireNotNull(bridge).snapshotUrls(visited).associateWith {
++                        CookieManagerCompat.getCookieInfo(manager, it)
++                    }
 +                withContext(Dispatchers.IO) { requireNotNull(bridge).complete(snapshots) }
 +                finish()
 +            } catch (cancelled: CancellationException) {
@@ -67525,10 +67763,10 @@ index 0000000..d399c28
 +}
 diff --git a/app/src/test/java/eu/kanade/tachiyomi/extension/sandbox/BrowserCookieSessionTest.kt b/app/src/test/java/eu/kanade/tachiyomi/extension/sandbox/BrowserCookieSessionTest.kt
 new file mode 100644
-index 0000000..ecfb1ae
+index 0000000..ddc3bd5
 --- /dev/null
 +++ b/app/src/test/java/eu/kanade/tachiyomi/extension/sandbox/BrowserCookieSessionTest.kt
-@@ -0,0 +1,158 @@
+@@ -0,0 +1,306 @@
 +package eu.kanade.tachiyomi.extension.sandbox
 +
 +import okhttp3.Cookie
@@ -67686,13 +67924,161 @@ index 0000000..ecfb1ae
 +            .complete(mapOf(url.toString() to listOf("token=v; Secure; Partitioned")))
 +        assertTrue(jar.values.isEmpty())
 +    }
++
++    @Test
++    fun `browser seeding narrows existing parent domain credentials to the selected host`() {
++        val jar =
++            Jar().apply {
++                values = listOf(cookie("session=old; Domain=example.com; Path=/; Secure; HttpOnly"))
++            }
++        val seeded = BrowserCookieSession(url.toString(), jar).seed().single()
++        assertTrue(seeded.hostOnly)
++        assertEquals(url.host, seeded.domain)
++        assertFalse(seeded.matches("https://sibling.example.com/".toHttpUrl()))
++    }
++
++    @Test
++    fun `contradicting snapshots cannot choose an arbitrary session value`() {
++        val jar = Jar()
++        assertThrows(IllegalArgumentException::class.java) {
++            BrowserCookieSession(url.toString(), jar)
++                .complete(
++                    linkedMapOf(
++                        url.toString() to listOf("login=first; Path=/; Secure"),
++                        "https://reader.example.com/account" to
++                            listOf("login=second; Path=/; Secure"),
++                    )
++                )
++        }
++        assertEquals(0, jar.writes)
++    }
++
++    @Test
++    fun `snapshot plan includes seeded account paths and strips query credentials`() {
++        val jar = Jar().apply { values = listOf(cookie("account=old; Path=/account; Secure")) }
++        val browser = BrowserCookieSession(url.toString(), jar)
++        browser.seed("https://reader.example.com/account".toHttpUrl())
++        val urls =
++            browser.snapshotUrls(listOf("https://reader.example.com/account?code=secret#token"))
++        assertEquals(listOf(url.toString(), "https://reader.example.com/account"), urls)
++        assertFalse(urls.any { '?' in it || '#' in it })
++    }
++
++    @Test
++    fun `snapshot planning refuses foreign origins and oversized navigation histories`() {
++        val browser = BrowserCookieSession(url.toString(), Jar())
++        assertThrows(IllegalArgumentException::class.java) {
++            browser.snapshotUrls(listOf("https://other.example.com/"))
++        }
++        assertThrows(IllegalArgumentException::class.java) {
++            browser.snapshotUrls(
++                List(BrowserCookieSession.MAX_VISITED + 1) { "https://reader.example.com/$it" }
++            )
++        }
++    }
++
++    @Test
++    fun `a second seed cannot rebase the original login snapshot`() {
++        val jar = Jar().apply { values = listOf(cookie("login=before; Path=/; Secure")) }
++        val browser = BrowserCookieSession(url.toString(), jar)
++        browser.seed()
++        jar.values = listOf(cookie("login=newer; Path=/; Secure"))
++        assertThrows(IllegalStateException::class.java) { browser.seed() }
++        assertEquals("newer", jar.values.single().value)
++        assertEquals(0, jar.writes)
++    }
++
++    @Test
++    fun `different browser domain identities cannot collapse silently into one host cookie`() {
++        val jar = Jar()
++        assertThrows(IllegalArgumentException::class.java) {
++            BrowserCookieSession(url.toString(), jar)
++                .complete(
++                    mapOf(
++                        url.toString() to
++                            listOf(
++                                "login=same; Domain=example.com; Path=/; Secure",
++                                "login=same; Domain=reader.example.com; Path=/; Secure",
++                            )
++                    )
++                )
++        }
++        assertEquals(0, jar.writes)
++    }
++
++    @Test
++    fun `identical max age observations and equivalent attributes merge once`() {
++        for ((first, second) in
++            listOf(
++                "login=same; Path=/; Secure; Max-Age=3600" to
++                    "login=same; Path=/; Secure; Max-Age=3600",
++                "login=same; Path=/; Secure; HttpOnly; Expires=Wed, 01 Jan 2031 00:00:00 GMT" to
++                    "login=same; HttpOnly; Secure; Expires=Wed, 01 Jan 2031 00:00:00 GMT; Path=/",
++            )) {
++            val jar = Jar()
++            BrowserCookieSession(url.toString(), jar)
++                .complete(
++                    linkedMapOf(
++                        url.toString() to listOf(first),
++                        "https://reader.example.com/account" to listOf(second),
++                    )
++                )
++            assertEquals(1, jar.values.size)
++            assertEquals("same", jar.values.single().value)
++            assertEquals(1, jar.writes)
++        }
++    }
++
++    @Test
++    fun `expired browser capabilities cannot seed or transfer credentials`() {
++        val jar =
++            object : RevocableCookieJar {
++                override fun isActive() = false
++
++                override fun loadForRequest(url: HttpUrl): List<Cookie> =
++                    throw AssertionError("Revoked read")
++
++                override fun saveFromResponse(url: HttpUrl, cookies: List<Cookie>) =
++                    throw AssertionError("Revoked write")
++            }
++        assertThrows(IllegalStateException::class.java) {
++            BrowserCookieSession(url.toString(), jar).seed()
++        }
++    }
++
++    @Test
++    fun `maximum bounded snapshot count can merge the same small cookie`() {
++        val jar = Jar()
++        BrowserCookieSession(url.toString(), jar)
++            .complete(
++                (0 until BrowserCookieSession.MAX_SNAPSHOTS).associate {
++                    "https://reader.example.com/$it" to listOf("login=value; Path=/; Secure")
++                }
++            )
++        assertEquals(1, jar.values.size)
++    }
++
++    @Test
++    fun `repeated cookie observations still obey the aggregate byte limit`() {
++        val jar = Jar()
++        val header = "login=" + "x".repeat(4000) + "; Path=/; Secure"
++        assertThrows(IllegalArgumentException::class.java) {
++            BrowserCookieSession(url.toString(), jar)
++                .complete(
++                    (0 until BrowserCookieSession.MAX_SNAPSHOTS).associate {
++                        "https://reader.example.com/$it" to List(CookieCodec.MAX_COOKIES) { header }
++                    }
++                )
++        }
++        assertEquals(0, jar.writes)
++    }
 +}
 diff --git a/app/src/test/java/eu/kanade/tachiyomi/extension/sandbox/CookieBankTest.kt b/app/src/test/java/eu/kanade/tachiyomi/extension/sandbox/CookieBankTest.kt
 new file mode 100644
-index 0000000..fecdf98
+index 0000000..91c306e
 --- /dev/null
 +++ b/app/src/test/java/eu/kanade/tachiyomi/extension/sandbox/CookieBankTest.kt
-@@ -0,0 +1,278 @@
+@@ -0,0 +1,349 @@
 +package eu.kanade.tachiyomi.extension.sandbox
 +
 +import java.io.IOException
@@ -67969,6 +68355,77 @@ index 0000000..fecdf98
 +            browser.complete(mapOf(url.toString() to emptyList()))
 +        }
 +        assertEquals("newer", http.loadForRequest(url).single().value)
++    }
++
++    @Test
++    fun `browser initialization includes account cookies even when starting at the root`() {
++        val bank = CookieBank(Storage()) { now }
++        val jar = bank.newSessionJar()
++        jar.saveFromResponse(url, listOf(cookie("account", path = "/account")))
++        val browser = BrowserCookieSession("https://reader.example.com/", bank.newSessionJar())
++        assertEquals(listOf("account"), browser.seed().map { it.name })
++    }
++
++    @Test
++    fun `absence in an unrelated path snapshot cannot delete a seeded account session`() {
++        val bank = CookieBank(Storage()) { now }
++        val jar = bank.newSessionJar()
++        val account = "https://reader.example.com/account".toHttpUrl()
++        jar.saveFromResponse(url, listOf(cookie("account", path = "/account")))
++        val browser = BrowserCookieSession(url.toString(), bank.newSessionJar())
++        browser.seed(account)
++        browser.complete(mapOf("https://reader.example.com/" to emptyList()))
++        assertEquals(listOf("account"), jar.loadForRequest(account).map { it.name })
++    }
++
++    @Test
++    fun `all path browser enumeration never includes another host`() {
++        val bank = CookieBank(Storage()) { now }
++        val jar = bank.newSessionJar()
++        val other = "https://other.example.com/".toHttpUrl()
++        jar.saveFromResponse(other, listOf(cookie("other", domain = "other.example.com")))
++        jar.saveFromResponse(url, listOf(cookie("account", path = "/account")))
++        assertEquals(
++            listOf("account"),
++            (jar as RevocableCookieJar).loadForBrowser(url).map { it.name },
++        )
++        assertEquals(listOf("other"), jar.loadForRequest(other).map { it.name })
++    }
++
++    @Test
++    fun `revocation denies the all path browser capability too`() {
++        val bank = CookieBank(Storage()) { now }
++        val jar = bank.newSessionJar() as RevocableCookieJar
++        jar.saveFromResponse(url, listOf(cookie("account", path = "/account")))
++        bank.clear()
++        assertTrue(jar.loadForBrowser(url).isEmpty())
++    }
++
++    @Test
++    fun `the snapshot plan can observe a removed account cookie without visiting its page`() {
++        val bank = CookieBank(Storage()) { now }
++        val jar = bank.newSessionJar()
++        jar.saveFromResponse(url, listOf(cookie("account", path = "/account")))
++        val browser = BrowserCookieSession(url.toString(), bank.newSessionJar())
++        browser.seed()
++        val snapshots = browser.snapshotUrls(emptyList()).associateWith { emptyList<String>() }
++        assertTrue("https://reader.example.com/account" in snapshots)
++        browser.complete(snapshots)
++        assertTrue(jar.loadForRequest("https://reader.example.com/account".toHttpUrl()).isEmpty())
++    }
++
++    @Test
++    fun `seed collisions preserve both original scoped cookie identities`() {
++        val bank = CookieBank(Storage()) { now }
++        val jar = bank.newSessionJar()
++        jar.saveFromResponse(
++            url,
++            listOf(cookie("login", "host"), cookie("login", "parent", domain = "example.com")),
++        )
++        assertThrows(IllegalArgumentException::class.java) {
++            BrowserCookieSession(url.toString(), bank.newSessionJar()).seed()
++        }
++        assertEquals(setOf("host", "parent"), jar.loadForRequest(url).map { it.value }.toSet())
 +    }
 +}
 diff --git a/app/src/test/java/eu/kanade/tachiyomi/extension/sandbox/SandboxFilterCodecTest.kt b/app/src/test/java/eu/kanade/tachiyomi/extension/sandbox/SandboxFilterCodecTest.kt
