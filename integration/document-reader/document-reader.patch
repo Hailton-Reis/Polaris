@@ -3805,7 +3805,7 @@ index 0000000..719562e
 +    }
 +}
 diff --git a/app/src/main/AndroidManifest.xml b/app/src/main/AndroidManifest.xml
-index 172b28c..2b42cd8 100644
+index 172b28c..66e9da7 100644
 --- a/app/src/main/AndroidManifest.xml
 +++ b/app/src/main/AndroidManifest.xml
 @@ -43,20 +43,53 @@
@@ -3937,7 +3937,18 @@ index 172b28c..2b42cd8 100644
          <activity
              android:name=".crash.CrashActivity"
              android:exported="false"
-@@ -261,7 +341,7 @@
+@@ -187,6 +267,10 @@
+             android:exported="false"
+             android:theme="@style/Theme.Tachiyomi" />
+ 
++        <activity
++            android:name=".extension.sandbox.SandboxLoginActivity"
++            android:exported="false" />
++
+         <activity
+             android:name=".ui.webview.WebViewActivity"
+             android:configChanges="uiMode|orientation|screenSize"
+@@ -261,7 +345,7 @@
  
          <meta-data
              android:name="android.webkit.WebView.EnableSafeBrowsing"
@@ -10011,7 +10022,7 @@ index a198c3f..9a3e84f 100644
                      preference = translationPreferences.translationEngineTemperature(),
                      title = stringResource(ATMR.strings.pref_engine_temperature),
 diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
-index 7f411fd..318103b 100644
+index 7f411fd..8130ab4 100644
 --- a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
 +++ b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
 @@ -1,15 +1,18 @@
@@ -10076,7 +10087,7 @@ index 7f411fd..318103b 100644
  
      // Identifies this overlay independently of the pinned upstream COMMIT_SHA.
 -    private const val POLARIS_READER_REVISION = "P20261031.2"
-+    private const val POLARIS_READER_REVISION = "P20261112.1"
++    private const val POLARIS_READER_REVISION = "P20261113.1"
  
      @Composable
      override fun Content() {
@@ -22219,6 +22230,96 @@ index 0000000..e998eaf
 +        )
 +    }
 +}
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/BrowserCookieSession.kt b/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/BrowserCookieSession.kt
+new file mode 100644
+index 0000000..ea51c1e
+--- /dev/null
++++ b/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/BrowserCookieSession.kt
+@@ -0,0 +1,84 @@
++package eu.kanade.tachiyomi.extension.sandbox
++
++import okhttp3.Cookie
++import okhttp3.CookieJar
++import okhttp3.HttpUrl
++import okhttp3.HttpUrl.Companion.toHttpUrl
++
++/** A revocable bridge for one explicitly selected HTTPS origin, never the global browser. */
++internal class BrowserCookieSession(baseUrl: String, private val jar: CookieJar) {
++    val origin =
++        baseUrl.toHttpUrl().also {
++            SandboxNetworkPolicy.requireUrl(it.toString())
++            require(it.isHttps) { "Browser login requires HTTPS" }
++        }
++    private val initial = linkedMapOf<Triple<String, String, String>, Cookie>()
++
++    private fun copyCookie(
++        cookie: Cookie,
++        host: String,
++        expired: Boolean = false,
++        hostOnly: Boolean = true,
++    ): Cookie =
++        Cookie.Builder()
++            .name(cookie.name)
++            .value(cookie.value)
++            .path(cookie.path)
++            .apply {
++                if (hostOnly) hostOnlyDomain(host) else domain(host)
++                if (cookie.persistent || expired) expiresAt(if (expired) 0 else cookie.expiresAt)
++                if (cookie.secure) secure()
++                if (cookie.httpOnly) httpOnly()
++            }
++            .build()
++
++    fun accepts(value: String): Boolean =
++        runCatching {
++                val url = value.toHttpUrl()
++                SandboxNetworkPolicy.requireUrl(value)
++                url.isHttps && url.host == origin.host && url.port == origin.port
++            }
++            .getOrDefault(false)
++
++    fun seed(url: HttpUrl = origin): List<Cookie> {
++        require(accepts(url.toString()))
++        return jar.loadForRequest(url).also { cookies ->
++            cookies.forEach { initial[Triple(it.name, it.domain, it.path)] = it }
++        }
++    }
++
++    /** Preserve attributes using GET_COOKIE_INFO; never infer expiry from a Cookie header. */
++    fun complete(snapshots: Map<String, List<String>>) {
++        check((jar as? RevocableCookieJar)?.isActive() != false) { "Login session revoked" }
++        require(snapshots.size in 1..32 && snapshots.keys.all(::accepts))
++        require(snapshots.values.sumOf { it.size } <= CookieCodec.MAX_COOKIES * 32)
++        val current = linkedMapOf<Triple<String, String, String>, Cookie>()
++        snapshots.forEach { (value, headers) ->
++            val url = value.toHttpUrl()
++            headers.forEach cookie@{ header ->
++                require(header.toByteArray().size <= 8192)
++                // Partitioned browser state cannot be represented by OkHttp's unpartitioned jar.
++                if (header.split(';').drop(1).any { it.trim().equals("Partitioned", true) })
++                    return@cookie
++                val parsed = Cookie.parse(url, header) ?: error("Invalid browser cookie")
++                require(CookieCodec.valid(parsed))
++                // A login for one host never grants a parent-domain session to sibling sources.
++                val cookie = copyCookie(parsed, origin.host)
++                current[Triple(cookie.name, cookie.domain, cookie.path)] = cookie
++            }
++        }
++        require(current.size <= CookieCodec.MAX_COOKIES)
++        require(
++            CookieCodec.encode(current.values).toString().toByteArray().size <=
++                CookieCodec.MAX_BYTES
++        )
++        val removed =
++            initial
++                .filter { (key, _) -> key !in current }
++                .values
++                .map { copyCookie(it, it.domain, expired = true, hostOnly = it.hostOnly) }
++        // A jar issued before clearSession is revoked by CookieBank and ignores this write.
++        jar.saveFromResponse(origin, removed + current.values)
++        check((jar as? RevocableCookieJar)?.isActive() != false) { "Login session revoked" }
++    }
++}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/ExtensionSandboxProtocol.kt b/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/ExtensionSandboxProtocol.kt
 new file mode 100644
 index 0000000..1c2ab92
@@ -22971,10 +23072,10 @@ index 0000000..486a3e2
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/IsolatedHttpSource.kt b/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/IsolatedHttpSource.kt
 new file mode 100644
-index 0000000..57a5934
+index 0000000..4115985
 --- /dev/null
 +++ b/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/IsolatedHttpSource.kt
-@@ -0,0 +1,311 @@
+@@ -0,0 +1,316 @@
 +package eu.kanade.tachiyomi.extension.sandbox
 +
 +import android.content.Context
@@ -23013,6 +23114,11 @@ index 0000000..57a5934
 +    fun sessionStatus() = runtime.cookies.status()
 +
 +    fun clearSession() = runtime.cookies.clear()
++
++    fun browserSession(): BrowserCookieSession {
++        check(!runtime.isQuarantined()) { "Extension quarantined" }
++        return BrowserCookieSession(baseUrl, runtime.cookies.newSessionJar())
++    }
 +
 +    suspend fun preferenceSchema(): JsonObject = call("preferences")
 +
@@ -23288,10 +23394,10 @@ index 0000000..57a5934
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxCookieStore.kt b/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxCookieStore.kt
 new file mode 100644
-index 0000000..43702ef
+index 0000000..3f8cd83
 --- /dev/null
 +++ b/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxCookieStore.kt
-@@ -0,0 +1,332 @@
+@@ -0,0 +1,338 @@
 +package eu.kanade.tachiyomi.extension.sandbox
 +
 +import android.content.Context
@@ -23342,6 +23448,10 @@ index 0000000..43702ef
 +    private companion object {
 +        val processCache = SessionCache()
 +    }
++}
++
++internal interface RevocableCookieJar : CookieJar {
++    fun isActive(): Boolean
 +}
 +
 +internal interface CookieStorage {
@@ -23412,7 +23522,9 @@ index 0000000..43702ef
 +    @Synchronized
 +    fun newSessionJar(): CookieJar {
 +        val issued = generation
-+        return object : CookieJar {
++        return object : RevocableCookieJar {
++            override fun isActive() = synchronized(this@CookieBank) { issued == generation }
++
 +            override fun loadForRequest(url: HttpUrl): List<Cookie> =
 +                synchronized(this@CookieBank) {
 +                    SandboxNetworkPolicy.requireUrl(url.toString())
@@ -24250,6 +24362,254 @@ index 0000000..a3cd212
 +                .build()
 +    }
 +}
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxLoginActivity.kt b/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxLoginActivity.kt
+new file mode 100644
+index 0000000..29c1fab
+--- /dev/null
++++ b/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxLoginActivity.kt
+@@ -0,0 +1,242 @@
++package eu.kanade.tachiyomi.extension.sandbox
++
++import android.content.Context
++import android.content.Intent
++import android.os.Bundle
++import android.webkit.PermissionRequest
++import android.webkit.WebChromeClient
++import android.webkit.WebResourceRequest
++import android.webkit.WebResourceResponse
++import android.webkit.WebView
++import android.webkit.WebViewClient
++import android.widget.Button
++import android.widget.LinearLayout
++import android.widget.TextView
++import android.widget.Toast
++import androidx.appcompat.app.AlertDialog
++import androidx.fragment.app.FragmentActivity
++import androidx.webkit.CookieManagerCompat
++import androidx.webkit.ProfileStore
++import androidx.webkit.WebStorageCompat
++import androidx.webkit.WebViewCompat
++import androidx.webkit.WebViewFeature
++import java.io.ByteArrayInputStream
++import java.util.UUID
++import tachiyomi.core.common.i18n.stringResource
++import tachiyomi.domain.source.service.SourceManager
++import tachiyomi.i18n.at.ATMR
++import uy.kohesive.injekt.injectLazy
++
++/**
++ * Explicit host browser, separate from extension execution and from the default WebView profile.
++ */
++internal class SandboxLoginActivity : FragmentActivity() {
++    private val sources: SourceManager by injectLazy()
++    private var web: WebView? = null
++    private var profileName: String? = null
++    private var profileAttached = false
++    private var bridge: BrowserCookieSession? = null
++    private val visited = linkedSetOf<String>()
++    private var saving = false
++
++    override fun onCreate(savedInstanceState: Bundle?) {
++        super.onCreate(savedInstanceState)
++        // Unsupported providers never fall back to the global browser or compatibility loader.
++        if (!supported()) {
++            message(ATMR.strings.sandbox_login_unavailable)
++            finish()
++            return
++        }
++        val source = sources.get(intent.getLongExtra(SOURCE, -1)) as? IsolatedHttpSource
++        if (source == null) {
++            finish()
++            return
++        }
++        val session =
++            runCatching { source.browserSession() }
++                .getOrElse {
++                    message(ATMR.strings.sandbox_login_unavailable)
++                    finish()
++                    return
++                }
++        bridge = session
++        AlertDialog.Builder(this)
++            .setTitle(stringResource(ATMR.strings.sandbox_login_title))
++            .setMessage(
++                stringResource(ATMR.strings.sandbox_login_confirm) + "\n\n" + session.origin.host
++            )
++            .setNegativeButton(android.R.string.cancel) { _, _ -> finish() }
++            .setOnCancelListener { finish() }
++            .setPositiveButton(android.R.string.ok) { _, _ -> open(session, source.name) }
++            .show()
++    }
++
++    @Suppress("SetJavaScriptEnabled")
++    private fun open(session: BrowserCookieSession, sourceName: String) {
++        try {
++            val store = ProfileStore.getInstance()
++            // Only profiles from interrupted logins, never ordinary browsing or another live login.
++            store.allProfileNames
++                .filter { it.startsWith(PREFIX) && it !in active }
++                .forEach { runCatching { store.deleteProfile(it) } }
++            val name = PREFIX + UUID.randomUUID().toString()
++            profileName = name
++            active += name
++            val browser = WebView(this)
++            web = browser
++            WebViewCompat.setProfile(browser, name) // Before settings, scripts or any navigation.
++            profileAttached = true
++            val manager = WebViewCompat.getProfile(browser).cookieManager
++            manager.setAcceptCookie(true)
++            manager.setAcceptThirdPartyCookies(browser, false)
++            val layout = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
++            layout.addView(
++                TextView(this).apply {
++                    text = "$sourceName — ${session.origin.host}"
++                    setPadding(16, 16, 16, 16)
++                }
++            )
++            layout.addView(
++                Button(this).apply {
++                    text = stringResource(ATMR.strings.sandbox_login_done)
++                    setOnClickListener { save() }
++                }
++            )
++            layout.addView(browser, LinearLayout.LayoutParams(-1, 0, 1f))
++            setContentView(layout)
++            browser.settings.apply {
++                javaScriptEnabled = true
++                domStorageEnabled = true
++                allowFileAccess = false
++                allowContentAccess = false
++                @Suppress("DEPRECATION")
++                allowFileAccessFromFileURLs = false
++                @Suppress("DEPRECATION")
++                allowUniversalAccessFromFileURLs = false
++                mixedContentMode = android.webkit.WebSettings.MIXED_CONTENT_NEVER_ALLOW
++                setGeolocationEnabled(false)
++                setSupportMultipleWindows(false)
++                javaScriptCanOpenWindowsAutomatically = false
++                if (android.os.Build.VERSION.SDK_INT >= 26) safeBrowsingEnabled = true
++                saveFormData = false
++            }
++            // Service-worker traffic must not outlive an interactive login.
++            WebViewCompat.getProfile(browser)
++                .serviceWorkerController
++                .serviceWorkerWebSettings
++                .blockNetworkLoads = true
++            browser.webChromeClient =
++                object : WebChromeClient() {
++                    override fun onPermissionRequest(request: PermissionRequest) = request.deny()
++                }
++            browser.webViewClient =
++                object : WebViewClient() {
++                    override fun shouldOverrideUrlLoading(
++                        view: WebView,
++                        request: WebResourceRequest,
++                    ) = !session.accepts(request.url.toString())
++
++                    override fun shouldInterceptRequest(
++                        view: WebView,
++                        request: WebResourceRequest,
++                    ): WebResourceResponse? =
++                        if (session.accepts(request.url.toString())) null else blocked()
++
++                    override fun onPageFinished(view: WebView, url: String) {
++                        if (session.accepts(url) && visited.size < 31) visited += url
++                    }
++                }
++            val start =
++                session.origin.newBuilder().encodedPath("/").query(null).fragment(null).build()
++            visited += start.toString()
++            // Set-Cookie callbacks must finish before the first request, including HttpOnly
++            // cookies.
++            val cookies = session.seed(start)
++            fun seed(index: Int) {
++                if (isFinishing || isDestroyed) return
++                if (index == cookies.size) browser.loadUrl(start.toString())
++                else
++                    manager.setCookie(start.toString(), cookies[index].toString()) {
++                        seed(index + 1)
++                    }
++            }
++            seed(0)
++        } catch (_: Exception) {
++            message(ATMR.strings.sandbox_login_unavailable)
++            finish()
++        }
++    }
++
++    private fun save() {
++        if (saving) return
++        saving = true
++        val browser = web ?: return
++        browser.stopLoading()
++        try {
++            val manager = WebViewCompat.getProfile(browser).cookieManager
++            val snapshots = visited.associateWith { CookieManagerCompat.getCookieInfo(manager, it) }
++            requireNotNull(bridge).complete(snapshots)
++            finish()
++        } catch (_: Exception) {
++            saving = false
++            message(ATMR.strings.sandbox_login_failed)
++        }
++    }
++
++    private fun message(resource: dev.icerock.moko.resources.StringResource) {
++        Toast.makeText(this, stringResource(resource), Toast.LENGTH_LONG).show()
++    }
++
++    override fun onDestroy() {
++        web?.let { browser ->
++            // A failed setProfile must never clear the provider's default profile.
++            if (profileAttached)
++                runCatching {
++                    val profile = WebViewCompat.getProfile(browser)
++                    check(profile.name == profileName)
++                    browser.stopLoading()
++                    profile.cookieManager.removeAllCookies(null)
++                    WebStorageCompat.deleteBrowsingData(profile.webStorage) {}
++                }
++            runCatching {
++                browser.stopLoading()
++                (browser.parent as? android.view.ViewGroup)?.removeView(browser)
++                browser.destroy()
++            }
++        }
++        web = null
++        profileName?.let { name ->
++            active -= name
++            // Providers may defer actual deletion until the next process; stale cleanup retries.
++            runCatching { ProfileStore.getInstance().deleteProfile(name) }
++        }
++        super.onDestroy()
++    }
++
++    companion object {
++        private const val SOURCE = "polaris_source"
++        private const val PREFIX = "polaris_login_"
++        private val active = mutableSetOf<String>() // UI-thread only.
++
++        fun supported() =
++            runCatching {
++                    WebViewFeature.isFeatureSupported(WebViewFeature.MULTI_PROFILE) &&
++                        WebViewFeature.isFeatureSupported(WebViewFeature.GET_COOKIE_INFO) &&
++                        WebViewFeature.isFeatureSupported(WebViewFeature.DELETE_BROWSING_DATA)
++                }
++                .getOrDefault(false)
++
++        fun intent(context: Context, sourceId: Long) =
++            Intent(context, SandboxLoginActivity::class.java).putExtra(SOURCE, sourceId)
++
++        private fun blocked() =
++            WebResourceResponse(
++                "text/plain",
++                "utf-8",
++                403,
++                "Blocked",
++                emptyMap(),
++                ByteArrayInputStream(byteArrayOf()),
++            )
++    }
++}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxNetworkPolicy.kt b/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxNetworkPolicy.kt
 new file mode 100644
 index 0000000..60652dd
@@ -24733,10 +25093,10 @@ index 0000000..7ff21bf
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxPreferenceUi.kt b/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxPreferenceUi.kt
 new file mode 100644
-index 0000000..9c10d5e
+index 0000000..2ef0cbe
 --- /dev/null
 +++ b/app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxPreferenceUi.kt
-@@ -0,0 +1,326 @@
+@@ -0,0 +1,347 @@
 +package eu.kanade.tachiyomi.extension.sandbox
 +
 +import android.text.InputType
@@ -24764,6 +25124,14 @@ index 0000000..9c10d5e
 +        get() = owner.lifecycleScope
 +
 +    private var dirty = false
++    private var loginOpened = false
++
++    fun onResume() {
++        if (loginOpened) {
++            loginOpened = false
++            load()
++        }
++    }
 +
 +    fun load() {
 +        val loading = owner.preferenceManager.createPreferenceScreen(context)
@@ -24978,6 +25346,19 @@ index 0000000..9c10d5e
 +                    else context.stringResource(ATMR.strings.sandbox_session_status)
 +                isSelectable = false
 +                isIconSpaceReserved = false
++            }
++        )
++        screen.addPreference(
++            Preference(context).apply {
++                key = "polaris_host_login"
++                title = context.stringResource(ATMR.strings.sandbox_login_title)
++                summary = context.stringResource(ATMR.strings.sandbox_login_summary)
++                isIconSpaceReserved = false
++                setOnPreferenceClickListener {
++                    loginOpened = true
++                    context.startActivity(SandboxLoginActivity.intent(context, source.id))
++                    true
++                }
 +            }
 +        )
 +        screen.addPreference(
@@ -28422,7 +28803,7 @@ index a1ab133..5ffde92 100644
  
      fun toggleIncognito(enable: Boolean) {
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/browse/extension/details/SourcePreferencesScreen.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/browse/extension/details/SourcePreferencesScreen.kt
-index 538e257..74a1b2c 100644
+index 538e257..1605259 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/ui/browse/extension/details/SourcePreferencesScreen.kt
 +++ b/app/src/main/java/eu/kanade/tachiyomi/ui/browse/extension/details/SourcePreferencesScreen.kt
 @@ -63,13 +63,11 @@ class SourcePreferencesScreen(val sourceId: Long) : Screen() {
@@ -28470,7 +28851,7 @@ index 538e257..74a1b2c 100644
              update = { view ->
                  if (!initialized) {
                      fragmentManager.commit { commit(view.id) }
-@@ -108,16 +102,22 @@ class SourcePreferencesScreen(val sourceId: Long) : Screen() {
+@@ -108,16 +102,27 @@ class SourcePreferencesScreen(val sourceId: Long) : Screen() {
  
      /** Access to package-private method in FragmentManager through reflection */
      private fun FragmentManager.onContainerAvailable(view: FragmentContainerView) {
@@ -28490,6 +28871,11 @@ index 538e257..74a1b2c 100644
  class SourcePreferencesFragment : PreferenceFragmentCompat() {
 +    private var isolatedUi: eu.kanade.tachiyomi.extension.sandbox.SandboxPreferenceUi? = null
 +
++    override fun onResume() {
++        super.onResume()
++        isolatedUi?.onResume()
++    }
++
 +    override fun onStop() {
 +        isolatedUi?.onStop()
 +        super.onStop()
@@ -28497,7 +28883,7 @@ index 538e257..74a1b2c 100644
  
      override fun getContext(): Context? {
          val superCtx = super.getContext() ?: return null
-@@ -127,7 +127,13 @@ class SourcePreferencesFragment : PreferenceFragmentCompat() {
+@@ -127,7 +132,13 @@ class SourcePreferencesFragment : PreferenceFragmentCompat() {
      }
  
      override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
@@ -28512,7 +28898,7 @@ index 538e257..74a1b2c 100644
      }
  
      private fun populateScreen(): PreferenceScreen {
-@@ -166,9 +172,7 @@ class SourcePreferencesFragment : PreferenceFragmentCompat() {
+@@ -166,9 +177,7 @@ class SourcePreferencesFragment : PreferenceFragmentCompat() {
  
          fun getInstance(sourceId: Long): SourcePreferencesFragment {
              return SourcePreferencesFragment().apply {
@@ -29044,12 +29430,60 @@ index 03900aa..a478e8c 100644
          val isEmpty: Boolean
              get() = result.isEmpty()
      }
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentImportSpace.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentImportSpace.kt
+new file mode 100644
+index 0000000..47feeac
+--- /dev/null
++++ b/app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentImportSpace.kt
+@@ -0,0 +1,42 @@
++package eu.kanade.tachiyomi.ui.documents
++
++import java.io.IOException
++import java.io.InputStream
++import java.io.OutputStream
++
++/** Advisory local-volume checks; providers and concurrent writers may still fail during IO. */
++internal object DocumentImportSpace {
++    const val RESERVE_BYTES = 8L * 1024 * 1024
++
++    fun requireAvailable(available: Long, nextBytes: Long) {
++        require(nextBytes >= 0)
++        if (available < RESERVE_BYTES || nextBytes > available - RESERVE_BYTES)
++            throw IOException(
++                "Not enough space to import this document; free storage and try again"
++            )
++    }
++
++    fun copy(
++        input: InputStream,
++        output: OutputStream,
++        maxBytes: Long,
++        available: () -> Long,
++        checkActive: () -> Unit,
++    ): Long {
++        require(maxBytes > 0)
++        val buffer = ByteArray(32 * 1024)
++        var total = 0L
++        while (true) {
++            checkActive()
++            val count = input.read(buffer)
++            if (count < 0) break
++            if (count == 0) continue
++            require(count <= maxBytes - total) { "Document exceeds the supported size limit" }
++            requireAvailable(available(), count.toLong())
++            output.write(buffer, 0, count)
++            total += count
++        }
++        require(total > 0) { "Empty document" }
++        return total
++    }
++}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentImporter.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentImporter.kt
 new file mode 100644
-index 0000000..9e9e164
+index 0000000..f68665a
 --- /dev/null
 +++ b/app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentImporter.kt
-@@ -0,0 +1,210 @@
+@@ -0,0 +1,214 @@
 +package eu.kanade.tachiyomi.ui.documents
 +
 +import android.content.Context
@@ -29166,17 +29600,14 @@ index 0000000..9e9e164
 +        var author = suggestedAuthor.take(2000)
 +        try {
 +            temporary.outputStream().use { output ->
-+                val buffer = ByteArray(32 * 1024)
-+                var total = 0L
-+                while (true) {
-+                    coroutineContext.ensureActive()
-+                    val count = input.read(buffer)
-+                    if (count < 0) break
-+                    total += count
-+                    require(total <= DocumentLimits.MAX_FILE_BYTES) { "Document exceeds the supported size limit" }
-+                    output.write(buffer, 0, count)
-+                }
-+                require(total > 0) { "Empty document" }
++                val importContext = coroutineContext
++                DocumentImportSpace.copy(
++                    input,
++                    output,
++                    DocumentLimits.MAX_FILE_BYTES,
++                    available = { context.cacheDir.usableSpace },
++                    checkActive = { importContext.ensureActive() },
++                )
 +            }
 +            when (format) {
 +                DocumentFormat.PDF -> {
@@ -29219,6 +29650,13 @@ index 0000000..9e9e164
 +            val base =
 +                Injekt.get<StorageManager>().getLocalSourceDirectory()
 +                    ?: error("Choose the app storage folder in Settings")
++            // A file-backed library exposes its volume capacity; SAF providers may not.
++            // This is advisory, not a reservation or a guarantee about another volume.
++            if (base.uri.scheme == "file") {
++                base.uri.path?.let { path ->
++                    DocumentImportSpace.requireAvailable(File(path).usableSpace, temporary.length())
++                }
++            }
 +            val id = UUID.randomUUID().toString().take(12)
 +            val safeTitle = DiskUtil.buildValidFilename(title).take(100).ifBlank { "document" }
 +            val folderName = "$safeTitle-$id"
@@ -35811,6 +36249,100 @@ index f5f057b..354d551 100644
          }
      }
  }
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/webview/WebViewActivity.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/webview/WebViewActivity.kt
+index 8506fa8..5187112 100644
+--- a/app/src/main/java/eu/kanade/tachiyomi/ui/webview/WebViewActivity.kt
++++ b/app/src/main/java/eu/kanade/tachiyomi/ui/webview/WebViewActivity.kt
+@@ -44,7 +44,10 @@ class WebViewActivity : BaseActivity() {
+             )
+         } else {
+             @Suppress("DEPRECATION")
+-            overridePendingTransition(R.anim.shared_axis_x_push_enter, R.anim.shared_axis_x_push_exit)
++            overridePendingTransition(
++                R.anim.shared_axis_x_push_enter,
++                R.anim.shared_axis_x_push_exit,
++            )
+         }
+         super.onCreate(savedInstanceState)
+ 
+@@ -54,6 +57,16 @@ class WebViewActivity : BaseActivity() {
+             return
+         }
+ 
++        val sourceId = intent.getLongExtra(SOURCE_KEY, -1)
++        if (
++            sourceManager.get(sourceId) is eu.kanade.tachiyomi.extension.sandbox.IsolatedHttpSource
++        ) {
++            startActivity(
++                eu.kanade.tachiyomi.extension.sandbox.SandboxLoginActivity.intent(this, sourceId)
++            )
++            finish()
++            return
++        }
+         val url = intent.extras?.getString(URL_KEY) ?: return
+         assistUrl = url
+ 
+@@ -122,7 +135,12 @@ class WebViewActivity : BaseActivity() {
+         private const val SOURCE_KEY = "source_key"
+         private const val TITLE_KEY = "title_key"
+ 
+-        fun newIntent(context: Context, url: String, sourceId: Long? = null, title: String? = null): Intent {
++        fun newIntent(
++            context: Context,
++            url: String,
++            sourceId: Long? = null,
++            title: String? = null,
++        ): Intent {
+             return Intent(context, WebViewActivity::class.java).apply {
+                 addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                 putExtra(URL_KEY, url)
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/webview/WebViewScreen.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/webview/WebViewScreen.kt
+index 385ecd9..b6dd6c7 100644
+--- a/app/src/main/java/eu/kanade/tachiyomi/ui/webview/WebViewScreen.kt
++++ b/app/src/main/java/eu/kanade/tachiyomi/ui/webview/WebViewScreen.kt
+@@ -9,6 +9,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
+ import eu.kanade.presentation.util.AssistContentScreen
+ import eu.kanade.presentation.util.Screen
+ import eu.kanade.presentation.webview.WebViewScreenContent
++import uy.kohesive.injekt.api.get
+ 
+ class WebViewScreen(
+     private val url: String,
+@@ -24,12 +25,28 @@ class WebViewScreen(
+     override fun Content() {
+         val navigator = LocalNavigator.currentOrThrow
+         val context = LocalContext.current
+-        val viewModel = viewModel<WebViewViewModel>(
+-            factory = WebViewViewModel.Factory,
+-            extras = CreationExtras {
+-                set(WebViewViewModel.SOURCE_ID_KEY, sourceId)
+-            },
+-        )
++        val source =
++            sourceId?.let {
++                uy.kohesive.injekt.Injekt.get<tachiyomi.domain.source.service.SourceManager>()
++                    .get(it)
++            }
++        if (source is eu.kanade.tachiyomi.extension.sandbox.IsolatedHttpSource) {
++            androidx.compose.runtime.LaunchedEffect(sourceId) {
++                context.startActivity(
++                    eu.kanade.tachiyomi.extension.sandbox.SandboxLoginActivity.intent(
++                        context,
++                        source.id,
++                    )
++                )
++                navigator.pop()
++            }
++            return
++        }
++        val viewModel =
++            viewModel<WebViewViewModel>(
++                factory = WebViewViewModel.Factory,
++                extras = CreationExtras { set(WebViewViewModel.SOURCE_ID_KEY, sourceId) },
++            )
+ 
+         WebViewScreenContent(
+             onNavigateUp = { navigator.pop() },
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/util/chapter/ChapterFilterDownloaded.kt b/app/src/main/java/eu/kanade/tachiyomi/util/chapter/ChapterFilterDownloaded.kt
 index f33313c..7b25b7b 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/util/chapter/ChapterFilterDownloaded.kt
@@ -66150,6 +66682,170 @@ index 0000000..d399c28
 +        }
 +    }
 +}
+diff --git a/app/src/test/java/eu/kanade/tachiyomi/extension/sandbox/BrowserCookieSessionTest.kt b/app/src/test/java/eu/kanade/tachiyomi/extension/sandbox/BrowserCookieSessionTest.kt
+new file mode 100644
+index 0000000..ecfb1ae
+--- /dev/null
++++ b/app/src/test/java/eu/kanade/tachiyomi/extension/sandbox/BrowserCookieSessionTest.kt
+@@ -0,0 +1,158 @@
++package eu.kanade.tachiyomi.extension.sandbox
++
++import okhttp3.Cookie
++import okhttp3.CookieJar
++import okhttp3.HttpUrl
++import okhttp3.HttpUrl.Companion.toHttpUrl
++import org.junit.jupiter.api.Assertions.*
++import org.junit.jupiter.api.Test
++
++class BrowserCookieSessionTest {
++    private val url = "https://reader.example.com/".toHttpUrl()
++
++    private class Jar : CookieJar {
++        var values = emptyList<Cookie>()
++        var writes = 0
++
++        override fun loadForRequest(url: HttpUrl) = values.filter { it.matches(url) }
++
++        override fun saveFromResponse(url: HttpUrl, cookies: List<Cookie>) {
++            writes++
++            values = cookies
++        }
++    }
++
++    private fun cookie(value: String) = requireNotNull(Cookie.parse(url, value))
++
++    @Test
++    fun `only the selected HTTPS origin is accepted`() {
++        val session = BrowserCookieSession(url.toString(), Jar())
++        assertTrue(session.accepts("https://reader.example.com/account/login"))
++        listOf(
++                "http://reader.example.com/",
++                "https://other.example.com/",
++                "https://reader.example.com:444/",
++                "https://reader.example.com@evil.example/",
++                "file:///secret",
++                "content://secret",
++                "javascript:alert(1)",
++                "https://127.0.0.1/",
++                "https://localhost/",
++                "intent://reader.example.com/",
++            )
++            .forEach { assertFalse(session.accepts(it), it) }
++    }
++
++    @Test
++    fun `HTTP sources cannot create browser sessions`() {
++        assertThrows(IllegalArgumentException::class.java) {
++            BrowserCookieSession("http://example.com", Jar())
++        }
++    }
++
++    @Test
++    fun `cookie attributes and host boundary survive browser import`() {
++        val jar = Jar()
++        BrowserCookieSession(url.toString(), jar)
++            .complete(
++                mapOf(
++                    url.toString() to
++                        listOf(
++                            "login=token; Domain=example.com; Path=/account; Secure; HttpOnly; Max-Age=3600"
++                        )
++                )
++            )
++        val cookie = jar.values.single()
++        assertTrue(cookie.secure && cookie.httpOnly && cookie.persistent && cookie.hostOnly)
++        assertEquals("/account", cookie.path)
++        assertEquals("reader.example.com", cookie.domain)
++        assertFalse(cookie.matches("https://sibling.example.com/account".toHttpUrl()))
++    }
++
++    @Test
++    fun `temporary browser cookies remain temporary`() {
++        val jar = Jar()
++        BrowserCookieSession(url.toString(), jar)
++            .complete(mapOf(url.toString() to listOf("session=v; Secure; HttpOnly")))
++        assertFalse(jar.values.single().persistent)
++    }
++
++    @Test
++    fun `cancelling without completion writes nothing`() {
++        val jar = Jar().apply { values = listOf(cookie("old=value; Secure; HttpOnly")) }
++        BrowserCookieSession(url.toString(), jar).seed()
++        assertEquals(0, jar.writes)
++        assertEquals("old", jar.values.single().name)
++    }
++
++    @Test
++    fun `invalid snapshot origins reject the whole import`() {
++        val jar = Jar()
++        assertThrows(IllegalArgumentException::class.java) {
++            BrowserCookieSession(url.toString(), jar)
++                .complete(
++                    mapOf(
++                        url.toString() to listOf("valid=yes"),
++                        "https://evil.example/" to listOf("secret=no"),
++                    )
++                )
++        }
++        assertEquals(0, jar.writes)
++    }
++
++    @Test
++    fun `oversized or malformed browser output never partially commits`() {
++        for (headers in
++            listOf(
++                listOf("good=yes", "invalid"),
++                listOf("x=" + "v".repeat(9000)),
++                (0..CookieCodec.MAX_COOKIES).map { "c$it=value" },
++            )) {
++            val jar = Jar()
++            assertThrows(Exception::class.java) {
++                BrowserCookieSession(url.toString(), jar).complete(mapOf(url.toString() to headers))
++            }
++            assertEquals(0, jar.writes)
++        }
++    }
++
++    @Test
++    fun `removed seeded cookies expire with their original domain identity`() {
++        val jar = Jar().apply { values = listOf(cookie("old=value; Domain=example.com; Secure")) }
++        val session = BrowserCookieSession(url.toString(), jar)
++        session.seed()
++        session.complete(mapOf(url.toString() to emptyList()))
++        assertTrue(jar.values.single().expiresAt < System.currentTimeMillis())
++        assertEquals("example.com", jar.values.single().domain)
++        assertFalse(jar.values.single().hostOnly)
++    }
++
++    @Test
++    fun `cleared sessions cannot be restored by a browser still open`() {
++        val jar =
++            object : RevocableCookieJar {
++                var active = true
++
++                override fun isActive() = active
++
++                override fun loadForRequest(url: HttpUrl) = emptyList<Cookie>()
++
++                override fun saveFromResponse(url: HttpUrl, cookies: List<Cookie>) =
++                    throw AssertionError("Revoked write")
++            }
++        val session = BrowserCookieSession(url.toString(), jar)
++        session.seed()
++        jar.active = false
++        assertThrows(IllegalStateException::class.java) {
++            session.complete(mapOf(url.toString() to listOf("new=v")))
++        }
++    }
++
++    @Test
++    fun `partitioned cookies never become unpartitioned credentials`() {
++        val jar = Jar()
++        BrowserCookieSession(url.toString(), jar)
++            .complete(mapOf(url.toString() to listOf("token=v; Secure; Partitioned")))
++        assertTrue(jar.values.isEmpty())
++    }
++}
 diff --git a/app/src/test/java/eu/kanade/tachiyomi/extension/sandbox/CookieBankTest.kt b/app/src/test/java/eu/kanade/tachiyomi/extension/sandbox/CookieBankTest.kt
 new file mode 100644
 index 0000000..9b8f701
@@ -69376,6 +70072,117 @@ index 0000000..59497de
 +        val original = file(root, "local/book.pdf")
 +        assertThrows<IllegalArgumentException> { DocumentCacheBudget.acquire(root, original) {} }
 +        assertTrue(original.exists())
++    }
++}
+diff --git a/app/src/test/java/eu/kanade/tachiyomi/ui/documents/DocumentImportSpaceTest.kt b/app/src/test/java/eu/kanade/tachiyomi/ui/documents/DocumentImportSpaceTest.kt
+new file mode 100644
+index 0000000..e0368d5
+--- /dev/null
++++ b/app/src/test/java/eu/kanade/tachiyomi/ui/documents/DocumentImportSpaceTest.kt
+@@ -0,0 +1,105 @@
++package eu.kanade.tachiyomi.ui.documents
++
++import java.io.ByteArrayInputStream
++import java.io.ByteArrayOutputStream
++import java.io.IOException
++import org.junit.jupiter.api.Assertions.*
++import org.junit.jupiter.api.Test
++
++class DocumentImportSpaceTest {
++    @Test
++    fun `copy preserves bytes and leaves streams owned by caller`() {
++        val bytes = ByteArray(90000) { it.toByte() }
++        val output = ByteArrayOutputStream()
++        var checks = 0
++        assertEquals(
++            bytes.size.toLong(),
++            DocumentImportSpace.copy(
++                ByteArrayInputStream(bytes),
++                output,
++                100000,
++                { Long.MAX_VALUE },
++                { checks++ },
++            ),
++        )
++        assertArrayEquals(bytes, output.toByteArray())
++        assertTrue(checks >= 3)
++    }
++
++    @Test
++    fun `insufficient space rejects the next chunk before writing`() {
++        val output = ByteArrayOutputStream()
++        assertThrows(IOException::class.java) {
++            DocumentImportSpace.copy(
++                ByteArrayInputStream(ByteArray(100)),
++                output,
++                1000,
++                { DocumentImportSpace.RESERVE_BYTES + 99 },
++                {},
++            )
++        }
++        assertEquals(0, output.size())
++    }
++
++    @Test
++    fun `capacity is checked again as a stream grows`() {
++        val output = ByteArrayOutputStream()
++        assertThrows(IOException::class.java) {
++            DocumentImportSpace.copy(
++                ByteArrayInputStream(ByteArray(70000)),
++                output,
++                100000,
++                { DocumentImportSpace.RESERVE_BYTES + 40000 - output.size() },
++                {},
++            )
++        }
++        assertEquals(32 * 1024, output.size())
++    }
++
++    @Test
++    fun `file limit holds even when storage is plentiful`() {
++        val output = ByteArrayOutputStream()
++        assertThrows(IllegalArgumentException::class.java) {
++            DocumentImportSpace.copy(
++                ByteArrayInputStream(ByteArray(100)),
++                output,
++                99,
++                { Long.MAX_VALUE },
++                {},
++            )
++        }
++        assertEquals(0, output.size())
++    }
++
++    @Test
++    fun `cancellation stops before more bytes are read or written`() {
++        val output = ByteArrayOutputStream()
++        assertThrows(java.util.concurrent.CancellationException::class.java) {
++            DocumentImportSpace.copy(
++                ByteArrayInputStream(ByteArray(100)),
++                output,
++                1000,
++                { Long.MAX_VALUE },
++                { throw java.util.concurrent.CancellationException() },
++            )
++        }
++        assertEquals(0, output.size())
++    }
++
++    @Test
++    fun `unknown capacity empty inputs and overflow never appear as available space`() {
++        assertThrows(IOException::class.java) { DocumentImportSpace.requireAvailable(0, 1) }
++        assertThrows(IOException::class.java) {
++            DocumentImportSpace.requireAvailable(Long.MAX_VALUE, Long.MAX_VALUE)
++        }
++        assertThrows(IllegalArgumentException::class.java) {
++            DocumentImportSpace.copy(
++                ByteArrayInputStream(byteArrayOf()),
++                ByteArrayOutputStream(),
++                100,
++                { Long.MAX_VALUE },
++                {},
++            )
++        }
 +    }
 +}
 diff --git a/app/src/test/java/eu/kanade/tachiyomi/ui/documents/DocumentOrganizationTest.kt b/app/src/test/java/eu/kanade/tachiyomi/ui/documents/DocumentOrganizationTest.kt
@@ -76747,7 +77554,7 @@ index 9839272..46e74da 100644
  junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }
  junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
 diff --git a/i18n-at/src/commonMain/moko-resources/base/strings.xml b/i18n-at/src/commonMain/moko-resources/base/strings.xml
-index 7ed4795..ede49c5 100644
+index 7ed4795..476971a 100644
 --- a/i18n-at/src/commonMain/moko-resources/base/strings.xml
 +++ b/i18n-at/src/commonMain/moko-resources/base/strings.xml
 @@ -10,7 +10,7 @@
@@ -76759,7 +77566,7 @@ index 7ed4795..ede49c5 100644
      <string name="pref_group_setup">Translation Setup</string>
      <string name="pref_translate_from">Translate From</string>
      <string name="pref_translate_to">Translate To</string>
-@@ -73,12 +73,316 @@
+@@ -73,12 +73,322 @@
      <string name="repository_add_error">Could not add this repository. Check your connection and try again.</string>
      <string name="repository_refresh_error">Repository added, but extension listings could not be refreshed. Refresh the Extensions screen.</string>
      <string name="chapter_group_version">Group/version: %1$s</string>
@@ -77077,9 +77884,15 @@ index 7ed4795..ede49c5 100644
 +    <string name="polaris_achievement_started">%1$d of %2$d different works started</string>
 +    <string name="polaris_achievement_completed">%1$d of %2$d completed works read</string>
 +    <string name="polaris_achievement_count_help">Linked editions count as one work. Starting means reading at least one chapter. Finishing requires a completed work with all known chapters read and completed status in its linked editions. Removing works or restoring older reading progress does not reduce recorded milestones.</string>
++    <string name="sandbox_login_title">Sign in to this source</string>
++    <string name="sandbox_login_summary">Open a separate browser session for this extension. Your normal browser session is not imported.</string>
++    <string name="sandbox_login_confirm">This opens a Polaris browser outside the extension worker. Only this website is allowed. Choose Use session when finished to transfer its cookies to this extension. Cancel discards the browser session. External login providers and some challenges are not supported.</string>
++    <string name="sandbox_login_done">Use session</string>
++    <string name="sandbox_login_unavailable">This login requires HTTPS and a WebView with separate profile and cookie attribute support. No shared browser was opened.</string>
++    <string name="sandbox_login_failed">The session could not be transferred. Try again or cancel.</string>
  </resources>
 diff --git a/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml b/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
-index d1748bc..b12f1c4 100644
+index d1748bc..f8f18d5 100644
 --- a/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
 +++ b/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
 @@ -10,7 +10,7 @@
@@ -77091,7 +77904,7 @@ index d1748bc..b12f1c4 100644
      <string name="pref_group_setup">Configuração da tradução</string>
      <string name="pref_translate_from">Traduzir de</string>
      <string name="pref_translate_to">Traduzir para</string>
-@@ -73,12 +73,316 @@
+@@ -73,12 +73,322 @@
      <string name="repository_add_error">Não foi possível adicionar o repositório. Confira a conexão e tente novamente.</string>
      <string name="repository_refresh_error">Repositório adicionado, mas não foi possível atualizar as extensões. Atualize a tela Extensões.</string>
      <string name="chapter_group_version">Grupo/versão: %1$s</string>
@@ -77409,6 +78222,12 @@ index d1748bc..b12f1c4 100644
 +    <string name="polaris_achievement_started">%1$d de %2$d obras diferentes iniciadas</string>
 +    <string name="polaris_achievement_completed">%1$d de %2$d obras concluídas lidas</string>
 +    <string name="polaris_achievement_count_help">Edições vinculadas contam como uma obra. Iniciar significa ler ao menos um capítulo. Finalizar exige uma obra concluída com todos os capítulos conhecidos lidos e situação concluída nas edições vinculadas. Remover obras ou restaurar progresso de leitura mais antigo não reduz os marcos já registrados.</string>
++    <string name="sandbox_login_title">Entrar nesta fonte</string>
++    <string name="sandbox_login_summary">Abre uma sessão de navegador separada para esta extensão, sem importar sua navegação habitual.</string>
++    <string name="sandbox_login_confirm">Abre um navegador do Polaris fora do processo da extensão. Apenas este site é permitido. Ao terminar, escolha Usar sessão para transferir seus cookies para esta extensão. Cancelar descarta a sessão do navegador. Login por serviços externos e alguns desafios ainda não são compatíveis.</string>
++    <string name="sandbox_login_done">Usar sessão</string>
++    <string name="sandbox_login_unavailable">Este login exige HTTPS e WebView com perfis separados e atributos de cookies. Nenhum navegador compartilhado foi aberto.</string>
++    <string name="sandbox_login_failed">Não foi possível transferir a sessão. Tente novamente ou cancele.</string>
  </resources>
 diff --git a/i18n/src/commonMain/moko-resources/base/strings.xml b/i18n/src/commonMain/moko-resources/base/strings.xml
 index c0832ba..ebf8f48 100644

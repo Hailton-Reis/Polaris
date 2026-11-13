@@ -1,0 +1,154 @@
+Picked up JAVA_TOOL_OPTIONS: -Duser.home=/workspace/work/java-user -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Dhttps.proxyHost=proxy -Dhttps.proxyPort=8080 -Dhttp.proxyHost=proxy -Dhttp.proxyPort=8080
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/9.6.1/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+Configuration on demand is an incubating feature.
+Type-safe project accessors is an incubating feature.
+> Task :build-logic:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :build-logic:compileKotlin UP-TO-DATE
+> Task :build-logic:compileJava NO-SOURCE
+> Task :build-logic:pluginDescriptors UP-TO-DATE
+> Task :build-logic:processResources UP-TO-DATE
+> Task :build-logic:classes UP-TO-DATE
+> Task :build-logic:jar UP-TO-DATE
+Observed package id 'platforms;android-37.0' in inconsistent location '/workspace/work/android-sdk/platforms/android-37.0-2' (Expected '/workspace/work/android-sdk/platforms/android-37.0')
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preDebugBuild UP-TO-DATE
+> Task :app:compileDebugAidl UP-TO-DATE
+> Task :app:dataBindingMergeDependencyArtifactsDebug UP-TO-DATE
+> Task :app:generateDebugResources UP-TO-DATE
+> Task :app:prepareLibraryDefinitionsDebug UP-TO-DATE
+> Task :app:replaceDebugShortcutPlaceholder UP-TO-DATE
+> Task :core-metadata:preBuild UP-TO-DATE
+> Task :core-metadata:preDebugBuild UP-TO-DATE
+> Task :core-metadata:generateDebugResources UP-TO-DATE
+> Task :core-metadata:packageDebugResources UP-TO-DATE
+> Task :data:preBuild UP-TO-DATE
+> Task :data:preDebugBuild UP-TO-DATE
+> Task :data:generateDebugResources UP-TO-DATE
+> Task :data:packageDebugResources UP-TO-DATE
+> Task :dbnet-native:preBuild UP-TO-DATE
+> Task :dbnet-native:preDebugBuild UP-TO-DATE
+> Task :dbnet-native:generateDebugResources UP-TO-DATE
+> Task :dbnet-native:packageDebugResources UP-TO-DATE
+> Task :domain:preBuild UP-TO-DATE
+> Task :domain:preDebugBuild UP-TO-DATE
+> Task :domain:generateDebugResources UP-TO-DATE
+> Task :domain:packageDebugResources UP-TO-DATE
+> Task :i18n:generateAndroidMainLocalesConfig UP-TO-DATE
+> Task :i18n:generateMRcommonTest UP-TO-DATE
+> Task :i18n:generateMRandroidHostTest UP-TO-DATE
+> Task :i18n:generateMRcommonMain UP-TO-DATE
+> Task :i18n:generateMRandroidMain UP-TO-DATE
+> Task :i18n:androidPreBuild UP-TO-DATE
+> Task :i18n:preAndroidMainBuild UP-TO-DATE
+> Task :i18n:packageAndroidMainResources UP-TO-DATE
+> Task :i18n-at:generateMRcommonTest UP-TO-DATE
+> Task :i18n-at:generateMRandroidHostTest UP-TO-DATE
+> Task :i18n-at:generateMRcommonMain UP-TO-DATE
+> Task :i18n-at:generateMRandroidMain UP-TO-DATE
+> Task :i18n-at:androidPreBuild UP-TO-DATE
+> Task :i18n-at:preAndroidMainBuild UP-TO-DATE
+> Task :i18n-at:packageAndroidMainResources UP-TO-DATE
+> Task :ppocr-sdk:preBuild UP-TO-DATE
+> Task :ppocr-sdk:preDebugBuild UP-TO-DATE
+> Task :ppocr-sdk:generateDebugResources UP-TO-DATE
+> Task :ppocr-sdk:packageDebugResources UP-TO-DATE
+> Task :presentation-core:preBuild UP-TO-DATE
+> Task :presentation-core:preDebugBuild UP-TO-DATE
+> Task :presentation-core:generateDebugResources UP-TO-DATE
+> Task :presentation-core:packageDebugResources UP-TO-DATE
+> Task :presentation-widget:preBuild UP-TO-DATE
+> Task :presentation-widget:preDebugBuild UP-TO-DATE
+> Task :presentation-widget:generateDebugResources UP-TO-DATE
+> Task :presentation-widget:packageDebugResources UP-TO-DATE
+> Task :source-api:preBuild UP-TO-DATE
+> Task :source-api:preDebugBuild UP-TO-DATE
+> Task :source-api:generateDebugResources UP-TO-DATE
+> Task :source-api:packageDebugResources UP-TO-DATE
+> Task :source-local:preBuild UP-TO-DATE
+> Task :source-local:preDebugBuild UP-TO-DATE
+> Task :source-local:generateDebugResources UP-TO-DATE
+> Task :source-local:packageDebugResources UP-TO-DATE
+> Task :telemetry:preBuild UP-TO-DATE
+> Task :telemetry:preDebugBuild UP-TO-DATE
+> Task :telemetry:generateDebugResources UP-TO-DATE
+> Task :telemetry:packageDebugResources UP-TO-DATE
+> Task :core:archive:preBuild UP-TO-DATE
+> Task :core:archive:preDebugBuild UP-TO-DATE
+> Task :core:archive:generateDebugResources UP-TO-DATE
+> Task :core:archive:packageDebugResources UP-TO-DATE
+> Task :core:common:preBuild UP-TO-DATE
+> Task :core:common:preDebugBuild UP-TO-DATE
+> Task :core:common:generateDebugResources UP-TO-DATE
+> Task :core:common:packageDebugResources UP-TO-DATE
+> Task :core:viewmodel:preBuild UP-TO-DATE
+> Task :core:viewmodel:preDebugBuild UP-TO-DATE
+> Task :core:viewmodel:generateDebugResources UP-TO-DATE
+> Task :core:viewmodel:packageDebugResources UP-TO-DATE
+> Task :app:mergeDebugResources UP-TO-DATE
+> Task :app:dataBindingGenBaseClassesDebug UP-TO-DATE
+> Task :app:generateDebugBuildConfig
+> Task :app:packageDebugResources UP-TO-DATE
+> Task :core-metadata:processDebugNavigationResources UP-TO-DATE
+> Task :data:processDebugNavigationResources UP-TO-DATE
+> Task :dbnet-native:processDebugNavigationResources UP-TO-DATE
+> Task :domain:processDebugNavigationResources UP-TO-DATE
+> Task :i18n:generateAndroidMainEmptyResourceFiles UP-TO-DATE
+> Task :i18n-at:generateAndroidMainEmptyResourceFiles UP-TO-DATE
+> Task :ppocr-sdk:processDebugNavigationResources UP-TO-DATE
+> Task :presentation-core:processDebugNavigationResources UP-TO-DATE
+> Task :presentation-widget:processDebugNavigationResources UP-TO-DATE
+> Task :source-api:processDebugNavigationResources UP-TO-DATE
+> Task :source-local:processDebugNavigationResources UP-TO-DATE
+> Task :telemetry:processDebugNavigationResources UP-TO-DATE
+> Task :core:archive:processDebugNavigationResources UP-TO-DATE
+> Task :core:common:processDebugNavigationResources UP-TO-DATE
+> Task :core:viewmodel:processDebugNavigationResources UP-TO-DATE
+> Task :app:processDebugNavigationResources UP-TO-DATE
+> Task :app:parseDebugLocalResources UP-TO-DATE
+> Task :core-metadata:parseDebugLocalResources UP-TO-DATE
+> Task :source-api:parseDebugLocalResources UP-TO-DATE
+> Task :i18n:parseAndroidMainLocalResources UP-TO-DATE
+> Task :i18n:generateAndroidMainRFile UP-TO-DATE
+> Task :core:common:parseDebugLocalResources UP-TO-DATE
+> Task :core:common:generateDebugRFile UP-TO-DATE
+> Task :source-api:generateDebugRFile UP-TO-DATE
+> Task :core-metadata:generateDebugRFile UP-TO-DATE
+> Task :data:parseDebugLocalResources UP-TO-DATE
+> Task :domain:parseDebugLocalResources UP-TO-DATE
+> Task :domain:generateDebugRFile UP-TO-DATE
+> Task :data:generateDebugRFile UP-TO-DATE
+> Task :dbnet-native:parseDebugLocalResources UP-TO-DATE
+> Task :dbnet-native:generateDebugRFile UP-TO-DATE
+> Task :i18n-at:parseAndroidMainLocalResources UP-TO-DATE
+> Task :i18n-at:generateAndroidMainRFile UP-TO-DATE
+> Task :ppocr-sdk:parseDebugLocalResources UP-TO-DATE
+> Task :ppocr-sdk:generateDebugRFile UP-TO-DATE
+> Task :presentation-core:parseDebugLocalResources UP-TO-DATE
+> Task :presentation-core:generateDebugRFile UP-TO-DATE
+> Task :presentation-widget:parseDebugLocalResources UP-TO-DATE
+> Task :presentation-widget:generateDebugRFile FAILED
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':presentation-widget:generateDebugRFile' (registered by plugin 'com.android.internal.library').
+> Could not resolve all files for configuration ':presentation-widget:debugCompileClasspath'.
+   > Could not resolve androidx.core:core:1.13.0.
+     Required by:
+         project ':presentation-widget' > com.google.android.material:material:1.12.0
+         project ':presentation-widget' > project ':core:common' > androidx.preference:preference-ktx:1.2.1 > androidx.preference:preference:1.2.1
+      > Repository Google is disabled due to earlier error below:
+         > Could not resolve androidx.appcompat:appcompat-resources:1.6.1.
+            > Could not get resource 'https://dl.google.com/dl/android/maven2/androidx/appcompat/appcompat-resources/1.6.1/appcompat-resources-1.6.1.pom'.
+               > Could not GET 'https://dl.google.com/dl/android/maven2/androidx/appcompat/appcompat-resources/1.6.1/appcompat-resources-1.6.1.pom'. Received status code 503 from server: Service Unavailable
+> There are 15 more failures with identical causes.
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights from a Build Scan (powered by Develocity).
+> Get more help at https://help.gradle.org.
+
+BUILD FAILED in 31s
+89 actionable tasks: 2 executed, 87 up-to-date

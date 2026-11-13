@@ -2,6 +2,10 @@
 
 O roadmap indica prioridades e critérios de verificação. Não representa prazo de entrega nem recurso já aprovado.
 
+## Consolidação da beta.11
+
+O [checklist atual](BETA11_CHECKLIST.md) acompanha as frentes autorizadas em 13/11. Login e proteção de espaço têm uma primeira candidata; testes Android completos e publicação continuam pendentes.
+
 ## Estado da auditoria P20261107.1
 
 A [auditoria geral](AUDITORIA_GERAL_P20261107_1.md) separa implementação, prova por componentes e aceite externo. A Jornada Polaris, títulos decorativos, três ícones alternativos e três temas estão implementados na revisão de desenvolvimento. A beta.10 publicada não muda com esta revisão.

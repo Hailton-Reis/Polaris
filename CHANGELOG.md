@@ -2,6 +2,16 @@
 
 Este arquivo registra a evolução real do código. **Revisões de desenvolvimento não são lançamentos públicos.** As datas abaixo usam America/Fortaleza, exceto quando houver indicação de UTC. O histórico de distribuição fica em [Releases](https://github.com/Hailton-Reis/Polaris/releases).
 
+## Desenvolvimento · P20261113.1 — 13/11/2026
+
+**Estado:** candidata da beta.11/código112, sem lançamento; compilação Android bloqueada no download de dependências Google (HTTP503). A beta.10 pública permanece igual.
+
+- Primeira integração de login HTTPS para fontes isoladas, com perfil WebView separado, confirmação e transferência limitada de cookies. Sem fallback ao navegador global. OAuth externo/Cloudflare genérico e aceite real continuam pendentes.
+- Verificação consultiva de espaço durante a importação e antes da cópia para biblioteca em volume local, preservando original e cancelamento.
+- 26 testes JVM focados, quatro verificações de aplicação do overlay e nove de empacotamento passaram. Isso não aprova a atividade Android nem todo o aplicativo.
+
+[Escopo e limites](docs/LOGIN_E_ARMAZENAMENTO_P20261113_1.md) · [Checklist da beta.11](docs/BETA11_CHECKLIST.md).
+
 ## Desenvolvimento · P20261112.1 — 12/11/2026
 
 **Estado:** revisão da beta.11/código112, sem lançamento. A beta.10 pública permanece intacta.
