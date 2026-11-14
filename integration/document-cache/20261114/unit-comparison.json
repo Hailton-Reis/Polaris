@@ -1,0 +1,101 @@
+{
+  "status": "NO_NEW_UNIT_REGRESSIONS",
+  "baseline": {
+    "total": 975,
+    "passed": 975,
+    "failed": 0,
+    "skipped": 0
+  },
+  "patched": {
+    "total": 989,
+    "passed": 989,
+    "failed": 0,
+    "skipped": 0
+  },
+  "preexisting_failures_still_present": 0,
+  "missing_baseline_tests": [],
+  "new_failures_or_skips": [],
+  "android_runtime_verified": false,
+  "gradle_exit_codes": {
+    "baseline": 0,
+    "patched": 0
+  },
+  "required_module_coverage": {
+    "app": 890,
+    "domain": 85
+  },
+  "baseline_origin": "Archived P20261114.1 reports: 890 app + 85 domain; not rerun.",
+  "current_origin": "904 app tests freshly executed; 85 domain previously passed and UP-TO-DATE.",
+  "new_cases": [
+    {
+      "class": "eu.kanade.tachiyomi.ui.documents.DocumentMaterializationTest",
+      "name": "a corrupt content cache is refused without replacing a file held by a reader()",
+      "status": "passed"
+    },
+    {
+      "class": "eu.kanade.tachiyomi.ui.documents.DocumentMaterializationTest",
+      "name": "unknown length cannot make equal timestamp edits look unchanged()",
+      "status": "passed"
+    },
+    {
+      "class": "eu.kanade.tachiyomi.ui.documents.DocumentMaterializationTest",
+      "name": "reliable metadata retains the fast cache hit()",
+      "status": "passed"
+    },
+    {
+      "class": "eu.kanade.tachiyomi.ui.documents.DocumentMaterializationTest",
+      "name": "unknown metadata changing bytes cannot return the previous cached document()",
+      "status": "passed"
+    },
+    {
+      "class": "eu.kanade.tachiyomi.ui.documents.DocumentMaterializationTest",
+      "name": "unknown metadata must not silently reuse a copy when the provider is unreadable()",
+      "status": "passed"
+    },
+    {
+      "class": "eu.kanade.tachiyomi.ui.documents.DocumentMaterializationTest",
+      "name": "unknown timestamp cannot make equal size edits look unchanged()",
+      "status": "passed"
+    },
+    {
+      "class": "eu.kanade.tachiyomi.ui.documents.DocumentMaterializationTest",
+      "name": "metadata changing during a reliable copy requires another attempt()",
+      "status": "passed"
+    },
+    {
+      "class": "eu.kanade.tachiyomi.ui.documents.DocumentMaterializationTest",
+      "name": "unsupported declared size is refused before opening the provider()",
+      "status": "passed"
+    },
+    {
+      "class": "eu.kanade.tachiyomi.ui.documents.DocumentMaterializationTest",
+      "name": "partial provider failure closes its stream and removes its temporary copy()",
+      "status": "passed"
+    },
+    {
+      "class": "eu.kanade.tachiyomi.ui.documents.DocumentMaterializationTest",
+      "name": "empty documents never become cached publications()",
+      "status": "passed"
+    },
+    {
+      "class": "eu.kanade.tachiyomi.ui.documents.DocumentMaterializationTest",
+      "name": "identical content stays pinned until both reading leases close()",
+      "status": "passed"
+    },
+    {
+      "class": "eu.kanade.tachiyomi.ui.documents.DocumentMaterializationTest",
+      "name": "identical bytes with unknown metadata share a copy across provider identities()",
+      "status": "passed"
+    },
+    {
+      "class": "eu.kanade.tachiyomi.ui.documents.DocumentMaterializationTest",
+      "name": "cache trimming cannot remove the temporary before its final file is pinned()",
+      "status": "passed"
+    },
+    {
+      "class": "eu.kanade.tachiyomi.ui.documents.DocumentMaterializationTest",
+      "name": "a reliable length that disagrees with actual bytes is not cached()",
+      "status": "passed"
+    }
+  ]
+}

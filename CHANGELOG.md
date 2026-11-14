@@ -2,6 +2,17 @@
 
 Este arquivo registra a evolução real do código. **Revisões de desenvolvimento não são lançamentos públicos.** As datas abaixo usam America/Fortaleza, exceto quando houver indicação de UTC. O histórico de distribuição fica em [Releases](https://github.com/Hailton-Reis/Polaris/releases).
 
+## Desenvolvimento · P20261114.2 — 14/11/2026
+
+**Estado:** continuação da beta.11/código 112, sem novo APK ou lançamento. Conta/login Google/nuvem permanecem adiados.
+
+- Cache de documentos sem tamanho/data positivos passa a identificar o conteúdo pelos bytes, evitando devolver uma cópia antiga da mesma URI ou ocultar falha do provedor. Conteúdo igual pode reutilizar o cache sem substituir cópias abertas.
+- Preparação fica protegida da limpeza até o pin do arquivo final. Caminho rápido por metadados positivos continua disponível; tamanho e metadados são reconferidos na primeira cópia.
+- Quatro regressões reproduzidas antes da correção; 904 testes do app aprovados (14 novos), mais 85 anteriores de domain. Core/app/instrumentação compilados; quatro testes de overlay e 16 de empacotamento aprovados. Dois cenários Android compilados aguardam execução.
+- Releitura/temporário adicionais exigem medição no A12/ARM; não há promessa de desempenho, pico menor ou detecção de metadados positivos incorretos.
+
+[Escopo](docs/CACHE_DOCUMENTOS_P20261114_2.md) · [Resultados filtrados](integration/document-cache/20261114/README.md).
+
 ## Desenvolvimento · P20261114.1 — 14/11/2026
 
 **Estado:** continuação da beta.11/código 112, sem novo APK ou lançamento. Conta/login Google/nuvem permanecem adiados.

@@ -1,0 +1,15 @@
+{
+  "revision": "P20261114.2",
+  "prior_pr_head": "7ba51d7ba94988a33455dece4d63258c3ec4cb99",
+  "prior_pr_tree": "3694b832569d6a138c4fe810858eb328225ab016",
+  "upstream_prerequisite": "f037c5d85575e30694295df5d079e97dcc4a35b9",
+  "overlay_sha256": "831b97d00929fac35a19c770dce07cee41df8870aab17ac5f85c766f64c5418b",
+  "overlay_git_sha": "d85e0db7fafbf479d15fd13c4b6aaed5baa68bda",
+  "changed_android_source_sha256": {
+    "core/archive/src/main/kotlin/mihon/core/archive/DocumentFiles.kt": "15971b4ea4c50d1142e788126a8574d5482a8a97f8246fd71494d7014678e3f1",
+    "core/archive/src/main/kotlin/mihon/core/archive/DocumentCacheBudget.kt": "00d911a36a7ae1507d28a0e98c831716e4c72644f13063cfc85ac59a871a971d",
+    "app/src/test/java/eu/kanade/tachiyomi/ui/documents/DocumentMaterializationTest.kt": "c18f212fc552be42ee17506f01cbc152f369973bf83594e97c143ee7ce6dd72d",
+    "app/src/androidTest/java/eu/kanade/tachiyomi/storage/SafeStorageAndroidTest.kt": "41f249e66d67c1a79bd1254899aa7064666611292076b47dca7ea1e74ee0e4f3",
+    "app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt": "a54c8d9445e27ac349b9bf7dcba99da3b1f6abe4b41a08273f7084d94371802f"
+  }
+}

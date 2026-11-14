@@ -2736,10 +2736,10 @@ index 0000000..d97cf8e
 +}
 diff --git a/app/src/androidTest/java/eu/kanade/tachiyomi/storage/SafeStorageAndroidTest.kt b/app/src/androidTest/java/eu/kanade/tachiyomi/storage/SafeStorageAndroidTest.kt
 new file mode 100644
-index 0000000..d40ef80
+index 0000000..fa67bd3
 --- /dev/null
 +++ b/app/src/androidTest/java/eu/kanade/tachiyomi/storage/SafeStorageAndroidTest.kt
-@@ -0,0 +1,207 @@
+@@ -0,0 +1,247 @@
 +package eu.kanade.tachiyomi.storage
 +
 +import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -2781,6 +2781,46 @@ index 0000000..d40ef80
 +            it.setWritable(true)
 +            it.delete()
 +        }
++    }
++
++    private fun documentContext() =
++        object : android.content.ContextWrapper(context) {
++            override fun getCacheDir() = File(folder, "reader-cache").apply { mkdirs() }
++        }
++
++    @Test
++    fun nativeDocumentCacheKeepsBothLeasesAndPreservesTheOriginal() {
++        val isolated = documentContext()
++        val original = File(folder, "reading.txt").apply { writeText("original document") }
++        val source = checkNotNull(UniFile.fromFile(original))
++        mihon.core.archive.DocumentFiles.materialize(isolated, source).use { first ->
++            mihon.core.archive.DocumentFiles.materialize(isolated, source).use { second ->
++                assertEquals(first.file, second.file)
++                assertEquals(0L, mihon.core.archive.DocumentCacheBudget.trim(isolated.cacheDir, 0))
++                assertEquals("original document", first.file.readText())
++            }
++            assertEquals(0L, mihon.core.archive.DocumentCacheBudget.trim(isolated.cacheDir, 0))
++        }
++        mihon.core.archive.DocumentCacheBudget.trim(isolated.cacheDir, 0)
++        assertEquals("original document", original.readText())
++    }
++
++    @Test
++    fun nativeDocumentWithoutTimestampUsesTheNewBytesWithoutReplacingTheOpenCopy() {
++        val isolated = documentContext()
++        val original = File(folder, "unknown-time.txt").apply { writeText("one") }
++        val source = checkNotNull(UniFile.fromFile(original))
++        org.junit.Assume.assumeTrue(original.setLastModified(0) && source.lastModified() == 0L)
++        mihon.core.archive.DocumentFiles.materialize(isolated, source).use { first ->
++            original.writeText("two")
++            org.junit.Assume.assumeTrue(original.setLastModified(0) && source.lastModified() == 0L)
++            mihon.core.archive.DocumentFiles.materialize(isolated, source).use { second ->
++                assertEquals("two", second.file.readText())
++                assertEquals("one", first.file.readText())
++                assertFalse(first.file == second.file)
++            }
++        }
++        assertEquals("two", original.readText())
 +    }
 +
 +    @Test
@@ -10566,7 +10606,7 @@ index a198c3f..9a3e84f 100644
                      preference = translationPreferences.translationEngineTemperature(),
                      title = stringResource(ATMR.strings.pref_engine_temperature),
 diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
-index 7f411fd..e156a8d 100644
+index 7f411fd..7f8b26b 100644
 --- a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
 +++ b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
 @@ -1,15 +1,18 @@
@@ -10631,7 +10671,7 @@ index 7f411fd..e156a8d 100644
  
      // Identifies this overlay independently of the pinned upstream COMMIT_SHA.
 -    private const val POLARIS_READER_REVISION = "P20261031.2"
-+    private const val POLARIS_READER_REVISION = "P20261114.1"
++    private const val POLARIS_READER_REVISION = "P20261114.2"
  
      @Composable
      override fun Content() {
@@ -73131,6 +73171,268 @@ index 0000000..3264417
 +        }
 +    }
 +}
+diff --git a/app/src/test/java/eu/kanade/tachiyomi/ui/documents/DocumentMaterializationTest.kt b/app/src/test/java/eu/kanade/tachiyomi/ui/documents/DocumentMaterializationTest.kt
+new file mode 100644
+index 0000000..536809d
+--- /dev/null
++++ b/app/src/test/java/eu/kanade/tachiyomi/ui/documents/DocumentMaterializationTest.kt
+@@ -0,0 +1,256 @@
++package eu.kanade.tachiyomi.ui.documents
++
++import android.content.Context
++import android.net.Uri
++import com.hippo.unifile.UniFile
++import io.mockk.every
++import io.mockk.mockk
++import java.io.ByteArrayInputStream
++import java.io.File
++import java.io.IOException
++import java.util.concurrent.CountDownLatch
++import java.util.concurrent.Executors
++import java.util.concurrent.TimeUnit
++import java.util.concurrent.TimeoutException
++import mihon.core.archive.DocumentCacheBudget
++import mihon.core.archive.DocumentFiles
++import mihon.core.archive.DocumentLimits
++import org.junit.jupiter.api.Assertions.assertEquals
++import org.junit.jupiter.api.Assertions.assertFalse
++import org.junit.jupiter.api.Assertions.assertNotEquals
++import org.junit.jupiter.api.Assertions.assertTrue
++import org.junit.jupiter.api.Test
++import org.junit.jupiter.api.assertThrows
++import org.junit.jupiter.api.io.TempDir
++
++/** Production materializer, real streams/files/leases; Android provider metadata is simulated. */
++class DocumentMaterializationTest {
++    @TempDir lateinit var root: File
++    private val context = mockk<Context>()
++
++    private class Document(
++        var bytes: ByteArray = "first document".toByteArray(),
++        var length: Long = 0,
++        var modified: Long = 0,
++        identity: String = "content://documents/book",
++    ) {
++        val source = mockk<UniFile>()
++        var opens = 0
++        var closed = 0
++        var unavailable = false
++        var failRead = false
++        var onRead: () -> Unit = {}
++
++        init {
++            val uri = mockk<Uri>()
++            every { uri.toString() } returns identity
++            every { source.uri } returns uri
++            every { source.length() } answers { length }
++            every { source.lastModified() } answers { modified }
++            every { source.openInputStream() } answers
++                {
++                    opens++
++                    if (unavailable) throw IOException("Provider unavailable")
++                    object : ByteArrayInputStream(bytes) {
++                        override fun read(buffer: ByteArray, offset: Int, count: Int): Int {
++                            onRead()
++                            if (failRead) throw IOException("Interrupted provider read")
++                            return super.read(buffer, offset, count)
++                        }
++
++                        override fun close() {
++                            closed++
++                            super.close()
++                        }
++                    }
++                }
++        }
++    }
++
++    private fun prepare(document: Document): DocumentCacheBudget.Lease {
++        every { context.cacheDir } returns root
++        return DocumentFiles.materialize(context, document.source)
++    }
++
++    @Test
++    fun `unknown metadata changing bytes cannot return the previous cached document`() {
++        val document = Document()
++        prepare(document).use { first ->
++            val before = first.file.readBytes()
++            document.bytes = "other document".toByteArray()
++            prepare(document).use { next ->
++                assertEquals("other document", next.file.readText())
++                assertNotEquals(first.file, next.file)
++                assertTrue(before.contentEquals(first.file.readBytes()))
++            }
++        }
++        assertEquals(2, document.opens)
++        assertEquals(2, document.closed)
++    }
++
++    @Test
++    fun `unknown timestamp cannot make equal size edits look unchanged`() {
++        val document = Document("one".toByteArray(), length = 3)
++        prepare(document).use { first ->
++            document.bytes = "two".toByteArray()
++            prepare(document).use { next ->
++                assertEquals("two", next.file.readText())
++                assertEquals("one", first.file.readText())
++                assertNotEquals(first.file, next.file)
++            }
++        }
++    }
++
++    @Test
++    fun `unknown length cannot make equal timestamp edits look unchanged`() {
++        val document = Document(modified = 50)
++        prepare(document).close()
++        document.bytes = "updated document".toByteArray()
++        prepare(document).use { assertEquals("updated document", it.file.readText()) }
++    }
++
++    @Test
++    fun `unknown metadata must not silently reuse a copy when the provider is unreadable`() {
++        val document = Document()
++        prepare(document).use { first ->
++            document.unavailable = true
++            assertThrows<IOException> { prepare(document).close() }
++            assertEquals("first document", first.file.readText())
++        }
++    }
++
++    @Test
++    fun `reliable metadata retains the fast cache hit`() {
++        val document = Document("one".toByteArray(), length = 3, modified = 50)
++        prepare(document).use { first ->
++            document.unavailable = true
++            prepare(document).use { assertEquals(first.file, it.file) }
++        }
++        assertEquals(1, document.opens)
++        assertEquals(1, document.closed)
++    }
++
++    @Test
++    fun `identical bytes with unknown metadata share a copy across provider identities`() {
++        val firstDocument = Document(identity = "content://documents/first")
++        val secondDocument = Document(identity = "content://documents/second")
++        prepare(firstDocument).use { first ->
++            prepare(secondDocument).use { second ->
++                assertEquals(first.file, second.file)
++                assertEquals(1, File(root, "document-files").listFiles()!!.size)
++            }
++        }
++        assertEquals(1, firstDocument.opens)
++        assertEquals(1, secondDocument.opens)
++    }
++
++    @Test
++    fun `partial provider failure closes its stream and removes its temporary copy`() {
++        val document = Document(ByteArray(100_000))
++        var reads = 0
++        document.onRead = { if (++reads == 2) document.failRead = true }
++        assertThrows<IOException> { prepare(document).close() }
++        assertEquals(1, document.closed)
++        assertTrue(File(root, "document-files").listFiles()!!.isEmpty())
++    }
++
++    @Test
++    fun `empty documents never become cached publications`() {
++        val document = Document(byteArrayOf())
++        assertThrows<IllegalArgumentException> { prepare(document).close() }
++        assertEquals(1, document.closed)
++        assertTrue(File(root, "document-files").listFiles()!!.isEmpty())
++    }
++
++    @Test
++    fun `a reliable length that disagrees with actual bytes is not cached`() {
++        val document = Document("longer than declared".toByteArray(), length = 3, modified = 50)
++        assertThrows<IllegalArgumentException> { prepare(document).close() }
++        assertEquals(1, document.closed)
++        assertTrue(File(root, "document-files").listFiles()!!.isEmpty())
++    }
++
++    @Test
++    fun `metadata changing during a reliable copy requires another attempt`() {
++        val document = Document("one".toByteArray(), length = 3, modified = 50)
++        document.onRead = { document.modified = 51 }
++        assertThrows<IllegalStateException> { prepare(document).close() }
++        assertTrue(File(root, "document-files").listFiles()!!.isEmpty())
++        document.onRead = {}
++        prepare(document).use { assertEquals("one", it.file.readText()) }
++    }
++
++    @Test
++    fun `a corrupt content cache is refused without replacing a file held by a reader`() {
++        val document = Document()
++        prepare(document).use { first ->
++            val corrupt = "x".repeat(document.bytes.size)
++            first.file.writeText(corrupt)
++            assertThrows<IllegalStateException> { prepare(document).close() }
++            assertEquals(corrupt, first.file.readText())
++            assertEquals(1, File(root, "document-files").listFiles()!!.size)
++        }
++    }
++
++    @Test
++    fun `identical content stays pinned until both reading leases close`() {
++        val document = Document()
++        lateinit var file: File
++        prepare(document).use { first ->
++            file = first.file
++            prepare(document).use { second ->
++                assertEquals(first.file, second.file)
++                assertEquals(0L, DocumentCacheBudget.trim(root, 0))
++            }
++            assertEquals(0L, DocumentCacheBudget.trim(root, 0))
++            assertTrue(file.exists())
++        }
++        DocumentCacheBudget.trim(root, 0)
++        assertFalse(file.exists())
++    }
++
++    @Test
++    fun `cache trimming cannot remove the temporary before its final file is pinned`() {
++        val document = Document()
++        val reading = CountDownLatch(1)
++        val resume = CountDownLatch(1)
++        val trimming = CountDownLatch(1)
++        var firstRead = true
++        document.onRead = {
++            if (firstRead) {
++                firstRead = false
++                reading.countDown()
++                check(resume.await(5, TimeUnit.SECONDS))
++            }
++        }
++        val threads = Executors.newFixedThreadPool(2)
++        val preparing = threads.submit<DocumentCacheBudget.Lease> { prepare(document) }
++        try {
++            assertTrue(reading.await(5, TimeUnit.SECONDS))
++            val trim =
++                threads.submit<Long> {
++                    trimming.countDown()
++                    DocumentCacheBudget.trim(root, 0)
++                }
++            assertTrue(trimming.await(5, TimeUnit.SECONDS))
++            assertThrows<TimeoutException> { trim.get(150, TimeUnit.MILLISECONDS) }
++            resume.countDown()
++            preparing.get(5, TimeUnit.SECONDS).use { lease ->
++                assertEquals(0L, trim.get(5, TimeUnit.SECONDS))
++                assertTrue(lease.file.exists())
++            }
++        } finally {
++            resume.countDown()
++            threads.shutdownNow()
++            threads.awaitTermination(5, TimeUnit.SECONDS)
++            if (preparing.isDone && !preparing.isCancelled) runCatching { preparing.get().close() }
++        }
++    }
++
++    @Test
++    fun `unsupported declared size is refused before opening the provider`() {
++        val document = Document(length = DocumentLimits.MAX_FILE_BYTES + 1, modified = 50)
++        assertThrows<IllegalArgumentException> { prepare(document).close() }
++        assertEquals(0, document.opens)
++    }
++}
 diff --git a/app/src/test/java/eu/kanade/tachiyomi/ui/documents/DocumentOrganizationTest.kt b/app/src/test/java/eu/kanade/tachiyomi/ui/documents/DocumentOrganizationTest.kt
 new file mode 100644
 index 0000000..f89b137
@@ -77220,17 +77522,19 @@ index 0000000..7dbd01e
 +}
 diff --git a/core/archive/src/main/kotlin/mihon/core/archive/DocumentCacheBudget.kt b/core/archive/src/main/kotlin/mihon/core/archive/DocumentCacheBudget.kt
 new file mode 100644
-index 0000000..db8bea6
+index 0000000..d10b007
 --- /dev/null
 +++ b/core/archive/src/main/kotlin/mihon/core/archive/DocumentCacheBudget.kt
-@@ -0,0 +1,73 @@
+@@ -0,0 +1,84 @@
 +package mihon.core.archive
 +
 +import java.io.Closeable
 +import java.io.File
 +import java.nio.file.Files
 +
-+/** Only regenerable document caches. Imported originals and models are outside these directories. */
++/**
++ * Only regenerable document caches. Imported originals and models are outside these directories.
++ */
 +object DocumentCacheBudget {
 +    const val LIMIT_BYTES = 256L * 1024 * 1024
 +    val directories = setOf("document-files", "pdf-pages", "document-translations")
@@ -77239,7 +77543,8 @@ index 0000000..db8bea6
 +    class Lease internal constructor(val file: File, private val release: () -> Unit) : Closeable {
 +        private var closed = false
 +
-+        @Synchronized override fun close() {
++        @Synchronized
++        override fun close() {
 +            if (!closed) {
 +                closed = true
 +                release()
@@ -77254,7 +77559,7 @@ index 0000000..db8bea6
 +                File(root, it).canonicalFile.toPath().let { base ->
 +                    target.canonicalFile.toPath().startsWith(base)
 +                }
-+            },
++            }
 +        )
 +        prepare()
 +        check(target.isFile)
@@ -77271,8 +77576,12 @@ index 0000000..db8bea6
 +        }
 +    }
 +
++    /** Content-addressed documents determine their target only after a bounded copy. */
 +    @Synchronized
-+    fun size(root: File): Long = files(root).sumOf { it.length() }
++    internal fun acquirePrepared(root: File, prepare: () -> File): Lease =
++        acquire(root, prepare()) {}
++
++    @Synchronized fun size(root: File): Long = files(root).sumOf { it.length() }
 +
 +    @Synchronized
 +    fun trim(root: File, limit: Long = LIMIT_BYTES): Long {
@@ -77292,47 +77601,122 @@ index 0000000..db8bea6
 +        return deleted
 +    }
 +
-+    private fun files(root: File): List<File> = directories.flatMap { name ->
-+        File(root, name).walkTopDown().onEnter { !Files.isSymbolicLink(it.toPath()) }
-+            .filter { it.isFile && !Files.isSymbolicLink(it.toPath()) }.toList()
-+    }
++    private fun files(root: File): List<File> =
++        directories.flatMap { name ->
++            File(root, name)
++                .walkTopDown()
++                .onEnter { !Files.isSymbolicLink(it.toPath()) }
++                .filter { it.isFile && !Files.isSymbolicLink(it.toPath()) }
++                .toList()
++        }
 +}
 diff --git a/core/archive/src/main/kotlin/mihon/core/archive/DocumentFiles.kt b/core/archive/src/main/kotlin/mihon/core/archive/DocumentFiles.kt
 new file mode 100644
-index 0000000..22654f0
+index 0000000..8b43c97
 --- /dev/null
 +++ b/core/archive/src/main/kotlin/mihon/core/archive/DocumentFiles.kt
-@@ -0,0 +1,31 @@
+@@ -0,0 +1,102 @@
 +package mihon.core.archive
 +
 +import android.content.Context
 +import com.hippo.unifile.UniFile
 +import java.io.File
++import java.security.DigestInputStream
 +import java.security.MessageDigest
 +import java.util.UUID
 +
 +object DocumentFiles {
 +    @Synchronized
 +    fun materialize(context: Context, source: UniFile): DocumentCacheBudget.Lease {
-+        val identity = "${source.uri}|${source.length()}|${source.lastModified()}"
-+        val key = MessageDigest.getInstance("SHA-256").digest(identity.toByteArray())
-+            .joinToString("") { "%02x".format(it) }
-+        val directory = File(context.cacheDir, "document-files").apply { mkdirs() }
++        val root = context.cacheDir
++        val length = source.length()
++        val modified = source.lastModified()
++        require(length <= DocumentLimits.MAX_FILE_BYTES) {
++            "Document exceeds the supported size limit"
++        }
++        val directory = File(root, "document-files")
++        check(directory.isDirectory || directory.mkdirs()) { "Cannot prepare document cache" }
++        if (length <= 0 || modified <= 0) return materializeByContent(root, directory, source)
++
++        val key = hash("${source.uri}|$length|$modified".toByteArray())
 +        val target = File(directory, key)
-+        return DocumentCacheBudget.acquire(context.cacheDir, target) {
-+            if (target.isFile && target.length() > 0) return@acquire
++        return DocumentCacheBudget.acquire(root, target) {
++            if (target.isFile && target.length() == length) return@acquire
++            check(!target.exists()) {
++                "Document cache is incomplete; clear the document cache and retry"
++            }
 +            val temporary = File(directory, ".$key-${UUID.randomUUID()}")
 +            try {
-+                val size = source.openInputStream().use { input ->
-+                    temporary.outputStream().use { output -> DocumentLimits.copy(input, output) }
++                val size =
++                    source.openInputStream().use { input ->
++                        temporary.outputStream().use { output ->
++                            DocumentLimits.copy(input, output, length)
++                        }
++                    }
++                require(size == length) { "Document size changed while preparing it" }
++                check(source.length() == length && source.lastModified() == modified) {
++                    "Document changed while preparing it; try again"
 +                }
-+                require(size > 0) { "Empty document" }
 +                check(temporary.renameTo(target)) { "Cannot prepare document" }
 +            } finally {
 +                temporary.delete()
 +            }
 +        }
 +    }
++
++    private fun materializeByContent(
++        root: File,
++        directory: File,
++        source: UniFile,
++    ): DocumentCacheBudget.Lease =
++        DocumentCacheBudget.acquirePrepared(root) {
++            // Keep the temporary under the budget lock until its final file is pinned.
++            val temporary = File(directory, ".reading-${UUID.randomUUID()}")
++            try {
++                val digest = MessageDigest.getInstance("SHA-256")
++                val size =
++                    DigestInputStream(source.openInputStream(), digest).use { input ->
++                        temporary.outputStream().use { output ->
++                            DocumentLimits.copy(input, output)
++                        }
++                    }
++                require(size > 0) { "Empty document" }
++                val fingerprint = hex(digest.digest())
++                val target = File(directory, "content-$fingerprint")
++                if (target.exists()) {
++                    check(
++                        target.isFile && target.length() == size && hashFile(target) == fingerprint
++                    ) {
++                        "Document cache verification failed; clear the document cache and retry"
++                    }
++                } else {
++                    check(temporary.renameTo(target)) { "Cannot prepare document" }
++                }
++                target
++            } finally {
++                temporary.delete()
++            }
++        }
++
++    private fun hashFile(file: File): String {
++        val digest = MessageDigest.getInstance("SHA-256")
++        DigestInputStream(file.inputStream(), digest).use { input ->
++            val buffer = ByteArray(32 * 1024)
++            var total = 0L
++            while (true) {
++                val count = input.read(buffer)
++                if (count < 0) break
++                total += count
++                check(total <= DocumentLimits.MAX_FILE_BYTES) { "Invalid cached document size" }
++            }
++        }
++        return hex(digest.digest())
++    }
++
++    private fun hash(bytes: ByteArray): String =
++        hex(MessageDigest.getInstance("SHA-256").digest(bytes))
++
++    private fun hex(bytes: ByteArray): String = bytes.joinToString("") { "%02x".format(it) }
 +}
 diff --git a/core/archive/src/main/kotlin/mihon/core/archive/DocumentFormat.kt b/core/archive/src/main/kotlin/mihon/core/archive/DocumentFormat.kt
 new file mode 100644

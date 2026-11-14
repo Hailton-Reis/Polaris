@@ -31,6 +31,8 @@ A [continuação P20261114.1](RESTAURACAO_CATEGORIAS_P20261114_1.md) corrige a o
 - Conferir a meta de cache com arquivos em uso e o crescimento dos caches fora dessa meta.
 - Validar a limpeza conjunta de download/tradução mantendo o vocabulário.
 
+A [continuação P20261114.2](CACHE_DOCUMENTOS_P20261114_2.md) corrige cache antigo quando tamanho/data estão ausentes. Releitura e temporário adicionais mantêm a necessidade de medir pico e desempenho no A12/ARM.
+
 A [análise crítica](ARMAZENAMENTO.md) explica o que motivou cada prioridade e qual evidência falta.
 
 A [continuação P20261113.7](IMPORTACAO_REPETIDA_P20261113_7.md) trata importações novas repetidas e retomada de publicação válida após falha de registro. Pastas antigas, staging abandonado e aceites físicos permanecem abertos.
