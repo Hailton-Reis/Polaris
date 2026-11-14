@@ -10566,7 +10566,7 @@ index a198c3f..9a3e84f 100644
                      preference = translationPreferences.translationEngineTemperature(),
                      title = stringResource(ATMR.strings.pref_engine_temperature),
 diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
-index 7f411fd..15a6db5 100644
+index 7f411fd..e156a8d 100644
 --- a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
 +++ b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
 @@ -1,15 +1,18 @@
@@ -10631,7 +10631,7 @@ index 7f411fd..15a6db5 100644
  
      // Identifies this overlay independently of the pinned upstream COMMIT_SHA.
 -    private const val POLARIS_READER_REVISION = "P20261031.2"
-+    private const val POLARIS_READER_REVISION = "P20261113.7"
++    private const val POLARIS_READER_REVISION = "P20261114.1"
  
      @Composable
      override fun Content() {
@@ -14038,10 +14038,18 @@ index 0ecf97e..87761ac 100644
          }
  
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/data/backup/restore/BackupRestorer.kt b/app/src/main/java/eu/kanade/tachiyomi/data/backup/restore/BackupRestorer.kt
-index ce21be4..13edbcf 100644
+index ce21be4..01e1c3e 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/data/backup/restore/BackupRestorer.kt
 +++ b/app/src/main/java/eu/kanade/tachiyomi/data/backup/restore/BackupRestorer.kt
-@@ -15,6 +15,14 @@ import eu.kanade.tachiyomi.data.backup.restore.restorers.MangaRestorer
+@@ -4,6 +4,7 @@ import android.content.Context
+ import android.net.Uri
+ import eu.kanade.tachiyomi.data.backup.BackupDecoder
+ import eu.kanade.tachiyomi.data.backup.BackupNotifier
++import eu.kanade.tachiyomi.data.backup.models.Backup
+ import eu.kanade.tachiyomi.data.backup.models.BackupCategory
+ import eu.kanade.tachiyomi.data.backup.models.BackupExtensionStore
+ import eu.kanade.tachiyomi.data.backup.models.BackupManga
+@@ -15,8 +16,17 @@ import eu.kanade.tachiyomi.data.backup.restore.restorers.MangaRestorer
  import eu.kanade.tachiyomi.data.backup.restore.restorers.PreferenceRestorer
  import eu.kanade.tachiyomi.data.download.DownloadCache
  import eu.kanade.tachiyomi.util.system.createFileInCacheDir
@@ -14055,8 +14063,11 @@ index ce21be4..13edbcf 100644
 +import kotlin.concurrent.atomics.incrementAndFetch
  import kotlinx.coroutines.CoroutineScope
  import kotlinx.coroutines.coroutineScope
++import kotlinx.coroutines.currentCoroutineContext
  import kotlinx.coroutines.ensureActive
-@@ -26,21 +34,12 @@ import tachiyomi.data.Database
+ import kotlinx.coroutines.launch
+ import logcat.LogPriority
+@@ -26,35 +36,28 @@ import tachiyomi.data.Database
  import tachiyomi.i18n.MR
  import uy.kohesive.injekt.Injekt
  import uy.kohesive.injekt.api.get
@@ -14078,7 +14089,15 @@ index ce21be4..13edbcf 100644
      private val database: Database = Injekt.get(),
      private val categoriesRestorer: CategoriesRestorer = CategoriesRestorer(),
      private val preferenceRestorer: PreferenceRestorer = PreferenceRestorer(context),
-@@ -52,9 +51,7 @@ class BackupRestorer(
+     private val extensionStoreRestorer: ExtensionStoreRestorer = ExtensionStoreRestorer(),
+     private val mangaRestorer: MangaRestorer = MangaRestorer(),
++    private val sourceManager: () -> eu.kanade.tachiyomi.source.AndroidSourceManager? = {
++        Injekt.get<tachiyomi.domain.source.service.SourceManager>()
++            as? eu.kanade.tachiyomi.source.AndroidSourceManager
++    },
+ ) {
+ 
+     private var restoreAmount = 0
      private val restoreProgress = AtomicInt(0)
      private val errors = CopyOnWriteArrayList<Pair<Date, String>>()
  
@@ -14089,7 +14108,7 @@ index ce21be4..13edbcf 100644
      private var sourceMapping: Map<Long, String> = emptyMap()
  
      suspend fun restore(uri: Uri, options: RestoreOptions) {
-@@ -75,13 +72,7 @@ class BackupRestorer(
+@@ -75,18 +78,14 @@ class BackupRestorer(
  
          val logFile = writeErrorLog()
  
@@ -14104,7 +14123,21 @@ index ce21be4..13edbcf 100644
      }
  
      private suspend fun restoreFromFile(uri: Uri, options: RestoreOptions) {
-@@ -112,13 +103,38 @@ class BackupRestorer(
+-        val backup = BackupDecoder(context).decode(uri)
++        restoreBackup(BackupDecoder(context).decode(uri), options)
++    }
+ 
++    internal suspend fun restoreBackup(backup: Backup, options: RestoreOptions) {
+         // Store source mapping for error messages
+         val backupMaps = backup.backupSources
+         sourceMapping = backupMaps.associate { it.sourceId to it.name }
+@@ -108,17 +107,42 @@ class BackupRestorer(
+         }
+ 
+         coroutineScope {
++            // Both library assignments and preference ID remapping depend on committed categories.
++            // Run this phase directly: a cancelled child Job followed by join would allow progress.
+             if (options.categories) {
                  restoreCategories(backup.backupCategories)
              }
              if (options.appSettings) {
@@ -14120,9 +14153,7 @@ index ce21be4..13edbcf 100644
              if (options.libraryEntries) {
 -                restoreManga(backup.backupManga, if (options.categories) backup.backupCategories else emptyList())
 +                // Source names/languages restore storage identity, never extension trust/code.
-+                val manager =
-+                    Injekt.get<tachiyomi.domain.source.service.SourceManager>()
-+                        as? eu.kanade.tachiyomi.source.AndroidSourceManager
++                val manager = sourceManager()
 +                backup.backupManga
 +                    .flatMap(
 +                        eu.kanade.tachiyomi.data.backup.models.PortableMangaBackup::
@@ -14145,7 +14176,18 @@ index ce21be4..13edbcf 100644
              }
              if (options.extensionStores) {
                  restoreExtensionStores(backup.backupExtensionStores)
-@@ -145,10 +161,9 @@ class BackupRestorer(
+@@ -128,8 +152,8 @@ class BackupRestorer(
+         }
+     }
+ 
+-    private fun CoroutineScope.restoreCategories(backupCategories: List<BackupCategory>) = launch {
+-        ensureActive()
++    private suspend fun restoreCategories(backupCategories: List<BackupCategory>) {
++        currentCoroutineContext().ensureActive()
+         categoriesRestorer(backupCategories)
+ 
+         val progress = restoreProgress.incrementAndFetch()
+@@ -145,10 +169,9 @@ class BackupRestorer(
          backupMangas: List<BackupManga>,
          backupCategories: List<BackupCategory>,
      ) = launch {
@@ -14159,7 +14201,7 @@ index ce21be4..13edbcf 100644
                      database.transaction {
                          chunk.forEach {
                              ensureActive()
-@@ -162,26 +177,31 @@ class BackupRestorer(
+@@ -162,26 +185,31 @@ class BackupRestorer(
                      false
                  }
  
@@ -14207,7 +14249,7 @@ index ce21be4..13edbcf 100644
      }
  
      private fun CoroutineScope.restoreAppPreferences(
-@@ -189,10 +209,7 @@ class BackupRestorer(
+@@ -189,10 +217,7 @@ class BackupRestorer(
          categories: List<BackupCategory>?,
      ) = launch {
          ensureActive()
@@ -14219,7 +14261,7 @@ index ce21be4..13edbcf 100644
  
          val progress = restoreProgress.incrementAndFetch()
          notifier.showRestoreProgress(
-@@ -203,7 +220,9 @@ class BackupRestorer(
+@@ -203,7 +228,9 @@ class BackupRestorer(
          )
      }
  
@@ -14230,7 +14272,7 @@ index ce21be4..13edbcf 100644
          ensureActive()
          preferenceRestorer.restoreSource(preferences)
  
-@@ -217,31 +236,29 @@ class BackupRestorer(
+@@ -217,31 +244,29 @@ class BackupRestorer(
      }
  
      private fun CoroutineScope.restoreExtensionStores(
@@ -66363,6 +66405,312 @@ index 0000000..b7731ad
 +        assertEquals("English", descriptors.getValue(1).name)
 +        assertEquals("en", descriptors.getValue(1).language)
 +        assertEquals("pt-BR", descriptors.getValue(2).language)
++    }
++}
+diff --git a/app/src/test/java/eu/kanade/tachiyomi/data/backup/restore/BackupRestoreOrderingTest.kt b/app/src/test/java/eu/kanade/tachiyomi/data/backup/restore/BackupRestoreOrderingTest.kt
+new file mode 100644
+index 0000000..f10fe88
+--- /dev/null
++++ b/app/src/test/java/eu/kanade/tachiyomi/data/backup/restore/BackupRestoreOrderingTest.kt
+@@ -0,0 +1,300 @@
++package eu.kanade.tachiyomi.data.backup.restore
++
++import android.content.ContentResolver
++import android.content.Context
++import android.net.Uri
++import app.cash.sqldelight.SuspendingTransactionWithoutReturn
++import dev.icerock.moko.resources.StringResource
++import eu.kanade.tachiyomi.data.backup.BackupDecoder
++import eu.kanade.tachiyomi.data.backup.BackupNotifier
++import eu.kanade.tachiyomi.data.backup.models.Backup
++import eu.kanade.tachiyomi.data.backup.models.BackupCategory
++import eu.kanade.tachiyomi.data.backup.models.BackupManga
++import eu.kanade.tachiyomi.data.backup.models.BackupPreference
++import eu.kanade.tachiyomi.data.backup.models.IntPreferenceValue
++import eu.kanade.tachiyomi.data.backup.models.StringSetPreferenceValue
++import eu.kanade.tachiyomi.data.backup.restore.restorers.CategoriesRestorer
++import eu.kanade.tachiyomi.data.backup.restore.restorers.ExtensionStoreRestorer
++import eu.kanade.tachiyomi.data.backup.restore.restorers.MangaRestorer
++import eu.kanade.tachiyomi.data.backup.restore.restorers.PreferenceRestorer
++import io.mockk.coEvery
++import io.mockk.every
++import io.mockk.mockk
++import io.mockk.mockkStatic
++import io.mockk.unmockkStatic
++import java.io.ByteArrayInputStream
++import java.io.IOException
++import kotlinx.coroutines.CancellationException
++import kotlinx.coroutines.CompletableDeferred
++import kotlinx.coroutines.async
++import kotlinx.coroutines.cancelAndJoin
++import kotlinx.coroutines.delay
++import kotlinx.coroutines.launch
++import kotlinx.coroutines.supervisorScope
++import kotlinx.coroutines.test.runCurrent
++import kotlinx.coroutines.test.runTest
++import kotlinx.serialization.protobuf.ProtoBuf
++import org.junit.jupiter.api.AfterEach
++import org.junit.jupiter.api.Assertions.assertEquals
++import org.junit.jupiter.api.Assertions.assertFalse
++import org.junit.jupiter.api.Assertions.assertNull
++import org.junit.jupiter.api.Assertions.assertTrue
++import org.junit.jupiter.api.BeforeEach
++import org.junit.jupiter.api.Test
++import org.junit.jupiter.api.assertThrows
++import tachiyomi.core.common.i18n.stringResource
++import tachiyomi.core.common.preference.InMemoryPreferenceStore.InMemoryPreference
++import tachiyomi.core.common.preference.PreferenceStore
++import tachiyomi.data.Database
++import tachiyomi.domain.category.interactor.GetCategories
++import tachiyomi.domain.category.model.Category
++import tachiyomi.domain.library.service.LibraryPreferences
++
++/**
++ * Real restore coordinator and preference mapper; database/Android services are test boundaries.
++ */
++class BackupRestoreOrderingTest {
++    private val context = mockk<Context>()
++    private val notifier = mockk<BackupNotifier>(relaxed = true)
++    private val database = mockk<Database>()
++    private val categories = mockk<CategoriesRestorer>()
++    private val preferences = mockk<PreferenceRestorer>()
++    private val repositories = mockk<ExtensionStoreRestorer>(relaxed = true)
++    private val mangas = mockk<MangaRestorer>()
++    private val getCategories = mockk<GetCategories>()
++    private val store = mockk<PreferenceStore>()
++    private val defaultCategory =
++        InMemoryPreference(LibraryPreferences.DEFAULT_CATEGORY_PREF_KEY, 44, -1)
++    private val filterKey =
++        LibraryPreferences.categoryPreferenceKeys.first {
++            it != LibraryPreferences.DEFAULT_CATEGORY_PREF_KEY
++        }
++    private val filter = InMemoryPreference(filterKey, setOf("44"), emptySet<String>())
++    private val restoredCategory = Category(700, "To read", 5, 0)
++    private var rows = emptyList<Category>()
++    private val events = mutableListOf<String>()
++    private var categoriesForSettings: List<BackupCategory>? = null
++    private var categoriesForManga = emptyList<BackupCategory>()
++    private var rowsSeenByManga = emptyList<Category>()
++    private var deliveredManga: BackupManga? = null
++    private val backupCategory = BackupCategory("To read", order = 2, id = 9)
++    private val backup =
++        Backup(
++            listOf(BackupManga(42, "/work", "Work").apply { categories = listOf(2) }),
++            backupCategories = listOf(backupCategory),
++            backupPreferences =
++                listOf(
++                    BackupPreference(
++                        LibraryPreferences.DEFAULT_CATEGORY_PREF_KEY,
++                        IntPreferenceValue(9),
++                    ),
++                    BackupPreference(filterKey, StringSetPreferenceValue(setOf("9"))),
++                ),
++        )
++    private val options = RestoreOptions(extensionStores = false, sourceSettings = false)
++
++    @BeforeEach
++    fun setup() {
++        mockkStatic("tachiyomi.core.common.i18n.LocalizeKt")
++        every { context.stringResource(any<StringResource>()) } returns "restoring"
++        every { store.getAll() } answers
++            {
++                mapOf(defaultCategory.key() to defaultCategory.get(), filterKey to filter.get())
++            }
++        every { store.getInt(defaultCategory.key(), any()) } returns defaultCategory
++        every { store.getStringSet(filterKey, any()) } returns filter
++        coEvery { getCategories.await() } answers { rows }
++        coEvery { categories(any()) } coAnswers
++            {
++                events += "categories-start"
++                delay(50)
++                rows =
++                    firstArg<List<BackupCategory>>().mapIndexed { index, category ->
++                        Category(700L + index, category.name, 5L + index, category.flags)
++                    }
++                events += "categories-ready"
++            }
++        val mapper = PreferenceRestorer(context, getCategories, store)
++        coEvery { preferences.restoreApp(any(), any()) } coAnswers
++            {
++                events += "settings"
++                categoriesForSettings = secondArg()
++                mapper.restorePreferences(firstArg(), store, secondArg())
++            }
++        coEvery { preferences.restoreSource(any()) } coAnswers { events += "source-settings" }
++        coEvery { mangas.sortByNew(any()) } coAnswers { firstArg() }
++        coEvery { database.transaction(any(), any()) } coAnswers
++            {
++                secondArg<suspend SuspendingTransactionWithoutReturn.() -> Unit>().invoke(mockk())
++            }
++        coEvery { mangas.restore(any(), any()) } coAnswers
++            {
++                events += "manga"
++                deliveredManga = firstArg()
++                categoriesForManga = secondArg()
++                rowsSeenByManga = rows.toList()
++            }
++    }
++
++    @AfterEach fun teardown() = unmockkStatic("tachiyomi.core.common.i18n.LocalizeKt")
++
++    private fun restorer() =
++        BackupRestorer(
++            context,
++            notifier,
++            false,
++            database,
++            categories,
++            preferences,
++            repositories,
++            mangas,
++            sourceManager = { null },
++        )
++
++    @Test
++    fun `settings map imported category ids only after categories exist`() = runTest {
++        restorer().restoreBackup(backup, options.copy(libraryEntries = false))
++        assertEquals(700, defaultCategory.get())
++        assertEquals(setOf("44", "700"), filter.get())
++        assertEquals(listOf(backupCategory), categoriesForSettings)
++        assertTrue(events.indexOf("categories-ready") < events.indexOf("settings"))
++    }
++
++    @Test
++    fun `library entries see committed categories on their first restore`() = runTest {
++        restorer().restoreBackup(backup, options.copy(appSettings = false))
++        assertEquals(listOf(restoredCategory), rowsSeenByManga)
++        assertEquals(listOf(backupCategory), categoriesForManga)
++        assertTrue(events.indexOf("categories-ready") < events.indexOf("manga"))
++    }
++
++    @Test
++    fun `category failure prevents all later restore phases`() = runTest {
++        val failure = IOException("Category storage unavailable")
++        coEvery { categories(any()) } coAnswers
++            {
++                delay(50)
++                throw failure
++            }
++        supervisorScope {
++            val task = async {
++                restorer().restoreBackup(backup, options.copy(sourceSettings = true))
++            }
++            assertEquals(failure.message, assertThrows<IOException> { task.await() }.message)
++        }
++        assertTrue(events.isEmpty())
++        assertEquals(44, defaultCategory.get())
++    }
++
++    @Test
++    fun `category cancellation is propagated before dependent mutations`() = runTest {
++        val cancellation = CancellationException("Cancelled category transaction")
++        coEvery { categories(any()) } coAnswers
++            {
++                delay(50)
++                throw cancellation
++            }
++        supervisorScope {
++            val task = async {
++                restorer().restoreBackup(backup, options.copy(sourceSettings = true))
++            }
++            assertEquals(
++                cancellation.message,
++                assertThrows<CancellationException> { task.await() }.message,
++            )
++        }
++        assertTrue(events.isEmpty())
++        assertEquals(44, defaultCategory.get())
++    }
++
++    @Test
++    fun `cancelling a blocked category phase never starts settings or library`() = runTest {
++        val waiting = CompletableDeferred<Unit>()
++        coEvery { categories(any()) } coAnswers { waiting.await() }
++        val task = launch { restorer().restoreBackup(backup, options.copy(sourceSettings = true)) }
++        runCurrent()
++        task.cancelAndJoin()
++        assertTrue(events.isEmpty())
++        assertEquals(44, defaultCategory.get())
++    }
++
++    @Test
++    fun `declining category import passes no mapping and preserves category settings`() = runTest {
++        rows = listOf(Category(44, "Existing", 0, 0))
++        restorer().restoreBackup(backup, options.copy(categories = false))
++        assertFalse(events.any { it.startsWith("categories") })
++        assertNull(categoriesForSettings)
++        assertTrue(categoriesForManga.isEmpty())
++        assertEquals(44, defaultCategory.get())
++        assertEquals(setOf("44"), filter.get())
++        assertEquals(rows, rowsSeenByManga)
++    }
++
++    @Test
++    fun `a categories only restore awaits its result and skips other phases`() = runTest {
++        restorer().restoreBackup(backup, options.copy(libraryEntries = false, appSettings = false))
++        assertEquals(listOf("categories-start", "categories-ready"), events)
++        assertEquals(listOf(restoredCategory), rows)
++    }
++
++    @Test
++    fun `disabled restore options have no side effects`() = runTest {
++        restorer().restoreBackup(backup, RestoreOptions(false, false, false, false, false))
++        assertTrue(events.isEmpty())
++        assertTrue(rows.isEmpty())
++    }
++
++    @Test
++    fun `independent settings still run concurrently after category readiness`() = runTest {
++        val sourceDone = CompletableDeferred<Unit>()
++        coEvery { preferences.restoreApp(any(), any()) } coAnswers
++            {
++                assertEquals(listOf(restoredCategory), rows)
++                sourceDone.await()
++                events += "settings"
++            }
++        coEvery { preferences.restoreSource(any()) } coAnswers
++            {
++                assertEquals(listOf(restoredCategory), rows)
++                events += "source-settings"
++                sourceDone.complete(Unit)
++            }
++        restorer()
++            .restoreBackup(backup, options.copy(libraryEntries = false, sourceSettings = true))
++        assertEquals(
++            listOf("categories-start", "categories-ready", "source-settings", "settings"),
++            events,
++        )
++    }
++
++    private suspend fun restoreExternalArchive(name: String) {
++        val bytes =
++            checkNotNull(javaClass.getResourceAsStream("/backup-interop/$name.tachibk")).use {
++                it.readBytes()
++            }
++        val resolver = mockk<ContentResolver>()
++        val uri = mockk<Uri>()
++        every { context.contentResolver } returns resolver
++        every { resolver.openInputStream(uri) } answers { ByteArrayInputStream(bytes) }
++        val imported = BackupDecoder(context, ProtoBuf).decode(uri)
++        restorer().restoreBackup(imported, options.copy(appSettings = false))
++        assertEquals("Favoritos", rowsSeenByManga.single().name)
++        assertEquals(700L, rowsSeenByManga.single().id)
++        assertEquals(7L, categoriesForManga.single().order)
++        assertEquals(listOf(7L), checkNotNull(deliveredManga).categories)
++        val chapter = checkNotNull(deliveredManga).chapters.single()
++        assertTrue(chapter.read)
++        assertTrue(chapter.bookmark)
++        assertEquals(17L, chapter.lastPageRead)
++    }
++
++    @Test
++    fun `Tachiyomi archive reaches library restore after its categories`() = runTest {
++        restoreExternalArchive("tachiyomi")
++    }
++
++    @Test
++    fun `Mihon archive reaches library restore after its categories`() = runTest {
++        restoreExternalArchive("mihon")
 +    }
 +}
 diff --git a/app/src/test/java/eu/kanade/tachiyomi/data/backup/restore/SourcePreferenceNamespaceTest.kt b/app/src/test/java/eu/kanade/tachiyomi/data/backup/restore/SourcePreferenceNamespaceTest.kt

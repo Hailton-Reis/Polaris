@@ -1,0 +1,47 @@
+{
+  "revision": "P20261114.1",
+  "status": "COMPILE_AND_UNIT_PASS_DEVICE_PENDING",
+  "unit_tests": {
+    "app": {
+      "total": 890,
+      "passed": 890,
+      "failed": 0,
+      "skipped": 0
+    },
+    "domain": {
+      "total": 85,
+      "passed": 85,
+      "failed": 0,
+      "skipped": 0
+    }
+  },
+  "unit_execution": {
+    "app": "fresh",
+    "domain": "up-to-date"
+  },
+  "new_unit_tests": 11,
+  "red_tests": 11,
+  "red_failures": 8,
+  "missing_baseline_cases": 0,
+  "android_app_compile": true,
+  "android_test_compile": true,
+  "android_runtime_executed": false,
+  "connected_devices": 0,
+  "overlay_tests_passed": 4,
+  "packaging_tests_passed": 16,
+  "selected_gradle_outcomes": [
+    "> Task :domain:testDebugUnitTest UP-TO-DATE",
+    "> Task :data:testDebugUnitTest NO-SOURCE",
+    "> Task :source-api:testDebugUnitTest NO-SOURCE",
+    "> Task :app:compileDebugKotlin",
+    "> Task :app:compileDebugAndroidTestKotlin",
+    "> Task :app:testDebugUnitTest",
+    "BUILD SUCCESSFUL in 2m 28s"
+  ],
+  "backup_format_changed": false,
+  "account_cloud_sync": "DEFERRED_BY_USER",
+  "new_apk_built": false,
+  "prior_internal_apk_revision": "P20261113.3",
+  "release_published": false,
+  "publication": "Readable outcomes only. Raw logs/XML remain local."
+}

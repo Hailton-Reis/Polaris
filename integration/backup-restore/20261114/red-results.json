@@ -1,0 +1,64 @@
+{
+  "tests": 11,
+  "passed": 3,
+  "failed": 8,
+  "cases": [
+    {
+      "name": "category failure prevents all later restore phases()",
+      "status": "failed",
+      "assertion": "org.opentest4j.AssertionFailedError: expected: <true> but was: <false>"
+    },
+    {
+      "name": "cancelling a blocked category phase never starts settings or library()",
+      "status": "failed",
+      "assertion": "org.opentest4j.AssertionFailedError: expected: <true> but was: <false>"
+    },
+    {
+      "name": "declining category import passes no mapping and preserves category settings()",
+      "status": "passed"
+    },
+    {
+      "name": "Tachiyomi archive reaches library restore after its categories()",
+      "status": "failed",
+      "assertion": "java.util.NoSuchElementException: List is empty."
+    },
+    {
+      "name": "disabled restore options have no side effects()",
+      "status": "passed"
+    },
+    {
+      "name": "library entries see committed categories on their first restore()",
+      "status": "failed",
+      "assertion": "org.opentest4j.AssertionFailedError: expected: <[Category(id=700, name=To read, order=5, flags=0)]> but was: <[]>"
+    },
+    {
+      "name": "a categories only restore awaits its result and skips other phases()",
+      "status": "passed"
+    },
+    {
+      "name": "independent settings still run concurrently after category readiness()",
+      "status": "failed",
+      "assertion": "org.opentest4j.AssertionFailedError: expected: <[Category(id=700, name=To read, order=5, flags=0)]> but was: <[]>"
+    },
+    {
+      "name": "settings map imported category ids only after categories exist()",
+      "status": "failed",
+      "assertion": "org.opentest4j.AssertionFailedError: expected: <700> but was: <44>"
+    },
+    {
+      "name": "category cancellation is propagated before dependent mutations()",
+      "status": "failed",
+      "assertion": "org.opentest4j.AssertionFailedError: Expected java.util.concurrent.CancellationException to be thrown, but nothing was thrown."
+    },
+    {
+      "name": "Mihon archive reaches library restore after its categories()",
+      "status": "failed",
+      "assertion": "java.util.NoSuchElementException: List is empty."
+    }
+  ],
+  "source_sha256": {
+    "app/src/main/java/eu/kanade/tachiyomi/data/backup/restore/BackupRestorer.kt": "e99344bdb85a38916b7ca38bd319ae109234142315efcfee5f5b80ba2c2756f2",
+    "app/src/test/java/eu/kanade/tachiyomi/data/backup/restore/BackupRestoreOrderingTest.kt": "88d499ae085d46b4c31ffed3f5a55cc4dfbb6702275081bef6361a01dfd40cce"
+  },
+  "scope": "Same restore coordinator dependency seams; category phase still concurrent before correction."
+}

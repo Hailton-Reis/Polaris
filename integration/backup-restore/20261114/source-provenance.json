@@ -1,0 +1,13 @@
+{
+  "revision": "P20261114.1",
+  "prior_pr_head": "e99b430083ca98e86cf821c35ef9260e1eaf0757",
+  "prior_pr_tree": "219f4debacf14ee63f06f5e9f21e48c2abfaf8e4",
+  "upstream_prerequisite": "f037c5d85575e30694295df5d079e97dcc4a35b9",
+  "overlay_sha256": "c130179b0606e3bffc5d9fd555ff46a0651c8c4346e3048fc7c1f92c8f656e0e",
+  "overlay_git_sha": "2029fb98d03f84b8a0d00a1fdc8ff539a1873005",
+  "changed_android_source_sha256": {
+    "app/src/main/java/eu/kanade/tachiyomi/data/backup/restore/BackupRestorer.kt": "7046c512d8ec82360aea14a022d58899fe117ba8b0034186a00e556c7362c17f",
+    "app/src/test/java/eu/kanade/tachiyomi/data/backup/restore/BackupRestoreOrderingTest.kt": "88d499ae085d46b4c31ffed3f5a55cc4dfbb6702275081bef6361a01dfd40cce",
+    "app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt": "eb43aac77ea834df3cab8d44039f1e1416408d3d60fd551f3ea174d0f132704c"
+  }
+}

@@ -21,6 +21,8 @@ Antes de ampliar a distribuição, priorizar:
 - Validar em fontes reais as [preferências e filtros da sandbox](SANDBOX_PREFERENCIAS_FILTROS_P20261110_3.md) e a [persistência de sessões HTTP P20261111.1](SESSOES_E_ICONES_P20261111_1.md). Login/WebView, integração de perfis do navegador, controles personalizados e novels continuam pendentes.
 - Consolidar distribuição não depurável, preservando ID, assinatura e instalação por cima; validar callbacks dos rastreadores em navegador real.
 
+A [continuação P20261114.1](RESTAURACAO_CATEGORIAS_P20261114_1.md) corrige a ordem de restauração entre categorias, configurações e biblioteca. O aceite em SQLite/interface Android e em leitores externos continua pendente.
+
 ## Prioridade atual: armazenamento antes da ampliação do beta
 
 - Medir instalação completa, modelos, cópias, renderização e temporários nos aparelhos.

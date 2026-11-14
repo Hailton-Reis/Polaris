@@ -2,6 +2,16 @@
 
 Este arquivo registra a evolução real do código. **Revisões de desenvolvimento não são lançamentos públicos.** As datas abaixo usam America/Fortaleza, exceto quando houver indicação de UTC. O histórico de distribuição fica em [Releases](https://github.com/Hailton-Reis/Polaris/releases).
 
+## Desenvolvimento · P20261114.1 — 14/11/2026
+
+**Estado:** continuação da beta.11/código 112, sem novo APK ou lançamento. Conta/login Google/nuvem permanecem adiados.
+
+- Restauração aguarda categorias antes de remapear configurações e registrar obras; erro ou cancelamento nessa fase impede as seguintes. As demais etapas continuam concorrentes depois dessa dependência.
+- Oito regressões reproduzidas antes da correção. Na versão final, 890 testes do app passaram (11 novos); mais 85 de domain já aprovados/UP-TO-DATE, sem ausentes na comparação. App e instrumentação compilados, quatro testes de overlay e 16 de empacotamento aprovados.
+- Backups sintéticos Tachiyomi/Mihon foram decodificados até a fronteira de persistência, que é simulada nos testes. Sem mudança em SQL ou formato de backup; banco Android real, interface/aparelhos e ida/volta em leitores externos permanecem pendentes.
+
+[Escopo](docs/RESTAURACAO_CATEGORIAS_P20261114_1.md) · [Resultados filtrados](integration/backup-restore/20261114/README.md).
+
 ## Desenvolvimento · P20261113.7 — 13/11/2026
 
 **Estado:** candidata beta.11/código 112, sem novo APK ou lançamento. Conta/login Google/nuvem adiados pelo usuário.
