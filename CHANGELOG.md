@@ -2,6 +2,16 @@
 
 Este arquivo registra a evolução real do código. **Revisões de desenvolvimento não são lançamentos públicos.** As datas abaixo usam America/Fortaleza, exceto quando houver indicação de UTC. O histórico de distribuição fica em [Releases](https://github.com/Hailton-Reis/Polaris/releases).
 
+## Desenvolvimento · P20261114.3 — 14/11/2026
+
+**Estado:** continuação da beta.11/código 112. Testes pessoais na consolidação final, conforme pedido; sem novo APK do app ou Release. Conta/login Google/nuvem permanecem adiados.
+
+- Botões locais de Preference padrão passam a pedir confirmação e executar listener síncrono no worker, sem HTTP. Estado/hierarquia/token são reconferidos e alterações fora da fonte são recusadas. Falha/false não confirma alterações; não há repetição automática.
+- Campos e backups não disparam ações. Intents, telas personalizadas, callbacks assíncronos, OAuth e novels continuam pendentes.
+- 919 testes do app aprovados (15 novos), mais 85 anteriores de domain; nenhum ausente na comparação. App e instrumentação compilados, quatro testes de overlay e 16 de empacotamento aprovados. Fixture DEX ampliada e seis cenários Android compilados para a rodada final.
+
+[Escopo](docs/SANDBOX_ACOES_LOCAIS_P20261114_3.md) · [Resultados filtrados](integration/sandbox-actions/20261114/README.md).
+
 ## Desenvolvimento · P20261114.2 — 14/11/2026
 
 **Estado:** continuação da beta.11/código 112, sem novo APK ou lançamento. Conta/login Google/nuvem permanecem adiados.

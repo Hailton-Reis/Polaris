@@ -23,6 +23,8 @@ Antes de ampliar a distribuição, priorizar:
 
 A [continuação P20261114.1](RESTAURACAO_CATEGORIAS_P20261114_1.md) corrige a ordem de restauração entre categorias, configurações e biblioteca. O aceite em SQLite/interface Android e em leitores externos continua pendente.
 
+A [continuação P20261114.3](SANDBOX_ACOES_LOCAIS_P20261114_3.md) acrescenta ações locais padrão na sandbox, com confirmação e sem capacidade HTTP. Telas/ações personalizadas, assincronia, OAuth e novels continuam pendentes. Os testes pessoais ficam para a consolidação final, conforme pedido do usuário.
+
 ## Prioridade atual: armazenamento antes da ampliação do beta
 
 - Medir instalação completa, modelos, cópias, renderização e temporários nos aparelhos.

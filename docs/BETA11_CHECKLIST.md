@@ -7,13 +7,16 @@ Este checklist acompanha o trabalho autorizado em 13/11. Não é uma declaraçã
 | --- | --- |
 | Jornada, XP, conquistas e grimórios | Implementados no checkpoint anterior |
 | Login de fontes isoladas | Integração compilada; cookies por caminho/host e snapshots corrigidos P20261113.6. Login real pendente |
-| Sandbox: controles dinâmicos, provedores externos/OAuth e novels | Controle numérico e listas dinâmicas síncronas implementados P20261113.4/.5; ações personalizadas/assíncronas, OAuth e novels pendentes |
+| Sandbox: controles dinâmicos, provedores externos/OAuth e novels | Controles numéricos, listas síncronas e ações locais padrão implementados; telas/ações personalizadas, assíncronas, OAuth e novels pendentes |
 | Biblioteca, fontes reais e backups entre leitores | Criação segura e ordem da restauração verificadas em JVM; SQLite/interface Android e ida/volta externa pendentes |
 | Leitura, OCR e tradução nos aparelhos | Pendente, incluindo diagnóstico do A12 |
 | Armazenamento | Importação com reuso/retomada (P20261113.7) e cache sem metadados corrigido (P20261114.2); legado/staging abandonado, pico e medição física pendentes |
 | Atualização beta.10 → beta.11 e distribuição não depurável | APK interno gerado com assinatura original; atualização no aparelho e variante não depurável pendentes |
 
 Ordem: autenticação/sandbox → biblioteca/backups → armazenamento/leitura → teste ARM → pacote.
+
+Fluxo combinado com o usuário: concluir as pendências de implementação e as validações automáticas; seus testes ficam para a consolidação final, seguida da publicação da versão no GitHub. Não solicitar testes pessoais a cada revisão intermediária.
+
 Não repetir funcionalidades já entregues com base nos documentos históricos. Não transformar
 resultado de teste de componentes em aprovação da próxima beta inteira.
 
@@ -37,3 +40,5 @@ P20261113.7: importador e registro verificados por 18 casos novos. App/instrumen
 P20261114.1: [restauração de categorias](RESTAURACAO_CATEGORIAS_P20261114_1.md) concluída antes de configurações/biblioteca; cancelamento impede continuação. 890 testes do app aprovados (11 novos), mais 85 anteriores de domain. App/instrumentação compilados, overlay4/empacotamento16 aprovados. Sem aceite físico ou de banco real e sem outro APK.
 
 P20261114.2: [cache de documentos](CACHE_DOCUMENTOS_P20261114_2.md) por conteúdo quando tamanho/data estão ausentes, com proteção de cópias em uso. 904 testes do app aprovados (14 novos), mais 85 anteriores de domain; core/app/instrumentação compilados, quatro testes de overlay e 16 de empacotamento aprovados. Dois cenários Android aguardam execução; sem novo APK ou benchmark ARM.
+
+P20261114.3: [ações locais padrão](SANDBOX_ACOES_LOCAIS_P20261114_3.md) com confirmação, execução no worker e sem HTTP. 919 testes do app aprovados (15 novos), mais 85 anteriores de domain; app/instrumentação compilados, quatro testes de overlay e 16 de empacotamento aprovados. Seis cenários Android compilados ficam para a consolidação final. Sem novo APK do app ou Release.

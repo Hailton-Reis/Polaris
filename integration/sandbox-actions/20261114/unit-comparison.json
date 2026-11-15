@@ -1,0 +1,106 @@
+{
+  "status": "NO_NEW_UNIT_REGRESSIONS",
+  "baseline": {
+    "total": 989,
+    "passed": 989,
+    "failed": 0,
+    "skipped": 0
+  },
+  "patched": {
+    "total": 1004,
+    "passed": 1004,
+    "failed": 0,
+    "skipped": 0
+  },
+  "preexisting_failures_still_present": 0,
+  "missing_baseline_tests": [],
+  "new_failures_or_skips": [],
+  "android_runtime_verified": false,
+  "gradle_exit_codes": {
+    "baseline": 0,
+    "patched": 0
+  },
+  "required_module_coverage": {
+    "app": 904,
+    "domain": 85
+  },
+  "baseline_origin": "Archived P20261114.2 reports: 904 app + 85 domain, not rerun.",
+  "current_origin": "919 app tests freshly executed, 85 domain previously passed and UP-TO-DATE.",
+  "new_cases": [
+    {
+      "class": "eu.kanade.tachiyomi.extension.sandbox.SandboxPreferenceActionTest",
+      "name": "writes deletions and added scopes outside the selected source are refused()",
+      "status": "passed"
+    },
+    {
+      "class": "eu.kanade.tachiyomi.extension.sandbox.SandboxPreferenceActionTest",
+      "name": "stale descriptors are rejected before invoking the callback()",
+      "status": "passed"
+    },
+    {
+      "class": "eu.kanade.tachiyomi.extension.sandbox.SandboxPreferenceActionTest",
+      "name": "standard local action descriptors are accepted through nested groups()",
+      "status": "passed"
+    },
+    {
+      "class": "eu.kanade.tachiyomi.extension.sandbox.SandboxPreferenceActionTest",
+      "name": "a false return is rejected without automatically retrying the callback()",
+      "status": "passed"
+    },
+    {
+      "class": "eu.kanade.tachiyomi.extension.sandbox.SandboxPreferenceActionTest",
+      "name": "unavailable ancestors prevent otherwise enabled child actions()",
+      "status": "passed"
+    },
+    {
+      "class": "eu.kanade.tachiyomi.extension.sandbox.SandboxPreferenceActionTest",
+      "name": "non group subtrees cannot smuggle an unvalidated action target()",
+      "status": "passed"
+    },
+    {
+      "class": "eu.kanade.tachiyomi.extension.sandbox.SandboxPreferenceActionTest",
+      "name": "actions require a bounded key and cannot request list preparation()",
+      "status": "passed"
+    },
+    {
+      "class": "eu.kanade.tachiyomi.extension.sandbox.SandboxPreferenceActionTest",
+      "name": "actions stay outside editable preference and import kinds()",
+      "status": "passed"
+    },
+    {
+      "class": "eu.kanade.tachiyomi.extension.sandbox.SandboxPreferenceActionTest",
+      "name": "hidden disabled and unsupported buttons cannot run()",
+      "status": "passed"
+    },
+    {
+      "class": "eu.kanade.tachiyomi.extension.sandbox.SandboxPreferenceActionTest",
+      "name": "callback exceptions propagate and are never automatically retried()",
+      "status": "passed"
+    },
+    {
+      "class": "eu.kanade.tachiyomi.extension.sandbox.SandboxPreferenceActionTest",
+      "name": "ordinary fields and information cannot execute as local actions()",
+      "status": "passed"
+    },
+    {
+      "class": "eu.kanade.tachiyomi.extension.sandbox.SandboxPreferenceActionTest",
+      "name": "unknown keys fail without selecting a different button()",
+      "status": "passed"
+    },
+    {
+      "class": "eu.kanade.tachiyomi.extension.sandbox.SandboxPreferenceActionTest",
+      "name": "local action HTTP capability refuses GET HEAD and POST()",
+      "status": "passed"
+    },
+    {
+      "class": "eu.kanade.tachiyomi.extension.sandbox.SandboxPreferenceActionTest",
+      "name": "duplicate action keys are rejected before dispatch()",
+      "status": "passed"
+    },
+    {
+      "class": "eu.kanade.tachiyomi.extension.sandbox.SandboxPreferenceActionTest",
+      "name": "a consumed synchronous action executes once and changes only its source()",
+      "status": "passed"
+    }
+  ]
+}

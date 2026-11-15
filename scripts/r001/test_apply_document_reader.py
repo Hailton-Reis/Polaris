@@ -33,7 +33,7 @@ class DocumentOverlayTests(unittest.TestCase):
                            check=True, capture_output=True)
 
     def verify_fixture_bytes(self):
-        expected = json.loads((PROJECT / 'integration/sandbox-dynamic/20261113/fixture/provenance.json').read_text())['sha256']
+        expected = json.loads((PROJECT / 'integration/sandbox-actions/20261114/fixture/provenance.json').read_text())['sha256']
         actual = self.root / 'app/src/androidTest/assets/polaris-sandbox/fixture.apk'
         self.assertEqual(hashlib.sha256(actual.read_bytes()).hexdigest(), expected)
 
@@ -57,7 +57,7 @@ class DocumentOverlayTests(unittest.TestCase):
         subprocess.run(['git', '-C', str(self.root), 'diff', '--check'], check=True)
         self.assertFalse((self.root / 'data/src/main/sqldelight/tachiyomi/migrations/15.sqm').exists())
         about = self.root / 'app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt'
-        self.assertIn('P20261114.2', about.read_text())
+        self.assertIn('P20261114.3', about.read_text())
         self.verify_fixture_bytes()
         self.verify_generated_icons()
         self.assertTrue((self.root / 'app/src/main/java/eu/kanade/tachiyomi/source/selection/UnifiedWorkSearch.kt').exists())
