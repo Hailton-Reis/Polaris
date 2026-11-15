@@ -1208,10 +1208,10 @@ index 0000000..d97cf8e
 +}
 diff --git a/app/src/androidTest/java/eu/kanade/tachiyomi/storage/SafeStorageAndroidTest.kt b/app/src/androidTest/java/eu/kanade/tachiyomi/storage/SafeStorageAndroidTest.kt
 new file mode 100644
-index 0000000..1e9fbdd
+index 0000000..748538e
 --- /dev/null
 +++ b/app/src/androidTest/java/eu/kanade/tachiyomi/storage/SafeStorageAndroidTest.kt
-@@ -0,0 +1,341 @@
+@@ -0,0 +1,391 @@
 +package eu.kanade.tachiyomi.storage
 +
 +import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -1274,6 +1274,56 @@ index 0000000..1e9fbdd
 +            )
 +        return stage
 +    }
++
++    @Test
++    fun importReviewUsesNativeUniFileAndCacheCleanupPreservesTheCopies() =
++        kotlinx.coroutines.runBlocking<Unit> {
++            val original = File(folder, "review.pdf").apply { writeText("%PDF-1.4\nReview") }
++            val base = File(folder, "review-library").apply { mkdir() }
++            val stage = sealedImport(base, original)
++            val before = stage.listFiles()!!.associate { it.name to it.readBytes().toList() }
++            val review =
++                eu.kanade.tachiyomi.ui.documents.DocumentImportPublication.review(
++                    checkNotNull(UniFile.fromFile(base)),
++                    checkActive = {},
++                )
++            assertEquals(
++                eu.kanade.tachiyomi.ui.documents.ImportReviewKind.SEALED,
++                review.entries.single().kind,
++            )
++            assertFalse(review.partial)
++            mihon.core.archive.DocumentCacheBudget.trim(documentContext().cacheDir, 0)
++            assertTrue(stage.isDirectory)
++            assertEquals(
++                before,
++                stage.listFiles()!!.associate { it.name to it.readBytes().toList() },
++            )
++            assertEquals("%PDF-1.4\nReview", original.readText())
++        }
++
++    @Test
++    fun nativeImportReviewPreservesBothLegacyAndUnsealedCopies() =
++        kotlinx.coroutines.runBlocking<Unit> {
++            val base = File(folder, "old-review-library").apply { mkdir() }
++            val old = File(base, ".import-1234abcd-abc").apply { mkdir() }
++            val partial = File(base, ".import-${java.util.UUID.randomUUID()}").apply { mkdir() }
++            File(old, "document.txt").writeText("Old data")
++            File(partial, "document.pdf").writeText("Partial bytes")
++            val review =
++                eu.kanade.tachiyomi.ui.documents.DocumentImportPublication.review(
++                    checkNotNull(UniFile.fromFile(base)),
++                    checkActive = {},
++                )
++            assertEquals(
++                setOf(
++                    eu.kanade.tachiyomi.ui.documents.ImportReviewKind.LEGACY,
++                    eu.kanade.tachiyomi.ui.documents.ImportReviewKind.INCOMPLETE,
++                ),
++                review.entries.map { it.kind }.toSet(),
++            )
++            assertEquals("Old data", File(old, "document.txt").readText())
++            assertEquals("Partial bytes", File(partial, "document.pdf").readText())
++        }
 +
 +    @Test
 +    fun completedInterruptedImportPublishesWithoutAnotherNativePayloadCopy() =
@@ -5962,10 +6012,10 @@ index 0000000..ce24b2b
 +}
 diff --git a/app/src/main/java/eu/kanade/presentation/documents/PolarisStorageScreen.kt b/app/src/main/java/eu/kanade/presentation/documents/PolarisStorageScreen.kt
 new file mode 100644
-index 0000000..83b49fe
+index 0000000..4cba00e
 --- /dev/null
 +++ b/app/src/main/java/eu/kanade/presentation/documents/PolarisStorageScreen.kt
-@@ -0,0 +1,150 @@
+@@ -0,0 +1,275 @@
 +package eu.kanade.presentation.documents
 +
 +import android.text.format.Formatter
@@ -5984,9 +6034,11 @@ index 0000000..83b49fe
 +import androidx.compose.runtime.mutableStateOf
 +import androidx.compose.runtime.remember
 +import androidx.compose.runtime.rememberCoroutineScope
++import androidx.compose.runtime.saveable.rememberSaveable
 +import androidx.compose.runtime.setValue
 +import androidx.compose.ui.Modifier
 +import androidx.compose.ui.platform.LocalContext
++import androidx.compose.ui.text.style.TextOverflow
 +import androidx.compose.ui.unit.dp
 +import cafe.adriel.voyager.navigator.LocalNavigator
 +import cafe.adriel.voyager.navigator.currentOrThrow
@@ -5994,9 +6046,12 @@ index 0000000..83b49fe
 +import com.google.mlkit.nl.translate.TranslateRemoteModel
 +import eu.kanade.presentation.components.AppBar
 +import eu.kanade.presentation.util.Screen
++import eu.kanade.tachiyomi.ui.documents.ImportReviewKind
++import eu.kanade.tachiyomi.ui.documents.ImportReviewSnapshot
 +import eu.kanade.tachiyomi.ui.documents.PolarisStorageSnapshot
 +import eu.kanade.tachiyomi.ui.documents.PolarisStorageUsage
 +import eu.kanade.tachiyomi.ui.documents.StorageBytes
++import kotlin.coroutines.cancellation.CancellationException
 +import kotlinx.coroutines.Dispatchers
 +import kotlinx.coroutines.launch
 +import kotlinx.coroutines.tasks.await
@@ -6008,10 +6063,10 @@ index 0000000..83b49fe
 +import tachiyomi.presentation.core.i18n.stringResource
 +import uy.kohesive.injekt.Injekt
 +import uy.kohesive.injekt.api.get
-+import kotlin.coroutines.cancellation.CancellationException
 +
 +class PolarisStorageScreen : Screen() {
-+    @Composable override fun Content() {
++    @Composable
++    override fun Content() {
 +        val navigator = LocalNavigator.currentOrThrow
 +        val context = LocalContext.current
 +        val scope = rememberCoroutineScope()
@@ -6029,10 +6084,17 @@ index 0000000..83b49fe
 +                    withContext(Dispatchers.IO) {
 +                        PolarisStorageUsage(context, Injekt.get<StorageManager>()).snapshot()
 +                    }
-+                models = runCatching {
-+                    RemoteModelManager.getInstance().getDownloadedModels(TranslateRemoteModel::class.java).await()
-+                        .map { it.language }.sorted().joinToString(", ").ifBlank { "—" }
-+                }.getOrNull()
++                models =
++                    runCatching {
++                            RemoteModelManager.getInstance()
++                                .getDownloadedModels(TranslateRemoteModel::class.java)
++                                .await()
++                                .map { it.language }
++                                .sorted()
++                                .joinToString(", ")
++                                .ifBlank { "—" }
++                        }
++                        .getOrNull()
 +            } catch (error: CancellationException) {
 +                throw error
 +            } catch (_: Exception) {
@@ -6041,13 +6103,15 @@ index 0000000..83b49fe
 +                loading = false
 +            }
 +        }
-+        Scaffold(topBar = { behavior ->
-+            AppBar(
-+                title = stringResource(ATMR.strings.storage_polaris_title),
-+                navigateUp = navigator::pop,
-+                scrollBehavior = behavior,
-+            )
-+        }) { padding ->
++        Scaffold(
++            topBar = { behavior ->
++                AppBar(
++                    title = stringResource(ATMR.strings.storage_polaris_title),
++                    navigateUp = navigator::pop,
++                    scrollBehavior = behavior,
++                )
++            }
++        ) { padding ->
 +            LazyColumn(
 +                contentPadding = padding,
 +                modifier = Modifier.padding(horizontal = 20.dp),
@@ -6061,48 +6125,159 @@ index 0000000..83b49fe
 +                    }
 +                }
 +                data?.let { value ->
-+                    item { SizeRow(stringResource(ATMR.strings.storage_original_downloads), value.downloads) }
-+                    item { SizeRow(stringResource(ATMR.strings.storage_imported_copies), value.imports) }
-+                    item { SizeRow(stringResource(ATMR.strings.storage_saved_translations), value.translations) }
 +                    item {
-+                        SizeRow(stringResource(ATMR.strings.storage_document_cache), StorageBytes(value.documentCache))
++                        SizeRow(
++                            stringResource(ATMR.strings.storage_original_downloads),
++                            value.downloads,
++                        )
 +                    }
-+                    item { SizeRow(stringResource(ATMR.strings.storage_other_cache), value.otherCache) }
-+                    item { SizeRow(stringResource(ATMR.strings.storage_internal_data), value.internal) }
-+                    item { SizeRow(stringResource(ATMR.strings.storage_apks), StorageBytes(value.apks)) }
-+                    item { SizeRow(stringResource(ATMR.strings.storage_native_libraries), value.nativeLibraries) }
++                    item {
++                        SizeRow(stringResource(ATMR.strings.storage_imported_copies), value.imports)
++                    }
++                    item { ImportReview(value.importReview) }
++                    item {
++                        SizeRow(
++                            stringResource(ATMR.strings.storage_saved_translations),
++                            value.translations,
++                        )
++                    }
++                    item {
++                        SizeRow(
++                            stringResource(ATMR.strings.storage_document_cache),
++                            StorageBytes(value.documentCache),
++                        )
++                    }
++                    item {
++                        SizeRow(stringResource(ATMR.strings.storage_other_cache), value.otherCache)
++                    }
++                    item {
++                        SizeRow(stringResource(ATMR.strings.storage_internal_data), value.internal)
++                    }
++                    item {
++                        SizeRow(stringResource(ATMR.strings.storage_apks), StorageBytes(value.apks))
++                    }
++                    item {
++                        SizeRow(
++                            stringResource(ATMR.strings.storage_native_libraries),
++                            value.nativeLibraries,
++                        )
++                    }
 +                }
 +                item {
 +                    Text(
 +                        stringResource(
 +                            ATMR.strings.storage_models,
 +                            models ?: stringResource(ATMR.strings.storage_unknown),
-+                        ),
++                        )
 +                    )
-+                    Text(stringResource(ATMR.strings.storage_budget_note), style = MaterialTheme.typography.bodySmall)
-+                    Button(onClick = {
-+                        scope.launch {
-+                            clearing = true
-+                            try {
-+                                withContext(Dispatchers.IO) { DocumentCacheBudget.trim(context.cacheDir, 0) }
-+                                refresh++
-+                            } catch (error: CancellationException) {
-+                                throw error
-+                            } catch (_: Exception) {
-+                                failed = true
-+                            } finally {
-+                                clearing = false
++                    Text(
++                        stringResource(ATMR.strings.storage_budget_note),
++                        style = MaterialTheme.typography.bodySmall,
++                    )
++                    Button(
++                        onClick = {
++                            scope.launch {
++                                clearing = true
++                                try {
++                                    withContext(Dispatchers.IO) {
++                                        DocumentCacheBudget.trim(context.cacheDir, 0)
++                                    }
++                                    refresh++
++                                } catch (error: CancellationException) {
++                                    throw error
++                                } catch (_: Exception) {
++                                    failed = true
++                                } finally {
++                                    clearing = false
++                                }
 +                            }
-+                        }
-+                    }, enabled = !clearing) { Text(stringResource(ATMR.strings.storage_clear_documents)) }
-+                    Text(stringResource(ATMR.strings.storage_delete_policy), style = MaterialTheme.typography.bodySmall)
-+                    Text(stringResource(ATMR.strings.storage_measure_note), style = MaterialTheme.typography.bodySmall)
++                        },
++                        enabled = !clearing,
++                    ) {
++                        Text(stringResource(ATMR.strings.storage_clear_documents))
++                    }
++                    Text(
++                        stringResource(ATMR.strings.storage_delete_policy),
++                        style = MaterialTheme.typography.bodySmall,
++                    )
++                    Text(
++                        stringResource(ATMR.strings.storage_measure_note),
++                        style = MaterialTheme.typography.bodySmall,
++                    )
 +                }
 +            }
 +        }
 +    }
 +
-+    @Composable private fun SizeRow(label: String, size: StorageBytes?) {
++    @Composable
++    private fun ImportReview(review: ImportReviewSnapshot?) {
++        var expanded by rememberSaveable { mutableStateOf(false) }
++        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
++            Text(
++                stringResource(ATMR.strings.storage_import_review_title),
++                style = MaterialTheme.typography.titleSmall,
++            )
++            Text(
++                stringResource(ATMR.strings.storage_import_review_note),
++                style = MaterialTheme.typography.bodySmall,
++            )
++            if (review == null) {
++                Text(stringResource(ATMR.strings.storage_unknown))
++            } else {
++                if (review.partial) Text(stringResource(ATMR.strings.storage_import_review_partial))
++                if (review.entries.isEmpty() && !review.partial) {
++                    Text(stringResource(ATMR.strings.storage_import_review_empty))
++                }
++                if (review.entries.isNotEmpty()) {
++                    OutlinedButton(onClick = { expanded = !expanded }) {
++                        Text(
++                            stringResource(
++                                if (expanded) ATMR.strings.storage_import_review_hide
++                                else ATMR.strings.storage_import_review_show,
++                                review.entries.size,
++                            )
++                        )
++                    }
++                    if (expanded) {
++                        review.entries.forEach { entry ->
++                            Text(
++                                entry.name.take(240),
++                                maxLines = 2,
++                                overflow = TextOverflow.Ellipsis,
++                            )
++                            Text(
++                                stringResource(
++                                    when (entry.kind) {
++                                        ImportReviewKind.SEALED ->
++                                            ATMR.strings.storage_import_review_sealed
++                                        ImportReviewKind.INCOMPLETE ->
++                                            ATMR.strings.storage_import_review_incomplete
++                                        ImportReviewKind.LEGACY ->
++                                            ATMR.strings.storage_import_review_legacy
++                                        ImportReviewKind.REVIEW_REQUIRED ->
++                                            ATMR.strings.storage_import_review_required
++                                    }
++                                ),
++                                style = MaterialTheme.typography.bodySmall,
++                            )
++                            val context = LocalContext.current
++                            Text(
++                                Formatter.formatFileSize(context, entry.size.bytes) +
++                                    if (entry.size.partial) " +" else ""
++                            )
++                        }
++                        Text(
++                            stringResource(ATMR.strings.storage_import_review_retry),
++                            style = MaterialTheme.typography.bodySmall,
++                        )
++                    }
++                }
++            }
++        }
++    }
++
++    @Composable
++    private fun SizeRow(label: String, size: StorageBytes?) {
 +        val context = LocalContext.current
 +        Column {
 +            Text(label, style = MaterialTheme.typography.titleSmall)
@@ -6111,7 +6286,7 @@ index 0000000..83b49fe
 +                    stringResource(ATMR.strings.storage_unknown)
 +                } else {
 +                    Formatter.formatFileSize(context, size.bytes) + if (size.partial) " +" else ""
-+                },
++                }
 +            )
 +        }
 +    }
@@ -9191,7 +9366,7 @@ index a198c3f..9a3e84f 100644
                      preference = translationPreferences.translationEngineTemperature(),
                      title = stringResource(ATMR.strings.pref_engine_temperature),
 diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
-index 7f411fd..d976ed1 100644
+index 7f411fd..63d478c 100644
 --- a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
 +++ b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
 @@ -1,15 +1,18 @@
@@ -9256,7 +9431,7 @@ index 7f411fd..d976ed1 100644
  
      // Identifies this overlay independently of the pinned upstream COMMIT_SHA.
 -    private const val POLARIS_READER_REVISION = "P20261031.2"
-+    private const val POLARIS_READER_REVISION = "P20261115.2"
++    private const val POLARIS_READER_REVISION = "P20261115.3"
  
      @Composable
      override fun Content() {
@@ -25300,10 +25475,10 @@ index 03900aa..a478e8c 100644
      }
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentImportPublication.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentImportPublication.kt
 new file mode 100644
-index 0000000..7477195
+index 0000000..b7682e2
 --- /dev/null
 +++ b/app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentImportPublication.kt
-@@ -0,0 +1,323 @@
+@@ -0,0 +1,326 @@
 +package eu.kanade.tachiyomi.ui.documents
 +
 +import com.hippo.unifile.UniFile
@@ -25324,8 +25499,11 @@ index 0000000..7477195
 +internal object DocumentImportPublication {
 +    private val lock = Mutex()
 +    private const val MARKER = ".polaris-import"
-+    private val stageNamePattern =
++    internal val stageNamePattern =
 +        Regex("[.]import-[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}")
++
++    suspend fun review(base: UniFile, checkActive: () -> Unit): ImportReviewSnapshot =
++        lock.withLock { DocumentImportReview.inspect(base, checkActive) }
 +
 +    data class Identity(val sha256: String, val bytes: Long) {
 +        init {
@@ -25626,6 +25804,216 @@ index 0000000..7477195
 +                if (owned && !publicationAttempted) staging.delete()
 +            }
 +        }
++}
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentImportReview.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentImportReview.kt
+new file mode 100644
+index 0000000..f86db5b
+--- /dev/null
++++ b/app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentImportReview.kt
+@@ -0,0 +1,204 @@
++package eu.kanade.tachiyomi.ui.documents
++
++import com.hippo.unifile.UniFile
++import java.io.ByteArrayOutputStream
++import kotlin.coroutines.cancellation.CancellationException
++import kotlinx.serialization.json.*
++import mihon.core.archive.DocumentFormat
++import mihon.core.archive.DocumentLimits
++
++enum class ImportReviewKind {
++    SEALED,
++    INCOMPLETE,
++    LEGACY,
++    REVIEW_REQUIRED,
++}
++
++data class ImportReviewEntry(val name: String, val kind: ImportReviewKind, val size: StorageBytes)
++
++data class ImportReviewSnapshot(val entries: List<ImportReviewEntry>, val partial: Boolean)
++
++/** Read-only inventory. Names/metadata never establish ownership or permission to delete. */
++internal object DocumentImportReview {
++    internal data class Limits(
++        val rootEntries: Int = 2000,
++        val results: Int = 100,
++        val children: Int = 64,
++        val nanos: Long = 5_000_000_000L,
++    ) {
++        init {
++            require(rootEntries > 0 && results > 0 && children >= 3 && nanos > 0)
++        }
++    }
++
++    private val oldStage = Regex("[.]import-[0-9a-f]{8}-[0-9a-f]{3}")
++    private val oldPublication = Regex(".+-[0-9a-f]{8}-[0-9a-f]{3}")
++    private val payloads = DocumentFormat.entries.map { "document.${it.extension}" }.toSet()
++
++    fun inspect(
++        base: UniFile,
++        checkActive: () -> Unit,
++        limits: Limits = Limits(),
++        now: () -> Long = System::nanoTime,
++    ): ImportReviewSnapshot {
++        val started = now()
++        val entries = mutableListOf<ImportReviewEntry>()
++        var partial = false
++        fun checkpoint() {
++            checkActive()
++            check(now() - started < limits.nanos) { "Review time limit reached" }
++        }
++        try {
++            checkpoint()
++            check(base.isDirectory)
++            val roots = checkNotNull(base.listFiles())
++            for ((index, folder) in roots.withIndex()) {
++                checkpoint()
++                if (index >= limits.rootEntries || entries.size >= limits.results) {
++                    partial = true
++                    break
++                }
++                val name = folder.name.orEmpty()
++                val stage = name.startsWith(".import-")
++                if (!stage && !oldPublication.matches(name)) continue
++                try {
++                    checkpoint()
++                    if (!folder.isDirectory) {
++                        if (stage) {
++                            entries +=
++                                ImportReviewEntry(
++                                    name,
++                                    ImportReviewKind.REVIEW_REQUIRED,
++                                    StorageBytes(0, true),
++                                )
++                            partial = true
++                        }
++                        continue
++                    }
++                    val children = checkNotNull(folder.listFiles())
++                    var bytes = 0L
++                    var sizePartial = children.size > limits.children
++                    val files = children.take(limits.children)
++                    val names = mutableSetOf<String>()
++                    for (file in files) {
++                        checkpoint()
++                        names += file.name.orEmpty()
++                        if (file.isDirectory) sizePartial = true
++                        else {
++                            val length = file.length()
++                            if (length <= 0L) sizePartial = true
++                            else if (length > Long.MAX_VALUE - bytes) {
++                                bytes = Long.MAX_VALUE
++                                sizePartial = true
++                            } else bytes += length
++                        }
++                    }
++                    partial = partial || sizePartial
++                    if (
++                        !stage &&
++                            (names.none { it in payloads } ||
++                                names.none { it == "details.json" || it == "ComicInfo.xml" })
++                    )
++                        continue
++                    val kind =
++                        when {
++                            sizePartial && children.size > limits.children ->
++                                ImportReviewKind.REVIEW_REQUIRED
++                            oldStage.matches(name) || !stage -> ImportReviewKind.LEGACY
++                            !DocumentImportPublication.stageNamePattern.matches(name) ->
++                                ImportReviewKind.REVIEW_REQUIRED
++                            ".polaris-import" !in names -> {
++                                if (
++                                    files.all {
++                                        !it.isDirectory &&
++                                            (it.name in payloads || it.name == "details.json")
++                                    }
++                                )
++                                    ImportReviewKind.INCOMPLETE
++                                else ImportReviewKind.REVIEW_REQUIRED
++                            }
++                            else -> {
++                                if (sealed(files, checkpoint = ::checkpoint))
++                                    ImportReviewKind.SEALED
++                                else ImportReviewKind.REVIEW_REQUIRED
++                            }
++                        }
++                    entries += ImportReviewEntry(name, kind, StorageBytes(bytes, sizePartial))
++                } catch (cancelled: CancellationException) {
++                    throw cancelled
++                } catch (_: Exception) {
++                    entries +=
++                        ImportReviewEntry(
++                            name,
++                            ImportReviewKind.REVIEW_REQUIRED,
++                            StorageBytes(0, true),
++                        )
++                    partial = true
++                }
++            }
++        } catch (cancelled: CancellationException) {
++            throw cancelled
++        } catch (_: Exception) {
++            partial = true
++        }
++        return ImportReviewSnapshot(entries.sortedBy { it.name }, partial)
++    }
++
++    private fun read(file: UniFile, limit: Int, checkpoint: () -> Unit): JsonObject {
++        require(!file.isDirectory)
++        return checkNotNull(file.openInputStream()).use { input ->
++            val bytes = ByteArrayOutputStream()
++            val buffer = ByteArray(2048)
++            while (true) {
++                checkpoint()
++                val count = input.read(buffer)
++                if (count < 0) break
++                if (count == 0) continue
++                require(count <= limit - bytes.size())
++                bytes.write(buffer, 0, count)
++            }
++            Json.parseToJsonElement(
++                    bytes.toByteArray().decodeToString(throwOnInvalidSequence = true)
++                )
++                .jsonObject
++        }
++    }
++
++    private fun sealed(files: List<UniFile>, checkpoint: () -> Unit): Boolean {
++        if (
++            files.size != 3 ||
++                files.any { it.isDirectory } ||
++                files.map { it.name }.toSet().size != 3
++        )
++            return false
++        val byName = files.associateBy { it.name }
++        val record = read(byName[".polaris-import"] ?: return false, 4096, checkpoint)
++        if (record.keys != setOf("version", "sha256", "bytes", "format")) return false
++        val version = record.getValue("version").jsonPrimitive
++        val digest = record.getValue("sha256").jsonPrimitive
++        val length = record.getValue("bytes").jsonPrimitive
++        val extension = record.getValue("format").jsonPrimitive
++        if (
++            version.isString ||
++                version.int != 1 ||
++                !digest.isString ||
++                !digest.content.matches(Regex("[0-9a-f]{64}")) ||
++                length.isString ||
++                length.long !in 1..DocumentLimits.MAX_FILE_BYTES ||
++                !extension.isString
++        )
++            return false
++        val format =
++            DocumentFormat.entries.singleOrNull { it.extension == extension.content }
++                ?: return false
++        val payload = byName["document.${format.extension}"] ?: return false
++        val reported = payload.length()
++        if (reported > 0 && reported != length.long) return false
++        val details = read(byName["details.json"] ?: return false, 16 * 1024, checkpoint)
++        return details.keys == setOf("title", "author") &&
++            details.getValue("title").jsonPrimitive.let {
++                it.isString && it.content.isNotBlank()
++            } &&
++            details.getValue("author").jsonPrimitive.isString
++    }
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentImportSpace.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentImportSpace.kt
 new file mode 100644
@@ -26543,25 +26931,27 @@ index 0000000..914e45c
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/documents/PolarisStorageUsage.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/documents/PolarisStorageUsage.kt
 new file mode 100644
-index 0000000..6449268
+index 0000000..af615af
 --- /dev/null
 +++ b/app/src/main/java/eu/kanade/tachiyomi/ui/documents/PolarisStorageUsage.kt
-@@ -0,0 +1,79 @@
+@@ -0,0 +1,89 @@
 +package eu.kanade.tachiyomi.ui.documents
 +
 +import android.content.Context
 +import com.hippo.unifile.UniFile
-+import kotlinx.coroutines.ensureActive
-+import mihon.core.archive.DocumentCacheBudget
-+import tachiyomi.domain.storage.service.StorageManager
 +import java.io.File
 +import java.nio.file.Files
 +import kotlin.coroutines.coroutineContext
++import kotlinx.coroutines.ensureActive
++import mihon.core.archive.DocumentCacheBudget
++import tachiyomi.domain.storage.service.StorageManager
 +
 +data class StorageBytes(val bytes: Long, val partial: Boolean = false)
++
 +data class PolarisStorageSnapshot(
 +    val downloads: StorageBytes?,
 +    val imports: StorageBytes?,
++    val importReview: ImportReviewSnapshot?,
 +    val translations: StorageBytes?,
 +    val documentCache: Long,
 +    val otherCache: StorageBytes,
@@ -26575,9 +26965,12 @@ index 0000000..6449268
 +        val managed = DocumentCacheBudget.size(context.cacheDir)
 +        val cache = files(context.cacheDir)
 +        val codeCache = files(context.codeCacheDir)
++        val local = storage.getLocalSourceDirectory()
++        val scanContext = coroutineContext
 +        return PolarisStorageSnapshot(
 +            tree(storage.getDownloadsDirectory()),
-+            tree(storage.getLocalSourceDirectory()),
++            tree(local),
++            local?.let { DocumentImportPublication.review(it) { scanContext.ensureActive() } },
 +            tree(storage.getTranslationsDirectory()),
 +            managed,
 +            StorageBytes(
@@ -26585,8 +26978,10 @@ index 0000000..6449268
 +                cache.partial || codeCache.partial,
 +            ),
 +            files(context.dataDir, setOf("cache", "code_cache", "lib")),
-+            (listOf(context.applicationInfo.sourceDir) + context.applicationInfo.splitSourceDirs.orEmpty())
-+                .distinct().sumOf { File(it).length() },
++            (listOf(context.applicationInfo.sourceDir) +
++                    context.applicationInfo.splitSourceDirs.orEmpty())
++                .distinct()
++                .sumOf { File(it).length() },
 +            context.applicationInfo.nativeLibraryDir?.let { files(File(it)) } ?: StorageBytes(0),
 +        )
 +    }
@@ -26600,7 +26995,8 @@ index 0000000..6449268
 +        val deadline = System.nanoTime() + 10_000_000_000L
 +        while (pending.isNotEmpty()) {
 +            coroutineContext.ensureActive()
-+            if (visited.size >= 20000 || System.nanoTime() > deadline) return StorageBytes(bytes, true)
++            if (visited.size >= 20000 || System.nanoTime() > deadline)
++                return StorageBytes(bytes, true)
 +            val file = pending.removeFirst()
 +            if (!visited.add(file.uri.toString())) continue
 +            if (file.isDirectory) {
@@ -26616,9 +27012,11 @@ index 0000000..6449268
 +    private suspend fun files(root: File, excluded: Set<String> = emptySet()): StorageBytes {
 +        var bytes = 0L
 +        var count = 0
-+        for (file in root.walkTopDown().onEnter {
-+            !Files.isSymbolicLink(it.toPath()) && !(it.parentFile == root && it.name in excluded)
-+        }) {
++        for (file in
++            root.walkTopDown().onEnter {
++                !Files.isSymbolicLink(it.toPath()) &&
++                    !(it.parentFile == root && it.name in excluded)
++            }) {
 +            coroutineContext.ensureActive()
 +            if (++count > 20000) return StorageBytes(bytes, true)
 +            if (file.isFile && !Files.isSymbolicLink(file.toPath())) bytes += file.length()
@@ -66224,6 +66622,416 @@ index 0000000..59497de
 +        assertTrue(original.exists())
 +    }
 +}
+diff --git a/app/src/test/java/eu/kanade/tachiyomi/ui/documents/DocumentImportReviewTest.kt b/app/src/test/java/eu/kanade/tachiyomi/ui/documents/DocumentImportReviewTest.kt
+new file mode 100644
+index 0000000..56b010a
+--- /dev/null
++++ b/app/src/test/java/eu/kanade/tachiyomi/ui/documents/DocumentImportReviewTest.kt
+@@ -0,0 +1,404 @@
++package eu.kanade.tachiyomi.ui.documents
++
++import com.hippo.unifile.UniFile
++import io.mockk.every
++import io.mockk.mockk
++import java.io.File
++import java.io.IOException
++import java.security.MessageDigest
++import java.util.UUID
++import kotlinx.coroutines.CompletableDeferred
++import kotlinx.coroutines.async
++import kotlinx.coroutines.test.runCurrent
++import kotlinx.coroutines.test.runTest
++import mihon.core.archive.DocumentFormat
++import org.junit.jupiter.api.Assertions.*
++import org.junit.jupiter.api.Test
++import org.junit.jupiter.api.assertThrows
++import org.junit.jupiter.api.io.TempDir
++
++/** Real metadata streams/files. The provider adapter denies payload reads and all mutations. */
++@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
++class DocumentImportReviewTest {
++    @TempDir lateinit var root: File
++    private val unavailable = mutableSetOf<String>()
++    private val lengths = mutableMapOf<String, Long>()
++    private var metadataReads = 0
++    private var payloadReads = 0
++    private var cancelMetadata = false
++
++    private fun node(file: File): UniFile =
++        mockk<UniFile>().also { result ->
++            every { result.name } returns file.name
++            every { result.isDirectory } answers { file.isDirectory }
++            every { result.listFiles() } answers
++                {
++                    if (file.name in unavailable) throw IOException("Provider permission revoked")
++                    file.listFiles()?.map(::node)?.toTypedArray()
++                }
++            every { result.length() } answers { lengths[file.name] ?: file.length() }
++            every { result.openInputStream() } answers
++                {
++                    if (file.name.startsWith("document.")) {
++                        payloadReads++
++                        throw IOException("A storage inventory must not read full documents")
++                    }
++                    metadataReads++
++                    if (cancelMetadata)
++                        throw kotlinx.coroutines.CancellationException("Stopped review")
++                    file.inputStream()
++                }
++            // No delete/rename/create/write stubs: any mutation fails the test immediately.
++        }
++
++    private fun stage(name: String = ".import-${UUID.randomUUID()}"): File =
++        File(root, name).apply { mkdir() }
++
++    private fun sealed(): File =
++        stage().apply {
++            File(this, "document.pdf").writeText("%PDF-1.4\nRead-only review")
++            File(this, "details.json").writeText("""{"title":"Review","author":"Author"}""")
++            File(this, ".polaris-import")
++                .writeText(
++                    """{"version":1,"sha256":"${"a".repeat(64)}","bytes":${File(this, "document.pdf").length()},"format":"pdf"}"""
++                )
++        }
++
++    private fun bytes() =
++        root.walkTopDown().filter(File::isFile).associate {
++            it.relativeTo(root).path to it.readBytes().toList()
++        }
++
++    private fun review(limits: DocumentImportReview.Limits = DocumentImportReview.Limits()) =
++        DocumentImportReview.inspect(node(root), {}, limits)
++
++    @Test
++    fun `structurally complete copy awaits verification without opening its payload or changing files`() {
++        val copy = sealed()
++        val before = bytes()
++        val result = review()
++        assertEquals(ImportReviewKind.SEALED, result.entries.single().kind)
++        assertEquals(copy.listFiles()!!.sumOf(File::length), result.entries.single().size.bytes)
++        assertFalse(result.partial)
++        assertEquals(0, payloadReads)
++        assertEquals(2, metadataReads)
++        assertEquals(before, bytes())
++    }
++
++    @Test
++    fun `an unsealed partial copy and an empty current stage are preserved`() {
++        val partial = stage()
++        File(partial, "document.pdf").writeText("partial")
++        stage()
++        val before = bytes()
++        val result = review()
++        assertEquals(2, result.entries.size)
++        assertTrue(result.entries.all { it.kind == ImportReviewKind.INCOMPLETE })
++        assertEquals(before, bytes())
++        assertEquals(2, root.listFiles()!!.size)
++    }
++
++    @Test
++    fun `an old truncated uuid stage is reported as legacy even without a seal`() {
++        val copy = stage(".import-1234abcd-abc")
++        File(copy, "document.txt").writeText("Old copy")
++        val before = bytes()
++        assertEquals(ImportReviewKind.LEGACY, review().entries.single().kind)
++        assertEquals(before, bytes())
++    }
++
++    @Test
++    fun `an older publication with native converted metadata remains a local file for review`() {
++        val copy = stage("Book-1234abcd-abc")
++        File(copy, "document.epub").writeText("Older publication")
++        File(copy, "ComicInfo.xml").writeText("User metadata")
++        val before = bytes()
++        assertEquals(ImportReviewKind.LEGACY, review().entries.single().kind)
++        assertEquals(before, bytes())
++        assertEquals(0, metadataReads)
++    }
++
++    @Test
++    fun `ordinary local manga folders and unrelated names are not classified as failed imports`() {
++        File(root, "Manga").mkdir()
++        val unrelated = stage("My files-1234abcd-abc")
++        File(unrelated, "notes.txt").writeText("User file")
++        File(root, ".import-not-a-folder").writeText("Unknown file")
++        val result = review()
++        assertEquals(listOf(".import-not-a-folder"), result.entries.map { it.name })
++        assertEquals(ImportReviewKind.REVIEW_REQUIRED, result.entries.single().kind)
++        assertTrue(result.entries.single().size.partial)
++        assertTrue(File(unrelated, "notes.txt").exists())
++    }
++
++    @Test
++    fun `an unknown import name never grants ownership or automatic cleanup`() {
++        val copy = stage(".import-user-folder")
++        File(copy, "document.pdf").writeText("User bytes")
++        val before = bytes()
++        assertEquals(ImportReviewKind.REVIEW_REQUIRED, review().entries.single().kind)
++        assertEquals(before, bytes())
++    }
++
++    @Test
++    fun `invalid marker metadata is reported while another copy remains visible`() {
++        val invalid = sealed()
++        File(invalid, ".polaris-import").writeText("{truncated")
++        sealed()
++        val before = bytes()
++        val result = review()
++        assertEquals(
++            setOf(ImportReviewKind.REVIEW_REQUIRED, ImportReviewKind.SEALED),
++            result.entries.map { it.kind }.toSet(),
++        )
++        assertTrue(result.partial)
++        assertEquals(before, bytes())
++    }
++
++    @Test
++    fun `unsupported seal versions or schema cannot be described as awaiting normal recovery`() {
++        val copy = sealed()
++        val marker = File(copy, ".polaris-import")
++        val valid = marker.readText()
++        for (invalid in
++            listOf(
++                valid.replace("\"version\":1", "\"version\":2"),
++                valid.replace("\"version\":1", "\"version\":\"1\""),
++                valid.replace("a".repeat(64), "invalid"),
++                valid.dropLast(1) + ",\"extra\":true}",
++            )) {
++            marker.writeText(invalid)
++            assertEquals(ImportReviewKind.REVIEW_REQUIRED, review().entries.single().kind)
++            assertEquals(invalid, marker.readText())
++        }
++    }
++
++    @Test
++    fun `oversized metadata is bounded and preserved for review`() {
++        val copy = sealed()
++        val details = File(copy, "details.json").apply { writeText(" ".repeat(17000)) }
++        val before = bytes()
++        assertEquals(ImportReviewKind.REVIEW_REQUIRED, review().entries.single().kind)
++        assertEquals(before, bytes())
++        assertEquals(17000L, details.length())
++    }
++
++    @Test
++    fun `unknown provider lengths make sizes partial without reading full documents`() {
++        sealed()
++        lengths["document.pdf"] = 0
++        val result = review()
++        assertEquals(ImportReviewKind.SEALED, result.entries.single().kind)
++        assertTrue(result.partial)
++        assertTrue(result.entries.single().size.partial)
++        assertEquals(0, payloadReads)
++    }
++
++    @Test
++    fun `a known payload size mismatch requires review without modifying the document`() {
++        val copy = sealed()
++        File(copy, "document.pdf").appendText("Extra data")
++        val before = bytes()
++        assertEquals(ImportReviewKind.REVIEW_REQUIRED, review().entries.single().kind)
++        assertEquals(before, bytes())
++    }
++
++    @Test
++    fun `nested folders are preserved and are not recursively traversed by the inventory`() {
++        val copy = sealed()
++        val extra = File(copy, "User files").apply { mkdir() }
++        File(extra, "personal.txt").writeText("Keep")
++        unavailable += extra.name
++        val before = bytes()
++        val result = review()
++        assertEquals(ImportReviewKind.REVIEW_REQUIRED, result.entries.single().kind)
++        assertTrue(result.entries.single().size.partial)
++        assertEquals(before, bytes())
++    }
++
++    @Test
++    fun `too many child entries produce a partial result instead of an exhaustive walk`() {
++        val copy = sealed()
++        repeat(3) { File(copy, "extra-$it.txt").writeText("Keep") }
++        val before = bytes()
++        val result = review(DocumentImportReview.Limits(children = 3))
++        assertTrue(result.partial)
++        assertEquals(ImportReviewKind.REVIEW_REQUIRED, result.entries.single().kind)
++        assertEquals(before, bytes())
++    }
++
++    @Test
++    fun `truncated older-folder inspection cannot report that no matching copies exist`() {
++        val copy = stage("Older-1234abcd-abc")
++        val extra = (1..3).map { File(copy, "extra-$it").apply { writeText("Keep") } }
++        val payload = File(copy, "document.txt").apply { writeText("Original") }
++        val metadata = File(copy, "details.json").apply { writeText("{}") }
++        val candidate = node(copy)
++        every { candidate.listFiles() } returns
++            (extra + payload + metadata).map(::node).toTypedArray()
++        val base = node(root)
++        every { base.listFiles() } returns arrayOf(candidate)
++        val result =
++            DocumentImportReview.inspect(base, {}, DocumentImportReview.Limits(children = 3))
++        assertTrue(result.partial)
++        assertTrue(result.entries.isEmpty())
++        assertEquals("Original", payload.readText())
++    }
++
++    @Test
++    fun `unavailable root listings are not reported as a clean inventory`() {
++        unavailable += root.name
++        assertTrue(review().partial)
++        unavailable.clear()
++        val base = node(root)
++        every { base.listFiles() } returns null
++        val result = DocumentImportReview.inspect(base, {})
++        assertTrue(result.partial)
++        assertTrue(result.entries.isEmpty())
++    }
++
++    @Test
++    fun `a revoked child permission does not hide other copies`() {
++        val failed = sealed()
++        sealed()
++        unavailable += failed.name
++        val result = review()
++        assertEquals(2, result.entries.size)
++        assertTrue(result.partial)
++        assertEquals(1, result.entries.count { it.kind == ImportReviewKind.SEALED })
++    }
++
++    @Test
++    fun `cancellation while reading metadata propagates and preserves the folder`() {
++        sealed()
++        val before = bytes()
++        cancelMetadata = true
++        assertThrows<kotlinx.coroutines.CancellationException> { review() }
++        assertEquals(before, bytes())
++    }
++
++    @Test
++    fun `root and result limits keep the displayed inventory explicitly incomplete`() {
++        repeat(3) { sealed() }
++        val before = bytes()
++        val limitedRoot = review(DocumentImportReview.Limits(rootEntries = 1))
++        assertEquals(1, limitedRoot.entries.size)
++        assertTrue(limitedRoot.partial)
++        val limitedResults = review(DocumentImportReview.Limits(results = 2))
++        assertEquals(2, limitedResults.entries.size)
++        assertTrue(limitedResults.partial)
++        assertEquals(before, bytes())
++    }
++
++    @Test
++    fun `expired time budget is incomplete without scanning the whole library`() {
++        sealed()
++        var time = 0L
++        val result =
++            DocumentImportReview.inspect(
++                node(root),
++                {},
++                DocumentImportReview.Limits(nanos = 2),
++                now = { time++ },
++            )
++        assertTrue(result.partial)
++        assertTrue(result.entries.isEmpty())
++        assertEquals(0, metadataReads)
++    }
++
++    @Test
++    fun `invalid UTF8 metadata remains untouched and requires review`() {
++        val copy = sealed()
++        File(copy, "details.json").writeBytes(byteArrayOf(0xc3.toByte(), 0x28))
++        val before = bytes()
++        assertEquals(ImportReviewKind.REVIEW_REQUIRED, review().entries.single().kind)
++        assertEquals(before, bytes())
++    }
++
++    @Test
++    fun `impossible provider lengths cannot overflow into a misleading negative size`() {
++        sealed()
++        lengths["document.pdf"] = Long.MAX_VALUE
++        val result = review()
++        assertEquals(Long.MAX_VALUE, result.entries.single().size.bytes)
++        assertTrue(result.entries.single().size.partial)
++    }
++
++    @Test
++    fun `storage review waits until a publication has finished registering`() = runTest {
++        val original = File(root, "original.pdf").apply { writeText("%PDF-1.4\nPublication lock") }
++        fun writable(initial: File): UniFile {
++            var file = initial
++            return mockk<UniFile>().also { result ->
++                every { result.name } answers { file.name }
++                every { result.isDirectory } answers { file.isDirectory }
++                every { result.length() } answers { file.length() }
++                every { result.listFiles() } answers
++                    {
++                        file.listFiles()?.map(::writable)?.toTypedArray()
++                    }
++                every { result.findFile(any()) } answers
++                    {
++                        File(file, firstArg<String>()).takeIf { it.exists() }?.let(::writable)
++                    }
++                every { result.createDirectory(any()) } answers
++                    {
++                        File(file, firstArg<String>()).apply { check(mkdir()) }.let(::writable)
++                    }
++                every { result.createFile(any()) } answers
++                    {
++                        File(file, firstArg<String>())
++                            .apply { check(createNewFile()) }
++                            .let(::writable)
++                    }
++                every { result.openInputStream() } answers { file.inputStream() }
++                every { result.openOutputStream() } answers { file.outputStream() }
++                every { result.renameTo(any()) } answers
++                    {
++                        val destination = File(file.parentFile, firstArg<String>())
++                        java.nio.file.Files.move(file.toPath(), destination.toPath())
++                        file = destination
++                        true
++                    }
++                every { result.delete() } answers { file.deleteRecursively() }
++            }
++        }
++        val identity =
++            DocumentImportPublication.Identity(
++                MessageDigest.getInstance("SHA-256").digest(original.readBytes()).joinToString("") {
++                    "%02x".format(it)
++                },
++                original.length(),
++            )
++        val entered = CompletableDeferred<Unit>()
++        val release = CompletableDeferred<Unit>()
++        val publication = async {
++            DocumentImportPublication.publish(
++                writable(root),
++                original,
++                DocumentFormat.PDF,
++                identity,
++                "Book",
++                "",
++                {},
++                {},
++            ) {
++                entered.complete(Unit)
++                release.await()
++                it
++            }
++        }
++        entered.await()
++        val reviewBase = node(root)
++        val pending = async { DocumentImportPublication.review(reviewBase) {} }
++        runCurrent()
++        assertFalse(pending.isCompleted)
++        io.mockk.verify(exactly = 0) { reviewBase.listFiles() }
++        release.complete(Unit)
++        publication.await()
++        val reviewed = pending.await()
++        io.mockk.verify(exactly = 1) { reviewBase.listFiles() }
++        assertTrue(reviewed.entries.isEmpty())
++        assertTrue(original.exists())
++    }
++}
 diff --git a/app/src/test/java/eu/kanade/tachiyomi/ui/documents/DocumentImportSpaceTest.kt b/app/src/test/java/eu/kanade/tachiyomi/ui/documents/DocumentImportSpaceTest.kt
 new file mode 100644
 index 0000000..e0368d5
@@ -74705,7 +75513,7 @@ index 9839272..46e74da 100644
  junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }
  junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
 diff --git a/i18n-at/src/commonMain/moko-resources/base/strings.xml b/i18n-at/src/commonMain/moko-resources/base/strings.xml
-index 7ed4795..916b9b7 100644
+index 7ed4795..aa3df6d 100644
 --- a/i18n-at/src/commonMain/moko-resources/base/strings.xml
 +++ b/i18n-at/src/commonMain/moko-resources/base/strings.xml
 @@ -10,7 +10,7 @@
@@ -74717,7 +75525,7 @@ index 7ed4795..916b9b7 100644
      <string name="pref_group_setup">Translation Setup</string>
      <string name="pref_translate_from">Translate From</string>
      <string name="pref_translate_to">Translate To</string>
-@@ -73,12 +73,300 @@
+@@ -73,12 +73,311 @@
      <string name="repository_add_error">Could not add this repository. Check your connection and try again.</string>
      <string name="repository_refresh_error">Repository added, but extension listings could not be refreshed. Refresh the Extensions screen.</string>
      <string name="chapter_group_version">Group/version: %1$s</string>
@@ -75019,9 +75827,20 @@ index 7ed4795..916b9b7 100644
 +    <string name="extension_risk_continue">Continue</string>
 +    <string name="extension_risk_save_failed">Could not save your acknowledgement. Try again.</string>
 +    <string name="extension_risk_paused_selection">Isolation has been removed from this beta. Review the extension notice before using this previously isolated extension in the regular mode.</string>
++    <string name="storage_import_review_title">Import review</string>
++    <string name="storage_import_review_note">Review interrupted copies and older folders. This review preserves your files. Older folders may still be used by your library.</string>
++    <string name="storage_import_review_partial">The review or some file sizes are incomplete. Refresh after checking access to the storage folder.</string>
++    <string name="storage_import_review_empty">No interrupted copies or folders matching the older import format were found in this review.</string>
++    <string name="storage_import_review_show">Show folders (%1$d)</string>
++    <string name="storage_import_review_hide">Hide folders (%1$d)</string>
++    <string name="storage_import_review_sealed">Copy awaiting content verification</string>
++    <string name="storage_import_review_incomplete">Unfinished copy</string>
++    <string name="storage_import_review_legacy">Older naming format — review the files</string>
++    <string name="storage_import_review_required">Files need review</string>
++    <string name="storage_import_review_retry">To try resuming a complete copy, import the same original file again in Documents. Older or incomplete folders remain available for review in your file manager. The document-cache cleanup does not remove them.</string>
  </resources>
 diff --git a/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml b/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
-index d1748bc..31665d3 100644
+index d1748bc..7844564 100644
 --- a/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
 +++ b/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
 @@ -10,7 +10,7 @@
@@ -75033,7 +75852,7 @@ index d1748bc..31665d3 100644
      <string name="pref_group_setup">Configuração da tradução</string>
      <string name="pref_translate_from">Traduzir de</string>
      <string name="pref_translate_to">Traduzir para</string>
-@@ -73,12 +73,300 @@
+@@ -73,12 +73,311 @@
      <string name="repository_add_error">Não foi possível adicionar o repositório. Confira a conexão e tente novamente.</string>
      <string name="repository_refresh_error">Repositório adicionado, mas não foi possível atualizar as extensões. Atualize a tela Extensões.</string>
      <string name="chapter_group_version">Grupo/versão: %1$s</string>
@@ -75335,6 +76154,17 @@ index d1748bc..31665d3 100644
 +    <string name="extension_risk_continue">Continuar</string>
 +    <string name="extension_risk_save_failed">Não foi possível salvar sua confirmação. Tente novamente.</string>
 +    <string name="extension_risk_paused_selection">O isolamento foi removido desta beta. Revise o aviso de extensões antes de usar esta extensão antes isolada no modo normal.</string>
++    <string name="storage_import_review_title">Revisar importações</string>
++    <string name="storage_import_review_note">Confira cópias interrompidas e pastas antigas. Esta revisão mantém seus arquivos preservados. Pastas antigas ainda podem estar em uso pela biblioteca.</string>
++    <string name="storage_import_review_partial">A revisão ou alguns tamanhos estão incompletos. Atualize depois de conferir o acesso à pasta de armazenamento.</string>
++    <string name="storage_import_review_empty">Nenhuma cópia interrompida ou pasta no formato antigo de importação foi encontrada nesta revisão.</string>
++    <string name="storage_import_review_show">Mostrar pastas (%1$d)</string>
++    <string name="storage_import_review_hide">Ocultar pastas (%1$d)</string>
++    <string name="storage_import_review_sealed">Cópia aguardando conferência do conteúdo</string>
++    <string name="storage_import_review_incomplete">Cópia incompleta</string>
++    <string name="storage_import_review_legacy">Formato antigo — confira os arquivos</string>
++    <string name="storage_import_review_required">Arquivos precisam de revisão</string>
++    <string name="storage_import_review_retry">Para tentar retomar uma cópia completa, importe novamente o mesmo arquivo original em Documentos. Pastas antigas ou incompletas ficam disponíveis para conferência no gerenciador de arquivos. A limpeza do cache de documentos não remove essas pastas.</string>
  </resources>
 diff --git a/i18n/src/commonMain/moko-resources/base/strings.xml b/i18n/src/commonMain/moko-resources/base/strings.xml
 index c0832ba..ebf8f48 100644

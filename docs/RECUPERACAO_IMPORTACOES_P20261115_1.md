@@ -33,3 +33,5 @@ O temporário inicial e a validação do arquivo escolhido continuam necessário
 Os testes exercitam DocumentImporter/DocumentImportPublication reais, streams e arquivos locais. Context/UniFile e o limite de registro no banco são simulados; não aprovam um provedor SAF ou uma restauração completa em SQLite. Dois cenários com UniFile nativo foram compilados para a rodada final, sem execução nesta etapa.
 
 [Evidências filtradas](../integration/import-recovery/20261115/README.md) · [Checklist ativo](BETA11_CHECKLIST.md).
+
+A [revisão P20261115.3](REVISAO_IMPORTACOES_P20261115_3.md) torna cópias interrompidas e pastas antigas visíveis no armazenamento. O inventário não lê o payload inteiro nem libera conteúdo com base apenas nos metadados; a retomada descrita aqui continua conferindo o hash real.

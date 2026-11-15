@@ -1,0 +1,146 @@
+{
+  "new_cases": 22,
+  "status": "ALL_PASSED",
+  "provider": "Mocked UniFile over real files and metadata streams; document payload reads and mutation operations unavailable to the read adapter",
+  "cases": [
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.ui.documents.DocumentImportReviewTest",
+      "name": "a known payload size mismatch requires review without modifying the document()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.ui.documents.DocumentImportReviewTest",
+      "name": "a revoked child permission does not hide other copies()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.ui.documents.DocumentImportReviewTest",
+      "name": "an old truncated uuid stage is reported as legacy even without a seal()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.ui.documents.DocumentImportReviewTest",
+      "name": "an older publication with native converted metadata remains a local file for review()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.ui.documents.DocumentImportReviewTest",
+      "name": "an unknown import name never grants ownership or automatic cleanup()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.ui.documents.DocumentImportReviewTest",
+      "name": "an unsealed partial copy and an empty current stage are preserved()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.ui.documents.DocumentImportReviewTest",
+      "name": "cancellation while reading metadata propagates and preserves the folder()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.ui.documents.DocumentImportReviewTest",
+      "name": "expired time budget is incomplete without scanning the whole library()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.ui.documents.DocumentImportReviewTest",
+      "name": "impossible provider lengths cannot overflow into a misleading negative size()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.ui.documents.DocumentImportReviewTest",
+      "name": "invalid UTF8 metadata remains untouched and requires review()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.ui.documents.DocumentImportReviewTest",
+      "name": "invalid marker metadata is reported while another copy remains visible()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.ui.documents.DocumentImportReviewTest",
+      "name": "nested folders are preserved and are not recursively traversed by the inventory()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.ui.documents.DocumentImportReviewTest",
+      "name": "ordinary local manga folders and unrelated names are not classified as failed imports()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.ui.documents.DocumentImportReviewTest",
+      "name": "oversized metadata is bounded and preserved for review()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.ui.documents.DocumentImportReviewTest",
+      "name": "root and result limits keep the displayed inventory explicitly incomplete()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.ui.documents.DocumentImportReviewTest",
+      "name": "storage review waits until a publication has finished registering()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.ui.documents.DocumentImportReviewTest",
+      "name": "structurally complete copy awaits verification without opening its payload or changing files()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.ui.documents.DocumentImportReviewTest",
+      "name": "too many child entries produce a partial result instead of an exhaustive walk()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.ui.documents.DocumentImportReviewTest",
+      "name": "truncated older-folder inspection cannot report that no matching copies exist()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.ui.documents.DocumentImportReviewTest",
+      "name": "unavailable root listings are not reported as a clean inventory()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.ui.documents.DocumentImportReviewTest",
+      "name": "unknown provider lengths make sizes partial without reading full documents()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.ui.documents.DocumentImportReviewTest",
+      "name": "unsupported seal versions or schema cannot be described as awaiting normal recovery()",
+      "status": "passed"
+    }
+  ],
+  "android_controls": {
+    "status": "COMPILED_NOT_EXECUTED",
+    "cases": [
+      "importReviewUsesNativeUniFileAndCacheCleanupPreservesTheCopies",
+      "nativeImportReviewPreservesBothLegacyAndUnsealedCopies"
+    ]
+  }
+}

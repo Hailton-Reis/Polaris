@@ -2,6 +2,18 @@
 
 Este arquivo registra a evolução real do código. **Revisões de desenvolvimento não são lançamentos públicos.** As datas abaixo usam America/Fortaleza, exceto quando houver indicação de UTC. O histórico de distribuição fica em [Releases](https://github.com/Hailton-Reis/Polaris/releases).
 
+## Desenvolvimento · P20261115.3 — 15/11/2026
+
+**Estado:** continuação da beta.11/código 112, na frente de armazenamento. Sandbox arquivada/retirada; conta/nuvem adiadas; sem novo APK ou Release.
+
+- Tela de armazenamento mostra cópias interrompidas e pastas no formato antigo de importação, com nomes, tamanhos conhecidos, situações de revisão e orientação para repetir o original quando houver cópia completa compatível.
+- Inventário somente leitura, sincronizado com a publicação. Limites, falhas de acesso e tamanhos desconhecidos aparecem como resultado parcial. A classificação por metadados não substitui a conferência completa do conteúdo feita pelo importador.
+- Pastas incompletas, antigas ou desconhecidas ficam preservadas. Nenhuma exclusão, movimentação ou limpeza automática de cópias locais foi acrescentada. Validação e limites na evidência; aceites finais de SAF/interface/aparelhos e pico continuam pendentes.
+
+- Compilação do app/instrumentação aprovada; 873 testes do app aprovados (22 novos), mais 85 anteriores de domain. Nenhum caso anterior ausente. Quatro testes de overlay e 16 de empacotamento aprovados; dois cenários Android novos compilados para a rodada final.
+
+[Escopo](docs/REVISAO_IMPORTACOES_P20261115_3.md) · [Evidências filtradas](integration/import-review/20261115/README.md).
+
 ## Desenvolvimento · P20261115.2 — 15/11/2026
 
 **Estado:** sandbox arquivada e removida dos fontes compilados da beta.11/código 112. Sem novo APK ou Release.

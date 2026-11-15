@@ -1,0 +1,52 @@
+{
+  "previous_engineering_commit": "cc7776a7f7465aa8a34879bf9b9d6a1410dc3ab7",
+  "overlay_prerequisite": "f037c5d85575e30694295df5d079e97dcc4a35b9",
+  "overlay_sha256": "9d1c9a3b817e5876594607495d23313f1c84eb86cf0b7bdf34732ceee9b95280",
+  "files": [
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentImportReview.kt",
+      "bytes": 8621,
+      "sha256": "1e5d1c74a0e30f649918ee61b42a6ef7dab9bbfb30bc5a382c25e2374b25232b"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentImportPublication.kt",
+      "bytes": 13273,
+      "sha256": "2846c20100a55ed30753487b238ddc54496bd11f930ca6883f6a6da174b8d855"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/ui/documents/PolarisStorageUsage.kt",
+      "bytes": 3493,
+      "sha256": "216d156502e0957721270cf66ac08f1eba560443b2e576d7400786ecdf246306"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/presentation/documents/PolarisStorageScreen.kt",
+      "bytes": 12131,
+      "sha256": "28a196c49092b9de4e0bd2467ab53c5cf77c24863e9de90e9ed5d73fe405dc1e"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/ui/documents/DocumentImportReviewTest.kt",
+      "bytes": 16267,
+      "sha256": "c7f95cecd2a962845fde81e35601ca6be942b00c45c727cb631e507106ce59bc"
+    },
+    {
+      "path": "app/src/androidTest/java/eu/kanade/tachiyomi/storage/SafeStorageAndroidTest.kt",
+      "bytes": 17127,
+      "sha256": "4c5723ad90f8629e1ae74d7d8198704847a1714d17eef638af11449d3a9e5edf"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt",
+      "bytes": 10875,
+      "sha256": "00f67fe30deedb5f8b56076baa3fe70cfeb81b3678a8b7926eb6e325e05192f3"
+    },
+    {
+      "path": "i18n-at/src/commonMain/moko-resources/base/strings.xml",
+      "bytes": 38324,
+      "sha256": "de6f478155cc33205d43cda2bb013674a88ebe77b60585eb37ba00a2100a494c"
+    },
+    {
+      "path": "i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml",
+      "bytes": 40468,
+      "sha256": "844c2cf20363295c03119b9b2ae41c7f2c116c6c28f850decb3150a42a0920eb"
+    }
+  ]
+}

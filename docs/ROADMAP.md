@@ -77,3 +77,5 @@ Os exemplos preparados ajudam a começar. Páginas reais autorizadas e revisão 
 A beta.8 integra agrupamento de edições, seleção automática de catálogos compatíveis e fonte fixa por obra, com testes de provedores simulados. O aceite completo com duas fontes, a ponte de tradução canônica e a evolução de backup seguem os critérios próprios da engenharia. Não são declarados concluídos por esta página ou pelo pacote de leitura local.
 
 Um servidor pessoal continua opcional; o projeto não deve depender dele para a leitura básica.
+
+A [revisão P20261115.3](REVISAO_IMPORTACOES_P20261115_3.md) apresenta importações interrompidas e pastas no formato antigo na tela de armazenamento. Inventário somente leitura, com limites e resultado parcial explícito; arquivos sem origem comprovada continuam preservados para conferência manual. Medição de pico e aceites SAF/aparelhos permanecem para a consolidação final.

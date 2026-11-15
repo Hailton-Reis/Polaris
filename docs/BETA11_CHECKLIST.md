@@ -9,7 +9,7 @@ Este checklist acompanha o trabalho autorizado em 13/11. Não é uma declaraçã
 | Sandbox e login isolado | PAUSADOS pelo usuário; fora do escopo de conclusão desta beta. Executor removido dos fontes compilados; histórico preservado na branch de arquivo (P20261115.2) |
 | Biblioteca, fontes reais e backups entre leitores | Criação segura e ordem da restauração verificadas em JVM; SQLite/interface Android e ida/volta externa pendentes |
 | Leitura, OCR e tradução nos aparelhos | Pendente, incluindo diagnóstico do A12 |
-| Armazenamento | Importação/cache e retomada de cópias completas (P20261115.1) implementados; cópias parciais/legado, pico e validação final pendentes |
+| Armazenamento | Importação/cache, retomada de cópias completas e revisão de cópias parciais/pastas antigas (P20261115.3) implementados; pico, SAF e validação final pendentes |
 | Atualização beta.10 → beta.11 e distribuição não depurável | APK interno gerado com assinatura original; atualização no aparelho e variante não depurável pendentes |
 
 Ordem ativa: armazenamento → backups → leitura → distribuição. A sandbox não bloqueia a consolidação desta beta.
@@ -49,3 +49,7 @@ P20261114.4: sandbox pausada e desabilitada; aviso único local com duas caixas,
 P20261115.1: [retomada de cópias completas](RECUPERACAO_IMPORTACOES_P20261115_1.md) após publicação interrompida, com conferência de conteúdo/metadados e sem nova cópia do payload pelo importador. 945 testes do app aprovados (14 novos), mais 85 anteriores de domain; app/instrumentação compilados, quatro testes de overlay e 16 de empacotamento aprovados. Resíduos parciais/legado permanecem pendentes; sem novo APK ou Release.
 
 P20261115.2: [sandbox arquivada e retirada dos fontes compilados](ARQUIVAMENTO_SANDBOX_P20261115_2.md), incluindo componentes e ramificações de integração. Aviso e revisão de seleções/quarentenas antigas mantidos. 851 testes do app aprovados e 85 anteriores de domain; 94 casos exclusivos do executor arquivados, nenhum outro ausente. App/instrumentação compilados, classes/manifestos inspecionados, overlay4/empacotamento16 aprovados. Sem novo APK/Release ou medição do tamanho.
+
+P20261115.3: [revisão de importações](REVISAO_IMPORTACOES_P20261115_3.md) na tela de armazenamento, com inventário limitado e somente leitura. Cópias interrompidas/pastas antigas ficam visíveis; falhas/limites/tamanhos desconhecidos são indicados. Não há limpeza automática de cópias locais, e retomada continua exigindo a conferência completa pelo importador. Resultados e limites na evidência da revisão.
+
+Validação P20261115.3: BUILD SUCCESSFUL 2min09s; 873 testes do app aprovados (22 novos), mais 85 anteriores de domain/UP-TO-DATE. Total 958 nos relatórios, sem falhas/skips ou casos anteriores ausentes. App/instrumentação compilados, overlay4/empacotamento16 aprovados; dois cenários Android novos compilados e ainda não executados. A sandbox continua ausente do JAR/manifesto atual. Sem novo APK/Release.
