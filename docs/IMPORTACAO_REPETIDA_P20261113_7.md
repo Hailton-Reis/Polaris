@@ -14,6 +14,8 @@ Quando já existe favorito para a URL publicada, a entrada é aberta com o mesmo
 
 O marcador `.polaris-import` não usa extensão JSON: o leitor local trata um JSON na pasta como metadados legados e pode convertê-lo em ComicInfo.xml. A reutilização aceita essa conversão e conserva metadados/capas extras. Não há mudança no esquema SQL ou formato do backup.
 
+**Continuação P20261115.1:** [retomada de cópias completas ainda em pasta temporária](RECUPERACAO_IMPORTACOES_P20261115_1.md), mediante protocolo/bytes/metadados conferidos. Cópias incompletas, ambíguas ou de origem desconhecida continuam preservadas para revisão. Os limites abaixo registram a revisão original.
+
 ## Limites
 
 - Deduplicação automática vale para publicações criadas com este marcador, no diretório local atual e com o mesmo formato. Pastas legadas/renomeadas, aliases de formato, arquivos parecidos e duplicatas já existentes não são mesclados automaticamente.

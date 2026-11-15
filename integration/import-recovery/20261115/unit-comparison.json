@@ -1,0 +1,115 @@
+{
+  "status": "NO_NEW_UNIT_REGRESSIONS",
+  "baseline": {
+    "total": 1016,
+    "passed": 1016,
+    "failed": 0,
+    "skipped": 0
+  },
+  "patched": {
+    "total": 1030,
+    "passed": 1030,
+    "failed": 0,
+    "skipped": 0
+  },
+  "preexisting_failures_still_present": 0,
+  "missing_baseline_tests": [],
+  "new_failures_or_skips": [],
+  "android_runtime_verified": false,
+  "gradle_exit_codes": {
+    "baseline": 0,
+    "patched": 0
+  },
+  "required_module_coverage": {
+    "app": 931,
+    "domain": 85
+  },
+  "baseline_origin": "Archived P20261114.4 reports: 931 app + 85 domain, not rerun.",
+  "current_origin": "945 app tests freshly executed; 85 domain previously passed and UP-TO-DATE.",
+  "new_cases": [
+    {
+      "module": "app",
+      "class": "eu.kanade.tachiyomi.ui.documents.DocumentImportTransactionTest",
+      "name": "a matching unfinished copy with an unknown marker version is not replaced()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "class": "eu.kanade.tachiyomi.ui.documents.DocumentImportTransactionTest",
+      "name": "a recovered rename reported as false can be retried without another copy()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "class": "eu.kanade.tachiyomi.ui.documents.DocumentImportTransactionTest",
+      "name": "a regular file with a staging shaped name is never treated as an import directory()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "class": "eu.kanade.tachiyomi.ui.documents.DocumentImportTransactionTest",
+      "name": "a user renamed staging directory is preserved rather than moved automatically()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "class": "eu.kanade.tachiyomi.ui.documents.DocumentImportTransactionTest",
+      "name": "an incomplete unsealed copy stays untouched while a new import can proceed()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "class": "eu.kanade.tachiyomi.ui.documents.DocumentImportTransactionTest",
+      "name": "an indexing failure after recovery keeps the publication for another attempt()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "class": "eu.kanade.tachiyomi.ui.documents.DocumentImportTransactionTest",
+      "name": "an unrelated future marker does not authorize touching its directory()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "class": "eu.kanade.tachiyomi.ui.documents.DocumentImportTransactionTest",
+      "name": "cancellation during recovery verification preserves the old completed copy()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "class": "eu.kanade.tachiyomi.ui.documents.DocumentImportTransactionTest",
+      "name": "edited sealed staging is preserved without creating a replacement()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "class": "eu.kanade.tachiyomi.ui.documents.DocumentImportTransactionTest",
+      "name": "extra user files prevent automatic movement of an unfinished directory()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "class": "eu.kanade.tachiyomi.ui.documents.DocumentImportTransactionTest",
+      "name": "invalid completed metadata prevents recovery without rewriting the original data()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "class": "eu.kanade.tachiyomi.ui.documents.DocumentImportTransactionTest",
+      "name": "retry reuses sealed staging instead of another copy()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "class": "eu.kanade.tachiyomi.ui.documents.DocumentImportTransactionTest",
+      "name": "sealed staging recovery does not require capacity for a second destination copy()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "class": "eu.kanade.tachiyomi.ui.documents.DocumentImportTransactionTest",
+      "name": "two matching unfinished copies are preserved for explicit review()",
+      "status": "passed"
+    }
+  ]
+}

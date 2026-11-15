@@ -31,6 +31,8 @@ A [continuação P20261114.1](RESTAURACAO_CATEGORIAS_P20261114_1.md) corrige a o
 
 A [continuação P20261114.3](SANDBOX_ACOES_LOCAIS_P20261114_3.md) acrescenta ações locais padrão na sandbox, com confirmação e sem capacidade HTTP. Telas/ações personalizadas, assincronia, OAuth e novels continuam pendentes. Os testes pessoais ficam para a consolidação final, conforme pedido do usuário.
 
+A [continuação P20261115.1](RECUPERACAO_IMPORTACOES_P20261115_1.md) retoma cópias completas deixadas por publicação interrompida, sem outra cópia do payload pelo importador. Resíduos parciais, legado e medição de pico permanecem abertos.
+
 ## Prioridade atual: armazenamento antes da ampliação do beta
 
 - Medir instalação completa, modelos, cópias, renderização e temporários nos aparelhos.

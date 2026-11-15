@@ -2979,10 +2979,10 @@ index 0000000..d97cf8e
 +}
 diff --git a/app/src/androidTest/java/eu/kanade/tachiyomi/storage/SafeStorageAndroidTest.kt b/app/src/androidTest/java/eu/kanade/tachiyomi/storage/SafeStorageAndroidTest.kt
 new file mode 100644
-index 0000000..fa67bd3
+index 0000000..1e9fbdd
 --- /dev/null
 +++ b/app/src/androidTest/java/eu/kanade/tachiyomi/storage/SafeStorageAndroidTest.kt
-@@ -0,0 +1,247 @@
+@@ -0,0 +1,341 @@
 +package eu.kanade.tachiyomi.storage
 +
 +import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -3029,6 +3029,100 @@ index 0000000..fa67bd3
 +    private fun documentContext() =
 +        object : android.content.ContextWrapper(context) {
 +            override fun getCacheDir() = File(folder, "reader-cache").apply { mkdirs() }
++        }
++
++    private fun sealedImport(base: File, original: File): File {
++        val stage = File(base, ".import-${java.util.UUID.randomUUID()}").apply { mkdir() }
++        original.copyTo(File(stage, "document.pdf"))
++        val digest =
++            java.security.MessageDigest.getInstance("SHA-256")
++                .digest(original.readBytes())
++                .joinToString("") { "%02x".format(it) }
++        File(stage, "details.json").writeText("""{"title":"Interrupted","author":""}""")
++        File(stage, ".polaris-import")
++            .writeText(
++                """{"version":1,"sha256":"$digest","bytes":${original.length()},"format":"pdf"}"""
++            )
++        return stage
++    }
++
++    @Test
++    fun completedInterruptedImportPublishesWithoutAnotherNativePayloadCopy() =
++        kotlinx.coroutines.runBlocking<Unit> {
++            val original =
++                File(folder, "interrupted.pdf").apply {
++                    writeText("%PDF-1.4\nInterrupted document")
++                }
++            val base = File(folder, "interrupted-library").apply { mkdir() }
++            val stage = sealedImport(base, original)
++            val expected = stage.listFiles()!!.associate { it.name to it.readBytes().toList() }
++            val digest =
++                java.security.MessageDigest.getInstance("SHA-256")
++                    .digest(original.readBytes())
++                    .joinToString("") { "%02x".format(it) }
++            val name =
++                eu.kanade.tachiyomi.ui.documents.DocumentImportPublication.publish(
++                    checkNotNull(UniFile.fromFile(base)),
++                    original,
++                    mihon.core.archive.DocumentFormat.PDF,
++                    eu.kanade.tachiyomi.ui.documents.DocumentImportPublication.Identity(
++                        digest,
++                        original.length(),
++                    ),
++                    "New form title",
++                    "",
++                    beforeCopy = { throw IOException("No second copy allowed") },
++                    checkActive = {},
++                ) {
++                    it
++                }
++            assertTrue(name.startsWith("Interrupted-"))
++            assertFalse(stage.exists())
++            assertEquals(1, base.listFiles()!!.size)
++            assertEquals(
++                expected,
++                File(base, name).listFiles()!!.associate { it.name to it.readBytes().toList() },
++            )
++            assertEquals("%PDF-1.4\nInterrupted document", original.readText())
++        }
++
++    @Test
++    fun ambiguousInterruptedNativeImportsRemainUntouched() =
++        kotlinx.coroutines.runBlocking<Unit> {
++            val original =
++                File(folder, "ambiguous.pdf").apply { writeText("%PDF-1.4\nAmbiguous document") }
++            val base = File(folder, "ambiguous-library").apply { mkdir() }
++            val first = sealedImport(base, original)
++            val second = sealedImport(base, original)
++            val digest =
++                java.security.MessageDigest.getInstance("SHA-256")
++                    .digest(original.readBytes())
++                    .joinToString("") { "%02x".format(it) }
++            var copies = 0
++            var rejected = false
++            try {
++                eu.kanade.tachiyomi.ui.documents.DocumentImportPublication.publish(
++                    checkNotNull(UniFile.fromFile(base)),
++                    original,
++                    mihon.core.archive.DocumentFormat.PDF,
++                    eu.kanade.tachiyomi.ui.documents.DocumentImportPublication.Identity(
++                        digest,
++                        original.length(),
++                    ),
++                    "Any title",
++                    "",
++                    beforeCopy = { copies++ },
++                    checkActive = {},
++                ) {
++                    it
++                }
++            } catch (_: IllegalStateException) {
++                rejected = true
++            }
++            assertTrue(rejected)
++            assertEquals(0, copies)
++            assertTrue(first.isDirectory && second.isDirectory)
++            assertEquals(2, base.listFiles()!!.size)
 +        }
 +
 +    @Test
@@ -10994,7 +11088,7 @@ index a198c3f..9a3e84f 100644
                      preference = translationPreferences.translationEngineTemperature(),
                      title = stringResource(ATMR.strings.pref_engine_temperature),
 diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
-index 7f411fd..0250575 100644
+index 7f411fd..1e6d693 100644
 --- a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
 +++ b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
 @@ -1,15 +1,18 @@
@@ -11059,7 +11153,7 @@ index 7f411fd..0250575 100644
  
      // Identifies this overlay independently of the pinned upstream COMMIT_SHA.
 -    private const val POLARIS_READER_REVISION = "P20261031.2"
-+    private const val POLARIS_READER_REVISION = "P20261114.4"
++    private const val POLARIS_READER_REVISION = "P20261115.1"
  
      @Composable
      override fun Content() {
@@ -31546,10 +31640,10 @@ index 03900aa..a478e8c 100644
      }
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentImportPublication.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentImportPublication.kt
 new file mode 100644
-index 0000000..dc34d3f
+index 0000000..7477195
 --- /dev/null
 +++ b/app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentImportPublication.kt
-@@ -0,0 +1,227 @@
+@@ -0,0 +1,323 @@
 +package eu.kanade.tachiyomi.ui.documents
 +
 +import com.hippo.unifile.UniFile
@@ -31570,6 +31664,8 @@ index 0000000..dc34d3f
 +internal object DocumentImportPublication {
 +    private val lock = Mutex()
 +    private const val MARKER = ".polaris-import"
++    private val stageNamePattern =
++        Regex("[.]import-[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}")
 +
 +    data class Identity(val sha256: String, val bytes: Long) {
 +        init {
@@ -31649,6 +31745,12 @@ index 0000000..dc34d3f
 +        }
 +    }
 +
++    private fun marker(folder: UniFile, checkActive: () -> Unit): JsonObject =
++        Json.parseToJsonElement(
++                readSmall(child(folder, MARKER), 4096, checkActive).decodeToString()
++            )
++            .jsonObject
++
 +    private fun verify(
 +        folder: UniFile,
 +        name: String,
@@ -31657,11 +31759,7 @@ index 0000000..dc34d3f
 +        checkActive: () -> Unit,
 +    ) {
 +        require(folder.isDirectory && folder.name == name) { "Import destination changed" }
-+        val marker =
-+            Json.parseToJsonElement(
-+                    readSmall(child(folder, MARKER), 4096, checkActive).decodeToString()
-+                )
-+                .jsonObject
++        val marker = marker(folder, checkActive)
 +        require(marker.keys == setOf("version", "sha256", "bytes", "format"))
 +        require(
 +            !marker.getValue("version").jsonPrimitive.isString &&
@@ -31689,6 +31787,85 @@ index 0000000..dc34d3f
 +
 +    }
 +
++    private fun recoveryCandidate(
++        entries: Array<UniFile>,
++        format: DocumentFormat,
++        identity: Identity,
++        checkActive: () -> Unit,
++    ): UniFile? {
++        var found: UniFile? = null
++        for (entry in entries) {
++            checkActive()
++            if (!entry.isDirectory || !stageNamePattern.matches(entry.name.orEmpty())) continue
++            if (entry.findFile(MARKER) == null) continue
++            // A crash during marker writing can leave an incomplete seal. Preserve it untouched.
++            val record =
++                try {
++                    marker(entry, checkActive)
++                } catch (_: IllegalArgumentException) {
++                    continue
++                }
++            if (
++                (record["sha256"] as? JsonPrimitive)?.content != identity.sha256 ||
++                    (record["format"] as? JsonPrimitive)?.content != format.extension
++            )
++                continue
++            check(found == null) {
++                "Multiple unfinished copies claim this content; preserve them for review"
++            }
++            found = entry
++        }
++        return found
++    }
++
++    private fun recoveryTitle(
++        staging: UniFile,
++        format: DocumentFormat,
++        identity: Identity,
++        checkActive: () -> Unit,
++    ): String {
++        require(stageNamePattern.matches(staging.name.orEmpty()))
++        val files = children(staging)
++        check(
++            files.size == 3 &&
++                files.all { !it.isDirectory } &&
++                files.map { it.name }.toSet() ==
++                    setOf(MARKER, "details.json", "document.${format.extension}")
++        ) {
++            "Unfinished import has unexpected files; preserve it for review"
++        }
++        verify(staging, checkNotNull(staging.name), format, identity, checkActive)
++        val details =
++            Json.parseToJsonElement(
++                    readSmall(child(staging, "details.json"), 16 * 1024, checkActive)
++                        .decodeToString(throwOnInvalidSequence = true)
++                )
++                .jsonObject
++        require(details.keys == setOf("title", "author"))
++        require(
++            details.getValue("title").jsonPrimitive.isString &&
++                details.getValue("title").jsonPrimitive.content.isNotBlank()
++        )
++        require(details.getValue("author").jsonPrimitive.isString)
++        return details.getValue("title").jsonPrimitive.content
++    }
++
++    private suspend fun <T> finish(
++        base: UniFile,
++        staging: UniFile,
++        name: String,
++        format: DocumentFormat,
++        identity: Identity,
++        checkActive: () -> Unit,
++        register: suspend (String) -> T,
++    ): T {
++        check(staging.renameTo(name)) { "Cannot publish imported document" }
++        val published = checkNotNull(base.findFile(name)) { "Published import is not visible" }
++        verify(published, name, format, identity, checkActive)
++        checkActive()
++        return register(name)
++    }
++
 +    suspend fun <T> publish(
 +        base: UniFile,
 +        temporary: File,
@@ -31704,8 +31881,8 @@ index 0000000..dc34d3f
 +            require(base.isDirectory)
 +            checkActive()
 +            val finalName = identity.folder(format, title)
-+            val candidates =
-+                children(base).filter { it.name.orEmpty().endsWith(identity.suffix(format)) }
++            val entries = children(base)
++            val candidates = entries.filter { it.name.orEmpty().endsWith(identity.suffix(format)) }
 +            check(candidates.size <= 1) {
 +                "Multiple copies claim this content; preserve them for review"
 +            }
@@ -31714,6 +31891,24 @@ index 0000000..dc34d3f
 +                verify(existing, existingName, format, identity, checkActive)
 +                checkActive()
 +                return@withLock register(existingName)
++            }
++            recoveryCandidate(entries, format, identity, checkActive)?.let { staging ->
++                val recoveredTitle = recoveryTitle(staging, format, identity, checkActive)
++                val recoveredName = identity.folder(format, recoveredTitle)
++                checkActive()
++                check(children(base).none { it.name.orEmpty().endsWith(identity.suffix(format)) }) {
++                    "Import destination appeared concurrently"
++                }
++                // Existing completed data is never removed, even if rename or indexing fails.
++                return@withLock finish(
++                    base,
++                    staging,
++                    recoveredName,
++                    format,
++                    identity,
++                    checkActive,
++                    register,
++                )
 +            }
 +            beforeCopy()
 +            checkActive()
@@ -31766,12 +31961,7 @@ index 0000000..dc34d3f
 +                // Once rename is attempted, an opaque provider may already have published the data.
 +                // Preserve the complete copy even if it reports failure or indexing later throws.
 +                publicationAttempted = true
-+                check(staging.renameTo(finalName)) { "Cannot publish imported document" }
-+                val published =
-+                    checkNotNull(base.findFile(finalName)) { "Published import is not visible" }
-+                verify(published, finalName, format, identity, checkActive)
-+                checkActive()
-+                register(finalName)
++                finish(base, staging, finalName, format, identity, checkActive, register)
 +            } finally {
 +                if (owned && !publicationAttempted) staging.delete()
 +            }
@@ -74095,10 +74285,10 @@ index 0000000..e0368d5
 +}
 diff --git a/app/src/test/java/eu/kanade/tachiyomi/ui/documents/DocumentImportTransactionTest.kt b/app/src/test/java/eu/kanade/tachiyomi/ui/documents/DocumentImportTransactionTest.kt
 new file mode 100644
-index 0000000..d62c27a
+index 0000000..a144962
 --- /dev/null
 +++ b/app/src/test/java/eu/kanade/tachiyomi/ui/documents/DocumentImportTransactionTest.kt
-@@ -0,0 +1,308 @@
+@@ -0,0 +1,544 @@
 +package eu.kanade.tachiyomi.ui.documents
 +
 +import android.content.ContentResolver
@@ -74129,6 +74319,9 @@ index 0000000..d62c27a
 +    private var corruptReadback = false
 +    private var unknownLength = false
 +    private var falseAfterRename = false
++    private var falseBeforeRename = false
++    private var payloadWrites = 0
++    private var cancelPayloadRead = false
 +    private var cancelWrite = false
 +    private var registrationCalls = 0
 +    private var denyListing = false
@@ -74171,12 +74364,17 @@ index 0000000..d62c27a
 +            }
 +        every { node.openInputStream() } answers
 +            {
++                if (cancelPayloadRead && file.name.startsWith("document.") && file.length() > 0)
++                    throw kotlinx.coroutines.CancellationException(
++                        "Cancelled while verifying recovered content"
++                    )
 +                if (corruptReadback && file.length() > 0 && file.name.startsWith("document."))
 +                    ByteArrayInputStream(byteArrayOf(1, 2, 3))
 +                else file.inputStream()
 +            }
 +        every { node.openOutputStream() } answers
 +            {
++                if (file.name.startsWith("document.")) payloadWrites++
 +                if (cancelWrite)
 +                    object : java.io.OutputStream() {
 +                        override fun write(value: Int) {
@@ -74187,10 +74385,13 @@ index 0000000..d62c27a
 +            }
 +        every { node.renameTo(any()) } answers
 +            {
-+                val target = File(file.parentFile, firstArg<String>())
-+                Files.move(file.toPath(), target.toPath())
-+                file = target
-+                !falseAfterRename
++                if (falseBeforeRename) false
++                else {
++                    val target = File(file.parentFile, firstArg<String>())
++                    Files.move(file.toPath(), target.toPath())
++                    file = target
++                    !falseAfterRename
++                }
 +            }
 +        every { node.delete() } answers { file.deleteRecursively() }
 +        return node
@@ -74406,6 +74607,231 @@ index 0000000..d62c27a
 +        assertTrue(registered.isEmpty())
 +        assertEquals("%PDF-1.4\nsynthetic document\n", original.readText())
 +    }
++
++    private suspend fun sealedStage(importer: DocumentImporter, uri: Uri): File {
++        falseBeforeRename = true
++        assertThrows<IllegalStateException> { importer.fromUri(uri, options) }
++        falseBeforeRename = false
++        return library.listFiles()!!.single().also {
++            assertTrue(it.name.startsWith(".import-"))
++            assertTrue(File(it, ".polaris-import").isFile)
++        }
++    }
++
++    private fun identity() =
++        DocumentImportPublication.Identity(
++            java.security.MessageDigest.getInstance("SHA-256")
++                .digest(original.readBytes())
++                .joinToString("") { "%02x".format(it) },
++            original.length(),
++        )
++
++    @Test
++    fun `retry reuses sealed staging instead of another copy`() = runTest {
++        val (importer, uri) = setup()
++        val stage = sealedStage(importer, uri)
++        val snapshot = stage.listFiles()!!.associate { it.name to it.readBytes().toList() }
++        importer.fromUri(uri, options.copy(title = "A different form title"))
++        val result = library.listFiles()!!.single()
++        assertFalse(result.name.startsWith("."))
++        assertTrue(result.name.startsWith("My document-"))
++        assertEquals(
++            snapshot,
++            result.listFiles()!!.associate { it.name to it.readBytes().toList() },
++        )
++        assertEquals(1, payloadWrites)
++        assertEquals(1, registrationCalls)
++        assertTrue(original.isFile)
++    }
++
++    @Test
++    fun `sealed staging recovery does not require capacity for a second destination copy`() =
++        runTest {
++            val (importer, uri) = setup()
++            sealedStage(importer, uri)
++            val name =
++                DocumentImportPublication.publish(
++                    document(library),
++                    original,
++                    mihon.core.archive.DocumentFormat.PDF,
++                    identity(),
++                    "Other",
++                    "",
++                    beforeCopy = { throw IOException("No room for another copy") },
++                    checkActive = {},
++                ) {
++                    it
++                }
++            assertEquals(name, library.listFiles()!!.single().name)
++            assertEquals(1, payloadWrites)
++        }
++
++    @Test
++    fun `edited sealed staging is preserved without creating a replacement`() = runTest {
++        val (importer, uri) = setup()
++        val stage = sealedStage(importer, uri)
++        File(stage, "document.pdf").writeText("%PDF-manual-edition")
++        assertThrows<IllegalStateException> { importer.fromUri(uri, options) }
++        assertTrue(stage.isDirectory)
++        assertEquals("%PDF-manual-edition", File(stage, "document.pdf").readText())
++        assertEquals(1, library.listFiles()!!.size)
++        assertEquals(0, registrationCalls)
++    }
++
++    @Test
++    fun `two matching unfinished copies are preserved for explicit review`() = runTest {
++        val (importer, uri) = setup()
++        val stage = sealedStage(importer, uri)
++        val duplicate = File(library, ".import-${java.util.UUID.randomUUID()}")
++        stage.copyRecursively(duplicate)
++        assertThrows<IllegalStateException> { importer.fromUri(uri, options) }
++        assertEquals(2, library.listFiles()!!.size)
++        assertTrue(stage.isDirectory && duplicate.isDirectory)
++        assertEquals(1, payloadWrites)
++        assertEquals(0, registrationCalls)
++    }
++
++    @Test
++    fun `a matching unfinished copy with an unknown marker version is not replaced`() = runTest {
++        val (importer, uri) = setup()
++        val stage = sealedStage(importer, uri)
++        val marker = File(stage, ".polaris-import")
++        marker.writeText(marker.readText().replace("\"version\":1", "\"version\":99"))
++        val before = marker.readText()
++        assertThrows<IllegalArgumentException> { importer.fromUri(uri, options) }
++        assertEquals(before, marker.readText())
++        assertEquals(1, library.listFiles()!!.size)
++        assertEquals(1, payloadWrites)
++        assertEquals(0, registrationCalls)
++    }
++
++    @Test
++    fun `extra user files prevent automatic movement of an unfinished directory`() = runTest {
++        val (importer, uri) = setup()
++        val stage = sealedStage(importer, uri)
++        File(stage, "my-notes.txt").writeText("Keep this personal file")
++        assertThrows<IllegalStateException> { importer.fromUri(uri, options) }
++        assertEquals("Keep this personal file", File(stage, "my-notes.txt").readText())
++        assertEquals(1, library.listFiles()!!.size)
++        assertEquals(1, payloadWrites)
++    }
++
++    @Test
++    fun `an incomplete unsealed copy stays untouched while a new import can proceed`() = runTest {
++        val (importer, uri) = setup()
++        val stage = sealedStage(importer, uri)
++        assertTrue(File(stage, ".polaris-import").delete())
++        val before = stage.listFiles()!!.associate { it.name to it.readBytes().toList() }
++        importer.fromUri(uri, options)
++        assertEquals(before, stage.listFiles()!!.associate { it.name to it.readBytes().toList() })
++        assertEquals(2, library.listFiles()!!.size)
++        assertEquals(1, registrationCalls)
++    }
++
++    @Test
++    fun `a user renamed staging directory is preserved rather than moved automatically`() =
++        runTest {
++            val (importer, uri) = setup()
++            val stage = sealedStage(importer, uri)
++            val personal = File(library, ".import-personal")
++            assertTrue(stage.renameTo(personal))
++            val before = personal.listFiles()!!.associate { it.name to it.readBytes().toList() }
++            importer.fromUri(uri, options)
++            assertEquals(
++                before,
++                personal.listFiles()!!.associate { it.name to it.readBytes().toList() },
++            )
++            assertEquals(2, library.listFiles()!!.size)
++        }
++
++    @Test
++    fun `cancellation during recovery verification preserves the old completed copy`() = runTest {
++        val (importer, uri) = setup()
++        val stage = sealedStage(importer, uri)
++        cancelPayloadRead = true
++        assertThrows<kotlinx.coroutines.CancellationException> { importer.fromUri(uri, options) }
++        assertTrue(stage.isDirectory)
++        assertTrue(File(stage, ".polaris-import").isFile)
++        assertEquals(1, payloadWrites)
++        assertEquals(0, registrationCalls)
++        cancelPayloadRead = false
++        importer.fromUri(uri, options)
++        assertEquals(1, library.listFiles()!!.size)
++        assertEquals(1, payloadWrites)
++    }
++
++    @Test
++    fun `a recovered rename reported as false can be retried without another copy`() = runTest {
++        val (importer, uri) = setup()
++        sealedStage(importer, uri)
++        falseAfterRename = true
++        assertThrows<IllegalStateException> { importer.fromUri(uri, options) }
++        val published = library.listFiles()!!.single()
++        assertFalse(published.name.startsWith("."))
++        falseAfterRename = false
++        importer.fromUri(uri, options)
++        assertEquals(published.name, library.listFiles()!!.single().name)
++        assertEquals(1, payloadWrites)
++        assertEquals(1, registrationCalls)
++    }
++
++    @Test
++    fun `an indexing failure after recovery keeps the publication for another attempt`() = runTest {
++        val (importer, uri) = setup()
++        sealedStage(importer, uri)
++        failRegistration = true
++        assertThrows<IOException> { importer.fromUri(uri, options) }
++        val folder = library.listFiles()!!.single()
++        assertFalse(folder.name.startsWith("."))
++        failRegistration = false
++        importer.fromUri(uri, options)
++        assertEquals(folder.name, library.listFiles()!!.single().name)
++        assertEquals(1, payloadWrites)
++        assertEquals(2, registrationCalls)
++    }
++
++    @Test
++    fun `invalid completed metadata prevents recovery without rewriting the original data`() =
++        runTest {
++            val (importer, uri) = setup()
++            val stage = sealedStage(importer, uri)
++            val details = File(stage, "details.json")
++            val invalid = "{\"title\":\"Personal\",\"author\":9}"
++            details.writeText(invalid)
++            assertThrows<IllegalArgumentException> { importer.fromUri(uri, options) }
++            assertEquals(invalid, details.readText())
++            assertEquals(1, payloadWrites)
++            assertEquals(0, registrationCalls)
++        }
++
++    @Test
++    fun `an unrelated future marker does not authorize touching its directory`() = runTest {
++        val (importer, uri) = setup()
++        val stage = sealedStage(importer, uri)
++        val marker = File(stage, ".polaris-import")
++        marker.writeText(marker.readText().replace("\"version\":1", "\"version\":99"))
++        val before = marker.readText()
++        original.appendText("different content")
++        importer.fromUri(uri, options)
++        assertTrue(stage.isDirectory)
++        assertEquals(before, marker.readText())
++        assertEquals(2, library.listFiles()!!.size)
++        assertEquals(1, registrationCalls)
++    }
++
++    @Test
++    fun `a regular file with a staging shaped name is never treated as an import directory`() =
++        runTest {
++            val (importer, uri) = setup()
++            val personal =
++                File(library, ".import-${java.util.UUID.randomUUID()}").apply {
++                    writeText("My notes")
++                }
++            importer.fromUri(uri, options)
++            assertEquals("My notes", personal.readText())
++            assertEquals(2, library.listFiles()!!.size)
++            assertEquals(1, registrationCalls)
++        }
 +}
 diff --git a/app/src/test/java/eu/kanade/tachiyomi/ui/documents/DocumentLibraryRegistrationTest.kt b/app/src/test/java/eu/kanade/tachiyomi/ui/documents/DocumentLibraryRegistrationTest.kt
 new file mode 100644
