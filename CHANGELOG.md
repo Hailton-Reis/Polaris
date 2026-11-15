@@ -2,6 +2,17 @@
 
 Este arquivo registra a evolução real do código. **Revisões de desenvolvimento não são lançamentos públicos.** As datas abaixo usam America/Fortaleza, exceto quando houver indicação de UTC. O histórico de distribuição fica em [Releases](https://github.com/Hailton-Reis/Polaris/releases).
 
+## Desenvolvimento · P20261114.4 — 14/11/2026
+
+**Estado:** mudança de escopo da beta.11/código 112. Sandbox pausada pelo usuário; quatro frentes ativas: armazenamento, backups, leitura e distribuição. Conta/login Google/nuvem adiados.
+
+- Código experimental preservado, ativação/serviço/tela desabilitados. Seleções antigas aguardam revisão antes da mudança para execução normal.
+- Aviso geral único antes de instalações/atualizações no app, com as caixas obrigatórias “Estou ciente” e “Terei cuidado, relaxa”. Aceite local, não exportado/restaurado em backup. Abrange lotes e novels; assinatura/integridade/revisão de repositórios continuam independentes.
+- 931 testes do app aprovados (12 novos), mais 85 anteriores de domain; nenhum ausente na comparação. App/instrumentação compilados, manifesto mesclado inspecionado, quatro testes de overlay e 16 de empacotamento aprovados. Dois cenários Android novos compilados; três classes de testes da sandbox explicitamente pausadas.
+- Desativação não é medição de redução do APK. Sem novo pacote do app ou Release; testes pessoais na consolidação final.
+
+[Decisão e comportamento](docs/PAUSA_SANDBOX_E_AVISO_P20261114_4.md) · [Evidências filtradas](integration/extension-risk-notice/20261114/README.md).
+
 ## Desenvolvimento · P20261114.3 — 14/11/2026
 
 **Estado:** continuação da beta.11/código 112. Testes pessoais na consolidação final, conforme pedido; sem novo APK do app ou Release. Conta/login Google/nuvem permanecem adiados.

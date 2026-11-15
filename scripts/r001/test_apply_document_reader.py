@@ -57,7 +57,16 @@ class DocumentOverlayTests(unittest.TestCase):
         subprocess.run(['git', '-C', str(self.root), 'diff', '--check'], check=True)
         self.assertFalse((self.root / 'data/src/main/sqldelight/tachiyomi/migrations/15.sqm').exists())
         about = self.root / 'app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt'
-        self.assertIn('P20261114.3', about.read_text())
+        self.assertIn('P20261114.4', about.read_text())
+        import xml.etree.ElementTree as ET
+        android_name = '{http://schemas.android.com/apk/res/android}name'
+        android_enabled = '{http://schemas.android.com/apk/res/android}enabled'
+        manifest = ET.parse(self.root / 'app/src/main/AndroidManifest.xml').getroot()
+        components = list(manifest.find('application'))
+        for suffix in ('ExtensionSandboxService', 'SandboxLoginActivity'):
+            component = next(node for node in components if node.get(android_name, '').endswith(suffix))
+            self.assertEqual('false', component.get(android_enabled))
+
         self.verify_fixture_bytes()
         self.verify_generated_icons()
         self.assertTrue((self.root / 'app/src/main/java/eu/kanade/tachiyomi/source/selection/UnifiedWorkSearch.kt').exists())

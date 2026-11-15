@@ -474,6 +474,73 @@ QCSqawXY)a?MgqqEA5B<j2LJ#7
 literal 0
 HcmV?d00001
 
+diff --git a/app/src/androidTest/java/eu/kanade/tachiyomi/extension/ExtensionRiskNoticeAndroidTest.kt b/app/src/androidTest/java/eu/kanade/tachiyomi/extension/ExtensionRiskNoticeAndroidTest.kt
+new file mode 100644
+index 0000000..36dbd64
+--- /dev/null
++++ b/app/src/androidTest/java/eu/kanade/tachiyomi/extension/ExtensionRiskNoticeAndroidTest.kt
+@@ -0,0 +1,61 @@
++package eu.kanade.tachiyomi.extension
++
++import android.content.ComponentName
++import android.content.Context
++import android.content.pm.PackageManager
++import androidx.test.ext.junit.runners.AndroidJUnit4
++import androidx.test.platform.app.InstrumentationRegistry
++import java.util.UUID
++import org.junit.Assert.*
++import org.junit.Test
++import org.junit.runner.RunWith
++import tachiyomi.core.common.preference.AndroidPreferenceStore
++
++@RunWith(AndroidJUnit4::class)
++class ExtensionRiskNoticeAndroidTest {
++    private val context = InstrumentationRegistry.getInstrumentation().targetContext
++
++    @Test
++    fun twoChecksAreRequiredAndANewAdapterReadsTheSameLocalDecision() {
++        val name = "polaris-risk-notice-${UUID.randomUUID()}"
++        val native = context.getSharedPreferences(name, Context.MODE_PRIVATE)
++        try {
++            val first =
++                ExtensionRiskAcknowledgement(
++                    AndroidPreferenceStore(context, native)
++                        .getBoolean(ExtensionRiskAcknowledgement.KEY)
++                )
++            assertFalse(first.acknowledge(true, false))
++            assertFalse(first.isAcknowledged)
++            assertTrue(first.acknowledge(true, true))
++            assertTrue(native.edit().commit())
++            val recreated =
++                ExtensionRiskAcknowledgement(
++                    AndroidPreferenceStore(context, native)
++                        .getBoolean(ExtensionRiskAcknowledgement.KEY)
++                )
++            assertTrue(recreated.isAcknowledged)
++        } finally {
++            context.deleteSharedPreferences(name)
++        }
++    }
++
++    @Test
++    fun pausedSandboxComponentsAreDisabledInTheInstalledManifest() {
++        assertFalse(ExtensionExecutionPolicy.SANDBOX_ENABLED)
++        val service =
++            ComponentName(context, "eu.kanade.tachiyomi.extension.sandbox.ExtensionSandboxService")
++        val activity =
++            ComponentName(context, "eu.kanade.tachiyomi.extension.sandbox.SandboxLoginActivity")
++        assertFalse(
++            context.packageManager
++                .getServiceInfo(service, PackageManager.MATCH_DISABLED_COMPONENTS)
++                .enabled
++        )
++        assertFalse(
++            context.packageManager
++                .getActivityInfo(activity, PackageManager.MATCH_DISABLED_COMPONENTS)
++                .enabled
++        )
++    }
++}
 diff --git a/app/src/androidTest/java/eu/kanade/tachiyomi/extension/sandbox/AutomaticLanguageAndroidTest.kt b/app/src/androidTest/java/eu/kanade/tachiyomi/extension/sandbox/AutomaticLanguageAndroidTest.kt
 new file mode 100644
 index 0000000..eb7f576
@@ -507,10 +574,10 @@ index 0000000..eb7f576
 +}
 diff --git a/app/src/androidTest/java/eu/kanade/tachiyomi/extension/sandbox/ExtensionSandboxAndroidTest.kt b/app/src/androidTest/java/eu/kanade/tachiyomi/extension/sandbox/ExtensionSandboxAndroidTest.kt
 new file mode 100644
-index 0000000..e5c1e2a
+index 0000000..22019a9
 --- /dev/null
 +++ b/app/src/androidTest/java/eu/kanade/tachiyomi/extension/sandbox/ExtensionSandboxAndroidTest.kt
-@@ -0,0 +1,181 @@
+@@ -0,0 +1,182 @@
 +package eu.kanade.tachiyomi.extension.sandbox
 +
 +import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -529,6 +596,7 @@ index 0000000..e5c1e2a
 + * Runs the actual internal service/proxy with compiled synthetic Source code, without the reader
 + * UI.
 + */
++@org.junit.Ignore("Sandbox paused for the beta; components are disabled")
 +@RunWith(AndroidJUnit4::class)
 +class ExtensionSandboxAndroidTest {
 +    private val instrumentation = InstrumentationRegistry.getInstrumentation()
@@ -694,10 +762,10 @@ index 0000000..e5c1e2a
 +}
 diff --git a/app/src/androidTest/java/eu/kanade/tachiyomi/extension/sandbox/SandboxCookieAndroidTest.kt b/app/src/androidTest/java/eu/kanade/tachiyomi/extension/sandbox/SandboxCookieAndroidTest.kt
 new file mode 100644
-index 0000000..9654a79
+index 0000000..04590f7
 --- /dev/null
 +++ b/app/src/androidTest/java/eu/kanade/tachiyomi/extension/sandbox/SandboxCookieAndroidTest.kt
-@@ -0,0 +1,408 @@
+@@ -0,0 +1,409 @@
 +package eu.kanade.tachiyomi.extension.sandbox
 +
 +import androidx.preference.PreferenceFragmentCompat
@@ -716,6 +784,7 @@ index 0000000..9654a79
 +import org.junit.Test
 +import org.junit.runner.RunWith
 +
++@org.junit.Ignore("Sandbox paused for the beta; components are disabled")
 +@RunWith(AndroidJUnit4::class)
 +class SandboxCookieAndroidTest {
 +    private val instrumentation = InstrumentationRegistry.getInstrumentation()
@@ -1108,10 +1177,10 @@ index 0000000..9654a79
 +}
 diff --git a/app/src/androidTest/java/eu/kanade/tachiyomi/extension/sandbox/SandboxSettingsAndroidTest.kt b/app/src/androidTest/java/eu/kanade/tachiyomi/extension/sandbox/SandboxSettingsAndroidTest.kt
 new file mode 100644
-index 0000000..e91887a
+index 0000000..2d87b95
 --- /dev/null
 +++ b/app/src/androidTest/java/eu/kanade/tachiyomi/extension/sandbox/SandboxSettingsAndroidTest.kt
-@@ -0,0 +1,769 @@
+@@ -0,0 +1,770 @@
 +package eu.kanade.tachiyomi.extension.sandbox
 +
 +import android.app.Application
@@ -1146,6 +1215,7 @@ index 0000000..e91887a
 +import uy.kohesive.injekt.Injekt
 +import uy.kohesive.injekt.api.addSingleton
 +
++@org.junit.Ignore("Sandbox paused for the beta; components are disabled")
 +@RunWith(AndroidJUnit4::class)
 +class SandboxSettingsAndroidTest {
 +    private val instrumentation = InstrumentationRegistry.getInstrumentation()
@@ -4562,10 +4632,10 @@ index 0000000..719562e
 +    }
 +}
 diff --git a/app/src/main/AndroidManifest.xml b/app/src/main/AndroidManifest.xml
-index 172b28c..66e9da7 100644
+index 172b28c..6ef3c92 100644
 --- a/app/src/main/AndroidManifest.xml
 +++ b/app/src/main/AndroidManifest.xml
-@@ -43,20 +43,53 @@
+@@ -43,20 +43,54 @@
  
          android:name=".App"
          android:allowBackup="false"
@@ -4616,6 +4686,7 @@ index 172b28c..66e9da7 100644
 +
 +        <service
 +            android:name="eu.kanade.tachiyomi.extension.sandbox.ExtensionSandboxService"
++            android:enabled="false"
 +            android:exported="false"
 +            android:isolatedProcess="true"
 +            android:process=":extension_sandbox" />
@@ -4623,7 +4694,7 @@ index 172b28c..66e9da7 100644
          <service
              android:name="eu.kanade.translation.detection.DbnetService"
              android:exported="false"
-@@ -67,11 +100,6 @@
+@@ -67,11 +101,6 @@
              android:exported="true"
              android:launchMode="singleTop"
              android:theme="@style/Theme.Tachiyomi.SplashScreen">
@@ -4635,7 +4706,7 @@ index 172b28c..66e9da7 100644
  
              <!-- Legacy deeplink to add extension store -->
              <intent-filter android:label="@string/action_addExtensionStore">
-@@ -128,6 +156,58 @@
+@@ -128,6 +157,58 @@
                  android:resource="@xml/shortcuts" />
          </activity>
  
@@ -4694,18 +4765,19 @@ index 172b28c..66e9da7 100644
          <activity
              android:name=".crash.CrashActivity"
              android:exported="false"
-@@ -187,6 +267,10 @@
+@@ -187,6 +268,11 @@
              android:exported="false"
              android:theme="@style/Theme.Tachiyomi" />
  
 +        <activity
 +            android:name=".extension.sandbox.SandboxLoginActivity"
++            android:enabled="false"
 +            android:exported="false" />
 +
          <activity
              android:name=".ui.webview.WebViewActivity"
              android:configChanges="uiMode|orientation|screenSize"
-@@ -261,7 +345,7 @@
+@@ -261,7 +347,7 @@
  
          <meta-data
              android:name="android.webkit.WebView.EnableSafeBrowsing"
@@ -5329,10 +5401,10 @@ index 3b4351b..bd46232 100644
  
      fun trust(pkgName: String, versionCode: Long, signatureHash: String) {
 diff --git a/app/src/main/java/eu/kanade/domain/source/service/SourcePreferences.kt b/app/src/main/java/eu/kanade/domain/source/service/SourcePreferences.kt
-index d861014..ea54c62 100644
+index d861014..47eda37 100644
 --- a/app/src/main/java/eu/kanade/domain/source/service/SourcePreferences.kt
 +++ b/app/src/main/java/eu/kanade/domain/source/service/SourcePreferences.kt
-@@ -9,81 +9,100 @@ import tachiyomi.core.common.preference.getEnum
+@@ -9,81 +9,106 @@ import tachiyomi.core.common.preference.getEnum
  import tachiyomi.core.common.preference.getLongArray
  import tachiyomi.domain.library.model.LibraryDisplayMode
  
@@ -5391,6 +5463,12 @@ index d861014..ea54c62 100644
 +        preferenceStore.getStringSet(
 +            Preference.appStateKey("polaris_sandbox_quarantine"),
 +            emptySet(),
++        )
++
++    val extensionRiskAcknowledged: Preference<Boolean> =
++        preferenceStore.getBoolean(
++            eu.kanade.tachiyomi.extension.ExtensionRiskAcknowledgement.KEY,
++            false,
 +        )
 +
 +    val isolatedExtensions: Preference<Set<String>> =
@@ -5704,7 +5782,7 @@ index 0000000..c29663a
 +    }
 +}
 diff --git a/app/src/main/java/eu/kanade/presentation/browse/ExtensionDetailsScreen.kt b/app/src/main/java/eu/kanade/presentation/browse/ExtensionDetailsScreen.kt
-index 79352cd..d033194 100644
+index 79352cd..7a6115a 100644
 --- a/app/src/main/java/eu/kanade/presentation/browse/ExtensionDetailsScreen.kt
 +++ b/app/src/main/java/eu/kanade/presentation/browse/ExtensionDetailsScreen.kt
 @@ -57,6 +57,7 @@ import eu.kanade.tachiyomi.ui.browse.extension.details.ExtensionDetailsViewModel
@@ -5845,7 +5923,7 @@ index 79352cd..d033194 100644
          }
  
          item {
-@@ -177,24 +173,45 @@ private fun ExtensionDetails(
+@@ -177,24 +173,49 @@ private fun ExtensionDetails(
                  extension = extension,
                  extIncognitoMode = incognitoMode,
                  onClickUninstall = onClickUninstall,
@@ -5877,35 +5955,39 @@ index 79352cd..d033194 100644
 -            items = sources,
 -            key = { it.source.id },
 -        ) { source ->
-+        item {
-+            TextPreferenceWidget(
-+                title = stringResource(ATMR.strings.security_isolation_toggle),
-+                subtitle =
-+                    stringResource(
-+                        when (extension.executionMode) {
-+                            "isolated_experimental" ->
-+                                ATMR.strings.security_runtime_isolated_experimental
-+                            "isolation_failed" -> ATMR.strings.security_runtime_isolation_failed
-+                            else -> ATMR.strings.security_runtime_compatibility
-+                        }
-+                    ),
-+                onPreferenceClick = {
-+                    if (extension.executionMode == "compatibility") onClickIsolation(true)
-+                    else showCompatibilityWarning = true
-+                },
-+                widget = {
-+                    Switch(
-+                        checked = extension.executionMode != "compatibility",
-+                        onCheckedChange = null,
-+                    )
-+                },
-+            )
++        if (extension.executionMode == "isolation_paused") {
++            item { WarningBanner(ATMR.strings.extension_risk_paused_selection) }
 +        }
++        if (eu.kanade.tachiyomi.extension.ExtensionExecutionPolicy.SANDBOX_ENABLED)
++            item {
++                TextPreferenceWidget(
++                    title = stringResource(ATMR.strings.security_isolation_toggle),
++                    subtitle =
++                        stringResource(
++                            when (extension.executionMode) {
++                                "isolated_experimental" ->
++                                    ATMR.strings.security_runtime_isolated_experimental
++                                "isolation_failed" -> ATMR.strings.security_runtime_isolation_failed
++                                else -> ATMR.strings.security_runtime_compatibility
++                            }
++                        ),
++                    onPreferenceClick = {
++                        if (extension.executionMode == "compatibility") onClickIsolation(true)
++                        else showCompatibilityWarning = true
++                    },
++                    widget = {
++                        Switch(
++                            checked = extension.executionMode != "compatibility",
++                            onCheckedChange = null,
++                        )
++                    },
++                )
++            }
 +        items(items = sources, key = { it.source.id }) { source ->
              SourceSwitchPreference(
                  modifier = Modifier.animateItem(),
                  source = source,
-@@ -203,13 +220,31 @@ private fun ExtensionDetails(
+@@ -203,13 +224,31 @@ private fun ExtensionDetails(
              )
          }
      }
@@ -5941,7 +6023,7 @@ index 79352cd..d033194 100644
  }
  
  @Composable
-@@ -225,45 +260,46 @@ private fun DetailsHeader(
+@@ -225,45 +264,46 @@ private fun DetailsHeader(
  
      Column {
          Column(
@@ -6015,7 +6097,7 @@ index 79352cd..d033194 100644
                  extension = extension,
                  density = DisplayMetrics.DENSITY_XXXHIGH,
              )
-@@ -276,19 +312,16 @@ private fun DetailsHeader(
+@@ -276,19 +316,16 @@ private fun DetailsHeader(
  
              val strippedPkgName = extension.pkgName.substringAfter("eu.kanade.tachiyomi.extension.")
  
@@ -6042,7 +6124,7 @@ index 79352cd..d033194 100644
              horizontalArrangement = Arrangement.SpaceEvenly,
              verticalAlignment = Alignment.CenterVertically,
          ) {
-@@ -312,10 +345,11 @@ private fun DetailsHeader(
+@@ -312,10 +349,11 @@ private fun DetailsHeader(
                  InfoText(
                      modifier = Modifier.weight(1f),
                      primaryText = stringResource(MR.strings.ext_nsfw_short),
@@ -6058,7 +6140,7 @@ index 79352cd..d033194 100644
                      secondaryText = stringResource(MR.strings.ext_info_age_rating),
                      onClick = onClickAgeRating,
                  )
-@@ -323,23 +357,17 @@ private fun DetailsHeader(
+@@ -323,23 +361,17 @@ private fun DetailsHeader(
          }
  
          Row(
@@ -6087,7 +6169,7 @@ index 79352cd..d033194 100644
                      Text(
                          text = stringResource(MR.strings.ext_app_info),
                          color = MaterialTheme.colorScheme.onPrimary,
-@@ -354,9 +382,7 @@ private fun DetailsHeader(
+@@ -354,9 +386,7 @@ private fun DetailsHeader(
              subtitle = stringResource(MR.strings.pref_incognito_mode_extension_summary),
              icon = ImageVector.vectorResource(R.drawable.ic_glasses_24dp),
              widget = {
@@ -6098,7 +6180,7 @@ index 79352cd..d033194 100644
                      Switch(
                          checked = extIncognitoMode,
                          onCheckedChange = onExtIncognitoChange,
-@@ -378,22 +404,19 @@ private fun InfoText(
+@@ -378,22 +408,19 @@ private fun InfoText(
      primaryTextStyle: TextStyle = MaterialTheme.typography.bodyLarge,
      onClick: (() -> Unit)? = null,
  ) {
@@ -6128,7 +6210,7 @@ index 79352cd..d033194 100644
  
          Text(
              text = secondaryText + if (onClick != null) " ⓘ" else "",
-@@ -406,9 +429,7 @@ private fun InfoText(
+@@ -406,9 +433,7 @@ private fun InfoText(
  
  @Composable
  private fun InfoDivider() {
@@ -6139,7 +6221,7 @@ index 79352cd..d033194 100644
  }
  
  @Composable
-@@ -422,15 +443,14 @@ private fun SourceSwitchPreference(
+@@ -422,15 +447,14 @@ private fun SourceSwitchPreference(
  
      TextPreferenceWidget(
          modifier = modifier,
@@ -6162,7 +6244,7 @@ index 79352cd..d033194 100644
                  if (source.source is ConfigurableSource) {
                      IconButton(onClick = { onClickSourcePreferences(source.source.id) }) {
                          Icon(
-@@ -453,13 +473,9 @@ private fun SourceSwitchPreference(
+@@ -453,13 +477,9 @@ private fun SourceSwitchPreference(
  }
  
  @Composable
@@ -6788,6 +6870,139 @@ index 44de96e..8d57fc2 100644
                      isChecked = displayMode == LibraryDisplayMode.ComfortableGrid,
                  ) {
                      selectingDisplayMode = false
+diff --git a/app/src/main/java/eu/kanade/presentation/browse/components/ExtensionRiskNotice.kt b/app/src/main/java/eu/kanade/presentation/browse/components/ExtensionRiskNotice.kt
+new file mode 100644
+index 0000000..1f7f89f
+--- /dev/null
++++ b/app/src/main/java/eu/kanade/presentation/browse/components/ExtensionRiskNotice.kt
+@@ -0,0 +1,127 @@
++package eu.kanade.presentation.browse.components
++
++import androidx.compose.foundation.layout.*
++import androidx.compose.foundation.rememberScrollState
++import androidx.compose.foundation.selection.toggleable
++import androidx.compose.foundation.verticalScroll
++import androidx.compose.material3.*
++import androidx.compose.runtime.*
++import androidx.compose.runtime.saveable.rememberSaveable
++import androidx.compose.ui.Alignment
++import androidx.compose.ui.Modifier
++import androidx.compose.ui.platform.LocalContext
++import androidx.compose.ui.semantics.Role
++import androidx.compose.ui.unit.dp
++import androidx.compose.ui.window.DialogProperties
++import eu.kanade.domain.source.service.SourcePreferences
++import eu.kanade.tachiyomi.extension.ExtensionExecutionPolicy
++import eu.kanade.tachiyomi.extension.ExtensionRiskAcknowledgement
++import eu.kanade.tachiyomi.extension.util.ExtensionInstallReceiver
++import tachiyomi.i18n.at.ATMR
++import tachiyomi.presentation.core.i18n.stringResource
++import uy.kohesive.injekt.Injekt
++import uy.kohesive.injekt.api.get
++
++/** One acknowledgement shared by manual installs, updates, batches and novel plugins. */
++@Composable
++fun rememberExtensionRiskNotice(): (() -> Unit) -> Unit {
++    val context = LocalContext.current
++    val preferences = remember { Injekt.get<SourcePreferences>() }
++    val risk =
++        remember(preferences) {
++            ExtensionRiskAcknowledgement(preferences.extensionRiskAcknowledged)
++        }
++    var pending by remember { mutableStateOf<(() -> Unit)?>(null) }
++
++    fun resumeReviewedExtensions() {
++        if (ExtensionExecutionPolicy.SANDBOX_ENABLED) return
++        val selected = preferences.isolatedExtensions.get()
++        if (selected.isEmpty()) return
++        preferences.isolatedExtensions.set(emptySet())
++        selected.forEach { ExtensionInstallReceiver.notifyReplaced(context, it) }
++    }
++
++    // An old experimental selection is never silently switched to the shared app process.
++    LaunchedEffect(Unit) {
++        if (
++            !ExtensionExecutionPolicy.SANDBOX_ENABLED &&
++                preferences.isolatedExtensions.get().isNotEmpty()
++        ) {
++            if (risk.isAcknowledged) resumeReviewedExtensions()
++            else if (pending == null) pending = {}
++        }
++    }
++
++    if (pending != null) {
++        var understood by rememberSaveable { mutableStateOf(false) }
++        var careful by rememberSaveable { mutableStateOf(false) }
++        var failed by remember { mutableStateOf(false) }
++        AlertDialog(
++            onDismissRequest = {},
++            properties =
++                DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false),
++            title = { Text(stringResource(ATMR.strings.extension_risk_title)) },
++            text = {
++                Column(Modifier.heightIn(max = 480.dp).verticalScroll(rememberScrollState())) {
++                    Text(stringResource(ATMR.strings.extension_risk_message))
++                    Spacer(Modifier.height(16.dp))
++                    RiskCheck(stringResource(ATMR.strings.extension_risk_understood), understood) {
++                        understood = it
++                    }
++                    RiskCheck(stringResource(ATMR.strings.extension_risk_careful), careful) {
++                        careful = it
++                    }
++                    if (failed)
++                        Text(
++                            stringResource(ATMR.strings.extension_risk_save_failed),
++                            color = MaterialTheme.colorScheme.error,
++                        )
++                }
++            },
++            confirmButton = {
++                TextButton(
++                    enabled = understood && careful,
++                    onClick = {
++                        val action = pending
++                        val allowed =
++                            try {
++                                risk.acknowledge(understood, careful).also { accepted ->
++                                    if (accepted) resumeReviewedExtensions()
++                                }
++                            } catch (_: Exception) {
++                                failed = true
++                                false
++                            }
++                        if (allowed) {
++                            pending = null
++                            action?.invoke()
++                        }
++                    },
++                ) {
++                    Text(stringResource(ATMR.strings.extension_risk_continue))
++                }
++            },
++        )
++    }
++
++    return { action ->
++        if (risk.isAcknowledged) {
++            resumeReviewedExtensions()
++            action()
++        } else if (pending == null) pending = action
++    }
++}
++
++@Composable
++private fun RiskCheck(label: String, checked: Boolean, change: (Boolean) -> Unit) {
++    Row(
++        Modifier.fillMaxWidth()
++            .heightIn(min = 48.dp)
++            .toggleable(value = checked, role = Role.Checkbox, onValueChange = change),
++        verticalAlignment = Alignment.CenterVertically,
++    ) {
++        Checkbox(checked, onCheckedChange = null)
++        Spacer(Modifier.width(8.dp))
++        Text(label)
++    }
++}
 diff --git a/app/src/main/java/eu/kanade/presentation/browse/components/GlobalSearchToolbar.kt b/app/src/main/java/eu/kanade/presentation/browse/components/GlobalSearchToolbar.kt
 index dd67afb..d78cab1 100644
 --- a/app/src/main/java/eu/kanade/presentation/browse/components/GlobalSearchToolbar.kt
@@ -10779,7 +10994,7 @@ index a198c3f..9a3e84f 100644
                      preference = translationPreferences.translationEngineTemperature(),
                      title = stringResource(ATMR.strings.pref_engine_temperature),
 diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
-index 7f411fd..0bb7401 100644
+index 7f411fd..0250575 100644
 --- a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
 +++ b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
 @@ -1,15 +1,18 @@
@@ -10844,7 +11059,7 @@ index 7f411fd..0bb7401 100644
  
      // Identifies this overlay independently of the pinned upstream COMMIT_SHA.
 -    private const val POLARIS_READER_REVISION = "P20261031.2"
-+    private const val POLARIS_READER_REVISION = "P20261114.3"
++    private const val POLARIS_READER_REVISION = "P20261114.4"
  
      @Composable
      override fun Content() {
@@ -11225,10 +11440,10 @@ index 0000000..4d59c26
 +}
 diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/browse/preparation/SourcePreparationScreen.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/browse/preparation/SourcePreparationScreen.kt
 new file mode 100644
-index 0000000..5b1a846
+index 0000000..209555d
 --- /dev/null
 +++ b/app/src/main/java/eu/kanade/presentation/more/settings/screen/browse/preparation/SourcePreparationScreen.kt
-@@ -0,0 +1,565 @@
+@@ -0,0 +1,569 @@
 +package eu.kanade.presentation.more.settings.screen.browse.preparation
 +
 +import androidx.activity.compose.BackHandler
@@ -11268,6 +11483,7 @@ index 0000000..5b1a846
 +import androidx.lifecycle.viewmodel.compose.viewModel
 +import cafe.adriel.voyager.navigator.LocalNavigator
 +import cafe.adriel.voyager.navigator.currentOrThrow
++import eu.kanade.presentation.browse.components.rememberExtensionRiskNotice
 +import eu.kanade.presentation.components.AppBar
 +import eu.kanade.presentation.more.settings.screen.SearchableSettings
 +import eu.kanade.presentation.more.settings.screen.SettingsDataScreen
@@ -11286,6 +11502,7 @@ index 0000000..5b1a846
 +    @Composable
 +    override fun Content() {
 +        val navigator = LocalNavigator.currentOrThrow
++        val requestRiskNotice = rememberExtensionRiskNotice()
 +        val model = viewModel<SourcePreparationViewModel>()
 +        val state by model.state.collectAsState()
 +        val batch by model.queue.state.collectAsState()
@@ -11324,19 +11541,19 @@ index 0000000..5b1a846
 +                                }
 +                            } else {
 +                                Button(
-+                                    onClick = model::prepare,
++                                    onClick = { requestRiskNotice { model.prepare() } },
 +                                    modifier = Modifier.fillMaxWidth(),
 +                                    enabled =
-+                                    !state.busy &&
-+                                        state.consent &&
-+                                        state.catalogLoaded &&
-+                                        plan.extensions.isNotEmpty(),
++                                        !state.busy &&
++                                            state.consent &&
++                                            state.catalogLoaded &&
++                                            plan.extensions.isNotEmpty(),
 +                                ) {
 +                                    Text(
 +                                        stringResource(
 +                                            ATMR.strings.preparation_start,
 +                                            plan.extensions.size,
-+                                        ),
++                                        )
 +                                    )
 +                                }
 +                            }
@@ -11367,7 +11584,7 @@ index 0000000..5b1a846
 +                                    PreparationError.UNSIGNED -> ATMR.strings.preparation_unsigned
 +                                    PreparationError.ADULT_DISABLED ->
 +                                        ATMR.strings.preparation_adult_disabled
-+                                },
++                                }
 +                            ),
 +                            color = MaterialTheme.colorScheme.error,
 +                        )
@@ -11388,7 +11605,7 @@ index 0000000..5b1a846
 +                                    ATMR.strings.preparation_progress,
 +                                    batch.entries.count { it.status.terminal },
 +                                    batch.entries.size,
-+                                ),
++                                )
 +                            )
 +                            LinearProgressIndicator(
 +                                progress = {
@@ -11406,7 +11623,7 @@ index 0000000..5b1a846
 +                                    },
 +                                    batch.entries.count { it.status == PreparationStatus.FAILED },
 +                                    batch.entries.count { it.status == PreparationStatus.CANCELLED },
-+                                ),
++                                )
 +                            )
 +                            Text(stringResource(ATMR.strings.preparation_lifetime))
 +                            if (!state.consent) {
@@ -11430,7 +11647,11 @@ index 0000000..5b1a846
 +                                    }
 +                                ) {
 +                                    Button(
-+                                        onClick = { model.queue.retryFailures(state.consent) },
++                                        onClick = {
++                                            requestRiskNotice {
++                                                model.queue.retryFailures(state.consent)
++                                            }
++                                        },
 +                                        enabled = state.consent,
 +                                    ) {
 +                                        Text(stringResource(ATMR.strings.preparation_retry))
@@ -11440,7 +11661,7 @@ index 0000000..5b1a846
 +                                    onClick = {
 +                                        model.queue.clear()
 +                                        page = 0
-+                                    },
++                                    }
 +                                ) {
 +                                    Text(stringResource(ATMR.strings.preparation_review))
 +                                }
@@ -11472,8 +11693,8 @@ index 0000000..5b1a846
 +                                                ATMR.strings.preparation_failed
 +                                            PreparationStatus.CANCELLED ->
 +                                                ATMR.strings.preparation_cancelled
-+                                        },
-+                                    ),
++                                        }
++                                    )
 +                                )
 +                                HorizontalDivider()
 +                            }
@@ -11547,7 +11768,7 @@ index 0000000..5b1a846
 +                                            stringResource(
 +                                                ATMR.strings.preparation_check_repo,
 +                                                entry.name,
-+                                            ),
++                                            )
 +                                        )
 +                                    }
 +                                }
@@ -11580,7 +11801,7 @@ index 0000000..5b1a846
 +                                        stringResource(
 +                                            ATMR.strings.preparation_key,
 +                                            store.signingKey,
-+                                        ),
++                                        )
 +                                    )
 +                                    Text(stringResource(ATMR.strings.preparation_key_warning))
 +                                    Button(
@@ -11605,9 +11826,9 @@ index 0000000..5b1a846
 +                                    page = 2
 +                                },
 +                                enabled =
-+                                state.selectedRepositories.isNotEmpty() &&
-+                                    !state.busy &&
-+                                    state.consent,
++                                    state.selectedRepositories.isNotEmpty() &&
++                                        !state.busy &&
++                                        state.consent,
 +                            ) {
 +                                Text(stringResource(ATMR.strings.preparation_load_sources))
 +                            }
@@ -11645,7 +11866,7 @@ index 0000000..5b1a846
 +                                                    ATMR.strings.preparation_languages
 +                                                PreparationSelection.MANUAL ->
 +                                                    ATMR.strings.preparation_manual
-+                                            },
++                                            }
 +                                        ),
 +                                        choice == state.selection,
 +                                        enabled = !state.busy,
@@ -11669,13 +11890,13 @@ index 0000000..5b1a846
 +                                }
 +                                if (
 +                                    state.selection == PreparationSelection.LIBRARY &&
-+                                    plan.missingSourceIds.isNotEmpty()
++                                        plan.missingSourceIds.isNotEmpty()
 +                                ) {
 +                                    Text(
 +                                        stringResource(
 +                                            ATMR.strings.preparation_missing,
 +                                            plan.missingSourceIds.size,
-+                                        ),
++                                        )
 +                                    )
 +                                }
 +                                if (plan.unsupportedPackages.isNotEmpty()) {
@@ -11683,7 +11904,7 @@ index 0000000..5b1a846
 +                                        stringResource(
 +                                            ATMR.strings.preparation_unsupported,
 +                                            plan.unsupportedPackages.size,
-+                                        ),
++                                        )
 +                                    )
 +                                }
 +                                if (plan.conflicts.isNotEmpty()) {
@@ -11691,14 +11912,14 @@ index 0000000..5b1a846
 +                                        stringResource(
 +                                            ATMR.strings.preparation_conflicts,
 +                                            plan.conflicts.size,
-+                                        ),
++                                        )
 +                                    )
 +                                }
 +                                Text(
 +                                    stringResource(
 +                                        ATMR.strings.preparation_review_count,
 +                                        plan.extensions.size,
-+                                    ),
++                                    )
 +                                )
 +                                Text(stringResource(ATMR.strings.preparation_download_notice))
 +                                if (state.catalogLoaded && plan.extensions.isEmpty()) {
@@ -11741,13 +11962,11 @@ index 0000000..5b1a846
 +                                        (state.includeNsfw || !it.isNsfw) &&
 +                                            it.pkgName !in state.sharedPackages &&
 +                                            (state.installedVersions[it.pkgName] ?: -1) <
-+                                            it.versionCode &&
-+                                            (
-+                                                it.name.contains(query, true) ||
-+                                                    it.sources.any { source ->
-+                                                        source.name.contains(query, true)
-+                                                    }
-+                                                )
++                                                it.versionCode &&
++                                            (it.name.contains(query, true) ||
++                                                it.sources.any { source ->
++                                                    source.name.contains(query, true)
++                                                })
 +                                    }
 +                                    .distinctBy { it.pkgName }
 +                                    .sortedBy { it.name },
@@ -11788,7 +12007,7 @@ index 0000000..5b1a846
 +                role = Role.Checkbox,
 +                onValueChange = onChange,
 +            )
-+            .padding(vertical = 8.dp),
++            .padding(vertical = 8.dp)
 +    ) {
 +        Checkbox(checked = checked, onCheckedChange = null, enabled = enabled)
 +        Text(label, modifier = Modifier.weight(1f).padding(start = 8.dp))
@@ -21620,7 +21839,7 @@ index 0000000..1134341
 +    }
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/extension/ExtensionManager.kt b/app/src/main/java/eu/kanade/tachiyomi/extension/ExtensionManager.kt
-index 699e074..53a38f9 100644
+index 699e074..213687f 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/extension/ExtensionManager.kt
 +++ b/app/src/main/java/eu/kanade/tachiyomi/extension/ExtensionManager.kt
 @@ -9,10 +9,16 @@ import eu.kanade.tachiyomi.extension.api.ExtensionUpdateNotifier
@@ -21663,7 +21882,14 @@ index 699e074..53a38f9 100644
  
  /**
   * The manager of extensions installed as another apk which extend the available sources. It handles
-@@ -50,98 +60,197 @@ class ExtensionManager(
+@@ -45,103 +55,205 @@ class ExtensionManager(
+     private val trustExtension: TrustExtension = Injekt.get(),
+ ) {
+ 
++    private val risk = ExtensionRiskAcknowledgement(preferences.extensionRiskAcknowledged)
++
+     val scope = CoroutineScope(SupervisorJob())
+ 
      private val _isInitialized = MutableStateFlow(false)
      val isInitialized: StateFlow<Boolean> = _isInitialized.asStateFlow()
  
@@ -21701,6 +21927,7 @@ index 699e074..53a38f9 100644
 +                }
 +            },
 +            install = install@{ extension, progress ->
++                    if (!risk.isAcknowledged) return@install PreparationStatus.FAILED
 +                    // Existing Android-installed extensions keep their installation method.
 +                    if (context.isPackageInstalled(extension.pkgName))
 +                        return@install PreparationStatus.NEEDS_TRUST
@@ -21905,7 +22132,7 @@ index 699e074..53a38f9 100644
  
          enableAdditionalSubLanguages(extensions)
  
-@@ -151,13 +260,13 @@ class ExtensionManager(
+@@ -151,13 +263,13 @@ class ExtensionManager(
      }
  
      /**
@@ -21925,7 +22152,7 @@ index 699e074..53a38f9 100644
       */
      private fun enableAdditionalSubLanguages(extensions: List<Extension.Available>) {
          if (subLanguagesEnabledOnFirstRun || extensions.isEmpty()) {
-@@ -165,16 +274,16 @@ class ExtensionManager(
+@@ -165,16 +277,16 @@ class ExtensionManager(
          }
  
          // Use the source lang as some aren't present on the extension level.
@@ -21949,7 +22176,7 @@ index 699e074..53a38f9 100644
  
          preferences.enabledLanguages.set(defaultLanguages + languagesToEnable)
          subLanguagesEnabledOnFirstRun = true
-@@ -202,14 +311,10 @@ class ExtensionManager(
+@@ -202,14 +314,10 @@ class ExtensionManager(
              } else if (availableExt != null) {
                  val hasUpdate = extension.updateExists(availableExt)
                  if (extension.hasUpdate != hasUpdate) {
@@ -21967,7 +22194,7 @@ index 699e074..53a38f9 100644
                  }
                  changed = true
              }
-@@ -221,9 +326,9 @@ class ExtensionManager(
+@@ -221,27 +329,33 @@ class ExtensionManager(
      }
  
      /**
@@ -21980,7 +22207,10 @@ index 699e074..53a38f9 100644
       *
       * @param extension The extension to be installed.
       */
-@@ -232,16 +337,20 @@ class ExtensionManager(
+     fun installExtension(extension: Extension.Available): Flow<InstallStep> {
+-        return installer.downloadAndInstall(extension.apkUrl, extension)
++        return risk.whenAcknowledged { installer.downloadAndInstall(extension.apkUrl, extension) }
++            ?: kotlinx.coroutines.flow.flowOf(InstallStep.Error)
      }
  
      /**
@@ -21994,6 +22224,7 @@ index 699e074..53a38f9 100644
       * @param extension The extension to be updated.
       */
      fun updateExtension(extension: Extension.Installed): Flow<InstallStep> {
++        if (!risk.isAcknowledged) return kotlinx.coroutines.flow.flowOf(InstallStep.Error)
          val availableExt = availableExtensionMapFlow.value[extension.pkgName] ?: return emptyFlow()
          val isUpdateForPrivatelyInstalled = !extension.isShared
 -        return installer.downloadAndInstall(availableExt.apkUrl, availableExt, isUpdateForPrivatelyInstalled)
@@ -22005,7 +22236,7 @@ index 699e074..53a38f9 100644
      }
  
      fun cancelInstallUpdateExtension(extension: Extension) {
-@@ -279,13 +388,31 @@ class ExtensionManager(
+@@ -279,13 +393,31 @@ class ExtensionManager(
      suspend fun trust(extension: Extension.Untrusted) {
          untrustedExtensionMapFlow.value[extension.pkgName] ?: return
  
@@ -22042,7 +22273,7 @@ index 699e074..53a38f9 100644
      }
  
      /**
-@@ -298,8 +425,8 @@ class ExtensionManager(
+@@ -298,8 +430,8 @@ class ExtensionManager(
      }
  
      /**
@@ -22053,7 +22284,7 @@ index 699e074..53a38f9 100644
       *
       * @param extension The extension to be registered.
       */
-@@ -318,9 +445,7 @@ class ExtensionManager(
+@@ -318,9 +450,7 @@ class ExtensionManager(
          untrustedExtensionMapFlow.value -= pkgName
      }
  
@@ -22064,7 +22295,7 @@ index 699e074..53a38f9 100644
      private inner class InstallationListener : ExtensionInstallReceiver.Listener {
  
          override fun onExtensionInstalled(extension: Extension.Installed) {
-@@ -346,9 +471,7 @@ class ExtensionManager(
+@@ -346,9 +476,7 @@ class ExtensionManager(
          }
      }
  
@@ -22075,7 +22306,7 @@ index 699e074..53a38f9 100644
      private fun Extension.Installed.withUpdateCheck(): Extension.Installed {
          return if (updateExists()) {
              copy(hasUpdate = true)
-@@ -357,10 +480,11 @@ class ExtensionManager(
+@@ -357,10 +485,11 @@ class ExtensionManager(
          }
      }
  
@@ -22091,7 +22322,7 @@ index 699e074..53a38f9 100644
  
          return (availableExt.versionCode > versionCode || availableExt.libVersion > libVersion)
      }
-@@ -373,9 +497,13 @@ class ExtensionManager(
+@@ -373,9 +502,13 @@ class ExtensionManager(
          }
      }
  
@@ -22108,8 +22339,58 @@ index 699e074..53a38f9 100644
 +            .stateIn(scope, SharingStarted.Lazily, value.values.toList())
      }
  }
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/extension/ExtensionRiskAcknowledgement.kt b/app/src/main/java/eu/kanade/tachiyomi/extension/ExtensionRiskAcknowledgement.kt
+new file mode 100644
+index 0000000..3ed743b
+--- /dev/null
++++ b/app/src/main/java/eu/kanade/tachiyomi/extension/ExtensionRiskAcknowledgement.kt
+@@ -0,0 +1,44 @@
++package eu.kanade.tachiyomi.extension
++
++import tachiyomi.core.common.preference.Preference
++
++/** Local installation decision, deliberately excluded from portable backups. */
++class ExtensionRiskAcknowledgement(private val accepted: Preference<Boolean>) {
++    companion object {
++        val KEY = Preference.appStateKey("polaris_extension_risk_acknowledged_v1")
++    }
++
++    val isAcknowledged: Boolean
++        get() = accepted.get()
++
++    fun acknowledge(understood: Boolean, careful: Boolean): Boolean {
++        if (!understood || !careful) return false
++        accepted.set(true)
++        check(accepted.get()) { "Could not save extension risk acknowledgement" }
++        return true
++    }
++
++    fun <T : Any> whenAcknowledged(action: () -> T): T? = if (isAcknowledged) action() else null
++}
++
++/** Sandbox development is paused for this beta. Existing isolated choices require review. */
++object ExtensionExecutionPolicy {
++    const val SANDBOX_ENABLED = false
++
++    enum class Mode {
++        COMPATIBILITY,
++        ISOLATED,
++        AWAITING_ACKNOWLEDGEMENT,
++    }
++
++    fun mode(
++        requestedIsolation: Boolean,
++        acknowledged: Boolean,
++        enabled: Boolean = SANDBOX_ENABLED,
++    ): Mode =
++        when {
++            enabled && requestedIsolation -> Mode.ISOLATED
++            !enabled && requestedIsolation && !acknowledged -> Mode.AWAITING_ACKNOWLEDGEMENT
++            else -> Mode.COMPATIBILITY
++        }
++}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/extension/novel/NovelExtensionManager.kt b/app/src/main/java/eu/kanade/tachiyomi/extension/novel/NovelExtensionManager.kt
-index d273543..644fc9b 100644
+index d273543..3e3cdb8 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/extension/novel/NovelExtensionManager.kt
 +++ b/app/src/main/java/eu/kanade/tachiyomi/extension/novel/NovelExtensionManager.kt
 @@ -6,6 +6,8 @@ import eu.kanade.tachiyomi.extension.novel.model.NovelPlugin
@@ -22281,8 +22562,18 @@ index d273543..644fc9b 100644
              } finally {
                  _isRefreshing.value = false
              }
-@@ -139,12 +167,15 @@ class NovelExtensionManager(
+@@ -137,14 +165,25 @@ class NovelExtensionManager(
+     }
+ 
      fun installPlugin(plugin: NovelPlugin, onComplete: (Boolean) -> Unit) {
++        if (
++            !Injekt.get<eu.kanade.domain.source.service.SourcePreferences>()
++                .extensionRiskAcknowledged
++                .get()
++        ) {
++            onComplete(false)
++            return
++        }
          scope.launch {
              try {
 +                val targetFile = NovelPluginPaths.file(pluginsDir, plugin.id, "js")
@@ -22301,7 +22592,7 @@ index d273543..644fc9b 100644
                  metaFile.writeText(json.encodeToString(plugin))
                  loadInstalledExtensions()
                  refreshAvailablePlugins()
-@@ -157,11 +188,19 @@ class NovelExtensionManager(
+@@ -157,11 +196,19 @@ class NovelExtensionManager(
      }
  
      fun uninstallPlugin(pluginId: String) {
@@ -27643,7 +27934,7 @@ index 4d9493f..fddb83c 100644
          const val EXTRA_DOWNLOAD_ID = "ExtensionInstaller.extra.DOWNLOAD_ID"
      }
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/extension/util/ExtensionLoader.kt b/app/src/main/java/eu/kanade/tachiyomi/extension/util/ExtensionLoader.kt
-index 962fafa..945debe 100644
+index 962fafa..7becf41 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/extension/util/ExtensionLoader.kt
 +++ b/app/src/main/java/eu/kanade/tachiyomi/extension/util/ExtensionLoader.kt
 @@ -10,40 +10,37 @@ import eu.kanade.domain.extension.interactor.TrustExtension
@@ -28050,7 +28341,7 @@ index 962fafa..945debe 100644
          if (libVersion == null || libVersion !in SUPPORTED_LIB_VERSIONS) {
              logcat(LogPriority.WARN) {
                  "Lib version is $libVersion, while only version(s) ${SUPPORTED_LIB_VERSIONS.joinToString()} are supported"
-@@ -255,80 +319,160 @@ internal object ExtensionLoader {
+@@ -255,80 +319,171 @@ internal object ExtensionLoader {
              return LoadResult.Error
          }
  
@@ -28128,10 +28419,20 @@ index 962fafa..945debe 100644
 -                }
 -            }
 -            .flatMap {
-+        val isolation = pkgName in preferences.isolatedExtensions.get()
++        val execution =
++            eu.kanade.tachiyomi.extension.ExtensionExecutionPolicy.mode(
++                pkgName in preferences.isolatedExtensions.get(),
++                preferences.extensionRiskAcknowledged.get(),
++            )
++        val pausedSelection =
++            execution ==
++                eu.kanade.tachiyomi.extension.ExtensionExecutionPolicy.Mode.AWAITING_ACKNOWLEDGEMENT
++        val isolation =
++            execution == eu.kanade.tachiyomi.extension.ExtensionExecutionPolicy.Mode.ISOLATED
 +        var isolationFailed = false
 +        val sources: List<Source> =
-+            if (isolation) {
++            if (pausedSelection) emptyList()
++            else if (isolation) {
 +                val classes =
 +                    appInfo.metaData.getString(METADATA_SOURCE_CLASS)!!.split(";").map {
 +                        val name = it.trim()
@@ -28259,13 +28560,14 @@ index 962fafa..945debe 100644
 +                isShared = extensionInfo.isShared,
 +                securityWarnings = warnings,
 +                executionMode =
-+                    if (isolationFailed) "isolation_failed"
++                    if (pausedSelection) "isolation_paused"
++                    else if (isolationFailed) "isolation_failed"
 +                    else if (isolation) "isolated_experimental" else "compatibility",
 +            )
          return LoadResult.Success(extension)
      }
  
-@@ -338,15 +482,19 @@ internal object ExtensionLoader {
+@@ -338,15 +493,19 @@ internal object ExtensionLoader {
       * @param shared extension installed to system
       * @param private extension installed to data directory
       */
@@ -28288,7 +28590,7 @@ index 962fafa..945debe 100644
          ) {
              shared
          } else {
-@@ -359,6 +507,14 @@ internal object ExtensionLoader {
+@@ -359,6 +518,14 @@ internal object ExtensionLoader {
       *
       * @param pkgInfo The package info of the application.
       */
@@ -28303,7 +28605,7 @@ index 962fafa..945debe 100644
      private fun isPackageAnExtension(pkgInfo: PackageInfo): Boolean {
          return pkgInfo.reqFeatures.orEmpty().any { it.name == EXTENSION_FEATURE }
      }
-@@ -371,23 +527,22 @@ internal object ExtensionLoader {
+@@ -371,23 +538,22 @@ internal object ExtensionLoader {
       */
      private fun getSignatures(pkgInfo: PackageInfo): List<String>? {
          return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
@@ -28336,7 +28638,7 @@ index 962fafa..945debe 100644
       */
      private fun ApplicationInfo.fixBasePaths(apkPath: String) {
          if (sourceDir == null) {
-@@ -398,8 +553,5 @@ internal object ExtensionLoader {
+@@ -398,8 +564,5 @@ internal object ExtensionLoader {
          }
      }
  
@@ -30205,10 +30507,15 @@ index 0000000..232da69
 +        }
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/browse/extension/ExtensionsTab.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/browse/extension/ExtensionsTab.kt
-index efc3654..8858809 100644
+index efc3654..cd4ed11 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/ui/browse/extension/ExtensionsTab.kt
 +++ b/app/src/main/java/eu/kanade/tachiyomi/ui/browse/extension/ExtensionsTab.kt
-@@ -18,6 +18,7 @@ import eu.kanade.presentation.components.AppBar
+@@ -14,10 +14,12 @@ import androidx.compose.ui.platform.LocalContext
+ import cafe.adriel.voyager.navigator.LocalNavigator
+ import cafe.adriel.voyager.navigator.currentOrThrow
+ import eu.kanade.presentation.browse.ExtensionScreen
++import eu.kanade.presentation.browse.components.rememberExtensionRiskNotice
+ import eu.kanade.presentation.components.AppBar
  import eu.kanade.presentation.components.TabContent
  import eu.kanade.presentation.more.settings.screen.browse.ExtensionStoresScreen
  import eu.kanade.presentation.more.settings.screen.browse.discovery.RepositoryDiscoveryScreen
@@ -30216,22 +30523,151 @@ index efc3654..8858809 100644
  import eu.kanade.tachiyomi.extension.model.Extension
  import eu.kanade.tachiyomi.ui.browse.extension.details.ExtensionDetailsScreen
  import eu.kanade.tachiyomi.ui.webview.WebViewScreen
-@@ -41,6 +42,10 @@ fun extensionsTab(
+@@ -27,10 +29,9 @@ import tachiyomi.i18n.at.ATMR
+ import tachiyomi.presentation.core.i18n.stringResource
+ 
+ @Composable
+-fun extensionsTab(
+-    extensionsViewModel: ExtensionsViewModel,
+-): TabContent {
++fun extensionsTab(extensionsViewModel: ExtensionsViewModel): TabContent {
+     val navigator = LocalNavigator.currentOrThrow
++    val requestRiskNotice = rememberExtensionRiskNotice()
+     val context = LocalContext.current
+ 
+     val state by extensionsViewModel.state.collectAsState()
+@@ -40,24 +41,27 @@ fun extensionsTab(
+         titleRes = MR.strings.label_extensions,
          badgeNumber = state.updates.takeIf { it > 0 },
          searchEnabled = true,
-         actions = listOf(
-+            AppBar.OverflowAction(
-+                title = stringResource(ATMR.strings.preparation_title),
-+                onClick = { navigator.push(SourcePreparationScreen()) },
-+            ),
-             AppBar.OverflowAction(
-                 title = stringResource(ATMR.strings.repository_discovery),
-                 onClick = { navigator.push(RepositoryDiscoveryScreen()) },
+-        actions = listOf(
+-            AppBar.OverflowAction(
+-                title = stringResource(ATMR.strings.repository_discovery),
+-                onClick = { navigator.push(RepositoryDiscoveryScreen()) },
++        actions =
++            listOf(
++                AppBar.OverflowAction(
++                    title = stringResource(ATMR.strings.preparation_title),
++                    onClick = { navigator.push(SourcePreparationScreen()) },
++                ),
++                AppBar.OverflowAction(
++                    title = stringResource(ATMR.strings.repository_discovery),
++                    onClick = { navigator.push(RepositoryDiscoveryScreen()) },
++                ),
++                AppBar.OverflowAction(
++                    title = stringResource(MR.strings.action_filter),
++                    onClick = { navigator.push(ExtensionFilterScreen()) },
++                ),
++                AppBar.OverflowAction(
++                    title = stringResource(MR.strings.extensionStores),
++                    onClick = { navigator.push(ExtensionStoresScreen()) },
++                ),
+             ),
+-            AppBar.OverflowAction(
+-                title = stringResource(MR.strings.action_filter),
+-                onClick = { navigator.push(ExtensionFilterScreen()) },
+-            ),
+-            AppBar.OverflowAction(
+-                title = stringResource(MR.strings.extensionStores),
+-                onClick = { navigator.push(ExtensionStoresScreen()) },
+-            ),
+-        ),
+         content = { contentPadding, _ ->
+-            BackHandler(enabled = state.searchQuery != null) {
+-                extensionsViewModel.search(null)
+-            }
++            BackHandler(enabled = state.searchQuery != null) { extensionsViewModel.search(null) }
+ 
+             ExtensionScreen(
+                 state = state,
+@@ -65,7 +69,8 @@ fun extensionsTab(
+                 searchQuery = state.searchQuery,
+                 onLongClickItem = { extension ->
+                     when (extension) {
+-                        is Extension.Available -> extensionsViewModel.installExtension(extension)
++                        is Extension.Available ->
++                            requestRiskNotice { extensionsViewModel.installExtension(extension) }
+                         else -> {
+                             if (context.isPackageInstalled(extension.pkgName)) {
+                                 extensionsViewModel.uninstallExtension(extension)
+@@ -76,7 +81,9 @@ fun extensionsTab(
+                     }
+                 },
+                 onClickItemCancel = extensionsViewModel::cancelInstallUpdateExtension,
+-                onClickUpdateAll = extensionsViewModel::updateAllExtensions,
++                onClickUpdateAll = {
++                    requestRiskNotice { extensionsViewModel.updateAllExtensions() }
++                },
+                 onOpenWebView = { extension ->
+                     extension.sources.getOrNull(0)?.let {
+                         navigator.push(
+@@ -84,27 +91,27 @@ fun extensionsTab(
+                                 url = it.baseUrl,
+                                 initialTitle = it.name,
+                                 sourceId = it.id,
+-                            ),
++                            )
+                         )
+                     }
+                 },
+-                onInstallExtension = extensionsViewModel::installExtension,
++                onInstallExtension = { extension ->
++                    requestRiskNotice { extensionsViewModel.installExtension(extension) }
++                },
+                 onOpenExtension = { navigator.push(ExtensionDetailsScreen(it.pkgName)) },
+                 onTrustExtension = { extensionsViewModel.trustExtension(it) },
+                 onUninstallExtension = { extensionsViewModel.uninstallExtension(it) },
+-                onUpdateExtension = extensionsViewModel::updateExtension,
++                onUpdateExtension = { extension ->
++                    requestRiskNotice { extensionsViewModel.updateExtension(extension) }
++                },
+                 onRefresh = extensionsViewModel::findAvailableExtensions,
+             )
+ 
+             privateExtensionToUninstall?.let { extension ->
+                 ExtensionUninstallConfirmation(
+                     extensionName = extension.name,
+-                    onClickConfirm = {
+-                        extensionsViewModel.uninstallExtension(extension)
+-                    },
+-                    onDismissRequest = {
+-                        privateExtensionToUninstall = null
+-                    },
++                    onClickConfirm = { extensionsViewModel.uninstallExtension(extension) },
++                    onDismissRequest = { privateExtensionToUninstall = null },
+                 )
+             }
+         },
+@@ -118,9 +125,7 @@ private fun ExtensionUninstallConfirmation(
+     onDismissRequest: () -> Unit,
+ ) {
+     AlertDialog(
+-        title = {
+-            Text(text = stringResource(MR.strings.ext_confirm_remove))
+-        },
++        title = { Text(text = stringResource(MR.strings.ext_confirm_remove)) },
+         text = {
+             Text(text = stringResource(MR.strings.remove_private_extension_message, extensionName))
+         },
+@@ -129,7 +134,7 @@ private fun ExtensionUninstallConfirmation(
+                 onClick = {
+                     onClickConfirm()
+                     onDismissRequest()
+-                },
++                }
+             ) {
+                 Text(text = stringResource(MR.strings.ext_remove))
+             }
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/browse/extension/details/ExtensionDetailsScreen.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/browse/extension/details/ExtensionDetailsScreen.kt
-index 7ee326f..08b655f 100644
+index 7ee326f..a1ebb26 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/ui/browse/extension/details/ExtensionDetailsScreen.kt
 +++ b/app/src/main/java/eu/kanade/tachiyomi/ui/browse/extension/details/ExtensionDetailsScreen.kt
-@@ -13,18 +13,15 @@ import eu.kanade.presentation.util.Screen
+@@ -9,22 +9,21 @@ import androidx.lifecycle.viewmodel.compose.viewModel
+ import cafe.adriel.voyager.navigator.LocalNavigator
+ import cafe.adriel.voyager.navigator.currentOrThrow
+ import eu.kanade.presentation.browse.ExtensionDetailsScreen
++import eu.kanade.presentation.browse.components.rememberExtensionRiskNotice
+ import eu.kanade.presentation.util.Screen
  import kotlinx.coroutines.flow.collectLatest
  import tachiyomi.presentation.core.screens.LoadingScreen
  
@@ -30248,6 +30684,7 @@ index 7ee326f..08b655f 100644
 -                set(ExtensionDetailsViewModel.PKG_NAME_KEY, pkgName)
 -            },
 -        )
++        rememberExtensionRiskNotice()
 +        val viewModel =
 +            viewModel<ExtensionDetailsViewModel>(
 +                factory = ExtensionDetailsViewModel.Factory,
@@ -30256,7 +30693,7 @@ index 7ee326f..08b655f 100644
          val state by viewModel.state.collectAsState()
  
          if (state.isLoading) {
-@@ -44,6 +41,7 @@ data class ExtensionDetailsScreen(
+@@ -44,6 +43,7 @@ data class ExtensionDetailsScreen(
              onClickUninstall = viewModel::uninstallExtension,
              onClickSource = viewModel::toggleSource,
              onClickIncognito = viewModel::toggleIncognito,
@@ -30265,7 +30702,7 @@ index 7ee326f..08b655f 100644
  
          LaunchedEffect(Unit) {
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/browse/extension/details/ExtensionDetailsViewModel.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/browse/extension/details/ExtensionDetailsViewModel.kt
-index a1ab133..5ffde92 100644
+index a1ab133..328b7fd 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/ui/browse/extension/details/ExtensionDetailsViewModel.kt
 +++ b/app/src/main/java/eu/kanade/tachiyomi/ui/browse/extension/details/ExtensionDetailsViewModel.kt
 @@ -35,7 +35,7 @@ import uy.kohesive.injekt.api.get
@@ -30347,7 +30784,7 @@ index a1ab133..5ffde92 100644
  
          logcat { "Cleared $cleared cookies for: ${urls.joinToString()}" }
      }
-@@ -142,9 +147,19 @@ class ExtensionDetailsViewModel(
+@@ -142,9 +147,21 @@ class ExtensionDetailsViewModel(
      }
  
      fun toggleSources(enable: Boolean) {
@@ -30358,6 +30795,8 @@ index a1ab133..5ffde92 100644
 +    }
 +
 +    fun toggleIsolation(enable: Boolean) {
++        if (enable && !eu.kanade.tachiyomi.extension.ExtensionExecutionPolicy.SANDBOX_ENABLED)
++            return
 +        val extension = state.value.extension ?: return
 +        val selected = preferences.isolatedExtensions.get()
 +        preferences.isolatedExtensions.set(
@@ -30516,6 +30955,113 @@ index e754957..8220aca 100644
                  onToggleSortingDirection = viewModel::toggleSortingDirection,
                  onToggleSortingMode = viewModel::toggleSortingMode,
              )
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/browse/novel/NovelsTab.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/browse/novel/NovelsTab.kt
+index 9fc8ef9..5bcbb2c 100644
+--- a/app/src/main/java/eu/kanade/tachiyomi/ui/browse/novel/NovelsTab.kt
++++ b/app/src/main/java/eu/kanade/tachiyomi/ui/browse/novel/NovelsTab.kt
+@@ -9,9 +9,11 @@ import androidx.compose.runtime.getValue
+ import androidx.compose.ui.Modifier
+ import cafe.adriel.voyager.navigator.LocalNavigator
+ import cafe.adriel.voyager.navigator.currentOrThrow
++import eu.kanade.presentation.browse.components.rememberExtensionRiskNotice
+ import eu.kanade.presentation.components.AppBar
+ import eu.kanade.presentation.components.TabContent
+ import eu.kanade.presentation.more.settings.screen.browse.ExtensionStoresScreen
++import eu.kanade.tachiyomi.ui.webview.WebViewScreen
+ import tachiyomi.i18n.MR
+ import tachiyomi.presentation.core.components.material.PullRefresh
+ import tachiyomi.presentation.core.i18n.stringResource
+@@ -19,13 +21,10 @@ import tachiyomi.presentation.core.screens.EmptyScreen
+ import tachiyomi.presentation.core.screens.EmptyScreenAction
+ import tachiyomi.presentation.core.screens.LoadingScreen
+ 
+-import eu.kanade.tachiyomi.ui.webview.WebViewScreen
+-
+ @Composable
+-fun novelsTab(
+-    viewModel: NovelsViewModel,
+-): TabContent {
++fun novelsTab(viewModel: NovelsViewModel): TabContent {
+     val navigator = LocalNavigator.currentOrThrow
++    val requestRiskNotice = rememberExtensionRiskNotice()
+     val state by viewModel.state.collectAsState()
+     val searchQuery by viewModel.searchQuery.collectAsState()
+ 
+@@ -33,16 +32,21 @@ fun novelsTab(
+         titleRes = MR.strings.label_novels,
+         badgeNumber = state.updates.size.takeIf { it > 0 },
+         searchEnabled = true,
+-        actions = listOf(
+-            AppBar.OverflowAction(
+-                title = stringResource(MR.strings.action_filter),
+-                onClick = { navigator.push(eu.kanade.tachiyomi.ui.browse.extension.ExtensionFilterScreen()) },
+-            ),
+-            AppBar.OverflowAction(
+-                title = stringResource(MR.strings.extensionStores),
+-                onClick = { navigator.push(ExtensionStoresScreen()) },
++        actions =
++            listOf(
++                AppBar.OverflowAction(
++                    title = stringResource(MR.strings.action_filter),
++                    onClick = {
++                        navigator.push(
++                            eu.kanade.tachiyomi.ui.browse.extension.ExtensionFilterScreen()
++                        )
++                    },
++                ),
++                AppBar.OverflowAction(
++                    title = stringResource(MR.strings.extensionStores),
++                    onClick = { navigator.push(ExtensionStoresScreen()) },
++                ),
+             ),
+-        ),
+         content = { contentPadding, _ ->
+             PullRefresh(
+                 refreshing = state.isRefreshing,
+@@ -55,29 +59,31 @@ fun novelsTab(
+                         EmptyScreen(
+                             stringRes = MR.strings.empty_screen,
+                             modifier = Modifier.padding(contentPadding),
+-                            actions = listOf(
+-                                EmptyScreenAction(
+-                                    stringRes = MR.strings.extensionStores,
+-                                    icon = Icons.Outlined.Settings,
+-                                    onClick = { navigator.push(ExtensionStoresScreen()) },
++                            actions =
++                                listOf(
++                                    EmptyScreenAction(
++                                        stringRes = MR.strings.extensionStores,
++                                        icon = Icons.Outlined.Settings,
++                                        onClick = { navigator.push(ExtensionStoresScreen()) },
++                                    )
+                                 ),
+-                            ),
+                         )
+                     }
+                     else -> {
+                         NovelsScreen(
+                             state = state,
+                             contentPadding = contentPadding,
+-                            onInstallExtension = viewModel::installExtension,
++                            onInstallExtension = { extension ->
++                                requestRiskNotice { viewModel.installExtension(extension) }
++                            },
+                             onUninstallExtension = viewModel::uninstallExtension,
+-                            onUpdateExtension = viewModel::updateExtension,
++                            onUpdateExtension = { extension ->
++                                requestRiskNotice { viewModel.updateExtension(extension) }
++                            },
+                             onOpenWebView = { plugin ->
+                                 if (plugin.site.isNotBlank()) {
+                                     navigator.push(
+-                                        WebViewScreen(
+-                                            url = plugin.site,
+-                                            initialTitle = plugin.name,
+-                                        ),
++                                        WebViewScreen(url = plugin.site, initialTitle = plugin.name)
+                                     )
+                                 }
+                             },
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/browse/source/globalsearch/GlobalSearchScreen.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/browse/source/globalsearch/GlobalSearchScreen.kt
 index a7c138d..82d1a66 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/ui/browse/source/globalsearch/GlobalSearchScreen.kt
@@ -68230,6 +68776,176 @@ index 0000000..52defe4
 +        assertTrue(preferences.shouldCheck(true, true, now))
 +    }
 +}
+diff --git a/app/src/test/java/eu/kanade/tachiyomi/extension/ExtensionRiskAcknowledgementTest.kt b/app/src/test/java/eu/kanade/tachiyomi/extension/ExtensionRiskAcknowledgementTest.kt
+new file mode 100644
+index 0000000..2170611
+--- /dev/null
++++ b/app/src/test/java/eu/kanade/tachiyomi/extension/ExtensionRiskAcknowledgementTest.kt
+@@ -0,0 +1,164 @@
++package eu.kanade.tachiyomi.extension
++
++import android.content.Context
++import eu.kanade.domain.source.service.SourcePreferences
++import eu.kanade.tachiyomi.data.backup.create.creators.PreferenceBackupCreator
++import eu.kanade.tachiyomi.data.backup.models.BackupPreference
++import eu.kanade.tachiyomi.data.backup.models.BooleanPreferenceValue
++import eu.kanade.tachiyomi.data.backup.models.StringPreferenceValue
++import eu.kanade.tachiyomi.data.backup.restore.restorers.PreferenceRestorer
++import io.mockk.every
++import io.mockk.mockk
++import java.io.IOException
++import kotlinx.coroutines.test.runTest
++import org.junit.jupiter.api.Assertions.*
++import org.junit.jupiter.api.Test
++import org.junit.jupiter.api.assertThrows
++import tachiyomi.core.common.preference.InMemoryPreferenceStore.InMemoryPreference
++import tachiyomi.core.common.preference.Preference
++import tachiyomi.core.common.preference.PreferenceStore
++import tachiyomi.domain.category.interactor.GetCategories
++import tachiyomi.domain.source.service.SourceManager
++
++class ExtensionRiskAcknowledgementTest {
++    private fun flag() = InMemoryPreference(ExtensionRiskAcknowledgement.KEY, false, false)
++
++    @Test
++    fun `a new local installation needs acknowledgement before executing installer code`() {
++        val risk = ExtensionRiskAcknowledgement(flag())
++        var called = false
++        assertFalse(risk.isAcknowledged)
++        assertNull(
++            risk.whenAcknowledged {
++                called = true
++                "installed"
++            }
++        )
++        assertFalse(called)
++    }
++
++    @Test
++    fun `neither a single checkbox nor an empty form can accept the notice`() {
++        for ((understood, careful) in listOf(false to false, true to false, false to true)) {
++            val value = flag()
++            val risk = ExtensionRiskAcknowledgement(value)
++            assertFalse(risk.acknowledge(understood, careful))
++            assertFalse(value.get())
++            assertNull(risk.whenAcknowledged { "must not install" })
++        }
++    }
++
++    @Test
++    fun `both checkboxes persist the decision before the installation is allowed`() {
++        val value = flag()
++        val risk = ExtensionRiskAcknowledgement(value)
++        assertTrue(risk.acknowledge(true, true))
++        assertEquals(
++            "installed",
++            risk.whenAcknowledged {
++                assertTrue(value.get())
++                "installed"
++            },
++        )
++    }
++
++    @Test
++    fun `a fresh controller shares the accepted decision for subsequent extensions`() {
++        val value = flag()
++        ExtensionRiskAcknowledgement(value).acknowledge(true, true)
++        val recreated = ExtensionRiskAcknowledgement(value)
++        assertTrue(recreated.isAcknowledged)
++        var installs = 0
++        repeat(3) { recreated.whenAcknowledged { installs++ } }
++        assertEquals(3, installs)
++    }
++
++    @Test
++    fun `a failed preference save cannot authorize installation`() {
++        val value = mockk<Preference<Boolean>>()
++        every { value.get() } returns false
++        every { value.set(true) } throws IOException("Storage unavailable")
++        val risk = ExtensionRiskAcknowledgement(value)
++        assertThrows<IOException> { risk.acknowledge(true, true) }
++        assertNull(risk.whenAcknowledged { "must not install" })
++    }
++
++    @Test
++    fun `an ignored write is detected before continuing`() {
++        val value = mockk<Preference<Boolean>>(relaxed = true)
++        every { value.get() } returns false
++        val risk = ExtensionRiskAcknowledgement(value)
++        assertThrows<IllegalStateException> { risk.acknowledge(true, true) }
++        assertNull(risk.whenAcknowledged { "must not install" })
++    }
++
++    @Test
++    fun `clearing local application data requires acknowledgement again`() {
++        val value = flag()
++        ExtensionRiskAcknowledgement(value).acknowledge(true, true)
++        value.delete()
++        assertFalse(ExtensionRiskAcknowledgement(value).isAcknowledged)
++    }
++
++    @Test
++    fun `the real source preferences wire the decision to local app state`() {
++        val value = flag()
++        val store = mockk<PreferenceStore>(relaxed = true)
++        every { store.getBoolean(ExtensionRiskAcknowledgement.KEY, false) } returns value
++        val prefs = SourcePreferences(store)
++        assertSame(value, prefs.extensionRiskAcknowledged)
++        assertTrue(Preference.isAppState(prefs.extensionRiskAcknowledged.key()))
++    }
++
++    @Test
++    fun `private backup exports omit the notice decision`() {
++        val store = mockk<PreferenceStore>()
++        every { store.getAll() } returns
++            mapOf(ExtensionRiskAcknowledgement.KEY to true, "ordinary" to "keep")
++        val creator = PreferenceBackupCreator(mockk<SourceManager>(), store)
++        assertEquals(listOf("ordinary"), creator.createApp(true).map { it.key })
++    }
++
++    @Test
++    fun `a crafted backup cannot pre accept the notice on another device`() = runTest {
++        val value = flag()
++        val ordinary = InMemoryPreference("ordinary", "before", "")
++        val store = mockk<PreferenceStore>()
++        every { store.getAll() } answers
++            {
++                mapOf(value.key() to value.get(), "ordinary" to ordinary.get())
++            }
++        every { store.getString("ordinary", any()) } returns ordinary
++        PreferenceRestorer(mockk<Context>(), mockk<GetCategories>(), store)
++            .restorePreferences(
++                listOf(
++                    BackupPreference(value.key(), BooleanPreferenceValue(true)),
++                    BackupPreference("ordinary", StringPreferenceValue("after")),
++                ),
++                store,
++            )
++        assertFalse(value.get())
++        assertEquals("after", ordinary.get())
++    }
++
++    @Test
++    fun `the beta execution policy disables the experimental sandbox`() {
++        assertFalse(ExtensionExecutionPolicy.SANDBOX_ENABLED)
++        assertEquals(
++            ExtensionExecutionPolicy.Mode.COMPATIBILITY,
++            ExtensionExecutionPolicy.mode(false, false),
++        )
++    }
++
++    @Test
++    fun `old isolated selections are not silently downgraded before acknowledgement`() {
++        assertEquals(
++            ExtensionExecutionPolicy.Mode.AWAITING_ACKNOWLEDGEMENT,
++            ExtensionExecutionPolicy.mode(true, false),
++        )
++        assertEquals(
++            ExtensionExecutionPolicy.Mode.COMPATIBILITY,
++            ExtensionExecutionPolicy.mode(true, true),
++        )
++    }
++}
 diff --git a/app/src/test/java/eu/kanade/tachiyomi/extension/novel/NovelPluginPathsTest.kt b/app/src/test/java/eu/kanade/tachiyomi/extension/novel/NovelPluginPathsTest.kt
 new file mode 100644
 index 0000000..3cda846
@@ -81511,7 +82227,7 @@ index 9839272..46e74da 100644
  junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }
  junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
 diff --git a/i18n-at/src/commonMain/moko-resources/base/strings.xml b/i18n-at/src/commonMain/moko-resources/base/strings.xml
-index 7ed4795..123bdc3 100644
+index 7ed4795..9ee5941 100644
 --- a/i18n-at/src/commonMain/moko-resources/base/strings.xml
 +++ b/i18n-at/src/commonMain/moko-resources/base/strings.xml
 @@ -10,7 +10,7 @@
@@ -81523,7 +82239,7 @@ index 7ed4795..123bdc3 100644
      <string name="pref_group_setup">Translation Setup</string>
      <string name="pref_translate_from">Translate From</string>
      <string name="pref_translate_to">Translate To</string>
-@@ -73,12 +73,325 @@
+@@ -73,12 +73,332 @@
      <string name="repository_add_error">Could not add this repository. Check your connection and try again.</string>
      <string name="repository_refresh_error">Repository added, but extension listings could not be refreshed. Refresh the Extensions screen.</string>
      <string name="chapter_group_version">Group/version: %1$s</string>
@@ -81850,9 +82566,16 @@ index 7ed4795..123bdc3 100644
 +    <string name="sandbox_settings_action_confirm">Run this local settings action?</string>
 +    <string name="sandbox_settings_action_complete">Action completed.</string>
 +    <string name="sandbox_settings_action_failed">The action could not be completed. Reload the settings before trying again.</string>
++    <string name="extension_risk_title">Before installing extensions</string>
++    <string name="extension_risk_message">Extensions are created by third parties. They can run code with the access available to Polaris, read data and authorized files, and send information over the internet. A malicious extension can compromise your data. This version does not provide extension sandboxing. Install extensions only from sources you trust. Installation and use are at your own risk.</string>
++    <string name="extension_risk_understood">I understand</string>
++    <string name="extension_risk_careful">I will be careful, relax</string>
++    <string name="extension_risk_continue">Continue</string>
++    <string name="extension_risk_save_failed">Could not save your acknowledgement. Try again.</string>
++    <string name="extension_risk_paused_selection">Sandboxing is paused in this beta. Review the extension notice to use this previously isolated extension in the regular mode.</string>
  </resources>
 diff --git a/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml b/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
-index d1748bc..a19759a 100644
+index d1748bc..b6bc87d 100644
 --- a/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
 +++ b/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
 @@ -10,7 +10,7 @@
@@ -81864,7 +82587,7 @@ index d1748bc..a19759a 100644
      <string name="pref_group_setup">Configuração da tradução</string>
      <string name="pref_translate_from">Traduzir de</string>
      <string name="pref_translate_to">Traduzir para</string>
-@@ -73,12 +73,325 @@
+@@ -73,12 +73,332 @@
      <string name="repository_add_error">Não foi possível adicionar o repositório. Confira a conexão e tente novamente.</string>
      <string name="repository_refresh_error">Repositório adicionado, mas não foi possível atualizar as extensões. Atualize a tela Extensões.</string>
      <string name="chapter_group_version">Grupo/versão: %1$s</string>
@@ -82191,6 +82914,13 @@ index d1748bc..a19759a 100644
 +    <string name="sandbox_settings_action_confirm">Executar esta ação local de configuração?</string>
 +    <string name="sandbox_settings_action_complete">Ação concluída.</string>
 +    <string name="sandbox_settings_action_failed">Não foi possível concluir a ação. Recarregue as configurações antes de tentar novamente.</string>
++    <string name="extension_risk_title">Antes de instalar extensões</string>
++    <string name="extension_risk_message">Extensões são criadas por terceiros. Elas podem executar código com o acesso disponível ao Polaris, ler dados e arquivos autorizados e enviar informações pela internet. Uma extensão mal-intencionada pode comprometer seus dados. Esta versão não oferece sandbox para extensões. Instale apenas extensões de fontes confiáveis. A instalação e o uso são por sua conta e risco.</string>
++    <string name="extension_risk_understood">Estou ciente</string>
++    <string name="extension_risk_careful">Terei cuidado, relaxa</string>
++    <string name="extension_risk_continue">Continuar</string>
++    <string name="extension_risk_save_failed">Não foi possível salvar sua confirmação. Tente novamente.</string>
++    <string name="extension_risk_paused_selection">A sandbox está pausada nesta beta. Revise o aviso de extensões para usar esta extensão antes isolada no modo normal.</string>
  </resources>
 diff --git a/i18n/src/commonMain/moko-resources/base/strings.xml b/i18n/src/commonMain/moko-resources/base/strings.xml
 index c0832ba..ebf8f48 100644

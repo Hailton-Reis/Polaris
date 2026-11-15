@@ -1,0 +1,91 @@
+{
+  "status": "NO_NEW_UNIT_REGRESSIONS",
+  "baseline": {
+    "total": 1004,
+    "passed": 1004,
+    "failed": 0,
+    "skipped": 0
+  },
+  "patched": {
+    "total": 1016,
+    "passed": 1016,
+    "failed": 0,
+    "skipped": 0
+  },
+  "preexisting_failures_still_present": 0,
+  "missing_baseline_tests": [],
+  "new_failures_or_skips": [],
+  "android_runtime_verified": false,
+  "gradle_exit_codes": {
+    "baseline": 0,
+    "patched": 0
+  },
+  "required_module_coverage": {
+    "app": 919,
+    "domain": 85
+  },
+  "baseline_origin": "Archived P20261114.3 reports: 919 app + 85 domain, not rerun.",
+  "current_origin": "931 app tests freshly executed; 85 domain previously passed and UP-TO-DATE.",
+  "new_cases": [
+    {
+      "class": "eu.kanade.tachiyomi.extension.ExtensionRiskAcknowledgementTest",
+      "name": "a failed preference save cannot authorize installation()",
+      "status": "passed"
+    },
+    {
+      "class": "eu.kanade.tachiyomi.extension.ExtensionRiskAcknowledgementTest",
+      "name": "a fresh controller shares the accepted decision for subsequent extensions()",
+      "status": "passed"
+    },
+    {
+      "class": "eu.kanade.tachiyomi.extension.ExtensionRiskAcknowledgementTest",
+      "name": "a crafted backup cannot pre accept the notice on another device()",
+      "status": "passed"
+    },
+    {
+      "class": "eu.kanade.tachiyomi.extension.ExtensionRiskAcknowledgementTest",
+      "name": "old isolated selections are not silently downgraded before acknowledgement()",
+      "status": "passed"
+    },
+    {
+      "class": "eu.kanade.tachiyomi.extension.ExtensionRiskAcknowledgementTest",
+      "name": "private backup exports omit the notice decision()",
+      "status": "passed"
+    },
+    {
+      "class": "eu.kanade.tachiyomi.extension.ExtensionRiskAcknowledgementTest",
+      "name": "clearing local application data requires acknowledgement again()",
+      "status": "passed"
+    },
+    {
+      "class": "eu.kanade.tachiyomi.extension.ExtensionRiskAcknowledgementTest",
+      "name": "the beta execution policy disables the experimental sandbox()",
+      "status": "passed"
+    },
+    {
+      "class": "eu.kanade.tachiyomi.extension.ExtensionRiskAcknowledgementTest",
+      "name": "both checkboxes persist the decision before the installation is allowed()",
+      "status": "passed"
+    },
+    {
+      "class": "eu.kanade.tachiyomi.extension.ExtensionRiskAcknowledgementTest",
+      "name": "an ignored write is detected before continuing()",
+      "status": "passed"
+    },
+    {
+      "class": "eu.kanade.tachiyomi.extension.ExtensionRiskAcknowledgementTest",
+      "name": "a new local installation needs acknowledgement before executing installer code()",
+      "status": "passed"
+    },
+    {
+      "class": "eu.kanade.tachiyomi.extension.ExtensionRiskAcknowledgementTest",
+      "name": "the real source preferences wire the decision to local app state()",
+      "status": "passed"
+    },
+    {
+      "class": "eu.kanade.tachiyomi.extension.ExtensionRiskAcknowledgementTest",
+      "name": "neither a single checkbox nor an empty form can accept the notice()",
+      "status": "passed"
+    }
+  ]
+}

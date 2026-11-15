@@ -1,0 +1,31 @@
+{
+  "revision": "P20261114.4",
+  "prior_pr_head": "3029ac6d2e8193a00659053197fb4a14e11d00d5",
+  "prior_pr_tree": "d0983c1ed43b4d6c8e09ade3ab3b26683e134320",
+  "upstream_prerequisite": "f037c5d85575e30694295df5d079e97dcc4a35b9",
+  "overlay_sha256": "b4032ede47a0e9af2feffcef8a531a407243424e86a38d64bf53de5001045781",
+  "overlay_git_sha": "380c1ca98453461d0ed6f67392f7ba1b3786727d",
+  "changed_android_source_sha256": {
+    "app/src/androidTest/java/eu/kanade/tachiyomi/extension/ExtensionRiskNoticeAndroidTest.kt": "8f9f74e6ceba7d4887e72ce71ffa8b4cb0f50ccad3f0165746d6b2f0d919914c",
+    "app/src/androidTest/java/eu/kanade/tachiyomi/extension/sandbox/ExtensionSandboxAndroidTest.kt": "90f2c8db79890f3ce33a278d4590bde689541b1fabe602948407ec2b39558413",
+    "app/src/androidTest/java/eu/kanade/tachiyomi/extension/sandbox/SandboxCookieAndroidTest.kt": "2ae56e2a0ddec8ee6cf627de134a2611a892e5a384dab150b336dc77599ea2fd",
+    "app/src/androidTest/java/eu/kanade/tachiyomi/extension/sandbox/SandboxSettingsAndroidTest.kt": "8723cc87fb3a233aabb79d1a0228b793c3a8bdeda067091dbe52c548d8715480",
+    "app/src/main/AndroidManifest.xml": "0a2e926afdf02bd61e1a42b24c4c2d0405cda8bdbf8749eddbf87d66c241e1d1",
+    "app/src/main/java/eu/kanade/domain/source/service/SourcePreferences.kt": "1721c1286618d17c2b609edba8f190493278bdcb6b3aa96a18b4d3da9d985b3e",
+    "app/src/main/java/eu/kanade/presentation/browse/ExtensionDetailsScreen.kt": "e759c6f9bdbf00c7e8b18a6c12e924ebcc9ca8ab7b1a62f4ec058a06728f67a1",
+    "app/src/main/java/eu/kanade/presentation/browse/components/ExtensionRiskNotice.kt": "53f136942678da6a860bba28bd82303bbc300942c6dcebd402b5ab7f2cafb839",
+    "app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt": "a3112774bdb20ea4e5542415c0222bcd418c9614813636f03ce253ca22300ce4",
+    "app/src/main/java/eu/kanade/presentation/more/settings/screen/browse/preparation/SourcePreparationScreen.kt": "5eb800e2f34f42f1dbb29ea2845e3eb9a9e1b86b78c4093fd75bdbf6897a66e0",
+    "app/src/main/java/eu/kanade/tachiyomi/extension/ExtensionManager.kt": "fd090e57e96e7def8e84fda9d101e8d749428a1ddc803101c327d335df39a1fa",
+    "app/src/main/java/eu/kanade/tachiyomi/extension/ExtensionRiskAcknowledgement.kt": "9757401d26d1e57f3724ad7831afd3422dcef8e54d7f9d011ca3b65ccd2300c6",
+    "app/src/main/java/eu/kanade/tachiyomi/extension/novel/NovelExtensionManager.kt": "b459f1dcbe603edb339c41d0ae57e06afe911eb92d160e770af10b4af70759b2",
+    "app/src/main/java/eu/kanade/tachiyomi/extension/util/ExtensionLoader.kt": "b1a5ee9b40f8d287129a6e47e2d2dc79052d28212da5b3d206f7d08a8ad47c67",
+    "app/src/main/java/eu/kanade/tachiyomi/ui/browse/extension/ExtensionsTab.kt": "c5f918a1100e0271dbca0d8faee7cfff31852c099b6015a6fa70af627d0fb565",
+    "app/src/main/java/eu/kanade/tachiyomi/ui/browse/extension/details/ExtensionDetailsScreen.kt": "e2774820294e1348157d2c750bb53c05361998fa02d4a25f9d490de679ced847",
+    "app/src/main/java/eu/kanade/tachiyomi/ui/browse/extension/details/ExtensionDetailsViewModel.kt": "6d990ccb96a02d68ff3ea2890b201a6e6078b7fa2b9d0cdabccaa69bee267ffa",
+    "app/src/main/java/eu/kanade/tachiyomi/ui/browse/novel/NovelsTab.kt": "98bd77d93710cc1454e693a64a913186f5d4a4221025cf31005bc3d4a266d3b2",
+    "app/src/test/java/eu/kanade/tachiyomi/extension/ExtensionRiskAcknowledgementTest.kt": "fa42a0543d6cce48c9554f0b99742c8658e7f1570377ac9a21dbb8fc2abbdd9d",
+    "i18n-at/src/commonMain/moko-resources/base/strings.xml": "912ff726112f501677676f40b3ca65fa688a8a7876d0975f90be1b82498a3a9e",
+    "i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml": "7bb1986592067d8c944f1a990483e30243a8bd7bfee0e8f787aea5894a53ed20"
+  }
+}

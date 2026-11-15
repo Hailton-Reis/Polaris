@@ -6,14 +6,15 @@ Este checklist acompanha o trabalho autorizado em 13/11. Não é uma declaraçã
 | Frente | Estado |
 | --- | --- |
 | Jornada, XP, conquistas e grimórios | Implementados no checkpoint anterior |
-| Login de fontes isoladas | Integração compilada; cookies por caminho/host e snapshots corrigidos P20261113.6. Login real pendente |
-| Sandbox: controles dinâmicos, provedores externos/OAuth e novels | Controles numéricos, listas síncronas e ações locais padrão implementados; telas/ações personalizadas, assíncronas, OAuth e novels pendentes |
+| Sandbox e login isolado | PAUSADOS pelo usuário; fora do escopo de conclusão desta beta. Código preservado, ativação/componentes desabilitados |
 | Biblioteca, fontes reais e backups entre leitores | Criação segura e ordem da restauração verificadas em JVM; SQLite/interface Android e ida/volta externa pendentes |
 | Leitura, OCR e tradução nos aparelhos | Pendente, incluindo diagnóstico do A12 |
 | Armazenamento | Importação com reuso/retomada (P20261113.7) e cache sem metadados corrigido (P20261114.2); legado/staging abandonado, pico e medição física pendentes |
 | Atualização beta.10 → beta.11 e distribuição não depurável | APK interno gerado com assinatura original; atualização no aparelho e variante não depurável pendentes |
 
-Ordem: autenticação/sandbox → biblioteca/backups → armazenamento/leitura → teste ARM → pacote.
+Ordem ativa: armazenamento → backups → leitura → distribuição. A sandbox não bloqueia a consolidação desta beta.
+
+A [decisão P20261114.4](PAUSA_SANDBOX_E_AVISO_P20261114_4.md) substitui as prioridades históricas abaixo. Instalações passam pelo aviso geral único com duas caixas; assinatura/integridade continuam verificadas.
 
 Fluxo combinado com o usuário: concluir as pendências de implementação e as validações automáticas; seus testes ficam para a consolidação final, seguida da publicação da versão no GitHub. Não solicitar testes pessoais a cada revisão intermediária.
 
@@ -42,3 +43,5 @@ P20261114.1: [restauração de categorias](RESTAURACAO_CATEGORIAS_P20261114_1.md
 P20261114.2: [cache de documentos](CACHE_DOCUMENTOS_P20261114_2.md) por conteúdo quando tamanho/data estão ausentes, com proteção de cópias em uso. 904 testes do app aprovados (14 novos), mais 85 anteriores de domain; core/app/instrumentação compilados, quatro testes de overlay e 16 de empacotamento aprovados. Dois cenários Android aguardam execução; sem novo APK ou benchmark ARM.
 
 P20261114.3: [ações locais padrão](SANDBOX_ACOES_LOCAIS_P20261114_3.md) com confirmação, execução no worker e sem HTTP. 919 testes do app aprovados (15 novos), mais 85 anteriores de domain; app/instrumentação compilados, quatro testes de overlay e 16 de empacotamento aprovados. Seis cenários Android compilados ficam para a consolidação final. Sem novo APK do app ou Release.
+
+P20261114.4: sandbox pausada e desabilitada; aviso único local com duas caixas, fora dos backups. 931 testes do app aprovados (12 novos), mais 85 anteriores de domain; app/instrumentação compilados e componentes desabilitados conferidos no manifesto mesclado. Quatro testes de overlay e 16 de empacotamento aprovados. Código experimental preservado; sem novo APK ou Release. Foco nas quatro frentes ativas.

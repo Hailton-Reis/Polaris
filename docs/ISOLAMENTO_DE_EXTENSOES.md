@@ -1,5 +1,8 @@
 # Extensões: isolamento, compatibilidade e quarentena
 
+**Decisão vigente P20261114.4:** sandbox pausada pelo usuário e desativada nesta beta; código preservado. O foco é armazenamento, backups, leitura e distribuição. O [aviso geral único](PAUSA_SANDBOX_E_AVISO_P20261114_4.md) informa os riscos de execução sem isolamento e exige duas confirmações. O restante deste documento é histórico de engenharia e não descreve um recurso ativo na candidata atual.
+
+
 **Atualização P20261111.1:** [Sessões HTTP próprias](SESSOES_E_ICONES_P20261111_1.md) passam a manter cookies por pacote/assinatura, com armazenamento autenticado do Keystore e limpeza que revoga clientes antigos. O navegador global não é importado. Login por WebView e novels continuam pendentes.
 
 **Atualização P20261110.3:** [Preferências básicas e filtros do executor isolado](SANDBOX_PREFERENCIAS_FILTROS_P20261110_3.md) estão implementados em desenvolvimento, com armazenamento separado por pacote/assinatura e importação explícita de configurações antigas. Login/WebView, cookies entre sessões, controles personalizados e novels continuam pendentes. O restante desta análise histórica distingue a beta publicada das provas anteriores.
