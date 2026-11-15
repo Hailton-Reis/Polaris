@@ -1,0 +1,746 @@
+{
+  "archive_branch": "archive/sandbox-P20261115.1",
+  "archive_commit": "668c350401a4e6625df97877f2723bad44a43678",
+  "recovery": "Apply the overlays from the archived engineering checkout to its pinned Android source, following scripts/r001/apply_document_reader.py.",
+  "removed_files": [
+    {
+      "path": "app/src/androidTest/assets/polaris-sandbox/fixture.apk",
+      "bytes": 42964,
+      "sha256": "f491b10b09d299f923e59c6699c83c13c39d8df4fe674a15158ba3ed75523d2b"
+    },
+    {
+      "path": "app/src/androidTest/java/eu/kanade/tachiyomi/extension/sandbox/ExtensionSandboxAndroidTest.kt",
+      "bytes": 6698,
+      "sha256": "90f2c8db79890f3ce33a278d4590bde689541b1fabe602948407ec2b39558413"
+    },
+    {
+      "path": "app/src/androidTest/java/eu/kanade/tachiyomi/extension/sandbox/SandboxCookieAndroidTest.kt",
+      "bytes": 17798,
+      "sha256": "2ae56e2a0ddec8ee6cf627de134a2611a892e5a384dab150b336dc77599ea2fd"
+    },
+    {
+      "path": "app/src/androidTest/java/eu/kanade/tachiyomi/extension/sandbox/SandboxSettingsAndroidTest.kt",
+      "bytes": 33861,
+      "sha256": "8723cc87fb3a233aabb79d1a0228b793c3a8bdeda067091dbe52c548d8715480"
+    },
+    {
+      "path": "app/src/debug/java/eu/kanade/tachiyomi/polaris/SandboxSettingsTestActivity.kt",
+      "bytes": 2313,
+      "sha256": "573109472dba3d2949e1dff73678fc9ccd531e889f64eee9622a33f8a1caf0a4"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/BrowserCookieSession.kt",
+      "bytes": 7365,
+      "sha256": "7eaabd59af83276bcfadba513ff7eb9f0d20419e6e3f79f17c00d67b40dcd600"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/ExtensionSandboxProtocol.kt",
+      "bytes": 3311,
+      "sha256": "043e9b3e50e9da609f599c746ee8d7cd624b50d8f5af169307d140fd55ad0c8a"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/ExtensionSandboxService.kt",
+      "bytes": 17448,
+      "sha256": "56e04991dd56ba21fe28f0f6eab5cb7e619340f8d91e49e33d59cebf8764d050"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/ExtensionSandboxSession.kt",
+      "bytes": 12601,
+      "sha256": "84054dfece751cbc2e829909efff96bc884a185a40c36c9cc2c395d0f618e348"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/IsolatedHttpSource.kt",
+      "bytes": 14140,
+      "sha256": "37ed84458e4709e205d1fe4ab736441e3366ee426f401e17b47f393096806d54"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxCookieStore.kt",
+      "bytes": 15361,
+      "sha256": "7f9c65b75ec6ad131b86e690eff87c074c36b29a00dcf04647b9957970711647"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxFilterCodec.kt",
+      "bytes": 10020,
+      "sha256": "0e2dd95b76612f951a84721ffe40a0bf87e2b6fee070278694166fc08b2daaf4"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxHttpBroker.kt",
+      "bytes": 17636,
+      "sha256": "22177e371a808706a990f05ef48a29e70a17f0ab1e545e4d273c96aca94d89c1"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxLoginActivity.kt",
+      "bytes": 11647,
+      "sha256": "23f623491fc796d43c0bfc98d3a0805dd478024c70b75bde49410895bfa3633e"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxNetworkPolicy.kt",
+      "bytes": 3518,
+      "sha256": "a36e58753b8095b227444ad72d6bbad16cf4c85a1ee71d1bc34059eab5581dcb"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxPreferenceAction.kt",
+      "bytes": 2497,
+      "sha256": "4b69a621a51cd91e9964642e192b13a68354c248b9a03067ebacc8dcfaf55ec2"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxPreferenceCodec.kt",
+      "bytes": 13930,
+      "sha256": "dcb5395418361830ac396448458189f5c730b1c99049b856dbcc0eafdbc6bc17"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxPreferencePreparation.kt",
+      "bytes": 1953,
+      "sha256": "25af1ad4c68707cde694a977e1a912d9a1de53f9e6d6f83bedf7c76c0f2fb1c8"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxPreferenceSchema.kt",
+      "bytes": 5581,
+      "sha256": "2e21a4a856a2fb7597bbb9e88792954558e2b531738fb83fdef2a2004b2ae401"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxPreferenceStore.kt",
+      "bytes": 2854,
+      "sha256": "2dcaed81cc0284b992fdf75eeb1c49cf5dd30904be7f18e8280f8e8bb2e4c0e9"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxPreferenceUi.kt",
+      "bytes": 26799,
+      "sha256": "004817937bc81ef2bdea5ef923e7d005f93ca5642d3b70d5152b3e95039090e0"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxPreferenceValues.kt",
+      "bytes": 5337,
+      "sha256": "ea2e2b62d420b1f390566562cc720de006616cb02edafb4d3491e0e32869a6c0"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxSourceCodec.kt",
+      "bytes": 2930,
+      "sha256": "64ebad452de8dc096ff8f9648e5aaefe856ed4d5ea75cd9e1c2a3126098b50a4"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxWorkerPreferences.kt",
+      "bytes": 6110,
+      "sha256": "e01432c5a8d709fafe6a50855ad6d9fa43f96cd2479799593e9d04aeaa151fea"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/extension/sandbox/BrowserCookieSessionTest.kt",
+      "bytes": 11705,
+      "sha256": "0d59227e57f393e7a9984be18638874a133bafc8b7533efa2785ef1f09754dbb"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/extension/sandbox/CookieBankTest.kt",
+      "bytes": 14831,
+      "sha256": "174a3ab85c42d8cde5e068312e96df2687ffdae47e5ea2311b180e3923eba718"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/extension/sandbox/SandboxFilterCodecTest.kt",
+      "bytes": 5261,
+      "sha256": "4598b08243c3816d25150aaa4f639afa7aaad2f98d09574ebbbadd5344a426da"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/extension/sandbox/SandboxNetworkPolicyTest.kt",
+      "bytes": 3090,
+      "sha256": "d84e1af62914dc7776a5bd979cf7edcb0f4b96daf21e40b2c8dd1fca5652c798"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/extension/sandbox/SandboxPreferenceActionTest.kt",
+      "bytes": 8311,
+      "sha256": "b17726918a0375f8efdba8ad5b174a8a77dec711058c9b8259228201ac39567b"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/extension/sandbox/SandboxPreferencePreparationTest.kt",
+      "bytes": 6153,
+      "sha256": "00dba43707623c02d392bb89250b5ba8ea055619b649db1ee8ed4b6f18ed5671"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/extension/sandbox/SandboxPreferenceSchemaTest.kt",
+      "bytes": 6841,
+      "sha256": "437d0a1bacd69e9d79144dec54005dca3c133d418e172600da0fed9f5b844ae1"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/extension/sandbox/SandboxPreferenceValuesTest.kt",
+      "bytes": 2853,
+      "sha256": "7de27e3ee5971ee998f6308167b96e961752b5a5b96e352a52f3eed27c26dcc6"
+    }
+  ],
+  "archived_unit_cases": [
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.BrowserCookieSessionTest",
+      "name": "HTTP sources cannot create browser sessions()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.BrowserCookieSessionTest",
+      "name": "a second seed cannot rebase the original login snapshot()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.BrowserCookieSessionTest",
+      "name": "browser seeding narrows existing parent domain credentials to the selected host()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.BrowserCookieSessionTest",
+      "name": "cancelling without completion writes nothing()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.BrowserCookieSessionTest",
+      "name": "cleared sessions cannot be restored by a browser still open()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.BrowserCookieSessionTest",
+      "name": "contradicting snapshots cannot choose an arbitrary session value()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.BrowserCookieSessionTest",
+      "name": "cookie attributes and host boundary survive browser import()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.BrowserCookieSessionTest",
+      "name": "different browser domain identities cannot collapse silently into one host cookie()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.BrowserCookieSessionTest",
+      "name": "expired browser capabilities cannot seed or transfer credentials()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.BrowserCookieSessionTest",
+      "name": "identical max age observations and equivalent attributes merge once()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.BrowserCookieSessionTest",
+      "name": "invalid snapshot origins reject the whole import()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.BrowserCookieSessionTest",
+      "name": "maximum bounded snapshot count can merge the same small cookie()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.BrowserCookieSessionTest",
+      "name": "only the selected HTTPS origin is accepted()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.BrowserCookieSessionTest",
+      "name": "oversized or malformed browser output never partially commits()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.BrowserCookieSessionTest",
+      "name": "partitioned cookies never become unpartitioned credentials()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.BrowserCookieSessionTest",
+      "name": "removed seeded cookies expire with their original domain identity()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.BrowserCookieSessionTest",
+      "name": "repeated cookie observations still obey the aggregate byte limit()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.BrowserCookieSessionTest",
+      "name": "snapshot plan includes seeded account paths and strips query credentials()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.BrowserCookieSessionTest",
+      "name": "snapshot planning refuses foreign origins and oversized navigation histories()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.BrowserCookieSessionTest",
+      "name": "temporary browser cookies remain temporary()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.CookieBankTest",
+      "name": "absence in an unrelated path snapshot cannot delete a seeded account session()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.CookieBankTest",
+      "name": "all path browser enumeration never includes another host()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.CookieBankTest",
+      "name": "browser initialization includes account cookies even when starting at the root()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.CookieBankTest",
+      "name": "browser removal cannot erase a session refreshed after opening()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.CookieBankTest",
+      "name": "clear revokes old clients and ignores delayed authenticated responses()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.CookieBankTest",
+      "name": "conflicting browser login rejects all changes instead of mixing accounts()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.CookieBankTest",
+      "name": "count and escaped byte budgets bound memory and persistent payloads()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.CookieBankTest",
+      "name": "expired saved entries are removed rather than revived after reload()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.CookieBankTest",
+      "name": "foreign cookie origins do not override a host-only session()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.CookieBankTest",
+      "name": "independent response names merge and expiration deletes only the matching cookie()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.CookieBankTest",
+      "name": "new browser cookies preserve unrelated concurrent refreshes()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.CookieBankTest",
+      "name": "persistent cookies restore and preserve secure httpOnly path and host flags()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.CookieBankTest",
+      "name": "revocation denies the all path browser capability too()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.CookieBankTest",
+      "name": "same-name cookies for a deeper path precede the root session()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.CookieBankTest",
+      "name": "seed collisions preserve both original scoped cookie identities()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.CookieBankTest",
+      "name": "session cookies survive worker client replacement without entering disk state()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.CookieBankTest",
+      "name": "storage failure keeps memory usable reports failure and does not claim disk persistence()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.CookieBankTest",
+      "name": "stored codec rejects wrong scalar types extra fields and oversized lists()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.CookieBankTest",
+      "name": "the snapshot plan can observe a removed account cookie without visiting its page()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.CookieBankTest",
+      "name": "unchanged browser cookies cannot roll back a newer HTTP session()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.SandboxFilterCodecTest",
+      "name": "invalid later state never partially mutates an earlier valid choice()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.SandboxFilterCodecTest",
+      "name": "nested selections are applied to original concrete worker classes()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.SandboxFilterCodecTest",
+      "name": "oversized and deeply nested filter trees are refused()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.SandboxFilterCodecTest",
+      "name": "quoted scalar and unknown payload fields are refused()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.SandboxFilterCodecTest",
+      "name": "stale schemas and swapped labels are rejected instead of silently ignoring filters()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.SandboxFilterCodecTest",
+      "name": "unrelated nonempty host lists cannot masquerade as source filters()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.SandboxNetworkPolicyTest",
+      "name": "DNS cannot route public names to local reserved or mixed addresses()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.SandboxNetworkPolicyTest",
+      "name": "URLs cannot request files content providers credentials or alternate ports()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.SandboxNetworkPolicyTest",
+      "name": "deep or oversized JSON is rejected before source metadata parsing()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.SandboxNetworkPolicyTest",
+      "name": "response input is bounded before parsing or returning extension bytes()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.SandboxPreferenceActionTest",
+      "name": "a consumed synchronous action executes once and changes only its source()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.SandboxPreferenceActionTest",
+      "name": "a false return is rejected without automatically retrying the callback()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.SandboxPreferenceActionTest",
+      "name": "actions require a bounded key and cannot request list preparation()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.SandboxPreferenceActionTest",
+      "name": "actions stay outside editable preference and import kinds()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.SandboxPreferenceActionTest",
+      "name": "callback exceptions propagate and are never automatically retried()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.SandboxPreferenceActionTest",
+      "name": "duplicate action keys are rejected before dispatch()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.SandboxPreferenceActionTest",
+      "name": "hidden disabled and unsupported buttons cannot run()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.SandboxPreferenceActionTest",
+      "name": "local action HTTP capability refuses GET HEAD and POST()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.SandboxPreferenceActionTest",
+      "name": "non group subtrees cannot smuggle an unvalidated action target()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.SandboxPreferenceActionTest",
+      "name": "ordinary fields and information cannot execute as local actions()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.SandboxPreferenceActionTest",
+      "name": "stale descriptors are rejected before invoking the callback()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.SandboxPreferenceActionTest",
+      "name": "standard local action descriptors are accepted through nested groups()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.SandboxPreferenceActionTest",
+      "name": "unavailable ancestors prevent otherwise enabled child actions()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.SandboxPreferenceActionTest",
+      "name": "unknown keys fail without selecting a different button()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.SandboxPreferenceActionTest",
+      "name": "writes deletions and added scopes outside the selected source are refused()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.SandboxPreferencePreparationTest",
+      "name": "disabled and hidden ancestors block callbacks on their children()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.SandboxPreferencePreparationTest",
+      "name": "duplicate keys are rejected before choosing a callback()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.SandboxPreferencePreparationTest",
+      "name": "hidden disabled and unsupported targets cannot execute callbacks()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.SandboxPreferencePreparationTest",
+      "name": "ordinary lists without a preparation callback cannot be invoked as actions()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.SandboxPreferencePreparationTest",
+      "name": "ordinary operations retain their explicit POST capability()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.SandboxPreferencePreparationTest",
+      "name": "plain information text and arbitrary custom controls cannot request preparation()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.SandboxPreferencePreparationTest",
+      "name": "preparation HTTP capability permits GET HEAD and refuses POST without granting it()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.SandboxPreferencePreparationTest",
+      "name": "preparation markers require booleans and take part in the form token()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.SandboxPreferencePreparationTest",
+      "name": "single and multiple choice targets are resolved through groups()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.SandboxPreferencePreparationTest",
+      "name": "unchanged scoped preferences are allowed regardless of object identity()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.SandboxPreferencePreparationTest",
+      "name": "unknown overlong and empty keys cannot select another action()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.SandboxPreferencePreparationTest",
+      "name": "writes or deletions in any source scope are rejected()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.SandboxPreferenceSchemaTest",
+      "name": "changing bounds without updating the transmitted token is refused()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.SandboxPreferenceSchemaTest",
+      "name": "changing value summary or availability preserves the structural token()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.SandboxPreferenceSchemaTest",
+      "name": "descriptor integer fields reject strings floats booleans null and overflow()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.SandboxPreferenceSchemaTest",
+      "name": "duplicate keys and unknown widget kinds are refused()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.SandboxPreferenceSchemaTest",
+      "name": "dynamic bounds increments and control kinds invalidate an old form token()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.SandboxPreferenceSchemaTest",
+      "name": "integer endpoints and drag values between keyboard increments are accepted()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.SandboxPreferenceSchemaTest",
+      "name": "invalid current values or increments fail before rendering()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.SandboxPreferenceSchemaTest",
+      "name": "negative and fixed ranges are valid without unsigned conversion()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.SandboxPreferenceSchemaTest",
+      "name": "numeric descriptors are validated and preserve integer bounds and flags()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.SandboxPreferenceSchemaTest",
+      "name": "outside bounds and numeric coercions are refused()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.SandboxPreferenceSchemaTest",
+      "name": "range flags require booleans and required fields cannot be omitted()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.SandboxPreferenceSchemaTest",
+      "name": "range width is checked using longs so integer overflow cannot bypass bounds()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.SandboxPreferenceValuesTest",
+      "name": "entry counts and total payload sizes stay bounded()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.SandboxPreferenceValuesTest",
+      "name": "memory editor returns copies and rejects invalid batches before writing()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.SandboxPreferenceValuesTest",
+      "name": "obvious access values and private marked fields are omitted by nonprivate backup policy()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.SandboxPreferenceValuesTest",
+      "name": "stored primitive types and string sets round trip without numeric coercion()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.extension.sandbox.SandboxPreferenceValuesTest",
+      "name": "wrong types nonfinite floats oversized values and arbitrary objects are refused()",
+      "status": "passed"
+    }
+  ],
+  "baseline_total": 1030,
+  "engineering_removed_files": [
+    {
+      "path": "scripts/extensions/build_source_sandbox_fixture.py",
+      "bytes": 4908,
+      "sha256": "49bee314b1842c20c52e0cb0228a518f459e39f90c8c6523845207f8d23ce693"
+    },
+    {
+      "path": "scripts/extensions/test_sandbox_session_host.py",
+      "bytes": 4556,
+      "sha256": "5af57f934023a177ae59d9206b7638ac95ca6a9e16888539b348de05093f4bcb"
+    }
+  ]
+}

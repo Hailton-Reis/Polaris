@@ -1,0 +1,16 @@
+{
+  "baseline_total": 1030,
+  "archived_exclusive_executor_cases": 94,
+  "expected_retained_cases": 936,
+  "current_total": 936,
+  "retained_missing": [],
+  "unexpected_cases": [],
+  "failed": [],
+  "skipped": [],
+  "modules": {
+    "domain": 85,
+    "app": 851
+  },
+  "status": "ALL_RETAINED_CASES_PASSED",
+  "note": "94 executor-only cases are archived, not counted as passed in this revision. Domain reports were previously passed and UP-TO-DATE."
+}

@@ -1,0 +1,43 @@
+{
+  "production_class_jars": [
+    {
+      "artifact": "app/build/intermediates/runtime_app_classes_jar/debug/bundleDebugClassesToRuntimeJar/classes.jar",
+      "sha256": "ac0997728e45cc71be7201e1814a677e341d8ece9b48324647f3faf6d9682c0b",
+      "sandbox_classes": [],
+      "ocr_worker_present": true
+    },
+    {
+      "artifact": "app/build/intermediates/compile_app_classes_jar/debug/bundleDebugClassesToCompileJar/classes.jar",
+      "sha256": "ac0997728e45cc71be7201e1814a677e341d8ece9b48324647f3faf6d9682c0b",
+      "sandbox_classes": [],
+      "ocr_worker_present": true
+    }
+  ],
+  "manifests": [
+    {
+      "artifact": "app/src/main/AndroidManifest.xml",
+      "sha256": "4dc462caaa49274c3b1fcd45ff357c177893b23ba738201995a9c9039a10b693",
+      "sandbox_components": []
+    },
+    {
+      "artifact": "app/src/debug/AndroidManifest.xml",
+      "sha256": "951288baa6bd5306269b9ba46700b8dea890c49112b80ab41f0b534a01ca02fc",
+      "sandbox_components": []
+    },
+    {
+      "artifact": "app/build/intermediates/merged_manifest/debug/processDebugMainManifest/AndroidManifest.xml",
+      "sha256": "dd08b88b5fcd62d41e37d0fdd1bce8cfef7eb1aaf921ee63b38da65cfa60c9e9",
+      "sandbox_components": []
+    },
+    {
+      "artifact": "app/build/intermediates/merged_manifests/debug/processDebugManifest/universal/AndroidManifest.xml",
+      "sha256": "dd08b88b5fcd62d41e37d0fdd1bce8cfef7eb1aaf921ee63b38da65cfa60c9e9",
+      "sandbox_components": []
+    }
+  ],
+  "archived_instrumentation_class_files": [],
+  "automatic_language_test_preserved": true,
+  "apk_generated": false,
+  "device_execution": false,
+  "apk_size_delta_measured": false
+}

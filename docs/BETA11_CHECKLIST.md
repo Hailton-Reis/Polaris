@@ -6,7 +6,7 @@ Este checklist acompanha o trabalho autorizado em 13/11. Não é uma declaraçã
 | Frente | Estado |
 | --- | --- |
 | Jornada, XP, conquistas e grimórios | Implementados no checkpoint anterior |
-| Sandbox e login isolado | PAUSADOS pelo usuário; fora do escopo de conclusão desta beta. Código preservado, ativação/componentes desabilitados |
+| Sandbox e login isolado | PAUSADOS pelo usuário; fora do escopo de conclusão desta beta. Executor removido dos fontes compilados; histórico preservado na branch de arquivo (P20261115.2) |
 | Biblioteca, fontes reais e backups entre leitores | Criação segura e ordem da restauração verificadas em JVM; SQLite/interface Android e ida/volta externa pendentes |
 | Leitura, OCR e tradução nos aparelhos | Pendente, incluindo diagnóstico do A12 |
 | Armazenamento | Importação/cache e retomada de cópias completas (P20261115.1) implementados; cópias parciais/legado, pico e validação final pendentes |
@@ -14,7 +14,7 @@ Este checklist acompanha o trabalho autorizado em 13/11. Não é uma declaraçã
 
 Ordem ativa: armazenamento → backups → leitura → distribuição. A sandbox não bloqueia a consolidação desta beta.
 
-A [decisão P20261114.4](PAUSA_SANDBOX_E_AVISO_P20261114_4.md) substitui as prioridades históricas abaixo. Instalações passam pelo aviso geral único com duas caixas; assinatura/integridade continuam verificadas.
+O [arquivamento P20261115.2](ARQUIVAMENTO_SANDBOX_P20261115_2.md) remove o executor do código ativo e preserva o aviso. A [decisão P20261114.4](PAUSA_SANDBOX_E_AVISO_P20261114_4.md) substitui as prioridades históricas abaixo. Instalações passam pelo aviso geral único com duas caixas; assinatura/integridade continuam verificadas.
 
 Fluxo combinado com o usuário: concluir as pendências de implementação e as validações automáticas; seus testes ficam para a consolidação final, seguida da publicação da versão no GitHub. Não solicitar testes pessoais a cada revisão intermediária.
 
@@ -47,3 +47,5 @@ P20261114.3: [ações locais padrão](SANDBOX_ACOES_LOCAIS_P20261114_3.md) com c
 P20261114.4: sandbox pausada e desabilitada; aviso único local com duas caixas, fora dos backups. 931 testes do app aprovados (12 novos), mais 85 anteriores de domain; app/instrumentação compilados e componentes desabilitados conferidos no manifesto mesclado. Quatro testes de overlay e 16 de empacotamento aprovados. Código experimental preservado; sem novo APK ou Release. Foco nas quatro frentes ativas.
 
 P20261115.1: [retomada de cópias completas](RECUPERACAO_IMPORTACOES_P20261115_1.md) após publicação interrompida, com conferência de conteúdo/metadados e sem nova cópia do payload pelo importador. 945 testes do app aprovados (14 novos), mais 85 anteriores de domain; app/instrumentação compilados, quatro testes de overlay e 16 de empacotamento aprovados. Resíduos parciais/legado permanecem pendentes; sem novo APK ou Release.
+
+P20261115.2: [sandbox arquivada e retirada dos fontes compilados](ARQUIVAMENTO_SANDBOX_P20261115_2.md), incluindo componentes e ramificações de integração. Aviso e revisão de seleções/quarentenas antigas mantidos. 851 testes do app aprovados e 85 anteriores de domain; 94 casos exclusivos do executor arquivados, nenhum outro ausente. App/instrumentação compilados, classes/manifestos inspecionados, overlay4/empacotamento16 aprovados. Sem novo APK/Release ou medição do tamanho.

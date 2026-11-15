@@ -4,7 +4,7 @@ O roadmap indica prioridades e critérios de verificação. Não representa praz
 
 ## Prioridades atuais — decisão P20261114.4
 
-Sandbox inteira pausada, código preservado e recurso desativado nesta beta. Não ampliar controles, ações, login isolado, OAuth/Cloudflare ou novels isoladas agora. Esses itens históricos não bloqueiam a conclusão da beta. O [aviso único de extensões](PAUSA_SANDBOX_E_AVISO_P20261114_4.md) exige as duas confirmações pedidas pelo usuário, sem substituir verificações de assinatura/integridade.
+Sandbox inteira pausada, [arquivada e removida dos fontes compilados](ARQUIVAMENTO_SANDBOX_P20261115_2.md) nesta beta. Não ampliar controles, ações, login isolado, OAuth/Cloudflare ou novels isoladas agora. Esses itens históricos não bloqueiam a conclusão da beta. O [aviso único de extensões](PAUSA_SANDBOX_E_AVISO_P20261114_4.md) exige as duas confirmações pedidas pelo usuário, sem substituir verificações de assinatura/integridade.
 
 As quatro frentes ativas são armazenamento, backups, leitura e distribuição. Testes pessoais após consolidação; conta/login Google/nuvem permanecem adiados. Pausar não comprova redução do APK: comparar pacotes equivalentes durante a distribuição.
 

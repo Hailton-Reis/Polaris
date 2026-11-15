@@ -66,3 +66,5 @@ Na candidata P20261113.3, o guard confirmou que o certificado debug deste ambien
 A [recuperação da assinatura original](../integration/signing-recovery/20261113/README.md) foi concluída após o registro anterior: o keystore recuperado corresponde ao certificado público da beta.10 e foi configurado somente no ambiente privado. A atualização real no aparelho continua pendente.
 
 A mesma continuação gerou e verificou o APK universal beta.11/P20261113.3 (272.970.356 bytes, ARM32/ARM64, código 112). O exportador confirmou SAME_ID_AND_SIGNER contra a beta.10 e 16 testes de empacotamento passaram após correção do verificador de aliases. Ainda é candidata interna; não houve Release pública nem aceite de atualização no aparelho.
+
+P20261115.2 remove a sandbox experimental dos fontes compilados e guarda o checkpoint anterior numa branch de arquivo. O aviso único permanece. Classes e manifestos foram inspecionados após compilação; a medida de tamanho fica para o pacote final. O APK interno P20261113.3 continua anterior a essa retirada e às demais revisões posteriores, sem representar a candidata atual. [Escopo atual](ARQUIVAMENTO_SANDBOX_P20261115_2.md).

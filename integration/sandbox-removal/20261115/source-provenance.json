@@ -1,0 +1,222 @@
+{
+  "archive_commit": "668c350401a4e6625df97877f2723bad44a43678",
+  "android_overlay_prerequisite": "f037c5d85575e30694295df5d079e97dcc4a35b9",
+  "overlay_sha256": "ef897b448dd38740ea5ba71b5f67267b8b2acc1ea26c5cc0ef4a70522bd06bd1",
+  "files": [
+    {
+      "path": "app/src/androidTest/java/eu/kanade/tachiyomi/extension/ExtensionRiskNoticeAndroidTest.kt",
+      "bytes": 2344,
+      "sha256": "da2e83997a5a70457b9a661988603e1a624040e3303d592d71dcc6379b2c7fe8"
+    },
+    {
+      "path": "app/src/androidTest/java/eu/kanade/translation/AutomaticLanguageAndroidTest.kt",
+      "bytes": 1133,
+      "sha256": "d0f97dde076febf495d44da38633b85514862988dbec357fcd7212451c0967e0"
+    },
+    {
+      "path": "app/src/debug/AndroidManifest.xml",
+      "bytes": 1513,
+      "sha256": "951288baa6bd5306269b9ba46700b8dea890c49112b80ab41f0b534a01ca02fc"
+    },
+    {
+      "path": "app/src/main/AndroidManifest.xml",
+      "bytes": 14449,
+      "sha256": "4dc462caaa49274c3b1fcd45ff357c177893b23ba738201995a9c9039a10b693"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/domain/extension/interactor/TrustExtension.kt",
+      "bytes": 1690,
+      "sha256": "e6ea14bccdb347869b05d10b644d8e52c4734e4386039db5090ffa12a06e9b95"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/domain/source/service/SourcePreferences.kt",
+      "bytes": 4899,
+      "sha256": "a94505d57cc581455d411c9297186ea0e4b2b17437d472dcd7e1cee2b3e05045"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/presentation/webview/WebViewScreenContent.kt",
+      "bytes": 16526,
+      "sha256": "773984b46ac2bf012d7593dfa6617ce000cf36c8ed1fb20c41d6238d1e72027d"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/App.kt",
+      "bytes": 12231,
+      "sha256": "2b59ada75b3574225e09e02b51e7c83f014d2d66ae7bac304dc6fab5ebac26a1"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/data/backup/create/creators/PreferenceBackupCreator.kt",
+      "bytes": 3086,
+      "sha256": "72108ba854858db0294b83752fc32c8088ff01dc7ecfa8b4dd38846dbf4ce606"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/data/coil/MangaCoverFetcher.kt",
+      "bytes": 12612,
+      "sha256": "f918097a4e0e64206e5df4a79e16e7d8826c039303df97a363ca765cc3fb207e"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/extension/ExtensionManager.kt",
+      "bytes": 21833,
+      "sha256": "fd090e57e96e7def8e84fda9d101e8d749428a1ddc803101c327d335df39a1fa"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/extension/ExtensionRiskAcknowledgement.kt",
+      "bytes": 1220,
+      "sha256": "57cb01c49f98d543131664ad6f08f86447e7b69e2610d377c81ec307bf64688d"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/extension/novel/NovelExtensionManager.kt",
+      "bytes": 8991,
+      "sha256": "b459f1dcbe603edb339c41d0ae57e06afe911eb92d160e770af10b4af70759b2"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/extension/novel/NovelPluginPaths.kt",
+      "bytes": 813,
+      "sha256": "f1d193fce5a2c88ac892789bdc4e1bfeb25285d1f1de298863416adbdd487c7f"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/extension/novel/tts/NovelAudioPlayer.kt",
+      "bytes": 15355,
+      "sha256": "1e6cb3597c45dcccd133571f7702eae543bdd4c4b02cc23d35ef0c00a2d83230"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/extension/preparation/ExtensionPreparationQueue.kt",
+      "bytes": 7156,
+      "sha256": "8ab21ccc01931fa25872d51c4b4c32824377bfb50abad4b0c5ce515bc71e6f6d"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/extension/preparation/PreparationPlan.kt",
+      "bytes": 4321,
+      "sha256": "26cb52c40543236fb73bccf5bf006d7b8faf6b0a56b0f9a9986c1f62a04d2e0f"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/extension/util/ExtensionInstaller.kt",
+      "bytes": 10501,
+      "sha256": "0bee2dbfdbbb0378809c50a9f7afad670a5fd463a6aa89aead03e00042d0ea71"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/extension/util/ExtensionLoader.kt",
+      "bytes": 21728,
+      "sha256": "113a9b899b5b24a336a4369893f7a6a29cb91ee98317ca6aa8a29e2ea314f684"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/extension/util/ExtensionSecurityAudit.kt",
+      "bytes": 7690,
+      "sha256": "84f4b3b9c90df91d85a2497887778fc76d5a0dbb59fdd7dfa7f6440627458b2c"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/extension/util/PrivateExtensionFiles.kt",
+      "bytes": 1914,
+      "sha256": "e6655c45ef2122fada301978ba7d14954640b1c3f47716e433db7da880bf21a9"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/extension/util/PrivateExtensionSignature.kt",
+      "bytes": 1490,
+      "sha256": "e6a1d10b9e19d9e636c5f351265516d970dd8b71e55c6cf5fe5d61e9997486e7"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/extension/util/RestoredRepositoryTrust.kt",
+      "bytes": 477,
+      "sha256": "c953bf516e2903cd13a38340af4c600206c9a35357e2fcb1cc7d86fa7068945e"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/ui/browse/extension/ExtensionsTab.kt",
+      "bytes": 6448,
+      "sha256": "c5f918a1100e0271dbca0d8faee7cfff31852c099b6015a6fa70af627d0fb565"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/ui/browse/extension/details/ExtensionDetailsScreen.kt",
+      "bytes": 2134,
+      "sha256": "50125b15873114ad64ad55c95f413099eebdc65a8a621d364a5a6c165f9b1cf4"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/ui/browse/extension/details/ExtensionDetailsViewModel.kt",
+      "bytes": 6629,
+      "sha256": "d7bb496adac2be99899b38dc6dddc53595057882b9a79467f5c36711400d153a"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/ui/browse/extension/details/SourcePreferencesScreen.kt",
+      "bytes": 6376,
+      "sha256": "483920686e8b6d63a5d79cbc048dd9b0bb835770f679ba3931c357aba9996493"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/ui/webview/WebViewActivity.kt",
+      "bytes": 4841,
+      "sha256": "208383caeace4e4a9f66dec39fcbc8e3e9151394d1ca5c146bf16ffced4efff3"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/ui/webview/WebViewScreen.kt",
+      "bytes": 1642,
+      "sha256": "eb2ae067509cac4209dd7b290191f1dae81375e813813dff1933ddbd06ef3c65"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/extension/ExtensionRiskAcknowledgementTest.kt",
+      "bytes": 6611,
+      "sha256": "475ac39273ef3eb864dc02d853314723c51bef6c4e78f110445ecdc89825055c"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/extension/novel/NovelPluginPathsTest.kt",
+      "bytes": 1902,
+      "sha256": "21d7d071da5cfecd39fa09bb581acdc4b060a01f6b479d3fcfff42ab537f443c"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/extension/novel/tts/NovelSpeechSanitizerTest.kt",
+      "bytes": 1795,
+      "sha256": "ab4141afa5ef92fe58ea50cee6711ee6db7c6b63767a7c0dafea2c25a2dc313b"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/extension/preparation/ExtensionPreparationQueueTest.kt",
+      "bytes": 9217,
+      "sha256": "d27b55f666159cb3b13516e736b4254befc873ce37443dccaef20d3cd2f6e447"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/extension/preparation/PreparationPlanTest.kt",
+      "bytes": 6790,
+      "sha256": "ec3da95b3fa20293e98f855cc9aa6390ffc26ecea40e7c3d0e54f4011cb7f2af"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/extension/preparation/PrivateExtensionSignatureTest.kt",
+      "bytes": 3272,
+      "sha256": "f0e16df33ec427c0b614a0407fccdd8daa8bd1feaf5e824f99a32458c31a1d25"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/extension/preparation/RepositoryReviewTest.kt",
+      "bytes": 4497,
+      "sha256": "19be4d27059527db6ca550b659128ab6e2ca0930e8803c969fb339a768af5990"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/extension/util/ExtensionInstallerDownloadTest.kt",
+      "bytes": 12227,
+      "sha256": "bafae9bdf320b171c9f1f17871807022e24a4ebf8cd234325f897d7e52e95808"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/extension/util/ExtensionSecurityAuditTest.kt",
+      "bytes": 5582,
+      "sha256": "fd86be5c886eb7a4d2b37f99fe575e730022808efb1c137096c001a7ce13664f"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/extension/util/PrivateExtensionFilesTest.kt",
+      "bytes": 5470,
+      "sha256": "6bbab63e95097f378119eb0e4bac38958e8a2170c4cc4d84b60a97a738bfe0e2"
+    },
+    {
+      "path": "core/common/src/main/kotlin/eu/kanade/tachiyomi/util/system/WebViewUtil.kt",
+      "bytes": 6465,
+      "sha256": "3290bff1d9975875c01be32b7c7040237af48d131729a00b1de684b458c09a18"
+    },
+    {
+      "path": "data/src/main/java/mihon/data/extension/repository/ExtensionStoreRepositoryImpl.kt",
+      "bytes": 5344,
+      "sha256": "ee3540f5986a1a942c6cd9212d80cd6549685e68b11d4ed5a631b5bcf7461221"
+    },
+    {
+      "path": "domain/src/main/java/eu/kanade/tachiyomi/extension/model/Extension.kt",
+      "bytes": 2343,
+      "sha256": "d5ad2b1b3509dd13d47a85dc55927da53e88316f3bfbb153e26afb521d06f53c"
+    },
+    {
+      "path": "domain/src/main/java/mihon/domain/extension/repository/ExtensionStoreRepository.kt",
+      "bytes": 689,
+      "sha256": "a57167637edfe31a3aa558a1bfe89bac83ebf921cd71feebb7f93fc514c53ace"
+    }
+  ]
+}

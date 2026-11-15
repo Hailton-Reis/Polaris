@@ -1,5 +1,8 @@
 # Pausa da sandbox e aviso de extensões — P20261114.4
 
+**Atualização P20261115.2:** a desativação descrita nesta revisão foi substituída pela [remoção do executor dos fontes compilados e arquivamento no Git](ARQUIVAMENTO_SANDBOX_P20261115_2.md). O aviso permanece.
+
+
 ## Decisão atual
 
 A pedido do usuário, toda a frente de sandbox está pausada e deixa de bloquear a beta.11. O foco ativo passa a ser armazenamento, backups, leitura e distribuição. Conta/login Google/nuvem continuam adiados. Os testes pessoais ficam para a consolidação final.
