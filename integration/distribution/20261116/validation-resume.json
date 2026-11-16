@@ -1,0 +1,16 @@
+{
+  "initial_test_execution": "901 app beta + 85 domain release passed before packaging",
+  "initial_assembly_stopped_by_disk_guard": true,
+  "source_unchanged_on_resume": true,
+  "final_build_result": "BUILD SUCCESSFUL in 3m 42s",
+  "final_selected_tasks": {
+    ":domain:testReleaseUnitTest": "UP-TO-DATE",
+    ":data:testDebugUnitTest": "NO-SOURCE",
+    ":source-api:testDebugUnitTest": "NO-SOURCE",
+    ":app:compileBetaKotlin": "EXECUTED",
+    ":app:testBetaUnitTest": "EXECUTED",
+    ":app:packageBeta": "EXECUTED",
+    ":app:assembleBeta": "EXECUTED"
+  },
+  "note": "Completed JVM reports were retained; the resumed build may reuse them as UP-TO-DATE. No incomplete assembly is counted as successful."
+}

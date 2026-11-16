@@ -3,6 +3,10 @@ import tempfile
 import unittest
 from package_internal_beta import package, signer_digest, validate_branding, verify_universal_architectures, validate_update_identity
 import zipfile
+import hashlib
+import struct
+import zlib
+from package_internal_beta import APPLICATION_ID, VERSION, VERSION_CODE, validate_compiled_build, verify_production_classes, dex_class_descriptors
 
 
 class UniversalPackagingTests(unittest.TestCase):
@@ -106,7 +110,7 @@ resource 0x7f080104 drawable/ic_polaris_splash"""
 
 class UpdateIdentityTests(unittest.TestCase):
     def test_same_id_and_original_signer_allow_update_metadata(self):
-        old = {'application_id': 'polaris.app', 'signer_sha256': 'A' * 64, 'version': '0.1.0-beta.10'}
+        old = {'application_id': 'polaris.app', 'signer_sha256': 'A' * 64, 'version': '0.1.0-beta.10', 'version_code': 111}
         self.assertEqual('SAME_ID_AND_SIGNER', validate_update_identity('polaris.app', 'a' * 64, old)['status'])
 
     def test_rebuilt_apk_with_another_key_is_not_an_update(self):
@@ -124,3 +128,94 @@ class UpdateIdentityTests(unittest.TestCase):
                     {'application_id': 'polaris.app', 'signer_sha256': 'not-a-hash'}]:
             with self.subTest(old=old), self.assertRaises(ValueError):
                 validate_update_identity('polaris.app', 'a' * 64, old)
+
+
+class CompiledBuildSafetyTests(unittest.TestCase):
+    badging = f"package: name='{APPLICATION_ID}' versionCode='{VERSION_CODE}' versionName='{VERSION}'\nsdkVersion:'26'\n"
+    manifest = "E: manifest\n E: application\n  A: http://schemas.android.com/apk/res/android:debuggable(0x0101000f)=(type 0x12)0x0\n"
+
+    def test_non_debug_beta_with_the_installed_identity_is_verified(self):
+        self.assertFalse(validate_compiled_build(self.badging, self.manifest, APPLICATION_ID)['debuggable'])
+
+    def test_current_aapt_minimum_sdk_label_is_accepted(self):
+        actual_badging_format = self.badging.replace('sdkVersion:', 'minSdkVersion:')
+        self.assertTrue(validate_compiled_build(actual_badging_format, self.manifest, APPLICATION_ID)['compiled_identity_verified'])
+
+    def test_metadata_cannot_disguise_another_compiled_package_version_or_api(self):
+        for text in [self.badging.replace(APPLICATION_ID, 'different.app'), self.badging.replace("versionCode='112'", "versionCode='111'"), self.badging.replace(VERSION, '0.1.0-beta.10'), self.badging.replace("sdkVersion:'26'", "sdkVersion:'28'"), '']:
+            with self.subTest(text=text), self.assertRaises(ValueError):
+                validate_compiled_build(text, self.manifest, APPLICATION_ID)
+
+    def test_debug_test_only_profileable_and_instrumentation_artifacts_are_rejected(self):
+        for text in [self.manifest.replace('0x0', '0xffffffff'), self.manifest+'  A: android:testOnly(0x01010272)=(type 0x12)0xffffffff\n', self.manifest+'  E: profileable\n   A: android:shell(0x01010523)=(type 0x12)0xffffffff\n', self.manifest+' E: instrumentation\n', self.manifest+'  E: activity\n   A: android:name(0x01010003)=".polaris.Spike001DebugActivity"\n', self.manifest+'  E: service\n   A: android:name(0x01010003)="eu.kanade.tachiyomi.extension.sandbox.ExtensionSandboxService"\n']:
+            with self.subTest(manifest=text), self.assertRaisesRegex(ValueError, 'Debug, test'):
+                validate_compiled_build(self.badging, text, APPLICATION_ID)
+
+    def test_unknown_boolean_reference_cannot_be_assumed_to_be_false(self):
+        with self.assertRaisesRegex(ValueError, 'Unverifiable'):
+            validate_compiled_build(self.badging, self.manifest.replace('(type 0x12)0x0', '@0x7f000001'), APPLICATION_ID)
+
+    def test_update_code_must_increase_and_cannot_be_bool_or_missing(self):
+        base = {'application_id': 'polaris.app', 'signer_sha256': 'a'*64}
+        for value in (None, True, 0, 112, 113, '111'):
+            with self.subTest(value=value), self.assertRaisesRegex(ValueError, 'version code'):
+                validate_update_identity('polaris.app', 'a'*64, dict(base, version_code=value))
+
+
+def dex_fixture(names):
+    # Minimal class-table fixture; this tests inventory decoding, not ART bytecode execution.
+    count = len(names)
+    strings_at = 112
+    types_at = strings_at + 4*count
+    classes_at = types_at + 4*count
+    payload_at = classes_at + 32*count
+    data = bytearray(payload_at)
+    data[:8] = b'dex\n038\0'
+    struct.pack_into('<II', data, 36, 112, 0x12345678)
+    for field, position in [(56, strings_at), (64, types_at), (96, classes_at)]:
+        struct.pack_into('<II', data, field, count, position)
+    for index, name in enumerate(names):
+        raw = name.encode()
+        if len(raw) >= 128: raise ValueError('Short fixture names only')
+        struct.pack_into('<I', data, strings_at+index*4, len(data))
+        struct.pack_into('<I', data, types_at+index*4, index)
+        struct.pack_into('<I', data, classes_at+index*32, index)
+        data.extend(bytes([len(raw)])+raw+b'\0')
+    struct.pack_into('<I', data, 32, len(data))
+    data[12:32] = hashlib.sha1(data[32:]).digest()
+    struct.pack_into('<I', data, 8, zlib.adler32(data[12:]) & 0xffffffff)
+    return bytes(data)
+
+
+class ProductionDexTests(unittest.TestCase):
+    def inspect(self, files):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory)/'classes.apk'
+            with zipfile.ZipFile(path,'w') as archive:
+                for name, data in files.items(): archive.writestr(name,data)
+            with zipfile.ZipFile(path) as archive: return verify_production_classes(archive)
+
+    def test_class_definitions_include_double_digit_multidex_files(self):
+        result=self.inspect({'classes.dex':dex_fixture(['Lapp/Main;']), 'classes10.dex':dex_fixture(['Lapp/Reader;'])})
+        self.assertEqual(2,result['class_definitions'])
+        self.assertEqual(2,result['dex_files'])
+
+    def test_sandbox_test_jdbc_and_debug_harness_classes_are_rejected(self):
+        for name in ['Leu/kanade/tachiyomi/extension/sandbox/Worker;', 'Lorg/sqlite/JDBC;', 'Lapp/cash/sqldelight/driver/jdbc/Driver;', 'Lorg/junit/Test;', 'Leu/kanade/tachiyomi/polaris/Spike001DebugActivity;']:
+            with self.subTest(name=name), self.assertRaisesRegex(ValueError, 'production APK'):
+                self.inspect({'classes.dex':dex_fixture([name])})
+
+    def test_duplicate_definitions_across_multidex_are_rejected(self):
+        with self.assertRaisesRegex(ValueError, 'Duplicate class'):
+            self.inspect({'classes.dex':dex_fixture(['Lapp/Main;']), 'classes2.dex':dex_fixture(['Lapp/Main;'])})
+
+    def test_damaged_dex_and_missing_dex_fail_closed(self):
+        for files in ({}, {'classes.dex':b'not dex'}, {'classes.dex':dex_fixture(['Lapp/Main;'])[:-1]}):
+            with self.subTest(files=files.keys()), self.assertRaises(ValueError): self.inspect(files)
+
+    def test_class_inventory_does_not_mistake_an_incidental_string_for_a_class(self):
+        data=bytearray(dex_fixture(['Lapp/Main;']))
+        data.extend(b'Leu/kanade/tachiyomi/extension/sandbox/OldName;\0')
+        struct.pack_into('<I',data,32,len(data));data[12:32]=hashlib.sha1(data[32:]).digest()
+        struct.pack_into('<I',data,8,zlib.adler32(data[12:]) & 0xffffffff)
+        self.assertEqual(1,self.inspect({'classes.dex':bytes(data)})['class_definitions'])

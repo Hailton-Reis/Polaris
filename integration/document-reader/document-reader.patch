@@ -21,10 +21,18 @@ index 79aff85..c2e70c6 100644
 +# Generated native build state
 +**/.cxx/
 diff --git a/app/build.gradle.kts b/app/build.gradle.kts
-index 63e2698..0eff368 100644
+index 63e2698..42fac81 100644
 --- a/app/build.gradle.kts
 +++ b/app/build.gradle.kts
-@@ -25,21 +25,23 @@ if (Config.includeTelemetry) {
+@@ -3,6 +3,7 @@ import mihon.gradle.getBuildTime
+ import mihon.gradle.getLatestCommitCount
+ import mihon.gradle.getLatestCommitSha
+ import mihon.gradle.tasks.ReplaceShortcutsPlaceholderTask
++import com.android.build.api.variant.HostTestBuilder
+ import java.io.FileInputStream
+ import java.util.Properties
+ import kotlin.io.encoding.Base64
+@@ -25,21 +26,23 @@ if (Config.includeTelemetry) {
  }
  
  val keystorePropertiesFile = rootProject.file("keystore.properties")
@@ -51,7 +59,7 @@ index 63e2698..0eff368 100644
  
          testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
      }
-@@ -71,7 +73,7 @@ android {
+@@ -71,7 +74,7 @@ android {
      buildTypes {
          val debug = getByName("debug") {
              applicationIdSuffix = ".dev"
@@ -60,7 +68,25 @@ index 63e2698..0eff368 100644
              isPseudoLocalesEnabled = true
          }
          val release = getByName("release") {
-@@ -99,9 +101,10 @@ android {
+@@ -82,6 +85,17 @@ android {
+             proguardFiles("proguard-android-optimize.txt", "proguard-rules.pro")
+             buildConfigField("String", "BUILD_TIME", "\"${getBuildTime(useLatestCommitTime = true)}\"")
+         }
++        create("beta") {
++            initWith(release)
++            applicationIdSuffix = ".dev" // Keep the identity of the installed public beta.10.
++            isDebuggable = false
++            isProfileable = false
++            isMinifyEnabled = false // Preserve the tested dynamic-extension/runtime behavior.
++            isShrinkResources = false
++            signingConfig = debug.signingConfig
++            matchingFallbacks.add(release.name)
++            buildConfigField("String", "BUILD_TIME", "\"${getBuildTime(useLatestCommitTime = false)}\"")
++        }
+         val commonMatchingFallbacks = listOf(release.name)
+         create("foss") { initWith(release); applicationIdSuffix = ".foss"; matchingFallbacks.addAll(commonMatchingFallbacks) }
+         create("preview") {
+@@ -99,9 +113,10 @@ android {
          getByName("preview").res.directories.add("src/debug/res")
          getByName("benchmark").res.directories.add("src/debug/res")
      }
@@ -72,7 +98,7 @@ index 63e2698..0eff368 100644
              keepDebugSymbols += listOf("libandroidx.graphics.path", "libarchive-jni", "libconscrypt_jni", "libimagedecoder", "libquickjs", "libsqlite3x").map { "**/$it.so" }
          }
          resources {
-@@ -135,20 +138,25 @@ kotlin {
+@@ -135,23 +150,31 @@ kotlin {
  baselineProfile { baselineProfileOutputDir = "baselineProfiles"; mergeIntoMain = true }
  
  dependencies {
@@ -100,7 +126,13 @@ index 63e2698..0eff368 100644
  }
  
  androidComponents {
-@@ -163,3 +171,15 @@ androidComponents {
++    beforeVariants(selector().withBuildType("beta")) {
++        it.hostTests.getValue(HostTestBuilder.UNIT_TEST_TYPE).enable = true
++    }
+     onVariants { variant ->
+         val resSource = variant.sources.res ?: return@onVariants
+         val variantName = variant.name.replaceFirstChar { it.uppercase() }
+@@ -163,3 +186,15 @@ androidComponents {
      }
      onVariants(selector().withFlavor("default" to "standard")) { it.packaging.resources.excludes.add("META-INF/*.version") }
  }
@@ -9612,7 +9644,7 @@ index a198c3f..9a3e84f 100644
                      preference = translationPreferences.translationEngineTemperature(),
                      title = stringResource(ATMR.strings.pref_engine_temperature),
 diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
-index 7f411fd..03310ff 100644
+index 7f411fd..6431af9 100644
 --- a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
 +++ b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
 @@ -1,15 +1,18 @@
@@ -9677,7 +9709,7 @@ index 7f411fd..03310ff 100644
  
      // Identifies this overlay independently of the pinned upstream COMMIT_SHA.
 -    private const val POLARIS_READER_REVISION = "P20261031.2"
-+    private const val POLARIS_READER_REVISION = "P20261115.5"
++    private const val POLARIS_READER_REVISION = "P20261116.1"
  
      @Composable
      override fun Content() {
@@ -9855,7 +9887,7 @@ index 7f411fd..03310ff 100644
                          },
                      )
                  }
-@@ -159,68 +206,41 @@ object AboutScreen : Screen() {
+@@ -159,68 +206,42 @@ object AboutScreen : Screen() {
          }
      }
  
@@ -9938,7 +9970,8 @@ index 7f411fd..03310ff 100644
 -                        it
 -                    }
 +                else -> {
-+                    "Stable ${BuildConfig.VERSION_NAME}"
++                    val channel = if (BuildConfig.BUILD_TYPE == "beta") "Beta" else "Stable"
++                    "$channel ${BuildConfig.VERSION_NAME}"
 +                        .let {
 +                            if (withBuildDate) {
 +                                "$it (${getFormattedBuildTime()})"
@@ -9954,7 +9987,7 @@ index 7f411fd..03310ff 100644
      }
  
      internal fun getFormattedBuildTime(): String {
-@@ -228,9 +248,7 @@ object AboutScreen : Screen() {
+@@ -228,9 +249,7 @@ object AboutScreen : Screen() {
              Instant.parse(BuildConfig.BUILD_TIME)
                  .toLocalDateTime(TimeZone.currentSystemDefault())
                  .toDateTimestampString(
@@ -74919,6 +74952,29 @@ index b5d1909..2bd16cf 100644
  insertNetworkManga {
      -- Insert the manga if it doesn't exist already
      INSERT INTO mangas(
+diff --git a/domain/build.gradle.kts b/domain/build.gradle.kts
+index cd42533..ddb1409 100644
+--- a/domain/build.gradle.kts
++++ b/domain/build.gradle.kts
+@@ -1,3 +1,5 @@
++import com.android.build.api.variant.HostTestBuilder
++
+ plugins {
+     alias(mihonx.plugins.android.library)
+     alias(mihonx.plugins.spotless)
+@@ -9,6 +11,12 @@ android {
+     namespace = "tachiyomi.domain"
+ }
+ 
++androidComponents {
++    beforeVariants(selector().withBuildType("release")) {
++        it.hostTests.getValue(HostTestBuilder.UNIT_TEST_TYPE).enable = true
++    }
++}
++
+ kotlin {
+     compilerOptions {
+         freeCompilerArgs.add("-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi")
 diff --git a/domain/src/main/java/eu/kanade/tachiyomi/extension/model/Extension.kt b/domain/src/main/java/eu/kanade/tachiyomi/extension/model/Extension.kt
 index 2d6d204..60d242b 100644
 --- a/domain/src/main/java/eu/kanade/tachiyomi/extension/model/Extension.kt

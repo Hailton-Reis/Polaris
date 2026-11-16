@@ -10,8 +10,8 @@ from xml.sax.saxutils import escape
 from compare_android_unit_tests import ReportError, check_coverage, check_gradle, collect, compare
 
 
-def fixture(root, cases, module="app"):
-    report = root / module / "build/test-results/testDebugUnitTest/TEST-Reader.xml"
+def fixture(root, cases, module="app", task="testDebugUnitTest"):
+    report = root / module / f"build/test-results/{task}/TEST-Reader.xml"
     report.parent.mkdir(parents=True, exist_ok=True)
     tests = []
     for name, state in cases.items():
@@ -119,6 +119,42 @@ class JunitComparisonTests(unittest.TestCase):
         result = self.cli("--patched-exit", "1")
         self.assertEqual(result.returncode, 2)
         self.assertIn("INCONCLUSIVE", result.stderr)
+
+    def test_beta_report_selection_cannot_be_masked_by_an_old_passing_debug_report(self):
+        fixture(self.baseline, {"works": "passed"})
+        fixture(self.patched, {"works": "passed"})
+        fixture(self.patched, {"works": "failed"}, task="testBetaUnitTest")
+        result = compare(collect(self.baseline), collect(self.patched, {"app": "testBetaUnitTest"}))
+        self.assertEqual("REGRESSION_DETECTED", result["status"])
+
+    def test_missing_selected_beta_reports_fail_closed_despite_existing_debug_reports(self):
+        fixture(self.patched, {"works": "passed"})
+        fixture(self.patched, {"domain": "passed"}, module="domain")
+        with self.assertRaises(ReportError): collect(self.patched, {"app": "testBetaUnitTest"})
+
+    def test_mixed_beta_and_release_tasks_compare_without_renaming_reports(self):
+        for module in ("app", "domain"): fixture(self.baseline, {"works": "passed"}, module=module)
+        fixture(self.patched, {"works": "passed"}, task="testBetaUnitTest")
+        fixture(self.patched, {"works": "passed"}, module="domain", task="testReleaseUnitTest")
+        outfile = Path(self.tmp.name)/"variants.json"
+        result = self.cli("--patched-task", "app=testBetaUnitTest", "--patched-task", "domain=testReleaseUnitTest", "--min-module", "app=1", "--min-module", "domain=1", "--output", str(outfile))
+        self.assertEqual(0, result.returncode, result.stderr)
+        self.assertEqual(2, json.loads(outfile.read_text())["patched"]["total"])
+        self.assertEqual("testBetaUnitTest", json.loads(outfile.read_text())["report_tasks"]["patched"]["app"])
+
+    def test_beta_compile_failure_cannot_pass_as_a_known_beta_unit_failure(self):
+        fixture(self.patched, {"old": "failed"}, task="testBetaUnitTest")
+        logfile=Path(self.tmp.name)/"beta.log"
+        logfile.write_text("> Task :app:compileBetaKotlin FAILED\nBUILD FAILED\n")
+        cases=collect(self.patched,{"app":"testBetaUnitTest"})
+        with self.assertRaises(ReportError): check_gradle(logfile,1,cases,"patched",{"app":"testBetaUnitTest"})
+
+    def test_duplicate_task_selection_cannot_silently_switch_the_compared_variant(self):
+        fixture(self.baseline, {"works":"passed"})
+        fixture(self.patched, {"works":"passed"})
+        result=self.cli("--patched-task","app=testBetaUnitTest","--patched-task","app=testDebugUnitTest")
+        self.assertEqual(2,result.returncode)
+        self.assertIn("Duplicate",result.stderr)
 
 
 if __name__ == "__main__": unittest.main()

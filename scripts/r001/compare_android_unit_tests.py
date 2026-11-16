@@ -23,7 +23,8 @@ ALLOWED_FAILED_TASKS = {
 }
 
 
-def collect(root: Path) -> dict[tuple[str, str, str], str]:
+def collect(root: Path, module_tasks: dict[str, str] | None = None) -> dict[tuple[str, str, str], str]:
+    module_tasks = module_tasks or {}
     if not root.is_dir():
         raise ReportError(f"Missing checkout directory: {root}")
     cases: dict[tuple[str, str, str], str] = {}
@@ -33,9 +34,9 @@ def collect(root: Path) -> dict[tuple[str, str, str], str]:
         if "build" not in relative:
             continue
         index = relative.index("build")
-        if relative[index + 1:index + 3] != ("test-results", "testDebugUnitTest"):
-            continue
         module = "/".join(relative[:index])
+        if relative[index + 1:index + 3] != ("test-results", module_tasks.get(module, "testDebugUnitTest")):
+            continue
         if not module:
             raise ReportError(f"Cannot identify module for {report}")
         try:
@@ -61,6 +62,9 @@ def collect(root: Path) -> dict[tuple[str, str, str], str]:
             cases[key] = state
     if reports == 0 or not cases:
         raise ReportError(f"No executed testDebugUnitTest JUnit XML cases under {root}")
+    missing_modules = set(module_tasks) - {key[0] for key in cases}
+    if missing_modules:
+        raise ReportError(f"Missing selected module/task reports: {sorted(missing_modules)}")
     return cases
 
 
@@ -74,7 +78,7 @@ def check_coverage(cases: dict, minima: dict[str, int], side: str):
             )
 
 
-def check_gradle(log_path: Path | None, exit_code: int, cases: dict, side: str):
+def check_gradle(log_path: Path | None, exit_code: int, cases: dict, side: str, module_tasks: dict[str, str] | None = None):
     if log_path is None:
         if exit_code:
             raise ReportError(f"{side} nonzero Gradle exit requires --{side}-log for failure classification")
@@ -91,7 +95,11 @@ def check_gradle(log_path: Path | None, exit_code: int, cases: dict, side: str):
             raise ReportError(f"{side} Gradle log lacks BUILD SUCCESSFUL")
         return
     failed_tasks = set(FAILED_TASK.findall(log))
-    if not failed_tasks or not failed_tasks.issubset(ALLOWED_FAILED_TASKS):
+    allowed = ALLOWED_FAILED_TASKS if not module_tasks else {
+        f":{module}:{module_tasks.get(module, 'testDebugUnitTest')}"
+        for module in {'app', 'data', 'domain', 'source-api'} | set(module_tasks)
+    }
+    if not failed_tasks or not failed_tasks.issubset(allowed):
         raise ReportError(f"{side} has non-unit-test or unidentified Gradle failure: {sorted(failed_tasks)}")
     failed_modules = {task.split(":")[1] for task in failed_tasks}
     if any(not any(key[0] == module and status == "failed" for key, status in cases.items())
@@ -132,6 +140,25 @@ def parse_minimum(value: str) -> tuple[str, int]:
         raise argparse.ArgumentTypeError("Expected MODULE=POSITIVE_INTEGER") from exc
 
 
+def parse_task(value: str) -> tuple[str, str]:
+    try:
+        module, task = value.split("=", 1)
+        if not re.fullmatch(r"[A-Za-z0-9_-]+", module) or not re.fullmatch(r"test[A-Za-z0-9]+UnitTest", task):
+            raise ValueError
+        return module, task
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError("Expected MODULE=testVariantUnitTest") from exc
+
+
+def task_map(values):
+    result = {}
+    for module, task in values:
+        if module in result:
+            raise ReportError(f"Duplicate module task selection: {module}")
+        result[module] = task
+    return result
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("baseline", type=Path)
@@ -142,18 +169,23 @@ def main() -> int:
     parser.add_argument("--baseline-log", type=Path)
     parser.add_argument("--patched-log", type=Path)
     parser.add_argument("--min-module", action="append", default=[], type=parse_minimum)
+    parser.add_argument("--baseline-task", action="append", default=[], type=parse_task)
+    parser.add_argument("--patched-task", action="append", default=[], type=parse_task)
     args = parser.parse_args()
     try:
-        original = collect(args.baseline)
-        modified = collect(args.patched)
+        base_tasks, patched_tasks = task_map(args.baseline_task), task_map(args.patched_task)
+        original = collect(args.baseline, base_tasks)
+        modified = collect(args.patched, patched_tasks)
         minima = dict(args.min_module)
         check_coverage(original, minima, "baseline")
         check_coverage(modified, minima, "patched")
-        check_gradle(args.baseline_log, args.baseline_exit, original, "baseline")
-        check_gradle(args.patched_log, args.patched_exit, modified, "patched")
+        check_gradle(args.baseline_log, args.baseline_exit, original, "baseline", base_tasks)
+        check_gradle(args.patched_log, args.patched_exit, modified, "patched", patched_tasks)
         result = compare(original, modified)
         result["gradle_exit_codes"] = {"baseline": args.baseline_exit, "patched": args.patched_exit}
         result["required_module_coverage"] = minima
+        result["report_tasks"] = {"baseline": base_tasks or {"default": "testDebugUnitTest"},
+                                  "patched": patched_tasks or {"default": "testDebugUnitTest"}}
         if args.output:
             args.output.parent.mkdir(parents=True, exist_ok=True)
             args.output.write_text(json.dumps(result, indent=2) + "\n")

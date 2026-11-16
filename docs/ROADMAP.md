@@ -10,7 +10,7 @@ As quatro frentes ativas são armazenamento, backups, leitura e distribuição. 
 
 ## Consolidação da beta.11
 
-O [checklist atual](BETA11_CHECKLIST.md) acompanha as frentes autorizadas em 13/11. Proteções de armazenamento/backups têm candidatas verificadas; testes finais e publicação continuam pendentes. As revisões históricas de sandbox abaixo estão pausadas por decisão atual.
+O [checklist atual](BETA11_CHECKLIST.md) acompanha as frentes autorizadas em 13/11. Proteções de armazenamento/backups/leitura e o [APK não depurável P20261116.1](DISTRIBUICAO_BETA_P20261116_1.md) têm candidatas verificadas. Atualização preservando dados, SAF/SQLite/interface Android, leitores externos e qualidade/memória nos aparelhos continuam para o aceite final antes da publicação. As revisões históricas de sandbox abaixo estão pausadas por decisão atual.
 
 Conta do Polaris com login Google e sincronização em nuvem é uma evolução desejada, mas foi **adiada por decisão do usuário**. Não priorizar configuração de Google Cloud ou provisionamento de contas agora. O backup local existente é preservado.
 

@@ -2,6 +2,18 @@
 
 Este arquivo registra a evolução real do código. **Revisões de desenvolvimento não são lançamentos públicos.** As datas abaixo usam America/Fortaleza, exceto quando houver indicação de UTC. O histórico de distribuição fica em [Releases](https://github.com/Hailton-Reis/Polaris/releases).
 
+## Desenvolvimento · P20261116.1 — 16/11/2026
+
+**Estado:** APK interno beta.11/código 112 gerado e verificado; sem Release pública.
+
+- Variante `beta` conserva o ID `.dev` e certificado da beta.10, com depuração, testOnly e profiling por shell desativados. R8/remoção de recursos permanecem desativados para preservar o carregamento dinâmico já exercitado. Sobre identifica o canal Beta.
+- APK universal ARM32/ARM64 de 259.481.310 bytes; manifesto, identidade, revisão, marca e bibliotecas conferidos. Oito DEX/68.658 classes sem sandbox, harnesses ou bibliotecas JVM de teste; worker OCR Dbnet preservado. O pacote anterior foi preservado e recusado pelos novos verificadores.
+- Compilação final aprovada em 3min42s; 901 testes do app beta executados/aprovados, mais 85 de domain release aprovados antes da retomada e UP-TO-DATE no final. Total 986 sem falhas/skips ou casos anteriores ausentes; 4 testes de overlay, 27 de empacotamento e 21 do comparador aprovados. A primeira montagem parou por limite de disco após os testes; a retomada usou os mesmos fontes.
+- Exportador exige manifesto anterior e código crescente. Comparador seleciona as tarefas reais beta/release e recusa relatórios selecionados ausentes. Guias do pacote agora descrevem a beta.11 e a sandbox pausada/retirada.
+- Atualização e dados no aparelho, SAF/SQLite/interface de backups, leitores externos e qualidade/pico de memória no A12/ARM permanecem pendentes. Conta/nuvem e sandbox continuam adiadas.
+
+[Escopo](docs/DISTRIBUICAO_BETA_P20261116_1.md) · [Evidências filtradas](integration/distribution/20261116/README.md).
+
 ## Desenvolvimento · P20261115.5 — 15/11/2026
 
 **Estado:** continuação da beta.11/código 112, na frente de leitura/OCR/tradução. Sem novo APK ou Release.

@@ -1,0 +1,32 @@
+{
+  "revision": "P20261116.1",
+  "status": "NON_DEBUG_INTERNAL_CANDIDATE_VERIFIED",
+  "build_result": "BUILD SUCCESSFUL in 3m 42s",
+  "selected_tasks": {
+    ":domain:testReleaseUnitTest": "UP-TO-DATE",
+    ":data:testDebugUnitTest": "NO-SOURCE",
+    ":source-api:testDebugUnitTest": "NO-SOURCE",
+    ":app:compileBetaKotlin": "EXECUTED",
+    ":app:testBetaUnitTest": "EXECUTED",
+    ":app:packageBeta": "EXECUTED",
+    ":app:assembleBeta": "EXECUTED"
+  },
+  "app_beta_executed_passed": 901,
+  "domain_release_executed_passed": 85,
+  "total_executed_passed": 986,
+  "missing_baseline_cases": 0,
+  "failed_or_skipped": 0,
+  "overlay_tests_passed": 4,
+  "packaging_tests_passed": 27,
+  "comparison_tests_passed": 21,
+  "compiled_manifest_and_dex_verified": true,
+  "sandbox_classes_or_components_present": false,
+  "dbnet_ocr_worker_preserved": true,
+  "new_internal_apk": true,
+  "new_public_release": false,
+  "physical_update_and_data_preservation": "PENDING",
+  "saf_android_sqlite_external_reader_ui": "PENDING",
+  "a12_arm_ocr_quality_and_memory": "PENDING",
+  "android_instrumentation_executed": false,
+  "jvm_execution": "PASSED_BEFORE_PACKAGING_RESUME; FINAL_TASK_STATES_RECORDED"
+}
