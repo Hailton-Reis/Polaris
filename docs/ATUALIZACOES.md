@@ -1,5 +1,13 @@
 # Atualizações do Polaris
 
+## Beta.11 publicada — 16/11/2026
+
+A [Release beta.11](https://github.com/Hailton-Reis/Polaris/releases/tag/v0.1.0-beta.11) está pública como pré-lançamento: P20261116.1/código 112, um APK universal ARM32/ARM64 de 259.481.310 bytes, com o identificador e certificado originais da beta.10. Para recebê-la, ative **Receber atualizações experimentais** e toque em **Verificar atualizações**. O download direto também está na Release.
+
+Os oito anexos foram baixados sem autenticação e conferidos por tamanho/SHA-256. A retomada HTTP 206 foi conferida contra os bytes locais. A compilação e os 986 casos JVM aprovados não substituem os aceites ainda pendentes em aparelhos: atualização preservando dados, SAF/SQLite/interface, fontes/leitores externos e qualidade/pico no A12/ARM. A publicação beta foi solicitada pelo mantenedor antes desses aceites.
+
+[Notas](versoes/0.1.0-beta.11.md) · [Registro de publicação](../.github/releases/v0.1.0-beta.11.publication.json).
+
 ## Escolha do canal
 
 Em **Configurações → Atualizações do aplicativo**:

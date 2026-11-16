@@ -2,6 +2,20 @@
 
 Este arquivo registra a evolução real do código. **Revisões de desenvolvimento não são lançamentos públicos.** As datas abaixo usam America/Fortaleza, exceto quando houver indicação de UTC. O histórico de distribuição fica em [Releases](https://github.com/Hailton-Reis/Polaris/releases).
 
+## 0.1.0-beta.11 — 16/11/2026
+
+**Publicada como pré-lançamento.** P20261116.1/código 112; um APK ARM32/ARM64, 259.481.310 bytes, com a assinatura da beta.10 e depuração desativada.
+
+- Jornada/XP/conquistas, grimórios e personalização; biblioteca unificada e continuidade entre edições/fontes.
+- Importações sem duplicação, retomada de cópias completas, cache por conteúdo e revisão de cópias interrompidas/pastas antigas.
+- Backups com restauração ordenada de categorias e preservação de lido/marcador/maior última página; cancelamento protegido em OCR/tradução.
+- Sandbox experimental arquivada e retirada do APK; aviso único e verificações de assinatura/integridade mantidos. Conta Google/nuvem adiadas.
+- 986 casos JVM aprovados; manifesto, assinatura, ARM e ausência de classes de sandbox/testes conferidos. Oito anexos públicos baixados e verificados por SHA-256, inclusive o APK completo; HTTP 206 conferido.
+
+Aceites em aparelhos de atualização/dados, SAF/SQLite/interface, leitores externos e qualidade/pico A12/ARM permanecem pendentes, conforme as notas do beta.
+
+[Release](https://github.com/Hailton-Reis/Polaris/releases/tag/v0.1.0-beta.11) · [Notas](docs/versoes/0.1.0-beta.11.md).
+
 ## 0.1.0-beta.10 · P20261106.1 — 06/11/2026
 
 **Estado:** pré-lançamento público para testes; versionCode 111; Android 8+, um APK universal ARM32/ARM64 de 261.130.442 bytes, com a assinatura anterior.
