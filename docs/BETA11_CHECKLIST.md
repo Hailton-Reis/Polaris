@@ -1,6 +1,6 @@
 # Beta.11 — checklist de consolidação
 
-Base pública: beta.10/código111. Base de engenharia: P20261112.1, commit 6952e5e.
+Base pública atual: beta.11/código 112 (P20261116.1, publicada em 16/11/2026). Base de engenharia: P20261112.1, commit 6952e5e.
 Este checklist acompanha o trabalho autorizado em 13/11. Não é uma declaração de lançamento.
 
 | Frente | Estado |
@@ -22,7 +22,7 @@ Não repetir funcionalidades já entregues com base nos documentos históricos. 
 resultado de teste de componentes em aprovação da próxima beta inteira.
 
 A [primeira revisão](LOGIN_E_ARMAZENAMENTO_P20261113_1.md) e a [proteção de backups P20261113.2](../integration/backup-safety/20261113/README.md) registram código, testes e limites.
-A publicação não foi iniciada; a beta.10 continua sendo a versão pública.
+A beta.11 foi publicada como pré-lançamento por solicitação do mantenedor. Os aceites em aparelhos seguem pendentes nas notas da Release.
 
 O APK interno P20261113.3 foi gerado com a assinatura original recuperada e verificado como ARM32/ARM64; não é uma Release pública. A atualização em aparelho continua pendente. [Evidência do pacote](../integration/signing-recovery/20261113/README.md).
 
@@ -59,3 +59,5 @@ P20261115.4: [backups com SQLite real e progresso sem regressão](BACKUPS_SQLITE
 P20261115.5: [cancelamento do processamento ML Kit](CANCELAMENTO_MLKIT_P20261115_5.md) mantém o recurso reservado até a Task terminar e impede resultado tardio após cancelamento, nos caminhos OCR/tradução de quadrinhos/documentos. Três falhas de ciclo de vida reproduzidas com Tasks reais e coordenador de produção, sem inferência/modelos. BUILD SUCCESSFUL 2min29s; 901 testes do app aprovados (12 novos) e 85 anteriores de domain/UP-TO-DATE; 986 casos nos relatórios, nenhum anterior ausente. App/instrumentação compilados, overlay4/empacotamento16 aprovados; dois controles Android compilados, não executados. Diagnóstico A12/ARM e qualidade/desempenho continuam pendentes; sem novo APK/Release.
 
 P20261116.1: [APK beta não depurável](DISTRIBUICAO_BETA_P20261116_1.md) gerado e exportado. Mesmo ID/certificado da beta.10, código 112, ARM32/ARM64 num único arquivo; depuração/testOnly/profiling por shell desativados. Oito DEX/68.658 classes conferidos sem executor sandbox, harnesses ou bibliotecas JVM de teste. Worker Dbnet preservado. Compilação final aprovada em 3min42s; 901 casos do app beta executados/aprovados, mais 85 de domain release aprovados antes da retomada e UP-TO-DATE no final. Total 986 sem falhas/skips ou casos anteriores ausentes; 4 testes de overlay, 27 de empacotamento e 21 do comparador aprovados. Guias do pacote atualizados para beta.11. A primeira montagem foi interrompida por limite de disco após os testes; a retomada com os mesmos fontes foi concluída. Sem Release; faltam os aceites finais em aparelhos listados na tabela.
+
+P20261116.2: [auditoria após a publicação](AUDITORIA_POS_BETA11_P20261116_2.md), com correções do tamanho e da retomada dos downloads, dez testes novos e 996 casos JVM aprovados. Sem novo APK/Release. Bibliotecas para 16 KB e limite de memória dos backups ficam registrados como próximos trabalhos.

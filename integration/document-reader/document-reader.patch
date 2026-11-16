@@ -9644,7 +9644,7 @@ index a198c3f..9a3e84f 100644
                      preference = translationPreferences.translationEngineTemperature(),
                      title = stringResource(ATMR.strings.pref_engine_temperature),
 diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
-index 7f411fd..6431af9 100644
+index 7f411fd..71f4016 100644
 --- a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
 +++ b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
 @@ -1,15 +1,18 @@
@@ -9709,7 +9709,7 @@ index 7f411fd..6431af9 100644
  
      // Identifies this overlay independently of the pinned upstream COMMIT_SHA.
 -    private const val POLARIS_READER_REVISION = "P20261031.2"
-+    private const val POLARIS_READER_REVISION = "P20261116.1"
++    private const val POLARIS_READER_REVISION = "P20261116.2"
  
      @Composable
      override fun Content() {
@@ -10024,10 +10024,10 @@ index 0000000..2cb3958
 +}
 diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/PolarisUpdateCheck.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/PolarisUpdateCheck.kt
 new file mode 100644
-index 0000000..4d59c26
+index 0000000..ea07c89
 --- /dev/null
 +++ b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/PolarisUpdateCheck.kt
-@@ -0,0 +1,61 @@
+@@ -0,0 +1,62 @@
 +package eu.kanade.presentation.more.settings.screen.about
 +
 +import androidx.compose.runtime.Composable
@@ -10068,6 +10068,7 @@ index 0000000..4d59c26
 +                                releaseLink = result.release.releaseLink,
 +                                downloadLink = result.release.downloadLink,
 +                                sha256 = result.release.sha256,
++                                expectedBytes = result.release.expectedBytes,
 +                            ),
 +                        )
 +                        GetApplicationRelease.Result.NoNewUpdate -> context.toast(
@@ -19899,7 +19900,7 @@ index 02b4af4..bf1be6d 100644
 +const val POLARIS_REPOSITORY_URL = "https://github.com/$GITHUB_REPO"
 +const val RELEASE_URL = "$POLARIS_REPOSITORY_URL/releases"
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/data/updater/AppUpdateDownloadJob.kt b/app/src/main/java/eu/kanade/tachiyomi/data/updater/AppUpdateDownloadJob.kt
-index ee19e89..4b24b0b 100644
+index ee19e89..90618ab 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/data/updater/AppUpdateDownloadJob.kt
 +++ b/app/src/main/java/eu/kanade/tachiyomi/data/updater/AppUpdateDownloadJob.kt
 @@ -1,8 +1,11 @@
@@ -19931,6 +19932,9 @@ index ee19e89..4b24b0b 100644
 +import eu.kanade.tachiyomi.util.system.notify
  import eu.kanade.tachiyomi.util.system.setForegroundSafely
  import eu.kanade.tachiyomi.util.system.workManager
++import java.io.File
++import java.io.IOException
++import java.util.concurrent.TimeUnit
  import kotlinx.coroutines.CancellationException
 +import kotlinx.coroutines.currentCoroutineContext
 +import kotlinx.coroutines.ensureActive
@@ -19941,13 +19945,11 @@ index ee19e89..4b24b0b 100644
  import tachiyomi.i18n.MR
 +import tachiyomi.i18n.at.ATMR
  import uy.kohesive.injekt.injectLazy
- import java.io.File
-+import java.io.IOException
-+import java.util.concurrent.TimeUnit
+-import java.io.File
  
  class AppUpdateDownloadJob(private val context: Context, workerParams: WorkerParameters) :
      CoroutineWorker(context, workerParams) {
-@@ -44,11 +53,48 @@ class AppUpdateDownloadJob(private val context: Context, workerParams: WorkerPar
+@@ -44,21 +53,73 @@ class AppUpdateDownloadJob(private val context: Context, workerParams: WorkerPar
  
          return try {
              withIOContext { downloadApk(url) }
@@ -19958,7 +19960,7 @@ index ee19e89..4b24b0b 100644
 +                    PROGRESS to 100,
 +                    EXTRA_DOWNLOAD_URL to url,
 +                    EXTRA_SHA256 to inputData.getString(EXTRA_SHA256),
-+                ),
++                )
 +            )
          } catch (e: CancellationException) {
              throw e
@@ -19967,7 +19969,8 @@ index ee19e89..4b24b0b 100644
 +        } catch (e: IOException) {
 +            currentCoroutineContext().ensureActive()
 +            logcat(LogPriority.WARN, e)
-+            val retryable = e !is UpdateResponseException && (e !is UpdateHttpException || e.retryable)
++            val retryable =
++                e !is UpdateResponseException && (e !is UpdateHttpException || e.retryable)
 +            if (retryable && runAttemptCount < 5) Result.retry() else failure(url)
 +        } catch (e: Exception) {
 +            logcat(LogPriority.ERROR, e)
@@ -19975,21 +19978,27 @@ index ee19e89..4b24b0b 100644
 +        }
 +    }
 +
-+    private fun failure(url: String) = Result.failure(
-+        workDataOf(EXTRA_DOWNLOAD_URL to url, EXTRA_SHA256 to inputData.getString(EXTRA_SHA256)),
-+    )
++    private fun failure(url: String) =
++        Result.failure(
++            workDataOf(EXTRA_DOWNLOAD_URL to url, EXTRA_SHA256 to inputData.getString(EXTRA_SHA256))
++        )
 +
 +    private fun notifyReady() {
-+        val intent = Intent(Intent.ACTION_VIEW).apply {
-+            setDataAndType(updateApk(context).getUriCompat(context), ExtensionInstaller.APK_MIME)
-+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION
-+        }
-+        val pendingIntent = PendingIntent.getActivity(
-+            context,
-+            Notifications.ID_APP_UPDATE_READY,
-+            intent,
-+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
-+        )
++        val intent =
++            Intent(Intent.ACTION_VIEW).apply {
++                setDataAndType(
++                    updateApk(context).getUriCompat(context),
++                    ExtensionInstaller.APK_MIME,
++                )
++                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION
++            }
++        val pendingIntent =
++            PendingIntent.getActivity(
++                context,
++                Notifications.ID_APP_UPDATE_READY,
++                intent,
++                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
++            )
 +        context.notify(Notifications.ID_APP_UPDATE_READY, Notifications.CHANNEL_APP_UPDATE) {
 +            setContentTitle(context.stringResource(ATMR.strings.polaris_update_ready))
 +            setContentText(context.stringResource(ATMR.strings.polaris_update_install_hint))
@@ -19999,7 +20008,31 @@ index ee19e89..4b24b0b 100644
          }
      }
  
-@@ -77,28 +123,31 @@ class AppUpdateDownloadJob(private val context: Context, workerParams: WorkerPar
+     override suspend fun getForegroundInfo(): ForegroundInfo {
+-        val notification = context.notificationBuilder(Notifications.CHANNEL_APP_UPDATE)
+-            .setContentTitle(context.stringResource(MR.strings.update_check_notification_update_available))
+-            .setContentText(context.stringResource(MR.strings.update_check_notification_download_in_progress))
+-            .setSmallIcon(android.R.drawable.stat_sys_download)
+-            .setOngoing(true)
+-            .build()
++        val notification =
++            context
++                .notificationBuilder(Notifications.CHANNEL_APP_UPDATE)
++                .setContentTitle(
++                    context.stringResource(MR.strings.update_check_notification_update_available)
++                )
++                .setContentText(
++                    context.stringResource(
++                        MR.strings.update_check_notification_download_in_progress
++                    )
++                )
++                .setSmallIcon(android.R.drawable.stat_sys_download)
++                .setOngoing(true)
++                .build()
+ 
+         return ForegroundInfo(
+             Notifications.ID_APP_UPDATER,
+@@ -77,28 +138,36 @@ class AppUpdateDownloadJob(private val context: Context, workerParams: WorkerPar
       * @param url url location of file
       */
      private suspend fun downloadApk(url: String) {
@@ -20018,18 +20051,23 @@ index ee19e89..4b24b0b 100644
 -                    lastTick = currentTime
 -                    setProgressAsync(workDataOf(PROGRESS to progress, EXTRA_DOWNLOAD_URL to url))
 -                }
-+        val client = network.client.newBuilder().cache(null)
-+            .readTimeout(45, TimeUnit.SECONDS)
-+            .callTimeout(0, TimeUnit.SECONDS)
-+            .build()
++        val client =
++            network.client
++                .newBuilder()
++                .cache(null)
++                .readTimeout(45, TimeUnit.SECONDS)
++                .callTimeout(0, TimeUnit.SECONDS)
++                .build()
 +        var savedProgress = -1
 +        var lastTick = 0L
-+        PolarisApkDownloader(updateDirectory(context), client).download(url, inputData.getString(EXTRA_SHA256)) {
-+                bytes,
-+                total,
-+            ->
++        PolarisApkDownloader(updateDirectory(context), client).download(
++            url,
++            inputData.getString(EXTRA_SHA256),
++            inputData.getLong(EXTRA_EXPECTED_BYTES, -1L).takeIf { it > 0 },
++        ) { bytes, total ->
 +            // Keep 100% for verified success; an unknown length must not cause division by zero.
-+            val progress = if (total > 0) (bytes.toDouble() * 100 / total).toInt().coerceIn(0, 99) else 0
++            val progress =
++                if (total > 0) (bytes.toDouble() * 100 / total).toInt().coerceIn(0, 99) else 0
 +            val now = android.os.SystemClock.elapsedRealtime()
 +            if (savedProgress < 0 || (progress != savedProgress && now - lastTick >= 200)) {
 +                savedProgress = progress
@@ -20039,7 +20077,7 @@ index ee19e89..4b24b0b 100644
 +                        PROGRESS to progress,
 +                        EXTRA_DOWNLOAD_URL to url,
 +                        EXTRA_SHA256 to inputData.getString(EXTRA_SHA256),
-+                    ),
++                    )
 +                )
              }
          }
@@ -20051,55 +20089,73 @@ index ee19e89..4b24b0b 100644
      }
  
      companion object {
-@@ -107,21 +156,29 @@ class AppUpdateDownloadJob(private val context: Context, workerParams: WorkerPar
+@@ -107,21 +176,42 @@ class AppUpdateDownloadJob(private val context: Context, workerParams: WorkerPar
          const val PROGRESS = "progress"
  
          const val EXTRA_DOWNLOAD_URL = "DOWNLOAD_URL"
+-
+-        fun updateApk(context: Context): File = File(context.externalCacheDir, "update.apk")
+-
+-        fun start(context: Context, url: String) {
+-            val constraints = Constraints(
+-                requiredNetworkType = NetworkType.CONNECTED,
+-            )
+-
+-            val request = OneTimeWorkRequestBuilder<AppUpdateDownloadJob>()
+-                .setConstraints(constraints)
+-                .addTag(TAG)
+-                .setInputData(workDataOf(EXTRA_DOWNLOAD_URL to url))
+-                .build()
+-
+-            context.workManager.enqueueUniqueWork(TAG, ExistingWorkPolicy.REPLACE, request)
 +        const val EXTRA_SHA256 = "EXPECTED_SHA256"
++        const val EXTRA_EXPECTED_BYTES = "EXPECTED_BYTES"
 +
 +        private fun updateDirectory(context: Context): File = File(context.cacheDir, "updates")
 +
 +        fun updateApk(context: Context): File = File(updateDirectory(context), "update.apk")
- 
--        fun updateApk(context: Context): File = File(context.externalCacheDir, "update.apk")
-+        fun updateTag(url: String, sha256: String?): String = "update-${PolarisApkDownloader.identity(url, sha256)}"
- 
--        fun start(context: Context, url: String) {
-+        fun start(context: Context, url: String, sha256: String? = null) {
++
++        fun updateTag(url: String, sha256: String?): String =
++            "update-${PolarisApkDownloader.identity(url, sha256)}"
++
++        fun start(
++            context: Context,
++            url: String,
++            sha256: String? = null,
++            expectedBytes: Long? = null,
++        ) {
++            require(expectedBytes == null || expectedBytes > 0) { "Invalid APK byte count" }
 +            context.cancelNotification(Notifications.ID_APP_UPDATE_READY)
-             val constraints = Constraints(
-                 requiredNetworkType = NetworkType.CONNECTED,
-             )
- 
-             val request = OneTimeWorkRequestBuilder<AppUpdateDownloadJob>()
-                 .setConstraints(constraints)
-+                .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 10, TimeUnit.SECONDS)
-                 .addTag(TAG)
--                .setInputData(workDataOf(EXTRA_DOWNLOAD_URL to url))
-+                .addTag(updateTag(url, sha256))
-+                .setInputData(workDataOf(EXTRA_DOWNLOAD_URL to url, EXTRA_SHA256 to sha256))
-                 .build()
- 
--            context.workManager.enqueueUniqueWork(TAG, ExistingWorkPolicy.REPLACE, request)
++            val constraints = Constraints(requiredNetworkType = NetworkType.CONNECTED)
++
++            val request =
++                OneTimeWorkRequestBuilder<AppUpdateDownloadJob>()
++                    .setConstraints(constraints)
++                    .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 10, TimeUnit.SECONDS)
++                    .addTag(TAG)
++                    .addTag(updateTag(url, sha256))
++                    .setInputData(
++                        workDataOf(
++                            EXTRA_DOWNLOAD_URL to url,
++                            EXTRA_SHA256 to sha256,
++                            EXTRA_EXPECTED_BYTES to expectedBytes,
++                        )
++                    )
++                    .build()
++
 +            context.workManager.enqueueUniqueWork(TAG, ExistingWorkPolicy.KEEP, request)
          }
  
          fun stop(context: Context) {
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/data/updater/PolarisApkDownloader.kt b/app/src/main/java/eu/kanade/tachiyomi/data/updater/PolarisApkDownloader.kt
 new file mode 100644
-index 0000000..0f13d7d
+index 0000000..89ab3f5
 --- /dev/null
 +++ b/app/src/main/java/eu/kanade/tachiyomi/data/updater/PolarisApkDownloader.kt
-@@ -0,0 +1,145 @@
+@@ -0,0 +1,193 @@
 +package eu.kanade.tachiyomi.data.updater
 +
 +import eu.kanade.tachiyomi.network.await
-+import kotlinx.coroutines.currentCoroutineContext
-+import kotlinx.coroutines.ensureActive
-+import kotlinx.coroutines.sync.Mutex
-+import kotlinx.coroutines.sync.withLock
-+import okhttp3.OkHttpClient
-+import okhttp3.Request
 +import java.io.EOFException
 +import java.io.File
 +import java.io.FileOutputStream
@@ -20107,116 +20163,168 @@ index 0000000..0f13d7d
 +import java.nio.file.Files
 +import java.nio.file.StandardCopyOption
 +import java.security.MessageDigest
++import kotlinx.coroutines.currentCoroutineContext
++import kotlinx.coroutines.ensureActive
++import kotlinx.coroutines.sync.Mutex
++import kotlinx.coroutines.sync.withLock
++import okhttp3.OkHttpClient
++import okhttp3.Request
 +
 +/** Keeps interrupted bytes separate from the APK offered to Android's installer. */
-+internal class PolarisApkDownloader(
-+    private val directory: File,
-+    private val client: OkHttpClient,
-+) {
++internal class PolarisApkDownloader(private val directory: File, private val client: OkHttpClient) {
 +    suspend fun download(
 +        url: String,
 +        sha256: String?,
++        expectedBytes: Long? = null,
 +        progress: (Long, Long) -> Unit = { _, _ -> },
-+    ): File = lock.withLock {
-+        if (!directory.isDirectory && !directory.mkdirs()) throw IOException("Cannot create update cache")
-+        val apk = File(directory, "update.apk")
-+        if (sha256 != null && apk.isFile) {
-+            if (runCatching { PolarisUpdateIntegrity.verify(apk, sha256) }.isSuccess) {
-+                progress(apk.length(), apk.length())
-+                return@withLock apk
++    ): File =
++        lock.withLock {
++            require(expectedBytes == null || expectedBytes > 0) { "Invalid APK byte count" }
++            if (!directory.isDirectory && !directory.mkdirs())
++                throw IOException("Cannot create update cache")
++            val apk = File(directory, "update.apk")
++            if (sha256 != null && apk.isFile) {
++                if (expectedBytes != null && apk.length() != expectedBytes) {
++                    apk.delete()
++                } else if (runCatching { PolarisUpdateIntegrity.verify(apk, sha256) }.isSuccess) {
++                    progress(apk.length(), apk.length())
++                    return@withLock apk
++                }
 +            }
-+        }
 +
-+        val part = File(directory, "update-${identity(url, sha256)}.part")
-+        // This directory belongs exclusively to the updater. Retain only this release's partial download.
-+        directory.listFiles()?.filter { it.name.startsWith("update-") && it.extension == "part" && it != part }
-+            ?.forEach { it.delete() }
-+        // Resuming without a pinned digest could combine bytes from two different APKs.
-+        if (sha256 == null) part.delete()
-+        var offset = part.length()
-+        progress(offset, -1)
++            val part = File(directory, "update-${identity(url, sha256)}.part")
++            // This directory belongs exclusively to the updater. Retain only this release's partial
++            // download.
++            directory
++                .listFiles()
++                ?.filter { it.name.startsWith("update-") && it.extension == "part" && it != part }
++                ?.forEach { it.delete() }
++            // Resuming without a pinned digest could combine bytes from two different APKs.
++            if (sha256 == null || (expectedBytes != null && part.length() > expectedBytes))
++                part.delete()
++            var offset = part.length()
++            progress(offset, -1)
 +
-+        while (true) {
-+            currentCoroutineContext().ensureActive()
-+            val request = Request.Builder().url(url)
-+                .header("Accept-Encoding", "identity")
-+                .apply { if (offset > 0) header("Range", "bytes=$offset-") }
-+                .build()
-+            client.newCall(request).await().use { response ->
-+                if (response.code == 416 && offset > 0) {
-+                    // The connection may have died after writing the final byte, before promotion.
-+                    if (sha256 != null && runCatching { PolarisUpdateIntegrity.verify(part, sha256) }.isSuccess) {
-+                        return@withLock promote(part, apk, progress)
++            while (true) {
++                currentCoroutineContext().ensureActive()
++                val request =
++                    Request.Builder()
++                        .url(url)
++                        .header("Accept-Encoding", "identity")
++                        .apply { if (offset > 0) header("Range", "bytes=$offset-") }
++                        .build()
++                client.newCall(request).await().use { response ->
++                    if (response.code == 416 && offset > 0) {
++                        // The connection may have died after writing the final byte, before
++                        // promotion.
++                        if (
++                            sha256 != null &&
++                                (expectedBytes == null || offset == expectedBytes) &&
++                                runCatching { PolarisUpdateIntegrity.verify(part, sha256) }
++                                    .isSuccess
++                        ) {
++                            return@withLock promote(part, apk, progress)
++                        }
++                        part.delete()
++                        offset = 0
++                        return@use
 +                    }
-+                    part.delete()
-+                    offset = 0
-+                    return@use
-+                }
-+                if (response.code != 200 && response.code != 206) {
-+                    throw UpdateHttpException(response.code)
-+                }
-+                if (response.header("Content-Encoding")?.equals("identity", ignoreCase = true) == false) {
-+                    part.delete()
-+                    throw UpdateResponseException("Encoded APK response")
-+                }
-+                val length = response.body.contentLength()
-+                val total: Long
-+                val responseLength: Long
-+                if (response.code == 206) {
-+                    val range = response.header("Content-Range")?.let { RANGE.matchEntire(it) }
-+                    val start = range?.groupValues?.get(1)?.toLongOrNull()
-+                    val end = range?.groupValues?.get(2)?.toLongOrNull()
-+                    val size = range?.groupValues?.get(3)?.toLongOrNull()
-+                    if (offset <= 0 || start != offset || end == null || size == null ||
-+                        end < offset || end >= size || (length >= 0 && length != end - offset + 1)
++                    if (response.code != 200 && response.code != 206) {
++                        throw UpdateHttpException(response.code)
++                    }
++                    if (
++                        response
++                            .header("Content-Encoding")
++                            ?.equals("identity", ignoreCase = true) == false
 +                    ) {
 +                        part.delete()
-+                        throw UpdateResponseException("Invalid APK Content-Range")
++                        throw UpdateResponseException("Encoded APK response")
 +                    }
-+                    total = size
-+                    responseLength = end - offset + 1
-+                } else {
-+                    // A server may ignore Range. Truncate, never append a full response to old bytes.
-+                    offset = 0
-+                    total = length
-+                    responseLength = length
-+                }
-+                var received = 0L
-+                response.body.byteStream().use { input ->
-+                    FileOutputStream(part, offset > 0).use { output ->
-+                        progress(offset, total)
-+                        val buffer = ByteArray(64 * 1024)
-+                        while (true) {
-+                            currentCoroutineContext().ensureActive()
-+                            val count = input.read(buffer)
-+                            if (count < 0) break
-+                            received += count
-+                            if (responseLength >= 0 && received > responseLength) {
-+                                part.delete()
-+                                throw UpdateResponseException("Oversized APK response")
-+                            }
-+                            output.write(buffer, 0, count)
-+                            progress(offset + received, total)
++                    val length = response.body.contentLength()
++                    val total: Long
++                    val responseLength: Long
++                    if (response.code == 206) {
++                        val range = response.header("Content-Range")?.let { RANGE.matchEntire(it) }
++                        val start = range?.groupValues?.get(1)?.toLongOrNull()
++                        val end = range?.groupValues?.get(2)?.toLongOrNull()
++                        val size = range?.groupValues?.get(3)?.toLongOrNull()
++                        if (
++                            offset <= 0 ||
++                                start != offset ||
++                                end == null ||
++                                size == null ||
++                                end < offset ||
++                                end >= size ||
++                                (length >= 0 && length != end - offset + 1) ||
++                                (expectedBytes != null && size != expectedBytes)
++                        ) {
++                            part.delete()
++                            throw UpdateResponseException("Invalid APK Content-Range")
 +                        }
-+                        output.fd.sync()
++                        total = size
++                        responseLength = end - offset + 1
++                    } else {
++                        if (expectedBytes != null && length >= 0 && length != expectedBytes) {
++                            part.delete()
++                            throw UpdateResponseException(
++                                "APK length differs from release metadata"
++                            )
++                        }
++                        // A server may ignore Range. Truncate, never append a full response to old
++                        // bytes.
++                        offset = 0
++                        total = expectedBytes ?: length
++                        responseLength = expectedBytes ?: length
 +                    }
++                    var received = 0L
++                    response.body.byteStream().use { input ->
++                        FileOutputStream(part, offset > 0).use { output ->
++                            progress(offset, total)
++                            val buffer = ByteArray(64 * 1024)
++                            while (true) {
++                                currentCoroutineContext().ensureActive()
++                                val count = input.read(buffer)
++                                if (count < 0) break
++                                if (
++                                    responseLength >= 0 &&
++                                        count.toLong() > responseLength - received
++                                ) {
++                                    part.delete()
++                                    throw UpdateResponseException("Oversized APK response")
++                                }
++                                received += count
++                                output.write(buffer, 0, count)
++                                progress(offset + received, total)
++                            }
++                            output.fd.sync()
++                        }
++                    }
++                    if (responseLength >= 0 && received != responseLength) {
++                        throw EOFException("Incomplete APK download")
++                    }
++                    if (response.code == 206 && part.length() < total) {
++                        // A valid range need not include the whole requested tail. Continue from
++                        // its end.
++                        offset = part.length()
++                        return@use
++                    }
++                    if (total >= 0 && part.length() != total)
++                        throw EOFException("Incomplete APK download")
++                    currentCoroutineContext().ensureActive()
++                    if (sha256 != null) PolarisUpdateIntegrity.verify(part, sha256)
++                    return@withLock promote(part, apk, progress)
 +                }
-+                if ((responseLength >= 0 && received != responseLength) ||
-+                    (total >= 0 && part.length() != total)
-+                ) {
-+                    throw EOFException("Incomplete APK download")
-+                }
-+                currentCoroutineContext().ensureActive()
-+                if (sha256 != null) PolarisUpdateIntegrity.verify(part, sha256)
-+                return@withLock promote(part, apk, progress)
 +            }
++            @Suppress("UNREACHABLE_CODE") error("Unreachable")
 +        }
-+        @Suppress("UNREACHABLE_CODE")
-+        error("Unreachable")
-+    }
 +
 +    private fun promote(part: File, apk: File, progress: (Long, Long) -> Unit): File {
-+        Files.move(part.toPath(), apk.toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE)
++        Files.move(
++            part.toPath(),
++            apk.toPath(),
++            StandardCopyOption.REPLACE_EXISTING,
++            StandardCopyOption.ATOMIC_MOVE,
++        )
 +        progress(apk.length(), apk.length())
 +        return apk
 +    }
@@ -20225,14 +20333,16 @@ index 0000000..0f13d7d
 +        private val lock = Mutex()
 +        private val RANGE = Regex("bytes (\\d+)-(\\d+)/(\\d+)")
 +
-+        fun identity(url: String, sha256: String?): String = MessageDigest.getInstance("SHA-256")
-+            .digest("$url\n${sha256?.lowercase().orEmpty()}".toByteArray())
-+            .joinToString("") { "%02x".format(it) }
++        fun identity(url: String, sha256: String?): String =
++            MessageDigest.getInstance("SHA-256")
++                .digest("$url\n${sha256?.lowercase().orEmpty()}".toByteArray())
++                .joinToString("") { "%02x".format(it) }
 +    }
 +}
 +
 +internal class UpdateHttpException(val status: Int) : IOException("APK HTTP $status") {
-+    val retryable: Boolean get() = status == 408 || status == 429 || status in 500..599
++    val retryable: Boolean
++        get() = status == 408 || status == 429 || status in 500..599
 +}
 +
 +internal class UpdateResponseException(message: String) : IOException(message)
@@ -20286,17 +20396,17 @@ index 0000000..040c70e
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/data/updater/PolarisUpdateClient.kt b/app/src/main/java/eu/kanade/tachiyomi/data/updater/PolarisUpdateClient.kt
 new file mode 100644
-index 0000000..db48f01
+index 0000000..75e4b01
 --- /dev/null
 +++ b/app/src/main/java/eu/kanade/tachiyomi/data/updater/PolarisUpdateClient.kt
-@@ -0,0 +1,106 @@
+@@ -0,0 +1,143 @@
 +package eu.kanade.tachiyomi.data.updater
 +
++import java.io.IOException
 +import kotlinx.serialization.SerialName
 +import kotlinx.serialization.Serializable
 +import tachiyomi.domain.release.interactor.GetApplicationRelease
 +import tachiyomi.domain.release.model.Release
-+import java.io.IOException
 +
 +data class PolarisReleasePage(val releases: List<PolarisGithubRelease>, val hasNext: Boolean)
 +
@@ -20318,7 +20428,12 @@ index 0000000..db48f01
 +)
 +
 +@Serializable
-+data class PolarisUpdateArtifact(val abi: String, val file: String, val bytes: Long, val sha256: String)
++data class PolarisUpdateArtifact(
++    val abi: String,
++    val file: String,
++    val bytes: Long,
++    val sha256: String,
++)
 +
 +@Serializable
 +data class PolarisUpdateManifest(
@@ -20342,7 +20457,9 @@ index 0000000..db48f01
 +        androidApi: Int,
 +        experimental: Boolean,
 +    ): GetApplicationRelease.Result {
-+        val current = PolarisReleaseVersion.parse(currentVersion) ?: throw IOException("Invalid installed version")
++        val current =
++            PolarisReleaseVersion.parse(currentVersion)
++                ?: throw IOException("Invalid installed version")
 +        val releases = mutableListOf<PolarisGithubRelease>()
 +        var page = 1
 +        while (true) {
@@ -20351,50 +20468,80 @@ index 0000000..db48f01
 +            if (!response.hasNext) break
 +            if (page++ >= 10) throw IOException("Release pagination limit reached")
 +        }
-+        val candidates = releases.mapNotNull { release ->
-+            val version = PolarisReleaseVersion.parse(release.tag) ?: return@mapNotNull null
-+            if (release.draft || (!experimental && (release.prerelease || version.prerelease.isNotEmpty()))) {
-+                return@mapNotNull null
-+            }
-+            if (version <= current || !release.url.startsWith("$POLARIS_REPOSITORY_URL/releases/tag/")) {
-+                return@mapNotNull null
-+            }
-+            version to release
-+        }.sortedByDescending { it.first }
++        val candidates =
++            releases
++                .mapNotNull { release ->
++                    val version = PolarisReleaseVersion.parse(release.tag) ?: return@mapNotNull null
++                    if (
++                        release.draft ||
++                            (!experimental &&
++                                (release.prerelease || version.prerelease.isNotEmpty()))
++                    ) {
++                        return@mapNotNull null
++                    }
++                    if (
++                        version <= current ||
++                            !release.url.startsWith("$POLARIS_REPOSITORY_URL/releases/tag/")
++                    ) {
++                        return@mapNotNull null
++                    }
++                    version to release
++                }
++                .sortedByDescending { it.first }
 +        var osTooOld = false
 +        for ((version, release) in candidates) {
-+            val metadata = release.assets.singleOrNull {
-+                it.name == "manifest.json" && officialDownload(it.url)
-+            } ?: continue
++            val metadata =
++                release.assets.singleOrNull {
++                    it.name == "manifest.json" && officialDownload(it.url)
++                } ?: continue
 +            val manifest = fetchManifest(metadata.url)
-+            if (PolarisReleaseVersion.parse(manifest.version) != version ||
-+                manifest.versionCode <= currentCode || manifest.applicationId != applicationId
++            if (
++                PolarisReleaseVersion.parse(manifest.version) != version ||
++                    manifest.versionCode <= currentCode ||
++                    manifest.applicationId != applicationId
 +            ) {
 +                continue
 +            }
-+            val artifact = supportedAbis.firstNotNullOfOrNull { abi ->
-+                manifest.artifacts.singleOrNull { it.abi == abi }
-+            } ?: continue
-+            if (!artifact.file.endsWith(".apk") || '/' in artifact.file || '\\' in artifact.file ||
-+                !artifact.sha256.matches(Regex("[a-fA-F0-9]{64}")) || artifact.bytes <= 0
++            val artifact =
++                supportedAbis.firstNotNullOfOrNull { abi ->
++                    manifest.artifacts.singleOrNull { it.abi == abi }
++                } ?: continue
++            if (
++                !artifact.file.endsWith(".apk") ||
++                    '/' in artifact.file ||
++                    '\\' in artifact.file ||
++                    !artifact.sha256.matches(Regex("[a-fA-F0-9]{64}")) ||
++                    artifact.bytes <= 0
 +            ) {
 +                continue
 +            }
-+            val asset = release.assets.singleOrNull {
-+                it.name == artifact.file && it.size == artifact.bytes && officialDownload(it.url)
-+            } ?: continue
++            val asset =
++                release.assets.singleOrNull {
++                    it.name == artifact.file &&
++                        it.size == artifact.bytes &&
++                        officialDownload(it.url)
++                } ?: continue
 +            if (manifest.minimumAndroidApi > androidApi) {
 +                osTooOld = true
 +                continue
 +            }
 +            return GetApplicationRelease.Result.NewUpdate(
-+                Release(release.tag, release.body.orEmpty(), release.url, asset.url, artifact.sha256.lowercase()),
++                Release(
++                    release.tag,
++                    release.body.orEmpty(),
++                    release.url,
++                    asset.url,
++                    artifact.sha256.lowercase(),
++                    artifact.bytes,
++                )
 +            )
 +        }
-+        return if (osTooOld) GetApplicationRelease.Result.OsTooOld else GetApplicationRelease.Result.NoNewUpdate
++        return if (osTooOld) GetApplicationRelease.Result.OsTooOld
++        else GetApplicationRelease.Result.NoNewUpdate
 +    }
 +
-+    private fun officialDownload(url: String) = url.startsWith("$POLARIS_REPOSITORY_URL/releases/download/")
++    private fun officialDownload(url: String) =
++        url.startsWith("$POLARIS_REPOSITORY_URL/releases/download/")
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/data/updater/PolarisUpdateIntegrity.kt b/app/src/main/java/eu/kanade/tachiyomi/data/updater/PolarisUpdateIntegrity.kt
 new file mode 100644
@@ -28578,14 +28725,15 @@ index a52f2fb..04e7bc8 100644
          }
      }
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/main/MainActivity.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/main/MainActivity.kt
-index ffdfc30..6366765 100644
+index ffdfc30..503db88 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/ui/main/MainActivity.kt
 +++ b/app/src/main/java/eu/kanade/tachiyomi/ui/main/MainActivity.kt
-@@ -318,6 +318,7 @@ class MainActivity : BaseActivity() {
+@@ -318,6 +318,8 @@ class MainActivity : BaseActivity() {
                              changelogInfo = result.release.info,
                              releaseLink = result.release.releaseLink,
                              downloadLink = result.release.downloadLink,
 +                            sha256 = result.release.sha256,
++                            expectedBytes = result.release.expectedBytes,
                          )
                          navigator.push(updateScreen)
                      }
@@ -30821,27 +30969,29 @@ index a6e576c..a198a04 100644
      data class Downloading(val pending: Int) : DownloadQueueState
  }
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/more/NewUpdateScreen.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/more/NewUpdateScreen.kt
-index 5fa273f..e1c45c8 100644
+index 5fa273f..ff4b4cc 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/ui/more/NewUpdateScreen.kt
 +++ b/app/src/main/java/eu/kanade/tachiyomi/ui/more/NewUpdateScreen.kt
-@@ -17,6 +17,7 @@ class NewUpdateScreen(
+@@ -17,6 +17,8 @@ class NewUpdateScreen(
      private val changelogInfo: String,
      private val releaseLink: String,
      private val downloadLink: String,
 +    private val sha256: String? = null,
++    private val expectedBytes: Long? = null,
  ) : Screen() {
  
      @Composable
-@@ -28,6 +29,7 @@ class NewUpdateScreen(
+@@ -28,6 +30,8 @@ class NewUpdateScreen(
              extras = CreationExtras {
                  set(NewUpdateScreenModel.CHANGELOG_INFO_KEY, changelogInfo)
                  set(NewUpdateScreenModel.DOWNLOAD_LINK_KEY, downloadLink)
 +                sha256?.let { set(NewUpdateScreenModel.SHA256_KEY, it) }
++                expectedBytes?.let { set(NewUpdateScreenModel.EXPECTED_BYTES_KEY, it) }
              },
          )
  
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/more/NewUpdateScreenModel.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/more/NewUpdateScreenModel.kt
-index beb77f2..5097a32 100644
+index beb77f2..14cc2e4 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/ui/more/NewUpdateScreenModel.kt
 +++ b/app/src/main/java/eu/kanade/tachiyomi/ui/more/NewUpdateScreenModel.kt
 @@ -15,7 +15,6 @@ import eu.kanade.tachiyomi.util.system.workManager
@@ -30852,12 +31002,13 @@ index beb77f2..5097a32 100644
  import kotlinx.coroutines.flow.onEach
  import kotlinx.coroutines.flow.update
  import mihon.core.viewmodel.StateViewModel
-@@ -25,38 +24,33 @@ import uy.kohesive.injekt.api.get
+@@ -25,38 +24,34 @@ import uy.kohesive.injekt.api.get
  class NewUpdateScreenModel(
      changelogInfo: String,
      private val downloadLink: String,
 +    private val sha256: String? = null,
      private val context: Context = Injekt.get(),
++    private val expectedBytes: Long? = null,
  ) : StateViewModel<NewUpdateScreenModel.State>(State(changelogInfo = changelogInfo)) {
  
      init {
@@ -30901,16 +31052,16 @@ index beb77f2..5097a32 100644
                      else -> Stage.Available
                  }
                  progress to stage
-@@ -75,7 +69,7 @@ class NewUpdateScreenModel(
+@@ -75,7 +70,7 @@ class NewUpdateScreenModel(
  
      fun startDownload() {
          mutableState.update { it.copy(downloadProgress = 0, stage = Stage.Downloading) }
 -        AppUpdateDownloadJob.start(context, downloadLink)
-+        AppUpdateDownloadJob.start(context, downloadLink, sha256)
++        AppUpdateDownloadJob.start(context, downloadLink, sha256, expectedBytes)
      }
  
      fun installUpdate() {
-@@ -87,10 +81,6 @@ class NewUpdateScreenModel(
+@@ -87,10 +82,6 @@ class NewUpdateScreenModel(
          context.startActivity(intent)
      }
  
@@ -30921,7 +31072,7 @@ index beb77f2..5097a32 100644
      @Immutable
      data class State(
          val changelogInfo: String,
-@@ -101,6 +91,7 @@ class NewUpdateScreenModel(
+@@ -101,6 +92,7 @@ class NewUpdateScreenModel(
      enum class Stage {
          Available,
          Downloading,
@@ -30929,11 +31080,12 @@ index beb77f2..5097a32 100644
          Downloaded,
          Failed,
      }
-@@ -108,12 +99,14 @@ class NewUpdateScreenModel(
+@@ -108,12 +100,16 @@ class NewUpdateScreenModel(
      companion object {
          val CHANGELOG_INFO_KEY = CreationExtras.Key<String>()
          val DOWNLOAD_LINK_KEY = CreationExtras.Key<String>()
 +        val SHA256_KEY = CreationExtras.Key<String>()
++        val EXPECTED_BYTES_KEY = CreationExtras.Key<Long>()
  
          val Factory = viewModelFactory {
              initializer {
@@ -30941,6 +31093,7 @@ index beb77f2..5097a32 100644
                      changelogInfo = get(CHANGELOG_INFO_KEY)!!,
                      downloadLink = get(DOWNLOAD_LINK_KEY)!!,
 +                    sha256 = get(SHA256_KEY),
++                    expectedBytes = get(EXPECTED_BYTES_KEY),
                  )
              }
          }
@@ -63390,16 +63543,269 @@ index 68f36cd..fb3271f 100644
 +        assertEquals("Hailton-Reis/Polaris", GITHUB_REPO)
      }
  }
-diff --git a/app/src/test/java/eu/kanade/tachiyomi/data/updater/PolarisApkDownloaderTest.kt b/app/src/test/java/eu/kanade/tachiyomi/data/updater/PolarisApkDownloaderTest.kt
+diff --git a/app/src/test/java/eu/kanade/tachiyomi/data/updater/PolarisApkDownloadBoundsTest.kt b/app/src/test/java/eu/kanade/tachiyomi/data/updater/PolarisApkDownloadBoundsTest.kt
 new file mode 100644
-index 0000000..a17f91f
+index 0000000..e976d39
 --- /dev/null
-+++ b/app/src/test/java/eu/kanade/tachiyomi/data/updater/PolarisApkDownloaderTest.kt
-@@ -0,0 +1,217 @@
++++ b/app/src/test/java/eu/kanade/tachiyomi/data/updater/PolarisApkDownloadBoundsTest.kt
+@@ -0,0 +1,239 @@
 +package eu.kanade.tachiyomi.data.updater
 +
 +import com.sun.net.httpserver.HttpExchange
 +import com.sun.net.httpserver.HttpServer
++import java.io.File
++import java.net.InetSocketAddress
++import java.security.MessageDigest
++import java.util.Collections
++import java.util.concurrent.Executors
++import java.util.concurrent.TimeUnit
++import kotlinx.coroutines.test.runTest
++import okhttp3.OkHttpClient
++import org.junit.jupiter.api.AfterEach
++import org.junit.jupiter.api.Assertions.assertArrayEquals
++import org.junit.jupiter.api.Assertions.assertEquals
++import org.junit.jupiter.api.Assertions.assertFalse
++import org.junit.jupiter.api.Test
++import org.junit.jupiter.api.assertThrows
++import org.junit.jupiter.api.io.TempDir
++
++/** Real HTTP and filesystem; the contract is the already selected manifest artifact byte count. */
++class PolarisApkDownloadBoundsTest {
++    @TempDir lateinit var directory: File
++    private val payload = ByteArray(24 * 1024) { (it % 251).toByte() }
++    private val hash =
++        MessageDigest.getInstance("SHA-256").digest(payload).joinToString("") { "%02x".format(it) }
++    private val client =
++        OkHttpClient.Builder()
++            .retryOnConnectionFailure(false)
++            .readTimeout(3, TimeUnit.SECONDS)
++            .build()
++    private val executor =
++        Executors.newCachedThreadPool { task -> Thread(task).apply { isDaemon = true } }
++    private val requests = Collections.synchronizedList(mutableListOf<String?>())
++    private var server: HttpServer? = null
++    private val apk
++        get() = File(directory, "update.apk")
++
++    private fun downloader() = PolarisApkDownloader(directory, client)
++
++    private fun partial(url: String) =
++        File(directory, "update-${PolarisApkDownloader.identity(url, hash)}.part")
++
++    @AfterEach
++    fun close() {
++        server?.stop(0)
++        executor.shutdownNow()
++        client.dispatcher.executorService.shutdownNow()
++        client.connectionPool.evictAll()
++    }
++
++    @Test
++    fun `declared larger response is rejected before writing any APK bytes`() = runTest {
++        val url = serve { response -> send(response, payload + ByteArray(32)) }
++        val progress = mutableListOf<Long>()
++        assertThrows<UpdateResponseException> {
++            downloader().download(url, hash, expectedBytes = payload.size.toLong()) { bytes, _ ->
++                progress += bytes
++            }
++        }
++        assertEquals(0L, progress.maxOrNull())
++        assertFalse(apk.exists())
++        assertFalse(partial(url).exists())
++    }
++
++    @Test
++    fun `chunked overflow is rejected before excess bytes reach disk or progress`() = runTest {
++        val url = serve { response -> send(response, payload + ByteArray(32), chunked = true) }
++        val progress = mutableListOf<Long>()
++        assertThrows<UpdateResponseException> {
++            downloader().download(url, hash, expectedBytes = payload.size.toLong()) { bytes, _ ->
++                progress += bytes
++            }
++        }
++        assertFalse(progress.any { it > payload.size })
++        assertFalse(apk.exists())
++        assertFalse(partial(url).exists())
++    }
++
++    @Test
++    fun `complete valid range segments continue until the pinned APK is verified`() = runTest {
++        val url = serve { response ->
++            val start =
++                response.requestHeaders
++                    .getFirst("Range")
++                    .substringAfter('=')
++                    .substringBefore('-')
++                    .toInt()
++            val end = minOf(start + 4095, payload.lastIndex)
++            response.responseHeaders.set("Content-Range", "bytes $start-$end/${payload.size}")
++            response.sendResponseHeaders(206, (end - start + 1).toLong())
++            response.responseBody.use { it.write(payload, start, end - start + 1) }
++        }
++        partial(url).writeBytes(payload.copyOf(4096))
++        assertArrayEquals(
++            payload,
++            downloader().download(url, hash, expectedBytes = payload.size.toLong()).readBytes(),
++        )
++        assertEquals(
++            listOf("bytes=4096-", "bytes=8192-", "bytes=12288-", "bytes=16384-", "bytes=20480-"),
++            requests,
++        )
++        assertFalse(partial(url).exists())
++    }
++
++    @Test
++    fun `chunked exact response uses the manifest total and still verifies its digest`() = runTest {
++        val url = serve { response -> send(response, payload, chunked = true) }
++        val progress = mutableListOf<Pair<Long, Long>>()
++        val result =
++            downloader().download(url, hash, expectedBytes = payload.size.toLong()) {
++                received,
++                total ->
++                progress += received to total
++            }
++        assertArrayEquals(payload, result.readBytes())
++        assertEquals(payload.size.toLong() to payload.size.toLong(), progress.last())
++    }
++
++    @Test
++    fun `declared shorter response is refused without persisting a partial`() = runTest {
++        val url = serve { response -> send(response, payload.copyOf(4000)) }
++        assertThrows<UpdateResponseException> {
++            downloader().download(url, hash, expectedBytes = payload.size.toLong())
++        }
++        assertFalse(apk.exists())
++        assertFalse(partial(url).exists())
++    }
++
++    @Test
++    fun `range total must agree with the pinned manifest before appending`() = runTest {
++        val start = 1024
++        val url = serve { response ->
++            response.responseHeaders.set(
++                "Content-Range",
++                "bytes $start-${payload.lastIndex}/${payload.size + 1}",
++            )
++            response.sendResponseHeaders(206, (payload.size - start).toLong())
++            response.responseBody.use { it.write(payload, start, payload.size - start) }
++        }
++        partial(url).writeBytes(payload.copyOf(start))
++        assertThrows<UpdateResponseException> {
++            downloader().download(url, hash, expectedBytes = payload.size.toLong())
++        }
++        assertFalse(partial(url).exists())
++        assertFalse(apk.exists())
++    }
++
++    @Test
++    fun `oversized staged partial is discarded before requesting a range`() = runTest {
++        val url = serve { response -> send(response, payload) }
++        partial(url).writeBytes(payload + byteArrayOf(1))
++        assertArrayEquals(
++            payload,
++            downloader().download(url, hash, expectedBytes = payload.size.toLong()).readBytes(),
++        )
++        assertEquals(listOf<String?>(null), requests)
++    }
++
++    @Test
++    fun `truncation preserves the bounded prefix and a new instance resumes it`() = runTest {
++        val prefix = 7000
++        val url = serve { response ->
++            if (response.requestHeaders.getFirst("Range") == null) {
++                response.sendResponseHeaders(200, payload.size.toLong())
++                response.responseBody.write(payload, 0, prefix)
++                response.responseBody.flush()
++            } else {
++                response.responseHeaders.set(
++                    "Content-Range",
++                    "bytes $prefix-${payload.lastIndex}/${payload.size}",
++                )
++                response.sendResponseHeaders(206, (payload.size - prefix).toLong())
++                response.responseBody.use { it.write(payload, prefix, payload.size - prefix) }
++            }
++        }
++        assertThrows<java.io.IOException> {
++            downloader().download(url, hash, expectedBytes = payload.size.toLong())
++        }
++        assertEquals(prefix.toLong(), partial(url).length())
++        assertFalse(apk.exists())
++        assertArrayEquals(
++            payload,
++            downloader().download(url, hash, expectedBytes = payload.size.toLong()).readBytes(),
++        )
++        assertEquals(listOf(null, "bytes=$prefix-"), requests)
++    }
++
++    @Test
++    fun `cached APK or complete partial cannot bypass a contradictory manifest size`() = runTest {
++        val url = serve { response ->
++            if (response.requestHeaders.getFirst("Range") != null) {
++                response.sendResponseHeaders(416, -1)
++            } else send(response, payload)
++        }
++        for (file in listOf(apk, partial(url))) {
++            file.writeBytes(payload)
++            assertThrows<UpdateResponseException> {
++                downloader().download(url, hash, expectedBytes = payload.size.toLong() + 1)
++            }
++            assertFalse(apk.exists())
++            assertFalse(partial(url).exists())
++        }
++        assertEquals(listOf(null, "bytes=${payload.size}-", null), requests)
++    }
++
++    @Test
++    fun `nonpositive declared sizes are rejected without a request`() = runTest {
++        val url = serve { response -> send(response, payload) }
++        for (size in listOf(0L, -1L)) {
++            assertThrows<IllegalArgumentException> {
++                downloader().download(url, hash, expectedBytes = size)
++            }
++        }
++        assertEquals(emptyList<String?>(), requests)
++        assertFalse(apk.exists())
++    }
++
++    private fun serve(handler: (HttpExchange) -> Unit): String {
++        val instance = HttpServer.create(InetSocketAddress("127.0.0.1", 0), 0)
++        instance.executor = executor
++        instance.createContext("/apk") { response ->
++            requests += response.requestHeaders.getFirst("Range")
++            try {
++                handler(response)
++            } finally {
++                response.close()
++            }
++        }
++        instance.start()
++        server = instance
++        return "http://127.0.0.1:${instance.address.port}/apk"
++    }
++
++    private fun send(response: HttpExchange, bytes: ByteArray, chunked: Boolean = false) {
++        response.sendResponseHeaders(200, if (chunked) 0 else bytes.size.toLong())
++        response.responseBody.use { it.write(bytes) }
++    }
++}
+diff --git a/app/src/test/java/eu/kanade/tachiyomi/data/updater/PolarisApkDownloaderTest.kt b/app/src/test/java/eu/kanade/tachiyomi/data/updater/PolarisApkDownloaderTest.kt
+new file mode 100644
+index 0000000..898e94f
+--- /dev/null
++++ b/app/src/test/java/eu/kanade/tachiyomi/data/updater/PolarisApkDownloaderTest.kt
+@@ -0,0 +1,253 @@
++package eu.kanade.tachiyomi.data.updater
++
++import com.sun.net.httpserver.HttpExchange
++import com.sun.net.httpserver.HttpServer
++import java.io.File
++import java.io.IOException
++import java.net.InetSocketAddress
++import java.security.MessageDigest
++import java.util.Collections
++import java.util.concurrent.Executors
++import java.util.concurrent.TimeUnit
++import java.util.concurrent.atomic.AtomicInteger
 +import kotlinx.coroutines.CancellationException
 +import kotlinx.coroutines.test.runTest
 +import okhttp3.OkHttpClient
@@ -63411,53 +63817,57 @@ index 0000000..a17f91f
 +import org.junit.jupiter.api.Test
 +import org.junit.jupiter.api.assertThrows
 +import org.junit.jupiter.api.io.TempDir
-+import java.io.File
-+import java.io.IOException
-+import java.net.InetSocketAddress
-+import java.security.MessageDigest
-+import java.util.Collections
-+import java.util.concurrent.Executors
-+import java.util.concurrent.TimeUnit
-+import java.util.concurrent.atomic.AtomicInteger
 +
 +/** Real HTTP/stream tests: no Android, mocked transport, new SDK or remote server required. */
 +class PolarisApkDownloaderTest {
 +    @TempDir lateinit var directory: File
 +    private val bytes = ByteArray(192 * 1024) { ((it * 31 + it / 11) % 251).toByte() }
-+    private val hash get() = digest(bytes)
-+    private val client = OkHttpClient.Builder().retryOnConnectionFailure(false)
-+        .readTimeout(3, TimeUnit.SECONDS).build()
++    private val hash
++        get() = digest(bytes)
++
++    private val client =
++        OkHttpClient.Builder()
++            .retryOnConnectionFailure(false)
++            .readTimeout(3, TimeUnit.SECONDS)
++            .build()
 +    private val requests = Collections.synchronizedList(mutableListOf<String?>())
-+    private val executor = Executors.newCachedThreadPool { task -> Thread(task).apply { isDaemon = true } }
++    private val executor =
++        Executors.newCachedThreadPool { task -> Thread(task).apply { isDaemon = true } }
 +    private var server: HttpServer? = null
-+    private val apk get() = File(directory, "update.apk")
++    private val apk
++        get() = File(directory, "update.apk")
++
 +    private fun downloader() = PolarisApkDownloader(directory, client)
 +
-+    @AfterEach fun close() {
++    @AfterEach
++    fun close() {
 +        server?.stop(0)
 +        executor.shutdownNow()
 +        client.dispatcher.executorService.shutdownNow()
 +        client.connectionPool.evictAll()
 +    }
 +
-+    @Test fun `interrupted transfer resumes with a new downloader instance and verifies the entire APK`() = runTest {
-+        val prefix = 70_000
-+        val url = serve { exchange, count ->
-+            if (count == 1) interrupt(exchange, prefix) else remaining(exchange, prefix)
++    @Test
++    fun `interrupted transfer resumes with a new downloader instance and verifies the entire APK`() =
++        runTest {
++            val prefix = 70_000
++            val url = serve { exchange, count ->
++                if (count == 1) interrupt(exchange, prefix) else remaining(exchange, prefix)
++            }
++            assertThrows<IOException> { downloader().download(url, hash) }
++            assertFalse(apk.exists())
++            assertEquals(prefix.toLong(), partial(url).length())
++            val progress = mutableListOf<Long>()
++            val result = downloader().download(url, hash) { received, _ -> progress += received }
++            assertArrayEquals(bytes, result.readBytes())
++            assertEquals(listOf(null, "bytes=$prefix-"), requests)
++            assertTrue(progress.first() >= prefix)
++            assertEquals(bytes.size.toLong(), progress.last())
++            assertFalse(partial(url).exists())
 +        }
-+        assertThrows<IOException> { downloader().download(url, hash) }
-+        assertFalse(apk.exists())
-+        assertEquals(prefix.toLong(), partial(url).length())
-+        val progress = mutableListOf<Long>()
-+        val result = downloader().download(url, hash) { received, _ -> progress += received }
-+        assertArrayEquals(bytes, result.readBytes())
-+        assertEquals(listOf(null, "bytes=$prefix-"), requests)
-+        assertTrue(progress.first() >= prefix)
-+        assertEquals(bytes.size.toLong(), progress.last())
-+        assertFalse(partial(url).exists())
-+    }
 +
-+    @Test fun `server ignoring Range restarts cleanly without appending a second full APK`() = runTest {
++    @Test
++    fun `server ignoring Range restarts cleanly without appending a second full APK`() = runTest {
 +        val url = serve { exchange, count ->
 +            if (count == 1) interrupt(exchange, 30_000) else full(exchange)
 +        }
@@ -63466,7 +63876,8 @@ index 0000000..a17f91f
 +        assertEquals("bytes=30000-", requests.last())
 +    }
 +
-+    @Test fun `incorrect partial response is never appended or offered for installation`() = runTest {
++    @Test
++    fun `incorrect partial response is never appended or offered for installation`() = runTest {
 +        val url = serve { exchange, _ -> remaining(exchange, 123) }
 +        partial(url).writeBytes(bytes.copyOf(100))
 +        assertThrows<UpdateResponseException> { downloader().download(url, hash) }
@@ -63474,17 +63885,22 @@ index 0000000..a17f91f
 +        assertFalse(partial(url).exists())
 +    }
 +
-+    @Test fun `416 after receiving the final byte promotes only a matching digest`() = runTest {
++    @Test
++    fun `416 after receiving the final byte promotes only a matching digest`() = runTest {
 +        val url = serve { exchange, _ ->
 +            exchange.sendResponseHeaders(416, -1)
 +            exchange.close()
 +        }
 +        partial(url).writeBytes(bytes)
-+        assertArrayEquals(bytes, downloader().download(url, hash).readBytes())
++        assertArrayEquals(
++            bytes,
++            downloader().download(url, hash, expectedBytes = bytes.size.toLong()).readBytes(),
++        )
 +        assertEquals(listOf("bytes=${bytes.size}-"), requests)
 +    }
 +
-+    @Test fun `416 with a corrupt partial discards it and requests the full file`() = runTest {
++    @Test
++    fun `416 with a corrupt partial discards it and requests the full file`() = runTest {
 +        val url = serve { exchange, count ->
 +            if (count == 1) {
 +                exchange.sendResponseHeaders(416, -1)
@@ -63498,16 +63914,25 @@ index 0000000..a17f91f
 +        assertEquals(listOf("bytes=11-", null), requests)
 +    }
 +
-+    @Test fun `checksum mismatch removes the candidate and leaves no installable APK`() = runTest {
++    @Test
++    fun `checksum mismatch removes the candidate and leaves no installable APK`() = runTest {
 +        val url = serve { exchange, _ -> full(exchange) }
-+        assertThrows<IOException> { downloader().download(url, "0".repeat(64)) }
++        assertThrows<IOException> {
++            downloader().download(url, "0".repeat(64), expectedBytes = bytes.size.toLong())
++        }
 +        assertFalse(apk.exists())
 +        assertTrue(directory.listFiles()!!.none { it.extension == "part" })
 +    }
 +
-+    @Test fun `cancellation retains written bytes and the next attempt resumes them`() = runTest {
++    @Test
++    fun `cancellation retains written bytes and the next attempt resumes them`() = runTest {
 +        val url = serve { exchange, _ ->
-+            val offset = exchange.requestHeaders.getFirst("Range")?.substringAfter('=')?.substringBefore('-')?.toInt()
++            val offset =
++                exchange.requestHeaders
++                    .getFirst("Range")
++                    ?.substringAfter('=')
++                    ?.substringBefore('-')
++                    ?.toInt()
 +            if (offset == null) full(exchange) else remaining(exchange, offset)
 +        }
 +        assertThrows<CancellationException> {
@@ -63522,14 +63947,16 @@ index 0000000..a17f91f
 +        assertEquals("bytes=$saved-", requests.last())
 +    }
 +
-+    @Test fun `verified APK is reused when the install screen is reopened`() = runTest {
++    @Test
++    fun `verified APK is reused when the install screen is reopened`() = runTest {
 +        val url = serve { exchange, _ -> full(exchange) }
 +        downloader().download(url, hash)
 +        assertArrayEquals(bytes, downloader().download(url, hash.uppercase()).readBytes())
 +        assertEquals(1, requests.size)
 +    }
 +
-+    @Test fun `another release cannot reuse stale partial bytes`() = runTest {
++    @Test
++    fun `another release cannot reuse stale partial bytes`() = runTest {
 +        val url = serve { exchange, _ -> full(exchange) }
 +        val old = partial("$url/old")
 +        old.writeText("old release")
@@ -63538,7 +63965,8 @@ index 0000000..a17f91f
 +        assertEquals(listOf<String?>(null), requests)
 +    }
 +
-+    @Test fun `legacy requests without a digest restart rather than merging unpinned bytes`() = runTest {
++    @Test
++    fun `legacy requests without a digest restart rather than merging unpinned bytes`() = runTest {
 +        val url = serve { exchange, count ->
 +            if (count == 1) interrupt(exchange, 30_000) else full(exchange)
 +        }
@@ -63547,7 +63975,8 @@ index 0000000..a17f91f
 +        assertEquals(listOf(null, null), requests)
 +    }
 +
-+    @Test fun `retryable HTTP error preserves a partial for the next worker attempt`() = runTest {
++    @Test
++    fun `retryable HTTP error preserves a partial for the next worker attempt`() = runTest {
 +        val url = serve { exchange, count ->
 +            if (count == 1) {
 +                exchange.sendResponseHeaders(503, -1)
@@ -63564,7 +63993,8 @@ index 0000000..a17f91f
 +        assertArrayEquals(bytes, downloader().download(url, hash).readBytes())
 +    }
 +
-+    @Test fun `encoded response is rejected before it changes the partial`() = runTest {
++    @Test
++    fun `encoded response is rejected before it changes the partial`() = runTest {
 +        val url = serve { exchange, _ ->
 +            exchange.responseHeaders.set("Content-Encoding", "gzip")
 +            full(exchange)
@@ -63573,7 +64003,8 @@ index 0000000..a17f91f
 +        assertFalse(apk.exists())
 +    }
 +
-+    private fun partial(url: String) = File(directory, "update-${PolarisApkDownloader.identity(url, hash)}.part")
++    private fun partial(url: String) =
++        File(directory, "update-${PolarisApkDownloader.identity(url, hash)}.part")
 +
 +    private fun serve(handler: (HttpExchange, Int) -> Unit): String {
 +        val count = AtomicInteger()
@@ -63605,13 +64036,16 @@ index 0000000..a17f91f
 +    }
 +
 +    private fun remaining(exchange: HttpExchange, offset: Int) {
-+        exchange.responseHeaders.set("Content-Range", "bytes $offset-${bytes.lastIndex}/${bytes.size}")
++        exchange.responseHeaders.set(
++            "Content-Range",
++            "bytes $offset-${bytes.lastIndex}/${bytes.size}",
++        )
 +        exchange.sendResponseHeaders(206, (bytes.size - offset).toLong())
 +        exchange.responseBody.use { it.write(bytes, offset, bytes.size - offset) }
 +    }
 +
-+    private fun digest(value: ByteArray) = MessageDigest.getInstance("SHA-256").digest(value)
-+        .joinToString("") { "%02x".format(it) }
++    private fun digest(value: ByteArray) =
++        MessageDigest.getInstance("SHA-256").digest(value).joinToString("") { "%02x".format(it) }
 +}
 diff --git a/app/src/test/java/eu/kanade/tachiyomi/data/updater/PolarisReleaseVersionTest.kt b/app/src/test/java/eu/kanade/tachiyomi/data/updater/PolarisReleaseVersionTest.kt
 new file mode 100644
@@ -63649,10 +64083,10 @@ index 0000000..6c9d85e
 +}
 diff --git a/app/src/test/java/eu/kanade/tachiyomi/data/updater/PolarisUpdateClientTest.kt b/app/src/test/java/eu/kanade/tachiyomi/data/updater/PolarisUpdateClientTest.kt
 new file mode 100644
-index 0000000..1d5677c
+index 0000000..dc9d840
 --- /dev/null
 +++ b/app/src/test/java/eu/kanade/tachiyomi/data/updater/PolarisUpdateClientTest.kt
-@@ -0,0 +1,250 @@
+@@ -0,0 +1,254 @@
 +package eu.kanade.tachiyomi.data.updater
 +
 +import java.io.IOException
@@ -63709,6 +64143,7 @@ index 0000000..1d5677c
 +            check(listOf(candidate, beta, marked, stable)) as GetApplicationRelease.Result.NewUpdate
 +        assertEquals(stable.tag, result.release.version)
 +        assertEquals("a".repeat(64), result.release.sha256)
++        assertEquals(apk.size, checkNotNull(result.release.expectedBytes))
 +        assertEquals("Release notes", result.release.info)
 +    }
 +
@@ -63776,10 +64211,12 @@ index 0000000..1d5677c
 +        val releases = listOf(release().copy(assets = listOf(metadata, arm32, apk)))
 +        val preferred = check(releases, data) as GetApplicationRelease.Result.NewUpdate
 +        assertEquals(apk.url, preferred.release.downloadLink)
++        assertEquals(apk.size, checkNotNull(preferred.release.expectedBytes))
 +        val fallback =
 +            check(releases, data, abis = listOf("armeabi-v7a"))
 +                as GetApplicationRelease.Result.NewUpdate
 +        assertEquals(arm32.url, fallback.release.downloadLink)
++        assertEquals(arm32.size, checkNotNull(fallback.release.expectedBytes))
 +        assertEquals(
 +            GetApplicationRelease.Result.NoNewUpdate,
 +            check(releases, data, abis = listOf("x86")),
@@ -63816,6 +64253,7 @@ index 0000000..1d5677c
 +                val result =
 +                    check(releases, data, abis = abis) as GetApplicationRelease.Result.NewUpdate
 +                assertEquals(universal.url, result.release.downloadLink)
++                assertEquals(universal.size, checkNotNull(result.release.expectedBytes))
 +            }
 +            assertEquals(
 +                GetApplicationRelease.Result.NoNewUpdate,
@@ -76323,14 +76761,23 @@ index e1111ec..d78b520 100644
  
      suspend fun insertNetworkManga(manga: List<Manga>): List<Manga>
 diff --git a/domain/src/main/java/tachiyomi/domain/release/model/Release.kt b/domain/src/main/java/tachiyomi/domain/release/model/Release.kt
-index d7001d9..0dad0f5 100644
+index d7001d9..4608f8f 100644
 --- a/domain/src/main/java/tachiyomi/domain/release/model/Release.kt
 +++ b/domain/src/main/java/tachiyomi/domain/release/model/Release.kt
-@@ -8,4 +8,5 @@ data class Release(
+@@ -1,11 +1,11 @@
+ package tachiyomi.domain.release.model
+ 
+-/**
+- * Contains information about the latest release.
+- */
++/** Contains information about the latest release. */
+ data class Release(
+     val version: String,
      val info: String,
      val releaseLink: String,
      val downloadLink: String,
 +    val sha256: String? = null,
++    val expectedBytes: Long? = null,
  )
 diff --git a/domain/src/main/java/tachiyomi/domain/translation/TranslationPreferences.kt b/domain/src/main/java/tachiyomi/domain/translation/TranslationPreferences.kt
 index ee30e4b..8e079bd 100644

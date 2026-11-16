@@ -2,6 +2,18 @@
 
 Este arquivo registra a evolução real do código. **Revisões de desenvolvimento não são lançamentos públicos.** As datas abaixo usam America/Fortaleza, exceto quando houver indicação de UTC. O histórico de distribuição fica em [Releases](https://github.com/Hailton-Reis/Polaris/releases).
 
+## Desenvolvimento · P20261116.2 — 16/11/2026
+
+**Estado:** auditoria após a beta.11 pública; correções para uma próxima versão. Sem novo APK ou Release.
+
+- Tamanho do manifesto passa pelas telas e pelo WorkManager até o downloader. Respostas inconsistentes/excessivas, cache e parciais respeitam o total antes da promoção; SHA-256 permanece exigido no fluxo oficial.
+- Trechos HTTP 206 completos continuam no offset seguinte até completar o arquivo; truncamentos preservam a retomada.
+- Três falhas reproduzidas antes da correção; 37 controles focados aprovados, dez novos. 911 testes do app beta e 85 de domain release executados/aprovados, total 996, sem casos anteriores ausentes. 4 testes de overlay, 27 de empacotamento e 21 do comparador aprovados.
+- Inspeção do APK público identifica duas bibliotecas ARM64 com PT_LOAD abaixo de 16 KB; compatibilidade em sistema 16 KB permanece a verificar. Bibliotecas nativas ocupam 192.286.636 bytes, 74,1% do APK.
+- Decoder de backups sem limite explícito de descompressão registrado para próxima correção. Quatro coordenadas Maven consultadas no OSV, sem avisos retornados; não é certificação do código nativo ou do grafo inteiro.
+
+[Achados e próximos passos](docs/AUDITORIA_POS_BETA11_P20261116_2.md) · [Evidências](integration/post-beta11-audit/20261116/README.md).
+
 ## Desenvolvimento · P20261116.1 — 16/11/2026
 
 **Estado:** APK interno beta.11/código 112 gerado e verificado; sem Release pública.

@@ -1,0 +1,32 @@
+{
+  "revision": "P20261116.2",
+  "status": "AUDIT_FIXES_COMPILED_AND_JVM_PASSED_UNRELEASED",
+  "source_baseline": "32a9c831c32b83f761001cf1a298348defaed2fa",
+  "build_result": "BUILD SUCCESSFUL in 3m 5s",
+  "selected_tasks": {
+    ":app:compileBetaKotlin": "EXECUTED",
+    ":domain:testReleaseUnitTest": "EXECUTED",
+    ":app:testBetaUnitTest": "EXECUTED",
+    ":data:testDebugUnitTest": "NO-SOURCE",
+    ":source-api:testDebugUnitTest": "NO-SOURCE"
+  },
+  "app_beta_executed_passed": 911,
+  "domain_release_executed_passed": 85,
+  "total_executed_passed": 996,
+  "new_http_regressions": 10,
+  "focused_updater_cases_passed": 37,
+  "missing_baseline_cases": 0,
+  "failed_or_skipped": 0,
+  "overlay_tests_passed": 4,
+  "packaging_tests_passed": 27,
+  "comparison_tests_passed": 21,
+  "native_header_check": "31 libraries inspected in published beta.11; ARM64 libc++_shared and OpenCV below 16KB PT_LOAD alignment",
+  "native_16kb_device_execution": "NOT_RUN",
+  "declared_maven_coordinates_queried": 4,
+  "osv_advisories_returned": 0,
+  "native_vulnerability_audit_complete": false,
+  "backup_memory_guard": "OPEN_STATIC_FINDING",
+  "new_apk": false,
+  "new_public_release": false,
+  "physical_update_memory_ocr_quality": "PENDING"
+}

@@ -1,0 +1,26 @@
+{
+  "status": "THREE_BEHAVIORAL_FAILURES_REPRODUCED",
+  "baseline_source": "32a9c831c32b83f761001cf1a298348defaed2fa",
+  "reproduction": "An optional expectedBytes parameter was introduced without using it; the original downloader behavior was otherwise unchanged. Two responses were rejected late by digest, and a valid segmented range raised EOFException.",
+  "routing_source_sha256": "96d97c74fa110db02a60619cbabbf2a92ab91293cb58f0398ec94d0547791081",
+  "cases": [
+    {
+      "classname": "eu.kanade.tachiyomi.data.updater.PolarisApkDownloadBoundsTest",
+      "name": "chunked overflow is rejected before excess bytes reach disk or progress()",
+      "type": "org.opentest4j.AssertionFailedError",
+      "message": "org.opentest4j.AssertionFailedError: Unexpected exception type thrown, expected: <eu.kanade.tachiyomi.data.updater.UpdateResponseException> but was: <java.io.IOException>"
+    },
+    {
+      "classname": "eu.kanade.tachiyomi.data.updater.PolarisApkDownloadBoundsTest",
+      "name": "declared larger response is rejected before writing any APK bytes()",
+      "type": "org.opentest4j.AssertionFailedError",
+      "message": "org.opentest4j.AssertionFailedError: Unexpected exception type thrown, expected: <eu.kanade.tachiyomi.data.updater.UpdateResponseException> but was: <java.io.IOException>"
+    },
+    {
+      "classname": "eu.kanade.tachiyomi.data.updater.PolarisApkDownloadBoundsTest",
+      "name": "complete valid range segments continue until the pinned APK is verified()",
+      "type": "java.io.EOFException",
+      "message": "java.io.EOFException: Incomplete APK download"
+    }
+  ]
+}

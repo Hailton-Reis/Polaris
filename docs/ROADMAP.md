@@ -2,6 +2,10 @@
 
 O roadmap indica prioridades e critérios de verificação. Não representa prazo de entrega nem recurso já aprovado.
 
+## Após a beta.11 — auditoria P20261116.2
+
+A beta.11 foi publicada e instalada pelo mantenedor; relatos dos testes em aparelhos serão incorporados. A [auditoria pós-beta.11](AUDITORIA_POS_BETA11_P20261116_2.md) corrige limites e retomada do downloader para a próxima versão e registra prioridades: bibliotecas ARM64/16 KB, memória da decodificação de backups e investigação de tamanho nas bibliotecas nativas. Conta/nuvem e sandbox continuam adiadas. Não há novo APK nesta revisão.
+
 ## Prioridades atuais — decisão P20261114.4
 
 Sandbox inteira pausada, [arquivada e removida dos fontes compilados](ARQUIVAMENTO_SANDBOX_P20261115_2.md) nesta beta. Não ampliar controles, ações, login isolado, OAuth/Cloudflare ou novels isoladas agora. Esses itens históricos não bloqueiam a conclusão da beta. O [aviso único de extensões](PAUSA_SANDBOX_E_AVISO_P20261114_4.md) exige as duas confirmações pedidas pelo usuário, sem substituir verificações de assinatura/integridade.

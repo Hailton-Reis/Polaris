@@ -1,0 +1,66 @@
+{
+  "total": 10,
+  "transport": "Loopback HTTP server, real OkHttp and filesystem; no Android network/device execution",
+  "cases": [
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.data.updater.PolarisApkDownloadBoundsTest",
+      "name": "cached APK or complete partial cannot bypass a contradictory manifest size()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.data.updater.PolarisApkDownloadBoundsTest",
+      "name": "chunked exact response uses the manifest total and still verifies its digest()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.data.updater.PolarisApkDownloadBoundsTest",
+      "name": "chunked overflow is rejected before excess bytes reach disk or progress()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.data.updater.PolarisApkDownloadBoundsTest",
+      "name": "complete valid range segments continue until the pinned APK is verified()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.data.updater.PolarisApkDownloadBoundsTest",
+      "name": "declared larger response is rejected before writing any APK bytes()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.data.updater.PolarisApkDownloadBoundsTest",
+      "name": "declared shorter response is refused without persisting a partial()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.data.updater.PolarisApkDownloadBoundsTest",
+      "name": "nonpositive declared sizes are rejected without a request()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.data.updater.PolarisApkDownloadBoundsTest",
+      "name": "oversized staged partial is discarded before requesting a range()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.data.updater.PolarisApkDownloadBoundsTest",
+      "name": "range total must agree with the pinned manifest before appending()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.data.updater.PolarisApkDownloadBoundsTest",
+      "name": "truncation preserves the bounded prefix and a new instance resumes it()",
+      "status": "passed"
+    }
+  ]
+}
