@@ -17,3 +17,5 @@ Os testes exercitam o coordenador de produção e o mapeador real de preferênci
 Isso não equivale a restaurar um banco Android real nem a testar interface/aparelho ou ida e volta completa em outros leitores. O retorno do CategoriesRestorer depende da semântica transacional já existente. A restauração inteira não vira uma transação única: categorias confirmadas podem permanecer se uma etapa posterior falhar.
 
 [Evidências filtradas](../integration/backup-restore/20261114/README.md) · [Checklist](BETA11_CHECKLIST.md).
+
+A [continuação P20261115.4](BACKUPS_SQLITE_P20261115_4.md) exercita categorias/biblioteca em SQLite real na JVM, com reabertura e reexportação. Os limites descritos acima correspondem à revisão .14.1; a validação Android/interface e a troca pela UI de outros leitores continuam pendentes.

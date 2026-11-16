@@ -21,7 +21,7 @@ index 79aff85..c2e70c6 100644
 +# Generated native build state
 +**/.cxx/
 diff --git a/app/build.gradle.kts b/app/build.gradle.kts
-index 63e2698..da6087b 100644
+index 63e2698..0eff368 100644
 --- a/app/build.gradle.kts
 +++ b/app/build.gradle.kts
 @@ -25,21 +25,23 @@ if (Config.includeTelemetry) {
@@ -72,11 +72,12 @@ index 63e2698..da6087b 100644
              keepDebugSymbols += listOf("libandroidx.graphics.path", "libarchive-jni", "libconscrypt_jni", "libimagedecoder", "libquickjs", "libsqlite3x").map { "**/$it.so" }
          }
          resources {
-@@ -135,20 +138,24 @@ kotlin {
+@@ -135,20 +138,25 @@ kotlin {
  baselineProfile { baselineProfileOutputDir = "baselineProfiles"; mergeIntoMain = true }
  
  dependencies {
 +    implementation(libs.guava) // Pin the Android build with bounded native-deserialization allocation.
++    testImplementation(libs.sqldelight.sqliteDriver) // SQLite persistence checks on the JVM; excluded from the app.
 +    testImplementation("org.json:json:20260814") // Real JSON for JVM tests; Android provides org.json at runtime.
 +    implementation(libs.android.apksig)
      baselineProfile(projects.baselineProfile)
@@ -99,7 +100,7 @@ index 63e2698..da6087b 100644
  }
  
  androidComponents {
-@@ -163,3 +170,15 @@ androidComponents {
+@@ -163,3 +171,15 @@ androidComponents {
      }
      onVariants(selector().withFlavor("default" to "standard")) { it.packaging.resources.excludes.add("META-INF/*.version") }
  }
@@ -1205,6 +1206,161 @@ index 0000000..d97cf8e
 +            bitmap.recycle()
 +        }
 +    }
++}
+diff --git a/app/src/androidTest/java/eu/kanade/tachiyomi/storage/BackupSqliteRestoreAndroidTest.kt b/app/src/androidTest/java/eu/kanade/tachiyomi/storage/BackupSqliteRestoreAndroidTest.kt
+new file mode 100644
+index 0000000..d5262af
+--- /dev/null
++++ b/app/src/androidTest/java/eu/kanade/tachiyomi/storage/BackupSqliteRestoreAndroidTest.kt
+@@ -0,0 +1,149 @@
++package eu.kanade.tachiyomi.storage
++
++import androidx.sqlite.driver.bundled.BundledSQLiteDriver
++import androidx.test.ext.junit.runners.AndroidJUnit4
++import androidx.test.platform.app.InstrumentationRegistry
++import app.cash.sqldelight.db.SqlDriver
++import com.eygraber.sqldelight.androidx.driver.AndroidxSqliteConfiguration
++import com.eygraber.sqldelight.androidx.driver.AndroidxSqliteDatabaseType
++import com.eygraber.sqldelight.androidx.driver.AndroidxSqliteDriver
++import com.eygraber.sqldelight.androidx.driver.FileProvider
++import eu.kanade.domain.manga.interactor.UpdateManga
++import eu.kanade.tachiyomi.data.backup.models.BackupChapter
++import eu.kanade.tachiyomi.data.backup.models.BackupManga
++import eu.kanade.tachiyomi.data.backup.restore.restorers.MangaRestorer
++import java.util.UUID
++import kotlinx.coroutines.runBlocking
++import org.junit.After
++import org.junit.Assert.*
++import org.junit.Before
++import org.junit.Test
++import org.junit.runner.RunWith
++import tachiyomi.data.*
++import tachiyomi.data.category.CategoryRepositoryImpl
++import tachiyomi.data.chapter.ChapterRepositoryImpl
++import tachiyomi.data.manga.MangaRepositoryImpl
++import tachiyomi.data.track.TrackRepositoryImpl
++import tachiyomi.domain.category.interactor.GetCategories
++import tachiyomi.domain.chapter.interactor.GetChaptersByMangaId
++import tachiyomi.domain.manga.interactor.FetchInterval
++import tachiyomi.domain.manga.interactor.GetMangaByUrlAndSourceId
++import tachiyomi.domain.track.interactor.GetTracks
++import tachiyomi.domain.track.interactor.InsertTrack
++
++/** Independent temporary database through the app's actual Android bundled-SQLite driver. */
++@RunWith(AndroidJUnit4::class)
++class BackupSqliteRestoreAndroidTest {
++    private val context = InstrumentationRegistry.getInstrumentation().targetContext
++    private val name = "polaris-backup-control-${UUID.randomUUID()}.db"
++    private lateinit var driver: SqlDriver
++    private lateinit var database: Database
++    private lateinit var mangas: MangaRepositoryImpl
++    private lateinit var chapters: GetChaptersByMangaId
++    private lateinit var restorer: MangaRestorer
++
++    @Before
++    fun setup() {
++        open()
++    }
++
++    @After
++    fun cleanup() {
++        if (::driver.isInitialized) driver.close()
++        context.deleteDatabase(name)
++    }
++
++    private fun open() {
++        driver =
++            AndroidxSqliteDriver(
++                driver = BundledSQLiteDriver(),
++                databaseType = AndroidxSqliteDatabaseType.FileProvider(context, name),
++                schema = Database.Schema,
++                configuration = AndroidxSqliteConfiguration(isForeignKeyConstraintsEnabled = true),
++            )
++        database =
++            Database(
++                driver,
++                chaptersAdapter = Chapters.Adapter(MemoColumnAdapter),
++                historyAdapter = History.Adapter(DateColumnAdapter),
++                mangasAdapter =
++                    Mangas.Adapter(
++                        StringListColumnAdapter,
++                        UpdateStrategyColumnAdapter,
++                        MemoColumnAdapter,
++                    ),
++            )
++        mangas = MangaRepositoryImpl(database)
++        chapters = GetChaptersByMangaId(ChapterRepositoryImpl(database))
++        val categories = GetCategories(CategoryRepositoryImpl(database))
++        val interval = FetchInterval(chapters)
++        val tracks = TrackRepositoryImpl(database)
++        restorer =
++            MangaRestorer(
++                database,
++                categories,
++                GetMangaByUrlAndSourceId(mangas),
++                chapters,
++                UpdateManga(mangas, interval),
++                GetTracks(tracks),
++                InsertTrack(tracks),
++                interval,
++            )
++    }
++
++    private fun entry(page: Long, read: Boolean = false, bookmark: Boolean = false) =
++        BackupManga(42, "/control", "Synthetic backup control").apply {
++            chapters =
++                listOf(
++                    BackupChapter(
++                        "/chapter",
++                        "Chapter",
++                        read = read,
++                        bookmark = bookmark,
++                        lastPageRead = page,
++                    )
++                )
++        }
++
++    @Test
++    fun restoredProgressSurvivesMergeAndReopeningWithTheNativeDriver() =
++        runBlocking<Unit> {
++            restorer.restore(entry(20, bookmark = true), emptyList())
++            restorer.restore(entry(4, read = true), emptyList())
++            driver.close()
++            open()
++            val manga = checkNotNull(mangas.getMangaByUrlAndSourceId("/control", 42))
++            val chapter = chapters.awaitNative(manga.id).single()
++            assertEquals(20L, chapter.lastPageRead)
++            assertTrue(chapter.read && chapter.bookmark)
++            assertEquals(1, mangas.getFavorites().size)
++        }
++
++    @Test
++    fun aLateNativeSqlFailureRollsBackTheSyntheticRestore() =
++        runBlocking<Unit> {
++            driver
++                .execute(
++                    null,
++                    "CREATE TRIGGER reject_control BEFORE INSERT ON excluded_scanlators WHEN NEW.scanlator = 'broken' BEGIN SELECT RAISE(ABORT, 'Synthetic restore failure'); END",
++                    0,
++                )
++                .await()
++            var failed = false
++            try {
++                restorer.restore(
++                    entry(17).apply { excludedScanlators = listOf("broken") },
++                    emptyList(),
++                )
++            } catch (_: Exception) {
++                failed = true
++            }
++            assertTrue(failed)
++            driver.close()
++            open()
++            assertTrue(mangas.getFavorites().isEmpty())
++            restorer.restore(entry(9), emptyList())
++            val manga = checkNotNull(mangas.getMangaByUrlAndSourceId("/control", 42))
++            assertEquals(9L, chapters.awaitNative(manga.id).single().lastPageRead)
++        }
 +}
 diff --git a/app/src/androidTest/java/eu/kanade/tachiyomi/storage/SafeStorageAndroidTest.kt b/app/src/androidTest/java/eu/kanade/tachiyomi/storage/SafeStorageAndroidTest.kt
 new file mode 100644
@@ -9366,7 +9522,7 @@ index a198c3f..9a3e84f 100644
                      preference = translationPreferences.translationEngineTemperature(),
                      title = stringResource(ATMR.strings.pref_engine_temperature),
 diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
-index 7f411fd..63d478c 100644
+index 7f411fd..5456dc5 100644
 --- a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
 +++ b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
 @@ -1,15 +1,18 @@
@@ -9431,7 +9587,7 @@ index 7f411fd..63d478c 100644
  
      // Identifies this overlay independently of the pinned upstream COMMIT_SHA.
 -    private const val POLARIS_READER_REVISION = "P20261031.2"
-+    private const val POLARIS_READER_REVISION = "P20261115.3"
++    private const val POLARIS_READER_REVISION = "P20261115.4"
  
      @Composable
      override fun Content() {
@@ -13146,7 +13302,7 @@ index a8fc4dd..da9dda9 100644
              indexUrl = backupStore.indexUrl,
              name = backupStore.name,
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/data/backup/restore/restorers/MangaRestorer.kt b/app/src/main/java/eu/kanade/tachiyomi/data/backup/restore/restorers/MangaRestorer.kt
-index 5257fde..74016d7 100644
+index 5257fde..8837f04 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/data/backup/restore/restorers/MangaRestorer.kt
 +++ b/app/src/main/java/eu/kanade/tachiyomi/data/backup/restore/restorers/MangaRestorer.kt
 @@ -9,6 +9,10 @@ import eu.kanade.tachiyomi.data.backup.models.BackupChapter
@@ -13233,7 +13389,7 @@ index 5257fde..74016d7 100644
              calculateInterval = null,
              initialized = manga.initialized,
              viewer = manga.viewerFlags,
-@@ -138,58 +141,59 @@ class MangaRestorer(
+@@ -138,58 +141,56 @@ class MangaRestorer(
          return manga
      }
  
@@ -13280,19 +13436,16 @@ index 5257fde..74016d7 100644
 +                    }
 +
 +                    // Update to an existing chapter
-+                    var updatedChapter =
++                    // A restore merges reading state; older snapshots must not rewind a chapter.
++                    val updatedChapter =
 +                        chapter
 +                            .copyFrom(dbChapter)
 +                            .copy(
 +                                id = dbChapter.id,
++                                read = chapter.read || dbChapter.read,
 +                                bookmark = chapter.bookmark || dbChapter.bookmark,
++                                lastPageRead = max(chapter.lastPageRead, dbChapter.lastPageRead),
 +                            )
-+                    if (dbChapter.read && !updatedChapter.read) {
-+                        updatedChapter =
-+                            updatedChapter.copy(read = true, lastPageRead = dbChapter.lastPageRead)
-+                    } else if (updatedChapter.lastPageRead == 0L && dbChapter.lastPageRead != 0L) {
-+                        updatedChapter = updatedChapter.copy(lastPageRead = dbChapter.lastPageRead)
-+                    }
 +                    updatedChapter
                  }
 -
@@ -13335,7 +13488,7 @@ index 5257fde..74016d7 100644
  
      private suspend fun insertNewChapters(chapters: List<Chapter>) {
          database.transaction {
-@@ -243,30 +247,31 @@ class MangaRestorer(
+@@ -243,30 +244,31 @@ class MangaRestorer(
       * @return id of [Manga], null if not found
       */
      private suspend fun insertManga(manga: Manga): Long {
@@ -13391,7 +13544,7 @@ index 5257fde..74016d7 100644
              .awaitAsOne()
      }
  
-@@ -304,13 +309,14 @@ class MangaRestorer(
+@@ -304,13 +306,14 @@ class MangaRestorer(
  
          val backupCategoriesByOrder = backupCategories.associateBy { it.order }
  
@@ -13411,7 +13564,7 @@ index 5257fde..74016d7 100644
  
          if (mangaCategoriesToUpdate.isNotEmpty()) {
              database.transaction {
-@@ -323,44 +329,44 @@ class MangaRestorer(
+@@ -323,44 +326,44 @@ class MangaRestorer(
      }
  
      private suspend fun restoreHistory(manga: Manga, backupHistory: List<BackupHistory>) {
@@ -13488,7 +13641,7 @@ index 5257fde..74016d7 100644
              }
          }
      }
-@@ -368,29 +374,31 @@ class MangaRestorer(
+@@ -368,29 +371,31 @@ class MangaRestorer(
      private suspend fun restoreTracking(manga: Manga, backupTracks: List<BackupTracking>) {
          val dbTrackByTrackerId = getTracks.await(manga.id).associateBy { it.trackerId }
  
@@ -13541,7 +13694,7 @@ index 5257fde..74016d7 100644
  
          if (newTracks.isNotEmpty()) {
              insertTrack.awaitAll(newTracks)
-@@ -429,9 +437,10 @@ class MangaRestorer(
+@@ -429,9 +434,10 @@ class MangaRestorer(
       */
      private suspend fun restoreExcludedScanlators(manga: Manga, excludedScanlators: List<String>) {
          if (excludedScanlators.isEmpty()) return
@@ -61886,6 +62039,444 @@ index 0000000..f10fe88
 +        restoreExternalArchive("mihon")
 +    }
 +}
+diff --git a/app/src/test/java/eu/kanade/tachiyomi/data/backup/restore/BackupSqliteRestoreTest.kt b/app/src/test/java/eu/kanade/tachiyomi/data/backup/restore/BackupSqliteRestoreTest.kt
+new file mode 100644
+index 0000000..408040c
+--- /dev/null
++++ b/app/src/test/java/eu/kanade/tachiyomi/data/backup/restore/BackupSqliteRestoreTest.kt
+@@ -0,0 +1,432 @@
++package eu.kanade.tachiyomi.data.backup.restore
++
++import android.content.ContentResolver
++import android.content.Context
++import android.net.Uri
++import app.cash.sqldelight.async.coroutines.awaitAsList
++import app.cash.sqldelight.async.coroutines.awaitAsOne
++import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
++import dev.icerock.moko.resources.StringResource
++import eu.kanade.domain.manga.interactor.UpdateManga
++import eu.kanade.tachiyomi.data.backup.BackupDecoder
++import eu.kanade.tachiyomi.data.backup.BackupNotifier
++import eu.kanade.tachiyomi.data.backup.create.BackupOptions
++import eu.kanade.tachiyomi.data.backup.create.creators.CategoriesBackupCreator
++import eu.kanade.tachiyomi.data.backup.create.creators.MangaBackupCreator
++import eu.kanade.tachiyomi.data.backup.models.*
++import eu.kanade.tachiyomi.data.backup.restore.restorers.CategoriesRestorer
++import eu.kanade.tachiyomi.data.backup.restore.restorers.ExtensionStoreRestorer
++import eu.kanade.tachiyomi.data.backup.restore.restorers.MangaRestorer
++import eu.kanade.tachiyomi.data.backup.restore.restorers.PreferenceRestorer
++import io.mockk.*
++import java.io.ByteArrayInputStream
++import java.io.ByteArrayOutputStream
++import java.io.File
++import java.util.zip.GZIPOutputStream
++import kotlinx.coroutines.runBlocking
++import kotlinx.coroutines.test.runTest
++import kotlinx.serialization.protobuf.ProtoBuf
++import org.junit.jupiter.api.AfterEach
++import org.junit.jupiter.api.Assertions.*
++import org.junit.jupiter.api.BeforeEach
++import org.junit.jupiter.api.Test
++import org.junit.jupiter.api.assertThrows
++import org.junit.jupiter.api.io.TempDir
++import tachiyomi.core.common.i18n.stringResource
++import tachiyomi.core.common.preference.InMemoryPreferenceStore.InMemoryPreference
++import tachiyomi.data.*
++import tachiyomi.data.category.CategoryRepositoryImpl
++import tachiyomi.data.chapter.ChapterRepositoryImpl
++import tachiyomi.data.history.HistoryRepositoryImpl
++import tachiyomi.data.manga.MangaRepositoryImpl
++import tachiyomi.data.track.TrackRepositoryImpl
++import tachiyomi.domain.category.interactor.GetCategories
++import tachiyomi.domain.chapter.interactor.GetChaptersByMangaId
++import tachiyomi.domain.history.interactor.GetHistory
++import tachiyomi.domain.library.service.LibraryPreferences
++import tachiyomi.domain.manga.interactor.FetchInterval
++import tachiyomi.domain.manga.interactor.GetMangaByUrlAndSourceId
++import tachiyomi.domain.track.interactor.GetTracks
++import tachiyomi.domain.track.interactor.InsertTrack
++
++/** File-backed SQLite, production schema, repositories and manga/chapter restore transactions. */
++class BackupSqliteRestoreTest {
++    @TempDir lateinit var directory: File
++    private lateinit var driver: JdbcSqliteDriver
++    private lateinit var database: Database
++    private lateinit var mangas: MangaRepositoryImpl
++    private lateinit var chapters: GetChaptersByMangaId
++    private lateinit var categories: GetCategories
++    private lateinit var restorer: MangaRestorer
++
++    private val context = mockk<Context>()
++    private val notifier = mockk<BackupNotifier>(relaxed = true)
++    private lateinit var interval: FetchInterval
++    private lateinit var tracks: TrackRepositoryImpl
++
++    @BeforeEach
++    fun setup() = runBlocking {
++        mockkStatic("tachiyomi.core.common.i18n.LocalizeKt")
++        every { context.stringResource(any<StringResource>()) } returns "restoring"
++        open(create = true)
++    }
++
++    @AfterEach
++    fun cleanup() {
++        if (::driver.isInitialized) driver.close()
++        unmockkStatic("tachiyomi.core.common.i18n.LocalizeKt")
++    }
++
++    private suspend fun open(create: Boolean) {
++        driver =
++            JdbcSqliteDriver(
++                "jdbc:sqlite:${File(directory, "backup-test.db").absolutePath}",
++                java.util.Properties().apply { setProperty("foreign_keys", "true") },
++            )
++        driver.execute(null, "PRAGMA foreign_keys = ON", 0).await()
++        if (create) Database.Schema.create(driver).await()
++        database =
++            Database(
++                driver,
++                chaptersAdapter = Chapters.Adapter(MemoColumnAdapter),
++                historyAdapter = History.Adapter(DateColumnAdapter),
++                mangasAdapter =
++                    Mangas.Adapter(
++                        StringListColumnAdapter,
++                        UpdateStrategyColumnAdapter,
++                        MemoColumnAdapter,
++                    ),
++            )
++        mangas = MangaRepositoryImpl(database)
++        chapters = GetChaptersByMangaId(ChapterRepositoryImpl(database))
++        categories = GetCategories(CategoryRepositoryImpl(database))
++        interval = FetchInterval(chapters)
++        tracks = TrackRepositoryImpl(database)
++        restorer = createRestorer()
++    }
++
++    private fun createRestorer(update: UpdateManga = UpdateManga(mangas, interval)) =
++        MangaRestorer(
++            database,
++            categories,
++            GetMangaByUrlAndSourceId(mangas),
++            chapters,
++            update,
++            GetTracks(tracks),
++            InsertTrack(tracks),
++            interval,
++        )
++
++    private fun entry(page: Long, read: Boolean = false, bookmarked: Boolean = false) =
++        BackupManga(42, "/work", "SQLite work").apply {
++            chapters =
++                listOf(
++                    BackupChapter(
++                        "/work/ch-1",
++                        "Chapter 1",
++                        lastPageRead = page,
++                        read = read,
++                        bookmark = bookmarked,
++                    )
++                )
++        }
++
++    private suspend fun chapter() =
++        chapters.awaitNative(checkNotNull(mangas.getMangaByUrlAndSourceId("/work", 42)).id).single()
++
++    @Test
++    fun `restoring an older unread page cannot rewind current progress in SQLite`() = runTest {
++        restorer.restore(entry(20), emptyList())
++        restorer.restore(entry(4), emptyList())
++        assertEquals(20L, chapter().lastPageRead)
++        assertFalse(chapter().read)
++    }
++
++    @Test
++    fun `a completed local chapter preserves a later page from the backup`() = runTest {
++        restorer.restore(entry(10, read = true), emptyList())
++        restorer.restore(entry(18), emptyList())
++        assertEquals(18L, chapter().lastPageRead)
++        assertTrue(chapter().read)
++    }
++
++    @Test
++    fun `a completion in an old backup cannot reduce the current page`() = runTest {
++        restorer.restore(entry(20), emptyList())
++        restorer.restore(entry(4, read = true), emptyList())
++        assertEquals(20L, chapter().lastPageRead)
++        assertTrue(chapter().read)
++    }
++
++    @Test
++    fun `committed reading state remains after closing and reopening the database file`() =
++        runTest {
++            restorer.restore(entry(17, read = true, bookmarked = true), emptyList())
++            val id = chapter().id
++            driver.close()
++            open(create = false)
++            val restored = chapter()
++            assertEquals(id, restored.id)
++            assertEquals(17L, restored.lastPageRead)
++            assertTrue(restored.read && restored.bookmark)
++            assertTrue(mangas.getFavorites().single().favorite)
++        }
++
++    @Test
++    fun `a newer unread page advances progress and a zero backup does not reset it`() = runTest {
++        restorer.restore(entry(4), emptyList())
++        restorer.restore(entry(20), emptyList())
++        restorer.restore(entry(0), emptyList())
++        assertEquals(20L, chapter().lastPageRead)
++        assertFalse(chapter().read)
++    }
++
++    @Test
++    fun `bookmarks and completed status survive an older unmarked restore`() = runTest {
++        restorer.restore(entry(20, read = true, bookmarked = true), emptyList())
++        restorer.restore(entry(4), emptyList())
++        assertTrue(chapter().read && chapter().bookmark)
++        assertEquals(20L, chapter().lastPageRead)
++    }
++
++    @Test
++    fun `repeated restores keep one manga chapter and category association`() = runTest {
++        val prefs = mockk<LibraryPreferences>()
++        every { prefs.categorizedDisplaySettings } returns
++            InMemoryPreference("categorized", false, false)
++        val backupCategory = BackupCategory("To read", order = 7, id = 23, flags = 0)
++        CategoriesRestorer(database, categories, prefs)(listOf(backupCategory))
++        val backup = entry(12).apply { categories = listOf(7) }
++        repeat(3) { restorer.restore(backup, listOf(backupCategory)) }
++        val manga = mangas.getFavorites().single()
++        assertEquals(1, chapters.awaitNative(manga.id).size)
++        assertEquals(listOf("To read"), categories.await(manga.id).map { it.name })
++        assertEquals(12L, chapter().lastPageRead)
++    }
++
++    @Test
++    fun `the same chapter URL in different sources keeps native reading states separate`() =
++        runTest {
++            restorer.restore(entry(20), emptyList())
++            restorer.restore(entry(4).apply { source = 99 }, emptyList())
++            val other = checkNotNull(mangas.getMangaByUrlAndSourceId("/work", 99))
++            assertEquals(20L, chapter().lastPageRead)
++            assertEquals(4L, chapters.awaitNative(other.id).single().lastPageRead)
++            assertEquals(2, mangas.getFavorites().size)
++        }
++
++    @Test
++    fun `restored history uses the largest duration and latest timestamp without adding duplicates`() =
++        runTest {
++            fun backup(duration: Long, time: Long) =
++                entry(7).apply { history = listOf(BackupHistory("/work/ch-1", time, duration)) }
++            restorer.restore(backup(12000, 1700000000300), emptyList())
++            restorer.restore(backup(3000, 1700000000100), emptyList())
++            restorer.restore(backup(15000, 1700000000400), emptyList())
++            restorer.restore(backup(15000, 1700000000400), emptyList())
++            val id = checkNotNull(mangas.getMangaByUrlAndSourceId("/work", 42)).id
++            val history = HistoryRepositoryImpl(database).getHistoryByMangaId(id).single()
++            assertEquals(15000L, history.readDuration)
++            assertEquals(1700000000400L, history.readAt?.time)
++        }
++
++    @Test
++    fun `restored tracker progress cannot go backwards or create another track`() = runTest {
++        fun backup(progress: Float) =
++            entry(7).apply {
++                tracking = listOf(BackupTracking(1, 123, mediaId = 456, lastChapterRead = progress))
++            }
++        restorer.restore(backup(39.5f), emptyList())
++        restorer.restore(backup(20f), emptyList())
++        val id = checkNotNull(mangas.getMangaByUrlAndSourceId("/work", 42)).id
++        assertEquals(39.5, tracks.getTracksByMangaId(id).single().lastChapterRead)
++    }
++
++    @Test
++    fun `a late SQLite failure rolls back manga chapter history and track writes`() = runTest {
++        driver
++            .execute(
++                null,
++                "CREATE TRIGGER reject_restore BEFORE INSERT ON excluded_scanlators WHEN NEW.scanlator = 'broken' BEGIN SELECT RAISE(ABORT, 'Synthetic restore failure'); END",
++                0,
++            )
++            .await()
++        val broken =
++            entry(17).apply {
++                history = listOf(BackupHistory("/work/ch-1", 1700000000300, 12000))
++                tracking = listOf(BackupTracking(1, 123, mediaId = 456))
++                excludedScanlators = listOf("broken")
++            }
++        assertThrows<java.sql.SQLException> { restorer.restore(broken, emptyList()) }
++        assertTrue(mangas.getFavorites().isEmpty())
++        assertTrue(database.chaptersQueries.getChapterByUrl("/work/ch-1").awaitAsList().isEmpty())
++        assertTrue(database.manga_syncQueries.getTracks().awaitAsList().isEmpty())
++        assertEquals(0L, database.historyQueries.getReadDuration().awaitAsOne())
++        restorer.restore(entry(9), emptyList())
++        assertEquals(9L, chapter().lastPageRead)
++    }
++
++    @Test
++    fun `cancellation late in a restore rolls back persisted changes and preserves earlier state`() =
++        runTest {
++            restorer.restore(entry(20), emptyList())
++            val update = mockk<UpdateManga>()
++            coEvery { update.awaitUpdateFetchInterval(any(), any(), any(), any()) } throws
++                kotlinx.coroutines.CancellationException("Cancelled before commit")
++            assertThrows<kotlinx.coroutines.CancellationException> {
++                createRestorer(update).restore(entry(30, bookmarked = true), emptyList())
++            }
++            driver.close()
++            open(create = false)
++            assertEquals(20L, chapter().lastPageRead)
++            assertFalse(chapter().bookmark)
++        }
++
++    private fun coordinator(): BackupRestorer {
++        val preferences = mockk<LibraryPreferences>()
++        every { preferences.categorizedDisplaySettings } returns
++            InMemoryPreference("categorized", false, false)
++        return BackupRestorer(
++            context,
++            notifier,
++            false,
++            database,
++            CategoriesRestorer(database, categories, preferences),
++            mockk<PreferenceRestorer>(),
++            mockk<ExtensionStoreRestorer>(),
++            restorer,
++            sourceManager = { null },
++        )
++    }
++
++    @Test
++    fun `a failed batch rolls back before good entries are retried individually`() = runTest {
++        driver
++            .execute(
++                null,
++                "CREATE TRIGGER reject_chapter BEFORE INSERT ON chapters WHEN NEW.name = 'Broken' BEGIN SELECT RAISE(ABORT, 'Synthetic bad chapter'); END",
++                0,
++            )
++            .await()
++        val good = entry(11).apply { url = "/good" }
++        val broken =
++            entry(7).apply {
++                url = "/bad"
++                chapters.single().name = "Broken"
++            }
++        val last = entry(13).apply { url = "/last" }
++        coordinator()
++            .restoreBackup(
++                Backup(listOf(good, broken, last)),
++                RestoreOptions(
++                    categories = false,
++                    appSettings = false,
++                    sourceSettings = false,
++                    extensionStores = false,
++                ),
++            )
++        assertEquals(setOf("/good", "/last"), mangas.getFavorites().map { it.url }.toSet())
++        assertNull(mangas.getMangaByUrlAndSourceId("/bad", 42))
++        assertEquals(
++            1,
++            chapters.awaitNative(checkNotNull(mangas.getMangaByUrlAndSourceId("/good", 42)).id).size,
++        )
++        verify { notifier.showRestoreProgress(any(), 3, 3, false) }
++    }
++
++    private fun decode(bytes: ByteArray): Backup {
++        val resolver = mockk<ContentResolver>()
++        val uri = mockk<Uri>()
++        every { context.contentResolver } returns resolver
++        every { resolver.openInputStream(uri) } answers { ByteArrayInputStream(bytes) }
++        return BackupDecoder(context, ProtoBuf).decode(uri)
++    }
++
++    private suspend fun externalRoundTrip(name: String) {
++        val archive =
++            checkNotNull(javaClass.getResourceAsStream("/backup-interop/$name.tachibk")).use {
++                it.readBytes()
++            }
++        val incoming = decode(archive)
++        database.categoriesQueries.insert("Existing", 0, 0)
++        coordinator()
++            .restoreBackup(
++                incoming,
++                RestoreOptions(appSettings = false, sourceSettings = false, extensionStores = false),
++            )
++        driver.close()
++        open(create = false)
++        val stored = mangas.getFavorites().single()
++        val chapter = chapters.awaitNative(stored.id).single()
++        assertEquals(8787213233662904706L, stored.source)
++        assertEquals("/work", stored.url)
++        assertEquals("Obra de teste — ação", stored.title)
++        assertTrue(chapter.read && chapter.bookmark)
++        assertEquals(17L, chapter.lastPageRead)
++        assertEquals("Favoritos", categories.await(stored.id).single().name)
++        assertNotEquals(
++            incoming.backupCategories.single().id,
++            categories.await(stored.id).single().id,
++        )
++        val exported =
++            Backup(
++                MangaBackupCreator(
++                    database,
++                    categories,
++                    GetHistory(HistoryRepositoryImpl(database)),
++                )(listOf(stored), BackupOptions()),
++                backupCategories = CategoriesBackupCreator(categories)(),
++                backupSources = incoming.backupSources,
++            )
++        val bytes =
++            ByteArrayOutputStream()
++                .also { out ->
++                    GZIPOutputStream(out).use {
++                        it.write(ProtoBuf.encodeToByteArray(Backup.serializer(), exported))
++                    }
++                }
++                .toByteArray()
++        val decoded = decode(bytes)
++        val manga = decoded.backupManga.single()
++        val read = manga.chapters.single()
++        assertEquals(stored.source, manga.source)
++        assertTrue(read.read && read.bookmark)
++        assertEquals(17L, read.lastPageRead)
++        assertEquals(
++            decoded.backupCategories.single { it.name == "Favoritos" }.order,
++            manga.categories.single(),
++        )
++        assertEquals(12345L, manga.history.single().readDuration)
++        assertEquals(39.5f, manga.tracking.single().lastChapterRead)
++        assertEquals(incoming.backupManga.single().notes, manga.notes)
++        assertEquals(incoming.backupManga.single().memo.toList(), manga.memo.toList())
++    }
++
++    @Test
++    fun `Tachiyomi backup persists to SQLite and reexports reading state through the product creator`() =
++        runTest {
++            externalRoundTrip("tachiyomi")
++        }
++
++    @Test
++    fun `Mihon backup persists to SQLite and reexports reading state through the product creator`() =
++        runTest {
++            externalRoundTrip("mihon")
++        }
++
++    @Test
++    fun `the persistence fixture enforces real SQLite foreign keys`() = runTest {
++        val error =
++            assertThrows<java.sql.SQLException> {
++                driver
++                    .execute(
++                        null,
++                        "INSERT INTO chapters (manga_id,url,name,read,bookmark,last_page_read,chapter_number,source_order,date_fetch,date_upload) VALUES (999,'/orphan','Orphan',0,0,0,1,0,0,0)",
++                        0,
++                    )
++                    .await()
++            }
++        assertTrue(error.message.orEmpty().contains("FOREIGN KEY", ignoreCase = true))
++        assertTrue(database.chaptersQueries.getChapterByUrl("/orphan").awaitAsList().isEmpty())
++    }
++}
 diff --git a/app/src/test/java/eu/kanade/tachiyomi/data/backup/restore/SourcePreferenceNamespaceTest.kt b/app/src/test/java/eu/kanade/tachiyomi/data/backup/restore/SourcePreferenceNamespaceTest.kt
 new file mode 100644
 index 0000000..b6fc1ed
@@ -75467,7 +76058,7 @@ index 0000000..c62d0ce
 +    }
 +}
 diff --git a/gradle/libs.versions.toml b/gradle/libs.versions.toml
-index 9839272..46e74da 100644
+index 9839272..6d6b5be 100644
 --- a/gradle/libs.versions.toml
 +++ b/gradle/libs.versions.toml
 @@ -41,7 +41,8 @@ flexibleAdapter = "3268efe4"
@@ -75512,6 +76103,14 @@ index 9839272..46e74da 100644
  jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
  junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }
  junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
+@@ -187,6 +188,7 @@ rxJava = { module = "io.reactivex:rxjava", version.ref = "rxJava" }
+ shizuku-api = { module = "dev.rikka.shizuku:api", version.ref = "shizuku" }
+ shizuku-provider = { module = "dev.rikka.shizuku:provider", version.ref = "shizuku" }
+ spotless-gradle = { module = "com.diffplug.spotless:spotless-plugin-gradle", version.ref = "spotless" }
++sqldelight-sqliteDriver = { module = "app.cash.sqldelight:sqlite-driver", version.ref = "sqldelight" }
+ sqldelight-androidxDriver = { module = "com.github.mihon.sqldelight-androidx-driver:sqldelight-androidx-driver", version.ref = "sqldelight-androidx-driver" }
+ sqldelight-androidxPaging = { module = "app.cash.sqldelight:androidx-paging3-extensions", version.ref = "sqldelight" }
+ sqldelight-async = { module = "app.cash.sqldelight:async-extensions", version.ref = "sqldelight" }
 diff --git a/i18n-at/src/commonMain/moko-resources/base/strings.xml b/i18n-at/src/commonMain/moko-resources/base/strings.xml
 index 7ed4795..aa3df6d 100644
 --- a/i18n-at/src/commonMain/moko-resources/base/strings.xml

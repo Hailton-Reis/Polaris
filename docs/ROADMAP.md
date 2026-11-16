@@ -79,3 +79,5 @@ A beta.8 integra agrupamento de edições, seleção automática de catálogos c
 Um servidor pessoal continua opcional; o projeto não deve depender dele para a leitura básica.
 
 A [revisão P20261115.3](REVISAO_IMPORTACOES_P20261115_3.md) apresenta importações interrompidas e pastas no formato antigo na tela de armazenamento. Inventário somente leitura, com limites e resultado parcial explícito; arquivos sem origem comprovada continuam preservados para conferência manual. Medição de pico e aceites SAF/aparelhos permanecem para a consolidação final.
+
+A [revisão P20261115.4](BACKUPS_SQLITE_P20261115_4.md) impede que um backup antigo reduza a última página. Acrescenta persistência e reexportação com SQLite real e repositórios de produção em JVM, incluindo rollback/retomada do lote. Driver adicional exclusivo de testes; validação Android/interface e troca em leitores externos permanecem pendentes.

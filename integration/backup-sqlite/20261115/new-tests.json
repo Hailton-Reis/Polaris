@@ -1,0 +1,111 @@
+{
+  "total": 16,
+  "status": "ALL_PASSED",
+  "database": "File-backed SQLite through SQLDelight JDBC; production schema, repositories, restorers and creators. Foreign keys verified with a failing orphan insert.",
+  "android_boundaries": "Context, notifications and selected coordinator services mocked on JVM; no database/query/transaction mocks.",
+  "cases": [
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.data.backup.restore.BackupSqliteRestoreTest",
+      "name": "Mihon backup persists to SQLite and reexports reading state through the product creator()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.data.backup.restore.BackupSqliteRestoreTest",
+      "name": "Tachiyomi backup persists to SQLite and reexports reading state through the product creator()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.data.backup.restore.BackupSqliteRestoreTest",
+      "name": "a completed local chapter preserves a later page from the backup()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.data.backup.restore.BackupSqliteRestoreTest",
+      "name": "a completion in an old backup cannot reduce the current page()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.data.backup.restore.BackupSqliteRestoreTest",
+      "name": "a failed batch rolls back before good entries are retried individually()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.data.backup.restore.BackupSqliteRestoreTest",
+      "name": "a late SQLite failure rolls back manga chapter history and track writes()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.data.backup.restore.BackupSqliteRestoreTest",
+      "name": "a newer unread page advances progress and a zero backup does not reset it()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.data.backup.restore.BackupSqliteRestoreTest",
+      "name": "bookmarks and completed status survive an older unmarked restore()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.data.backup.restore.BackupSqliteRestoreTest",
+      "name": "cancellation late in a restore rolls back persisted changes and preserves earlier state()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.data.backup.restore.BackupSqliteRestoreTest",
+      "name": "committed reading state remains after closing and reopening the database file()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.data.backup.restore.BackupSqliteRestoreTest",
+      "name": "repeated restores keep one manga chapter and category association()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.data.backup.restore.BackupSqliteRestoreTest",
+      "name": "restored history uses the largest duration and latest timestamp without adding duplicates()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.data.backup.restore.BackupSqliteRestoreTest",
+      "name": "restored tracker progress cannot go backwards or create another track()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.data.backup.restore.BackupSqliteRestoreTest",
+      "name": "restoring an older unread page cannot rewind current progress in SQLite()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.data.backup.restore.BackupSqliteRestoreTest",
+      "name": "the persistence fixture enforces real SQLite foreign keys()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.data.backup.restore.BackupSqliteRestoreTest",
+      "name": "the same chapter URL in different sources keeps native reading states separate()",
+      "status": "passed"
+    }
+  ],
+  "android_controls": {
+    "status": "COMPILED_NOT_EXECUTED",
+    "cases": [
+      "restoredProgressSurvivesMergeAndReopeningWithTheNativeDriver",
+      "aLateNativeSqlFailureRollsBackTheSyntheticRestore"
+    ]
+  }
+}

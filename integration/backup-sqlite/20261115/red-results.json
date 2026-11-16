@@ -1,0 +1,24 @@
+{
+  "status": "THREE_REAL_SQLITE_ASSERTIONS_FAILED_BEFORE_FIX",
+  "previous_engineering_commit": "64b8807d30f6c5374835c3249a4b1cb1d506352e",
+  "red_production_source_sha256": "cd0b7b5f7a93e4fd77327ef4e84440636544c68e781304876ab6a73ee9dff8e2",
+  "red_three_case_fixture_sha256": "178cb38cfd22cbf8b6c3bbf0387f37d849e27d6f958a23e5f21248fb61ec2202",
+  "cases": [
+    {
+      "name": "a completion in an old backup cannot reduce the current page()",
+      "type": "org.opentest4j.AssertionFailedError",
+      "message": "org.opentest4j.AssertionFailedError: expected: <20> but was: <4>"
+    },
+    {
+      "name": "restoring an older unread page cannot rewind current progress in SQLite()",
+      "type": "org.opentest4j.AssertionFailedError",
+      "message": "org.opentest4j.AssertionFailedError: expected: <20> but was: <4>"
+    },
+    {
+      "name": "a completed local chapter preserves a later page from the backup()",
+      "type": "org.opentest4j.AssertionFailedError",
+      "message": "org.opentest4j.AssertionFailedError: expected: <18> but was: <10>"
+    }
+  ],
+  "note": "Earlier configuration and disk-guard stops are not counted as behavior reproductions. The three case methods remain in the expanded 16-case suite."
+}

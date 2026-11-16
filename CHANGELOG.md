@@ -2,6 +2,17 @@
 
 Este arquivo registra a evolução real do código. **Revisões de desenvolvimento não são lançamentos públicos.** As datas abaixo usam America/Fortaleza, exceto quando houver indicação de UTC. O histórico de distribuição fica em [Releases](https://github.com/Hailton-Reis/Polaris/releases).
 
+## Desenvolvimento · P20261115.4 — 15/11/2026
+
+**Estado:** continuação da beta.11/código 112, na frente de backups. Sem novo APK ou Release.
+
+- Restaurar um backup antigo podia reduzir a última página de um capítulo em leitura ou ignorar uma página posterior quando o capítulo local já estava concluído. A mesclagem passa a manter a maior página e preservar lido/marcador.
+- Três regressões reproduzidas com SQLite real antes da correção. Novos controles usam esquema, repositórios, transações e criadores de produção em banco temporário em arquivo, incluindo reabertura, idempotência, histórico/acompanhamento, rollback e reexportação de dois exemplos sintéticos upstream.
+- Compilação do app/instrumentação aprovada; 889 testes do app e 85 de domain executados e aprovados: 974, incluindo 16 novos. Nenhum caso anterior ausente; overlay4/empacotamento16 aprovados. Dois controles Android compilados, ainda não executados.
+- Driver adicional exclusivo dos testes JVM; sqlite-jdbc ausente de releaseRuntimeClasspath. Esquema SQL/Protobuf inalterados. SQLite/interface Android, aparelhos e troca pela UI de leitores externos seguem para a validação final.
+
+[Escopo](docs/BACKUPS_SQLITE_P20261115_4.md) · [Evidências filtradas](integration/backup-sqlite/20261115/README.md).
+
 ## Desenvolvimento · P20261115.3 — 15/11/2026
 
 **Estado:** continuação da beta.11/código 112, na frente de armazenamento. Sandbox arquivada/retirada; conta/nuvem adiadas; sem novo APK ou Release.

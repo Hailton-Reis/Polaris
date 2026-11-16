@@ -7,7 +7,7 @@ Este checklist acompanha o trabalho autorizado em 13/11. Não é uma declaraçã
 | --- | --- |
 | Jornada, XP, conquistas e grimórios | Implementados no checkpoint anterior |
 | Sandbox e login isolado | PAUSADOS pelo usuário; fora do escopo de conclusão desta beta. Executor removido dos fontes compilados; histórico preservado na branch de arquivo (P20261115.2) |
-| Biblioteca, fontes reais e backups entre leitores | Criação segura e ordem da restauração verificadas em JVM; SQLite/interface Android e ida/volta externa pendentes |
+| Biblioteca, fontes reais e backups entre leitores | Criação segura, ordem de categorias e persistência/reexportação em SQLite real verificadas em JVM (P20261115.4); SQLite/interface Android e troca pela UI de leitores externos pendentes |
 | Leitura, OCR e tradução nos aparelhos | Pendente, incluindo diagnóstico do A12 |
 | Armazenamento | Importação/cache, retomada de cópias completas e revisão de cópias parciais/pastas antigas (P20261115.3) implementados; pico, SAF e validação final pendentes |
 | Atualização beta.10 → beta.11 e distribuição não depurável | APK interno gerado com assinatura original; atualização no aparelho e variante não depurável pendentes |
@@ -53,3 +53,5 @@ P20261115.2: [sandbox arquivada e retirada dos fontes compilados](ARQUIVAMENTO_S
 P20261115.3: [revisão de importações](REVISAO_IMPORTACOES_P20261115_3.md) na tela de armazenamento, com inventário limitado e somente leitura. Cópias interrompidas/pastas antigas ficam visíveis; falhas/limites/tamanhos desconhecidos são indicados. Não há limpeza automática de cópias locais, e retomada continua exigindo a conferência completa pelo importador. Resultados e limites na evidência da revisão.
 
 Validação P20261115.3: BUILD SUCCESSFUL 2min09s; 873 testes do app aprovados (22 novos), mais 85 anteriores de domain/UP-TO-DATE. Total 958 nos relatórios, sem falhas/skips ou casos anteriores ausentes. App/instrumentação compilados, overlay4/empacotamento16 aprovados; dois cenários Android novos compilados e ainda não executados. A sandbox continua ausente do JAR/manifesto atual. Sem novo APK/Release.
+
+P20261115.4: [backups com SQLite real e progresso sem regressão](BACKUPS_SQLITE_P20261115_4.md). Três falhas anteriores reproduzidas; 16 casos novos aprovados, com esquema/repositórios/transações reais em JVM. Compilação de app/instrumentação aprovada; 889 testes do app e 85 de domain executados/aprovados (974), nenhum caso anterior ausente. Overlay4/empacotamento16 aprovados, dois controles Android novos compilados. Driver JDBC exclusivo de testes confirmado fora do runtime release. Sem novo APK/Release; Android/interface e troca pela UI de outros leitores permanecem pendentes.
