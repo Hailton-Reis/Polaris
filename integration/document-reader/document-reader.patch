@@ -1789,6 +1789,96 @@ index 0000000..8797bd0
 +        )
 +    }
 +}
+diff --git a/app/src/androidTest/java/eu/kanade/translation/MlKitProcessingAndroidTest.kt b/app/src/androidTest/java/eu/kanade/translation/MlKitProcessingAndroidTest.kt
+new file mode 100644
+index 0000000..f25bdf5
+--- /dev/null
++++ b/app/src/androidTest/java/eu/kanade/translation/MlKitProcessingAndroidTest.kt
+@@ -0,0 +1,84 @@
++package eu.kanade.translation
++
++import androidx.test.ext.junit.runners.AndroidJUnit4
++import com.google.android.gms.tasks.TaskCompletionSource
++import com.google.android.gms.tasks.Tasks
++import eu.kanade.translation.recognizer.*
++import kotlinx.coroutines.CoroutineStart
++import kotlinx.coroutines.async
++import kotlinx.coroutines.cancel
++import kotlinx.coroutines.launch
++import kotlinx.coroutines.runBlocking
++import kotlinx.coroutines.yield
++import org.junit.Assert.*
++import org.junit.Test
++import org.junit.runner.RunWith
++
++/** Google Task/coroutine lifecycle on Android; no OCR model, bitmap or native inference. */
++@RunWith(AndroidJUnit4::class)
++class MlKitProcessingAndroidTest {
++    @Test
++    fun cancellationKeepsTheEngineUntilTheAndroidTaskCompletes() =
++        runBlocking<Unit> {
++            val source = TaskCompletionSource<String>()
++            var closes = 0
++            var published = false
++            val manager = OcrEngineManager { selectedType, selectedLanguage ->
++                object : OcrEngine {
++                    override val type = selectedType
++                    override val language = selectedLanguage
++
++                    override suspend fun recognize(image: OcrImage): OcrPage =
++                        error("No native inference")
++
++                    override suspend fun release() {
++                        closes++
++                    }
++                }
++            }
++            val job =
++                launch(start = CoroutineStart.UNDISPATCHED) {
++                    manager.withEngine<String>(
++                        OcrEngineType.ML_KIT,
++                        TextRecognizerLanguage.ENGLISH,
++                    ) {
++                        awaitMlKitProcessing { source.task }.also { published = true }
++                    }
++                }
++            job.cancel()
++            val release = async(start = CoroutineStart.UNDISPATCHED) { manager.release() }
++            yield()
++            try {
++                assertFalse(release.isCompleted)
++                assertFalse(source.task.isComplete)
++                assertEquals(0, closes)
++            } finally {
++                source.trySetResult("complete")
++                job.join()
++                release.await()
++            }
++            assertEquals(1, closes)
++            assertTrue(job.isCancelled)
++            assertFalse(published)
++        }
++
++    @Test
++    fun anAlreadyCancelledAndroidCallerDoesNotStartProcessing() =
++        runBlocking<Unit> {
++            var starts = 0
++            var applied = false
++            val job =
++                launch(start = CoroutineStart.UNDISPATCHED) {
++                    coroutineContext.cancel()
++                    awaitMlKitProcessing {
++                        starts++
++                        Tasks.forResult("cached SDK result")
++                    }
++                    applied = true
++                }
++            job.join()
++            assertTrue(job.isCancelled)
++            assertEquals(0, starts)
++            assertFalse(applied)
++        }
++}
 diff --git a/app/src/androidTest/java/eu/kanade/translation/presentation/PortugueseRealPageTypographyTest.kt b/app/src/androidTest/java/eu/kanade/translation/presentation/PortugueseRealPageTypographyTest.kt
 new file mode 100644
 index 0000000..e696dab
@@ -9522,7 +9612,7 @@ index a198c3f..9a3e84f 100644
                      preference = translationPreferences.translationEngineTemperature(),
                      title = stringResource(ATMR.strings.pref_engine_temperature),
 diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
-index 7f411fd..5456dc5 100644
+index 7f411fd..03310ff 100644
 --- a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
 +++ b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
 @@ -1,15 +1,18 @@
@@ -9587,7 +9677,7 @@ index 7f411fd..5456dc5 100644
  
      // Identifies this overlay independently of the pinned upstream COMMIT_SHA.
 -    private const val POLARIS_READER_REVISION = "P20261031.2"
-+    private const val POLARIS_READER_REVISION = "P20261115.4"
++    private const val POLARIS_READER_REVISION = "P20261115.5"
  
      @Composable
      override fun Content() {
@@ -26966,10 +27056,10 @@ index 0000000..ce6e322
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentTextTranslator.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentTextTranslator.kt
 new file mode 100644
-index 0000000..8d16a78
+index 0000000..500220d
 --- /dev/null
 +++ b/app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentTextTranslator.kt
-@@ -0,0 +1,87 @@
+@@ -0,0 +1,113 @@
 +package eu.kanade.tachiyomi.ui.documents
 +
 +import android.content.Context
@@ -26977,85 +27067,111 @@ index 0000000..8d16a78
 +import com.google.mlkit.nl.translate.TranslateLanguage
 +import com.google.mlkit.nl.translate.Translation
 +import com.google.mlkit.nl.translate.TranslatorOptions
++import eu.kanade.translation.awaitMlKitProcessing
 +import eu.kanade.translation.memory.TranslationGlossary
 +import eu.kanade.translation.memory.TranslationMemory
 +import eu.kanade.translation.recognizer.TextRecognizerLanguage
 +import eu.kanade.translation.translator.ComicTranslationContext
 +import eu.kanade.translation.translator.TextTranslatorLanguage
++import java.io.File
++import java.security.MessageDigest
++import java.util.UUID
++import kotlin.coroutines.coroutineContext
 +import kotlinx.coroutines.Dispatchers
++import kotlinx.coroutines.ensureActive
 +import kotlinx.coroutines.tasks.await
 +import kotlinx.coroutines.withContext
 +import mihon.core.archive.DocumentBlock
 +import mihon.core.archive.DocumentCacheBudget
 +import tachiyomi.domain.translation.TranslationPreferences
-+import java.io.File
-+import java.security.MessageDigest
-+import java.util.UUID
 +
 +class DocumentTextTranslator(
 +    private val context: Context,
 +    private val preferences: TranslationPreferences,
 +    private val title: String,
 +) {
-+    suspend fun translate(blocks: List<DocumentBlock>): List<DocumentBlock> = withContext(Dispatchers.IO) {
-+        val from = TextRecognizerLanguage.fromPref(preferences.translateFromLanguage()).code
-+        val to =
-+            TranslateLanguage.fromLanguageTag(TextTranslatorLanguage.fromPref(preferences.translateToLanguage()).code)
-+                ?: error("Language is not supported by on-device translation")
-+        if (from == to) return@withContext blocks
-+        val translator = Translation.getClient(
-+            TranslatorOptions.Builder().setSourceLanguage(from).setTargetLanguage(to).build(),
-+        )
-+        val cache = File(context.cacheDir, "document-translations").apply { mkdirs() }
-+        val work = ComicTranslationContext(title, "Document")
-+        val revision = TranslationMemory.revision(work)
-+        var modelReady = false
-+        try {
-+            blocks.map { block ->
-+                if (block !is DocumentBlock.Text || block.value.isBlank()) return@map block
-+                val key = MessageDigest.getInstance(
-+                    "SHA-256",
-+                ).digest("document-v2|$title|$revision|$from|$to|${block.value}".toByteArray())
-+                    .joinToString("") { "%02x".format(it) }
-+                val file = File(cache, key)
-+                val cached = runCatching {
-+                    DocumentCacheBudget.acquire(context.cacheDir, file) { check(file.isFile) }
-+                        .use { it.file.readText() }
-+                }.getOrNull()
-+                val translated = if (!cached.isNullOrBlank()) {
-+                    cached
-+                } else {
-+                    if (!modelReady) {
-+                        translator.downloadModelIfNeeded(DownloadConditions.Builder().build()).await()
-+                        modelReady = true
-+                    }
-+                    val prepared = TranslationGlossary.prepare(block.value, work)
-+                    val value = TranslationGlossary.resolve(
-+                        prepared,
-+                        translator.translate(prepared.textForTranslation).await(),
-+                        work,
-+                    )
-+                    if (value.isNotBlank()) {
++    suspend fun translate(blocks: List<DocumentBlock>): List<DocumentBlock> =
++        withContext(Dispatchers.IO) {
++            coroutineContext.ensureActive()
++            val from = TextRecognizerLanguage.fromPref(preferences.translateFromLanguage()).code
++            val to =
++                TranslateLanguage.fromLanguageTag(
++                    TextTranslatorLanguage.fromPref(preferences.translateToLanguage()).code
++                ) ?: error("Language is not supported by on-device translation")
++            if (from == to) return@withContext blocks
++            val translator =
++                Translation.getClient(
++                    TranslatorOptions.Builder()
++                        .setSourceLanguage(from)
++                        .setTargetLanguage(to)
++                        .build()
++                )
++            val cache = File(context.cacheDir, "document-translations").apply { mkdirs() }
++            val work = ComicTranslationContext(title, "Document")
++            val revision = TranslationMemory.revision(work)
++            var modelReady = false
++            try {
++                blocks.map { block ->
++                    coroutineContext.ensureActive()
++                    if (block !is DocumentBlock.Text || block.value.isBlank()) return@map block
++                    val key =
++                        MessageDigest.getInstance("SHA-256")
++                            .digest(
++                                "document-v2|$title|$revision|$from|$to|${block.value}"
++                                    .toByteArray()
++                            )
++                            .joinToString("") { "%02x".format(it) }
++                    val file = File(cache, key)
++                    val cached =
 +                        runCatching {
-+                            DocumentCacheBudget.acquire(context.cacheDir, file) {
-+                                val temporary = File(cache, ".$key-${UUID.randomUUID()}")
-+                                try {
-+                                    temporary.writeText(value)
-+                                    check(temporary.renameTo(file))
-+                                } finally {
-+                                    temporary.delete()
++                                DocumentCacheBudget.acquire(context.cacheDir, file) {
++                                        check(file.isFile)
++                                    }
++                                    .use { it.file.readText() }
++                            }
++                            .getOrNull()
++                    val translated =
++                        if (!cached.isNullOrBlank()) {
++                            cached
++                        } else {
++                            if (!modelReady) {
++                                translator
++                                    .downloadModelIfNeeded(DownloadConditions.Builder().build())
++                                    .await()
++                                modelReady = true
++                            }
++                            val prepared = TranslationGlossary.prepare(block.value, work)
++                            val value =
++                                TranslationGlossary.resolve(
++                                    prepared,
++                                    awaitMlKitProcessing {
++                                        translator.translate(prepared.textForTranslation)
++                                    },
++                                    work,
++                                )
++                            if (value.isNotBlank()) {
++                                runCatching {
++                                    DocumentCacheBudget.acquire(context.cacheDir, file) {
++                                            val temporary =
++                                                File(cache, ".$key-${UUID.randomUUID()}")
++                                            try {
++                                                temporary.writeText(value)
++                                                check(temporary.renameTo(file))
++                                            } finally {
++                                                temporary.delete()
++                                            }
++                                        }
++                                        .close()
 +                                }
-+                            }.close()
++                            }
++                            value
 +                        }
-+                    }
-+                    value
++                    DocumentBlock.Text(translated.ifBlank { block.value }, block.heading)
 +                }
-+                DocumentBlock.Text(translated.ifBlank { block.value }, block.heading)
++            } finally {
++                translator.close()
 +            }
-+        } finally {
-+            translator.close()
 +        }
-+    }
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentWebSearch.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentWebSearch.kt
 new file mode 100644
@@ -34462,6 +34578,36 @@ index 0000000..99de352
 +        }
 +    }
 +}
+diff --git a/app/src/main/java/eu/kanade/translation/MlKitProcessing.kt b/app/src/main/java/eu/kanade/translation/MlKitProcessing.kt
+new file mode 100644
+index 0000000..4325175
+--- /dev/null
++++ b/app/src/main/java/eu/kanade/translation/MlKitProcessing.kt
+@@ -0,0 +1,24 @@
++package eu.kanade.translation
++
++import com.google.android.gms.tasks.Task
++import kotlinx.coroutines.NonCancellable
++import kotlinx.coroutines.currentCoroutineContext
++import kotlinx.coroutines.ensureActive
++import kotlinx.coroutines.tasks.await
++import kotlinx.coroutines.withContext
++
++/** Processing tasks are owned by the OCR/translation client, unlike model downloads. */
++internal suspend fun <T> awaitMlKitProcessing(start: () -> Task<T>): T {
++    val caller = currentCoroutineContext()
++    caller.ensureActive()
++    try {
++        // Cancelling await does not stop ML Kit. Keep the client's lease until its task settles.
++        return withContext(NonCancellable) {
++            caller.ensureActive()
++            start().await()
++        }
++    } finally {
++        // This context switch does not change dispatcher: explicitly suppress a cancelled result.
++        caller.ensureActive()
++    }
++}
 diff --git a/app/src/main/java/eu/kanade/translation/SourceTranslationLanguage.kt b/app/src/main/java/eu/kanade/translation/SourceTranslationLanguage.kt
 new file mode 100644
 index 0000000..fab22cc
@@ -37329,10 +37475,10 @@ index ec6041a..0c13d7b 100644
                  )
              }
 diff --git a/app/src/main/java/eu/kanade/translation/recognizer/MlKitOcrEngine.kt b/app/src/main/java/eu/kanade/translation/recognizer/MlKitOcrEngine.kt
-index 6e0e8b1..ed823df 100644
+index 6e0e8b1..70fe62a 100644
 --- a/app/src/main/java/eu/kanade/translation/recognizer/MlKitOcrEngine.kt
 +++ b/app/src/main/java/eu/kanade/translation/recognizer/MlKitOcrEngine.kt
-@@ -1,21 +1,26 @@
+@@ -1,14 +1,17 @@
  package eu.kanade.translation.recognizer
  
  import android.content.Context
@@ -37344,15 +37490,14 @@ index 6e0e8b1..ed823df 100644
  import com.google.mlkit.vision.text.japanese.JapaneseTextRecognizerOptions
  import com.google.mlkit.vision.text.korean.KoreanTextRecognizerOptions
  import com.google.mlkit.vision.text.latin.TextRecognizerOptions
++import eu.kanade.translation.awaitMlKitProcessing
++import kotlin.coroutines.coroutineContext
  import kotlinx.coroutines.Dispatchers
-+import kotlinx.coroutines.NonCancellable
 +import kotlinx.coroutines.ensureActive
-+import kotlinx.coroutines.tasks.await
  import kotlinx.coroutines.withContext
  import logcat.LogPriority
  import tachiyomi.core.common.util.system.logcat
-+import kotlin.coroutines.coroutineContext
- 
+@@ -16,82 +19,158 @@ import tachiyomi.core.common.util.system.logcat
  class MlKitOcrEngine(
      context: Context,
      override val language: TextRecognizerLanguage,
@@ -37360,19 +37505,37 @@ index 6e0e8b1..ed823df 100644
  ) : OcrEngine {
      override val type = OcrEngineType.ML_KIT
  
-@@ -35,20 +40,17 @@ class MlKitOcrEngine(
-     override suspend fun recognize(image: OcrImage): OcrPage = withContext(Dispatchers.IO) {
-         val pageStart = System.nanoTime()
-         try {
-+            if (stripsEnabled() && language == TextRecognizerLanguage.ENGLISH) {
-+                recognizeStrips(image, pageStart)?.let { return@withContext it }
+     private val appContext = context.applicationContext
+     private val initializationStart = System.nanoTime()
+-    private val recognizer = TextRecognition.getClient(
+-        when (language) {
+-            TextRecognizerLanguage.ENGLISH -> TextRecognizerOptions.DEFAULT_OPTIONS
+-            TextRecognizerLanguage.CHINESE -> ChineseTextRecognizerOptions.Builder().build()
+-            TextRecognizerLanguage.JAPANESE -> JapaneseTextRecognizerOptions.Builder().build()
+-            TextRecognizerLanguage.KOREAN -> KoreanTextRecognizerOptions.Builder().build()
+-        },
+-    )
++    private val recognizer =
++        TextRecognition.getClient(
++            when (language) {
++                TextRecognizerLanguage.ENGLISH -> TextRecognizerOptions.DEFAULT_OPTIONS
++                TextRecognizerLanguage.CHINESE -> ChineseTextRecognizerOptions.Builder().build()
++                TextRecognizerLanguage.JAPANESE -> JapaneseTextRecognizerOptions.Builder().build()
++                TextRecognizerLanguage.KOREAN -> KoreanTextRecognizerOptions.Builder().build()
 +            }
-             val inputImage = InputImage.fromFilePath(appContext, image.uri)
-             val ocrStart = System.nanoTime()
-             val result = recognizer.process(inputImage).await()
-             val ocrTimeMs = elapsedMs(ocrStart)
-             val blocks = result.textBlocks.mapNotNull { block ->
-                 val bounds = block.boundingBox ?: return@mapNotNull null
++        )
+     private val initializationTimeMs = elapsedMs(initializationStart)
+     private var initializationReported = false
+ 
+-    override suspend fun recognize(image: OcrImage): OcrPage = withContext(Dispatchers.IO) {
+-        val pageStart = System.nanoTime()
+-        try {
+-            val inputImage = InputImage.fromFilePath(appContext, image.uri)
+-            val ocrStart = System.nanoTime()
+-            val result = recognizer.process(inputImage).await()
+-            val ocrTimeMs = elapsedMs(ocrStart)
+-            val blocks = result.textBlocks.mapNotNull { block ->
+-                val bounds = block.boundingBox ?: return@mapNotNull null
 -                val firstSymbolBounds = block.lines
 -                    .firstOrNull()
 -                    ?.elements
@@ -37381,14 +37544,57 @@ index 6e0e8b1..ed823df 100644
 -                    ?.firstOrNull()
 -                    ?.boundingBox
 -
-+                val firstSymbolBounds = block.lines.firstOrNull()?.elements?.firstOrNull()
-+                    ?.symbols?.firstOrNull()?.boundingBox
-                 OcrTextBlock(
-                     text = block.text,
-                     x = bounds.left.toFloat(),
-@@ -60,23 +62,7 @@ class MlKitOcrEngine(
-                     angle = block.lines.firstOrNull()?.angle ?: 0f,
-                 )
+-                OcrTextBlock(
+-                    text = block.text,
+-                    x = bounds.left.toFloat(),
+-                    y = bounds.top.toFloat(),
+-                    width = bounds.width().toFloat(),
+-                    height = bounds.height().toFloat(),
+-                    symbolWidth = firstSymbolBounds?.width()?.toFloat() ?: 1f,
+-                    symbolHeight = firstSymbolBounds?.height()?.toFloat() ?: 1f,
+-                    angle = block.lines.firstOrNull()?.angle ?: 0f,
+-                )
++    override suspend fun recognize(image: OcrImage): OcrPage =
++        withContext(Dispatchers.IO) {
++            val pageStart = System.nanoTime()
++            try {
++                if (stripsEnabled() && language == TextRecognizerLanguage.ENGLISH) {
++                    recognizeStrips(image, pageStart)?.let {
++                        return@withContext it
++                    }
++                }
++                val inputImage = InputImage.fromFilePath(appContext, image.uri)
++                val ocrStart = System.nanoTime()
++                val result = awaitMlKitProcessing { recognizer.process(inputImage) }
++                val ocrTimeMs = elapsedMs(ocrStart)
++                val blocks =
++                    result.textBlocks.mapNotNull { block ->
++                        val bounds = block.boundingBox ?: return@mapNotNull null
++                        val firstSymbolBounds =
++                            block.lines
++                                .firstOrNull()
++                                ?.elements
++                                ?.firstOrNull()
++                                ?.symbols
++                                ?.firstOrNull()
++                                ?.boundingBox
++                        OcrTextBlock(
++                            text = block.text,
++                            x = bounds.left.toFloat(),
++                            y = bounds.top.toFloat(),
++                            width = bounds.width().toFloat(),
++                            height = bounds.height().toFloat(),
++                            symbolWidth = firstSymbolBounds?.width()?.toFloat() ?: 1f,
++                            symbolHeight = firstSymbolBounds?.height()?.toFloat() ?: 1f,
++                            angle = block.lines.firstOrNull()?.angle ?: 0f,
++                        )
++                    }
++                finishPage(inputImage.width, inputImage.height, blocks, pageStart, ocrTimeMs, 1)
++            } catch (error: Throwable) {
++                logcat(LogPriority.ERROR, error) {
++                    "OCR failure engine=ML_KIT totalMs=${elapsedMs(pageStart)} error=${error::class.simpleName}"
++                }
++                throw error
              }
 -            val reportedInitializationMs = if (initializationReported) 0L else initializationTimeMs
 -            initializationReported = true
@@ -37396,27 +37602,8 @@ index 6e0e8b1..ed823df 100644
 -            logcat(LogPriority.INFO) {
 -                "OCR page engine=ML_KIT initMs=$reportedInitializationMs ocrMs=$ocrTimeMs " +
 -                    "totalMs=$totalTimeMs blocks=${blocks.size}"
--            }
--            OcrPage(
--                width = inputImage.width,
--                height = inputImage.height,
--                blocks = blocks,
--                metrics = OcrPerformanceMetrics(
--                    initializationTimeMs = reportedInitializationMs,
--                    ocrTimeMs = ocrTimeMs,
--                    totalTimeMs = totalTimeMs,
--                ),
--            )
-+            finishPage(inputImage.width, inputImage.height, blocks, pageStart, ocrTimeMs, 1)
-         } catch (error: Throwable) {
-             logcat(LogPriority.ERROR, error) {
-                 "OCR failure engine=ML_KIT totalMs=${elapsedMs(pageStart)} error=${error::class.simpleName}"
-@@ -85,13 +71,91 @@ class MlKitOcrEngine(
-         }
-     }
- 
--    override suspend fun release() {
--        recognizer.close()
++        }
++
 +    private suspend fun recognizeStrips(image: OcrImage, pageStart: Long): OcrPage? {
 +        val source = OcrStripImage.open(image) ?: return null
 +        val lines = mutableListOf<StripOcrLine>()
@@ -37429,18 +37616,28 @@ index 6e0e8b1..ed823df 100644
 +                    val ocrStart = System.nanoTime()
 +                    // ML Kit's Task cannot be cancelled with the coroutine. Wait for
 +                    // this one region before recycling its pixels or closing the engine.
-+                    val text = withContext(NonCancellable) {
-+                        recognizer.process(InputImage.fromBitmap(bitmap, 0)).await()
++                    val text = awaitMlKitProcessing {
++                        recognizer.process(InputImage.fromBitmap(bitmap, 0))
 +                    }
 +                    ocrTimeMs += elapsedMs(ocrStart)
 +                    coroutineContext.ensureActive()
-+                    lines += text.textBlocks.flatMap { it.lines }.mapNotNull { line ->
-+                        toStripLine(line, strip, index)
-+                    }
++                    lines +=
++                        text.textBlocks
++                            .flatMap { it.lines }
++                            .mapNotNull { line -> toStripLine(line, strip, index) }
 +                } finally {
 +                    bitmap.recycle()
 +                }
-+            }
+             }
+-            OcrPage(
+-                width = inputImage.width,
+-                height = inputImage.height,
+-                blocks = blocks,
+-                metrics = OcrPerformanceMetrics(
+-                    initializationTimeMs = reportedInitializationMs,
+-                    ocrTimeMs = ocrTimeMs,
+-                    totalTimeMs = totalTimeMs,
+-                ),
 +        }
 +        return finishPage(
 +            source.width,
@@ -37455,28 +37652,36 @@ index 6e0e8b1..ed823df 100644
 +    private fun toStripLine(line: Text.Line, strip: OcrStrip, index: Int): StripOcrLine? {
 +        val bounds = line.boundingBox ?: return null
 +        if (bounds.width() <= 0 || bounds.height() <= 0) return null
-+        val symbols = line.elements.flatMap { it.symbols }.mapNotNull { it.boundingBox }
-+            .filter { it.width() > 0 && it.height() > 0 }
++        val symbols =
++            line.elements
++                .flatMap { it.symbols }
++                .mapNotNull { it.boundingBox }
++                .filter { it.width() > 0 && it.height() > 0 }
 +        val widths = symbols.map { it.width() }.sorted()
 +        val heights = symbols.map { it.height() }.sorted()
-+        val block = OcrTextBlock(
-+            text = line.text,
-+            x = bounds.left.toFloat(),
-+            y = (strip.top + bounds.top).toFloat(),
-+            width = bounds.width().toFloat(),
-+            height = bounds.height().toFloat(),
-+            symbolWidth = widths.getOrNull(widths.size / 2)?.toFloat() ?: 1f,
-+            symbolHeight = heights.getOrNull(heights.size / 2)?.toFloat() ?: 1f,
-+            angle = line.angle,
-+        )
++        val block =
++            OcrTextBlock(
++                text = line.text,
++                x = bounds.left.toFloat(),
++                y = (strip.top + bounds.top).toFloat(),
++                width = bounds.width().toFloat(),
++                height = bounds.height().toFloat(),
++                symbolWidth = widths.getOrNull(widths.size / 2)?.toFloat() ?: 1f,
++                symbolHeight = heights.getOrNull(heights.size / 2)?.toFloat() ?: 1f,
++                angle = line.angle,
+             )
+-        } catch (error: Throwable) {
+-            logcat(LogPriority.ERROR, error) {
+-                "OCR failure engine=ML_KIT totalMs=${elapsedMs(pageStart)} error=${error::class.simpleName}"
+-            }
+-            throw error
 +        return StripOcrLine(
 +            block,
 +            index,
 +            minOf(bounds.top, strip.bottom - strip.top - bounds.bottom).toFloat().coerceAtLeast(0f),
 +        )
-     }
- 
--    private fun elapsedMs(startNanos: Long): Long = (System.nanoTime() - startNanos) / NANOS_PER_MILLISECOND
++    }
++
 +    private fun finishPage(
 +        width: Int,
 +        height: Int,
@@ -37491,21 +37696,24 @@ index 6e0e8b1..ed823df 100644
 +        logcat(LogPriority.INFO) {
 +            "OCR page engine=ML_KIT initMs=$reportedInitializationMs ocrMs=$ocrTimeMs " +
 +                "totalMs=$totalTimeMs blocks=${blocks.size} strips=$strips"
-+        }
+         }
 +        return OcrPage(
 +            width,
 +            height,
 +            blocks,
 +            OcrPerformanceMetrics(reportedInitializationMs, ocrTimeMs, totalTimeMs),
 +        )
-+    }
+     }
  
+     override suspend fun release() {
+         recognizer.close()
+     }
+ 
+-    private fun elapsedMs(startNanos: Long): Long = (System.nanoTime() - startNanos) / NANOS_PER_MILLISECOND
+-
 -    private companion object {
 -        const val NANOS_PER_MILLISECOND = 1_000_000L
-+    override suspend fun release() {
-+        recognizer.close()
-     }
-+
+-    }
 +    private fun elapsedMs(startNanos: Long): Long = (System.nanoTime() - startNanos) / 1_000_000L
  }
 diff --git a/app/src/main/java/eu/kanade/translation/recognizer/OcrEngineFactory.kt b/app/src/main/java/eu/kanade/translation/recognizer/OcrEngineFactory.kt
@@ -38717,6 +38925,175 @@ index 1f99c17..4f8b5fe 100644
      val type = detail::class.java.simpleName.ifBlank { "Throwable" }
      var detailMessage = detail.message.orEmpty()
      if (apiKey.isNotBlank()) detailMessage = detailMessage.replace(apiKey, "[REDACTED]")
+diff --git a/app/src/main/java/eu/kanade/translation/translator/MLKitTranslator.kt b/app/src/main/java/eu/kanade/translation/translator/MLKitTranslator.kt
+index 8cfbb58..194902d 100644
+--- a/app/src/main/java/eu/kanade/translation/translator/MLKitTranslator.kt
++++ b/app/src/main/java/eu/kanade/translation/translator/MLKitTranslator.kt
+@@ -1,25 +1,33 @@
+ package eu.kanade.translation.translator
+ 
+-import kotlinx.coroutines.tasks.await
+ import com.google.mlkit.common.model.DownloadConditions
+ import com.google.mlkit.nl.translate.TranslateLanguage
+ import com.google.mlkit.nl.translate.Translation
+ import com.google.mlkit.nl.translate.TranslatorOptions
++import eu.kanade.translation.awaitMlKitProcessing
+ import eu.kanade.translation.memory.TranslationCache
+ import eu.kanade.translation.memory.TranslationGlossary
+ import eu.kanade.translation.model.PageTranslation
+ import eu.kanade.translation.recognizer.TextRecognizerLanguage
++import kotlin.coroutines.coroutineContext
++import kotlinx.coroutines.CancellationException
++import kotlinx.coroutines.ensureActive
++import kotlinx.coroutines.tasks.await
+ 
+ class MLKitTranslator(
+     override val fromLang: TextRecognizerLanguage,
+     override val toLang: TextTranslatorLanguage,
+ ) : TextTranslator {
+ 
+-    private var translator = Translation.getClient(
+-        TranslatorOptions.Builder().setSourceLanguage(fromLang.code)
+-            .setTargetLanguage(TranslateLanguage.fromLanguageTag(toLang.code) ?: TranslateLanguage.ENGLISH)
+-            .build(),
+-    )
++    private var translator =
++        Translation.getClient(
++            TranslatorOptions.Builder()
++                .setSourceLanguage(fromLang.code)
++                .setTargetLanguage(
++                    TranslateLanguage.fromLanguageTag(toLang.code) ?: TranslateLanguage.ENGLISH
++                )
++                .build()
++        )
+ 
+     private var conditions = DownloadConditions.Builder().build()
+ 
+@@ -27,6 +35,7 @@ class MLKitTranslator(
+         pages: MutableMap<String, PageTranslation>,
+         context: ComicTranslationContext,
+     ) {
++        coroutineContext.ensureActive()
+         val sequentialBlocks = pages.values.flatMap { it.blocks }
+         if (sequentialBlocks.isEmpty()) return
+ 
+@@ -37,27 +46,32 @@ class MLKitTranslator(
+         // Avoid even loading/downloading the ML Kit model when the complete set
+         // is already known. For partial misses we keep the original full batch
+         // so neighboring dialogue continues to provide translation context.
+-        val translations = if (cached.all { it != null }) {
+-            cached.map { it.orEmpty() }
+-        } else {
+-            translator.downloadModelIfNeeded(conditions).await()
+-            translateBlocksWithContext(
+-                texts = preparedTexts.map { it.textForTranslation },
+-                sourceTextsForPostEdit = normalizedTexts,
+-            )
+-        }
++        val translations =
++            if (cached.all { it != null }) {
++                cached.map { it.orEmpty() }
++            } else {
++                translator.downloadModelIfNeeded(conditions).await()
++                translateBlocksWithContext(
++                    texts = preparedTexts.map { it.textForTranslation },
++                    sourceTextsForPostEdit = normalizedTexts,
++                )
++            }
+ 
+         sequentialBlocks.forEachIndexed { index, block ->
+-            val finalTranslation = cached[index] ?: TranslationGlossary.resolve(
+-                prepared = preparedTexts[index],
+-                translatedText = translations[index],
+-                context = context,
+-            )
+-            block.translation = TranslationGlossary.apply(
+-                sourceText = block.text,
+-                translatedText = finalTranslation,
+-                context = context,
+-            )
++            coroutineContext.ensureActive()
++            val finalTranslation =
++                cached[index]
++                    ?: TranslationGlossary.resolve(
++                        prepared = preparedTexts[index],
++                        translatedText = translations[index],
++                        context = context,
++                    )
++            block.translation =
++                TranslationGlossary.apply(
++                    sourceText = block.text,
++                    translatedText = finalTranslation,
++                    context = context,
++                )
+             if (cached[index] == null) {
+                 TranslationCache.put(
+                     context = context,
+@@ -76,33 +90,49 @@ class MLKitTranslator(
+     ): List<String> {
+         val normalizedTexts = texts.map(::normalizeOcrText)
+         val translations = MutableList(normalizedTexts.size) { "" }
+-        val chunks = buildMachineTranslationChunks(
+-            texts = normalizedTexts,
+-            maxCharacters = MLKIT_CONTEXT_MAX_CHARACTERS,
+-            maxItems = MLKIT_CONTEXT_MAX_ITEMS,
+-        )
++        val chunks =
++            buildMachineTranslationChunks(
++                texts = normalizedTexts,
++                maxCharacters = MLKIT_CONTEXT_MAX_CHARACTERS,
++                maxItems = MLKIT_CONTEXT_MAX_ITEMS,
++            )
+ 
+         chunks.forEach { chunk ->
+-            val contextualResult = runCatching {
+-                translator.translate(buildMarkedMachineTranslationText(chunk)).await()
+-            }.getOrNull()
+-            val parsedTranslations = contextualResult?.let {
+-                parseMarkedMachineTranslations(it, chunk)
+-            }
++            coroutineContext.ensureActive()
++            val contextualResult =
++                try {
++                    awaitMlKitProcessing {
++                        translator.translate(buildMarkedMachineTranslationText(chunk))
++                    }
++                } catch (cancelled: CancellationException) {
++                    throw cancelled
++                } catch (_: Exception) {
++                    null
++                }
++            val parsedTranslations =
++                contextualResult?.let { parseMarkedMachineTranslations(it, chunk) }
+ 
+             if (parsedTranslations != null) {
+                 parsedTranslations.forEach { (index, value) -> translations[index] = value }
+             } else {
+                 chunk.forEach { item ->
+-                    translations[item.index] = translator.translate(item.value).await()
++                    translations[item.index] = awaitMlKitProcessing {
++                        translator.translate(item.value)
++                    }
+                 }
+             }
+         }
+ 
+         findSuspiciousDuplicateTranslationIndices(normalizedTexts, translations).forEach { index ->
+-            val individualTranslation = runCatching {
+-                translator.translate(normalizedTexts[index]).await()
+-            }.getOrNull()
++            coroutineContext.ensureActive()
++            val individualTranslation =
++                try {
++                    awaitMlKitProcessing { translator.translate(normalizedTexts[index]) }
++                } catch (cancelled: CancellationException) {
++                    throw cancelled
++                } catch (_: Exception) {
++                    null
++                }
+             if (!individualTranslation.isNullOrBlank()) {
+                 translations[index] = individualTranslation
+             }
 diff --git a/app/src/main/java/eu/kanade/translation/translator/OpenRouterTranslator.kt b/app/src/main/java/eu/kanade/translation/translator/OpenRouterTranslator.kt
 index 4c611ee..69ca99b 100644
 --- a/app/src/main/java/eu/kanade/translation/translator/OpenRouterTranslator.kt
@@ -69440,6 +69817,340 @@ index 0000000..b6da299
 +        val failed = info(WorkInfo.State.FAILED, 200)
 +        assertEquals(failed, EnglishTranslationSetupJob.latest(listOf(failed, older)))
 +        assertNull(EnglishTranslationSetupJob.latest(emptyList()))
++    }
++}
+diff --git a/app/src/test/java/eu/kanade/translation/MlKitProcessingTest.kt b/app/src/test/java/eu/kanade/translation/MlKitProcessingTest.kt
+new file mode 100644
+index 0000000..248b818
+--- /dev/null
++++ b/app/src/test/java/eu/kanade/translation/MlKitProcessingTest.kt
+@@ -0,0 +1,328 @@
++package eu.kanade.translation
++
++import com.google.android.gms.tasks.TaskCompletionSource
++import com.google.android.gms.tasks.Tasks
++import eu.kanade.translation.recognizer.*
++import java.io.IOException
++import kotlinx.coroutines.CancellationException
++import kotlinx.coroutines.CoroutineStart
++import kotlinx.coroutines.async
++import kotlinx.coroutines.cancel
++import kotlinx.coroutines.launch
++import kotlinx.coroutines.test.runCurrent
++import kotlinx.coroutines.test.runTest
++import org.junit.jupiter.api.Assertions.*
++import org.junit.jupiter.api.Test
++import org.junit.jupiter.api.assertThrows
++
++/** Actual Google Tasks + production engine coordinator; inference/model loading is not run. */
++@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
++class MlKitProcessingTest {
++    private class Engine(
++        override val type: OcrEngineType,
++        override val language: TextRecognizerLanguage,
++    ) : OcrEngine {
++        var releases = 0
++
++        override suspend fun recognize(image: OcrImage): OcrPage =
++            error("No native inference in this control")
++
++        override suspend fun release() {
++            releases++
++        }
++    }
++
++    @Test
++    fun `cancelling OCR cannot close the engine while its Google Task is pending`() = runTest {
++        val task = TaskCompletionSource<String>()
++        val engines = mutableListOf<Engine>()
++        val manager = OcrEngineManager { type, language ->
++            Engine(type, language).also(engines::add)
++        }
++        val job = launch {
++            manager.withEngine(OcrEngineType.ML_KIT, TextRecognizerLanguage.ENGLISH) {
++                awaitMlKitProcessing<String> { task.task }
++            }
++        }
++        runCurrent()
++        job.cancel()
++        val release = async { manager.release() }
++        runCurrent()
++        try {
++            assertFalse(task.task.isComplete)
++            assertFalse(release.isCompleted)
++            assertEquals(0, engines.single().releases)
++        } finally {
++            task.trySetResult("finished")
++            job.join()
++            release.await()
++        }
++        assertTrue(job.isCancelled)
++        assertEquals(1, engines.single().releases)
++    }
++
++    @Test
++    fun `engine replacement waits for cancelled native work to actually finish`() = runTest {
++        val task = TaskCompletionSource<String>()
++        val engines = mutableListOf<Engine>()
++        val manager = OcrEngineManager { type, language ->
++            Engine(type, language).also(engines::add)
++        }
++        val job = launch {
++            manager.withEngine(OcrEngineType.ML_KIT, TextRecognizerLanguage.ENGLISH) {
++                awaitMlKitProcessing<String> { task.task }
++            }
++        }
++        runCurrent()
++        job.cancel()
++        val replacement = async {
++            manager.withEngine(OcrEngineType.PADDLE_OCR, TextRecognizerLanguage.ENGLISH) { it.type }
++        }
++        runCurrent()
++        try {
++            assertFalse(replacement.isCompleted)
++            assertEquals(1, engines.size)
++            assertEquals(0, engines.first().releases)
++        } finally {
++            task.trySetResult("finished")
++            job.join()
++            replacement.await()
++            manager.release()
++        }
++    }
++
++    @Test
++    fun `an owned translation client is closed only after cancelled processing has settled`() =
++        runTest {
++            val task = TaskCompletionSource<String>()
++            var closed = false
++            var applied = false
++            val job = launch {
++                try {
++                    awaitMlKitProcessing<String> { task.task }
++                    applied = true
++                } finally {
++                    closed = true
++                }
++            }
++            runCurrent()
++            job.cancel()
++            runCurrent()
++            try {
++                assertFalse(closed)
++                assertFalse(task.task.isComplete)
++            } finally {
++                task.trySetResult("finished")
++                job.join()
++            }
++            assertTrue(closed)
++            assertFalse(applied)
++        }
++
++    @Test
++    fun `completed and delayed tasks return the SDK result while the caller is active`() = runTest {
++        assertEquals("ready", awaitMlKitProcessing { Tasks.forResult("ready") })
++        val source = TaskCompletionSource<String>()
++        val pending = async { awaitMlKitProcessing { source.task } }
++        runCurrent()
++        assertFalse(pending.isCompleted)
++        source.setResult("later")
++        assertEquals("later", pending.await())
++    }
++
++    @Test
++    fun `a failed task preserves its cause and releases the engine for another request`() =
++        runTest {
++            val engine = Engine(OcrEngineType.ML_KIT, TextRecognizerLanguage.ENGLISH)
++            val manager = OcrEngineManager { _, _ -> engine }
++            val failure = IOException("Synthetic SDK failure")
++            val observed =
++                assertThrows<IOException> {
++                    manager.withEngine<String>(engine.type, engine.language) {
++                        awaitMlKitProcessing { Tasks.forException<String>(failure) }
++                    }
++                }
++            assertEquals(failure.javaClass, observed.javaClass)
++            assertEquals(failure.message, observed.message)
++            assertTrue(generateSequence<Throwable>(observed) { it.cause }.any { it === failure })
++            assertEquals(
++                "recovered",
++                manager.withEngine<String>(engine.type, engine.language) {
++                    awaitMlKitProcessing { Tasks.forResult("recovered") }
++                },
++            )
++            manager.release()
++            assertEquals(1, engine.releases)
++        }
++
++    @Test
++    fun `late SDK failure after cancellation cannot publish a result or leak the client`() =
++        runTest {
++            val source = TaskCompletionSource<String>()
++            var closed = false
++            var applied = false
++            val pending = launch {
++                try {
++                    awaitMlKitProcessing<String> { source.task }
++                    applied = true
++                } finally {
++                    closed = true
++                }
++            }
++            runCurrent()
++            pending.cancel()
++            runCurrent()
++            assertFalse(closed)
++            source.setException(IOException("Late failure"))
++            pending.join()
++            assertTrue(pending.isCancelled)
++            assertTrue(closed)
++            assertFalse(applied)
++        }
++
++    @Test
++    fun `a task cancelled by the SDK is already terminal and does not block release`() = runTest {
++        val engine = Engine(OcrEngineType.ML_KIT, TextRecognizerLanguage.ENGLISH)
++        val manager = OcrEngineManager { _, _ -> engine }
++        assertThrows<CancellationException> {
++            manager.withEngine<String>(engine.type, engine.language) {
++                awaitMlKitProcessing { Tasks.forCanceled<String>() }
++            }
++        }
++        manager.release()
++        assertEquals(1, engine.releases)
++    }
++
++    @Test
++    fun `an already cancelled caller cannot start or accept an already completed task`() = runTest {
++        var starts = 0
++        var applied = false
++        val job =
++            launch(start = CoroutineStart.UNDISPATCHED) {
++                coroutineContext.cancel()
++                awaitMlKitProcessing {
++                    starts++
++                    Tasks.forResult("stale")
++                }
++                applied = true
++            }
++        job.join()
++        assertTrue(job.isCancelled)
++        assertEquals(0, starts)
++        assertFalse(applied)
++    }
++
++    @Test
++    fun `synchronous task creation failure cannot leave the engine locked`() = runTest {
++        val engine = Engine(OcrEngineType.ML_KIT, TextRecognizerLanguage.ENGLISH)
++        val manager = OcrEngineManager { _, _ -> engine }
++        val failure = IllegalStateException("Cannot start SDK operation")
++        val observed =
++            assertThrows<IllegalStateException> {
++                manager.withEngine<String>(engine.type, engine.language) {
++                    awaitMlKitProcessing { throw failure }
++                }
++            }
++        assertEquals(failure.javaClass, observed.javaClass)
++        assertEquals(failure.message, observed.message)
++        assertTrue(generateSequence<Throwable>(observed) { it.cause }.any { it === failure })
++        manager.release()
++        assertEquals(1, engine.releases)
++    }
++
++    @Test
++    fun `cancelling a queued caller never starts another SDK operation`() = runTest {
++        val first = TaskCompletionSource<String>()
++        val manager = OcrEngineManager { type, language -> Engine(type, language) }
++        var starts = 0
++        val owner = launch {
++            manager.withEngine<String>(OcrEngineType.ML_KIT, TextRecognizerLanguage.ENGLISH) {
++                awaitMlKitProcessing {
++                    starts++
++                    first.task
++                }
++            }
++        }
++        runCurrent()
++        val queued = launch {
++            manager.withEngine<String>(OcrEngineType.ML_KIT, TextRecognizerLanguage.ENGLISH) {
++                awaitMlKitProcessing {
++                    starts++
++                    Tasks.forResult("must not start")
++                }
++            }
++        }
++        runCurrent()
++        queued.cancel()
++        queued.join()
++        assertEquals(1, starts)
++        first.setResult("done")
++        owner.join()
++        manager.release()
++    }
++
++    @Test
++    fun `two callers sharing an engine keep SDK processing serialized`() = runTest {
++        val first = TaskCompletionSource<String>()
++        val second = TaskCompletionSource<String>()
++        val engine = Engine(OcrEngineType.ML_KIT, TextRecognizerLanguage.ENGLISH)
++        val manager = OcrEngineManager { _, _ -> engine }
++        var starts = 0
++        val a = async {
++            manager.withEngine<String>(engine.type, engine.language) {
++                awaitMlKitProcessing {
++                    starts++
++                    first.task
++                }
++            }
++        }
++        runCurrent()
++        val b = async {
++            manager.withEngine<String>(engine.type, engine.language) {
++                awaitMlKitProcessing {
++                    starts++
++                    second.task
++                }
++            }
++        }
++        runCurrent()
++        assertEquals(1, starts)
++        first.setResult("a")
++        assertEquals("a", a.await())
++        runCurrent()
++        assertEquals(2, starts)
++        assertFalse(b.isCompleted)
++        second.setResult("b")
++        assertEquals("b", b.await())
++        manager.release()
++        assertEquals(1, engine.releases)
++    }
++
++    @Test
++    fun `repeated cancellation and release waiters close the same engine once`() = runTest {
++        val source = TaskCompletionSource<String>()
++        val engine = Engine(OcrEngineType.ML_KIT, TextRecognizerLanguage.ENGLISH)
++        val manager = OcrEngineManager { _, _ -> engine }
++        val job = launch {
++            manager.withEngine<String>(engine.type, engine.language) {
++                awaitMlKitProcessing { source.task }
++            }
++        }
++        runCurrent()
++        job.cancel()
++        job.cancel()
++        val a = async { manager.release() }
++        val b = async { manager.release() }
++        runCurrent()
++        try {
++            assertFalse(a.isCompleted || b.isCompleted)
++            assertEquals(0, engine.releases)
++        } finally {
++            source.trySetResult("done")
++            job.join()
++            a.await()
++            b.await()
++        }
++        assertEquals(1, engine.releases)
 +    }
 +}
 diff --git a/app/src/test/java/eu/kanade/translation/SourceTranslationLanguageTest.kt b/app/src/test/java/eu/kanade/translation/SourceTranslationLanguageTest.kt

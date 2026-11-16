@@ -1,0 +1,31 @@
+{
+  "revision": "P20261115.5",
+  "status": "BUILD_AND_RETAINED_JVM_TESTS_PASSED",
+  "build_result": "BUILD SUCCESSFUL in 2m 29s",
+  "selected_tasks": {
+    ":domain:testDebugUnitTest": "UP-TO-DATE",
+    ":data:testDebugUnitTest": "NO-SOURCE",
+    ":source-api:testDebugUnitTest": "NO-SOURCE",
+    ":app:compileDebugKotlin": "EXECUTED",
+    ":app:compileDebugAndroidTestKotlin": "EXECUTED",
+    ":app:testDebugUnitTest": "EXECUTED"
+  },
+  "app_executed_passed": 901,
+  "domain_previously_passed_up_to_date": 85,
+  "total_reported_passed": 986,
+  "new_tests_passed": 12,
+  "missing_baseline_cases": 0,
+  "failed_or_skipped": 0,
+  "overlay_tests_passed": 4,
+  "packaging_tests_passed": 16,
+  "android_instrumentation": "COMPILED_NOT_EXECUTED",
+  "ocr_models_or_native_inference_executed": false,
+  "a12_arm_benchmark": "NOT_RUN",
+  "model_downloads_remain_cancellable": true,
+  "build_dependencies_unchanged": true,
+  "sandbox_runtime_classes": [],
+  "sandbox_manifest_components": [],
+  "ocr_worker_preserved": true,
+  "new_apk": false,
+  "new_release": false
+}

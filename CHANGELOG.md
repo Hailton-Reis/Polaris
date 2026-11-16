@@ -2,6 +2,17 @@
 
 Este arquivo registra a evolução real do código. **Revisões de desenvolvimento não são lançamentos públicos.** As datas abaixo usam America/Fortaleza, exceto quando houver indicação de UTC. O histórico de distribuição fica em [Releases](https://github.com/Hailton-Reis/Polaris/releases).
 
+## Desenvolvimento · P20261115.5 — 15/11/2026
+
+**Estado:** continuação da beta.11/código 112, na frente de leitura/OCR/tradução. Sem novo APK ou Release.
+
+- Cancelar o await podia liberar/trocar o motor de OCR ou fechar um cliente enquanto a Task do SDK ainda estava pendente. A proteção compartilhada aguarda o processamento iniciado terminar e reconfere o chamador antes de entregar o resultado.
+- OCR de página inteira/faixas e tradução de quadrinhos/documentos usam o limite; cancelamento não é tratado como motivo para outra inferência. Checkpoints protegem também o percurso/aplicação de cache. Downloads de modelos continuam canceláveis; não há modelos/dependências/processos/opções novos.
+- Três falhas reproduzidas com Tasks reais/coordenador de produção e motor de controle. Compilação aprovada; 901 testes do app aprovados (12 novos), mais 85 anteriores de domain/UP-TO-DATE. Nenhum caso anterior ausente. Overlay4/empacotamento16 aprovados; dois controles Android compilados, não executados.
+- Não foi executada inferência/modelo nessa validação. Diagnóstico A12/ARM, qualidade e medições de memória/desempenho continuam pendentes. A proteção não acrescenta timeout capaz de interromper uma Task nativa que não conclua.
+
+[Escopo](docs/CANCELAMENTO_MLKIT_P20261115_5.md) · [Evidências filtradas](integration/mlkit-cancellation/20261115/README.md).
+
 ## Desenvolvimento · P20261115.4 — 15/11/2026
 
 **Estado:** continuação da beta.11/código 112, na frente de backups. Sem novo APK ou Release.
