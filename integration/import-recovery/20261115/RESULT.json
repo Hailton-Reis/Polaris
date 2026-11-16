@@ -1,0 +1,56 @@
+{
+  "revision": "P20261115.1",
+  "status": "SEALED_IMPORT_RECOVERY_COMPILE_AND_UNIT_PASS",
+  "active_priorities": [
+    "storage",
+    "backups",
+    "reading",
+    "distribution"
+  ],
+  "sandbox_paused": true,
+  "unit_tests": {
+    "app": {
+      "total": 945,
+      "passed": 945,
+      "failed": 0,
+      "skipped": 0
+    },
+    "domain": {
+      "total": 85,
+      "passed": 85,
+      "failed": 0,
+      "skipped": 0
+    }
+  },
+  "unit_execution": {
+    "app": "fresh",
+    "domain": "up-to-date"
+  },
+  "new_unit_tests": 14,
+  "red_tests": 3,
+  "red_failures": 3,
+  "missing_baseline_cases": 0,
+  "android_app_compile": true,
+  "android_test_compile": true,
+  "new_android_cases_compiled": 2,
+  "android_runtime_executed": false,
+  "user_device_testing": "DEFERRED_UNTIL_CONSOLIDATION",
+  "overlay_tests_passed": 4,
+  "packaging_tests_passed": 16,
+  "selected_gradle_outcomes": [
+    "> Task :domain:testDebugUnitTest UP-TO-DATE",
+    "> Task :data:testDebugUnitTest NO-SOURCE",
+    "> Task :source-api:testDebugUnitTest NO-SOURCE",
+    "> Task :app:compileDebugKotlin",
+    "> Task :app:compileDebugAndroidTestKotlin",
+    "> Task :app:testDebugUnitTest",
+    "BUILD SUCCESSFUL in 2m 30s"
+  ],
+  "import_marker_version": 1,
+  "backup_format_changed": false,
+  "sql_schema_changed": false,
+  "account_cloud_sync": "DEFERRED_BY_USER",
+  "new_app_apk_built": false,
+  "release_published": false,
+  "publication": "Readable results only; raw logs/XML remain local."
+}

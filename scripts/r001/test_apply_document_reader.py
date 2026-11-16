@@ -32,10 +32,22 @@ class DocumentOverlayTests(unittest.TestCase):
             subprocess.run([sys.executable, str(PROJECT / script), str(self.root)],
                            check=True, capture_output=True)
 
-    def verify_fixture_bytes(self):
-        expected = json.loads((PROJECT / 'integration/sandbox-settings/20261110/fixture/provenance.json').read_text())['sha256']
-        actual = self.root / 'app/src/androidTest/assets/polaris-sandbox/fixture.apk'
-        self.assertEqual(hashlib.sha256(actual.read_bytes()).hexdigest(), expected)
+    def verify_sandbox_removed(self):
+        import xml.etree.ElementTree as ET
+        android_name = '{http://schemas.android.com/apk/res/android}name'
+        for variant in ('main', 'debug'):
+            manifest = ET.parse(self.root / f'app/src/{variant}/AndroidManifest.xml').getroot()
+            for node in manifest.iter():
+                self.assertNotIn('sandbox', node.get(android_name, '').lower())
+        self.assertFalse((self.root / 'app/src/main/java/eu/kanade/tachiyomi/extension/sandbox').exists())
+        self.assertFalse((self.root / 'app/src/androidTest/assets/polaris-sandbox/fixture.apk').exists())
+        for variant in ('main', 'debug'):
+            for source in (self.root / f'app/src/{variant}').rglob('*.kt'):
+                self.assertNotIn('extension.sandbox.', source.read_text(), str(source))
+        # The independent OCR worker and language tests must survive this removal.
+        self.assertTrue((self.root / 'app/src/androidTest/java/eu/kanade/translation/AutomaticLanguageAndroidTest.kt').exists())
+        app = (self.root / 'app/src/main/java/eu/kanade/tachiyomi/App.kt').read_text()
+        self.assertIn('DbnetProcess.isWorker(this)', app)
 
     def verify_generated_icons(self):
         provenance = json.loads((PROJECT / 'design/polaris-grimoires/20261111/provenance.json').read_text())
@@ -57,16 +69,13 @@ class DocumentOverlayTests(unittest.TestCase):
         subprocess.run(['git', '-C', str(self.root), 'diff', '--check'], check=True)
         self.assertFalse((self.root / 'data/src/main/sqldelight/tachiyomi/migrations/15.sqm').exists())
         about = self.root / 'app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt'
-        self.assertIn('P20261112.1', about.read_text())
-        self.verify_fixture_bytes()
+        self.assertIn('P20261116.1', about.read_text())
+        self.verify_sandbox_removed()
         self.verify_generated_icons()
         self.assertTrue((self.root / 'app/src/main/java/eu/kanade/tachiyomi/source/selection/UnifiedWorkSearch.kt').exists())
         self.assertTrue((self.root / 'domain/src/main/java/tachiyomi/domain/manga/model/LibraryWork.kt').exists())
         self.assertTrue((self.root / 'domain/src/main/java/tachiyomi/domain/chapter/model/ChapterNumbering.kt').exists())
-        for name in ('SandboxFilterCodec.kt', 'SandboxPreferenceCodec.kt', 'SandboxPreferenceStore.kt', 'SandboxPreferenceUi.kt', 'SandboxCookieStore.kt'):
-            self.assertTrue((self.root / 'app/src/main/java/eu/kanade/tachiyomi/extension/sandbox' / name).exists())
         self.assertTrue((self.root / 'app/src/main/java/eu/kanade/domain/ui/model/LauncherIconRewards.kt').exists())
-        self.assertEqual(subprocess.check_output(['git', '-C', str(self.root), 'check-attr', 'text', '--', 'app/src/androidTest/assets/polaris-sandbox/fixture.apk'], text=True).strip().split(': ')[-1], 'unset')
         self.assertTrue((self.root / 'app/src/androidTest/java/eu/kanade/tachiyomi/polaris/LibraryConsolidationAndroidTest.kt').exists())
         self.assertFalse((self.root / 'app/src/main/java/eu/kanade/tachiyomi/data/profile/YomotsuLevelManager.kt').exists())
         self.assertFalse((self.root / 'app/src/main/res/drawable-nodpi/ic_yomotsu_logo.png').exists())
@@ -89,7 +98,7 @@ class DocumentOverlayTests(unittest.TestCase):
         self.prepare()
         self.assertEqual(apply(self.root)['status'], 'APPLIED')
         self.assertEqual(apply(self.root)['status'], 'ALREADY_APPLIED')
-        self.verify_fixture_bytes()
+        self.verify_sandbox_removed()
         self.verify_generated_icons()
 
     def test_prerequisite_and_migration_gate(self):

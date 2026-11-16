@@ -1,0 +1,86 @@
+{
+  "status": "NO_NEW_UNIT_REGRESSIONS",
+  "baseline": {
+    "total": 964,
+    "passed": 964,
+    "failed": 0,
+    "skipped": 0
+  },
+  "patched": {
+    "total": 975,
+    "passed": 975,
+    "failed": 0,
+    "skipped": 0
+  },
+  "preexisting_failures_still_present": 0,
+  "missing_baseline_tests": [],
+  "new_failures_or_skips": [],
+  "android_runtime_verified": false,
+  "gradle_exit_codes": {
+    "baseline": 0,
+    "patched": 0
+  },
+  "required_module_coverage": {
+    "app": 879,
+    "domain": 85
+  },
+  "baseline_origin": "Archived P20261113.7 reports (879 app + 85 domain); not rerun.",
+  "current_origin": "890 app tests freshly executed; 85 domain previously passed and UP-TO-DATE.",
+  "new_cases": [
+    {
+      "class": "eu.kanade.tachiyomi.data.backup.restore.BackupRestoreOrderingTest",
+      "name": "category failure prevents all later restore phases()",
+      "status": "passed"
+    },
+    {
+      "class": "eu.kanade.tachiyomi.data.backup.restore.BackupRestoreOrderingTest",
+      "name": "cancelling a blocked category phase never starts settings or library()",
+      "status": "passed"
+    },
+    {
+      "class": "eu.kanade.tachiyomi.data.backup.restore.BackupRestoreOrderingTest",
+      "name": "declining category import passes no mapping and preserves category settings()",
+      "status": "passed"
+    },
+    {
+      "class": "eu.kanade.tachiyomi.data.backup.restore.BackupRestoreOrderingTest",
+      "name": "Tachiyomi archive reaches library restore after its categories()",
+      "status": "passed"
+    },
+    {
+      "class": "eu.kanade.tachiyomi.data.backup.restore.BackupRestoreOrderingTest",
+      "name": "disabled restore options have no side effects()",
+      "status": "passed"
+    },
+    {
+      "class": "eu.kanade.tachiyomi.data.backup.restore.BackupRestoreOrderingTest",
+      "name": "library entries see committed categories on their first restore()",
+      "status": "passed"
+    },
+    {
+      "class": "eu.kanade.tachiyomi.data.backup.restore.BackupRestoreOrderingTest",
+      "name": "a categories only restore awaits its result and skips other phases()",
+      "status": "passed"
+    },
+    {
+      "class": "eu.kanade.tachiyomi.data.backup.restore.BackupRestoreOrderingTest",
+      "name": "independent settings still run concurrently after category readiness()",
+      "status": "passed"
+    },
+    {
+      "class": "eu.kanade.tachiyomi.data.backup.restore.BackupRestoreOrderingTest",
+      "name": "settings map imported category ids only after categories exist()",
+      "status": "passed"
+    },
+    {
+      "class": "eu.kanade.tachiyomi.data.backup.restore.BackupRestoreOrderingTest",
+      "name": "category cancellation is propagated before dependent mutations()",
+      "status": "passed"
+    },
+    {
+      "class": "eu.kanade.tachiyomi.data.backup.restore.BackupRestoreOrderingTest",
+      "name": "Mihon archive reaches library restore after its categories()",
+      "status": "passed"
+    }
+  ]
+}

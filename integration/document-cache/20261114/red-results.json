@@ -1,0 +1,37 @@
+{
+  "tests": 5,
+  "passed": 1,
+  "failed": 4,
+  "cases": [
+    {
+      "name": "unknown length cannot make equal timestamp edits look unchanged()",
+      "status": "failed",
+      "assertion": "org.opentest4j.AssertionFailedError: expected: <updated document> but was: <first document>"
+    },
+    {
+      "name": "reliable metadata retains the fast cache hit()",
+      "status": "passed"
+    },
+    {
+      "name": "unknown metadata changing bytes cannot return the previous cached document()",
+      "status": "failed",
+      "assertion": "org.opentest4j.AssertionFailedError: expected: <other document> but was: <first document>"
+    },
+    {
+      "name": "unknown metadata must not silently reuse a copy when the provider is unreadable()",
+      "status": "failed",
+      "assertion": "org.opentest4j.AssertionFailedError: Expected java.io.IOException to be thrown, but nothing was thrown."
+    },
+    {
+      "name": "unknown timestamp cannot make equal size edits look unchanged()",
+      "status": "failed",
+      "assertion": "org.opentest4j.AssertionFailedError: expected: <two> but was: <one>"
+    }
+  ],
+  "source_sha256": {
+    "core/archive/src/main/kotlin/mihon/core/archive/DocumentFiles.kt": "776a1a52db36a1c0d78a4c20688f005f980998a48b36176068bf1abe1e53566d",
+    "core/archive/src/main/kotlin/mihon/core/archive/DocumentCacheBudget.kt": "a50ea21581eefdd4bb39f2ac4690d0f3206c14330a285d22543a3f17c6edf6b2",
+    "app/src/test/java/eu/kanade/tachiyomi/ui/documents/DocumentMaterializationTest.kt": "2c880ea9861436d25498fdbded5d4e0c1935bfba5ebd0959521b0bbeaa6f4437"
+  },
+  "scope": "Previous real materializer; four stale/unreadable-provider regressions and one fast-path control."
+}

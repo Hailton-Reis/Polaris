@@ -2,9 +2,197 @@
 
 Este arquivo registra a evolução real do código. **Revisões de desenvolvimento não são lançamentos públicos.** As datas abaixo usam America/Fortaleza, exceto quando houver indicação de UTC. O histórico de distribuição fica em [Releases](https://github.com/Hailton-Reis/Polaris/releases).
 
+## Desenvolvimento · P20261116.1 — 16/11/2026
+
+**Estado:** APK interno beta.11/código 112 gerado e verificado; sem Release pública.
+
+- Variante `beta` conserva o ID `.dev` e certificado da beta.10, com depuração, testOnly e profiling por shell desativados. R8/remoção de recursos permanecem desativados para preservar o carregamento dinâmico já exercitado. Sobre identifica o canal Beta.
+- APK universal ARM32/ARM64 de 259.481.310 bytes; manifesto, identidade, revisão, marca e bibliotecas conferidos. Oito DEX/68.658 classes sem sandbox, harnesses ou bibliotecas JVM de teste; worker OCR Dbnet preservado. O pacote anterior foi preservado e recusado pelos novos verificadores.
+- Compilação final aprovada em 3min42s; 901 testes do app beta executados/aprovados, mais 85 de domain release aprovados antes da retomada e UP-TO-DATE no final. Total 986 sem falhas/skips ou casos anteriores ausentes; 4 testes de overlay, 27 de empacotamento e 21 do comparador aprovados. A primeira montagem parou por limite de disco após os testes; a retomada usou os mesmos fontes.
+- Exportador exige manifesto anterior e código crescente. Comparador seleciona as tarefas reais beta/release e recusa relatórios selecionados ausentes. Guias do pacote agora descrevem a beta.11 e a sandbox pausada/retirada.
+- Atualização e dados no aparelho, SAF/SQLite/interface de backups, leitores externos e qualidade/pico de memória no A12/ARM permanecem pendentes. Conta/nuvem e sandbox continuam adiadas.
+
+[Escopo](docs/DISTRIBUICAO_BETA_P20261116_1.md) · [Evidências filtradas](integration/distribution/20261116/README.md).
+
+## Desenvolvimento · P20261115.5 — 15/11/2026
+
+**Estado:** continuação da beta.11/código 112, na frente de leitura/OCR/tradução. Sem novo APK ou Release.
+
+- Cancelar o await podia liberar/trocar o motor de OCR ou fechar um cliente enquanto a Task do SDK ainda estava pendente. A proteção compartilhada aguarda o processamento iniciado terminar e reconfere o chamador antes de entregar o resultado.
+- OCR de página inteira/faixas e tradução de quadrinhos/documentos usam o limite; cancelamento não é tratado como motivo para outra inferência. Checkpoints protegem também o percurso/aplicação de cache. Downloads de modelos continuam canceláveis; não há modelos/dependências/processos/opções novos.
+- Três falhas reproduzidas com Tasks reais/coordenador de produção e motor de controle. Compilação aprovada; 901 testes do app aprovados (12 novos), mais 85 anteriores de domain/UP-TO-DATE. Nenhum caso anterior ausente. Overlay4/empacotamento16 aprovados; dois controles Android compilados, não executados.
+- Não foi executada inferência/modelo nessa validação. Diagnóstico A12/ARM, qualidade e medições de memória/desempenho continuam pendentes. A proteção não acrescenta timeout capaz de interromper uma Task nativa que não conclua.
+
+[Escopo](docs/CANCELAMENTO_MLKIT_P20261115_5.md) · [Evidências filtradas](integration/mlkit-cancellation/20261115/README.md).
+
+## Desenvolvimento · P20261115.4 — 15/11/2026
+
+**Estado:** continuação da beta.11/código 112, na frente de backups. Sem novo APK ou Release.
+
+- Restaurar um backup antigo podia reduzir a última página de um capítulo em leitura ou ignorar uma página posterior quando o capítulo local já estava concluído. A mesclagem passa a manter a maior página e preservar lido/marcador.
+- Três regressões reproduzidas com SQLite real antes da correção. Novos controles usam esquema, repositórios, transações e criadores de produção em banco temporário em arquivo, incluindo reabertura, idempotência, histórico/acompanhamento, rollback e reexportação de dois exemplos sintéticos upstream.
+- Compilação do app/instrumentação aprovada; 889 testes do app e 85 de domain executados e aprovados: 974, incluindo 16 novos. Nenhum caso anterior ausente; overlay4/empacotamento16 aprovados. Dois controles Android compilados, ainda não executados.
+- Driver adicional exclusivo dos testes JVM; sqlite-jdbc ausente de releaseRuntimeClasspath. Esquema SQL/Protobuf inalterados. SQLite/interface Android, aparelhos e troca pela UI de leitores externos seguem para a validação final.
+
+[Escopo](docs/BACKUPS_SQLITE_P20261115_4.md) · [Evidências filtradas](integration/backup-sqlite/20261115/README.md).
+
+## Desenvolvimento · P20261115.3 — 15/11/2026
+
+**Estado:** continuação da beta.11/código 112, na frente de armazenamento. Sandbox arquivada/retirada; conta/nuvem adiadas; sem novo APK ou Release.
+
+- Tela de armazenamento mostra cópias interrompidas e pastas no formato antigo de importação, com nomes, tamanhos conhecidos, situações de revisão e orientação para repetir o original quando houver cópia completa compatível.
+- Inventário somente leitura, sincronizado com a publicação. Limites, falhas de acesso e tamanhos desconhecidos aparecem como resultado parcial. A classificação por metadados não substitui a conferência completa do conteúdo feita pelo importador.
+- Pastas incompletas, antigas ou desconhecidas ficam preservadas. Nenhuma exclusão, movimentação ou limpeza automática de cópias locais foi acrescentada. Validação e limites na evidência; aceites finais de SAF/interface/aparelhos e pico continuam pendentes.
+
+- Compilação do app/instrumentação aprovada; 873 testes do app aprovados (22 novos), mais 85 anteriores de domain. Nenhum caso anterior ausente. Quatro testes de overlay e 16 de empacotamento aprovados; dois cenários Android novos compilados para a rodada final.
+
+[Escopo](docs/REVISAO_IMPORTACOES_P20261115_3.md) · [Evidências filtradas](integration/import-review/20261115/README.md).
+
+## Desenvolvimento · P20261115.2 — 15/11/2026
+
+**Estado:** sandbox arquivada e removida dos fontes compilados da beta.11/código 112. Sem novo APK ou Release.
+
+- Executor, IPC, serviço/tela, preferências/cookies isolados, componentes de apoio e ramificações de integração retirados. Nenhuma flag reativa o executor. A branch de arquivo conserva o checkpoint anterior.
+- Aviso único com as duas caixas mantido; seleções/quarentenas antigas preservadas para migração e revisão. O texto de revisão não promete mais execução isolada. OCR, assinatura/integridade e dados privados existentes preservados.
+- Compilação do app/instrumentação aprovada e ausência de classes/componentes conferida nos JARs/manifestos. 851 testes do app aprovados, mais 85 anteriores de domain; os 94 testes exclusivos da sandbox foram arquivados com o executor, e todos os demais casos anteriores permanecem. Quatro testes de overlay e 16 de empacotamento aprovados. Redução do APK ainda não medida.
+
+[Arquivamento e escopo](docs/ARQUIVAMENTO_SANDBOX_P20261115_2.md) · [Evidência filtrada](integration/sandbox-removal/20261115/README.md).
+
+## Desenvolvimento · P20261115.1 — 15/11/2026
+
+**Estado:** continuação da beta.11/código 112, na frente de armazenamento. Sandbox pausada; conta/nuvem adiadas; sem novo APK ou Release.
+
+- Repetir uma inclusão pode retomar a cópia completa ainda em pasta temporária, após conferir protocolo, bytes e metadados, sem outra cópia do payload pelo importador. Título/metadados guardados são preservados.
+- Falhas de rename/indexação e cancelamento conservam dados preexistentes. Pastas ambíguas, conteúdo divergente ou arquivos extras ficam para revisão; resíduos parciais e legado não são apagados automaticamente.
+- Três falhas reproduzidas antes da correção; 945 testes do app aprovados (14 novos), mais 85 anteriores de domain. App/instrumentação compilados; quatro testes de overlay e 16 de empacotamento aprovados. Dois cenários Android compilados para a rodada final.
+
+[Escopo](docs/RECUPERACAO_IMPORTACOES_P20261115_1.md) · [Evidências filtradas](integration/import-recovery/20261115/README.md).
+
+## Desenvolvimento · P20261114.4 — 14/11/2026
+
+**Estado:** mudança de escopo da beta.11/código 112. Sandbox pausada pelo usuário; quatro frentes ativas: armazenamento, backups, leitura e distribuição. Conta/login Google/nuvem adiados.
+
+- Código experimental preservado, ativação/serviço/tela desabilitados. Seleções antigas aguardam revisão antes da mudança para execução normal.
+- Aviso geral único antes de instalações/atualizações no app, com as caixas obrigatórias “Estou ciente” e “Terei cuidado, relaxa”. Aceite local, não exportado/restaurado em backup. Abrange lotes e novels; assinatura/integridade/revisão de repositórios continuam independentes.
+- 931 testes do app aprovados (12 novos), mais 85 anteriores de domain; nenhum ausente na comparação. App/instrumentação compilados, manifesto mesclado inspecionado, quatro testes de overlay e 16 de empacotamento aprovados. Dois cenários Android novos compilados; três classes de testes da sandbox explicitamente pausadas.
+- Desativação não é medição de redução do APK. Sem novo pacote do app ou Release; testes pessoais na consolidação final.
+
+[Decisão e comportamento](docs/PAUSA_SANDBOX_E_AVISO_P20261114_4.md) · [Evidências filtradas](integration/extension-risk-notice/20261114/README.md).
+
+## Desenvolvimento · P20261114.3 — 14/11/2026
+
+**Estado:** continuação da beta.11/código 112. Testes pessoais na consolidação final, conforme pedido; sem novo APK do app ou Release. Conta/login Google/nuvem permanecem adiados.
+
+- Botões locais de Preference padrão passam a pedir confirmação e executar listener síncrono no worker, sem HTTP. Estado/hierarquia/token são reconferidos e alterações fora da fonte são recusadas. Falha/false não confirma alterações; não há repetição automática.
+- Campos e backups não disparam ações. Intents, telas personalizadas, callbacks assíncronos, OAuth e novels continuam pendentes.
+- 919 testes do app aprovados (15 novos), mais 85 anteriores de domain; nenhum ausente na comparação. App e instrumentação compilados, quatro testes de overlay e 16 de empacotamento aprovados. Fixture DEX ampliada e seis cenários Android compilados para a rodada final.
+
+[Escopo](docs/SANDBOX_ACOES_LOCAIS_P20261114_3.md) · [Resultados filtrados](integration/sandbox-actions/20261114/README.md).
+
+## Desenvolvimento · P20261114.2 — 14/11/2026
+
+**Estado:** continuação da beta.11/código 112, sem novo APK ou lançamento. Conta/login Google/nuvem permanecem adiados.
+
+- Cache de documentos sem tamanho/data positivos passa a identificar o conteúdo pelos bytes, evitando devolver uma cópia antiga da mesma URI ou ocultar falha do provedor. Conteúdo igual pode reutilizar o cache sem substituir cópias abertas.
+- Preparação fica protegida da limpeza até o pin do arquivo final. Caminho rápido por metadados positivos continua disponível; tamanho e metadados são reconferidos na primeira cópia.
+- Quatro regressões reproduzidas antes da correção; 904 testes do app aprovados (14 novos), mais 85 anteriores de domain. Core/app/instrumentação compilados; quatro testes de overlay e 16 de empacotamento aprovados. Dois cenários Android compilados aguardam execução.
+- Releitura/temporário adicionais exigem medição no A12/ARM; não há promessa de desempenho, pico menor ou detecção de metadados positivos incorretos.
+
+[Escopo](docs/CACHE_DOCUMENTOS_P20261114_2.md) · [Resultados filtrados](integration/document-cache/20261114/README.md).
+
+## Desenvolvimento · P20261114.1 — 14/11/2026
+
+**Estado:** continuação da beta.11/código 112, sem novo APK ou lançamento. Conta/login Google/nuvem permanecem adiados.
+
+- Restauração aguarda categorias antes de remapear configurações e registrar obras; erro ou cancelamento nessa fase impede as seguintes. As demais etapas continuam concorrentes depois dessa dependência.
+- Oito regressões reproduzidas antes da correção. Na versão final, 890 testes do app passaram (11 novos); mais 85 de domain já aprovados/UP-TO-DATE, sem ausentes na comparação. App e instrumentação compilados, quatro testes de overlay e 16 de empacotamento aprovados.
+- Backups sintéticos Tachiyomi/Mihon foram decodificados até a fronteira de persistência, que é simulada nos testes. Sem mudança em SQL ou formato de backup; banco Android real, interface/aparelhos e ida/volta em leitores externos permanecem pendentes.
+
+[Escopo](docs/RESTAURACAO_CATEGORIAS_P20261114_1.md) · [Resultados filtrados](integration/backup-restore/20261114/README.md).
+
+## Desenvolvimento · P20261113.7 — 13/11/2026
+
+**Estado:** candidata beta.11/código 112, sem novo APK ou lançamento. Conta/login Google/nuvem adiados pelo usuário.
+
+- Novas importações idênticas reutilizam a publicação verificada; nome igual com bytes diferentes continua separado. O prefixo de pasta é legível e o marcador não interfere nos metadados nativos.
+- Falha no registro da biblioteca pode ser retomada sem outra cópia. Favoritos existentes conservam identidade, organização e progresso; cópias editadas não são sobrescritas.
+- Três falhas reproduzidas antes da correção; 879 testes do app passaram (18 novos), mais 85 de domain já aprovados/UP-TO-DATE. App e instrumentação compilados, quatro testes de overlay e 16 de empacotamento aprovados. Dois cenários Android aguardam dispositivo.
+
+[Escopo e limites](docs/IMPORTACAO_REPETIDA_P20261113_7.md) · [Evidências](integration/document-import/20261113/README.md).
+
+## Desenvolvimento · P20261113.6 — 13/11/2026
+
+**Estado:** continuação da beta.11/código 112, sem outro APK ou lançamento.
+
+- Login copia também cookies existentes em /account e outros caminhos para o perfil exclusivo, restringindo domínios ao host escolhido. Colisões são recusadas.
+- Consultas locais cobrem os caminhos iniciais e páginas navegadas. Snapshots parciais não apagam sessões não observadas; capturas contraditórias não gravam. Limites e revogação mantidos.
+- Quatro falhas reproduzidas antes da correção; 63 focados e 861 testes do app aprovados (16 novos), além de quatro de overlay e 16 de empacotamento. App/instrumentação compilados; três cenários Android aguardam aparelho. Com domain UP-TO-DATE, relatórios somam 946 sem falhas/skips.
+
+[Escopo e limites](docs/LOGIN_COOKIES_P20261113_6.md) · [Evidência](integration/login-cookies/20261113/README.md).
+
+## Desenvolvimento · P20261113.5 — 13/11/2026
+
+**Estado:** continuação da beta.11/código 112; sem novo APK ou lançamento.
+
+- Listas simples e múltiplas preparam opções síncronas no worker e abrem diálogos próprios do host. A gravação reconstrói opções/listeners em worker novo e rejeita formulários desatualizados.
+- Preparação limita HTTP a GET/HEAD e exige snapshot de preferências inalterado. Ações consumidoras, callbacks assíncronos, escrita na preparação e interfaces personalizadas permanecem pendentes.
+- App e instrumentação compilados; 845 testes do app aprovados (12 novos), quatro de overlay e 16 de empacotamento. Seis cenários Android compilados, aguardando dispositivo. Com domain UP-TO-DATE, relatórios somam 930 sem falhas/skips.
+
+[Escopo e limites](docs/SANDBOX_DINAMICO_P20261113_5.md) · [Evidência](integration/sandbox-dynamic/20261113/README.md).
+
+## Desenvolvimento · P20261113.4 — 13/11/2026
+
+**Estado:** continuação da beta.11/código 112, sem lançamento. O APK interno anterior permanece P20261113.3.
+
+- Controles SeekBarPreference em configurações de fontes isoladas, com gravação assíncrona e callbacks no worker. Aceitam faixas negativas/fixas e conservam o incremento de teclado do AndroidX.
+- Contrato de tela compartilhado entre validação, edição e importação explícita: tipos estritos, limites com proteção de overflow e rejeição de formulário antigo quando opções mudam.
+- 833 testes do app passaram, incluindo 12 novos; relatórios com domain somam 918 sem falhas/skips. Compilação real do app e de instrumentação aprovada, quatro testes de overlay e 16 de empacotamento aprovados.
+- Fixture sintética ampliada e três cenários Android compilados. Sem dispositivo/emulador conectado para executá-los.
+
+[Comportamento e limites](docs/SANDBOX_CONTROLES_P20261113_4.md) · [Evidências](integration/sandbox-numeric/20261113/README.md).
+
+## Continuação · P20261113.3 — recuperação da assinatura — 13/11/2026
+
+- Keystore original recuperado por transporte criptografado; certificado exportado diretamente confere com a beta.10. Configuração local privada e ignorada pelo Git; nenhum material secreto publicado.
+- APK interno universal ARM32/ARM64 gerado e verificado com a assinatura original da beta.10 (272.970.356 bytes). Sem lançamento público ou aceite de atualização no aparelho.
+- Empacotamento exclui intermediários de emulador e o verificador de marca distingue os ícones de conquistas dos atributos da application. Três regressões reproduzidas, 16 testes de empacotamento e quatro de overlay aprovados.
+
+[Recuperação e validação](integration/signing-recovery/20261113/README.md).
+
+## Desenvolvimento · P20261113.3 — 13/11/2026
+
+**Estado:** candidata beta.11/código 112, sem lançamento. Compilação Android e 906/906 testes JVM passaram; APK bloqueado por espaço e assinatura original não localizada.
+
+- Transferência de cookies preserva atualizações HTTP concorrentes e rejeita conflitos de forma atômica. Login aguarda a preparação de cookies, confere o perfil e move armazenamento cifrado para IO.
+- Dependências do widget alinhadas às versões já usadas pelo app e WebKit declarado diretamente. Testes locais usam o transporte JVM oficial do OkHttp; produção mantém Android.
+- Exportador verifica identidade/assinatura contra manifesto anterior quando solicitado; quatro regressões novas e 47 testes focados passaram, além de quatro de overlay e 13 de empacotamento.
+- Nenhum dos 880 casos históricos desapareceu;26 casos novos passaram. Sem aceite de aparelho ou APK concluído. A chave criada neste ambiente difere da assinatura da beta.10; não distribuir como atualização.
+
+[Evidências e bloqueios](integration/build-validation/20261113/README.md).
+
+## Desenvolvimento · P20261113.2 — 13/11/2026
+
+**Estado:** candidata da beta.11/código 112; sem publicação. Compilação Android continua bloqueada por Google Maven HTTP503.
+
+- A limpeza automática preserva arquivos cujos nomes contêm datas impossíveis. Nomes antigos e atuais com datas válidas continuam aceitos.
+- 43 testes JVM focados passaram: 26 anteriores, nove existentes de integridade da escrita, dois de namespaces de fontes e seis novos de retenção. Dois casos reproduziram a falha antes da correção.
+- O aviso de login descreve o escopo dos cookies, sem prometer mediação completa da rede do WebView.
+
+[Evidências e limites](integration/backup-safety/20261113/README.md).
+
+## Desenvolvimento · P20261113.1 — 13/11/2026
+
+**Estado:** candidata da beta.11/código 112, sem lançamento; compilação Android bloqueada no download de dependências Google (HTTP503). A beta.10 pública permanece igual.
+
+- Primeira integração de login HTTPS para fontes isoladas, com perfil WebView separado, confirmação e transferência limitada de cookies. Sem fallback ao navegador global. OAuth externo/Cloudflare genérico e aceite real continuam pendentes.
+- Verificação consultiva de espaço durante a importação e antes da cópia para biblioteca em volume local, preservando original e cancelamento.
+- 26 testes JVM focados, quatro verificações de aplicação do overlay e nove de empacotamento passaram. Isso não aprova a atividade Android nem todo o aplicativo.
+
+[Escopo e limites](docs/LOGIN_E_ARMAZENAMENTO_P20261113_1.md) · [Checklist da beta.11](docs/BETA11_CHECKLIST.md).
+
 ## Desenvolvimento · P20261112.1 — 12/11/2026
 
-**Estado:** revisão da beta.11/código112, sem lançamento. A beta.10 pública permanece intacta.
+**Estado:** revisão da beta.11/código 112, sem lançamento. A beta.10 pública permanece intacta.
 
 - Doze conquistas em quatro caminhos alternativos: pontos de leitura, obras na biblioteca, obras iniciadas e obras concluídas lidas. Uma condição basta para liberar cada grimório.
 - Progresso e disponibilidade na Jornada e na Aparência; marcos permanentes e restauração de cosméticos sem revogar conquistas locais por um backup mais antigo.
@@ -15,7 +203,7 @@ Este arquivo registra a evolução real do código. **Revisões de desenvolvimen
 
 ## Desenvolvimento · P20261111.2 — 11/11/2026
 
-**Estado:** revisão da beta.11/código112, sem lançamento. A beta.10 pública permanece intacta.
+**Estado:** revisão da beta.11/código 112, sem lançamento. A beta.10 pública permanece intacta.
 
 - Nova coleção de quatro ícones ilustrados: Grimório Polaris, trevo de três folhas, quatro folhas amado pela mana e cinco folhas com visual sombrio.
 - Nomes e fundos acompanham as artes; aliases, seleção salva, desbloqueios e marcos de 900/4.500/9.000 pontos são preservados.
@@ -224,7 +412,7 @@ Sete testes novos passaram. A comparação completa terminou com 505 testes: 471
 - Ajustes de posicionamento, automação de downloads em inglês e respeito à escolha por obra.
 - Catálogo inicial de repositórios e apresentação mais clara dos grupos/versões dos capítulos.
 
-[Código de 29/10](https://github.com/Hailton-Reis/Polaris/commit/87c5ce7) · [Tradução em inglês](https://github.com/Hailton-Reis/Polaris/commit/e8ef402) · [Descoberta e capítulos](https://github.com/Hailton-Reis/Polaris/commit/582e8c4)
+[Código de 29/10](https://github.com/Hailton-Reis/Polaris/commit/87c5ce7) · [Tradução em inglês](https://github.com/Hailton-Reis/Polaris/commit/e 8ef402) · [Descoberta e capítulos](https://github.com/Hailton-Reis/Polaris/commit/582e8c4)
 
 ## Como registrar as próximas versões
 

@@ -1,0 +1,33 @@
+{
+  "status": "NO_NEW_UNIT_REGRESSIONS",
+  "baseline": {
+    "total": 946,
+    "passed": 946,
+    "failed": 0,
+    "skipped": 0
+  },
+  "patched": {
+    "total": 964,
+    "passed": 964,
+    "failed": 0,
+    "skipped": 0
+  },
+  "preexisting_failures_still_present": 0,
+  "missing_baseline_tests": [],
+  "new_failures_or_skips": [],
+  "android_runtime_verified": false,
+  "gradle_exit_codes": {
+    "baseline": 0,
+    "patched": 0
+  },
+  "required_module_coverage": {
+    "app": 861,
+    "domain": 85
+  },
+  "baseline_origin": "Archived P20261113.6 XML, not rerun",
+  "current_origin": {
+    "app": "879 cases freshly executed",
+    "domain": "85 unchanged cases UP-TO-DATE"
+  },
+  "new_cases": 18
+}

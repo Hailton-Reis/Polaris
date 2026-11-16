@@ -1,0 +1,9 @@
+test_crlf_stack (test_apply_document_reader.DocumentOverlayTests.test_crlf_stack) ... ok
+test_drift_is_rejected_without_partial_application (test_apply_document_reader.DocumentOverlayTests.test_drift_is_rejected_without_partial_application) ... ok
+test_full_stack_application_and_idempotence (test_apply_document_reader.DocumentOverlayTests.test_full_stack_application_and_idempotence) ... ok
+test_prerequisite_and_migration_gate (test_apply_document_reader.DocumentOverlayTests.test_prerequisite_and_migration_gate) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 7.886s
+
+OK

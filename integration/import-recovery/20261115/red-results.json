@@ -1,0 +1,26 @@
+{
+  "tests": 3,
+  "failed": 3,
+  "cases": [
+    {
+      "name": "edited sealed staging is preserved without creating a replacement()",
+      "status": "failed",
+      "assertion": "org.opentest4j.AssertionFailedError: Expected java.lang.IllegalStateException to be thrown, but nothing was thrown."
+    },
+    {
+      "name": "sealed staging recovery does not require capacity for a second destination copy()",
+      "status": "failed",
+      "assertion": "java.io.IOException: No room for another copy"
+    },
+    {
+      "name": "retry reuses sealed staging instead of another copy()",
+      "status": "failed",
+      "assertion": "java.lang.IllegalArgumentException: Array has more than one element."
+    }
+  ],
+  "source_sha256": {
+    "app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentImportPublication.kt": "3a1e3251d439c111a491cbac8bb3132325b3fd88ef11d88d1c0050a53f1a2d65",
+    "app/src/test/java/eu/kanade/tachiyomi/ui/documents/DocumentImportTransactionTest.kt": "fa8da251fce9ae48fb51ee27740c1eabe2941501286e4e639cfbd255f3f173d2"
+  },
+  "scope": "Previous real publication code: repeated rename failure produced another folder, required second-copy capacity and ignored edited completed staging."
+}

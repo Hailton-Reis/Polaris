@@ -1,0 +1,29 @@
+{
+  "revision": "P20261114.3",
+  "prior_pr_head": "06d98a2b72c9fd69521b034cacfba9c3a6093e80",
+  "prior_pr_tree": "bed5ff351722888cc009cb3d709a0a7b535b332a",
+  "upstream_prerequisite": "f037c5d85575e30694295df5d079e97dcc4a35b9",
+  "overlay_sha256": "6efd2b8aebd422ed420a9c91554df1483322a675e6d2a1702008035bd1b05be9",
+  "overlay_git_sha": "448bfd943252062a77823c361791ad78803ad88f",
+  "changed_android_source_sha256": {
+    "app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxPreferenceAction.kt": "4b69a621a51cd91e9964642e192b13a68354c248b9a03067ebacc8dcfaf55ec2",
+    "app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxPreferenceSchema.kt": "2e21a4a856a2fb7597bbb9e88792954558e2b531738fb83fdef2a2004b2ae401",
+    "app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxPreferenceCodec.kt": "dcb5395418361830ac396448458189f5c730b1c99049b856dbcc0eafdbc6bc17",
+    "app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxPreferenceUi.kt": "004817937bc81ef2bdea5ef923e7d005f93ca5642d3b70d5152b3e95039090e0",
+    "app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/IsolatedHttpSource.kt": "37ed84458e4709e205d1fe4ab736441e3366ee426f401e17b47f393096806d54",
+    "app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/ExtensionSandboxService.kt": "56e04991dd56ba21fe28f0f6eab5cb7e619340f8d91e49e33d59cebf8764d050",
+    "app/src/test/java/eu/kanade/tachiyomi/extension/sandbox/SandboxPreferenceActionTest.kt": "b17726918a0375f8efdba8ad5b174a8a77dec711058c9b8259228201ac39567b",
+    "app/src/androidTest/java/eu/kanade/tachiyomi/extension/sandbox/SandboxSettingsAndroidTest.kt": "67297ea363aa83b456adb4214e4d9415d7e548eb5120eefbccaaf946c4f0062b",
+    "app/src/androidTest/assets/polaris-sandbox/fixture.apk": "f491b10b09d299f923e59c6699c83c13c39d8df4fe674a15158ba3ed75523d2b",
+    "app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt": "1783068e2a3addff84a5397b82fbdbfe3577678066d456e5187434cc6f81fbc3",
+    "i18n-at/src/commonMain/moko-resources/base/strings.xml": "b0318140294e4ed0ab7a01965e0d41ec31f75cad19f32c5fef1a65cba677a24d",
+    "i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml": "0d4aedd011a68b717dbfc5b327fe1e064fad4a96a8cd11d19ca1d7f484c220ca"
+  },
+  "fixture": {
+    "scope": "Synthetic current-Source-API implementation in a DEX zip; not a signed third-party extension or full-reader acceptance test.",
+    "source_sha256": "ea1eb3632e64c2cd60d6f53c33447e1d5323890a39bd5056b855dca6de7bdfa4",
+    "sha256": "f491b10b09d299f923e59c6699c83c13c39d8df4fe674a15158ba3ed75523d2b",
+    "bytes": 42964,
+    "dex_sha256": "3766f6521b38f2b7a60cef85c83b462f4868c215da95ebe90358560e5598e216"
+  }
+}

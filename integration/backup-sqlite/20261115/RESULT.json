@@ -1,0 +1,32 @@
+{
+  "revision": "P20261115.4",
+  "status": "BUILD_AND_ALL_JVM_TESTS_PASSED",
+  "build_result": "BUILD SUCCESSFUL in 2m 42s",
+  "selected_tasks": {
+    ":app:compileDebugKotlin": "EXECUTED",
+    ":domain:testDebugUnitTest": "EXECUTED",
+    ":data:testDebugUnitTest": "NO-SOURCE",
+    ":source-api:testDebugUnitTest": "NO-SOURCE",
+    ":app:testDebugUnitTest": "EXECUTED",
+    ":app:dependencyInsight": "EXECUTED",
+    ":app:compileDebugAndroidTestKotlin": "EXECUTED"
+  },
+  "app_executed_passed": 889,
+  "domain_executed_passed": 85,
+  "total_executed_passed": 974,
+  "new_sqlite_tests_passed": 16,
+  "missing_baseline_cases": 0,
+  "failed_or_skipped": 0,
+  "overlay_tests_passed": 4,
+  "packaging_tests_passed": 16,
+  "android_instrumentation": "COMPILED_NOT_EXECUTED",
+  "release_jdbc_dependency_check": {
+    "configuration": "releaseRuntimeClasspath",
+    "dependency": "sqlite-jdbc",
+    "result": "No dependencies matching given input were found in configuration ':app:releaseRuntimeClasspath'"
+  },
+  "sandbox_runtime_classes": [],
+  "sandbox_manifest_components": [],
+  "new_apk": false,
+  "new_release": false
+}

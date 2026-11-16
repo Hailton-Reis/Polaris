@@ -1,0 +1,88 @@
+{
+  "total": 12,
+  "status": "ALL_PASSED",
+  "tasks": "Real Google Tasks and coroutine scheduler; production OCR coordinator with control engine",
+  "native_inference_executed": false,
+  "cases": [
+    {
+      "module": "app",
+      "classname": "eu.kanade.translation.MlKitProcessingTest",
+      "name": "a failed task preserves its cause and releases the engine for another request()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.translation.MlKitProcessingTest",
+      "name": "a task cancelled by the SDK is already terminal and does not block release()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.translation.MlKitProcessingTest",
+      "name": "an already cancelled caller cannot start or accept an already completed task()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.translation.MlKitProcessingTest",
+      "name": "an owned translation client is closed only after cancelled processing has settled()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.translation.MlKitProcessingTest",
+      "name": "cancelling OCR cannot close the engine while its Google Task is pending()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.translation.MlKitProcessingTest",
+      "name": "cancelling a queued caller never starts another SDK operation()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.translation.MlKitProcessingTest",
+      "name": "completed and delayed tasks return the SDK result while the caller is active()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.translation.MlKitProcessingTest",
+      "name": "engine replacement waits for cancelled native work to actually finish()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.translation.MlKitProcessingTest",
+      "name": "late SDK failure after cancellation cannot publish a result or leak the client()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.translation.MlKitProcessingTest",
+      "name": "repeated cancellation and release waiters close the same engine once()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.translation.MlKitProcessingTest",
+      "name": "synchronous task creation failure cannot leave the engine locked()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.translation.MlKitProcessingTest",
+      "name": "two callers sharing an engine keep SDK processing serialized()",
+      "status": "passed"
+    }
+  ],
+  "android_controls": {
+    "status": "COMPILED_NOT_EXECUTED",
+    "cases": [
+      "cancellationKeepsTheEngineUntilTheAndroidTaskCompletes",
+      "anAlreadyCancelledAndroidCallerDoesNotStartProcessing"
+    ],
+    "models_or_bitmap_inference": false
+  }
+}

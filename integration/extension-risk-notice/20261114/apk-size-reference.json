@@ -1,0 +1,13 @@
+{
+  "scope": "Existing internal APK P20261113.3; not a new candidate or an A/B sandbox-removal measurement",
+  "apk_bytes": 272970356,
+  "apk_sha256": "ada69c1e08a679489575a0622e43a8825de5e443083d978281c1d2a688631c98",
+  "compressed_entry_bytes": {
+    "lib/": 192659644,
+    "assets/": 30055762,
+    "res/": 2073645,
+    "dex": 41550198
+  },
+  "native_library_share_of_apk_percent": 70.6,
+  "sandbox_size_delta_measured": false
+}

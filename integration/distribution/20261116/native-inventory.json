@@ -1,0 +1,42 @@
+{
+  "abis": {
+    "arm64-v8a": [
+      "libandroidx.graphics.path.so",
+      "libarchive-jni.so",
+      "libc++_shared.so",
+      "libconscrypt_jni.so",
+      "libimagedecoder.so",
+      "liblanguage_id_l2c_jni.so",
+      "libmlkit_google_ocr_pipeline.so",
+      "libonnxruntime.so",
+      "libonnxruntime4j_jni.so",
+      "libopencv_java4.so",
+      "libquickjs.so",
+      "libsqliteJni.so",
+      "libtdjni.so",
+      "libtranslate_jni.so",
+      "libyomotsu_dbnet.so",
+      "libzstd-kmp.so"
+    ],
+    "armeabi-v7a": [
+      "libandroidx.graphics.path.so",
+      "libarchive-jni.so",
+      "libc++_shared.so",
+      "libconscrypt_jni.so",
+      "libimagedecoder.so",
+      "liblanguage_id_l2c_jni.so",
+      "libmlkit_google_ocr_pipeline.so",
+      "libonnxruntime.so",
+      "libonnxruntime4j_jni.so",
+      "libopencv_java4.so",
+      "libquickjs.so",
+      "libsqliteJni.so",
+      "libtdjni.so",
+      "libtranslate_jni.so",
+      "libzstd-kmp.so"
+    ]
+  },
+  "dbnet_ocr_worker_preserved": true,
+  "dbnet_native_backend_arm64_only": true,
+  "ocr_worker_compiled_manifest_verified": true
+}

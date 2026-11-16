@@ -1,0 +1,15 @@
+{
+  "flags": {
+    "debuggable": false,
+    "profileable": false,
+    "minify_enabled": false,
+    "shrink_resources": false,
+    "application_id_suffix": ".dev",
+    "signing_config_present": true,
+    "matching_fallbacks": [
+      "release"
+    ]
+  },
+  "assembly_graph_has_device_dependency": false,
+  "assembly_graph_tasks": 438
+}

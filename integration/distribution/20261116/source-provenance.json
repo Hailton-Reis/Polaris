@@ -1,0 +1,59 @@
+{
+  "previous_engineering_commit": "3d83de329ee7b1408b66d9a009f7e8d5649a4ab3",
+  "overlay_prerequisite": "f037c5d85575e30694295df5d079e97dcc4a35b9",
+  "overlay_sha256": "758d7587042872c0ada970d63de4f5cf37a79a53aef8680c680e2119cf5ddd76",
+  "android_files": [
+    {
+      "path": "app/build.gradle.kts",
+      "bytes": 12595,
+      "sha256": "3cd58f09ea651b369e6abed4cbdd4dc714854dc80794354e0d59114a15519532"
+    },
+    {
+      "path": "domain/build.gradle.kts",
+      "bytes": 1098,
+      "sha256": "f3b3cf35c5d7424c6717b376f9dc2870a7c807b8ec08d94e762dcd1e0a814eae"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt",
+      "bytes": 10970,
+      "sha256": "cb8ec7a29432465b144e72855b6b57142a30bdf53c6dabe3556d9573aba93ae4"
+    }
+  ],
+  "engineering_files": [
+    {
+      "path": "scripts/beta/package_internal_beta.py",
+      "bytes": 17621,
+      "sha256": "b802c2400b4f9c6a24c57994561f0558eed5942f33b1100342ec9e453ea205ab"
+    },
+    {
+      "path": "scripts/beta/test_package_internal_beta.py",
+      "bytes": 13547,
+      "sha256": "824b0ddc5230fe296650286398885b1c4e4f24bcbde580a0baa20c38ed515bc6"
+    },
+    {
+      "path": "scripts/r001/compare_android_unit_tests.py",
+      "bytes": 9573,
+      "sha256": "2c1c34608f749a08181f666693fc1f5c221c8156aa8ac4d5cc4185849dab086c"
+    },
+    {
+      "path": "scripts/r001/test_compare_android_unit_tests.py",
+      "bytes": 8776,
+      "sha256": "7082688e2754a4d38f64ee42ce5fdb45c5a87f4d7692e92f4b88511038db8d12"
+    },
+    {
+      "path": "scripts/r001/test_apply_document_reader.py",
+      "bytes": 6424,
+      "sha256": "7a7354a7ec0821724cf4459afac0dc8a45d1f0dc863768c636c8387f2ecdea37"
+    },
+    {
+      "path": "docs/COMECE_AQUI_BETA11.md",
+      "bytes": 1809,
+      "sha256": "0620d17531c21a5c24a7b2d5322c21d07709547473c9f03db3422165cef34897"
+    },
+    {
+      "path": "docs/EXTENSOES_BETA11.md",
+      "bytes": 787,
+      "sha256": "837509e6d2d7ff38d800146b58b722a80d3739563af44d189f6b22e077dc5380"
+    }
+  ]
+}

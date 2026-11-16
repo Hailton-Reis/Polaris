@@ -1,0 +1,19 @@
+{
+  "exit_code": 0,
+  "stopped_by_disk_guard": false,
+  "minimum_free_bytes": 480497664,
+  "command": [
+    "./gradlew",
+    "--no-daemon",
+    "--max-workers=2",
+    "--no-build-cache",
+    "-Dorg.gradle.jvmargs=-Xmx2g -XX:MaxMetaspaceSize=768m -Dfile.encoding=UTF-8",
+    ":app:compileDebugKotlin",
+    ":app:testDebugUnitTest",
+    ":domain:testDebugUnitTest",
+    ":data:testDebugUnitTest",
+    ":source-api:testDebugUnitTest",
+    ":app:compileDebugAndroidTestKotlin"
+  ],
+  "publication": "Environment wrapper and machine paths omitted; original retained locally."
+}

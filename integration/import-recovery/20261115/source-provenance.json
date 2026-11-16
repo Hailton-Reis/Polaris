@@ -1,0 +1,14 @@
+{
+  "revision": "P20261115.1",
+  "prior_pr_head": "14c830d9c52d056ec7c4579f501bb99946ff8e25",
+  "prior_pr_tree": "18be73815bd16a41c33f96e72441e2a32dc6ddf3",
+  "upstream_prerequisite": "f037c5d85575e30694295df5d079e97dcc4a35b9",
+  "overlay_sha256": "eaddd727f7f378907c32502275eda74df1c7add6728c5d4276e12d792da1ddbc",
+  "overlay_git_sha": "de367efe109854a4642e88784719b6aa7ec87fee",
+  "changed_android_source_sha256": {
+    "app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentImportPublication.kt": "91651071a1ea752ce1854b753422d616ce131bf0daf057647f8efd4cab3c146d",
+    "app/src/test/java/eu/kanade/tachiyomi/ui/documents/DocumentImportTransactionTest.kt": "12403ebbf55ecb1aebfaedf87cb6659d10415584759dcef6c33d8d9a178d952c",
+    "app/src/androidTest/java/eu/kanade/tachiyomi/storage/SafeStorageAndroidTest.kt": "3d1ec1b2815dc083bc64787e68a3896e9f0184a534c5a7b5ed164efd033fbdb5",
+    "app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt": "dd62c83d97b22d6f41dd2f10185d8e7093e8ed777bc330f5c49e96fb22fd3ec0"
+  }
+}

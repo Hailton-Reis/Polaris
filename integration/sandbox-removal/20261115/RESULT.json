@@ -1,0 +1,21 @@
+{
+  "revision": "P20261115.2",
+  "status": "BUILD_AND_RETAINED_JVM_TESTS_PASSED",
+  "build_result": "BUILD SUCCESSFUL in 2m 25s",
+  "selected_tasks": {
+    ":domain:testDebugUnitTest": "UP-TO-DATE",
+    ":data:testDebugUnitTest": "NO-SOURCE",
+    ":source-api:testDebugUnitTest": "NO-SOURCE",
+    ":app:compileDebugKotlin": "EXECUTED",
+    ":app:compileDebugAndroidTestKotlin": "EXECUTED",
+    ":app:testDebugUnitTest": "EXECUTED"
+  },
+  "app_passed": 851,
+  "domain_previously_passed_up_to_date": 85,
+  "archived_cases_not_run": 94,
+  "overlay_tests_passed": 4,
+  "packaging_tests_passed": 16,
+  "new_apk": false,
+  "new_release": false,
+  "android_instrumentation": "COMPILED_NOT_EXECUTED"
+}

@@ -1,0 +1,81 @@
+{
+  "status": "INTERNAL_BETA_CANDIDATE",
+  "version": "0.1.0-beta.11",
+  "version_code": 112,
+  "revision": "P20261116.1",
+  "minimum_android_api": 26,
+  "application_id": "app.mihon.tachiyomiat.dev",
+  "signer_sha256": "3ae747069cc9015ca1777f94fd56b030501f45d6af380426a572ad60e94d8227",
+  "artifacts": [
+    {
+      "abi": "arm64-v8a",
+      "file": "Polaris-0.1.0-beta.11-universal.apk",
+      "bytes": 259481310,
+      "sha256": "27feeaadc4aec9f54c9a6b57760421dee601e9f3bfe7efef9866fd3ae7fa40e3"
+    },
+    {
+      "abi": "armeabi-v7a",
+      "file": "Polaris-0.1.0-beta.11-universal.apk",
+      "bytes": 259481310,
+      "sha256": "27feeaadc4aec9f54c9a6b57760421dee601e9f3bfe7efef9866fd3ae7fa40e3"
+    }
+  ],
+  "unit_comparison": {
+    "status": "NO_NEW_UNIT_REGRESSIONS",
+    "baseline": {
+      "total": 986,
+      "passed": 986,
+      "failed": 0,
+      "skipped": 0
+    },
+    "patched": {
+      "total": 986,
+      "passed": 986,
+      "failed": 0,
+      "skipped": 0
+    },
+    "preexisting_failures_still_present": 0,
+    "missing_baseline_tests": [],
+    "new_failures_or_skips": [],
+    "android_runtime_verified": false,
+    "gradle_exit_codes": {
+      "baseline": 0,
+      "patched": 0
+    },
+    "required_module_coverage": {
+      "app": 901,
+      "domain": 85
+    },
+    "report_tasks": {
+      "baseline": {
+        "default": "testDebugUnitTest"
+      },
+      "patched": {
+        "app": "testBetaUnitTest",
+        "domain": "testReleaseUnitTest"
+      }
+    }
+  },
+  "display_name": "Polaris",
+  "branding_verified": true,
+  "physical_device_acceptance": "PENDING",
+  "cjk_ocr_quality": "PENDING",
+  "distribution": "universal-arm",
+  "apk_files": 1,
+  "update_compatibility": {
+    "status": "SAME_ID_AND_SIGNER",
+    "previous_version": "0.1.0-beta.10"
+  },
+  "build_safety": {
+    "variant": "beta",
+    "debuggable": false,
+    "test_only": false,
+    "profileable_by_shell": false,
+    "compiled_identity_verified": true
+  },
+  "production_classes": {
+    "dex_files": 8,
+    "class_definitions": 68658,
+    "forbidden_classes": []
+  }
+}

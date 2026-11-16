@@ -1,0 +1,47 @@
+{
+  "status": "THREE_TASK_LIFECYCLE_ASSERTIONS_FAILED_BEFORE_FIX",
+  "previous_engineering_commit": "8b1c4f82502e6723bfb69381d849bbe5fc1bf027",
+  "original_wait_behavior": "start().await()",
+  "routing_only_before_fix": true,
+  "tasks": "Real Google TaskCompletionSource; production OcrEngineManager; control engine, no models/bitmap/native inference",
+  "cases": [
+    {
+      "name": "an owned translation client is closed only after cancelled processing has settled()",
+      "type": "org.opentest4j.AssertionFailedError",
+      "message": "org.opentest4j.AssertionFailedError: expected: <false> but was: <true>"
+    },
+    {
+      "name": "engine replacement waits for cancelled native work to actually finish()",
+      "type": "org.opentest4j.AssertionFailedError",
+      "message": "org.opentest4j.AssertionFailedError: expected: <false> but was: <true>"
+    },
+    {
+      "name": "cancelling OCR cannot close the engine while its Google Task is pending()",
+      "type": "org.opentest4j.AssertionFailedError",
+      "message": "org.opentest4j.AssertionFailedError: expected: <false> but was: <true>"
+    }
+  ],
+  "source_hashes": [
+    {
+      "path": "app/src/main/java/eu/kanade/translation/MlKitProcessing.kt",
+      "sha256": "84409d989d19fb8833fc78c2e0b61c94358af2215c98c94d739da29ff817a9dd"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/translation/recognizer/MlKitOcrEngine.kt",
+      "sha256": "484fff48fee87511ea0079e5a7bc0b923ce140750a845aefffcf693817bf0859"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/translation/translator/MLKitTranslator.kt",
+      "sha256": "b692b4454ddfd59146bceeee76a69510bc445689d44f4be1c1b018f4e212e781"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentTextTranslator.kt",
+      "sha256": "6d2655f90d288f158a6d3bdf635326c52552294381349e730f41b3531396957f"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/translation/MlKitProcessingTest.kt",
+      "sha256": "3c0ad8003c1e2fee23665b87d4004279ee0e94a27b6e3ef058813624b1fd7c80"
+    }
+  ],
+  "note": "The existing cancellable await was factored without changing its semantics for the reproduction. Compilation setup errors and coroutine exception-identity assertion adjustments are not counted as behavioral regressions."
+}

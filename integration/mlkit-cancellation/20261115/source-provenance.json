@@ -1,0 +1,54 @@
+{
+  "previous_engineering_commit": "8b1c4f82502e6723bfb69381d849bbe5fc1bf027",
+  "overlay_prerequisite": "f037c5d85575e30694295df5d079e97dcc4a35b9",
+  "overlay_sha256": "501aca510ef438ea6d8044b3e69e649e05013b5eb1328fc62734b0a72daee0be",
+  "files": [
+    {
+      "path": "app/src/main/java/eu/kanade/translation/MlKitProcessing.kt",
+      "bytes": 888,
+      "sha256": "287a50935b45875aeff7e31e5f84b2a89a170bde60b8f1225b5096364f906ba1"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/translation/recognizer/MlKitOcrEngine.kt",
+      "bytes": 7507,
+      "sha256": "11050a648eab4677fb9ee7aa7a98ddecea2b23ed3a82c83831cf66403bd7c5cb"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/translation/translator/MLKitTranslator.kt",
+      "bytes": 6154,
+      "sha256": "84d252302e4ea4a940fa4c3c02af3958218fef6058ebe3d99a1e7f148f89c04c"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/ui/documents/DocumentTextTranslator.kt",
+      "bytes": 5380,
+      "sha256": "24285003c37b1379dad60eb6788ed1969944cd7e343bea154ec96e58e5ad36ca"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/translation/MlKitProcessingTest.kt",
+      "bytes": 11590,
+      "sha256": "375f21a426bb8c68c04dfcd6665708b50e5ad147d299f0bea8afc7cab35ec5c9"
+    },
+    {
+      "path": "app/src/androidTest/java/eu/kanade/translation/MlKitProcessingAndroidTest.kt",
+      "bytes": 2996,
+      "sha256": "07d096bed65ba9b2ee34eb9389c75d30fef3433a16594414cdd33298c84ac08b"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt",
+      "bytes": 10875,
+      "sha256": "d7115a6c66ce2cf9565484f299ac2648f8c382cde9ae8a2e44d8d36ebbcd44b2"
+    }
+  ],
+  "unchanged_dependency_files": [
+    {
+      "path": "app/build.gradle.kts",
+      "bytes": 11844,
+      "sha256": "cc4887a758915ab78f34203b6e3f496a4fdedfa82b1558def68ed0bcc0dba84e"
+    },
+    {
+      "path": "gradle/libs.versions.toml",
+      "bytes": 17196,
+      "sha256": "cdec539bb1f80ba13d49294083bb9819e2b175d674030fb15add165aebba0c14"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "tests": 2,
+  "failed": 2,
+  "scope": "Positive action descriptors were rejected by the previous schema contract, before enabling the new kind. Helper/tests introduced for this feature.",
+  "cases": [
+    {
+      "name": "standard local action descriptors are accepted through nested groups()",
+      "status": "failed",
+      "assertion": "java.lang.IllegalArgumentException: Failed requirement."
+    },
+    {
+      "name": "a consumed synchronous action executes once and changes only its source()",
+      "status": "failed",
+      "assertion": "java.lang.IllegalArgumentException: Failed requirement."
+    }
+  ],
+  "source_sha256": {
+    "app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxPreferenceSchema.kt": "07c215024647822d6a54e8d0d05a87c0a197c136b801abc64dd1a936377d59f6",
+    "app/src/main/java/eu/kanade/tachiyomi/extension/sandbox/SandboxPreferenceAction.kt": "eab1fc1e90fb672f41abf873580a85a2c909046819e32aeb92a070d76dbd699e",
+    "app/src/test/java/eu/kanade/tachiyomi/extension/sandbox/SandboxPreferenceActionTest.kt": "233a6237d174d4f651255247f497a49207436319d23cc7062d022cc496a40f6b"
+  }
+}

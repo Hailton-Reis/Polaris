@@ -1,0 +1,8 @@
+{
+  "revision": "P20261113.3",
+  "expected_rejections": {
+    "compiled_build": "Debug, test, profileable or sandbox components in production beta",
+    "production_classes": "Experimental sandbox, debug harness or JVM test classes in production APK"
+  },
+  "note": "The previous internal APK still contains debug/sandbox support. Rejections were obtained by inspecting that actual APK; no old artifact was overwritten."
+}

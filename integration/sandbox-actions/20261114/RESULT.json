@@ -1,0 +1,52 @@
+{
+  "revision": "P20261114.3",
+  "status": "LOCAL_ACTIONS_COMPILE_AND_UNIT_PASS_RUNTIME_DEFERRED",
+  "unit_tests": {
+    "app": {
+      "total": 919,
+      "passed": 919,
+      "failed": 0,
+      "skipped": 0
+    },
+    "domain": {
+      "total": 85,
+      "passed": 85,
+      "failed": 0,
+      "skipped": 0
+    }
+  },
+  "unit_execution": {
+    "app": "fresh",
+    "domain": "up-to-date"
+  },
+  "new_unit_tests": 15,
+  "previous_contract_positive_cases_rejected": 2,
+  "missing_baseline_cases": 0,
+  "android_app_compile": true,
+  "android_test_compile": true,
+  "new_android_cases_compiled": 6,
+  "android_runtime_executed": false,
+  "user_device_testing": "DEFERRED_UNTIL_FINAL_CONSOLIDATION_BY_USER",
+  "overlay_tests_passed": 4,
+  "packaging_tests_passed": 16,
+  "selected_gradle_outcomes": [
+    "> Task :domain:testDebugUnitTest UP-TO-DATE",
+    "> Task :data:testDebugUnitTest NO-SOURCE",
+    "> Task :source-api:testDebugUnitTest NO-SOURCE",
+    "> Task :app:compileDebugKotlin",
+    "> Task :app:testDebugUnitTest",
+    "> Task :app:compileDebugAndroidTestKotlin",
+    "BUILD SUCCESSFUL in 2m 30s"
+  ],
+  "final_android_compile": [
+    "> Task :app:compileDebugAndroidTestKotlin",
+    "BUILD SUCCESSFUL in 1m 23s"
+  ],
+  "action_http_methods": [],
+  "account_cloud_sync": "DEFERRED_BY_USER",
+  "new_app_apk_built": false,
+  "fixture_dex_built": true,
+  "prior_internal_apk_revision": "P20261113.3",
+  "release_published": false,
+  "publication": "Readable results only; original logs/XML remain local."
+}

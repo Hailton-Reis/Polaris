@@ -1,0 +1,39 @@
+{
+  "previous_engineering_commit": "64b8807d30f6c5374835c3249a4b1cb1d506352e",
+  "overlay_prerequisite": "f037c5d85575e30694295df5d079e97dcc4a35b9",
+  "overlay_sha256": "0ab54cc3ba43b150c90de39fc3c65f7bbfb3c46ff004853112641cc422a417f0",
+  "test_only_driver": "app.cash.sqldelight:sqlite-driver:2.3.2",
+  "test_only_sqlite_engine": "org.xerial:sqlite-jdbc:3.51.3.0",
+  "files": [
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/data/backup/restore/restorers/MangaRestorer.kt",
+      "bytes": 17269,
+      "sha256": "cc06a34979ad5b8319eedd0799e69a0f7de74d9748c1b92edcfe209cd3ba8456"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/data/backup/restore/BackupSqliteRestoreTest.kt",
+      "bytes": 18461,
+      "sha256": "caa98ab7a594a6a9b7c1aa19e4dfc973309f218e5d19dd9e65c0ba9a3f59fdf7"
+    },
+    {
+      "path": "app/src/androidTest/java/eu/kanade/tachiyomi/storage/BackupSqliteRestoreAndroidTest.kt",
+      "bytes": 5912,
+      "sha256": "55bb56227f15dcba8717a3f7c260d141a9114b70ea845cf1dbff7fa1b3495bf9"
+    },
+    {
+      "path": "app/build.gradle.kts",
+      "bytes": 11844,
+      "sha256": "cc4887a758915ab78f34203b6e3f496a4fdedfa82b1558def68ed0bcc0dba84e"
+    },
+    {
+      "path": "gradle/libs.versions.toml",
+      "bytes": 17196,
+      "sha256": "cdec539bb1f80ba13d49294083bb9819e2b175d674030fb15add165aebba0c14"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt",
+      "bytes": 10875,
+      "sha256": "c4e9ba7a0608058af0c43a0b9800bfa644aa6b3a9f86a309584c7e62ed0e8914"
+    }
+  ]
+}

@@ -39,7 +39,7 @@ O `application_id` e a chave de assinatura precisam permanecer os mesmos entre b
 ## Publicação pelo mantenedor
 
 1. Concluir os testes pendentes, incluindo armazenamento e instalação, antes de distribuir o candidato.
-2. Gerar os APKs ARM e o `manifest.json` pelo exportador atualizado, usando a assinatura original.
+2. Gerar o APK ARM da variante `beta` (`:app:assembleBeta -Ppolaris.universalArm=true`) e o `manifest.json` pelo exportador atualizado, usando a assinatura original. Na beta.11, `--previous-manifest integration/release-candidates/0.1.0-beta.10/manifest.json` é obrigatório. O exportador recusa identidade/assinatura divergentes, código não crescente, depuração ativa, componentes de teste/sandbox e classes JVM de teste no APK. A variante mantém o sufixo `.dev` da beta.10 instalada.
 3. Conferir que versão, código, identificador, Android mínimo, nomes, tamanhos e hashes correspondem aos arquivos finais.
 4. Anexar **`manifest.json` e os APKs** à mesma Release, com tag `v<version>`. As notas devem explicar mudanças, limitações e validação.
 5. Para um beta, marcar a Release como **pré-lançamento**; mantê-la em rascunho enquanto não estiver liberada. Um rascunho não vira atualização disponível no aplicativo.
@@ -60,3 +60,13 @@ A beta.10 / P20261106.1 tem um APK universal ARM32/ARM64 conferido por tamanho, 
 O APK universal mantém a identidade e a assinatura da beta.9 distribuída. Compilação, hashes e testes JVM não validam uma atualização real: retomada entre redes, instalação e preservação dos dados ainda exigem aceite nos aparelhos.
 
 [Notas e evidência da beta.10](versoes/0.1.0-beta.10.md).
+
+Na candidata P20261113.3, o guard confirmou que o certificado debug deste ambiente diverge da beta.10. O arquivo da chave original não foi encontrado nas fontes acessíveis; o certificado público não o substitui. Não publicar essa compilação como atualização nem desinstalar para contornar o conflito. [Registro atual](../integration/build-validation/20261113/README.md).
+
+A [recuperação da assinatura original](../integration/signing-recovery/20261113/README.md) foi concluída após o registro anterior: o keystore recuperado corresponde ao certificado público da beta.10 e foi configurado somente no ambiente privado. A atualização real no aparelho continua pendente.
+
+A mesma continuação gerou e verificou o APK universal beta.11/P20261113.3 (272.970.356 bytes, ARM32/ARM64, código 112). O exportador confirmou SAME_ID_AND_SIGNER contra a beta.10 e 16 testes de empacotamento passaram após correção do verificador de aliases. Ainda é candidata interna; não houve Release pública nem aceite de atualização no aparelho.
+
+P20261115.2 remove a sandbox experimental dos fontes compilados e guarda o checkpoint anterior numa branch de arquivo. O aviso único permanece. Classes e manifestos foram inspecionados após compilação; a medida de tamanho fica para o pacote final. O APK interno P20261113.3 continua anterior a essa retirada e às demais revisões posteriores, sem representar a candidata atual. [Escopo atual](ARQUIVAMENTO_SANDBOX_P20261115_2.md).
+
+A candidata P20261116.1 substitui o APK interno antigo como pacote atual de avaliação: beta.11/código 112, universal ARM32/ARM64, 259.481.310 bytes, mesmo ID/certificado da beta.10 e variante `beta` não depurável. Manifesto, oito DEX/68.658 classes, revisão, marca e bibliotecas nativas foram conferidos; sandbox/harnesses/classes JVM de teste ausentes, worker OCR preservado. [Build e verificação](DISTRIBUICAO_BETA_P20261116_1.md). O arquivo anterior foi preservado e é recusado pelos novos guards. Nenhuma Release pública foi criada; atualizar no aparelho e preservar dados continuam pendentes.

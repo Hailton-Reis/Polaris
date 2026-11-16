@@ -1,0 +1,30 @@
+[
+  {
+    "variant_manifest": "app/build/intermediates/merged_manifest/debug/processDebugMainManifest/AndroidManifest.xml",
+    "component": "eu.kanade.tachiyomi.extension.sandbox.ExtensionSandboxService",
+    "enabled": false,
+    "exported": "false",
+    "manifest_sha256": "78d362a2c86b89230a03485d983f58469ede7f33a2ce31c331db6fa57079333b"
+  },
+  {
+    "variant_manifest": "app/build/intermediates/merged_manifest/debug/processDebugMainManifest/AndroidManifest.xml",
+    "component": "eu.kanade.tachiyomi.extension.sandbox.SandboxLoginActivity",
+    "enabled": false,
+    "exported": "false",
+    "manifest_sha256": "78d362a2c86b89230a03485d983f58469ede7f33a2ce31c331db6fa57079333b"
+  },
+  {
+    "variant_manifest": "app/build/intermediates/merged_manifests/debug/processDebugManifest/universal/AndroidManifest.xml",
+    "component": "eu.kanade.tachiyomi.extension.sandbox.ExtensionSandboxService",
+    "enabled": false,
+    "exported": "false",
+    "manifest_sha256": "78d362a2c86b89230a03485d983f58469ede7f33a2ce31c331db6fa57079333b"
+  },
+  {
+    "variant_manifest": "app/build/intermediates/merged_manifests/debug/processDebugManifest/universal/AndroidManifest.xml",
+    "component": "eu.kanade.tachiyomi.extension.sandbox.SandboxLoginActivity",
+    "enabled": false,
+    "exported": "false",
+    "manifest_sha256": "78d362a2c86b89230a03485d983f58469ede7f33a2ce31c331db6fa57079333b"
+  }
+]

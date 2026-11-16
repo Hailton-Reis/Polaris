@@ -1,0 +1,8 @@
+Public extract: selected Gradle outcomes only. Full log retained locally.
+> Task :domain:testDebugUnitTest UP-TO-DATE
+> Task :data:testDebugUnitTest NO-SOURCE
+> Task :source-api:testDebugUnitTest NO-SOURCE
+> Task :app:compileDebugKotlin
+> Task :app:compileDebugKotlin FAILED
+BUILD FAILED in 1m 10s
+Diagnostic summary: nullable UniFile.listFiles result; resolved by explicit checkNotNull and regression coverage.
