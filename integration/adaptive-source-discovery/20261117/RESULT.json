@@ -1,0 +1,42 @@
+{
+  "revision": "P20261117.6",
+  "date": "2026-11-17",
+  "timezone": "America/Fortaleza",
+  "status": "VALIDATED_FOR_NEXT_VERSION_NOT_RELEASED",
+  "foreground_shared_alternative_operations": 4,
+  "background_shared_alternative_operations": 1,
+  "initial_mode": "background",
+  "foreground_signal": "Existing App ProcessLifecycleOwner onStart/onStop callbacks",
+  "already_admitted_operations_cancelled_on_mode_change": false,
+  "admission_order": "FIFO",
+  "capacity_shared_across_catalog_instances_and_works_in_this_process": true,
+  "original_source_uses_alternative_gate": false,
+  "global_text_search_tasks_unchanged": 5,
+  "prepared_result_buffer": 4,
+  "cooperative_cancellation_required": true,
+  "periodic_job_added_or_enabled": false,
+  "existing_library_schedule_and_discovery_eligibility_changed": false,
+  "net_new_cases": 12,
+  "expected_renamed_case_count": 1,
+  "focused_cases_before_final_additional_dispatcher_control": 49,
+  "final_validation": {
+    "duration": "2m 46s",
+    "gradle_exit_code": 0,
+    "fresh_app_beta_passed": 989,
+    "previously_passed_domain_release_up_to_date": 87,
+    "total_reports_passed": 1076,
+    "failed": 0,
+    "skipped": 0,
+    "unexpected_missing_cases": 0
+  },
+  "engineering_checks": {
+    "overlay_passed": 4,
+    "packaging_passed": 27,
+    "comparator_passed": 21
+  },
+  "real_dispatcher_thread_admission_control_passed": true,
+  "lifecycle_callbacks_compiled_not_device_tested": true,
+  "real_provider_speed_or_battery_measured": false,
+  "new_apk": false,
+  "new_release": false
+}

@@ -1,0 +1,60 @@
+{
+  "revision": "P20261117.1",
+  "date": "2026-11-17",
+  "timezone": "America/Fortaleza",
+  "status": "INTEGRATED_COMPILED_STATIC_CHECKS_PASSED_NOT_RELEASED",
+  "dependency": "org.opencv:opencv:4.12.0",
+  "compile": {
+    "exit_code": 0,
+    "duration": "1m45s",
+    "sdk_and_app_kotlin_compiled": true,
+    "native_merge_executed": true
+  },
+  "unit_validation": {
+    "exit_code": 0,
+    "duration": "2m36s",
+    "fresh_app_beta_passed": 932,
+    "previously_passed_domain_release_up_to_date": 85,
+    "total_reports_passed": 1017,
+    "failed": 0,
+    "skipped": 0,
+    "missing_baseline_cases": 0,
+    "new_junit_cases": 0
+  },
+  "initial_task_selection": {
+    "exit_code": 1,
+    "nonexistent_task": ":ppocr-sdk:testReleaseUnitTest",
+    "tests_executed": false,
+    "corrected": true,
+    "behavioral_regression": false
+  },
+  "engineering_checks": {
+    "overlay_passed": 4,
+    "packaging_passed": 27,
+    "comparator_passed": 21,
+    "native_negative_controls_rejected": 2
+  },
+  "native": {
+    "files": 31,
+    "arm64_files": 16,
+    "arm32_files": 15,
+    "official_opencv_cpp_hashes_match": 4,
+    "unrelated_files_unchanged": 27,
+    "arm64_pt_load_at_least_16k": true,
+    "arm64_load_offset_address_congruent_16k": true,
+    "cpp_prior_runtime_strong_imports_per_abi": 204,
+    "missing_cpp_symbols": 0,
+    "java_member_references_checked": 59,
+    "missing_or_changed_java_members": 0,
+    "total_merged_bytes": 195499800,
+    "previous_merged_bytes": 192286636,
+    "raw_native_delta_bytes": 3213164
+  },
+  "new_apk": false,
+  "new_release": false,
+  "final_apk_zip_verified": false,
+  "new_android_instrumentation": false,
+  "jni_or_ocr_executed": false,
+  "device_runtime_verified": false,
+  "ram_or_performance_measured": false
+}

@@ -1,0 +1,80 @@
+{
+  "net_new_cases": 12,
+  "renamed_existing_cases": [
+    {
+      "old": [
+        "app",
+        "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+        "confirmed catalog refreshes overlap in pairs instead of waiting in sequence()"
+      ],
+      "new": [
+        "app",
+        "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+        "confirmed catalog refreshes share the four foreground slots()"
+      ],
+      "reason": "Confirmed refresh policy now uses up to four foreground alternatives instead of pairs."
+    }
+  ],
+  "cases": [
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "background confirmed refreshes use one shared slot even with four pipeline workers()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "different catalog instances share four foreground operations rather than four each()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "hiding the app during discovery retains admitted results and serializes remaining alternatives()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.SourceDiscoveryConcurrencyTest",
+      "name": "a failing operation releases capacity for the next work()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.SourceDiscoveryConcurrencyTest",
+      "name": "a process without a visible activity starts with one alternative at a time()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.SourceDiscoveryConcurrencyTest",
+      "name": "background transition drains admitted work without cancelling it before admitting another()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.SourceDiscoveryConcurrencyTest",
+      "name": "cancellation after admission before dispatcher resume does not leak a slot()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.SourceDiscoveryConcurrencyTest",
+      "name": "cancelling a queued request preserves the order and capacity of surviving requests()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.SourceDiscoveryConcurrencyTest",
+      "name": "cancelling active and queued work leaves all foreground slots reusable()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.SourceDiscoveryConcurrencyTest",
+      "name": "concurrent dispatcher threads respect the shared limit and background drain()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.SourceDiscoveryConcurrencyTest",
+      "name": "foreground alternatives overlap up to four and queued requests keep FIFO order()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.SourceDiscoveryConcurrencyTest",
+      "name": "returning to foreground wakes waiting work without another request or poll()"
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "url": "https://developer.android.com/guide/practices/page-sizes",
+  "document_sha256": "185c7e0207ae3b3bdaf6c98744fcccf73d1e888baed3dffb4a747e5f4de68d67",
+  "snippets": [
+    "e same way and reimport the 16&nbsp;KB-aligned libraries into your app. Android NDK r28 and higher NDK version r28 and higher compile 16&nbsp;KB-aligned by default. Android NDK r27 and lower To support compiling 16&nbsp;KB-aligned shared libraries with Android NDK version r27 or lower, use the following linker flags: -Wl,-z,max-page-size=16384 -Wl,-z,common-page-size=16384 Here",
+    "ort different platform versions Filters on Google Play ⍈ 64-bit Support Support 16 KB page sizes Build AI experiences Get started Get started Hello, world! Adaptive apps Compose for UI AI-powered IDE Monetization with Play ↗️ Developer Verification Registered App Stores Optimize by form factor Phones, tablets, foldables Android for Cars Android TV Android XR Googlebook ChromeOS",
+    "sp;KB support Tip: If you update your tools to the latest versions (AGP version 8.5.1 or higher and NDK version r28 or higher) and use 16&nbsp;KB-compatible prebuilt dependencies, then your app is 16&nbsp;KB compatible by default and you can skip to the step for fixing code and resolving runtime issues . Update the packaging of your shared libraries Upgrade to AGP version 8.5.1",
+    " address of the GNU_RELRO segment ( VirtAddr + MemSiz ) must be 16 KB aligned ( 0x4000 ). Otherwise, when the Android Linker marks the 16 KB page containing the end of GNU_RELRO as read-only, any adjacent writable data residing in the remainder of that same 16 KB page also becomes read-only, crashing the app at runtime with a segmentation fault ( SIGSEGV ) when that data is wri"
+  ]
+}

@@ -1,0 +1,54 @@
+{
+  "revision": "P20261116.3",
+  "date": "2026-11-16",
+  "timezone": "America/Fortaleza",
+  "status": "VALIDATED_FOR_NEXT_VERSION_NOT_RELEASED",
+  "policy": {
+    "decoded_bytes": true,
+    "max_heap_fraction_denominator": 8,
+    "absolute_max_bytes": 67108864,
+    "total_heap_or_oom_guarantee": false,
+    "automatic_creation_guard": "After serialization, before destination/file/pruning/timestamp",
+    "manual_export_above_budget_allowed": true
+  },
+  "reproduced_failures": 3,
+  "focused_passed": 38,
+  "new_cases": 21,
+  "final_validation": {
+    "gradle_exit_code": 0,
+    "build_successful": true,
+    "duration": "2m53s",
+    "fresh_app_beta_passed": 932,
+    "previously_passed_domain_release_up_to_date": 85,
+    "total_reports_passed": 1017,
+    "failed": 0,
+    "skipped": 0,
+    "missing_baseline_cases": 0,
+    "data_and_source_api": "NO-SOURCE",
+    "tasks": {
+      "app": "testBetaUnitTest",
+      "domain": "testReleaseUnitTest"
+    }
+  },
+  "engineering_checks": {
+    "overlay_passed": 4,
+    "packaging_passed": 27,
+    "unit_comparator_passed": 21
+  },
+  "research": {
+    "opencv_candidate": "org.opencv:opencv:4.12.0",
+    "java_member_references_checked": 59,
+    "java_member_missing_or_changed": 0,
+    "no_references_negative_control_rejected": true,
+    "arm64_below_16k": [],
+    "raw_arm_native_delta_bytes": 3213164,
+    "candidate_integrated_or_built": false,
+    "dependencies_changed": false,
+    "native_inference_executed": false
+  },
+  "new_android_instrumentation": false,
+  "device_runtime_verified": false,
+  "ram_peak_measured": false,
+  "new_apk": false,
+  "new_release": false
+}

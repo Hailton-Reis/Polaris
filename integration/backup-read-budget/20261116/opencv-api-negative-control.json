@@ -1,0 +1,5 @@
+{
+  "control": "Consumer with no OpenCV references must not receive a success verdict",
+  "rejected": true,
+  "native_code_executed": false
+}

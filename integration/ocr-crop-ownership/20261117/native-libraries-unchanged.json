@@ -1,0 +1,163 @@
+{
+  "compared_with": "integration/opencv-integration/20261117/merged-native.json",
+  "files": 31,
+  "all_unchanged": true,
+  "libraries": [
+    {
+      "path": "arm64-v8a/libandroidx.graphics.path.so",
+      "sha256": "41e9a793c43a0f4fddb19e33f346bace464f30f888ba7b9eaf96294ea115bfb6",
+      "unchanged": true
+    },
+    {
+      "path": "arm64-v8a/libarchive-jni.so",
+      "sha256": "92332de41e661c2a5ce05df65c8a0a6367a99a2cb201e3b3eec7039c9cbc669e",
+      "unchanged": true
+    },
+    {
+      "path": "arm64-v8a/libc++_shared.so",
+      "sha256": "4397241b4bd20a8e579bfb41d21107857e12985f6a01ca0c2a5f83380d1270b4",
+      "unchanged": true
+    },
+    {
+      "path": "arm64-v8a/libconscrypt_jni.so",
+      "sha256": "0b9ac95fe4e7ef7404cb015b54a58d4a31194fb8d0249da83c47468590dcc60b",
+      "unchanged": true
+    },
+    {
+      "path": "arm64-v8a/libimagedecoder.so",
+      "sha256": "379f979c3df11717c12e28746cce7bfaa97e99e140b1e8c56134608c11b3bed3",
+      "unchanged": true
+    },
+    {
+      "path": "arm64-v8a/liblanguage_id_l2c_jni.so",
+      "sha256": "4479b044bbdad9a938fea15698dfa3473e73bd6bab9f8e0468fc3cc6069c137e",
+      "unchanged": true
+    },
+    {
+      "path": "arm64-v8a/libmlkit_google_ocr_pipeline.so",
+      "sha256": "fa41d509a661e8aa8b3e3ac1a28541f8823f308414fcad733fe26d61feea2646",
+      "unchanged": true
+    },
+    {
+      "path": "arm64-v8a/libonnxruntime.so",
+      "sha256": "11ef853b751532dc827bd7799f557f9495e2ee7523b9b355753fc0344576bd5e",
+      "unchanged": true
+    },
+    {
+      "path": "arm64-v8a/libonnxruntime4j_jni.so",
+      "sha256": "f657216254a2f88fcbd89c5e73a2f7ae5a8145d092f8700951aedba8e4a60ef2",
+      "unchanged": true
+    },
+    {
+      "path": "arm64-v8a/libopencv_java4.so",
+      "sha256": "144bbc9ad0b0bac4ba58f7d53198aead64379e5314f68200968c703d2c1c14ab",
+      "unchanged": true
+    },
+    {
+      "path": "arm64-v8a/libquickjs.so",
+      "sha256": "286c96e2dda9d062f1437b1d519421cb606a21eb9079d9ecbb84b88f9984f028",
+      "unchanged": true
+    },
+    {
+      "path": "arm64-v8a/libsqliteJni.so",
+      "sha256": "9d3ad85cca0b7b02e0fe31beec3f17c86cccdebf62e1d1c47ac46743f4967a99",
+      "unchanged": true
+    },
+    {
+      "path": "arm64-v8a/libtdjni.so",
+      "sha256": "7c1751197b35a64261e3b3f21764874c9ee8795e4b6118c23a74499426c44b91",
+      "unchanged": true
+    },
+    {
+      "path": "arm64-v8a/libtranslate_jni.so",
+      "sha256": "35b3d0366291347e3f25e80e809ee398d716aea49cd03278007fedd526a1496f",
+      "unchanged": true
+    },
+    {
+      "path": "arm64-v8a/libyomotsu_dbnet.so",
+      "sha256": "ec90e187ee7a0f2e6b9b81ffffedae2e5c4ab1e4a8c10ebad34e76e70873fe1a",
+      "unchanged": true
+    },
+    {
+      "path": "arm64-v8a/libzstd-kmp.so",
+      "sha256": "10ec47f13bee884450b0911066019ba7aa6b4164a4c1f8c33c9d30dd3fd8868a",
+      "unchanged": true
+    },
+    {
+      "path": "armeabi-v7a/libandroidx.graphics.path.so",
+      "sha256": "41399eba6fc2a60f6f14642375c1824f3cf25eb8fec7397d753730a3ceda3e2b",
+      "unchanged": true
+    },
+    {
+      "path": "armeabi-v7a/libarchive-jni.so",
+      "sha256": "d8168c8e2e82fd7795ba8e0631fd3ca6a7614dec36e9e168c77eac0e38628cb9",
+      "unchanged": true
+    },
+    {
+      "path": "armeabi-v7a/libc++_shared.so",
+      "sha256": "91b49f121b3120538faff020fcf535ade1d945e65ccd793fc0b815b5799bbdf0",
+      "unchanged": true
+    },
+    {
+      "path": "armeabi-v7a/libconscrypt_jni.so",
+      "sha256": "f636e341b0e41e527a057a4d8d2423aad1c9533597daa955fabe5335b4ef79c9",
+      "unchanged": true
+    },
+    {
+      "path": "armeabi-v7a/libimagedecoder.so",
+      "sha256": "efbf4ab9a9453b9fdf24ee050c6fe4340c1bf8096bc107e40a9c00e911360ffe",
+      "unchanged": true
+    },
+    {
+      "path": "armeabi-v7a/liblanguage_id_l2c_jni.so",
+      "sha256": "1c1a8baa63ecc473e611902a8aa010fa526f2a35594c302836f7279d1c73aa17",
+      "unchanged": true
+    },
+    {
+      "path": "armeabi-v7a/libmlkit_google_ocr_pipeline.so",
+      "sha256": "06b9e2f587e401c6446aa0db344bb31b622957a2d04aa4eac03cde8b3a6ed78a",
+      "unchanged": true
+    },
+    {
+      "path": "armeabi-v7a/libonnxruntime.so",
+      "sha256": "2e55ddb9df17bba226a2b3eb4ccd7029010c7631cee93a69a00f928c0e955972",
+      "unchanged": true
+    },
+    {
+      "path": "armeabi-v7a/libonnxruntime4j_jni.so",
+      "sha256": "8b53e40fc127190b18e69a524371cd4ce9b52e059354d8fe8f228a345bb8355d",
+      "unchanged": true
+    },
+    {
+      "path": "armeabi-v7a/libopencv_java4.so",
+      "sha256": "933fe7879c07fe603ce5e0f6a04298fa4b07e553c6dc83744a2779161d47e773",
+      "unchanged": true
+    },
+    {
+      "path": "armeabi-v7a/libquickjs.so",
+      "sha256": "5782df6a4e8ba113dc8a5dc034a81752fbeaac15534b9cfadd24684a036a6d60",
+      "unchanged": true
+    },
+    {
+      "path": "armeabi-v7a/libsqliteJni.so",
+      "sha256": "d1bcd83899465f738a7e155007f318be8331bbae97b942cce5d29c24b633501e",
+      "unchanged": true
+    },
+    {
+      "path": "armeabi-v7a/libtdjni.so",
+      "sha256": "56bcd646dae3442a2aeefee3ce28b72c14dc257488d267d4ed76e7e01e08f158",
+      "unchanged": true
+    },
+    {
+      "path": "armeabi-v7a/libtranslate_jni.so",
+      "sha256": "cdf803c7a17cadf5f53314365dd3c999746d98c510863c636de62c7acd8cb016",
+      "unchanged": true
+    },
+    {
+      "path": "armeabi-v7a/libzstd-kmp.so",
+      "sha256": "4b30671d21e9c6953dc84e4b4602e33b88740d61417af96dbc4ddf44b22a8e15",
+      "unchanged": true
+    }
+  ],
+  "new_native_runtime_execution": false
+}

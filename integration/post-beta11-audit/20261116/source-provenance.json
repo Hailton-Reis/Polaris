@@ -1,0 +1,79 @@
+{
+  "baseline_engineering_commit": "32a9c831c32b83f761001cf1a298348defaed2fa",
+  "overlay_prerequisite": "f037c5d85575e30694295df5d079e97dcc4a35b9",
+  "overlay_sha256": "3ea87c4611e3b6c57d45a16bea82eff504b0395d586c0172fa4d26dd378acb50",
+  "files": [
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/data/updater/PolarisApkDownloader.kt",
+      "bytes": 9003,
+      "sha256": "8878f070931b19e7a992c36ea9c6aaccfaccc9118fa6a9dd6f38ae52b8b41136"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/data/updater/PolarisUpdateClient.kt",
+      "bytes": 5154,
+      "sha256": "d71874dac677fea08794a567c664c2b2387b68bb36ee284f22da0656d0471805"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/data/updater/AppUpdateDownloadJob.kt",
+      "bytes": 8344,
+      "sha256": "6c3761671a1a7bee1ed7559d9512a6891eeea7e78906b935e0c4dbda70c02ba0"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/ui/more/NewUpdateScreen.kt",
+      "bytes": 2209,
+      "sha256": "121c18e5c1f47726d981a140d2aa7e29038d971185afc790328222f5a709d7ba"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/ui/more/NewUpdateScreenModel.kt",
+      "bytes": 4501,
+      "sha256": "a7bc4818bc97f7561fa6aacb00086b1be0f9bc84e7687473451d78b6fa41163c"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/ui/main/MainActivity.kt",
+      "bytes": 26415,
+      "sha256": "4f557d117cbac92226f5e48f1313eb54c89ed34117144431e3e45507658dac35"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/presentation/more/settings/screen/about/PolarisUpdateCheck.kt",
+      "bytes": 2805,
+      "sha256": "f7e56427e820b21b02c8bad80fa0810b5a28a764e95e9941ce9187a86b6226f0"
+    },
+    {
+      "path": "domain/src/main/java/tachiyomi/domain/release/model/Release.kt",
+      "bytes": 291,
+      "sha256": "a89d59ac80084ad19be48aae97d23f70afe8f9c0398fc3f2f19c156da9eb80ad"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt",
+      "bytes": 10970,
+      "sha256": "860462723019bbaf93a99bfc8d618f01d0d5b19d4d3c3b5e2d5e99c18880bacc"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/data/updater/PolarisApkDownloadBoundsTest.kt",
+      "bytes": 9674,
+      "sha256": "16b3c3c0c5a6470467162f92d76314967559647d3a5c54a771c3f960f7bb5b92"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/data/updater/PolarisApkDownloaderTest.kt",
+      "bytes": 10067,
+      "sha256": "ee8acb3e05a1807157d845570b905883669ab4e9176e99a60d3971d2e49c35a6"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/data/updater/PolarisUpdateClientTest.kt",
+      "bytes": 10490,
+      "sha256": "6eb8ffc9d593f0ffbcc50c2e8c01c7d7c13ed9f81dfaa76fbead7a013307ae04"
+    }
+  ],
+  "inspection_script_sha256": "57eb455bd22c87b906905dab8c517c27745e9899b7e9f3e7bac511eec472f8d7",
+  "backup_decoder_reviewed_sha256": "8a93eb2d8b0219f1c8bda1ddbb98cf506edf139daf0a1cef6ae71b81d663d950",
+  "native_dependency_declarations": [
+    {
+      "path": "ppocr-sdk/build.gradle.kts",
+      "sha256": "c6395382bc312fcad36612cd3c17e0365b8f40d2e053f5256b321a17d323a69a"
+    },
+    {
+      "path": "gradle/libs.versions.toml",
+      "sha256": "cdec539bb1f80ba13d49294083bb9819e2b175d674030fb15add165aebba0c14"
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "revision": "P20261117.5",
+  "date": "2026-11-17",
+  "timezone": "America/Fortaleza",
+  "status": "VALIDATED_FOR_NEXT_VERSION_NOT_RELEASED",
+  "default_filter_enabled": true,
+  "source_wide_gate_removed": true,
+  "extension_flag_lookups_removed": true,
+  "classification_scope": "work title, genres and explicit rating metadata",
+  "disable_confirmation": "I understand, allow",
+  "dismiss_keeps_filter_enabled": true,
+  "re_enable_without_confirmation": true,
+  "previous_opt_out_preserved": true,
+  "legacy_extension_loading_choice_independent": true,
+  "library_deletion": false,
+  "new_models_or_classification_network_requests": false,
+  "unlabeled_content_guaranteed_hidden": false,
+  "focused_cases_passed": 86,
+  "superseded_policy_cases": 7,
+  "replacement_policy_cases": 7,
+  "net_new_cases": 0,
+  "final_validation": {
+    "duration": "2m 37s",
+    "gradle_exit_code": 0,
+    "fresh_app_beta_passed": 977,
+    "previously_passed_domain_release_up_to_date": 87,
+    "total_reports_passed": 1064,
+    "failed": 0,
+    "skipped": 0,
+    "unexpected_missing_cases": 0
+  },
+  "engineering_checks": {
+    "overlay_passed": 4,
+    "packaging_passed": 27,
+    "comparator_passed": 21
+  },
+  "ui_compiled_and_code_reviewed": true,
+  "device_ui_tested": false,
+  "real_providers_tested": false,
+  "new_apk": false,
+  "new_release": false
+}

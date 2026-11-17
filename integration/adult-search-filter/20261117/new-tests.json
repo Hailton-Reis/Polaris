@@ -1,0 +1,130 @@
+{
+  "count": 25,
+  "cases": [
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AdultContentFilterTest",
+      "name": "a fully adult group disappears instead of falling back to its original representative()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AdultContentFilterTest",
+      "name": "declared adult providers are hidden even if individual results have no labels()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AdultContentFilterTest",
+      "name": "demographics romance orientations and generic mature genres are not adult ratings()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AdultContentFilterTest",
+      "name": "disabling the filter bypasses labels and source lookup and a new snapshot follows changes()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AdultContentFilterTest",
+      "name": "explicit genre labels work across separators accents case and full width text()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AdultContentFilterTest",
+      "name": "explicit memo ratings can classify unlabeled results without scanning arbitrary notes()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AdultContentFilterTest",
+      "name": "explicit title markers are blocked without treating ordinary title words as ratings()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AdultContentFilterTest",
+      "name": "filtering a group keeps legal editions and the existing favorite priority without modifying originals()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AdultContentFilterTest",
+      "name": "source snapshots do not retain a mutable external source set()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AdultContentFilterTest",
+      "name": "the search filter starts enabled without changing extension loading preferences()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "a remembered adult alternative is not image sampled or reactivated by automatic refresh()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "adult labeled matching alternatives are not adopted or image sampled()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "an existing adult original can still refresh from the library()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "declared adult sources are not queried even when their manga metadata has no labels()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "enabling filtering during an image check prevents adoption of that adult alternative()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "filter changes invalidate discovery even when installed provider ids stay the same()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.UnifiedWorkSearchTest",
+      "name": "a declared adult provider is not searched for localized aliases()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.UnifiedWorkSearchTest",
+      "name": "adult classification revealed by details removes the hit instead of falling back to its original card()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.UnifiedWorkSearchTest",
+      "name": "adult labeled search hits do not become visible work cards()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.UnifiedWorkSearchTest",
+      "name": "an adult favorite is not brought back through a normal matching search group()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.UnifiedWorkSearchTest",
+      "name": "an adult rating revealed in detail memo is filtered without copying provider memo into a saved hit()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.UnifiedWorkSearchTest",
+      "name": "disabling the filter restores adult labeled hits without changing their records()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.UnifiedWorkSearchTest",
+      "name": "enabling filtering while detail enrichment is in flight prevents adult fallback()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.ui.browse.source.globalsearch.AdultSearchViewModelTest",
+      "name": "enabling filtering cancels an in flight adult provider and clears its source row()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.ui.browse.source.globalsearch.AdultSearchViewModelTest",
+      "name": "flagged providers are not queried and adult rows are filtered before local persistence()"
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "method": "kotlinx.coroutines.test.runTest scheduler; real production catalog flow/matching/retention with simulated provider callbacks and delays. Not a network/device/RAM benchmark.",
+  "cases": [
+    {
+      "case": "three confirmed catalogs, each delayed 1000ms",
+      "baseline_virtual_ms": 3000,
+      "patched_virtual_ms": 2000
+    },
+    {
+      "case": "four alternative readability checks, each delayed 1000ms",
+      "baseline_virtual_ms": 4000,
+      "patched_virtual_ms": 2000,
+      "patched_peak_checks": 2
+    },
+    {
+      "case": "repeat search on healthy confirmed provider refreshed this attempt",
+      "baseline_searches": 1,
+      "patched_searches": 0
+    },
+    {
+      "case": "retry eligibility with incomplete attempt timestamp aged 65000ms",
+      "baseline_eligible": false,
+      "patched_eligible": true
+    },
+    {
+      "case": "another work completes while a slow work is still scanning",
+      "patched_fast_work_ready_at_virtual_ms": 30000,
+      "patched_slow_work_finishes_at_virtual_ms": 60000,
+      "baseline_timing_measured": false
+    }
+  ]
+}

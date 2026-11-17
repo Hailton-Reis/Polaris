@@ -1,0 +1,10 @@
+{
+  "scope": "Merged manifest, not a new packaged APK",
+  "application_id": "app.mihon.tachiyomiat.dev",
+  "version_name": "0.1.0-beta.11",
+  "version_code": "112",
+  "min_sdk": "26",
+  "debuggable_attribute": null,
+  "test_only_attribute": null,
+  "profileable_shell": []
+}

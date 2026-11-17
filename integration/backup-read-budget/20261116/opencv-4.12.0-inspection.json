@@ -1,0 +1,246 @@
+{
+  "scope": "Static ZIP sizes, ARM ELF machine and PT_LOAD headers; not device execution, installed size or RAM",
+  "apk_sha256": null,
+  "apk_bytes": null,
+  "artifact_sha256": "f71846a313388d9da667a59be1e921669fcf792d1ba264b3898253ca789bc3f0",
+  "artifact_bytes": 117745028,
+  "native_root": "jni",
+  "groups": {
+    "prefab": {
+      "compressed_bytes": 58536761,
+      "uncompressed_bytes": 143251628,
+      "files": 418
+    },
+    "jni/x86_64": {
+      "compressed_bytes": 23669216,
+      "uncompressed_bytes": 57083000,
+      "files": 3
+    },
+    "jni/x86": {
+      "compressed_bytes": 17176888,
+      "uncompressed_bytes": 42982224,
+      "files": 3
+    },
+    "jni/arm64-v8a": {
+      "compressed_bytes": 9746373,
+      "uncompressed_bytes": 24757992,
+      "files": 3
+    },
+    "jni/armeabi-v7a": {
+      "compressed_bytes": 8115551,
+      "uncompressed_bytes": 16495064,
+      "files": 3
+    },
+    "classes.jar": {
+      "compressed_bytes": 411432,
+      "uncompressed_bytes": 435072,
+      "files": 1
+    },
+    "res": {
+      "compressed_bytes": 192,
+      "uncompressed_bytes": 374,
+      "files": 3
+    },
+    "AndroidManifest.xml": {
+      "compressed_bytes": 142,
+      "uncompressed_bytes": 192,
+      "files": 1
+    },
+    "META-INF": {
+      "compressed_bytes": 111,
+      "uncompressed_bytes": 156,
+      "files": 6
+    },
+    "R.txt": {
+      "compressed_bytes": 110,
+      "uncompressed_bytes": 236,
+      "files": 1
+    },
+    "jni/": {
+      "compressed_bytes": 0,
+      "uncompressed_bytes": 0,
+      "files": 1
+    }
+  },
+  "largest_entries": [
+    {
+      "path": "prefab/modules/opencv_java4/libs/android.x86_64/libopencv_java4.so",
+      "compressed_bytes": 23253171,
+      "uncompressed_bytes": 55830920
+    },
+    {
+      "path": "jni/x86_64/libopencv_java4.so",
+      "compressed_bytes": 23253171,
+      "uncompressed_bytes": 55830920
+    },
+    {
+      "path": "prefab/modules/opencv_java4/libs/android.x86/libopencv_java4.so",
+      "compressed_bytes": 16739515,
+      "uncompressed_bytes": 41727236
+    },
+    {
+      "path": "jni/x86/libopencv_java4.so",
+      "compressed_bytes": 16739515,
+      "uncompressed_bytes": 41727236
+    },
+    {
+      "path": "prefab/modules/opencv_java4/libs/android.arm64-v8a/libopencv_java4.so",
+      "compressed_bytes": 9339810,
+      "uncompressed_bytes": 23465088
+    },
+    {
+      "path": "jni/arm64-v8a/libopencv_java4.so",
+      "compressed_bytes": 9339810,
+      "uncompressed_bytes": 23465088
+    },
+    {
+      "path": "prefab/modules/opencv_java4/libs/android.armeabi-v7a/libopencv_java4.so",
+      "compressed_bytes": 7766505,
+      "uncompressed_bytes": 15622192
+    },
+    {
+      "path": "jni/armeabi-v7a/libopencv_java4.so",
+      "compressed_bytes": 7766505,
+      "uncompressed_bytes": 15622192
+    },
+    {
+      "path": "jni/x86/libc++_shared.so",
+      "compressed_bytes": 437373,
+      "uncompressed_bytes": 1254988
+    },
+    {
+      "path": "jni/x86_64/libc++_shared.so",
+      "compressed_bytes": 416045,
+      "uncompressed_bytes": 1252080
+    },
+    {
+      "path": "classes.jar",
+      "compressed_bytes": 411432,
+      "uncompressed_bytes": 435072
+    },
+    {
+      "path": "jni/arm64-v8a/libc++_shared.so",
+      "compressed_bytes": 406563,
+      "uncompressed_bytes": 1292904
+    }
+  ],
+  "native_libraries": [
+    {
+      "path": "jni/x86_64/libc++_shared.so",
+      "elf_class_bits": 64,
+      "elf_machine": 62,
+      "abi_name_matches_elf": true,
+      "pt_load_alignments": [
+        16384,
+        16384,
+        16384,
+        16384
+      ],
+      "elf_minimum_alignment": 16384,
+      "zip_data_offset_multiple_16384": false,
+      "stored_uncompressed": false
+    },
+    {
+      "path": "jni/x86_64/libopencv_java4.so",
+      "elf_class_bits": 64,
+      "elf_machine": 62,
+      "abi_name_matches_elf": true,
+      "pt_load_alignments": [
+        16384,
+        16384,
+        16384
+      ],
+      "elf_minimum_alignment": 16384,
+      "zip_data_offset_multiple_16384": false,
+      "stored_uncompressed": false
+    },
+    {
+      "path": "jni/x86/libc++_shared.so",
+      "elf_class_bits": 32,
+      "elf_machine": 3,
+      "abi_name_matches_elf": true,
+      "pt_load_alignments": [
+        4096,
+        4096,
+        4096,
+        4096
+      ],
+      "elf_minimum_alignment": 4096,
+      "zip_data_offset_multiple_16384": false,
+      "stored_uncompressed": false
+    },
+    {
+      "path": "jni/x86/libopencv_java4.so",
+      "elf_class_bits": 32,
+      "elf_machine": 3,
+      "abi_name_matches_elf": true,
+      "pt_load_alignments": [
+        4096,
+        4096,
+        4096
+      ],
+      "elf_minimum_alignment": 4096,
+      "zip_data_offset_multiple_16384": false,
+      "stored_uncompressed": false
+    },
+    {
+      "path": "jni/arm64-v8a/libc++_shared.so",
+      "elf_class_bits": 64,
+      "elf_machine": 183,
+      "abi_name_matches_elf": true,
+      "pt_load_alignments": [
+        16384,
+        16384,
+        16384,
+        16384
+      ],
+      "elf_minimum_alignment": 16384,
+      "zip_data_offset_multiple_16384": false,
+      "stored_uncompressed": false
+    },
+    {
+      "path": "jni/arm64-v8a/libopencv_java4.so",
+      "elf_class_bits": 64,
+      "elf_machine": 183,
+      "abi_name_matches_elf": true,
+      "pt_load_alignments": [
+        16384,
+        16384,
+        16384
+      ],
+      "elf_minimum_alignment": 16384,
+      "zip_data_offset_multiple_16384": false,
+      "stored_uncompressed": false
+    },
+    {
+      "path": "jni/armeabi-v7a/libc++_shared.so",
+      "elf_class_bits": 32,
+      "elf_machine": 40,
+      "abi_name_matches_elf": true,
+      "pt_load_alignments": [
+        4096,
+        4096,
+        4096,
+        4096
+      ],
+      "elf_minimum_alignment": 4096,
+      "zip_data_offset_multiple_16384": false,
+      "stored_uncompressed": false
+    },
+    {
+      "path": "jni/armeabi-v7a/libopencv_java4.so",
+      "elf_class_bits": 32,
+      "elf_machine": 40,
+      "abi_name_matches_elf": true,
+      "pt_load_alignments": [
+        4096,
+        4096,
+        4096
+      ],
+      "elf_minimum_alignment": 4096,
+      "zip_data_offset_multiple_16384": false,
+      "stored_uncompressed": false
+    }
+  ],
+  "arm64_elf_below_16k": []
+}

@@ -1,0 +1,50 @@
+{
+  "reason": "User requested filtering each work while keeping mixed sources available; prior source-wide blocking controls are superseded.",
+  "superseded_count": 7,
+  "replacement_count": 7,
+  "net_new_test_count": 0,
+  "replacements": [
+    {
+      "classname": "eu.kanade.tachiyomi.source.selection.AdultContentFilterTest",
+      "superseded": [
+        "declared adult providers are hidden even if individual results have no labels()",
+        "disabling the filter bypasses labels and source lookup and a new snapshot follows changes()",
+        "source snapshots do not retain a mutable external source set()"
+      ],
+      "replacements": [
+        "an unknown work stays available even when another work on the same source is adult()",
+        "disabling the filter allows adult works and new snapshots follow setting changes()",
+        "filtering is per work and never blocks an entire mixed source()"
+      ]
+    },
+    {
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "superseded": [
+        "declared adult sources are not queried even when their manga metadata has no labels()"
+      ],
+      "replacements": [
+        "unlabeled alternatives from mixed sources remain available instead of blocking the source()"
+      ]
+    },
+    {
+      "classname": "eu.kanade.tachiyomi.source.selection.UnifiedWorkSearchTest",
+      "superseded": [
+        "a declared adult provider is not searched for localized aliases()"
+      ],
+      "replacements": [
+        "mixed sources remain eligible for aliases while their adult rows are hidden()"
+      ]
+    },
+    {
+      "classname": "eu.kanade.tachiyomi.ui.browse.source.globalsearch.AdultSearchViewModelTest",
+      "superseded": [
+        "enabling filtering cancels an in flight adult provider and clears its source row()",
+        "flagged providers are not queried and adult rows are filtered before local persistence()"
+      ],
+      "replacements": [
+        "all mixed providers are queried and only their adult rows are filtered before persistence()",
+        "enabling filtering restarts an in flight search and removes adult rows while retaining both providers()"
+      ]
+    }
+  ]
+}

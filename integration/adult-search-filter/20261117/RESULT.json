@@ -1,0 +1,46 @@
+{
+  "revision": "P20261117.4",
+  "date": "2026-11-17",
+  "timezone": "America/Fortaleza",
+  "status": "VALIDATED_FOR_NEXT_VERSION_NOT_RELEASED",
+  "behavioral_red_failures": 3,
+  "new_junit_cases": 25,
+  "default_enabled": true,
+  "reversible": true,
+  "signals": [
+    "adult extension source IDs",
+    "explicit genre labels",
+    "explicit title markers",
+    "explicit rating memo fields"
+  ],
+  "library_deletion": false,
+  "existing_root_and_pinned_reading_preserved": true,
+  "adult_automatic_alternative_adoption_blocked": true,
+  "extra_classification_network_requests": false,
+  "image_classifier": false,
+  "unlabeled_content_guaranteed_hidden": false,
+  "new_periodic_background_jobs": false,
+  "concurrency_unchanged": {
+    "global_search_tasks": 5,
+    "automatic_alternative_operations": 2
+  },
+  "final_validation": {
+    "gradle_exit_code": 0,
+    "duration": "2m 35s",
+    "fresh_app_beta_passed": 977,
+    "previously_passed_domain_release_up_to_date": 87,
+    "total_reports_passed": 1064,
+    "failed": 0,
+    "skipped": 0,
+    "missing_baseline_cases": 0
+  },
+  "engineering_checks": {
+    "overlay_passed": 4,
+    "packaging_passed": 27,
+    "comparator_passed": 21
+  },
+  "ui_compiled_not_device_executed": true,
+  "providers_simulated": true,
+  "new_apk": false,
+  "new_release": false
+}

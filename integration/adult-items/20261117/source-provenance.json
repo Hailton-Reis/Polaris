@@ -1,0 +1,147 @@
+{
+  "previous_audit_commit": "a6d728f2df5366bfecf87cde63a5945b2fefcc29",
+  "overlay_prerequisite": "f037c5d85575e30694295df5d079e97dcc4a35b9",
+  "overlay": {
+    "path": "integration/document-reader/document-reader.patch",
+    "bytes": 4161922,
+    "sha256": "783fd7f526e59f4ed830e23668db870bd4a092f2335876b4dd93d254a5d34401"
+  },
+  "baseline_files": [
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/source/selection/AdultContentFilter.kt",
+      "sha256": "ce9499fc2e01e64192652d0568e0d50802e402f1fe9ed56c43afedc498b87511"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/domain/DomainModule.kt",
+      "sha256": "42e9289e0611dac1f2e96479a174c77ca3bcfe3dca66904a41cfb147db74e7bf"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsBrowseScreen.kt",
+      "sha256": "f50bce32a841eb825533861160698a2877522c93ca9636b5aec684d01b433b58"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalog.kt",
+      "sha256": "497a6a72cd658c010ad2ff9b820986690515f53a1e97c65bcf9e15d5fe77be39"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/source/selection/UnifiedWorkSearch.kt",
+      "sha256": "a589d1af7abcd629ddd317051b183419376aff65fc37e8e72313601b20b4bde2"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/ui/browse/source/globalsearch/SearchViewModel.kt",
+      "sha256": "82f1bfcc2d90564d64db611fe0ddd48daf5bba08db3ddfb42c5c93402079d7e0"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/ui/browse/source/browse/BrowseSourceViewModel.kt",
+      "sha256": "e9cec6cc371603a3d2b300c5d949359e532a066ec4ebe05f229fa8b0d2e31666"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/source/selection/AdultContentFilterTest.kt",
+      "sha256": "04ec8a98a9047ef2f4ea196102d70c00cfec1d0b89adea7605445825f68dba04"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalogTest.kt",
+      "sha256": "adcad175a5f699982a3b084f0e7ee2692d2d02b4b10190e0373d7c867ced8bb9"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/source/selection/UnifiedWorkSearchTest.kt",
+      "sha256": "21a8a7fa98a659b956cd073eb94c24b7625d1a40cee38c1be3e33c09825f044d"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/ui/browse/source/globalsearch/AdultSearchViewModelTest.kt",
+      "sha256": "6336b067a84e27ea70f7177e99125c4a57d25883dfe2735484ea6a6fc2024b05"
+    },
+    {
+      "path": "i18n-at/src/commonMain/moko-resources/base/strings.xml",
+      "sha256": "5b3a8b7836d72cb43922e137c2456fef86c8fe2ec36dceb4d55cca8013daa013"
+    },
+    {
+      "path": "i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml",
+      "sha256": "40577e843e51681252c6c6c3cdcc296d7d835ce950418344d10f49a742f021ec"
+    }
+  ],
+  "files": [
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/source/selection/AdultContentFilter.kt",
+      "bytes": 4751,
+      "sha256": "a1f5c9e83c81c1938fa4c7e94655141a4405800254df0f2252eaf570abeecaa5"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/domain/DomainModule.kt",
+      "bytes": 14015,
+      "sha256": "f54809f40930f8a1ccb6317d2301d805ce9cd1024d56d9bbefc28ae871e96948"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsBrowseScreen.kt",
+      "bytes": 6258,
+      "sha256": "a19438577964386cd229252949c0e5c1e34e0bd7796532b1ccdd2dc2b6c335e5"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalog.kt",
+      "bytes": 27170,
+      "sha256": "3b98c9c3b3bd44dbbc2ea48b9f80061acaa58cf505d2083b46d75a46b3b1fb32"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/source/selection/UnifiedWorkSearch.kt",
+      "bytes": 11604,
+      "sha256": "c18cddd789cd21f3d1c7af8136678da376d1022c61de3878af4ff990f23e5cf9"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/ui/browse/source/globalsearch/SearchViewModel.kt",
+      "bytes": 12048,
+      "sha256": "cfa2f2434154962ae9e7d47416ec98e8c991529edac4250d55e0c455cce0ac8a"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/ui/browse/source/browse/BrowseSourceViewModel.kt",
+      "bytes": 13721,
+      "sha256": "440a622e2769147bb7b11788cc63ba44bcfb31e16358eec7627e909a28c8946f"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/source/selection/AdultContentFilterTest.kt",
+      "bytes": 7046,
+      "sha256": "e4ddad92b296f07147fbf1ea556dd8d87318c9a323699621074dc928e2c139fd"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalogTest.kt",
+      "bytes": 42531,
+      "sha256": "bc59e6ba5a2e596be55991adfd497b11b11cbac1f0b20bf1174099f67658135f"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/source/selection/UnifiedWorkSearchTest.kt",
+      "bytes": 13937,
+      "sha256": "32120705b5a48b43b50f1c2a78f9a36c64073aa3d3f29312482dad69d2aa8ebf"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/ui/browse/source/globalsearch/AdultSearchViewModelTest.kt",
+      "bytes": 7900,
+      "sha256": "4033435a94f1d11d5650b40b31040005730e628f6a44dedca5ca8688644bb5ac"
+    },
+    {
+      "path": "i18n-at/src/commonMain/moko-resources/base/strings.xml",
+      "bytes": 39393,
+      "sha256": "9c016fc68d731db6cdb4d5143af323d5f7e002a34f58e49e20be7bd5877fa735"
+    },
+    {
+      "path": "i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml",
+      "bytes": 41595,
+      "sha256": "42868b141f11d0f717d4f612df22f8133069838daefe6663e023f26903d883e9"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt",
+      "bytes": 10970,
+      "sha256": "d60f2121996a480c9134d3b3a275607a6824d0033d77a35c086232e7b85911be"
+    }
+  ],
+  "engineering_scripts": [
+    {
+      "path": "scripts/beta/package_internal_beta.py",
+      "bytes": 17621,
+      "sha256": "13f3b04c82869aabf5e6f33cfbc11f6101d4d875c082b85309d6673104821f3c"
+    },
+    {
+      "path": "scripts/r001/test_apply_document_reader.py",
+      "bytes": 6424,
+      "sha256": "c162400666463350204b7510b121a5cda75ccf88b07a26f17a7b04283664d33b"
+    }
+  ]
+}

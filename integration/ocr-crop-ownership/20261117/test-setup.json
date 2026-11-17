@@ -1,0 +1,7 @@
+{
+  "initial_compilation_exit_code": 1,
+  "cause": "OpenCV Java types were not on the app test compile classpath because the SDK uses an internal implementation dependency.",
+  "correction": "Added testImplementation(libs.opencv.android) to the app; same official artifact already used in production runtime.",
+  "behavioral_failure": false,
+  "subsequent_valid_red_cases": 2
+}

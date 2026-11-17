@@ -1,0 +1,23 @@
+{
+  "benchmark_of_real_providers_or_hardware": false,
+  "method": "Coroutine virtual delays in real catalog/pipeline code; prior assertions preserved in the preceding source snapshot.",
+  "confirmed_alternative_catalogs": {
+    "catalogs": 3,
+    "each_virtual_delay_ms": 1000,
+    "previous_fixed_two_elapsed_ms": 2000,
+    "foreground_four_elapsed_ms": 1000,
+    "background_one_elapsed_ms": 3000
+  },
+  "alternative_image_checks": {
+    "checks": 4,
+    "each_virtual_delay_ms": 1000,
+    "previous_fixed_two_elapsed_ms": 2000,
+    "foreground_four_elapsed_ms": 1000
+  },
+  "two_catalog_instances": {
+    "alternative_checks": 8,
+    "each_virtual_delay_ms": 1000,
+    "foreground_shared_peak": 4,
+    "virtual_elapsed_ms": 2000
+  }
+}

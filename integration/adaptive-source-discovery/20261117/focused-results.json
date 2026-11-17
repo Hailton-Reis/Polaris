@@ -1,0 +1,251 @@
+{
+  "passed": 49,
+  "scope": "Focused final production code before marker bump and final additional real dispatcher-thread control. Full suite covers all final cases.",
+  "cases": [
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "Portuguese editions lead while English fills the remaining chapters without a language filter change()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "Ragnarok aliases join forty Portuguese chapters with sixty English chapters()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "a confirmed catalog timeout remains retryable without enabling searches in the foreground refresh()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "a discovery deadline preserves the fast catalog and marks only the scan incomplete()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "a finished retry clears the incomplete marker and restores the normal daily cache()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "a real reader failure invalidates recent discovery and its sampled health()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "a remembered adult alternative is not image sampled or reactivated by automatic refresh()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "a remembered available provider does not prevent recovery when it now fails()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "a source pin still prevents discovery and image checks with an incomplete marker()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "a timed out scan becomes eligible again after a minute instead of waiting a day()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "adult labeled matching alternatives are not adopted or image sampled()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "an existing adult original can still refresh from the library()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "an expired image check really probes again and stores a fresh timestamp()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "an individual source timeout schedules retry even when the whole scan finishes earlier()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "another work can use the shared provider slots before a slow whole scan finishes()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "background confirmed refreshes use one shared slot even with four pipeline workers()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "background refresh never searches all extensions()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "bounded catalogs always retain the original provider()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "catalog with working images outranks Portuguese catalog whose images fail()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "confirmed catalog refreshes share the four foreground slots()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "different catalog instances share four foreground operations rather than four each()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "discovery reuses a healthy confirmed catalog without searching that provider again()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "enabling filtering during an image check prevents adoption of that adult alternative()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "explicit English pin prevents Portuguese search and health sampling()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "failed original preserves rows and can refresh a previously confirmed alternative()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "filter changes invalidate discovery even when installed provider ids stay the same()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "first provider refresh never waits for a slow alternative or samples images()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "foreground discovery combines verified editions into a single logical sequence()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "healthy Portuguese edition outranks larger English catalog()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "hidden providers are not queried during discovery()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "hiding the app during discovery retains admitted results and serializes remaining alternatives()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "image checks run inside the bounded provider pipeline instead of a serial collector()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "individual timeout keeps stored editions without cancelling another provider()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "installing a new enabled provider schedules discovery without waiting a day()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "obsolete Portuguese backup recovers aliases and complements without a migration request()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "parent cancellation is not converted into a successful partial refresh()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "parent cancellation releases all provider slots without returning partial success()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "pin restricts network refresh while keeping original stored chapters()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "restored work with missing source and no previous alternatives can recover()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "reusing a recent image check keeps its real timestamp instead of extending its validity()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "unlabeled alternatives from mixed sources remain available instead of blocking the source()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.SourceDiscoveryConcurrencyTest",
+      "name": "a failing operation releases capacity for the next work()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.SourceDiscoveryConcurrencyTest",
+      "name": "a process without a visible activity starts with one alternative at a time()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.SourceDiscoveryConcurrencyTest",
+      "name": "background transition drains admitted work without cancelling it before admitting another()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.SourceDiscoveryConcurrencyTest",
+      "name": "cancellation after admission before dispatcher resume does not leak a slot()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.SourceDiscoveryConcurrencyTest",
+      "name": "cancelling a queued request preserves the order and capacity of surviving requests()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.SourceDiscoveryConcurrencyTest",
+      "name": "cancelling active and queued work leaves all foreground slots reusable()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.SourceDiscoveryConcurrencyTest",
+      "name": "foreground alternatives overlap up to four and queued requests keep FIFO order()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.SourceDiscoveryConcurrencyTest",
+      "name": "returning to foreground wakes waiting work without another request or poll()"
+    }
+  ]
+}

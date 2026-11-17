@@ -1,0 +1,20 @@
+[
+  {
+    "classname": "eu.kanade.tachiyomi.source.selection.UnifiedWorkSearchTest",
+    "name": "adult labeled search hits do not become visible work cards()",
+    "type": "org.opentest4j.AssertionFailedError",
+    "message": "org.opentest4j.AssertionFailedError: expected: <[1]> but was: <[1, 2]>"
+  },
+  {
+    "classname": "eu.kanade.tachiyomi.source.selection.UnifiedWorkSearchTest",
+    "name": "adult classification revealed by details removes the hit instead of falling back to its original card()",
+    "type": "org.opentest4j.AssertionFailedError",
+    "message": "org.opentest4j.AssertionFailedError: expected: <[1]> but was: <[1, 2]>"
+  },
+  {
+    "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+    "name": "adult labeled matching alternatives are not adopted or image sampled()",
+    "type": "org.opentest4j.AssertionFailedError",
+    "message": "org.opentest4j.AssertionFailedError: expected: <false> but was: <true>"
+  }
+]
