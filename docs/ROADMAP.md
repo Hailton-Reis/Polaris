@@ -2,13 +2,15 @@
 
 O roadmap indica prioridades e critérios de verificação. Não representa prazo de entrega nem recurso já aprovado.
 
-## Após a beta.11 — auditoria P20261117.3
+## Após a beta.11 — auditoria P20261117.4
 
 A prioridade mais recente é tornar a busca entre fontes mais rápida e eficiente. A [P20261117.3](BUSCA_FONTES_P20261117_3.md) paraleliza a atualização dos catálogos confirmados e checagens de imagens, compartilha duas vagas por operação entre obras, evita buscas repetidas e distingue tentativas incompletas do cache diário. Provas de tempo são simuladas; faltam tempos/fontes reais e o novo pacote. Não relaxar a identificação de obras ou a numeração para ganhar velocidade.
 
 A beta.11 foi publicada e instalada pelo mantenedor; relatos dos testes em aparelhos serão incorporados. A [auditoria pós-beta.11](AUDITORIA_POS_BETA11_P20261116_2.md) corrige limites e retomada do downloader. A [continuação P20261116.3](LEITURA_BACKUPS_P20261116_3.md) limita/cancela a leitura de backups e move a validação para IO; a criação automática preserva as cópias anteriores em falha por tamanho, e a exportação manual permanece disponível. A política de entrada não garante o pico do grafo/serialização: medições nos aparelhos seguem pendentes.
 
 O [OpenCV oficial 4.12.0 foi integrado e compilado](OPENCV_P20261117_1.md), com ARM32/ARM64 e API mínima do app mantida em 26. A saída mesclada confirmou os quatro binários OpenCV/C++ oficiais, os outros 27 inalterados, PT_LOAD/congruência ARM64 para 16 KiB e importações do runtime conferidas. Ainda faltam APK final/alinhamento ZIP, carregamento JNI e execução OCR/qualidade/pico em aparelhos ARM32/ARM64 e sistema de páginas de 16 KiB. O acréscimo nativo bruto é de 3.213.164 bytes; não há medida de APK novo. Conta/nuvem e sandbox continuam adiadas. Essas correções ficam para a próxima versão, sem APK/Release nesta revisão; antes de publicar, aumentar versão e código acima de 112.
+
+A [P20261117.4](FILTRO_ADULTO_P20261117_4.md) acrescenta filtro +18 padrão nas buscas e alternativas automáticas, por fonte e marcação explícita. Obras sem identificação podem escapar; biblioteca preservada. Quatro ou cinco alternativas em primeiro plano, uma ou duas em segundo plano e atualização periódica são propostas a medir, ainda não implementadas. A busca geral já usa cinco tarefas e o serviço de alternativas mantém duas.
 
 ## Prioridades atuais — decisão P20261114.4
 

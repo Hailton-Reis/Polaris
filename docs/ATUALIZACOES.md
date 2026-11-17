@@ -8,6 +8,8 @@ A [P20261117.2](LIMPEZA_RECORTE_OCR_P20261117_2.md) acrescenta a limpeza de reco
 
 A [P20261117.3](BUSCA_FONTES_P20261117_3.md) melhora a busca entre fontes e o tratamento de tentativas incompletas. Também permanece no desenvolvimento, sem substituir a beta.11 pública ou gerar uma atualização disponível no app.
 
+A [P20261117.4](FILTRO_ADULTO_P20261117_4.md) acrescenta o filtro +18 de buscas, ligado por padrão e reversível. Conteúdo sem marcação pode aparecer. Também está somente no desenvolvimento; a biblioteca é preservada.
+
 ## Escolha do canal
 
 Em **Configurações → Atualizações do aplicativo**:

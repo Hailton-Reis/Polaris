@@ -2,6 +2,17 @@
 
 Este arquivo registra a evolução real do código. **Revisões de desenvolvimento não são lançamentos públicos.** As datas abaixo usam America/Fortaleza, exceto quando houver indicação de UTC. O histórico de distribuição fica em [Releases](https://github.com/Hailton-Reis/Polaris/releases).
 
+## Desenvolvimento · P20261117.4 — 17/11/2026
+
+**Estado:** filtro +18 para a próxima versão; sem novo APK ou Release.
+
+- Filtro ligado por padrão e reversível em Navegar → Conteúdo adulto. Oculta fontes adultas e obras marcadas nas buscas geral/novels/migração, navegação de fonte e alternativas automáticas, inclusive após enriquecimento válido.
+- Mudança da opção reinicia buscas e invalida a descoberta. Biblioteca e leitura original/fixa preservadas. Conteúdo sem marcação ou identificado tardiamente pode aparecer; sem análise de imagens ou consultas extras para classificar.
+- Três falhas anteriores reproduzidas e 25 casos novos. Validação completa: 977 app executados/aprovados + 87 domain anteriores/UP-TO-DATE = 1.064 casos; overlay4/empacotamento27/comparador21 aprovados. Provedores simulados, interface compilada sem execução no aparelho.
+- Mais alternativas em primeiro plano e atualização periódica em segundo plano ficam como propostas. Concorrência atual preservada: cinco tarefas na busca geral e duas nas alternativas automáticas.
+
+[Configuração e limites](docs/FILTRO_ADULTO_P20261117_4.md) · [Evidências](integration/adult-search-filter/20261117/README.md).
+
 ## Desenvolvimento · P20261117.3 — 17/11/2026
 
 **Estado:** descoberta entre fontes mais eficiente para a próxima versão; sem novo APK ou Release.

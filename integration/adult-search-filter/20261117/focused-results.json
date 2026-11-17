@@ -1,0 +1,431 @@
+{
+  "passed": 85,
+  "scope": "Focused controls before the final detail-rating metadata control. Final full suite covers current source.",
+  "cases": [
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AdultContentFilterTest",
+      "name": "a fully adult group disappears instead of falling back to its original representative()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AdultContentFilterTest",
+      "name": "declared adult providers are hidden even if individual results have no labels()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AdultContentFilterTest",
+      "name": "demographics romance orientations and generic mature genres are not adult ratings()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AdultContentFilterTest",
+      "name": "disabling the filter bypasses labels and source lookup and a new snapshot follows changes()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AdultContentFilterTest",
+      "name": "explicit genre labels work across separators accents case and full width text()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AdultContentFilterTest",
+      "name": "explicit memo ratings can classify unlabeled results without scanning arbitrary notes()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AdultContentFilterTest",
+      "name": "explicit title markers are blocked without treating ordinary title words as ratings()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AdultContentFilterTest",
+      "name": "filtering a group keeps legal editions and the existing favorite priority without modifying originals()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AdultContentFilterTest",
+      "name": "source snapshots do not retain a mutable external source set()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AdultContentFilterTest",
+      "name": "the search filter starts enabled without changing extension loading preferences()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "Portuguese editions lead while English fills the remaining chapters without a language filter change()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "Ragnarok aliases join forty Portuguese chapters with sixty English chapters()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "a confirmed catalog timeout remains retryable without enabling searches in the foreground refresh()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "a discovery deadline preserves the fast catalog and marks only the scan incomplete()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "a finished retry clears the incomplete marker and restores the normal daily cache()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "a real reader failure invalidates recent discovery and its sampled health()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "a remembered adult alternative is not image sampled or reactivated by automatic refresh()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "a remembered available provider does not prevent recovery when it now fails()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "a source pin still prevents discovery and image checks with an incomplete marker()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "a timed out scan becomes eligible again after a minute instead of waiting a day()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "adult labeled matching alternatives are not adopted or image sampled()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "an existing adult original can still refresh from the library()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "an expired image check really probes again and stores a fresh timestamp()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "an individual source timeout schedules retry even when the whole scan finishes earlier()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "another work can use the shared provider slots before a slow whole scan finishes()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "background refresh never searches all extensions()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "bounded catalogs always retain the original provider()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "catalog with working images outranks Portuguese catalog whose images fail()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "confirmed catalog refreshes overlap in pairs instead of waiting in sequence()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "declared adult sources are not queried even when their manga metadata has no labels()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "discovery reuses a healthy confirmed catalog without searching that provider again()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "enabling filtering during an image check prevents adoption of that adult alternative()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "explicit English pin prevents Portuguese search and health sampling()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "failed original preserves rows and can refresh a previously confirmed alternative()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "filter changes invalidate discovery even when installed provider ids stay the same()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "first provider refresh never waits for a slow alternative or samples images()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "foreground discovery combines verified editions into a single logical sequence()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "healthy Portuguese edition outranks larger English catalog()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "hidden providers are not queried during discovery()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "image checks run inside the bounded provider pipeline instead of a serial collector()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "individual timeout keeps stored editions without cancelling another provider()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "installing a new enabled provider schedules discovery without waiting a day()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "obsolete Portuguese backup recovers aliases and complements without a migration request()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "parent cancellation is not converted into a successful partial refresh()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "parent cancellation releases all provider slots without returning partial success()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "pin restricts network refresh while keeping original stored chapters()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "restored work with missing source and no previous alternatives can recover()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "reusing a recent image check keeps its real timestamp instead of extending its validity()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.UnifiedWorkSearchTest",
+      "name": "a declared adult provider is not searched for localized aliases()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.UnifiedWorkSearchTest",
+      "name": "adult classification revealed by details removes the hit instead of falling back to its original card()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.UnifiedWorkSearchTest",
+      "name": "adult labeled search hits do not become visible work cards()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.UnifiedWorkSearchTest",
+      "name": "alias discovery tries at most four empty providers and two names each()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.UnifiedWorkSearchTest",
+      "name": "an adult favorite is not brought back through a normal matching search group()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.UnifiedWorkSearchTest",
+      "name": "cancellation is not converted into a successful empty search()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.UnifiedWorkSearchTest",
+      "name": "catalogue query reference has a safe initialized URL and title()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.UnifiedWorkSearchTest",
+      "name": "detail timeouts leave unknown editions separate and finish()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.UnifiedWorkSearchTest",
+      "name": "details corroborate duplicate titles and keep wrong author separate()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.UnifiedWorkSearchTest",
+      "name": "details for a different title cannot lend its creator to the search hit()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.UnifiedWorkSearchTest",
+      "name": "disabling the filter restores adult labeled hits without changing their records()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.UnifiedWorkSearchTest",
+      "name": "enabling filtering while detail enrichment is in flight prevents adult fallback()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.UnifiedWorkSearchTest",
+      "name": "enrichment has a sixteen detail budget and two concurrent requests()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.UnifiedWorkSearchTest",
+      "name": "localized alias can recover an empty provider and join the confirmed card()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.UnifiedWorkSearchTest",
+      "name": "metadata network failure retains all native results()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.UnifiedWorkSearchTest",
+      "name": "metadata requests do not expose Polaris memo to a provider()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.WorkSearchGroupingTest",
+      "name": "a multi author bridge cannot transitively merge unrelated works()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.WorkSearchGroupingTest",
+      "name": "a novel local document or unknown medium is not reused as the comic favorite()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.WorkSearchGroupingTest",
+      "name": "a previously pinned work memo is preserved byte for byte()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.WorkSearchGroupingTest",
+      "name": "a restored favorite remains the original entry even when source is missing()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.WorkSearchGroupingTest",
+      "name": "an ambiguous saved bridge cannot hide two separate result cards()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.WorkSearchGroupingTest",
+      "name": "an exact source URL is the same saved record without creator metadata()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.WorkSearchGroupingTest",
+      "name": "candidate linking preserves notes glossary and existing candidate health without local IDs()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.WorkSearchGroupingTest",
+      "name": "confirmed aliases yield one card and prefer Brazilian Portuguese for new work()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.WorkSearchGroupingTest",
+      "name": "conflicting catalogue identities are ambiguous even with matching creator()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.WorkSearchGroupingTest",
+      "name": "different known creators retain separate homonyms()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.WorkSearchGroupingTest",
+      "name": "distinct URLs inside one provider need catalogue corroboration()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.WorkSearchGroupingTest",
+      "name": "existing pinned favorite wins over language and older unpinned favorite()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.WorkSearchGroupingTest",
+      "name": "global grouping rejects fuzzy spelling matches()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.WorkSearchGroupingTest",
+      "name": "large unrelated result sets remain distinct and preserve a matching library entry()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.WorkSearchGroupingTest",
+      "name": "missing creator cannot borrow catalogue certainty from title alone()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.WorkSearchGroupingTest",
+      "name": "only bounded native candidates are attached and host metadata is not sent to a provider()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.WorkSearchGroupingTest",
+      "name": "sequels parts and novel qualifiers remain distinct()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.WorkSearchGroupingTest",
+      "name": "translation names alone are not guessed()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.WorkSearchGroupingTest",
+      "name": "unknown and generic creators cannot collapse homonymous titles()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.ui.browse.source.globalsearch.AdultSearchViewModelTest",
+      "name": "enabling filtering cancels an in flight adult provider and clears its source row()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.ui.browse.source.globalsearch.AdultSearchViewModelTest",
+      "name": "flagged providers are not queried and adult rows are filtered before local persistence()"
+    }
+  ]
+}
