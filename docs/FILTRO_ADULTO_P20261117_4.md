@@ -1,5 +1,7 @@
 # Filtro de conteúdo +18 · P20261117.4
 
+**Revisão histórica:** a [P20261117.5](FONTES_MISTAS_P20261117_5.md) substitui o bloqueio por fonte por filtragem de cada obra e acrescenta confirmação ao liberar conteúdo +18.
+
 Revisão de desenvolvimento para a próxima versão. A beta.11 instalada permanece com o APK publicado; nenhum APK ou Release novo nesta revisão.
 
 Em **Configurações → Navegar → Conteúdo adulto → Filtrar conteúdo +18 nas buscas**, o filtro fica ligado por padrão e pode ser desligado. Ele oculta fontes identificadas pelas extensões como adultas e obras com marcações explícitas nos gêneros, classificação ou título. Abrange busca geral, busca de novels/migração, navegação de uma fonte e descoberta automática de alternativas. Alterar a opção reinicia as buscas abertas; a navegação da fonte recebe um novo paginador.

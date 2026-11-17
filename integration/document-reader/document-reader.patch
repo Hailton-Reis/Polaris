@@ -3381,7 +3381,7 @@ index 172b28c..0d2d43d 100644
              android:name="android.webkit.WebView.MetricsOptOut"
              android:value="true" />
 diff --git a/app/src/main/java/eu/kanade/domain/DomainModule.kt b/app/src/main/java/eu/kanade/domain/DomainModule.kt
-index b7eaaf7..c043ed8 100644
+index b7eaaf7..3ed614a 100644
 --- a/app/src/main/java/eu/kanade/domain/DomainModule.kt
 +++ b/app/src/main/java/eu/kanade/domain/DomainModule.kt
 @@ -26,6 +26,7 @@ import eu.kanade.domain.track.interactor.AddTracks
@@ -3477,7 +3477,7 @@ index b7eaaf7..c043ed8 100644
          addFactory { GetAvailableScanlators(get()) }
          addFactory { FilterChaptersForDownload(get(), get(), get()) }
  
-@@ -223,6 +247,44 @@ class DomainModule : InjektModule {
+@@ -223,6 +247,36 @@ class DomainModule : InjektModule {
          addFactory { ToggleIncognito(get()) }
          addFactory { GetIncognitoState(get(), get(), get()) }
  
@@ -3488,15 +3488,7 @@ index b7eaaf7..c043ed8 100644
 +                    get<eu.kanade.domain.source.service.SourcePreferences>()
 +                        .hideAdultSearchResults
 +                        .get()
-+                },
-+                adultSourceIds = {
-+                    get<eu.kanade.tachiyomi.extension.ExtensionManager>()
-+                        .installedExtensionsFlow
-+                        .value
-+                        .filter { it.isNsfw }
-+                        .flatMap { it.sources }
-+                        .mapTo(hashSetOf()) { it.id }
-+                },
++                }
 +            )
 +        }
 +        addSingletonFactory {
@@ -8645,10 +8637,27 @@ index 7afd0ea..879096e 100644
 +        "MMM dd, yyyy",
 +    )
 diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsBrowseScreen.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsBrowseScreen.kt
-index 82142a3..54e7eeb 100644
+index 82142a3..093e649 100644
 --- a/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsBrowseScreen.kt
 +++ b/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsBrowseScreen.kt
-@@ -25,9 +25,7 @@ import uy.kohesive.injekt.api.get
+@@ -1,10 +1,16 @@
+ package eu.kanade.presentation.more.settings.screen
+ 
++import androidx.compose.material3.AlertDialog
++import androidx.compose.material3.Text
++import androidx.compose.material3.TextButton
+ import androidx.compose.runtime.Composable
+ import androidx.compose.runtime.ReadOnlyComposable
+ import androidx.compose.runtime.collectAsState
+ import androidx.compose.runtime.getValue
++import androidx.compose.runtime.mutableStateOf
+ import androidx.compose.runtime.remember
++import androidx.compose.runtime.saveable.rememberSaveable
++import androidx.compose.runtime.setValue
+ import androidx.compose.ui.platform.LocalContext
+ import androidx.fragment.app.FragmentActivity
+ import cafe.adriel.voyager.navigator.LocalNavigator
+@@ -25,9 +31,7 @@ import uy.kohesive.injekt.api.get
  
  object SettingsBrowseScreen : SearchableSettings {
  
@@ -8659,7 +8668,34 @@ index 82142a3..54e7eeb 100644
  
      @Composable
      override fun getPreferences(): List<Preference> {
-@@ -42,39 +40,55 @@ object SettingsBrowseScreen : SearchableSettings {
+@@ -38,43 +42,89 @@ object SettingsBrowseScreen : SearchableSettings {
+         val getExtensionStoreCountAsFlow = remember { Injekt.get<GetExtensionStoreCountAsFlow>() }
+ 
+         val reposCount by getExtensionStoreCountAsFlow().collectAsState(0)
++        var confirmAdultContent by rememberSaveable { mutableStateOf(false) }
++
++        if (confirmAdultContent) {
++            val dismiss = { confirmAdultContent = false }
++            AlertDialog(
++                onDismissRequest = dismiss,
++                title = { Text(stringResource(ATMR.strings.polaris_adult_content_confirm_title)) },
++                text = { Text(stringResource(ATMR.strings.polaris_adult_content_confirm_message)) },
++                dismissButton = {
++                    TextButton(onClick = dismiss) { Text(stringResource(MR.strings.action_cancel)) }
++                },
++                confirmButton = {
++                    TextButton(
++                        onClick = {
++                            sourcePreferences.hideAdultSearchResults.set(false)
++                            dismiss()
++                        }
++                    ) {
++                        Text(stringResource(ATMR.strings.polaris_adult_content_confirm_action))
++                    }
++                },
++            )
++        }
+ 
          return listOf(
              Preference.PreferenceGroup(
                  title = stringResource(MR.strings.label_sources),
@@ -8720,6 +8756,13 @@ index 82142a3..54e7eeb 100644
 +                            title = stringResource(ATMR.strings.polaris_adult_search_filter),
 +                            subtitle =
 +                                stringResource(ATMR.strings.polaris_adult_search_filter_summary),
++                            onValueChanged = { hideAdult ->
++                                if (hideAdult) true
++                                else {
++                                    confirmAdultContent = true
++                                    false
++                                }
++                            },
 +                        ),
 +                        Preference.PreferenceItem.SwitchPreference(
 +                            preference = sourcePreferences.showNsfwSource,
@@ -9770,7 +9813,7 @@ index a198c3f..9a3e84f 100644
                      preference = translationPreferences.translationEngineTemperature(),
                      title = stringResource(ATMR.strings.pref_engine_temperature),
 diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
-index 7f411fd..bbbdba3 100644
+index 7f411fd..43585d1 100644
 --- a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
 +++ b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
 @@ -1,15 +1,18 @@
@@ -9835,7 +9878,7 @@ index 7f411fd..bbbdba3 100644
  
      // Identifies this overlay independently of the pinned upstream COMMIT_SHA.
 -    private const val POLARIS_READER_REVISION = "P20261031.2"
-+    private const val POLARIS_READER_REVISION = "P20261117.4"
++    private const val POLARIS_READER_REVISION = "P20261117.5"
  
      @Composable
      override fun Content() {
@@ -24253,10 +24296,10 @@ index 147e589..6bed3ee 100644
              val dbSource = sourceRepository.getStubSource(source.id)
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/source/selection/AdultContentFilter.kt b/app/src/main/java/eu/kanade/tachiyomi/source/selection/AdultContentFilter.kt
 new file mode 100644
-index 0000000..8b28234
+index 0000000..7c3c569
 --- /dev/null
 +++ b/app/src/main/java/eu/kanade/tachiyomi/source/selection/AdultContentFilter.kt
-@@ -0,0 +1,132 @@
+@@ -0,0 +1,121 @@
 +package eu.kanade.tachiyomi.source.selection
 +
 +import eu.kanade.tachiyomi.source.model.SManga
@@ -24269,35 +24312,24 @@ index 0000000..8b28234
 +import tachiyomi.domain.manga.model.Manga
 +
 +/** Best-effort discovery visibility, not a library deletion or image-classification service. */
-+class AdultContentFilter(
-+    private val enabled: () -> Boolean = { true },
-+    private val adultSourceIds: () -> Set<Long> = { emptySet() },
-+) {
++class AdultContentFilter(private val enabled: () -> Boolean = { true }) {
 +    fun snapshot(): Visibility {
 +        val hideAdult = enabled()
-+        return Visibility(hideAdult, if (hideAdult) adultSourceIds().toSet() else emptySet())
++        return Visibility(hideAdult)
 +    }
 +
-+    class Visibility
-+    internal constructor(val hideAdult: Boolean, private val adultSources: Set<Long>) {
-+        fun allowsSource(sourceId: Long): Boolean = !hideAdult || sourceId !in adultSources
++    class Visibility internal constructor(val hideAdult: Boolean) {
++        fun allows(manga: Manga): Boolean = allows(manga.title, manga.genre.orEmpty(), manga.memo)
 +
-+        fun allows(manga: Manga): Boolean =
-+            allows(manga.source, manga.title, manga.genre.orEmpty(), manga.memo)
-+
-+        fun allows(sourceId: Long, manga: SManga): Boolean =
-+            allows(sourceId, manga.title, listOfNotNull(manga.genre), manga.memo)
++        fun allows(manga: SManga): Boolean =
++            allows(manga.title, listOfNotNull(manga.genre), manga.memo)
 +
 +        fun allows(
-+            sourceId: Long,
 +            title: String,
 +            genres: Iterable<String>,
 +            memo: JsonObject = JsonObject(emptyMap()),
 +        ): Boolean =
-+            !hideAdult ||
-+                (allowsSource(sourceId) &&
-+                    !AdultLabels.matches(title, genres) &&
-+                    !AdultLabels.matches(memo))
++            !hideAdult || (!AdultLabels.matches(title, genres) && !AdultLabels.matches(memo))
 +
 +        fun filterGroups(groups: List<WorkSearchGroup>): List<WorkSearchGroup> =
 +            groups.mapNotNull { group ->
@@ -24391,10 +24423,10 @@ index 0000000..8b28234
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalog.kt b/app/src/main/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalog.kt
 new file mode 100644
-index 0000000..2b14775
+index 0000000..3505579
 --- /dev/null
 +++ b/app/src/main/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalog.kt
-@@ -0,0 +1,614 @@
+@@ -0,0 +1,608 @@
 +package eu.kanade.tachiyomi.source.selection
 +
 +import eu.kanade.domain.chapter.model.toRemoteSChapter
@@ -24487,12 +24519,10 @@ index 0000000..2b14775
 +    }
 +
 +    private fun enabledSources(): List<HttpSource> {
-+        val visibility = contentFilter.snapshot()
 +        return sourceManager
 +            .getOnlineSources()
 +            .filter {
 +                it !is INovelSource &&
-+                    visibility.allowsSource(it.id) &&
 +                    it.id.toString() !in preferences.disabledSources.get() &&
 +                    (it.lang in preferences.enabledLanguages.get() ||
 +                        it.lang.lowercase().replace('_', '-') in setOf("en", "pt", "pt-br"))
@@ -24640,7 +24670,7 @@ index 0000000..2b14775
 +
 +        fun compatible(catalog: Catalog): Boolean =
 +            pinned != null ||
-+                (contentFilter.snapshot().allows(catalog.binding.sourceId, catalog.manga) &&
++                (contentFilter.snapshot().allows(catalog.manga) &&
 +                    SourceMatching.compatibleNumbering(
 +                        referenceChapters,
 +                        catalog.chapters.map(::asChapter),
@@ -24687,7 +24717,7 @@ index 0000000..2b14775
 +                        matches =
 +                            page.mangas
 +                                .filter {
-+                                    visibility.allows(provider.id, it) &&
++                                    visibility.allows(it) &&
 +                                        SourceMatching.titleMatches(
 +                                            reference.title,
 +                                            it.title,
@@ -24704,7 +24734,7 @@ index 0000000..2b14775
 +                        return@withTimeoutOrNull Outcome(null, null)
 +                    val result = provider.getMangaUpdate(match, emptyList(), true, false).manga
 +                    result.url = match.url
-+                    if (!contentFilter.snapshot().allows(provider.id, result))
++                    if (!contentFilter.snapshot().allows(result))
 +                        return@withTimeoutOrNull Outcome(null, null)
 +                    if (!SourceMatching.sameWork(reference, result, identity))
 +                        return@withTimeoutOrNull Outcome(null, null)
@@ -24732,9 +24762,7 @@ index 0000000..2b14775
 +            remember(prepared.outcome, prepared.retained)
 +            incomplete = incomplete || prepared.outcome.timedOut
 +            prepared.retained
-+                ?.takeIf {
-+                    pinned != null || contentFilter.snapshot().allows(it.binding.sourceId, it.manga)
-+                }
++                ?.takeIf { pinned != null || contentFilter.snapshot().allows(it.manga) }
 +                ?.let(::retain)
 +        }
 +        if (pinned != null) {
@@ -24794,9 +24822,7 @@ index 0000000..2b14775
 +        }
 +        if (pinned == null) {
 +            val visibility = contentFilter.snapshot()
-+            catalogs.removeAll {
-+                it.binding.key != root.key && !visibility.allows(it.binding.sourceId, it.manga)
-+            }
++            catalogs.removeAll { it.binding.key != root.key && !visibility.allows(it.manga) }
 +        }
 +        if (catalogs.isEmpty() || catalogs.all { it.chapters.isEmpty() })
 +            throw NoChaptersException()
@@ -25348,10 +25374,10 @@ index 0000000..9a5e01e
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/source/selection/UnifiedWorkSearch.kt b/app/src/main/java/eu/kanade/tachiyomi/source/selection/UnifiedWorkSearch.kt
 new file mode 100644
-index 0000000..e38f0ba
+index 0000000..d421506
 --- /dev/null
 +++ b/app/src/main/java/eu/kanade/tachiyomi/source/selection/UnifiedWorkSearch.kt
-@@ -0,0 +1,253 @@
+@@ -0,0 +1,248 @@
 +package eu.kanade.tachiyomi.source.selection
 +
 +import eu.kanade.domain.manga.model.toSManga
@@ -25392,7 +25418,6 @@ index 0000000..e38f0ba
 +            sources
 +                .filterIsInstance<HttpSource>()
 +                .filter { it !is INovelSource }
-+                .filter { visibility.allowsSource(it.id) }
 +                .associateBy { it.id }
 +        val savedIdentities =
 +            visibleFavorites
@@ -25443,7 +25468,7 @@ index 0000000..e38f0ba
 +                            val aliasVisibility = contentFilter.snapshot()
 +                            val found =
 +                                page.mangas
-+                                    .filter { aliasVisibility.allows(source.id, it) }
++                                    .filter { aliasVisibility.allows(it) }
 +                                    .filter { remote ->
 +                                        identity.titles.any {
 +                                            SourceMatching.title(it) ==
@@ -25555,11 +25580,7 @@ index 0000000..e38f0ba
 +            allHits
 +                .mapNotNull { hit ->
 +                    val result = enriched[hit.manga.source to hit.manga.url]
-+                    if (
-+                        result != null &&
-+                            !currentVisibility.allows(hit.manga.source, result.metadata)
-+                    )
-+                        null
++                    if (result != null && !currentVisibility.allows(result.metadata)) null
 +                    else result?.hit ?: hit
 +                }
 +                .filter { currentVisibility.allows(it.manga) },
@@ -26391,18 +26412,10 @@ index 9fc8ef9..5bcbb2c 100644
                                  }
                              },
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/browse/source/browse/BrowseSourceViewModel.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/browse/source/browse/BrowseSourceViewModel.kt
-index bfbf986..09bcae1 100644
+index bfbf986..8a6cc9d 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/ui/browse/source/browse/BrowseSourceViewModel.kt
 +++ b/app/src/main/java/eu/kanade/tachiyomi/ui/browse/source/browse/BrowseSourceViewModel.kt
-@@ -12,6 +12,7 @@ import androidx.lifecycle.viewmodel.initializer
- import androidx.lifecycle.viewmodel.viewModelFactory
- import androidx.paging.Pager
- import androidx.paging.PagingConfig
-+import androidx.paging.PagingData
- import androidx.paging.cachedIn
- import androidx.paging.filter
- import androidx.paging.map
-@@ -21,12 +22,16 @@ import eu.kanade.domain.source.interactor.GetIncognitoState
+@@ -21,9 +21,12 @@ import eu.kanade.domain.source.interactor.GetIncognitoState
  import eu.kanade.domain.source.service.SourcePreferences
  import eu.kanade.domain.track.interactor.AddTracks
  import eu.kanade.tachiyomi.data.cache.CoverCache
@@ -26415,11 +26428,7 @@ index bfbf986..09bcae1 100644
  import kotlinx.coroutines.flow.distinctUntilChanged
  import kotlinx.coroutines.flow.emptyFlow
  import kotlinx.coroutines.flow.firstOrNull
-+import kotlinx.coroutines.flow.flowOf
- import kotlinx.coroutines.flow.map
- import kotlinx.coroutines.flow.stateIn
- import kotlinx.coroutines.flow.update
-@@ -49,8 +54,6 @@ import tachiyomi.domain.source.interactor.GetRemoteManga
+@@ -49,8 +52,6 @@ import tachiyomi.domain.source.interactor.GetRemoteManga
  import tachiyomi.domain.source.service.SourceManager
  import uy.kohesive.injekt.Injekt
  import uy.kohesive.injekt.api.get
@@ -26428,7 +26437,7 @@ index bfbf986..09bcae1 100644
  
  class BrowseSourceViewModel(
      private val sourceId: Long,
-@@ -68,6 +71,8 @@ class BrowseSourceViewModel(
+@@ -68,6 +69,8 @@ class BrowseSourceViewModel(
      private val updateManga: UpdateManga = Injekt.get(),
      private val addTracks: AddTracks = Injekt.get(),
      getIncognitoState: GetIncognitoState = Injekt.get(),
@@ -26437,7 +26446,7 @@ index bfbf986..09bcae1 100644
  ) : StateViewModel<BrowseSourceViewModel.State>(State(Listing.valueOf(listingQuery))) {
  
      companion object {
-@@ -98,11 +103,7 @@ class BrowseSourceViewModel(
+@@ -98,11 +101,7 @@ class BrowseSourceViewModel(
                  listing = Listing.Search(query, source.getFilterList())
              }
  
@@ -26450,7 +26459,7 @@ index bfbf986..09bcae1 100644
          }
  
          if (!getIncognitoState.await(source.id)) {
-@@ -110,34 +111,48 @@ class BrowseSourceViewModel(
+@@ -110,34 +109,45 @@ class BrowseSourceViewModel(
          }
      }
  
@@ -26469,6 +26478,8 @@ index bfbf986..09bcae1 100644
 -                    getManga.subscribe(manga.url, manga.source)
 -                        .map { it ?: manga }
 -                        .stateIn(viewModelScope)
+-                }
+-                    .filter { !hideInLibraryItems || !it.value.favorite }
 +    val mangaPagerFlowFlow =
 +        state
 +            .map { it.listing }
@@ -26476,10 +26487,6 @@ index bfbf986..09bcae1 100644
 +            .combine(sourcePreferences.hideAdultSearchResults.changes()) { listing, _ -> listing }
 +            .map { listing ->
 +                val visibility = contentFilter.snapshot()
-+                if (!visibility.allowsSource(sourceId)) {
-+                    return@map flowOf(PagingData.empty<kotlinx.coroutines.flow.StateFlow<Manga>>())
-                 }
--                    .filter { !hideInLibraryItems || !it.value.favorite }
 +                Pager(PagingConfig(pageSize = 25)) {
 +                        getRemoteManga(sourceId, listing.query ?: "", listing.filters)
 +                    }
@@ -26521,7 +26528,7 @@ index bfbf986..09bcae1 100644
          return if (columns == 0) GridCells.Adaptive(128.dp) else GridCells.Fixed(columns)
      }
  
-@@ -150,23 +165,18 @@ class BrowseSourceViewModel(
+@@ -150,23 +160,18 @@ class BrowseSourceViewModel(
      }
  
      fun setFilters(filters: FilterList) {
@@ -26551,7 +26558,7 @@ index bfbf986..09bcae1 100644
                  toolbarQuery = query ?: input.query,
              )
          }
-@@ -190,8 +200,10 @@ class BrowseSourceViewModel(
+@@ -190,8 +195,10 @@ class BrowseSourceViewModel(
                      }
                  }
              } else if (sourceFilter is SourceModelFilter.Select<*>) {
@@ -26564,7 +26571,7 @@ index bfbf986..09bcae1 100644
  
                  if (index != -1) {
                      sourceFilter.state = index
-@@ -202,16 +214,13 @@ class BrowseSourceViewModel(
+@@ -202,16 +209,13 @@ class BrowseSourceViewModel(
          }
  
          mutableState.update {
@@ -26588,7 +26595,7 @@ index bfbf986..09bcae1 100644
          }
      }
  
-@@ -222,13 +231,15 @@ class BrowseSourceViewModel(
+@@ -222,13 +226,15 @@ class BrowseSourceViewModel(
       */
      fun changeMangaFavorite(manga: Manga) {
          viewModelScope.launch {
@@ -26611,7 +26618,7 @@ index bfbf986..09bcae1 100644
  
              if (!new.favorite) {
                  new = new.removeCovers(coverCache)
-@@ -269,7 +280,7 @@ class BrowseSourceViewModel(
+@@ -269,7 +275,7 @@ class BrowseSourceViewModel(
                          Dialog.ChangeMangaCategory(
                              manga,
                              categories.mapAsCheckboxState { it.id in preselectedIds },
@@ -26620,7 +26627,7 @@ index bfbf986..09bcae1 100644
                      )
                  }
              }
-@@ -282,10 +293,7 @@ class BrowseSourceViewModel(
+@@ -282,10 +288,7 @@ class BrowseSourceViewModel(
       * @return List of categories, not including the default category
       */
      suspend fun getCategories(): List<Category> {
@@ -26632,7 +26639,7 @@ index bfbf986..09bcae1 100644
      }
  
      suspend fun getDuplicateLibraryManga(manga: Manga): List<MangaWithChapterCount> {
-@@ -298,10 +306,7 @@ class BrowseSourceViewModel(
+@@ -298,10 +301,7 @@ class BrowseSourceViewModel(
  
      fun moveMangaToCategories(manga: Manga, categoryIds: List<Long>) {
          viewModelScope.launchIO {
@@ -26644,7 +26651,7 @@ index bfbf986..09bcae1 100644
          }
      }
  
-@@ -319,18 +324,19 @@ class BrowseSourceViewModel(
+@@ -319,18 +319,19 @@ class BrowseSourceViewModel(
  
      sealed class Listing(open val query: String?, open val filters: FilterList) {
          data object Popular : Listing(query = GetRemoteManga.QUERY_POPULAR, filters = FilterList())
@@ -26669,7 +26676,7 @@ index bfbf986..09bcae1 100644
                  }
              }
          }
-@@ -338,12 +344,19 @@ class BrowseSourceViewModel(
+@@ -338,12 +339,19 @@ class BrowseSourceViewModel(
  
      sealed interface Dialog {
          data object Filter : Dialog
@@ -26690,7 +26697,7 @@ index bfbf986..09bcae1 100644
          data class Migrate(val target: Manga, val current: Manga) : Dialog
      }
  
-@@ -354,6 +367,7 @@ class BrowseSourceViewModel(
+@@ -354,6 +362,7 @@ class BrowseSourceViewModel(
          val toolbarQuery: String? = null,
          val dialog: Dialog? = null,
      ) {
@@ -26941,7 +26948,7 @@ index cfb48e5..3d3cde0 100644
      }
  }
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/browse/source/globalsearch/SearchViewModel.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/browse/source/globalsearch/SearchViewModel.kt
-index 03900aa..609e54e 100644
+index 03900aa..20d2af1 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/ui/browse/source/globalsearch/SearchViewModel.kt
 +++ b/app/src/main/java/eu/kanade/tachiyomi/ui/browse/source/globalsearch/SearchViewModel.kt
 @@ -7,11 +7,13 @@ import androidx.lifecycle.viewModelScope
@@ -26983,7 +26990,7 @@ index 03900aa..609e54e 100644
      private val coroutineDispatcher = Executors.newFixedThreadPool(5).asCoroutineDispatcher()
      private var searchJob: Job? = null
  
-@@ -65,33 +71,45 @@ abstract class SearchViewModel(
+@@ -65,28 +71,39 @@ abstract class SearchViewModel(
                  mutableState.update { it.copy(onlyShowHasResults = state) }
              }
          }
@@ -27029,14 +27036,7 @@ index 03900aa..609e54e 100644
              )
      }
  
-     private fun getSelectedSources(): List<Source> {
--        val enabledSources = getEnabledSources()
-+        val visibility = contentFilter.snapshot()
-+        val enabledSources = getEnabledSources().filter { visibility.allowsSource(it.id) }
- 
-         val filter = extensionFilter
-         if (filter.isNullOrEmpty()) {
-@@ -124,7 +142,9 @@ abstract class SearchViewModel(
+@@ -124,7 +141,9 @@ abstract class SearchViewModel(
          if (query.isNullOrBlank()) return
  
          val sameQuery = this.lastQuery == query
@@ -27047,7 +27047,7 @@ index 03900aa..609e54e 100644
  
          this.lastQuery = query
          this.lastSourceFilter = sourceFilter
-@@ -133,62 +153,98 @@ abstract class SearchViewModel(
+@@ -133,62 +152,97 @@ abstract class SearchViewModel(
  
          val sources = getSelectedSources()
  
@@ -27097,7 +27097,7 @@ index 03900aa..609e54e 100644
 +                                val visibility = contentFilter.snapshot()
 +                                val titles =
 +                                    page.mangas
-+                                        .filter { visibility.allows(source.id, it) }
++                                        .filter { visibility.allows(it) }
 +                                        .take(if (state.value.unifiedSearch) 100 else Int.MAX_VALUE)
 +                                        .map { it.toDomainManga(source.id) }
 +                                        .distinctBy { it.url }
@@ -27173,7 +27173,6 @@ index 03900aa..609e54e 100644
      private fun updateItem(source: Source, result: SearchItemResult) {
 -        updateItems(state.value.items + (source to result))
 +        val visibility = contentFilter.snapshot()
-+        if (!visibility.allowsSource(source.id)) return
 +        val filtered =
 +            if (result is SearchItemResult.Success)
 +                SearchItemResult.Success(result.result.filter { visibility.allows(it) })
@@ -27185,7 +27184,7 @@ index 03900aa..609e54e 100644
      }
  
      fun setMigrateDialog(currentId: Long, target: Manga) {
-@@ -210,8 +266,30 @@ abstract class SearchViewModel(
+@@ -210,8 +264,30 @@ abstract class SearchViewModel(
          val onlyShowHasResults: Boolean = false,
          val items: Map<Source, SearchItemResult> = mapOf(),
          val dialog: Dialog? = null,
@@ -27216,7 +27215,7 @@ index 03900aa..609e54e 100644
          val total: Int = items.size
          val filteredItems = items.filter { (_, result) -> result.isVisible(onlyShowHasResults) }
      }
-@@ -229,13 +307,9 @@ enum class SourceFilter {
+@@ -229,13 +305,9 @@ enum class SourceFilter {
  sealed interface SearchItemResult {
      data object Loading : SearchItemResult
  
@@ -67721,10 +67720,10 @@ index 0000000..5b8194d
 +}
 diff --git a/app/src/test/java/eu/kanade/tachiyomi/source/selection/AdultContentFilterTest.kt b/app/src/test/java/eu/kanade/tachiyomi/source/selection/AdultContentFilterTest.kt
 new file mode 100644
-index 0000000..51c28b0
+index 0000000..a64600f
 --- /dev/null
 +++ b/app/src/test/java/eu/kanade/tachiyomi/source/selection/AdultContentFilterTest.kt
-@@ -0,0 +1,195 @@
+@@ -0,0 +1,186 @@
 +package eu.kanade.tachiyomi.source.selection
 +
 +import eu.kanade.domain.source.service.SourcePreferences
@@ -67748,11 +67747,15 @@ index 0000000..51c28b0
 +    }
 +
 +    @Test
-+    fun `declared adult providers are hidden even if individual results have no labels`() {
-+        val visibility = AdultContentFilter(adultSourceIds = { setOf(2L) }).snapshot()
-+        assertFalse(visibility.allowsSource(2))
-+        assertFalse(visibility.allows(2, "The Star", emptyList()))
-+        assertTrue(visibility.allows(1, "The Star", listOf("Action")))
++    fun `filtering is per work and never blocks an entire mixed source`() {
++        val filter = AdultContentFilter().snapshot()
++        for (source in listOf(1L, 2L)) {
++            val normal =
++                Manga.create().copy(source = source, title = "The Star", genre = listOf("Action"))
++            val adult = normal.copy(genre = listOf("Hentai"))
++            assertTrue(filter.allows(normal))
++            assertFalse(filter.allows(adult))
++        }
 +    }
 +
 +    @Test
@@ -67767,7 +67770,7 @@ index 0000000..51c28b0
 +                "R-18",
 +                "18 +",
 +            )) {
-+            assertFalse(visibility.allows(1, "The Star", listOf(genres)), genres)
++            assertFalse(visibility.allows("The Star", listOf(genres)), genres)
 +        }
 +    }
 +
@@ -67776,7 +67779,6 @@ index 0000000..51c28b0
 +        val visibility = AdultContentFilter().snapshot()
 +        assertTrue(
 +            visibility.allows(
-+                1,
 +                "The Star",
 +                listOf(
 +                    "Seinen",
@@ -67793,7 +67795,7 @@ index 0000000..51c28b0
 +                ),
 +            )
 +        )
-+        assertTrue(visibility.allows(1, "The Star", listOf("Hentaiculture", "Adventure")))
++        assertTrue(visibility.allows("The Star", listOf("Hentaiculture", "Adventure")))
 +    }
 +
 +    @Test
@@ -67808,7 +67810,7 @@ index 0000000..51c28b0
 +                "The Star [Pornográfico]",
 +                "The Star ［１８＋］",
 +            )) {
-+            assertFalse(visibility.allows(1, title, emptyList()), title)
++            assertFalse(visibility.allows(title, emptyList()), title)
 +        }
 +        for (title in
 +            listOf(
@@ -67817,7 +67819,7 @@ index 0000000..51c28b0
 +                "Adult Life",
 +                "Chapter 18 + 19",
 +            )) {
-+            assertTrue(visibility.allows(1, title, emptyList()), title)
++            assertTrue(visibility.allows(title, emptyList()), title)
 +        }
 +    }
 +
@@ -67836,7 +67838,7 @@ index 0000000..51c28b0
 +                    it.url = "/work"
 +                    it.memo = buildJsonObject { put(key, value) }
 +                }
-+            assertFalse(visibility.allows(1, manga), key)
++            assertFalse(visibility.allows(manga), key)
 +        }
 +        val normal =
 +            Manga.create()
@@ -67854,34 +67856,22 @@ index 0000000..51c28b0
 +    }
 +
 +    @Test
-+    fun `disabling the filter bypasses labels and source lookup and a new snapshot follows changes`() {
++    fun `disabling the filter allows adult works and new snapshots follow setting changes`() {
 +        var enabled = false
-+        var lookups = 0
-+        val filter =
-+            AdultContentFilter(
-+                enabled = { enabled },
-+                adultSourceIds = {
-+                    lookups++
-+                    setOf(2L)
-+                },
-+            )
++        val filter = AdultContentFilter(enabled = { enabled })
 +        val previous = filter.snapshot()
-+        assertTrue(previous.allows(2, "The Star [18+]", listOf("Hentai")))
-+        assertEquals(0, lookups)
++        assertTrue(previous.allows("The Star [18+]", listOf("Hentai")))
 +        enabled = true
-+        assertFalse(filter.snapshot().allowsSource(2))
-+        assertEquals(1, lookups)
-+        assertTrue(previous.allowsSource(2))
++        assertFalse(filter.snapshot().allows("The Star [18+]", listOf("Hentai")))
++        assertTrue(previous.allows("The Star [18+]", listOf("Hentai")))
 +    }
 +
 +    @Test
-+    fun `source snapshots do not retain a mutable external source set`() {
-+        val ids = mutableSetOf(2L)
-+        val filter = AdultContentFilter(adultSourceIds = { ids })
-+        val previous = filter.snapshot()
-+        ids.clear()
-+        assertFalse(previous.allowsSource(2))
-+        assertTrue(filter.snapshot().allowsSource(2))
++    fun `an unknown work stays available even when another work on the same source is adult`() {
++        val filter = AdultContentFilter().snapshot()
++        val unknown = Manga.create().copy(source = 2, title = "The Star")
++        assertFalse(filter.allows(unknown.copy(genre = listOf("Hentai"))))
++        assertTrue(filter.allows(unknown))
 +    }
 +
 +    @Test
@@ -67922,10 +67912,10 @@ index 0000000..51c28b0
 +}
 diff --git a/app/src/test/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalogTest.kt b/app/src/test/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalogTest.kt
 new file mode 100644
-index 0000000..4f8231b
+index 0000000..8e46dc6
 --- /dev/null
 +++ b/app/src/test/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalogTest.kt
-@@ -0,0 +1,1032 @@
+@@ -0,0 +1,1019 @@
 +package eu.kanade.tachiyomi.source.selection
 +
 +import eu.kanade.domain.source.service.SourcePreferences
@@ -68080,37 +68070,24 @@ index 0000000..4f8231b
 +    }
 +
 +    @Test
-+    fun `declared adult sources are not queried even when their manga metadata has no labels`() =
++    fun `unlabeled alternatives from mixed sources remain available instead of blocking the source`() =
 +        runTest {
 +            val primary = Provider(1, 2)
-+            val adult = Provider(2, 4)
++            val mixed = Provider(2, 4)
 +            val c =
-+                AutomaticSourceCatalog(
-+                    Manager(listOf(primary, adult)),
-+                    preferences(),
-+                    contentFilter = AdultContentFilter(adultSourceIds = { setOf(2L) }),
-+                ) { _, _ ->
++                AutomaticSourceCatalog(Manager(listOf(primary, mixed)), preferences()) { _, _ ->
 +                    true
 +                }
-+
 +            val result = c.fetch(primary, work(), emptyList(), false, true, true)!!
-+
-+            assertEquals(0, adult.searches)
-+            assertTrue(result.chapters.all { ChapterOrigin.from(it.memo)?.sourceId == 1L })
++            assertTrue(mixed.searches > 0)
++            assertTrue(result.chapters.any { ChapterOrigin.from(it.memo)?.sourceId == 2L })
 +        }
 +
 +    @Test
 +    fun `an existing adult original can still refresh from the library`() = runTest {
 +        val original = Provider(1, 2, genre = "Hentai")
 +        val manga = work().copy(favorite = true)
-+        val c =
-+            AutomaticSourceCatalog(
-+                Manager(listOf(original)),
-+                preferences(),
-+                contentFilter = AdultContentFilter(adultSourceIds = { setOf(1L) }),
-+            ) { _, _ ->
-+                true
-+            }
++        val c = AutomaticSourceCatalog(Manager(listOf(original)), preferences()) { _, _ -> true }
 +
 +        val result = c.fetch(original, manga, emptyList(), false, true, true)!!
 +
@@ -69900,10 +69877,10 @@ index 0000000..2fa8f50
 +}
 diff --git a/app/src/test/java/eu/kanade/tachiyomi/source/selection/UnifiedWorkSearchTest.kt b/app/src/test/java/eu/kanade/tachiyomi/source/selection/UnifiedWorkSearchTest.kt
 new file mode 100644
-index 0000000..cc2bd6c
+index 0000000..77af1ae
 --- /dev/null
 +++ b/app/src/test/java/eu/kanade/tachiyomi/source/selection/UnifiedWorkSearchTest.kt
-@@ -0,0 +1,345 @@
+@@ -0,0 +1,350 @@
 +package eu.kanade.tachiyomi.source.selection
 +
 +import eu.kanade.tachiyomi.source.model.*
@@ -70016,22 +69993,27 @@ index 0000000..cc2bd6c
 +        }
 +
 +    @Test
-+    fun `a declared adult provider is not searched for localized aliases`() = runTest {
++    fun `mixed sources remain eligible for aliases while their adult rows are hidden`() = runTest {
 +        val normal = provider(1)
-+        val adult = provider(2, "pt-BR")
-+        val filter = AdultContentFilter(adultSourceIds = { setOf(2L) })
++        val mixed = provider(2, "pt-BR")
++        val adult =
++            info("Upando Sozinho Ragnarok").also {
++                it.url = "/adult"
++                it.genre = "Hentai"
++            }
++        coEvery { mixed.getSearchManga(any(), any(), any()) } returns
++            MangasPage(listOf(adult, info("Upando Sozinho Ragnarok")), false)
 +        val groups =
-+            UnifiedWorkSearch(contentFilter = filter) { identity }
++            UnifiedWorkSearch { identity }
 +                .refine(
 +                    "Solo Leveling Ragnarok",
 +                    listOf(hit(1, "DAUL")),
 +                    emptyList(),
-+                    listOf(normal, adult),
++                    listOf(normal, mixed),
 +                )
-+
-+        assertEquals(listOf(1L), groups.flatMap { it.editions }.map { it.manga.source })
-+        coVerify(exactly = 0) { adult.getSearchManga(any(), any(), any()) }
-+        coVerify(exactly = 0) { adult.getMangaUpdate(any(), any(), any(), any()) }
++        assertEquals(setOf(1L, 2L), groups.flatMap { it.editions }.map { it.manga.source }.toSet())
++        assertFalse(groups.flatMap { it.editions }.any { it.manga.url == "/adult" })
++        coVerify(exactly = 1) { mixed.getSearchManga(any(), any(), any()) }
 +    }
 +
 +    @Test
@@ -70649,10 +70631,10 @@ index 0000000..cd59c85
 +}
 diff --git a/app/src/test/java/eu/kanade/tachiyomi/ui/browse/source/globalsearch/AdultSearchViewModelTest.kt b/app/src/test/java/eu/kanade/tachiyomi/ui/browse/source/globalsearch/AdultSearchViewModelTest.kt
 new file mode 100644
-index 0000000..bddcb42
+index 0000000..13829b1
 --- /dev/null
 +++ b/app/src/test/java/eu/kanade/tachiyomi/ui/browse/source/globalsearch/AdultSearchViewModelTest.kt
-@@ -0,0 +1,203 @@
+@@ -0,0 +1,199 @@
 +package eu.kanade.tachiyomi.ui.browse.source.globalsearch
 +
 +import androidx.lifecycle.ViewModelStore
@@ -70666,6 +70648,7 @@ index 0000000..bddcb42
 +import io.mockk.coEvery
 +import io.mockk.mockk
 +import io.mockk.unmockkAll
++import java.util.concurrent.ConcurrentLinkedQueue
 +import java.util.concurrent.atomic.AtomicInteger
 +import kotlinx.coroutines.CompletableDeferred
 +import kotlinx.coroutines.Dispatchers
@@ -70792,64 +70775,59 @@ index 0000000..bddcb42
 +        }
 +
 +    @Test
-+    fun `flagged providers are not queried and adult rows are filtered before local persistence`() =
++    fun `all mixed providers are queried and only their adult rows are filtered before persistence`() =
 +        runBlocking {
 +            val mixed = Provider(1, listOf(row("/safe", "Action"), row("/adult", "Hentai")))
 +            val adult = Provider(2, listOf(row("/unlabeled", null)))
 +            val prefs = prefs()
-+            var persisted: List<Manga> = emptyList()
++            val persisted = ConcurrentLinkedQueue<Manga>()
 +            val normalizer = mockk<NetworkToLocalManga>()
 +            coEvery { normalizer(any<List<Manga>>()) } coAnswers
 +                {
-+                    firstArg<List<Manga>>().also { persisted = it }
++                    firstArg<List<Manga>>().also { persisted.addAll(it) }
 +                }
 +            val model =
-+                Model(
-+                    prefs,
-+                    Manager(listOf(mixed, adult)),
-+                    normalizer,
-+                    AdultContentFilter(adultSourceIds = { setOf(2L) }),
-+                )
++                Model(prefs, Manager(listOf(mixed, adult)), normalizer, AdultContentFilter())
 +            store.put("search", model)
 +
 +            model.search()
 +            val ready =
-+                withTimeout(10_000) { model.state.first { it.total == 1 && it.progress == 1 } }
++                withTimeout(10_000) { model.state.first { it.total == 2 && it.progress == 2 } }
 +
-+            assertEquals(0, adult.calls.get())
-+            assertEquals(listOf("/safe"), persisted.map { it.url })
++            assertEquals(1, adult.calls.get())
++            assertEquals(setOf("/safe", "/unlabeled"), persisted.map { it.url }.toSet())
 +            val result = ready.items.getValue(mixed) as SearchItemResult.Success
 +            assertEquals(listOf("/safe"), result.result.map { it.url })
 +        }
 +
 +    @Test
-+    fun `enabling filtering cancels an in flight adult provider and clears its source row`() =
++    fun `enabling filtering restarts an in flight search and removes adult rows while retaining both providers`() =
 +        runBlocking {
 +            val gate = CompletableDeferred<Unit>()
 +            val normal = Provider(1, listOf(row("/safe", "Action")))
-+            val adult = Provider(2, listOf(row("/adult", null)), gate)
++            val adult = Provider(2, listOf(row("/adult", "Hentai")), gate)
 +            val prefs = prefs().also { it.hideAdultSearchResults.set(false) }
 +            val normalizer = mockk<NetworkToLocalManga>()
 +            coEvery { normalizer(any<List<Manga>>()) } coAnswers { firstArg<List<Manga>>() }
-+            val filter =
-+                AdultContentFilter(
-+                    enabled = { prefs.hideAdultSearchResults.get() },
-+                    adultSourceIds = { setOf(2L) },
-+                )
++            val filter = AdultContentFilter(enabled = { prefs.hideAdultSearchResults.get() })
 +            val model = Model(prefs, Manager(listOf(normal, adult)), normalizer, filter)
 +            store.put("search", model)
 +            model.search()
 +            withTimeout(10_000) { adult.started.await() }
 +
 +            prefs.hideAdultSearchResults.set(true)
++            gate.complete(Unit)
 +            val ready =
 +                withTimeout(10_000) {
-+                    model.state.first { it.total == 1 && it.progress == 1 && adult !in it.items }
++                    model.state.first {
++                        it.total == 2 &&
++                            it.progress == 2 &&
++                            (it.items[adult] as? SearchItemResult.Success)?.isEmpty == true
++                    }
 +                }
-+            gate.complete(Unit)
 +
-+            assertFalse(adult in ready.items)
-+            assertEquals(1, adult.calls.get())
++            assertTrue((ready.items.getValue(adult) as SearchItemResult.Success).isEmpty)
++            assertEquals(2, adult.calls.get())
 +            assertEquals(
 +                listOf("/safe"),
 +                (ready.items.getValue(normal) as SearchItemResult.Success).result.map { it.url },
@@ -80513,7 +80491,7 @@ index 9839272..0ac8bdd 100644
 \ No newline at end of file
 +voyager = ["voyager-navigator", "voyager-tabNavigator", "voyager-transitions"]
 diff --git a/i18n-at/src/commonMain/moko-resources/base/strings.xml b/i18n-at/src/commonMain/moko-resources/base/strings.xml
-index 7ed4795..ff877e9 100644
+index 7ed4795..1ee9804 100644
 --- a/i18n-at/src/commonMain/moko-resources/base/strings.xml
 +++ b/i18n-at/src/commonMain/moko-resources/base/strings.xml
 @@ -10,7 +10,7 @@
@@ -80525,7 +80503,7 @@ index 7ed4795..ff877e9 100644
      <string name="pref_group_setup">Translation Setup</string>
      <string name="pref_translate_from">Translate From</string>
      <string name="pref_translate_to">Translate To</string>
-@@ -73,12 +73,315 @@
+@@ -73,12 +73,318 @@
      <string name="repository_add_error">Could not add this repository. Check your connection and try again.</string>
      <string name="repository_refresh_error">Repository added, but extension listings could not be refreshed. Refresh the Extensions screen.</string>
      <string name="chapter_group_version">Group/version: %1$s</string>
@@ -80653,7 +80631,10 @@ index 7ed4795..ff877e9 100644
 +    <string name="polaris_work_source_description">Reading uses the same work across providers, preferring Portuguese and filling missing chapters in English. Confirmed alternate titles and page samples help find replacements. You can pin a source for this work.</string>
 +    <string name="polaris_work_source_discovery_incomplete">The search did not finish. Chapters already found have been kept. You can search again.</string>
 +    <string name="polaris_adult_search_filter">Filter adult content in searches</string>
-+    <string name="polaris_adult_search_filter_summary">Hides sources and works identified as 18+. Unlabeled content may still appear. Does not remove your library.</string>
++    <string name="polaris_adult_search_filter_summary">Filters works identified as 18+ while keeping sources available. Unlabeled content may appear.</string>
++    <string name="polaris_adult_content_confirm_title">Allow adult content?</string>
++    <string name="polaris_adult_content_confirm_message">Turning off the filter may include nudity, sexually explicit material and other sensitive content in searches and automatic alternatives. You can turn the filter back on at any time.</string>
++    <string name="polaris_adult_content_confirm_action">I understand, allow</string>
 +    <string name="polaris_work_source_automatic">Automatic</string>
 +    <string name="polaris_work_source_search">Search sources</string>
 +    <string name="pref_ocr_engine_saved_hint">Used for new translations. To compare engines, delete only the saved chapter translation and translate again.</string>
@@ -80844,7 +80825,7 @@ index 7ed4795..ff877e9 100644
 +    <string name="backup_read_limit_exceeded">This backup exceeds the reading memory limit used by Polaris on this device. No existing backup was replaced. Use fewer optional fields when creating a backup, or a device with more memory.</string>
  </resources>
 diff --git a/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml b/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
-index d1748bc..d52e1c9 100644
+index d1748bc..c90db8a 100644
 --- a/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
 +++ b/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
 @@ -10,7 +10,7 @@
@@ -80856,7 +80837,7 @@ index d1748bc..d52e1c9 100644
      <string name="pref_group_setup">Configuração da tradução</string>
      <string name="pref_translate_from">Traduzir de</string>
      <string name="pref_translate_to">Traduzir para</string>
-@@ -73,12 +73,315 @@
+@@ -73,12 +73,318 @@
      <string name="repository_add_error">Não foi possível adicionar o repositório. Confira a conexão e tente novamente.</string>
      <string name="repository_refresh_error">Repositório adicionado, mas não foi possível atualizar as extensões. Atualize a tela Extensões.</string>
      <string name="chapter_group_version">Grupo/versão: %1$s</string>
@@ -80984,7 +80965,10 @@ index d1748bc..d52e1c9 100644
 +    <string name="polaris_work_source_description">Reúne capítulos da mesma obra: prioriza português e complementa com inglês. Nomes alternativos confirmados e amostras de páginas ajudam a encontrar substitutas. Você pode fixar uma fonte só para esta obra.</string>
 +    <string name="polaris_work_source_discovery_incomplete">A busca não terminou. Os capítulos encontrados foram mantidos. Você pode buscar novamente.</string>
 +    <string name="polaris_adult_search_filter">Filtrar conteúdo +18 nas buscas</string>
-+    <string name="polaris_adult_search_filter_summary">Oculta fontes e obras identificadas como +18. Conteúdo sem marcação pode aparecer. Não remove sua biblioteca.</string>
++    <string name="polaris_adult_search_filter_summary">Filtra obras identificadas como +18, mantendo as fontes disponíveis. Conteúdo sem marcação pode aparecer.</string>
++    <string name="polaris_adult_content_confirm_title">Liberar conteúdo +18?</string>
++    <string name="polaris_adult_content_confirm_message">Ao desligar o filtro, as buscas e alternativas automáticas poderão incluir nudez, conteúdo sexual explícito e outros conteúdos sensíveis. Você pode ligar o filtro novamente quando quiser.</string>
++    <string name="polaris_adult_content_confirm_action">Estou ciente, liberar</string>
 +    <string name="polaris_work_source_automatic">Automático</string>
 +    <string name="polaris_work_source_search">Buscar fontes</string>
 +    <string name="pref_ocr_engine_saved_hint">Usado nas novas traduções. Para comparar motores, exclua apenas a tradução salva do capítulo e traduza novamente.</string>

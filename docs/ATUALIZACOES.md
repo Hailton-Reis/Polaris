@@ -10,6 +10,8 @@ A [P20261117.3](BUSCA_FONTES_P20261117_3.md) melhora a busca entre fontes e o tr
 
 A [P20261117.4](FILTRO_ADULTO_P20261117_4.md) acrescenta o filtro +18 de buscas, ligado por padrão e reversível. Conteúdo sem marcação pode aparecer. Também está somente no desenvolvimento; a biblioteca é preservada.
 
+A [P20261117.5](FONTES_MISTAS_P20261117_5.md) mantém fontes mistas disponíveis, aplica o filtro +18 por obra e pede confirmação ao desligá-lo. Continua sem novo APK/Release.
+
 ## Escolha do canal
 
 Em **Configurações → Atualizações do aplicativo**:

@@ -2,6 +2,17 @@
 
 Este arquivo registra a evolução real do código. **Revisões de desenvolvimento não são lançamentos públicos.** As datas abaixo usam America/Fortaleza, exceto quando houver indicação de UTC. O histórico de distribuição fica em [Releases](https://github.com/Hailton-Reis/Polaris/releases).
 
+## Desenvolvimento · P20261117.5 — 17/11/2026
+
+**Estado:** fontes mistas preservadas e aviso de conteúdo sensível para a próxima versão; sem novo APK/Release.
+
+- Filtro +18 continua ligado por padrão, agora por obra: tags, classificação e marcadores no título. Removido o bloqueio de fontes inteiras pela marcação da extensão, permitindo resultados comuns de fontes mistas.
+- Desligar pede confirmação **Estou ciente, liberar**; cancelar mantém o filtro. Religar é imediato. Biblioteca e escolhas independentes de fontes preservadas; conteúdo sem marcação pode escapar.
+- Sete controles da política anterior foram substituídos por sete de filtragem por obra, sem aumento do total. 86 controles focados e validação completa aprovados: 977 app executados + 87 domain anteriores/UP-TO-DATE = 1.064 casos. Nenhuma falha/skip ou ausência inesperada; as sete substituições estão listadas nas evidências.
+- Overlay4/empacotamento27/comparador21 aprovados. Aviso compilado/revisado no código, sem execução da interface no aparelho. Sem análise de imagens ou alteração da concorrência/agendamento.
+
+[Comportamento e aviso](docs/FONTES_MISTAS_P20261117_5.md) · [Evidências](integration/adult-items/20261117/README.md).
+
 ## Desenvolvimento · P20261117.4 — 17/11/2026
 
 **Estado:** filtro +18 para a próxima versão; sem novo APK ou Release.
