@@ -1,0 +1,46 @@
+{
+  "status": "NO_UNEXPECTED_UNIT_REGRESSIONS",
+  "baseline": {
+    "total": 1064,
+    "passed": 1064,
+    "failed": 0,
+    "skipped": 0
+  },
+  "patched": {
+    "total": 1076,
+    "passed": 1076,
+    "failed": 0,
+    "skipped": 0
+  },
+  "preexisting_failures_still_present": 0,
+  "missing_baseline_tests": [
+    [
+      "app",
+      "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "confirmed catalog refreshes overlap in pairs instead of waiting in sequence()"
+    ]
+  ],
+  "new_failures_or_skips": [],
+  "android_runtime_verified": false,
+  "raw_comparison_status": "REGRESSION_DETECTED",
+  "expected_renames": [
+    {
+      "old": [
+        "app",
+        "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+        "confirmed catalog refreshes overlap in pairs instead of waiting in sequence()"
+      ],
+      "new": [
+        "app",
+        "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+        "confirmed catalog refreshes share the four foreground slots()"
+      ],
+      "reason": "Confirmed refresh policy now uses up to four foreground alternatives instead of pairs."
+    }
+  ],
+  "unexpected_missing_baseline_tests": [],
+  "report_tasks": {
+    "app": "testBetaUnitTest",
+    "domain": "testReleaseUnitTest"
+  }
+}

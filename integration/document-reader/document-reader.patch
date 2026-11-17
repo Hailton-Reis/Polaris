@@ -9813,7 +9813,7 @@ index a198c3f..9a3e84f 100644
                      preference = translationPreferences.translationEngineTemperature(),
                      title = stringResource(ATMR.strings.pref_engine_temperature),
 diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
-index 7f411fd..43585d1 100644
+index 7f411fd..0cb728b 100644
 --- a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
 +++ b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
 @@ -1,15 +1,18 @@
@@ -9878,7 +9878,7 @@ index 7f411fd..43585d1 100644
  
      // Identifies this overlay independently of the pinned upstream COMMIT_SHA.
 -    private const val POLARIS_READER_REVISION = "P20261031.2"
-+    private const val POLARIS_READER_REVISION = "P20261117.5"
++    private const val POLARIS_READER_REVISION = "P20261117.6"
  
      @Composable
      override fun Content() {
@@ -12260,7 +12260,7 @@ index d8c786f..9d1812e 100644
                  },
              )
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/App.kt b/app/src/main/java/eu/kanade/tachiyomi/App.kt
-index 6707d1a..d91a88d 100644
+index 6707d1a..2c25f13 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/App.kt
 +++ b/app/src/main/java/eu/kanade/tachiyomi/App.kt
 @@ -46,6 +46,7 @@ import eu.kanade.tachiyomi.util.system.WebViewUtil
@@ -12363,7 +12363,7 @@ index 6707d1a..d91a88d 100644
              LogcatLogger.install()
              LogcatLogger.loggers += AndroidLogcatLogger(minLogPriority)
          }
-@@ -188,36 +208,38 @@ class App : Application(), DefaultLifecycleObserver, SingletonImageLoader.Factor
+@@ -188,44 +208,48 @@ class App : Application(), DefaultLifecycleObserver, SingletonImageLoader.Factor
      }
  
      override fun newImageLoader(context: Context): ImageLoader {
@@ -12429,7 +12429,17 @@ index 6707d1a..d91a88d 100644
              .build()
      }
  
-@@ -233,14 +255,15 @@ class App : Application(), DefaultLifecycleObserver, SingletonImageLoader.Factor
+     override fun onStart(owner: LifecycleOwner) {
++        eu.kanade.tachiyomi.source.selection.SourceDiscoveryConcurrency.shared.setForeground(true)
+         SecureActivityDelegate.onApplicationStart()
+     }
+ 
+     override fun onStop(owner: LifecycleOwner) {
++        eu.kanade.tachiyomi.source.selection.SourceDiscoveryConcurrency.shared.setForeground(false)
+         SecureActivityDelegate.onApplicationStopped()
+     }
+ 
+@@ -233,14 +257,15 @@ class App : Application(), DefaultLifecycleObserver, SingletonImageLoader.Factor
          try {
              // Override the value passed as X-Requested-With in WebView requests
              val stackTrace = Thread.currentThread().stackTrace
@@ -24423,10 +24433,10 @@ index 0000000..7c3c569
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalog.kt b/app/src/main/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalog.kt
 new file mode 100644
-index 0000000..3505579
+index 0000000..01e8ca7
 --- /dev/null
 +++ b/app/src/main/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalog.kt
-@@ -0,0 +1,608 @@
+@@ -0,0 +1,605 @@
 +package eu.kanade.tachiyomi.source.selection
 +
 +import eu.kanade.domain.chapter.model.toRemoteSChapter
@@ -24448,9 +24458,7 @@ index 0000000..3505579
 +import kotlinx.coroutines.flow.flatMapMerge
 +import kotlinx.coroutines.flow.flow
 +import kotlinx.coroutines.sync.Mutex
-+import kotlinx.coroutines.sync.Semaphore
 +import kotlinx.coroutines.sync.withLock
-+import kotlinx.coroutines.sync.withPermit
 +import kotlinx.coroutines.withTimeoutOrNull
 +import kotlinx.serialization.json.JsonObject
 +import tachiyomi.domain.chapter.model.Chapter
@@ -24476,6 +24484,7 @@ index 0000000..3505579
 +        null
 +    },
 +    private val contentFilter: AdultContentFilter = AdultContentFilter(),
++    private val providerConcurrency: SourceDiscoveryConcurrency = SourceDiscoveryConcurrency.shared,
 +    private val checkReadability: suspend (HttpSource, List<SChapter>) -> Boolean =
 +        SourceReadabilityProbe::check,
 +) {
@@ -24780,7 +24789,7 @@ index 0000000..3505579
 +                    flow {
 +                        val prepared =
 +                            withTimeoutOrNull(PROVIDER_PIPELINE_TIMEOUT) {
-+                                providerGate.withPermit { prepare(loadSafely(binding)) }
++                                providerConcurrency.withPermit { prepare(loadSafely(binding)) }
 +                            } ?: Prepared(Outcome(binding, null, timedOut = true), null)
 +                        emit(prepared)
 +                    }
@@ -24806,7 +24815,7 @@ index 0000000..3505579
 +                                flow {
 +                                    val prepared =
 +                                        withTimeoutOrNull(PROVIDER_PIPELINE_TIMEOUT) {
-+                                            providerGate.withPermit {
++                                            providerConcurrency.withPermit {
 +                                                prepare(search(provider, alreadyKnown))
 +                                            }
 +                                        } ?: Prepared(Outcome(null, null, timedOut = true), null)
@@ -25013,8 +25022,6 @@ index 0000000..3505579
 +        JsonObject(memo.filterKeys { !it.startsWith("polaris.") })
 +
 +    companion object {
-+        private val providerGate = Semaphore(PARALLEL_PROVIDERS)
-+
 +        private fun languageRank(language: String): Int =
 +            when (language.lowercase().replace('_', '-')) {
 +                "pt-br" -> 0
@@ -25026,7 +25033,7 @@ index 0000000..3505579
 +        private val locks = ConcurrentHashMap<Long, Mutex>()
 +        private const val DISCOVERY_TTL = 24 * 60 * 60 * 1000L
 +        private const val PARTIAL_DISCOVERY_TTL = 60_000L
-+        private const val PARALLEL_PROVIDERS = 2
++        private const val PARALLEL_PROVIDERS = SourceDiscoveryConcurrency.FOREGROUND_LIMIT
 +        private const val PROVIDER_PIPELINE_TIMEOUT = 60_000L
 +        private const val SEARCH_TIMEOUT = 30_000L
 +        private const val CATALOG_TIMEOUT = 30_000L
@@ -25244,6 +25251,88 @@ index 0000000..6452fd0
 +                (manga.memo[LogicalChapterCounts.KEY] as? JsonObject)?.get("rows"),
 +            )
 +        }
++}
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/source/selection/SourceDiscoveryConcurrency.kt b/app/src/main/java/eu/kanade/tachiyomi/source/selection/SourceDiscoveryConcurrency.kt
+new file mode 100644
+index 0000000..ddbd8a9
+--- /dev/null
++++ b/app/src/main/java/eu/kanade/tachiyomi/source/selection/SourceDiscoveryConcurrency.kt
+@@ -0,0 +1,76 @@
++package eu.kanade.tachiyomi.source.selection
++
++import kotlinx.coroutines.CompletableDeferred
++import kotlinx.coroutines.currentCoroutineContext
++import kotlinx.coroutines.ensureActive
++
++/** FIFO admission for alternative-source operations, shared across works in this process. */
++class SourceDiscoveryConcurrency(initialForeground: Boolean = false) {
++    private class Waiter {
++        val ready = CompletableDeferred<Unit>()
++        var admitted = false
++    }
++
++    private val lock = Any()
++    private val waiting = ArrayDeque<Waiter>()
++    private var foreground = initialForeground
++    private var active = 0
++
++    fun setForeground(value: Boolean) {
++        val ready =
++            synchronized(lock) {
++                foreground = value
++                admitWaiting()
++            }
++        ready.forEach { it.ready.complete(Unit) }
++    }
++
++    suspend fun <T> withPermit(block: suspend () -> T): T {
++        val waiter = Waiter()
++        val ready =
++            synchronized(lock) {
++                waiting.addLast(waiter)
++                admitWaiting()
++            }
++        ready.forEach { it.ready.complete(Unit) }
++        try {
++            waiter.ready.await()
++        } catch (error: Throwable) {
++            val next =
++                synchronized(lock) {
++                    if (waiter.admitted) active-- else waiting.remove(waiter)
++                    admitWaiting()
++                }
++            next.forEach { it.ready.complete(Unit) }
++            throw error
++        }
++        try {
++            currentCoroutineContext().ensureActive()
++            return block()
++        } finally {
++            val next =
++                synchronized(lock) {
++                    active--
++                    admitWaiting()
++                }
++            next.forEach { it.ready.complete(Unit) }
++        }
++    }
++
++    // Called only while holding lock. Completion happens outside the lock, as it can resume code.
++    private fun admitWaiting(): List<Waiter> = buildList {
++        val limit = if (foreground) FOREGROUND_LIMIT else BACKGROUND_LIMIT
++        while (active < limit && waiting.isNotEmpty()) {
++            val waiter = waiting.removeFirst()
++            waiter.admitted = true
++            active++
++            add(waiter)
++        }
++    }
++
++    companion object {
++        const val FOREGROUND_LIMIT = 4
++        const val BACKGROUND_LIMIT = 1
++        val shared = SourceDiscoveryConcurrency()
++    }
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/source/selection/SourceMatching.kt b/app/src/main/java/eu/kanade/tachiyomi/source/selection/SourceMatching.kt
 new file mode 100644
@@ -67912,10 +68001,10 @@ index 0000000..a64600f
 +}
 diff --git a/app/src/test/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalogTest.kt b/app/src/test/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalogTest.kt
 new file mode 100644
-index 0000000..8e46dc6
+index 0000000..88cd40c
 --- /dev/null
 +++ b/app/src/test/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalogTest.kt
-@@ -0,0 +1,1019 @@
+@@ -0,0 +1,1138 @@
 +package eu.kanade.tachiyomi.source.selection
 +
 +import eu.kanade.domain.source.service.SourcePreferences
@@ -67935,9 +68024,11 @@ index 0000000..8e46dc6
 +import kotlinx.coroutines.flow.MutableStateFlow
 +import kotlinx.coroutines.test.runCurrent
 +import kotlinx.coroutines.test.runTest
++import org.junit.jupiter.api.AfterEach
 +import org.junit.jupiter.api.Assertions.assertEquals
 +import org.junit.jupiter.api.Assertions.assertFalse
 +import org.junit.jupiter.api.Assertions.assertTrue
++import org.junit.jupiter.api.BeforeEach
 +import org.junit.jupiter.api.Test
 +import tachiyomi.core.common.preference.InMemoryPreferenceStore
 +import tachiyomi.domain.chapter.model.Chapter
@@ -67950,6 +68041,10 @@ index 0000000..8e46dc6
 +import tachiyomi.domain.source.service.SourceManager
 +
 +class AutomaticSourceCatalogTest {
++    @BeforeEach fun visibleApp() = SourceDiscoveryConcurrency.shared.setForeground(true)
++
++    @AfterEach fun hiddenApp() = SourceDiscoveryConcurrency.shared.setForeground(false)
++
 +    private class Provider(
 +        override val id: Long,
 +        val count: Int,
@@ -68193,7 +68288,120 @@ index 0000000..8e46dc6
 +        }
 +
 +    @Test
-+    fun `confirmed catalog refreshes overlap in pairs instead of waiting in sequence`() = runTest {
++    fun `background confirmed refreshes use one shared slot even with four pipeline workers`() =
++        runTest {
++            SourceDiscoveryConcurrency.shared.setForeground(false)
++            val primary = Provider(1, 2)
++            val alternatives = (2L..4L).map { Provider(it, 3).also { it.delayMillis = 1_000 } }
++            val bindings =
++                alternatives.map {
++                    WorkSource(it.id, it.name, "en", "/work", "The Star", "Jane Doe")
++                }
++            val manga = work().copy(memo = WorkSources(candidates = bindings).attach(work().memo))
++            val result =
++                catalog(Manager(listOf(primary) + alternatives), preferences())
++                    .fetch(primary, manga, listOf(oldChapter()), false, true, false)!!
++            assertEquals(3_000L, testScheduler.currentTime)
++            assertEquals(
++                setOf(1L, 2L, 3L, 4L),
++                result.chapters.map { ChapterOrigin.from(it.memo)!!.sourceId }.toSet(),
++            )
++            assertTrue(alternatives.all { it.searches == 0 })
++        }
++
++    @Test
++    fun `different catalog instances share four foreground operations rather than four each`() =
++        runTest {
++            var active = 0
++            var peak = 0
++            val probe: suspend (HttpSource, List<SChapter>) -> Boolean = { source, _ ->
++                if (source.id !in setOf(1L, 101L)) {
++                    active++
++                    peak = maxOf(peak, active)
++                    try {
++                        delay(1_000)
++                    } finally {
++                        active--
++                    }
++                }
++                true
++            }
++            val primary = Provider(1, 2)
++            val otherPrimary = Provider(101, 2)
++            val first =
++                AutomaticSourceCatalog(
++                    Manager(listOf(primary) + (2L..5L).map { Provider(it, 3) }),
++                    preferences(),
++                    checkReadability = probe,
++                )
++            val second =
++                AutomaticSourceCatalog(
++                    Manager(listOf(otherPrimary) + (102L..105L).map { Provider(it, 3) }),
++                    preferences(),
++                    checkReadability = probe,
++                )
++            val a = async { first.fetch(primary, work(), emptyList(), false, true, true)!! }
++            val b = async {
++                second.fetch(
++                    otherPrimary,
++                    work().copy(id = 20, source = 101),
++                    emptyList(),
++                    false,
++                    true,
++                    true,
++                )!!
++            }
++            assertTrue(a.await().chapters.all { ChapterOrigin.from(it.memo)!!.sourceId in 1L..5L })
++            assertTrue(
++                b.await().chapters.all { ChapterOrigin.from(it.memo)!!.sourceId in 101L..105L }
++            )
++            assertEquals(4, peak)
++            assertEquals(0, active)
++            assertEquals(2_000L, testScheduler.currentTime)
++        }
++
++    @Test
++    fun `hiding the app during discovery retains admitted results and serializes remaining alternatives`() =
++        runTest {
++            val limiter = SourceDiscoveryConcurrency(initialForeground = true)
++            val primary = Provider(1, 2)
++            val alternatives = (2L..7L).map { Provider(it, 3) }
++            val gates = alternatives.associate { it.id to CompletableDeferred<Unit>() }
++            val started = mutableListOf<Long>()
++            val c =
++                AutomaticSourceCatalog(
++                    Manager(listOf(primary) + alternatives),
++                    preferences(),
++                    providerConcurrency = limiter,
++                ) { source, _ ->
++                    gates[source.id]?.let {
++                        started += source.id
++                        it.await()
++                    }
++                    true
++                }
++            val pending = async { c.fetch(primary, work(), emptyList(), false, true, true)!! }
++            runCurrent()
++            assertEquals(listOf(2L, 3L, 4L, 5L), started)
++            limiter.setForeground(false)
++            (2L..4L).forEach { gates.getValue(it).complete(Unit) }
++            runCurrent()
++            assertEquals(listOf(2L, 3L, 4L, 5L), started)
++            gates.getValue(5).complete(Unit)
++            runCurrent()
++            assertEquals((2L..6L).toList(), started)
++            gates.getValue(6).complete(Unit)
++            runCurrent()
++            assertEquals((2L..7L).toList(), started)
++            gates.getValue(7).complete(Unit)
++            val result = pending.await()
++            assertFalse(pending.isCancelled)
++            assertEquals(2, result.chapters.count { ChapterOrigin.from(it.memo)?.sourceId == 1L })
++            assertTrue(WorkSources.from(result.manga.memo).candidates.count { it.active } <= 4)
++        }
++
++    @Test
++    fun `confirmed catalog refreshes share the four foreground slots`() = runTest {
 +        val primary = Provider(1, 2)
 +        val alternatives = (2L..4L).map { Provider(it, 3).also { it.delayMillis = 1_000 } }
 +        val bindings =
@@ -68204,7 +68412,7 @@ index 0000000..8e46dc6
 +            catalog(Manager(listOf(primary) + alternatives), preferences())
 +                .fetch(primary, manga, listOf(oldChapter()), false, true, false)!!
 +
-+        assertEquals(2_000L, testScheduler.currentTime)
++        assertEquals(1_000L, testScheduler.currentTime)
 +        assertEquals(
 +            setOf(1L, 2L, 3L, 4L),
 +            result.chapters.map { ChapterOrigin.from(it.memo)!!.sourceId }.toSet(),
@@ -68237,8 +68445,8 @@ index 0000000..8e46dc6
 +
 +            val result = c.fetch(primary, work(), listOf(oldChapter()), false, true, true)!!
 +
-+            assertEquals(2_000L, testScheduler.currentTime)
-+            assertEquals(2, peak)
++            assertEquals(1_000L, testScheduler.currentTime)
++            assertEquals(4, peak)
 +            assertEquals(0, active)
 +            assertTrue(result.chapters.any { ChapterOrigin.from(it.memo)?.sourceId == 2L })
 +        }
@@ -69719,6 +69927,263 @@ index 0000000..d44b93c
 +                )
 +        val remote = c.toRemoteSChapter()
 +        assertEquals(setOf("provider"), remote.memo.keys)
++    }
++}
+diff --git a/app/src/test/java/eu/kanade/tachiyomi/source/selection/SourceDiscoveryConcurrencyTest.kt b/app/src/test/java/eu/kanade/tachiyomi/source/selection/SourceDiscoveryConcurrencyTest.kt
+new file mode 100644
+index 0000000..ec333bd
+--- /dev/null
++++ b/app/src/test/java/eu/kanade/tachiyomi/source/selection/SourceDiscoveryConcurrencyTest.kt
+@@ -0,0 +1,251 @@
++package eu.kanade.tachiyomi.source.selection
++
++import java.util.concurrent.atomic.AtomicBoolean
++import java.util.concurrent.atomic.AtomicInteger
++import kotlinx.coroutines.CompletableDeferred
++import kotlinx.coroutines.Dispatchers
++import kotlinx.coroutines.async
++import kotlinx.coroutines.awaitAll
++import kotlinx.coroutines.awaitCancellation
++import kotlinx.coroutines.cancelAndJoin
++import kotlinx.coroutines.delay
++import kotlinx.coroutines.launch
++import kotlinx.coroutines.runBlocking
++import kotlinx.coroutines.test.runCurrent
++import kotlinx.coroutines.test.runTest
++import kotlinx.coroutines.withTimeout
++import kotlinx.coroutines.yield
++import org.junit.jupiter.api.Assertions.*
++import org.junit.jupiter.api.Test
++
++class SourceDiscoveryConcurrencyTest {
++    @Test
++    fun `concurrent dispatcher threads respect the shared limit and background drain`() =
++        runBlocking {
++            val limiter = SourceDiscoveryConcurrency(initialForeground = true)
++            val active = AtomicInteger()
++            val peak = AtomicInteger()
++            val completed = AtomicInteger()
++            val background = AtomicBoolean(false)
++            val firstFour = CompletableDeferred<Unit>()
++            val release = CompletableDeferred<Unit>()
++            val jobs =
++                List(16) {
++                    async(Dispatchers.Default) {
++                        limiter.withPermit {
++                            val startedInBackground = background.get()
++                            val count = active.incrementAndGet()
++                            try {
++                                peak.updateAndGet { maxOf(it, count) }
++                                if (startedInBackground) assertEquals(1, count)
++                                if (count == 4) firstFour.complete(Unit)
++                                release.await()
++                                yield()
++                                completed.incrementAndGet()
++                            } finally {
++                                active.decrementAndGet()
++                            }
++                        }
++                    }
++                }
++            withTimeout(10_000) {
++                firstFour.await()
++                limiter.setForeground(false)
++                background.set(true)
++                release.complete(Unit)
++                jobs.awaitAll()
++            }
++            assertEquals(4, peak.get())
++            assertEquals(16, completed.get())
++            assertEquals(0, active.get())
++        }
++
++    @Test
++    fun `a process without a visible activity starts with one alternative at a time`() = runTest {
++        val limiter = SourceDiscoveryConcurrency()
++        var active = 0
++        var peak = 0
++        val order = mutableListOf<Int>()
++        (0..3)
++            .map { index ->
++                async {
++                    limiter.withPermit {
++                        active++
++                        peak = maxOf(peak, active)
++                        order += index
++                        try {
++                            delay(1_000)
++                        } finally {
++                            active--
++                        }
++                    }
++                }
++            }
++            .awaitAll()
++        assertEquals(4_000L, testScheduler.currentTime)
++        assertEquals(1, peak)
++        assertEquals(listOf(0, 1, 2, 3), order)
++    }
++
++    @Test
++    fun `foreground alternatives overlap up to four and queued requests keep FIFO order`() =
++        runTest {
++            val limiter = SourceDiscoveryConcurrency(initialForeground = true)
++            var active = 0
++            var peak = 0
++            val order = mutableListOf<Int>()
++            (0..7)
++                .map { index ->
++                    async {
++                        limiter.withPermit {
++                            active++
++                            peak = maxOf(peak, active)
++                            order += index
++                            try {
++                                delay(1_000)
++                            } finally {
++                                active--
++                            }
++                        }
++                    }
++                }
++                .awaitAll()
++            assertEquals(2_000L, testScheduler.currentTime)
++            assertEquals(4, peak)
++            assertEquals((0..7).toList(), order)
++            assertEquals(0, active)
++        }
++
++    @Test
++    fun `background transition drains admitted work without cancelling it before admitting another`() =
++        runTest {
++            val limiter = SourceDiscoveryConcurrency(initialForeground = true)
++            val gates = List(5) { CompletableDeferred<Unit>() }
++            val started = mutableListOf<Int>()
++            val completed = mutableListOf<Int>()
++            val jobs =
++                gates.mapIndexed { index, gate ->
++                    async {
++                        limiter.withPermit {
++                            started += index
++                            gate.await()
++                            completed += index
++                        }
++                    }
++                }
++            runCurrent()
++            assertEquals(listOf(0, 1, 2, 3), started)
++            limiter.setForeground(false)
++            repeat(3) { gates[it].complete(Unit) }
++            runCurrent()
++            assertEquals(listOf(0, 1, 2, 3), started)
++            assertEquals(listOf(0, 1, 2), completed)
++            gates[3].complete(Unit)
++            runCurrent()
++            assertEquals((0..4).toList(), started)
++            gates[4].complete(Unit)
++            jobs.awaitAll()
++            assertTrue(jobs.none { it.isCancelled })
++        }
++
++    @Test
++    fun `returning to foreground wakes waiting work without another request or poll`() = runTest {
++        val limiter = SourceDiscoveryConcurrency()
++        val gate = CompletableDeferred<Unit>()
++        var started = 0
++        val jobs =
++            List(4) {
++                async {
++                    limiter.withPermit {
++                        started++
++                        gate.await()
++                    }
++                }
++            }
++        runCurrent()
++        assertEquals(1, started)
++        limiter.setForeground(true)
++        runCurrent()
++        assertEquals(4, started)
++        gate.complete(Unit)
++        jobs.awaitAll()
++    }
++
++    @Test
++    fun `cancelling a queued request preserves the order and capacity of surviving requests`() =
++        runTest {
++            val limiter = SourceDiscoveryConcurrency()
++            val gate = CompletableDeferred<Unit>()
++            val order = mutableListOf<Int>()
++            val first = async { limiter.withPermit { gate.await() } }
++            runCurrent()
++            val cancelled = async { limiter.withPermit { fail<Unit>("cancelled waiter ran") } }
++            val third = async { limiter.withPermit { order += 3 } }
++            val fourth = async { limiter.withPermit { order += 4 } }
++            runCurrent()
++            cancelled.cancelAndJoin()
++            gate.complete(Unit)
++            first.await()
++            third.await()
++            fourth.await()
++            assertEquals(listOf(3, 4), order)
++        }
++
++    @Test
++    fun `cancellation after admission before dispatcher resume does not leak a slot`() = runTest {
++        val limiter = SourceDiscoveryConcurrency()
++        val gate = CompletableDeferred<Unit>()
++        val first = async { limiter.withPermit { gate.await() } }
++        runCurrent()
++        val cancelled = async { limiter.withPermit { fail<Unit>("cancelled grant ran") } }
++        val next = async { limiter.withPermit { 42 } }
++        runCurrent()
++        first.invokeOnCompletion { cancelled.cancel() }
++        gate.complete(Unit)
++        first.await()
++        assertEquals(42, next.await())
++        assertTrue(cancelled.isCancelled)
++    }
++
++    @Test
++    fun `a failing operation releases capacity for the next work`() = runTest {
++        val limiter = SourceDiscoveryConcurrency()
++        val error = runCatching { limiter.withPermit { throw IllegalStateException("provider") } }
++        assertTrue(error.exceptionOrNull() is IllegalStateException)
++        assertEquals("next", limiter.withPermit { "next" })
++    }
++
++    @Test
++    fun `cancelling active and queued work leaves all foreground slots reusable`() = runTest {
++        val limiter = SourceDiscoveryConcurrency(initialForeground = true)
++        var started = 0
++        val parent = launch {
++            repeat(8) {
++                launch {
++                    limiter.withPermit {
++                        started++
++                        awaitCancellation()
++                    }
++                }
++            }
++        }
++        runCurrent()
++        assertEquals(4, started)
++        parent.cancelAndJoin()
++        val gate = CompletableDeferred<Unit>()
++        var restarted = 0
++        val next =
++            List(4) {
++                async {
++                    limiter.withPermit {
++                        restarted++
++                        gate.await()
++                    }
++                }
++            }
++        runCurrent()
++        assertEquals(4, restarted)
++        gate.complete(Unit)
++        next.awaitAll()
 +    }
 +}
 diff --git a/app/src/test/java/eu/kanade/tachiyomi/source/selection/SourceMatchingTest.kt b/app/src/test/java/eu/kanade/tachiyomi/source/selection/SourceMatchingTest.kt

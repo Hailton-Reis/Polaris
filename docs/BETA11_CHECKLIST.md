@@ -2,7 +2,7 @@
 
 Base pública atual: beta.11/código 112 (P20261116.1, publicada em 16/11/2026). Base de engenharia: P20261112.1, commit 6952e5e.
 
-Última revisão de desenvolvimento: [P20261117.5](FONTES_MISTAS_P20261117_5.md), filtro +18 por obra, fontes mistas disponíveis e confirmação ao liberar conteúdo sensível. A [busca entre fontes P20261117.3](BUSCA_FONTES_P20261117_3.md) continua incluída. As correções anteriores de backups/OpenCV/OCR continuam incluídas. Sem novo APK; essas revisões ainda não estão no app instalado.
+Última revisão de desenvolvimento: [P20261117.6](CONCORRENCIA_FONTES_P20261117_6.md), quatro operações alternativas em primeiro plano e uma em segundo plano. O [filtro por obra e aviso de conteúdo sensível](FONTES_MISTAS_P20261117_5.md) continua incluído. A [busca entre fontes P20261117.3](BUSCA_FONTES_P20261117_3.md) continua incluída. As correções anteriores de backups/OpenCV/OCR continuam incluídas. Sem novo APK; essas revisões ainda não estão no app instalado.
 Este checklist acompanha o trabalho autorizado em 13/11. Não é uma declaração de lançamento.
 
 | Frente | Estado |

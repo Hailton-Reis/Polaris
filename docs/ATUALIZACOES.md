@@ -12,6 +12,8 @@ A [P20261117.4](FILTRO_ADULTO_P20261117_4.md) acrescenta o filtro +18 de buscas,
 
 A [P20261117.5](FONTES_MISTAS_P20261117_5.md) mantém fontes mistas disponíveis, aplica o filtro +18 por obra e pede confirmação ao desligá-lo. Continua sem novo APK/Release.
 
+A [P20261117.6](CONCORRENCIA_FONTES_P20261117_6.md) adapta a concorrência das alternativas à visibilidade: quatro com o app visível e uma em segundo plano. O agendamento da biblioteca continua opcional e inalterado. Revisão apenas de código, sem novo APK/Release.
+
 ## Escolha do canal
 
 Em **Configurações → Atualizações do aplicativo**:

@@ -2,6 +2,18 @@
 
 Este arquivo registra a evolução real do código. **Revisões de desenvolvimento não são lançamentos públicos.** As datas abaixo usam America/Fortaleza, exceto quando houver indicação de UTC. O histórico de distribuição fica em [Releases](https://github.com/Hailton-Reis/Polaris/releases).
 
+## Desenvolvimento · P20261117.6 — 17/11/2026
+
+**Estado:** concorrência adaptada à visibilidade para a próxima versão; sem novo APK/Release.
+
+- Operações alternativas passam de duas fixas para quatro com o app visível e uma em segundo plano, compartilhadas entre obras/instâncias. Processo começa com uma; callbacks existentes ajustam as vagas.
+- Mudança de modo preserva operações admitidas. Fila em ordem de chegada, cancelamento/erro devolvendo capacidade, sem reservar uma obra inteira. Fonte original fora desse limite; pool textual de cinco e agendamento opcional existente preservados.
+- Tempos simulados: três catálogos de um segundo passam de 2→1 segundo em primeiro plano (três em segundo plano); quatro checagens passam de 2→1 segundo. Sem benchmark de rede/aparelho/bateria ou pico de memória; buffer pronto passa a quatro.
+- 12 testes novos e um caso renomeado para a política de quatro vagas. Validação completa: 989 app executados/aprovados + 87 domain anteriores/UP-TO-DATE = 1.076 casos, sem falha/skip ou ausência inesperada. Inclui controle com threads reais e troca de modo durante busca.
+- Overlay4/empacotamento27/comparador21 aprovados. Filtro +18 por obra, fontes mistas e confirmação ao liberar conteúdo sensível preservados.
+
+[Política e agendamento](docs/CONCORRENCIA_FONTES_P20261117_6.md) · [Evidências](integration/adaptive-source-discovery/20261117/README.md).
+
 ## Desenvolvimento · P20261117.5 — 17/11/2026
 
 **Estado:** fontes mistas preservadas e aviso de conteúdo sensível para a próxima versão; sem novo APK/Release.
