@@ -2,6 +2,8 @@
 
 A [beta.11 está publicada](https://github.com/Hailton-Reis/Polaris/releases/tag/v0.1.0-beta.11), P20261116.1/código 112. O atualizador exige o canal experimental ativado. A [auditoria P20261116.2](AUDITORIA_POS_BETA11_P20261116_2.md) corrige limites e retomada do download para a próxima versão, ainda sem APK. Uma publicação posterior deve comparar a identidade com o manifesto da beta.11 e aumentar versão/código; não substituir os anexos da beta.11 por esse código de desenvolvimento.
 
+A [continuação P20261117.1](OPENCV_P20261117_1.md) integra/compila o OpenCV oficial e confere a saída nativa, junto às [proteções de backups](LEITURA_BACKUPS_P20261116_3.md). Também permanece sem novo APK/Release; o pacote instalado não inclui essas revisões posteriores.
+
 ## Escolha do canal
 
 Em **Configurações → Atualizações do aplicativo**:

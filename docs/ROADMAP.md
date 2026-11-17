@@ -2,11 +2,11 @@
 
 O roadmap indica prioridades e critérios de verificação. Não representa prazo de entrega nem recurso já aprovado.
 
-## Após a beta.11 — auditoria P20261116.3
+## Após a beta.11 — auditoria P20261117.1
 
 A beta.11 foi publicada e instalada pelo mantenedor; relatos dos testes em aparelhos serão incorporados. A [auditoria pós-beta.11](AUDITORIA_POS_BETA11_P20261116_2.md) corrige limites e retomada do downloader. A [continuação P20261116.3](LEITURA_BACKUPS_P20261116_3.md) limita/cancela a leitura de backups e move a validação para IO; a criação automática preserva as cópias anteriores em falha por tamanho, e a exportação manual permanece disponível. A política de entrada não garante o pico do grafo/serialização: medições nos aparelhos seguem pendentes.
 
-A candidata oficial OpenCV 4.12.0 tem ARM32/ARM64, minSdk21, alinhamento ELF ARM64 de pelo menos 16 KiB e 59 referências Java conferidas. Ainda faltam integração/compilação, escolha do runtime C++ e teste nativo/OCR/aparelhos antes de substituir o pin atual. O acréscimo bruto dos quatro binários ARM seria de 3.213.164 bytes; não há medida de APK novo. Conta/nuvem e sandbox continuam adiadas. Essas correções ficam para a próxima versão, sem APK/Release nesta revisão; antes de publicar, aumentar versão e código acima de 112.
+O [OpenCV oficial 4.12.0 foi integrado e compilado](OPENCV_P20261117_1.md), com ARM32/ARM64 e API mínima do app mantida em 26. A saída mesclada confirmou os quatro binários OpenCV/C++ oficiais, os outros 27 inalterados, PT_LOAD/congruência ARM64 para 16 KiB e importações do runtime conferidas. Ainda faltam APK final/alinhamento ZIP, carregamento JNI e execução OCR/qualidade/pico em aparelhos ARM32/ARM64 e sistema de páginas de 16 KiB. O acréscimo nativo bruto é de 3.213.164 bytes; não há medida de APK novo. Conta/nuvem e sandbox continuam adiadas. Essas correções ficam para a próxima versão, sem APK/Release nesta revisão; antes de publicar, aumentar versão e código acima de 112.
 
 ## Prioridades atuais — decisão P20261114.4
 

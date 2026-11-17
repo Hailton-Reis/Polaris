@@ -1,0 +1,53 @@
+{
+  "previous_audit_commit": "0aa2ec6c4f584a138f4f81df1d262b19be92917d",
+  "overlay_prerequisite": "f037c5d85575e30694295df5d079e97dcc4a35b9",
+  "overlay_bytes": 4069748,
+  "overlay_sha256": "72c1ba5ebff491d4bcca7b015bf840c9d22d7db424bdc8f602e67eeaefddda1f",
+  "overlay_git_blob_sha": "23efb14a59b9a8cb784f077afd1e9356a3f640c6",
+  "baseline_files": [
+    {
+      "path": "ppocr-sdk/build.gradle.kts",
+      "sha256": "c6395382bc312fcad36612cd3c17e0365b8f40d2e053f5256b321a17d323a69a"
+    },
+    {
+      "path": "gradle/libs.versions.toml",
+      "sha256": "cdec539bb1f80ba13d49294083bb9819e2b175d674030fb15add165aebba0c14"
+    },
+    {
+      "path": "app/build.gradle.kts",
+      "sha256": "3cd58f09ea651b369e6abed4cbdd4dc714854dc80794354e0d59114a15519532"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt",
+      "sha256": "a1ebcd07d5774858a54db8f9c9b3c6400756d2bad19f69354db45dddd2128085"
+    }
+  ],
+  "android_files": [
+    {
+      "path": "ppocr-sdk/build.gradle.kts",
+      "sha256": "da5622a831576ad17339ecdfc9b3ce0338e5a34f42296a718657ab5406201dde"
+    },
+    {
+      "path": "gradle/libs.versions.toml",
+      "sha256": "f3991cbb0006f7d55df9fb7d6682572c955fc28fb17be8721f7d164be38fb9c6"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt",
+      "sha256": "16666d2856a66ab902e126eff53681e3d819767d11f08b190cb0319de36dc84b"
+    }
+  ],
+  "engineering_scripts": [
+    {
+      "path": "scripts/audit/check_merged_native_libraries.py",
+      "sha256": "22b7571c20de80ade8cfb661661f900505e1172b8bd4b49247c48b943931da1c"
+    },
+    {
+      "path": "scripts/beta/package_internal_beta.py",
+      "sha256": "7b54ea1c94308f61ce7273d401133097e4209149390d10695df2cba4d4803fc2"
+    },
+    {
+      "path": "scripts/r001/test_apply_document_reader.py",
+      "sha256": "faaa071910f04cc6995878458dbae67df86e43b7b89ddb635e214e39d2dc9817"
+    }
+  ]
+}

@@ -1,6 +1,8 @@
 # Beta.11 — checklist de consolidação
 
 Base pública atual: beta.11/código 112 (P20261116.1, publicada em 16/11/2026). Base de engenharia: P20261112.1, commit 6952e5e.
+
+Última revisão de desenvolvimento: [P20261117.1](OPENCV_P20261117_1.md), OpenCV integrado/compilado e 31 bibliotecas mescladas conferidas. Sem novo APK; essa revisão ainda não está no app instalado.
 Este checklist acompanha o trabalho autorizado em 13/11. Não é uma declaração de lançamento.
 
 | Frente | Estado |
@@ -11,7 +13,7 @@ Este checklist acompanha o trabalho autorizado em 13/11. Não é uma declaraçã
 | Leitura, OCR e tradução nos aparelhos | Proteção do cancelamento ML Kit implementada (P20261115.5); execução real/qualidade, diagnóstico do A12 e medições ARM pendentes |
 | Armazenamento | Importação/cache, retomada de cópias completas e revisão de cópias parciais/pastas antigas (P20261115.3) implementados; pico, SAF e validação final pendentes |
 | Atualização beta.10 → beta.11 e distribuição não depurável | Beta.11 pública instalada pelo mantenedor, mesmo ID/certificado e sem depuração; seus testes continuam. P20261116.2 corrige tamanho/retomada para a próxima versão; sem novo APK |
-| Bibliotecas nativas e páginas de 16 KiB | Candidata oficial OpenCV inspecionada, 59 referências Java presentes e ARM64 com PT_LOAD de pelo menos 16 KiB; integração/runtime C++ e execução em aparelhos ainda pendentes (P20261116.3) |
+| Bibliotecas nativas e páginas de 16 KiB | OpenCV oficial integrado/compilado (P20261117.1); 31 bibliotecas mescladas conferidas, C++ oficial selecionado e importações preservadas. APK final/ZIP, JNI/OCR e execução nos aparelhos ainda pendentes |
 
 Ordem ativa: armazenamento → backups → leitura → distribuição. A sandbox não bloqueia a consolidação desta beta.
 

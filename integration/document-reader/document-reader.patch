@@ -9644,7 +9644,7 @@ index a198c3f..9a3e84f 100644
                      preference = translationPreferences.translationEngineTemperature(),
                      title = stringResource(ATMR.strings.pref_engine_temperature),
 diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
-index 7f411fd..df22c12 100644
+index 7f411fd..4f00165 100644
 --- a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
 +++ b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
 @@ -1,15 +1,18 @@
@@ -9709,7 +9709,7 @@ index 7f411fd..df22c12 100644
  
      // Identifies this overlay independently of the pinned upstream COMMIT_SHA.
 -    private const val POLARIS_READER_REVISION = "P20261031.2"
-+    private const val POLARIS_READER_REVISION = "P20261116.3"
++    private const val POLARIS_READER_REVISION = "P20261117.1"
  
      @Composable
      override fun Content() {
@@ -78352,7 +78352,7 @@ index 0000000..c62d0ce
 +    }
 +}
 diff --git a/gradle/libs.versions.toml b/gradle/libs.versions.toml
-index 9839272..6d6b5be 100644
+index 9839272..0ac8bdd 100644
 --- a/gradle/libs.versions.toml
 +++ b/gradle/libs.versions.toml
 @@ -41,7 +41,8 @@ flexibleAdapter = "3268efe4"
@@ -78365,7 +78365,7 @@ index 9839272..6d6b5be 100644
  junit = "6.1.2"
  kotest-assertions = "6.2.3"
  kotlin-gradle = "2.4.10"
-@@ -56,7 +57,6 @@ material = "1.12.0"
+@@ -56,13 +57,12 @@ material = "1.12.0"
  materialKolor = "5.0.0"
  mlkit-text-recognition = "16.0.1"
  mlkit-text-translate = "17.0.3"
@@ -78373,6 +78373,13 @@ index 9839272..6d6b5be 100644
  mockk = "1.14.11"
  moko-resources = "0.26.4"
  okhttp = "5.4.0"
+ okio = "3.18.1"
+ onnxruntime = "1.21.1"
+-opencv = "4.5.3"
++opencv = "4.12.0"
+ photoView = "2.3.0"
+ quickJs = "547f5b1597"
+ reorderable = "3.1.0"
 @@ -80,7 +80,6 @@ voyager = "2.2.21-1.10.3"
  xmlutil = "1.0.1"
  
@@ -78397,6 +78404,15 @@ index 9839272..6d6b5be 100644
  jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
  junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }
  junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
+@@ -179,7 +180,7 @@ okhttp-logging = { module = "com.squareup.okhttp3:logging-interceptor", version.
+ okhttp-zstd = { module = "com.squareup.okhttp3:okhttp-zstd", version.ref = "okhttp" }
+ okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
+ onnxruntime-android = { module = "com.microsoft.onnxruntime:onnxruntime-android", version.ref = "onnxruntime" }
+-opencv-android = { module = "com.quickbirdstudios:opencv", version.ref = "opencv" }
++opencv-android = { module = "org.opencv:opencv", version.ref = "opencv" }
+ photoView = { module = "com.github.chrisbanes:PhotoView", version.ref = "photoView" }
+ quickJs = { module = "com.github.zhanghai.quickjs-java:quickjs-android", version.ref = "quickJs" }
+ reorderable = { module = "sh.calvin.reorderable:reorderable", version.ref = "reorderable" }
 @@ -187,6 +188,7 @@ rxJava = { module = "io.reactivex:rxjava", version.ref = "rxJava" }
  shizuku-api = { module = "dev.rikka.shizuku:api", version.ref = "shizuku" }
  shizuku-provider = { module = "dev.rikka.shizuku:provider", version.ref = "shizuku" }
@@ -78405,6 +78421,13 @@ index 9839272..6d6b5be 100644
  sqldelight-androidxDriver = { module = "com.github.mihon.sqldelight-androidx-driver:sqldelight-androidx-driver", version.ref = "sqldelight-androidx-driver" }
  sqldelight-androidxPaging = { module = "app.cash.sqldelight:androidx-paging3-extensions", version.ref = "sqldelight" }
  sqldelight-async = { module = "app.cash.sqldelight:async-extensions", version.ref = "sqldelight" }
+@@ -231,4 +233,4 @@ serialization = ["kotlinx-serialization-json", "kotlinx-serialization-jsonOkio",
+ shizuku = ["shizuku-api", "shizuku-provider"]
+ sqldelight = ["sqldelight-androidxDriver", "sqldelight-async", "sqldelight-coroutines", "sqldelight-androidxPaging"]
+ test = ["junit-jupiter", "kotest-assertions", "mockk"]
+-voyager = ["voyager-navigator", "voyager-tabNavigator", "voyager-transitions"]
+\ No newline at end of file
++voyager = ["voyager-navigator", "voyager-tabNavigator", "voyager-transitions"]
 diff --git a/i18n-at/src/commonMain/moko-resources/base/strings.xml b/i18n-at/src/commonMain/moko-resources/base/strings.xml
 index 7ed4795..658d6ab 100644
 --- a/i18n-at/src/commonMain/moko-resources/base/strings.xml
@@ -79073,6 +79096,20 @@ index c0832ba..ebf8f48 100644
  
      <!-- Generic strings -->
      <string name="on">On</string>
+diff --git a/ppocr-sdk/build.gradle.kts b/ppocr-sdk/build.gradle.kts
+index f854e6a..47f798b 100644
+--- a/ppocr-sdk/build.gradle.kts
++++ b/ppocr-sdk/build.gradle.kts
+@@ -20,7 +20,7 @@ android {
+ 
+ dependencies {
+     implementation(libs.onnxruntime.android)
+-    // QuickBird explicitly marks 4.5.3 as having runtime issues on some Android versions.
+-    implementation("com.quickbirdstudios:opencv:4.5.3.0")
++    // Official ARM32/ARM64 artifacts include 16 KiB-aligned ARM64 OpenCV and C++ binaries.
++    implementation(libs.opencv.android)
+     implementation(libs.kotlinx.coroutines.android)
+ }
 diff --git a/presentation-widget/build.gradle.kts b/presentation-widget/build.gradle.kts
 index 9793514..074bd01 100644
 --- a/presentation-widget/build.gradle.kts

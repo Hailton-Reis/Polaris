@@ -1,5 +1,7 @@
 # Leitura de backups — P20261116.3
 
+**Continuação:** a [P20261117.1](OPENCV_P20261117_1.md) integra/compila o OpenCV oficial e confere a saída nativa real. A pesquisa abaixo mantém o estado histórico anterior à integração.
+
 Revisão de desenvolvimento após a beta.11 pública, em 16/11/2026. Sem novo APK ou Release. O código de desenvolvimento ainda identifica beta.11/112; uma próxima distribuição exige nova versão e código maior que 112.
 
 ## Comportamento

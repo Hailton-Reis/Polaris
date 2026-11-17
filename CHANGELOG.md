@@ -2,6 +2,17 @@
 
 Este arquivo registra a evolução real do código. **Revisões de desenvolvimento não são lançamentos públicos.** As datas abaixo usam America/Fortaleza, exceto quando houver indicação de UTC. O histórico de distribuição fica em [Releases](https://github.com/Hailton-Reis/Polaris/releases).
 
+## Desenvolvimento · P20261117.1 — 17/11/2026
+
+**Estado:** OpenCV oficial integrado/compilado para a próxima versão; sem novo APK ou Release.
+
+- Substituído o pin QuickBird por `org.opencv:opencv:4.12.0`, pelo catálogo realmente consumido no SDK. AAR resolvido coincide com o artefato oficial pesquisado; API mínima do app continua 26.
+- Saída nativa real conferida: 31 arquivos ARM32/ARM64, quatro OpenCV/C++ idênticos ao AAR e 27 restantes inalterados. Todas as ARM64 têm PT_LOAD de pelo menos 16 KiB e offsets/endereços congruentes; 204 importações C++ por ABI conferidas sem ausentes. Dois controles negativos recusados.
+- SDK/app/mesclagem compilados; 932 testes do app executados/aprovados e 85 anteriores de domain/UP-TO-DATE: 1.017 casos sem regressões. Overlay4/empacotamento27/comparador21 aprovados.
+- Conjunto nativo cresce 3.213.164 bytes brutos. Tamanho/alinhamento ZIP do futuro APK, JNI/OCR/qualidade e RAM nos aparelhos seguem pendentes.
+
+[Integração e limites](docs/OPENCV_P20261117_1.md) · [Evidências](integration/opencv-integration/20261117/README.md).
+
 ## Desenvolvimento · P20261116.3 — 16/11/2026
 
 **Estado:** correções para a próxima versão; sem novo APK ou Release.
