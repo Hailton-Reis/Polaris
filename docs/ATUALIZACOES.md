@@ -4,6 +4,8 @@ A [beta.11 está publicada](https://github.com/Hailton-Reis/Polaris/releases/tag
 
 A [continuação P20261117.1](OPENCV_P20261117_1.md) integra/compila o OpenCV oficial e confere a saída nativa, junto às [proteções de backups](LEITURA_BACKUPS_P20261116_3.md). Também permanece sem novo APK/Release; o pacote instalado não inclui essas revisões posteriores.
 
+A [P20261117.2](LIMPEZA_RECORTE_OCR_P20261117_2.md) acrescenta a limpeza de recortes Paddle em falhas de preparação. Continua no código de desenvolvimento, sem novo APK; a beta.11 instalada permanece no checkpoint público original.
+
 ## Escolha do canal
 
 Em **Configurações → Atualizações do aplicativo**:

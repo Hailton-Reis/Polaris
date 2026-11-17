@@ -21,7 +21,7 @@ index 79aff85..c2e70c6 100644
 +# Generated native build state
 +**/.cxx/
 diff --git a/app/build.gradle.kts b/app/build.gradle.kts
-index 63e2698..42fac81 100644
+index 63e2698..dba9833 100644
 --- a/app/build.gradle.kts
 +++ b/app/build.gradle.kts
 @@ -3,6 +3,7 @@ import mihon.gradle.getBuildTime
@@ -98,12 +98,13 @@ index 63e2698..42fac81 100644
              keepDebugSymbols += listOf("libandroidx.graphics.path", "libarchive-jni", "libconscrypt_jni", "libimagedecoder", "libquickjs", "libsqlite3x").map { "**/$it.so" }
          }
          resources {
-@@ -135,23 +150,31 @@ kotlin {
+@@ -135,23 +150,32 @@ kotlin {
  baselineProfile { baselineProfileOutputDir = "baselineProfiles"; mergeIntoMain = true }
  
  dependencies {
 +    implementation(libs.guava) // Pin the Android build with bounded native-deserialization allocation.
 +    testImplementation(libs.sqldelight.sqliteDriver) // SQLite persistence checks on the JVM; excluded from the app.
++    testImplementation(libs.opencv.android) // Java types for mocked SDK lifetime checks; no JVM JNI execution.
 +    testImplementation("org.json:json:20260814") // Real JSON for JVM tests; Android provides org.json at runtime.
 +    implementation(libs.android.apksig)
      baselineProfile(projects.baselineProfile)
@@ -132,7 +133,7 @@ index 63e2698..42fac81 100644
      onVariants { variant ->
          val resSource = variant.sources.res ?: return@onVariants
          val variantName = variant.name.replaceFirstChar { it.uppercase() }
-@@ -163,3 +186,15 @@ androidComponents {
+@@ -163,3 +187,15 @@ androidComponents {
      }
      onVariants(selector().withFlavor("default" to "standard")) { it.packaging.resources.excludes.add("META-INF/*.version") }
  }
@@ -9644,7 +9645,7 @@ index a198c3f..9a3e84f 100644
                      preference = translationPreferences.translationEngineTemperature(),
                      title = stringResource(ATMR.strings.pref_engine_temperature),
 diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
-index 7f411fd..4f00165 100644
+index 7f411fd..f335615 100644
 --- a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
 +++ b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
 @@ -1,15 +1,18 @@
@@ -9709,7 +9710,7 @@ index 7f411fd..4f00165 100644
  
      // Identifies this overlay independently of the pinned upstream COMMIT_SHA.
 -    private const val POLARIS_READER_REVISION = "P20261031.2"
-+    private const val POLARIS_READER_REVISION = "P20261117.1"
++    private const val POLARIS_READER_REVISION = "P20261117.2"
  
      @Composable
      override fun Content() {
@@ -72618,6 +72619,247 @@ index 0000000..0687a99
 +        edge,
 +    )
 +}
+diff --git a/app/src/test/java/eu/kanade/translation/recognizer/PaddleCropOwnershipTest.kt b/app/src/test/java/eu/kanade/translation/recognizer/PaddleCropOwnershipTest.kt
+new file mode 100644
+index 0000000..d7a0f5f
+--- /dev/null
++++ b/app/src/test/java/eu/kanade/translation/recognizer/PaddleCropOwnershipTest.kt
+@@ -0,0 +1,235 @@
++package eu.kanade.translation.recognizer
++
++import android.content.Context
++import android.graphics.Bitmap
++import android.graphics.PointF
++import com.paddle.ocr.EngineConfig
++import com.paddle.ocr.PaddleOCRConfig
++import com.paddle.ocr.engine.DetectionEngine
++import com.paddle.ocr.engine.OCREngine
++import com.paddle.ocr.engine.ORTSessionManager
++import com.paddle.ocr.engine.RecognitionEngine
++import com.paddle.ocr.model.ModelConfig
++import com.paddle.ocr.model.OCRBox
++import com.paddle.ocr.postprocess.QuadTextCrop
++import com.paddle.ocr.util.BitmapUtils
++import io.mockk.Runs
++import io.mockk.every
++import io.mockk.just
++import io.mockk.mockk
++import io.mockk.mockkConstructor
++import io.mockk.mockkObject
++import io.mockk.unmockkAll
++import io.mockk.verify
++import org.junit.jupiter.api.AfterEach
++import org.junit.jupiter.api.Assertions.assertEquals
++import org.junit.jupiter.api.Assertions.assertSame
++import org.junit.jupiter.api.Assertions.assertThrows
++import org.junit.jupiter.api.Assertions.assertTrue
++import org.junit.jupiter.api.BeforeEach
++import org.junit.jupiter.api.Test
++import org.opencv.core.Mat
++
++class PaddleCropOwnershipTest {
++    private val bitmap = mockk<Bitmap>()
++    private val source = mat(rows = 400, cols = 200)
++    private val firstBox = box(top = 10f)
++    private val secondBox = box(top = 50f)
++
++    @BeforeEach
++    fun prepareSdkBoundaries() {
++        mockkConstructor(ORTSessionManager::class, DetectionEngine::class, RecognitionEngine::class)
++        mockkObject(ModelConfig.Companion, BitmapUtils, QuadTextCrop)
++        every { anyConstructed<ORTSessionManager>().loadModels(any(), any()) } just Runs
++        every { anyConstructed<ORTSessionManager>().coldLoadTimeMs } returns 0
++        every { ModelConfig.parse(any(), any()) } returns ModelConfig(listOf("a"))
++        every { BitmapUtils.bitmapToBGRMat(bitmap) } returns source
++        detections(listOf(firstBox, secondBox))
++    }
++
++    @AfterEach fun releaseMocks() = unmockkAll()
++
++    @Test
++    fun `a later crop failure releases earlier crops and the page while preserving the error`() {
++        val first = mat()
++        val failure = IllegalStateException("perspective crop failed")
++        every { QuadTextCrop.crop(source, firstBox) } returns first
++        every { QuadTextCrop.crop(source, secondBox) } throws failure
++
++        val actual = assertThrows(IllegalStateException::class.java) { engine().run(bitmap) }
++
++        assertSame(failure, actual)
++        verify(exactly = 1) { source.release() }
++        verify(exactly = 0) { anyConstructed<RecognitionEngine>().recognize(any()) }
++        verify(exactly = 1) { first.release() }
++    }
++
++    @Test
++    fun `dimension failure releases the returned crop before it can enter the recognition list`() {
++        val first = mat()
++        val second = mat()
++        val failure = IllegalArgumentException("crop dimensions unavailable")
++        every { QuadTextCrop.crop(source, firstBox) } returns first
++        every { QuadTextCrop.crop(source, secondBox) } returns second
++        every { second.cols() } throws failure
++
++        val actual = assertThrows(IllegalArgumentException::class.java) { engine().run(bitmap) }
++
++        assertSame(failure, actual)
++        verify(exactly = 1) { source.release() }
++        verify(exactly = 0) { anyConstructed<RecognitionEngine>().recognize(any()) }
++        verify(exactly = 1) { second.release() }
++        verify(exactly = 1) { first.release() }
++    }
++
++    @Test
++    fun `recognition failure releases the prepared batch and preserves its error`() {
++        val first = mat()
++        val second = mat()
++        val failure = IllegalStateException("recognition failed")
++        every { QuadTextCrop.crop(source, firstBox) } returns first
++        every { QuadTextCrop.crop(source, secondBox) } returns second
++        every { anyConstructed<RecognitionEngine>().recognize(listOf(first, second)) } throws
++            failure
++
++        val actual = assertThrows(IllegalStateException::class.java) { engine().run(bitmap) }
++
++        assertSame(failure, actual)
++        verify(exactly = 1) { first.release() }
++        verify(exactly = 1) { second.release() }
++        verify(exactly = 1) { source.release() }
++    }
++
++    @Test
++    fun `successful aspect batches keep reading order and release every crop once`() {
++        val narrowBox = box(top = 50f, width = 20f)
++        val wideBox = box(top = 90f, width = 200f)
++        detections(listOf(wideBox, firstBox, narrowBox))
++        val first = mat()
++        val narrow = mat()
++        val wide = mat()
++        every { QuadTextCrop.crop(source, firstBox) } returns first
++        every { QuadTextCrop.crop(source, narrowBox) } returns narrow
++        every { QuadTextCrop.crop(source, wideBox) } returns wide
++        every { anyConstructed<RecognitionEngine>().recognize(listOf(narrow, first)) } returns
++            recognized("second" to 0.8f, "first" to 0.9f)
++        every { anyConstructed<RecognitionEngine>().recognize(listOf(wide)) } returns
++            recognized("third" to 0.95f)
++
++        val result = engine().run(bitmap)
++
++        assertEquals(listOf("first", "second", "third"), result.results.map { it.text })
++        assertEquals(listOf(firstBox, narrowBox, wideBox), result.results.map { it.box })
++        assertEquals(3, result.lineCount)
++        assertEquals(200, result.imageWidth)
++        assertEquals(400, result.imageHeight)
++        assertEquals(2, result.recInputShapes.size)
++        verify(exactly = 1) { first.release() }
++        verify(exactly = 1) { narrow.release() }
++        verify(exactly = 1) { wide.release() }
++        verify(exactly = 1) { source.release() }
++    }
++
++    @Test
++    fun `empty crops and low scores do not shift accepted text to another source box`() {
++        val thirdBox = box(top = 90f)
++        detections(listOf(firstBox, secondBox, thirdBox))
++        val empty = mat(rows = 0)
++        val low = mat()
++        val accepted = mat()
++        every { QuadTextCrop.crop(source, firstBox) } returns empty
++        every { QuadTextCrop.crop(source, secondBox) } returns low
++        every { QuadTextCrop.crop(source, thirdBox) } returns accepted
++        every { anyConstructed<RecognitionEngine>().recognize(listOf(low, accepted)) } returns
++            recognized("noise" to 0.2f, "accepted" to 0.9f)
++
++        val result = engine(batchSize = 3, scoreThreshold = 0.5f).run(bitmap)
++
++        assertEquals(listOf("accepted"), result.results.map { it.text })
++        assertEquals(listOf(thirdBox), result.results.map { it.box })
++        assertEquals(1, result.lineCount)
++        verify(exactly = 1) { empty.release() }
++        verify(exactly = 1) { low.release() }
++        verify(exactly = 1) { accepted.release() }
++        verify(exactly = 1) { source.release() }
++    }
++
++    @Test
++    fun `a later batch failure keeps previous batches released and closes its partial batch`() {
++        val thirdBox = box(top = 90f)
++        val fourthBox = box(top = 130f)
++        detections(listOf(firstBox, secondBox, thirdBox, fourthBox))
++        val first = mat()
++        val second = mat()
++        val third = mat()
++        val failure = IllegalStateException("later batch failed")
++        every { QuadTextCrop.crop(source, firstBox) } returns first
++        every { QuadTextCrop.crop(source, secondBox) } returns second
++        every { QuadTextCrop.crop(source, thirdBox) } returns third
++        every { QuadTextCrop.crop(source, fourthBox) } throws failure
++        every { anyConstructed<RecognitionEngine>().recognize(listOf(first, second)) } returns
++            recognized("first" to 0.9f, "second" to 0.9f)
++
++        val actual = assertThrows(IllegalStateException::class.java) { engine().run(bitmap) }
++
++        assertSame(failure, actual)
++        verify(exactly = 1) { anyConstructed<RecognitionEngine>().recognize(any()) }
++        verify(exactly = 1) { first.release() }
++        verify(exactly = 1) { second.release() }
++        verify(exactly = 1) { third.release() }
++        verify(exactly = 1) { source.release() }
++    }
++
++    @Test
++    fun `no detections release the page without cropping or recognition`() {
++        detections(emptyList())
++
++        val result = engine().run(bitmap)
++
++        assertTrue(result.results.isEmpty())
++        assertEquals(0, result.lineCount)
++        verify(exactly = 0) { QuadTextCrop.crop(any(), any()) }
++        verify(exactly = 0) { anyConstructed<RecognitionEngine>().recognize(any()) }
++        verify(exactly = 1) { source.release() }
++    }
++
++    private fun engine(batchSize: Int = 2, scoreThreshold: Float = 0.0f): OCREngine =
++        OCREngine(
++            mockk<Context>(),
++            PaddleOCRConfig(recBatchSize = batchSize, recScoreThresh = scoreThreshold),
++            EngineConfig(),
++        )
++
++    private fun recognized(vararg texts: Pair<String, Float>) =
++        RecognitionEngine.RecognitionResult(
++            texts.toList(),
++            0,
++            0,
++            0,
++            0,
++            listOf(texts.size, 3, 48, 160),
++        )
++
++    private fun detections(boxes: List<OCRBox>) {
++        every { anyConstructed<DetectionEngine>().detect(source) } returns
++            DetectionEngine.DetectionResult(boxes, 0, 0, 0, 0, listOf(1, 3, 400, 200))
++    }
++
++    private fun mat(rows: Int = 20, cols: Int = 100): Mat =
++        mockk<Mat>().also {
++            every { it.rows() } returns rows
++            every { it.cols() } returns cols
++            every { it.release() } just Runs
++        }
++
++    private fun box(top: Float, width: Float = 100f): OCRBox =
++        OCRBox(
++            listOf(point(0f, top), point(width, top), point(width, top + 20f), point(0f, top + 20f))
++        )
++
++    private fun point(left: Float, top: Float): PointF =
++        mockk<PointF>().apply {
++            x = left
++            y = top
++        }
++}
 diff --git a/app/src/test/java/eu/kanade/translation/recognizer/SpeechBubbleBackgroundRegressionTest.kt b/app/src/test/java/eu/kanade/translation/recognizer/SpeechBubbleBackgroundRegressionTest.kt
 index d53cceb..9ab7fcc 100644
 --- a/app/src/test/java/eu/kanade/translation/recognizer/SpeechBubbleBackgroundRegressionTest.kt
@@ -79096,10 +79338,39 @@ index c0832ba..ebf8f48 100644
  
      <!-- Generic strings -->
      <string name="on">On</string>
+diff --git a/ppocr-sdk/MODELS.md b/ppocr-sdk/MODELS.md
+index 9f9c128..4a68c5e 100644
+--- a/ppocr-sdk/MODELS.md
++++ b/ppocr-sdk/MODELS.md
+@@ -16,3 +16,15 @@ no runtime download path. SDK preprocessing, grouping and postprocessing are unc
+ | Recognition dictionary/config | [PP-OCRv6_small_rec_onnx_infer](https://paddle-model-ecology.bj.bcebos.com/paddlex/official_inference_model/paddle3.0.0/PP-OCRv6_small_rec_onnx_infer.tar) | `d267ab077a44a0eedb1ea8f8c542d263f211de8e9d7a029bf9fcfff7e5a88fb1` | `src/main/assets/models/rec/inference.yml` | 150,579 bytes | `ab078671bb49f06228eadccd34f1bb501e157f7a047095ffb943ba81512c77d1` |
+ 
+ The PaddleOCR source and official models are distributed under Apache License 2.0.
++
++## Polaris local lifetime patch — P20261117.2
++
++`engine/OCREngine.kt` registers every returned batch crop before inspecting its dimensions,
++inside the batch's existing try/finally. All returned crops, including empty ones, are released
++when preparation, inspection or recognition fails, and after successful recognition. Earlier
++batches remain released. Crop grouping, geometry, scores, result ordering and official models
++are unchanged. This only covers crops returned to OCREngine; it does not establish cleanup of
++temporaries inside a native crop operation that fails before returning, or measure native RAM.
++
++JVM ownership checks execute the production engine with mocked model loading, detection,
++cropping, recognition and Mats. No native inference or OpenCV allocation is executed by them.
 diff --git a/ppocr-sdk/build.gradle.kts b/ppocr-sdk/build.gradle.kts
-index f854e6a..47f798b 100644
+index f854e6a..2bd189d 100644
 --- a/ppocr-sdk/build.gradle.kts
 +++ b/ppocr-sdk/build.gradle.kts
+@@ -5,7 +5,7 @@ plugins {
+ 
+ spotless {
+     kotlin {
+-        // Keep the vendored upstream SDK byte-for-byte auditable against its pinned commit.
++        // Preserve upstream formatting; local lifetime changes are documented in MODELS.md.
+         targetExclude("src/main/java/com/paddle/ocr/**/*.kt")
+     }
+ }
 @@ -20,7 +20,7 @@ android {
  
  dependencies {
@@ -79110,6 +79381,48 @@ index f854e6a..47f798b 100644
 +    implementation(libs.opencv.android)
      implementation(libs.kotlinx.coroutines.android)
  }
+diff --git a/ppocr-sdk/src/main/java/com/paddle/ocr/engine/OCREngine.kt b/ppocr-sdk/src/main/java/com/paddle/ocr/engine/OCREngine.kt
+index 0a03198..7632da7 100644
+--- a/ppocr-sdk/src/main/java/com/paddle/ocr/engine/OCREngine.kt
++++ b/ppocr-sdk/src/main/java/com/paddle/ocr/engine/OCREngine.kt
+@@ -118,17 +118,19 @@ class OCREngine(
+         }.forEach { batch ->
+             val batchCrops = mutableListOf<org.opencv.core.Mat>()
+             val batchBoxIndices = mutableListOf<Int>()
+-            batch.forEach { indexedBox ->
+-                val crop = QuadTextCrop.crop(srcMat, indexedBox.value)
+-                if (crop.rows() > 0 && crop.cols() > 0) {
+-                    batchCrops.add(crop)
+-                    batchBoxIndices.add(indexedBox.index)
+-                } else {
+-                    crop.release()
+-                }
+-            }
++            // Own every returned crop before inspecting it, including empty crops.
++            val ownedCrops = ArrayList<org.opencv.core.Mat>(batch.size)
+ 
+             try {
++                batch.forEach { indexedBox ->
++                    val crop = QuadTextCrop.crop(srcMat, indexedBox.value)
++                    ownedCrops.add(crop)
++                    if (crop.rows() > 0 && crop.cols() > 0) {
++                        batchCrops.add(crop)
++                        batchBoxIndices.add(indexedBox.index)
++                    }
++                }
++
+                 if (batchCrops.isNotEmpty()) {
+                     val batchResult = recognitionEngine.recognize(batchCrops)
+                     totalRecPreMs += batchResult.preprocessMs
+@@ -154,7 +156,7 @@ class OCREngine(
+                     }
+                 }
+             } finally {
+-                batchCrops.forEach { it.release() }
++                ownedCrops.forEach { it.release() }
+             }
+         }
+ 
 diff --git a/presentation-widget/build.gradle.kts b/presentation-widget/build.gradle.kts
 index 9793514..074bd01 100644
 --- a/presentation-widget/build.gradle.kts

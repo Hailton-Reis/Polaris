@@ -2,13 +2,15 @@
 
 O roadmap indica prioridades e critérios de verificação. Não representa prazo de entrega nem recurso já aprovado.
 
-## Após a beta.11 — auditoria P20261117.1
+## Após a beta.11 — auditoria P20261117.2
 
 A beta.11 foi publicada e instalada pelo mantenedor; relatos dos testes em aparelhos serão incorporados. A [auditoria pós-beta.11](AUDITORIA_POS_BETA11_P20261116_2.md) corrige limites e retomada do downloader. A [continuação P20261116.3](LEITURA_BACKUPS_P20261116_3.md) limita/cancela a leitura de backups e move a validação para IO; a criação automática preserva as cópias anteriores em falha por tamanho, e a exportação manual permanece disponível. A política de entrada não garante o pico do grafo/serialização: medições nos aparelhos seguem pendentes.
 
 O [OpenCV oficial 4.12.0 foi integrado e compilado](OPENCV_P20261117_1.md), com ARM32/ARM64 e API mínima do app mantida em 26. A saída mesclada confirmou os quatro binários OpenCV/C++ oficiais, os outros 27 inalterados, PT_LOAD/congruência ARM64 para 16 KiB e importações do runtime conferidas. Ainda faltam APK final/alinhamento ZIP, carregamento JNI e execução OCR/qualidade/pico em aparelhos ARM32/ARM64 e sistema de páginas de 16 KiB. O acréscimo nativo bruto é de 3.213.164 bytes; não há medida de APK novo. Conta/nuvem e sandbox continuam adiadas. Essas correções ficam para a próxima versão, sem APK/Release nesta revisão; antes de publicar, aumentar versão e código acima de 112.
 
 ## Prioridades atuais — decisão P20261114.4
+
+A [P20261117.2](LIMPEZA_RECORTE_OCR_P20261117_2.md) corrige a liberação explícita dos recortes Paddle já devolvidos ao motor quando a preparação de um lote falha. Mantém ordem/índices, agrupamento e confiança. Temporários internos de corte/conversão e medições de pico continuam para auditoria; essa correção não substitui os aceites em aparelhos.
 
 Sandbox inteira pausada, [arquivada e removida dos fontes compilados](ARQUIVAMENTO_SANDBOX_P20261115_2.md) nesta beta. Não ampliar controles, ações, login isolado, OAuth/Cloudflare ou novels isoladas agora. Esses itens históricos não bloqueiam a conclusão da beta. O [aviso único de extensões](PAUSA_SANDBOX_E_AVISO_P20261114_4.md) exige as duas confirmações pedidas pelo usuário, sem substituir verificações de assinatura/integridade.
 

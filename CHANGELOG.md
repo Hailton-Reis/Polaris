@@ -2,6 +2,17 @@
 
 Este arquivo registra a evolução real do código. **Revisões de desenvolvimento não são lançamentos públicos.** As datas abaixo usam America/Fortaleza, exceto quando houver indicação de UTC. O histórico de distribuição fica em [Releases](https://github.com/Hailton-Reis/Polaris/releases).
 
+## Desenvolvimento · P20261117.2 — 17/11/2026
+
+**Estado:** limpeza de recortes Paddle para a próxima versão; sem novo APK ou Release.
+
+- Recortes passam a pertencer ao lote antes da consulta de dimensões, dentro do fechamento que também cobre a preparação. Falha num recorte seguinte ou na consulta não deixa os já retornados sem liberação explícita; vazios ficam fora do reconhecimento.
+- Duas falhas anteriores reproduzidas no motor real com fronteiras nativas simuladas. Sete casos novos e 15 controles focados aprovados, incluindo ordem/índices, confiança, vazios, erro de reconhecimento e falha em lote posterior.
+- Modelos e algoritmos permanecem com a lógica anterior; alteração local de vida útil documentada no SDK. Não mede RAM nem cobre temporários internos de uma operação que falha antes de devolver o recorte.
+- Compilação/validação final aprovada em 2min34s; 939 testes do app executados/aprovados e 85 anteriores de domain/UP-TO-DATE: 1.024 casos sem regressões. Overlay4/empacotamento27/comparador21 aprovados.
+
+[Correção e limites](docs/LIMPEZA_RECORTE_OCR_P20261117_2.md) · [Evidências](integration/ocr-crop-ownership/20261117/README.md).
+
 ## Desenvolvimento · P20261117.1 — 17/11/2026
 
 **Estado:** OpenCV oficial integrado/compilado para a próxima versão; sem novo APK ou Release.

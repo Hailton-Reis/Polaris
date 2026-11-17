@@ -1,0 +1,68 @@
+{
+  "previous_audit_commit": "5040b49b0dd36b2d9a8952b768b36bdd23954472",
+  "overlay_prerequisite": "f037c5d85575e30694295df5d079e97dcc4a35b9",
+  "overlay_bytes": 4083812,
+  "overlay_sha256": "f08faf3c612003636bbf6b1605962b2a533f3d6f85d6abd031f0d06cd759edaf",
+  "overlay_git_blob_sha": "221978246b5baeb322d957be891f70191ae1e326",
+  "baseline_files": [
+    {
+      "path": "ppocr-sdk/src/main/java/com/paddle/ocr/engine/OCREngine.kt",
+      "sha256": "e871b9c85fc8779981ead931819fab70e18984e77221313713c1c0e126bfcd5b"
+    },
+    {
+      "path": "ppocr-sdk/MODELS.md",
+      "sha256": "1bc18084cc852a6e2a1b01445594a2fd30ea66b18aa6c5f53a119eef6b4bba23"
+    },
+    {
+      "path": "ppocr-sdk/build.gradle.kts",
+      "sha256": "da5622a831576ad17339ecdfc9b3ce0338e5a34f42296a718657ab5406201dde"
+    },
+    {
+      "path": "app/build.gradle.kts",
+      "sha256": "3cd58f09ea651b369e6abed4cbdd4dc714854dc80794354e0d59114a15519532"
+    }
+  ],
+  "red_engine_sha256_matches_baseline": true,
+  "files": [
+    {
+      "path": "ppocr-sdk/src/main/java/com/paddle/ocr/engine/OCREngine.kt",
+      "bytes": 7856,
+      "sha256": "2f4414419c8252626b33c9e465a93d819a08e0642c00285883e605c1cae239a1"
+    },
+    {
+      "path": "ppocr-sdk/MODELS.md",
+      "bytes": 2791,
+      "sha256": "2e74aaef7f1273929e86ff6b822bd9b7af3762e655c04e8354424a0b3076286d"
+    },
+    {
+      "path": "ppocr-sdk/build.gradle.kts",
+      "bytes": 663,
+      "sha256": "bb1bf313a8a5faa8ca69f0e2c0af7a1d746e80938e1e8d205a4b2c723085e6cc"
+    },
+    {
+      "path": "app/build.gradle.kts",
+      "bytes": 12707,
+      "sha256": "9d8b02b2b93a7c819301a85e96b04ad447e9d4177922d6e8fdec5a5ef05f4c44"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/translation/recognizer/PaddleCropOwnershipTest.kt",
+      "bytes": 9702,
+      "sha256": "f8917488d5ebb8ede5cd1f0543d052d6d2aacd80d46a2f05001b9c28d602794f"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt",
+      "bytes": 10970,
+      "sha256": "8f11c0e04d43b53317e9272e855d888397c036a07dd2103ccf6efdd609c76f28"
+    }
+  ],
+  "engineering_scripts": [
+    {
+      "path": "scripts/beta/package_internal_beta.py",
+      "sha256": "991132452d614662c6f54d5c8fb80583a9f745313f9df0bfce3f2a1f5c4339ee"
+    },
+    {
+      "path": "scripts/r001/test_apply_document_reader.py",
+      "sha256": "ad07c4df1c78f3c14da16a0f31b6bd66617d0497c0958ccc71453cdeb0c2d6b1"
+    }
+  ]
+}

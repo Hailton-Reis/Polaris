@@ -1,0 +1,48 @@
+{
+  "total": 7,
+  "scope": "Production OCREngine constructor/run and ordering/batching/index/filter/cleanup; model loading, detection, crop, recognition and Mat boundaries mocked. No JNI, native allocation or inference executed.",
+  "cases": [
+    {
+      "module": "app",
+      "classname": "eu.kanade.translation.recognizer.PaddleCropOwnershipTest",
+      "name": "a later batch failure keeps previous batches released and closes its partial batch()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.translation.recognizer.PaddleCropOwnershipTest",
+      "name": "a later crop failure releases earlier crops and the page while preserving the error()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.translation.recognizer.PaddleCropOwnershipTest",
+      "name": "dimension failure releases the returned crop before it can enter the recognition list()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.translation.recognizer.PaddleCropOwnershipTest",
+      "name": "empty crops and low scores do not shift accepted text to another source box()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.translation.recognizer.PaddleCropOwnershipTest",
+      "name": "no detections release the page without cropping or recognition()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.translation.recognizer.PaddleCropOwnershipTest",
+      "name": "recognition failure releases the prepared batch and preserves its error()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.translation.recognizer.PaddleCropOwnershipTest",
+      "name": "successful aspect batches keep reading order and release every crop once()",
+      "status": "passed"
+    }
+  ]
+}
