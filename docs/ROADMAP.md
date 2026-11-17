@@ -2,7 +2,9 @@
 
 O roadmap indica prioridades e critérios de verificação. Não representa prazo de entrega nem recurso já aprovado.
 
-## Após a beta.11 — auditoria P20261117.2
+## Após a beta.11 — auditoria P20261117.3
+
+A prioridade mais recente é tornar a busca entre fontes mais rápida e eficiente. A [P20261117.3](BUSCA_FONTES_P20261117_3.md) paraleliza a atualização dos catálogos confirmados e checagens de imagens, compartilha duas vagas por operação entre obras, evita buscas repetidas e distingue tentativas incompletas do cache diário. Provas de tempo são simuladas; faltam tempos/fontes reais e o novo pacote. Não relaxar a identificação de obras ou a numeração para ganhar velocidade.
 
 A beta.11 foi publicada e instalada pelo mantenedor; relatos dos testes em aparelhos serão incorporados. A [auditoria pós-beta.11](AUDITORIA_POS_BETA11_P20261116_2.md) corrige limites e retomada do downloader. A [continuação P20261116.3](LEITURA_BACKUPS_P20261116_3.md) limita/cancela a leitura de backups e move a validação para IO; a criação automática preserva as cópias anteriores em falha por tamanho, e a exportação manual permanece disponível. A política de entrada não garante o pico do grafo/serialização: medições nos aparelhos seguem pendentes.
 

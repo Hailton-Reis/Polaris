@@ -6,6 +6,8 @@ A [continuação P20261117.1](OPENCV_P20261117_1.md) integra/compila o OpenCV of
 
 A [P20261117.2](LIMPEZA_RECORTE_OCR_P20261117_2.md) acrescenta a limpeza de recortes Paddle em falhas de preparação. Continua no código de desenvolvimento, sem novo APK; a beta.11 instalada permanece no checkpoint público original.
 
+A [P20261117.3](BUSCA_FONTES_P20261117_3.md) melhora a busca entre fontes e o tratamento de tentativas incompletas. Também permanece no desenvolvimento, sem substituir a beta.11 pública ou gerar uma atualização disponível no app.
+
 ## Escolha do canal
 
 Em **Configurações → Atualizações do aplicativo**:

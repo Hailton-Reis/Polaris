@@ -6987,10 +6987,10 @@ index d7597c6..7c2b90a 100644
                          null
 diff --git a/app/src/main/java/eu/kanade/presentation/manga/WorkSourceDialog.kt b/app/src/main/java/eu/kanade/presentation/manga/WorkSourceDialog.kt
 new file mode 100644
-index 0000000..5751175
+index 0000000..a690f3c
 --- /dev/null
 +++ b/app/src/main/java/eu/kanade/presentation/manga/WorkSourceDialog.kt
-@@ -0,0 +1,73 @@
+@@ -0,0 +1,76 @@
 +package eu.kanade.presentation.manga
 +
 +import androidx.compose.foundation.layout.Column
@@ -7021,6 +7021,9 @@ index 0000000..5751175
 +        text = {
 +            Column(Modifier.verticalScroll(rememberScrollState())) {
 +                Text(stringResource(ATMR.strings.polaris_work_source_description))
++                if (settings.pinned == null && settings.discoveryIncomplete) {
++                    Text(stringResource(ATMR.strings.polaris_work_source_discovery_incomplete))
++                }
 +                RadioItem(
 +                    label = stringResource(ATMR.strings.polaris_work_source_automatic),
 +                    selected = settings.pinned == null,
@@ -9645,7 +9648,7 @@ index a198c3f..9a3e84f 100644
                      preference = translationPreferences.translationEngineTemperature(),
                      title = stringResource(ATMR.strings.pref_engine_temperature),
 diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
-index 7f411fd..f335615 100644
+index 7f411fd..9ec285b 100644
 --- a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
 +++ b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
 @@ -1,15 +1,18 @@
@@ -9710,7 +9713,7 @@ index 7f411fd..f335615 100644
  
      // Identifies this overlay independently of the pinned upstream COMMIT_SHA.
 -    private const val POLARIS_READER_REVISION = "P20261031.2"
-+    private const val POLARIS_READER_REVISION = "P20261117.2"
++    private const val POLARIS_READER_REVISION = "P20261117.3"
  
      @Composable
      override fun Content() {
@@ -24128,10 +24131,10 @@ index 147e589..6bed3ee 100644
              val dbSource = sourceRepository.getStubSource(source.id)
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalog.kt b/app/src/main/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalog.kt
 new file mode 100644
-index 0000000..b8d7ffc
+index 0000000..2dc76df
 --- /dev/null
 +++ b/app/src/main/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalog.kt
-@@ -0,0 +1,556 @@
+@@ -0,0 +1,588 @@
 +package eu.kanade.tachiyomi.source.selection
 +
 +import eu.kanade.domain.chapter.model.toRemoteSChapter
@@ -24149,10 +24152,13 @@ index 0000000..b8d7ffc
 +import java.util.concurrent.ConcurrentHashMap
 +import kotlinx.coroutines.CancellationException
 +import kotlinx.coroutines.flow.asFlow
++import kotlinx.coroutines.flow.buffer
 +import kotlinx.coroutines.flow.flatMapMerge
 +import kotlinx.coroutines.flow.flow
 +import kotlinx.coroutines.sync.Mutex
++import kotlinx.coroutines.sync.Semaphore
 +import kotlinx.coroutines.sync.withLock
++import kotlinx.coroutines.sync.withPermit
 +import kotlinx.coroutines.withTimeoutOrNull
 +import kotlinx.serialization.json.JsonObject
 +import tachiyomi.domain.chapter.model.Chapter
@@ -24186,6 +24192,14 @@ index 0000000..b8d7ffc
 +        val chapters: List<SChapter>,
 +    )
 +
++    private data class Outcome(
++        val binding: WorkSource?,
++        val catalog: Catalog?,
++        val timedOut: Boolean = false,
++    )
++
++    private data class Prepared(val outcome: Outcome, val retained: Catalog?)
++
 +    private val invalidated = ConcurrentHashMap.newKeySet<Long>()
 +
 +    fun invalidate(workId: Long) {
@@ -24204,8 +24218,9 @@ index 0000000..b8d7ffc
 +            active.isNotEmpty() &&
 +                active.all { it.readability == "sample_failed" } &&
 +                active.all { now - it.healthCheckedAt >= 60_000L }
++        val ttl = if (settings.discoveryIncomplete) PARTIAL_DISCOVERY_TTL else DISCOVERY_TTL
 +        return manga.id in invalidated ||
-+            now - settings.checkedAt >= DISCOVERY_TTL ||
++            now - settings.checkedAt >= ttl ||
 +            failedSamples ||
 +            settings.installedFingerprint != fingerprint(enabled)
 +    }
@@ -24263,32 +24278,44 @@ index 0000000..b8d7ffc
 +            pinned == null && (allowDiscovery || source is StubSource) && needsDiscovery(manga)
 +        val catalogs = mutableListOf<Catalog>()
 +        val bindings = mutableListOf<WorkSource>()
-+        suspend fun loadSafely(binding: WorkSource): Catalog? {
++        suspend fun loadSafely(binding: WorkSource): Outcome {
 +            val provider = sourceManager.get(binding.sourceId) as? HttpSource
-+            val catalog =
-+                try {
-+                    if (provider == null) {
-+                        null
-+                    } else {
-+                        withTimeoutOrNull(CATALOG_TIMEOUT) {
++            return try {
++                if (provider == null) {
++                    Outcome(binding, null)
++                } else {
++                    withTimeoutOrNull(CATALOG_TIMEOUT) {
++                        Outcome(
++                            binding,
 +                            load(
 +                                binding,
 +                                existing,
 +                                root,
 +                                fetchDetails || discover || binding.key != root.key,
 +                                provider,
-+                            )
-+                        }
-+                    }
-+                } catch (error: CancellationException) {
-+                    throw error
-+                } catch (_: Exception) {
-+                    null
++                            ),
++                        )
++                    } ?: Outcome(binding, null, timedOut = true)
 +                }
-+            bindings += catalog?.binding ?: binding.copy(available = false)
-+            return catalog
++            } catch (error: CancellationException) {
++                throw error
++            } catch (_: Exception) {
++                Outcome(binding, null)
++            }
 +        }
-+        val rootCatalog = if (pinned == null || pinned.key == root.key) loadSafely(root) else null
++        // Workers return immutable outcomes; only the collector updates shared catalog state.
++        fun remember(outcome: Outcome, retained: Catalog? = null) {
++            val binding =
++                retained?.binding
++                    ?: outcome.catalog?.binding
++                    ?: outcome.binding?.copy(available = false)
++                    ?: return
++            val index = bindings.indexOfFirst { it.key == binding.key }
++            if (index >= 0) bindings[index] = binding else bindings += binding
++        }
++        val rootOutcome = if (pinned == null || pinned.key == root.key) loadSafely(root) else null
++        rootOutcome?.let { remember(it) }
++        val rootCatalog = rootOutcome?.catalog
 +        // A restored missing provider and a failing provider can recover without changing source
 +        // IDs.
 +        // Healthy background updates still do not search every extension.
@@ -24315,13 +24342,13 @@ index 0000000..b8d7ffc
 +            if (!discover) return catalog
 +            val recent = settings.candidates.firstOrNull { it.key == catalog.binding.key }
 +            val ttl = if (recent?.readability == "sample_failed") 60_000L else HEALTH_TTL
++            val cached =
++                recent?.takeIf {
++                    manga.id !in invalidated && now - it.healthCheckedAt in 0 until ttl
++                }
 +            val health =
-+                if (
-+                    manga.id !in invalidated &&
-+                        recent != null &&
-+                        now - recent.healthCheckedAt in 0 until ttl
-+                ) {
-+                    recent.readability
++                if (cached != null) {
++                    cached.readability
 +                } else {
 +                    val provider = sourceManager.get(catalog.binding.sourceId) as? HttpSource
 +                    if (provider != null && checkReadability(provider, catalog.chapters))
@@ -24330,16 +24357,21 @@ index 0000000..b8d7ffc
 +                }
 +            val checked =
 +                catalog.copy(
-+                    binding = catalog.binding.copy(readability = health, healthCheckedAt = now)
++                    binding =
++                        catalog.binding.copy(
++                            readability = health,
++                            healthCheckedAt = cached?.healthCheckedAt ?: System.currentTimeMillis(),
++                        )
 +                )
-+            val bindingIndex = bindings.indexOfFirst { it.key == checked.binding.key }
-+            if (bindingIndex >= 0) bindings[bindingIndex] = checked.binding
 +            return checked
 +        }
-+        if (catalogs.isNotEmpty()) catalogs[0] = sampled(catalogs[0])
++        if (catalogs.isNotEmpty()) {
++            catalogs[0] = sampled(catalogs[0])
++            remember(checkNotNull(rootOutcome), catalogs[0])
++        }
 +
-+        suspend fun retain(catalog: Catalog) {
-+            val compatible =
++        fun compatible(catalog: Catalog): Boolean =
++            pinned != null ||
 +                SourceMatching.compatibleNumbering(
 +                    referenceChapters,
 +                    catalog.chapters.map(::asChapter),
@@ -24347,140 +24379,137 @@ index 0000000..b8d7ffc
 +                        identity != null &&
 +                            SourceMatching.sameWork(reference, catalog.manga, identity),
 +                )
-+            if (pinned != null || compatible) {
-+                catalogs += sampled(catalog)
-+                catalogs.sortWith(catalogOrder(manga.source))
-+                // Always keep the original provider as a fallback, even if alternatives have larger
-+                // catalogs.
-+                // Keep additional catalogues when they add missing logical chapters. Redundant
-+                // fallback editions are bounded, but a larger overlapping catalogue must not erase
-+                // an origin containing the only available later chapters.
-+                val covered = mutableSetOf<ChapterVersions.Key>()
-+                var redundantSlots = 0
-+                val reserveRoot = catalogs.any { it.binding.key == root.key }
-+                val keep =
-+                    catalogs.filter { entry ->
-+                        val keys = entry.chapters.map { ChapterVersions.key(asChapter(it)) }.toSet()
-+                        val contributes = keys.any { it !in covered }
-+                        val isRoot = entry.binding.key == root.key
-+                        val fallback =
-+                            !isRoot &&
-+                                redundantSlots < MAX_ACTIVE_CATALOGS - if (reserveRoot) 1 else 0
-+                        val selected = fallback || isRoot || contributes
-+                        if (!isRoot && selected) redundantSlots++
-+                        if (selected) covered += keys
-+                        selected
++
++        suspend fun prepare(outcome: Outcome): Prepared =
++            Prepared(outcome, outcome.catalog?.takeIf(::compatible)?.let { sampled(it) })
++
++        fun retain(catalog: Catalog) {
++            catalogs += catalog
++            catalogs.sortWith(catalogOrder(manga.source))
++            // Always keep the original provider as a fallback, even if alternatives have larger
++            // catalogs.
++            // Keep additional catalogues when they add missing logical chapters. Redundant
++            // fallback editions are bounded, but a larger overlapping catalogue must not erase
++            // an origin containing the only available later chapters.
++            val covered = mutableSetOf<ChapterVersions.Key>()
++            var redundantSlots = 0
++            val reserveRoot = catalogs.any { it.binding.key == root.key }
++            val keep =
++                catalogs.filter { entry ->
++                    val keys = entry.chapters.map { ChapterVersions.key(asChapter(it)) }.toSet()
++                    val contributes = keys.any { it !in covered }
++                    val isRoot = entry.binding.key == root.key
++                    val fallback =
++                        !isRoot && redundantSlots < MAX_ACTIVE_CATALOGS - if (reserveRoot) 1 else 0
++                    val selected = fallback || isRoot || contributes
++                    if (!isRoot && selected) redundantSlots++
++                    if (selected) covered += keys
++                    selected
++                }
++            catalogs.retainAll(keep.toSet())
++        }
++        suspend fun search(provider: HttpSource, alreadyKnown: Set<String>): Outcome {
++            return try {
++                withTimeoutOrNull(SEARCH_TIMEOUT) {
++                    var matches = emptyList<SManga>()
++                    for (query in searchTitles) {
++                        matches =
++                            provider
++                                .getSearchManga(1, query, provider.getFilterList())
++                                .mangas
++                                .filter {
++                                    SourceMatching.titleMatches(reference.title, it.title, identity)
++                                }
++                                .distinctBy { it.url }
++                        if (matches.isNotEmpty()) break
 +                    }
-+                catalogs.retainAll(keep.toSet())
++                    if (matches.size != 1) return@withTimeoutOrNull Outcome(null, null)
++                    val match = matches.single()
++                    // A confirmed URL was already attempted during this refresh.
++                    if ("${provider.id}:${match.url}" in alreadyKnown)
++                        return@withTimeoutOrNull Outcome(null, null)
++                    val result = provider.getMangaUpdate(match, emptyList(), true, false).manga
++                    result.url = match.url
++                    if (!SourceMatching.sameWork(reference, result, identity))
++                        return@withTimeoutOrNull Outcome(null, null)
++                    val binding =
++                        WorkSource(
++                            provider.id,
++                            provider.name,
++                            provider.lang,
++                            result.url,
++                            result.title,
++                            result.author,
++                            result.artist,
++                            cleanMemo(result.memo),
++                        )
++                    Outcome(binding, load(binding, existing, root, false, provider))
++                } ?: Outcome(null, null, timedOut = true)
++            } catch (error: CancellationException) {
++                throw error
++            } catch (_: Exception) {
++                Outcome(null, null)
 +            }
++        }
++        var incomplete = false
++        fun collect(prepared: Prepared) {
++            remember(prepared.outcome, prepared.retained)
++            incomplete = incomplete || prepared.outcome.timedOut
++            prepared.retained?.let(::retain)
 +        }
 +        if (pinned != null) {
 +            if (pinned.key != root.key) {
 +                val binding = settings.candidates.find { it.key == pinned.key } ?: pinned
-+                loadSafely(binding)?.let { retain(it) }
++                collect(prepare(loadSafely(binding)))
 +            }
 +        } else {
++            val enabledIds = enabled.mapTo(hashSetOf()) { it.id }
 +            settings.candidates
-+                .filter {
-+                    it.active && it.key != root.key && it.sourceId in enabled.map { s -> s.id }
-+                }
-+                .forEach { binding -> loadSafely(binding)?.let { retain(it) } }
-+            if (discover) {
-+                val alreadyKnown = bindings.map { it.key }.toSet()
-+                // Bound foreground discovery as well as each individual provider; partial successes
-+                // remain useful.
-+                discoveryLock.withLock {
-+                    withTimeoutOrNull(DISCOVERY_TIMEOUT) {
-+                        enabled
-+                            .filter { it.id != manga.source }
-+                            .asFlow()
-+                            .flatMapMerge(concurrency = 2) { provider ->
-+                                flow {
-+                                    val catalog =
-+                                        try {
-+                                            withTimeoutOrNull(SEARCH_TIMEOUT) {
-+                                                var matches = emptyList<SManga>()
-+                                                for (query in searchTitles) {
-+                                                    matches =
-+                                                        provider
-+                                                            .getSearchManga(
-+                                                                1,
-+                                                                query,
-+                                                                provider.getFilterList(),
-+                                                            )
-+                                                            .mangas
-+                                                            .filter {
-+                                                                SourceMatching.titleMatches(
-+                                                                    reference.title,
-+                                                                    it.title,
-+                                                                    identity,
-+                                                                )
-+                                                            }
-+                                                            .distinctBy { it.url }
-+                                                    if (matches.isNotEmpty()) break
-+                                                }
-+                                                if (matches.size != 1) {
-+                                                    null
-+                                                } else {
-+                                                    val match = matches.single()
-+                                                    val result =
-+                                                        provider
-+                                                            .getMangaUpdate(
-+                                                                match,
-+                                                                emptyList(),
-+                                                                true,
-+                                                                false,
-+                                                            )
-+                                                            .manga
-+                                                    result.url = match.url
-+                                                    if (
-+                                                        !SourceMatching.sameWork(
-+                                                            reference,
-+                                                            result,
-+                                                            identity,
-+                                                        )
-+                                                    ) {
-+                                                        null
-+                                                    } else {
-+                                                        val binding =
-+                                                            WorkSource(
-+                                                                provider.id,
-+                                                                provider.name,
-+                                                                provider.lang,
-+                                                                result.url,
-+                                                                result.title,
-+                                                                result.author,
-+                                                                result.artist,
-+                                                                cleanMemo(result.memo),
-+                                                            )
-+                                                        if (binding.key in alreadyKnown) {
-+                                                            null
-+                                                        } else {
-+                                                            load(
-+                                                                binding,
-+                                                                existing,
-+                                                                root,
-+                                                                false,
-+                                                                provider,
-+                                                            )
-+                                                        }
-+                                                    }
-+                                                }
-+                                            }
-+                                        } catch (error: CancellationException) {
-+                                            throw error
-+                                        } catch (_: Exception) {
-+                                            null
-+                                        }
-+                                    if (catalog != null) emit(catalog)
-+                                }
-+                            }
-+                            .collect { catalog ->
-+                                bindings += catalog.binding
-+                                retain(catalog)
-+                            }
++                .filter { it.active && it.key != root.key && it.sourceId in enabledIds }
++                .distinctBy { it.key }
++                .asFlow()
++                .flatMapMerge(concurrency = PARALLEL_PROVIDERS) { binding ->
++                    flow {
++                        val prepared =
++                            withTimeoutOrNull(PROVIDER_PIPELINE_TIMEOUT) {
++                                providerGate.withPermit { prepare(loadSafely(binding)) }
++                            } ?: Prepared(Outcome(binding, null, timedOut = true), null)
++                        emit(prepared)
 +                    }
 +                }
++                .buffer(PARALLEL_PROVIDERS)
++                .collect(::collect)
++            if (discover) {
++                val alreadyKnown = bindings.map { it.key }.toSet()
++                val refreshed =
++                    catalogs
++                        .filter {
++                            it.chapters.isNotEmpty() && it.binding.readability != "sample_failed"
++                        }
++                        .mapTo(hashSetOf()) { it.binding.sourceId }
++                // Budget includes waiting for the app-wide alternative-provider slots.
++                // No work owns the whole discovery queue while other works wait.
++                val completed =
++                    withTimeoutOrNull(DISCOVERY_TIMEOUT) {
++                        enabled
++                            .filter { it.id != manga.source && it.id !in refreshed }
++                            .asFlow()
++                            .flatMapMerge(concurrency = PARALLEL_PROVIDERS) { provider ->
++                                flow {
++                                    val prepared =
++                                        withTimeoutOrNull(PROVIDER_PIPELINE_TIMEOUT) {
++                                            providerGate.withPermit {
++                                                prepare(search(provider, alreadyKnown))
++                                            }
++                                        } ?: Prepared(Outcome(null, null, timedOut = true), null)
++                                    emit(prepared)
++                                }
++                            }
++                            .buffer(PARALLEL_PROVIDERS)
++                            .collect(::collect)
++                        true
++                    }
++                if (completed != true) incomplete = true
 +            }
 +        }
 +        if (catalogs.isEmpty() || catalogs.all { it.chapters.isEmpty() })
@@ -24494,9 +24523,12 @@ index 0000000..b8d7ffc
 +        val state =
 +            settings.copy(
 +                candidates = choices,
-+                checkedAt = if (discover) now else settings.checkedAt,
++                checkedAt =
++                    if (discover || incomplete) System.currentTimeMillis() else settings.checkedAt,
 +                installedFingerprint = if (discover) fingerprint else settings.installedFingerprint,
 +                identity = identity,
++                discoveryIncomplete =
++                    if (discover) incomplete else incomplete || settings.discoveryIncomplete,
 +            )
 +        val output =
 +            catalogs
@@ -24669,7 +24701,7 @@ index 0000000..b8d7ffc
 +        JsonObject(memo.filterKeys { !it.startsWith("polaris.") })
 +
 +    companion object {
-+        private val discoveryLock = Mutex()
++        private val providerGate = Semaphore(PARALLEL_PROVIDERS)
 +
 +        private fun languageRank(language: String): Int =
 +            when (language.lowercase().replace('_', '-')) {
@@ -24681,6 +24713,9 @@ index 0000000..b8d7ffc
 +        private const val HEALTH_TTL = 10 * 60 * 1000L
 +        private val locks = ConcurrentHashMap<Long, Mutex>()
 +        private const val DISCOVERY_TTL = 24 * 60 * 60 * 1000L
++        private const val PARTIAL_DISCOVERY_TTL = 60_000L
++        private const val PARALLEL_PROVIDERS = 2
++        private const val PROVIDER_PIPELINE_TIMEOUT = 60_000L
 +        private const val SEARCH_TIMEOUT = 30_000L
 +        private const val CATALOG_TIMEOUT = 30_000L
 +        private const val DISCOVERY_TIMEOUT = 60_000L
@@ -67012,10 +67047,10 @@ index 0000000..5b8194d
 +}
 diff --git a/app/src/test/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalogTest.kt b/app/src/test/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalogTest.kt
 new file mode 100644
-index 0000000..664967e
+index 0000000..e539ce3
 --- /dev/null
 +++ b/app/src/test/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalogTest.kt
-@@ -0,0 +1,490 @@
+@@ -0,0 +1,900 @@
 +package eu.kanade.tachiyomi.source.selection
 +
 +import eu.kanade.domain.source.service.SourcePreferences
@@ -67027,8 +67062,13 @@ index 0000000..664967e
 +import eu.kanade.tachiyomi.source.model.SMangaUpdate
 +import eu.kanade.tachiyomi.source.online.HttpSource
 +import kotlinx.coroutines.CancellationException
++import kotlinx.coroutines.CompletableDeferred
++import kotlinx.coroutines.async
++import kotlinx.coroutines.awaitCancellation
++import kotlinx.coroutines.cancelAndJoin
 +import kotlinx.coroutines.delay
 +import kotlinx.coroutines.flow.MutableStateFlow
++import kotlinx.coroutines.test.runCurrent
 +import kotlinx.coroutines.test.runTest
 +import org.junit.jupiter.api.Assertions.assertEquals
 +import org.junit.jupiter.api.Assertions.assertFalse
@@ -67166,6 +67206,411 @@ index 0000000..664967e
 +                    .all { ChapterOrigin.isRouted(it.url) }
 +            )
 +            assertTrue(WorkSources.from(result.manga.memo).candidates.size == 2)
++        }
++
++    @Test
++    fun `confirmed catalog refreshes overlap in pairs instead of waiting in sequence`() = runTest {
++        val primary = Provider(1, 2)
++        val alternatives = (2L..4L).map { Provider(it, 3).also { it.delayMillis = 1_000 } }
++        val bindings =
++            alternatives.map { WorkSource(it.id, it.name, "en", "/work", "The Star", "Jane Doe") }
++        val manga = work().copy(memo = WorkSources(candidates = bindings).attach(work().memo))
++
++        val result =
++            catalog(Manager(listOf(primary) + alternatives), preferences())
++                .fetch(primary, manga, listOf(oldChapter()), false, true, false)!!
++
++        assertEquals(2_000L, testScheduler.currentTime)
++        assertEquals(
++            setOf(1L, 2L, 3L, 4L),
++            result.chapters.map { ChapterOrigin.from(it.memo)!!.sourceId }.toSet(),
++        )
++        assertTrue(alternatives.all { it.searches == 0 })
++    }
++
++    @Test
++    fun `image checks run inside the bounded provider pipeline instead of a serial collector`() =
++        runTest {
++            val primary = Provider(1, 2)
++            val alternatives = (2L..5L).map { Provider(it, 3) }
++            var active = 0
++            var peak = 0
++            val c =
++                AutomaticSourceCatalog(Manager(listOf(primary) + alternatives), preferences()) {
++                    provider,
++                    _ ->
++                    if (provider.id != primary.id) {
++                        active++
++                        peak = maxOf(peak, active)
++                        try {
++                            delay(1_000)
++                        } finally {
++                            active--
++                        }
++                    }
++                    true
++                }
++
++            val result = c.fetch(primary, work(), listOf(oldChapter()), false, true, true)!!
++
++            assertEquals(2_000L, testScheduler.currentTime)
++            assertEquals(2, peak)
++            assertEquals(0, active)
++            assertTrue(result.chapters.any { ChapterOrigin.from(it.memo)?.sourceId == 2L })
++        }
++
++    @Test
++    fun `a timed out scan becomes eligible again after a minute instead of waiting a day`() =
++        runTest {
++            val primary = Provider(1, 2)
++            val slow = (2L..7L).map { Provider(it, 3).also { it.delayMillis = 20_000 } }
++            val c = catalog(Manager(listOf(primary) + slow), preferences())
++            val result = c.fetch(primary, work(), listOf(oldChapter()), false, true, true)!!
++            val state = WorkSources.from(result.manga.memo)
++            val fresh = work().copy(memo = result.manga.memo)
++            val aged =
++                fresh.copy(
++                    memo =
++                        state
++                            .copy(checkedAt = System.currentTimeMillis() - 65_000)
++                            .attach(fresh.memo)
++                )
++
++            assertEquals(60_000L, testScheduler.currentTime)
++            assertFalse(c.needsDiscovery(fresh))
++            assertTrue(c.needsDiscovery(aged))
++            assertEquals(2, result.chapters.size)
++        }
++
++    @Test
++    fun `discovery reuses a healthy confirmed catalog without searching that provider again`() =
++        runTest {
++            val primary = Provider(1, 2)
++            val known = Provider(2, 3)
++            val fresh = Provider(3, 4)
++            val binding = WorkSource(2, known.name, "en", "/work", "The Star", "Jane Doe")
++            val manga =
++                work().copy(memo = WorkSources(candidates = listOf(binding)).attach(work().memo))
++
++            val result =
++                catalog(Manager(listOf(primary, known, fresh)), preferences())
++                    .fetch(primary, manga, listOf(oldChapter()), false, true, true)!!
++
++            assertEquals(0, known.searches)
++            assertEquals(1, fresh.searches)
++            assertTrue(result.chapters.any { ChapterOrigin.from(it.memo)?.sourceId == 3L })
++        }
++
++    @Test
++    fun `another work can use the shared provider slots before a slow whole scan finishes`() =
++        runTest {
++            val primary = Provider(1, 2)
++            val slow = (2L..7L).map { Provider(it, 3).also { it.delayMillis = 20_000 } }
++            val slowCatalog = catalog(Manager(listOf(primary) + slow), preferences())
++            val pending = async {
++                slowCatalog.fetch(primary, work(), emptyList(), false, true, true)
++            }
++            runCurrent()
++            val otherPrimary = Provider(101, 2)
++            val quick = Provider(102, 3)
++            val other = catalog(Manager(listOf(otherPrimary, quick)), preferences())
++            val result =
++                other.fetch(
++                    otherPrimary,
++                    work().copy(id = 20, source = 101),
++                    emptyList(),
++                    false,
++                    true,
++                    true,
++                )!!
++
++            assertEquals(30_000L, testScheduler.currentTime)
++            assertFalse(pending.isCompleted)
++            assertTrue(result.chapters.any { ChapterOrigin.from(it.memo)?.sourceId == 102L })
++            assertTrue(
++                result.chapters.all { ChapterOrigin.from(it.memo)?.sourceId in setOf(101L, 102L) }
++            )
++            pending.await()
++        }
++
++    @Test
++    fun `parent cancellation releases all provider slots without returning partial success`() =
++        runTest {
++            val primary = Provider(1, 2)
++            val alternatives = listOf(Provider(2, 3), Provider(3, 3))
++            val bothStarted = CompletableDeferred<Unit>()
++            var started = 0
++            var returned = false
++            val c =
++                AutomaticSourceCatalog(Manager(listOf(primary) + alternatives), preferences()) {
++                    provider,
++                    _ ->
++                    if (provider.id != primary.id) {
++                        started++
++                        if (started == 2) bothStarted.complete(Unit)
++                        awaitCancellation()
++                    }
++                    true
++                }
++            val pending = async {
++                c.fetch(primary, work(), emptyList(), false, true, true)
++                returned = true
++            }
++            bothStarted.await()
++            pending.cancelAndJoin()
++            assertFalse(returned)
++            assertTrue(pending.isCancelled)
++
++            val nextPrimary = Provider(101, 2)
++            val next = Provider(102, 3)
++            val recovered =
++                catalog(Manager(listOf(nextPrimary, next)), preferences())
++                    .fetch(
++                        nextPrimary,
++                        work().copy(id = 20, source = 101),
++                        emptyList(),
++                        false,
++                        true,
++                        true,
++                    )!!
++            assertEquals(0L, testScheduler.currentTime)
++            assertTrue(recovered.chapters.any { ChapterOrigin.from(it.memo)?.sourceId == 102L })
++        }
++
++    @Test
++    fun `a discovery deadline preserves the fast catalog and marks only the scan incomplete`() =
++        runTest {
++            val primary = Provider(1, 2)
++            val fast = Provider(2, 4)
++            val slow = (3L..8L).map { Provider(it, 3).also { it.delayMillis = 20_000 } }
++            val c = catalog(Manager(listOf(primary, fast) + slow), preferences())
++
++            val result = c.fetch(primary, work(), listOf(oldChapter()), false, true, true)!!
++            val state = WorkSources.from(result.manga.memo)
++
++            assertEquals(60_000L, testScheduler.currentTime)
++            assertTrue(state.discoveryIncomplete)
++            assertFalse(c.needsDiscovery(work().copy(memo = result.manga.memo)))
++            assertEquals(2, result.chapters.count { ChapterOrigin.from(it.memo)?.sourceId == 1L })
++            assertEquals(4, result.chapters.count { ChapterOrigin.from(it.memo)?.sourceId == 2L })
++            assertEquals(
++                setOf(1L, 2L),
++                state.candidates.filter { it.active }.map { it.sourceId }.toSet(),
++            )
++        }
++
++    @Test
++    fun `a finished retry clears the incomplete marker and restores the normal daily cache`() =
++        runTest {
++            val primary = Provider(1, 2)
++            val c = catalog(Manager(listOf(primary)), preferences())
++            val pendingMemo =
++                WorkSources(
++                        checkedAt = System.currentTimeMillis() - 65_000,
++                        discoveryIncomplete = true,
++                    )
++                    .attach(work().memo)
++            val result =
++                c.fetch(primary, work().copy(memo = pendingMemo), emptyList(), false, true, true)!!
++            val state = WorkSources.from(result.manga.memo)
++
++            assertFalse(state.discoveryIncomplete)
++            assertFalse(
++                c.needsDiscovery(
++                    work()
++                        .copy(
++                            memo =
++                                state
++                                    .copy(checkedAt = System.currentTimeMillis() - 120_000)
++                                    .attach(result.manga.memo)
++                        )
++                )
++            )
++            assertTrue(
++                c.needsDiscovery(
++                    work()
++                        .copy(
++                            memo =
++                                state
++                                    .copy(
++                                        checkedAt =
++                                            System.currentTimeMillis() - 25 * 60 * 60 * 1000L
++                                    )
++                                    .attach(result.manga.memo)
++                        )
++                )
++            )
++        }
++
++    @Test
++    fun `reusing a recent image check keeps its real timestamp instead of extending its validity`() =
++        runTest {
++            val primary = Provider(1, 2)
++            val alternative = Provider(2, 3)
++            var probes = 0
++            val c =
++                AutomaticSourceCatalog(Manager(listOf(primary, alternative)), preferences()) { _, _
++                    ->
++                    probes++
++                    true
++                }
++            val initial = c.fetch(primary, work(), emptyList(), false, true, true)!!
++            val oldStamp = System.currentTimeMillis() - 5 * 60_000L
++            val state = WorkSources.from(initial.manga.memo)
++            val retry =
++                state.copy(
++                    candidates = state.candidates.map { it.copy(healthCheckedAt = oldStamp) },
++                    checkedAt = 0,
++                    discoveryIncomplete = true,
++                )
++            probes = 0
++
++            val result =
++                c.fetch(
++                    primary,
++                    work().copy(memo = retry.attach(work().memo)),
++                    emptyList(),
++                    false,
++                    true,
++                    true,
++                )!!
++
++            assertEquals(0, probes)
++            assertEquals(2, WorkSources.from(result.manga.memo).candidates.size)
++            assertTrue(
++                WorkSources.from(result.manga.memo).candidates.all {
++                    it.healthCheckedAt == oldStamp
++                }
++            )
++        }
++
++    @Test
++    fun `an expired image check really probes again and stores a fresh timestamp`() = runTest {
++        val primary = Provider(1, 2)
++        val alternative = Provider(2, 3)
++        var probes = 0
++        val c =
++            AutomaticSourceCatalog(Manager(listOf(primary, alternative)), preferences()) { _, _ ->
++                probes++
++                true
++            }
++        val initial = c.fetch(primary, work(), emptyList(), false, true, true)!!
++        val state = WorkSources.from(initial.manga.memo)
++        val stale =
++            state.copy(
++                candidates =
++                    state.candidates.map {
++                        it.copy(healthCheckedAt = System.currentTimeMillis() - 11 * 60_000L)
++                    },
++                checkedAt = 0,
++            )
++        probes = 0
++        val started = System.currentTimeMillis()
++
++        val result =
++            c.fetch(
++                primary,
++                work().copy(memo = stale.attach(work().memo)),
++                emptyList(),
++                false,
++                true,
++                true,
++            )!!
++
++        assertEquals(2, probes)
++        assertTrue(
++            WorkSources.from(result.manga.memo).candidates.all { it.healthCheckedAt >= started }
++        )
++    }
++
++    @Test
++    fun `a confirmed catalog timeout remains retryable without enabling searches in the foreground refresh`() =
++        runTest {
++            val primary = Provider(1, 2)
++            val known = Provider(2, 3)
++            val c = catalog(Manager(listOf(primary, known)), preferences())
++            val initial = c.fetch(primary, work(), emptyList(), false, true, true)!!
++            val fresh = work().copy(memo = initial.manga.memo)
++            assertFalse(c.needsDiscovery(fresh))
++            known.searches = 0
++            known.delayMillis = 40_000
++
++            val result = c.fetch(primary, fresh, emptyList(), false, true, false)!!
++            val state = WorkSources.from(result.manga.memo)
++
++            assertEquals(30_000L, testScheduler.currentTime)
++            assertEquals(0, known.searches)
++            assertTrue(state.discoveryIncomplete)
++            assertFalse(c.needsDiscovery(work().copy(memo = result.manga.memo)))
++            assertTrue(
++                c.needsDiscovery(
++                    work()
++                        .copy(
++                            memo =
++                                state
++                                    .copy(checkedAt = System.currentTimeMillis() - 65_000)
++                                    .attach(result.manga.memo)
++                        )
++                )
++            )
++            assertEquals(2, result.chapters.size)
++        }
++
++    @Test
++    fun `an individual source timeout schedules retry even when the whole scan finishes earlier`() =
++        runTest {
++            val primary = Provider(1, 2)
++            val slow = Provider(2, 3).also { it.delayMillis = 20_000 }
++            val fast = Provider(3, 4)
++            val c = catalog(Manager(listOf(primary, slow, fast)), preferences())
++            val result = c.fetch(primary, work(), emptyList(), false, true, true)!!
++            val state = WorkSources.from(result.manga.memo)
++
++            assertEquals(30_000L, testScheduler.currentTime)
++            assertTrue(state.discoveryIncomplete)
++            assertFalse(c.needsDiscovery(work().copy(memo = result.manga.memo)))
++            assertTrue(
++                c.needsDiscovery(
++                    work()
++                        .copy(
++                            memo =
++                                state
++                                    .copy(checkedAt = System.currentTimeMillis() - 65_000)
++                                    .attach(result.manga.memo)
++                        )
++                )
++            )
++            assertTrue(result.chapters.any { ChapterOrigin.from(it.memo)?.sourceId == 3L })
++        }
++
++    @Test
++    fun `a source pin still prevents discovery and image checks with an incomplete marker`() =
++        runTest {
++            val primary = Provider(1, 2)
++            val alternative = Provider(2, 4)
++            val pin = WorkSource(1, primary.name, "en", "/work", "The Star", "Jane Doe")
++            val manga =
++                work()
++                    .copy(
++                        memo =
++                            WorkSources(pinned = pin, discoveryIncomplete = true)
++                                .attach(work().memo)
++                    )
++            var probes = 0
++            val c =
++                AutomaticSourceCatalog(Manager(listOf(primary, alternative)), preferences()) { _, _
++                    ->
++                    probes++
++                    true
++                }
++
++            assertFalse(c.needsDiscovery(manga))
++            val result = c.fetch(primary, manga, emptyList(), false, true, true)!!
++
++            assertEquals(0, alternative.searches)
++            assertEquals(0, probes)
++            assertEquals(pin, WorkSources.from(result.manga.memo).pinned)
++            assertTrue(result.chapters.all { ChapterOrigin.from(it.memo)?.sourceId == 1L })
 +        }
 +
 +    @Test
@@ -77982,10 +78427,10 @@ index 0000000..84cd5ad
 +}
 diff --git a/domain/src/main/java/tachiyomi/domain/manga/model/WorkSources.kt b/domain/src/main/java/tachiyomi/domain/manga/model/WorkSources.kt
 new file mode 100644
-index 0000000..2e38765
+index 0000000..cbdc5a2
 --- /dev/null
 +++ b/domain/src/main/java/tachiyomi/domain/manga/model/WorkSources.kt
-@@ -0,0 +1,50 @@
+@@ -0,0 +1,51 @@
 +package tachiyomi.domain.manga.model
 +
 +import kotlinx.serialization.Serializable
@@ -78023,6 +78468,7 @@ index 0000000..2e38765
 +    val checkedAt: Long = 0,
 +    val installedFingerprint: String = "",
 +    val identity: WorkIdentity? = null,
++    val discoveryIncomplete: Boolean = false,
 +) {
 +    fun attach(memo: JsonObject): JsonObject =
 +        JsonObject(memo + (KEY to json.encodeToJsonElement(this)))
@@ -78464,6 +78910,62 @@ index 0000000..378a85b
 +        assertEquals(emptyList<Chapter>(), interactor(listOf(chapter(1, 1, true))).await(10, 999, true))
 +    }
 +}
+diff --git a/domain/src/test/java/tachiyomi/domain/manga/model/WorkSourcesDiscoveryTest.kt b/domain/src/test/java/tachiyomi/domain/manga/model/WorkSourcesDiscoveryTest.kt
+new file mode 100644
+index 0000000..f48fb4f
+--- /dev/null
++++ b/domain/src/test/java/tachiyomi/domain/manga/model/WorkSourcesDiscoveryTest.kt
+@@ -0,0 +1,50 @@
++package tachiyomi.domain.manga.model
++
++import kotlinx.serialization.json.JsonPrimitive
++import kotlinx.serialization.json.buildJsonObject
++import kotlinx.serialization.json.put
++import org.junit.jupiter.api.Assertions.assertEquals
++import org.junit.jupiter.api.Assertions.assertFalse
++import org.junit.jupiter.api.Assertions.assertTrue
++import org.junit.jupiter.api.Test
++
++class WorkSourcesDiscoveryTest {
++    @Test
++    fun `older source metadata without an incomplete marker retains its settings`() {
++        val memo = buildJsonObject {
++            put(
++                WorkSources.KEY,
++                buildJsonObject {
++                    put("checkedAt", 123L)
++                    put("installedFingerprint", "installed")
++                    put("futureField", "ignored")
++                },
++            )
++        }
++        val state = WorkSources.from(memo)
++        assertFalse(state.discoveryIncomplete)
++        assertEquals(123L, state.checkedAt)
++        assertEquals("installed", state.installedFingerprint)
++    }
++
++    @Test
++    fun `partial discovery metadata round trips and can be cleared without losing other memo data`() {
++        val memo = buildJsonObject { put("reader.preference", JsonPrimitive("keep")) }
++        val state =
++            WorkSources(
++                candidates = listOf(WorkSource(2, "Provider", "en", "/work", "The Star")),
++                checkedAt = 123L,
++                installedFingerprint = "installed",
++                discoveryIncomplete = true,
++            )
++        val attached = state.attach(memo)
++        assertEquals(state, WorkSources.from(attached))
++        assertTrue(WorkSources.from(attached).discoveryIncomplete)
++        assertEquals(memo["reader.preference"], attached["reader.preference"])
++
++        val cleared = state.copy(discoveryIncomplete = false).attach(attached)
++        assertFalse(WorkSources.from(cleared).discoveryIncomplete)
++        assertEquals(state.candidates, WorkSources.from(cleared).candidates)
++        assertEquals(memo["reader.preference"], cleared["reader.preference"])
++    }
++}
 diff --git a/domain/src/test/java/tachiyomi/domain/translation/OcrExperimentPreferencesTest.kt b/domain/src/test/java/tachiyomi/domain/translation/OcrExperimentPreferencesTest.kt
 new file mode 100644
 index 0000000..c62d0ce
@@ -78671,7 +79173,7 @@ index 9839272..0ac8bdd 100644
 \ No newline at end of file
 +voyager = ["voyager-navigator", "voyager-tabNavigator", "voyager-transitions"]
 diff --git a/i18n-at/src/commonMain/moko-resources/base/strings.xml b/i18n-at/src/commonMain/moko-resources/base/strings.xml
-index 7ed4795..658d6ab 100644
+index 7ed4795..5da460b 100644
 --- a/i18n-at/src/commonMain/moko-resources/base/strings.xml
 +++ b/i18n-at/src/commonMain/moko-resources/base/strings.xml
 @@ -10,7 +10,7 @@
@@ -78683,7 +79185,7 @@ index 7ed4795..658d6ab 100644
      <string name="pref_group_setup">Translation Setup</string>
      <string name="pref_translate_from">Translate From</string>
      <string name="pref_translate_to">Translate To</string>
-@@ -73,12 +73,312 @@
+@@ -73,12 +73,313 @@
      <string name="repository_add_error">Could not add this repository. Check your connection and try again.</string>
      <string name="repository_refresh_error">Repository added, but extension listings could not be refreshed. Refresh the Extensions screen.</string>
      <string name="chapter_group_version">Group/version: %1$s</string>
@@ -78809,6 +79311,7 @@ index 7ed4795..658d6ab 100644
 +    <string name="polaris_dedication_close">Close</string>
 +    <string name="polaris_work_source_title">Sources for this work</string>
 +    <string name="polaris_work_source_description">Reading uses the same work across providers, preferring Portuguese and filling missing chapters in English. Confirmed alternate titles and page samples help find replacements. You can pin a source for this work.</string>
++    <string name="polaris_work_source_discovery_incomplete">The search did not finish. Chapters already found have been kept. You can search again.</string>
 +    <string name="polaris_work_source_automatic">Automatic</string>
 +    <string name="polaris_work_source_search">Search sources</string>
 +    <string name="pref_ocr_engine_saved_hint">Used for new translations. To compare engines, delete only the saved chapter translation and translate again.</string>
@@ -78999,7 +79502,7 @@ index 7ed4795..658d6ab 100644
 +    <string name="backup_read_limit_exceeded">This backup exceeds the reading memory limit used by Polaris on this device. No existing backup was replaced. Use fewer optional fields when creating a backup, or a device with more memory.</string>
  </resources>
 diff --git a/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml b/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
-index d1748bc..09a1ff7 100644
+index d1748bc..a3d2f89 100644
 --- a/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
 +++ b/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
 @@ -10,7 +10,7 @@
@@ -79011,7 +79514,7 @@ index d1748bc..09a1ff7 100644
      <string name="pref_group_setup">Configuração da tradução</string>
      <string name="pref_translate_from">Traduzir de</string>
      <string name="pref_translate_to">Traduzir para</string>
-@@ -73,12 +73,312 @@
+@@ -73,12 +73,313 @@
      <string name="repository_add_error">Não foi possível adicionar o repositório. Confira a conexão e tente novamente.</string>
      <string name="repository_refresh_error">Repositório adicionado, mas não foi possível atualizar as extensões. Atualize a tela Extensões.</string>
      <string name="chapter_group_version">Grupo/versão: %1$s</string>
@@ -79137,6 +79640,7 @@ index d1748bc..09a1ff7 100644
 +    <string name="polaris_dedication_close">Fechar</string>
 +    <string name="polaris_work_source_title">Fontes desta obra</string>
 +    <string name="polaris_work_source_description">Reúne capítulos da mesma obra: prioriza português e complementa com inglês. Nomes alternativos confirmados e amostras de páginas ajudam a encontrar substitutas. Você pode fixar uma fonte só para esta obra.</string>
++    <string name="polaris_work_source_discovery_incomplete">A busca não terminou. Os capítulos encontrados foram mantidos. Você pode buscar novamente.</string>
 +    <string name="polaris_work_source_automatic">Automático</string>
 +    <string name="polaris_work_source_search">Buscar fontes</string>
 +    <string name="pref_ocr_engine_saved_hint">Usado nas novas traduções. Para comparar motores, exclua apenas a tradução salva do capítulo e traduza novamente.</string>

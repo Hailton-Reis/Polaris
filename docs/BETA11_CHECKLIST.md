@@ -2,7 +2,7 @@
 
 Base pública atual: beta.11/código 112 (P20261116.1, publicada em 16/11/2026). Base de engenharia: P20261112.1, commit 6952e5e.
 
-Última revisão de desenvolvimento: [P20261117.2](LIMPEZA_RECORTE_OCR_P20261117_2.md), limpeza dos recortes Paddle em falhas de preparação. OpenCV integrado/compilado na etapa anterior. Sem novo APK; essas revisões ainda não estão no app instalado.
+Última revisão de desenvolvimento: [P20261117.3](BUSCA_FONTES_P20261117_3.md), paralelismo limitado entre fontes, consultas reaproveitadas e nova tentativa após descoberta incompleta. As correções anteriores de backups/OpenCV/OCR continuam incluídas. Sem novo APK; essas revisões ainda não estão no app instalado.
 Este checklist acompanha o trabalho autorizado em 13/11. Não é uma declaração de lançamento.
 
 | Frente | Estado |

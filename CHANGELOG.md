@@ -2,6 +2,17 @@
 
 Este arquivo registra a evolução real do código. **Revisões de desenvolvimento não são lançamentos públicos.** As datas abaixo usam America/Fortaleza, exceto quando houver indicação de UTC. O histórico de distribuição fica em [Releases](https://github.com/Hailton-Reis/Polaris/releases).
 
+## Desenvolvimento · P20261117.3 — 17/11/2026
+
+**Estado:** descoberta entre fontes mais eficiente para a próxima versão; sem novo APK ou Release.
+
+- Atualização de catálogos confirmados e checagem de imagens passam a integrar operações paralelas limitadas a duas alternativas entre obras. Fila de resultados pronta limitada a dois; fonte original preservada fora dessa fila.
+- Catálogo confirmado já atualizado não provoca pesquisa repetida na mesma fonte. Busca que esgota orçamento fica incompleta e elegível após um minuto; conclusão normal conserva 24 horas. Painel de fontes avisa sobre a tentativa incompleta.
+- Quatro falhas anteriores reproduzidas. Tempos simulados de 3→2 segundos para três catálogos e 4→2 para quatro checagens; não são medições de fonte real/aparelho.
+- Quinze casos novos; 952 app executados/aprovados e 87 domain anteriores/UP-TO-DATE: 1.039 casos sem regressões. Compilação final 2min19s; overlay4/empacotamento27/comparador21 aprovados. Critérios de associação, numeração, idiomas, origem dos dados e fonte fixa preservados; amostras reutilizadas mantêm sua validade original.
+
+[Comportamento e limites](docs/BUSCA_FONTES_P20261117_3.md) · [Evidências](integration/source-discovery/20261117/README.md).
+
 ## Desenvolvimento · P20261117.2 — 17/11/2026
 
 **Estado:** limpeza de recortes Paddle para a próxima versão; sem novo APK ou Release.

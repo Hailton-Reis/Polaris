@@ -1,0 +1,26 @@
+{
+  "methodology": "Production AutomaticSourceCatalog and WorkSources unchanged by hash for all four failures; only new tests, using existing fake provider delays and existing readability injection. No alternate implementation or new routing parameter.",
+  "gradle_exit_code": 1,
+  "failures": [
+    {
+      "name": "a timed out scan becomes eligible again after a minute instead of waiting a day()",
+      "type": "org.opentest4j.AssertionFailedError",
+      "message": "org.opentest4j.AssertionFailedError: expected: <true> but was: <false>"
+    },
+    {
+      "name": "image checks run inside the bounded provider pipeline instead of a serial collector()",
+      "type": "org.opentest4j.AssertionFailedError",
+      "message": "org.opentest4j.AssertionFailedError: expected: <2000> but was: <4000>"
+    },
+    {
+      "name": "discovery reuses a healthy confirmed catalog without searching that provider again()",
+      "type": "org.opentest4j.AssertionFailedError",
+      "message": "org.opentest4j.AssertionFailedError: expected: <0> but was: <1>"
+    },
+    {
+      "name": "confirmed catalog refreshes overlap in pairs instead of waiting in sequence()",
+      "type": "org.opentest4j.AssertionFailedError",
+      "message": "org.opentest4j.AssertionFailedError: expected: <2000> but was: <3000>"
+    }
+  ]
+}
