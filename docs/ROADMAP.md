@@ -2,9 +2,11 @@
 
 O roadmap indica prioridades e critérios de verificação. Não representa prazo de entrega nem recurso já aprovado.
 
-## Após a beta.11 — auditoria P20261116.2
+## Após a beta.11 — auditoria P20261116.3
 
-A beta.11 foi publicada e instalada pelo mantenedor; relatos dos testes em aparelhos serão incorporados. A [auditoria pós-beta.11](AUDITORIA_POS_BETA11_P20261116_2.md) corrige limites e retomada do downloader para a próxima versão e registra prioridades: bibliotecas ARM64/16 KB, memória da decodificação de backups e investigação de tamanho nas bibliotecas nativas. Conta/nuvem e sandbox continuam adiadas. Não há novo APK nesta revisão.
+A beta.11 foi publicada e instalada pelo mantenedor; relatos dos testes em aparelhos serão incorporados. A [auditoria pós-beta.11](AUDITORIA_POS_BETA11_P20261116_2.md) corrige limites e retomada do downloader. A [continuação P20261116.3](LEITURA_BACKUPS_P20261116_3.md) limita/cancela a leitura de backups e move a validação para IO; a criação automática preserva as cópias anteriores em falha por tamanho, e a exportação manual permanece disponível. A política de entrada não garante o pico do grafo/serialização: medições nos aparelhos seguem pendentes.
+
+A candidata oficial OpenCV 4.12.0 tem ARM32/ARM64, minSdk21, alinhamento ELF ARM64 de pelo menos 16 KiB e 59 referências Java conferidas. Ainda faltam integração/compilação, escolha do runtime C++ e teste nativo/OCR/aparelhos antes de substituir o pin atual. O acréscimo bruto dos quatro binários ARM seria de 3.213.164 bytes; não há medida de APK novo. Conta/nuvem e sandbox continuam adiadas. Essas correções ficam para a próxima versão, sem APK/Release nesta revisão; antes de publicar, aumentar versão e código acima de 112.
 
 ## Prioridades atuais — decisão P20261114.4
 
@@ -14,7 +16,7 @@ As quatro frentes ativas são armazenamento, backups, leitura e distribuição. 
 
 ## Consolidação da beta.11
 
-O [checklist atual](BETA11_CHECKLIST.md) acompanha as frentes autorizadas em 13/11. Proteções de armazenamento/backups/leitura e o [APK não depurável P20261116.1](DISTRIBUICAO_BETA_P20261116_1.md) têm candidatas verificadas. Atualização preservando dados, SAF/SQLite/interface Android, leitores externos e qualidade/memória nos aparelhos continuam para o aceite final antes da publicação. As revisões históricas de sandbox abaixo estão pausadas por decisão atual.
+O [checklist atual](BETA11_CHECKLIST.md) acompanha as frentes autorizadas em 13/11. Proteções de armazenamento/backups/leitura e o [APK não depurável P20261116.1](DISTRIBUICAO_BETA_P20261116_1.md) foram consolidados na beta.11 publicada. Atualização preservando dados, SAF/SQLite/interface Android, leitores externos e qualidade/memória nos aparelhos continuam para o aceite durante a rodada atual. As revisões históricas de sandbox abaixo estão pausadas por decisão atual.
 
 Conta do Polaris com login Google e sincronização em nuvem é uma evolução desejada, mas foi **adiada por decisão do usuário**. Não priorizar configuração de Google Cloud ou provisionamento de contas agora. O backup local existente é preservado.
 

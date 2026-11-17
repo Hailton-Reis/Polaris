@@ -9644,7 +9644,7 @@ index a198c3f..9a3e84f 100644
                      preference = translationPreferences.translationEngineTemperature(),
                      title = stringResource(ATMR.strings.pref_engine_temperature),
 diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
-index 7f411fd..71f4016 100644
+index 7f411fd..df22c12 100644
 --- a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
 +++ b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
 @@ -1,15 +1,18 @@
@@ -9709,7 +9709,7 @@ index 7f411fd..71f4016 100644
  
      // Identifies this overlay independently of the pinned upstream COMMIT_SHA.
 -    private const val POLARIS_READER_REVISION = "P20261031.2"
-+    private const val POLARIS_READER_REVISION = "P20261116.2"
++    private const val POLARIS_READER_REVISION = "P20261116.3"
  
      @Composable
      override fun Content() {
@@ -11098,6 +11098,269 @@ index 2d1e6b2..08a857e 100644
 -    )
 +    @Immutable data class State(val options: BackupOptions = BackupOptions())
  }
+diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/data/RestoreBackupScreen.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/data/RestoreBackupScreen.kt
+index a0a05ee..3fcc0ab 100644
+--- a/app/src/main/java/eu/kanade/presentation/more/settings/screen/data/RestoreBackupScreen.kt
++++ b/app/src/main/java/eu/kanade/presentation/more/settings/screen/data/RestoreBackupScreen.kt
+@@ -20,6 +20,7 @@ import androidx.compose.ui.text.buildAnnotatedString
+ import androidx.compose.ui.text.font.FontWeight
+ import androidx.compose.ui.text.withStyle
+ import androidx.core.net.toUri
++import androidx.lifecycle.viewModelScope
+ import androidx.lifecycle.viewmodel.CreationExtras
+ import androidx.lifecycle.viewmodel.compose.viewModel
+ import androidx.lifecycle.viewmodel.initializer
+@@ -30,10 +31,17 @@ import eu.kanade.presentation.components.AppBar
+ import eu.kanade.presentation.components.WarningBanner
+ import eu.kanade.presentation.util.Screen
+ import eu.kanade.tachiyomi.data.backup.BackupFileValidator
++import eu.kanade.tachiyomi.data.backup.BackupTooLargeException
+ import eu.kanade.tachiyomi.data.backup.restore.BackupRestoreJob
+ import eu.kanade.tachiyomi.data.backup.restore.RestoreOptions
+ import eu.kanade.tachiyomi.util.system.DeviceUtil
++import kotlinx.coroutines.CancellationException
++import kotlinx.coroutines.Dispatchers
++import kotlinx.coroutines.currentCoroutineContext
++import kotlinx.coroutines.ensureActive
+ import kotlinx.coroutines.flow.update
++import kotlinx.coroutines.launch
++import kotlinx.coroutines.withContext
+ import mihon.core.viewmodel.StateViewModel
+ import tachiyomi.i18n.MR
+ import tachiyomi.presentation.core.components.LabeledCheckbox
+@@ -45,19 +53,16 @@ import tachiyomi.presentation.core.i18n.stringResource
+ import uy.kohesive.injekt.Injekt
+ import uy.kohesive.injekt.api.get
+ 
+-class RestoreBackupScreen(
+-    private val uri: String,
+-) : Screen() {
++class RestoreBackupScreen(private val uri: String) : Screen() {
+ 
+     @Composable
+     override fun Content() {
+         val navigator = LocalNavigator.currentOrThrow
+-        val viewModel = viewModel<RestoreBackupViewModel>(
+-            factory = RestoreBackupViewModel.Factory,
+-            extras = CreationExtras {
+-                set(RestoreBackupViewModel.URI_KEY, uri)
+-            },
+-        )
++        val viewModel =
++            viewModel<RestoreBackupViewModel>(
++                factory = RestoreBackupViewModel.Factory,
++                extras = CreationExtras { set(RestoreBackupViewModel.URI_KEY, uri) },
++            )
+         val state by viewModel.state.collectAsState()
+ 
+         Scaffold(
+@@ -67,7 +72,7 @@ class RestoreBackupScreen(
+                     navigateUp = navigator::pop,
+                     scrollBehavior = it,
+                 )
+-            },
++            }
+         ) { contentPadding ->
+             LazyColumnWithAction(
+                 contentPadding = contentPadding,
+@@ -79,8 +84,15 @@ class RestoreBackupScreen(
+                 },
+             ) {
+                 if (DeviceUtil.isMiui && DeviceUtil.isMiuiOptimizationDisabled()) {
++                    item { WarningBanner(MR.strings.restore_miui_warning) }
++                }
++
++                if (state.validating) {
+                     item {
+-                        WarningBanner(MR.strings.restore_miui_warning)
++                        Text(
++                            stringResource(MR.strings.loading),
++                            Modifier.padding(MaterialTheme.padding.medium),
++                        )
+                     }
+                 }
+ 
+@@ -91,9 +103,7 @@ class RestoreBackupScreen(
+                                 LabeledCheckbox(
+                                     label = stringResource(option.label),
+                                     checked = option.getter(state.options),
+-                                    onCheckedChange = {
+-                                        viewModel.toggle(option.setter, it)
+-                                    },
++                                    onCheckedChange = { viewModel.toggle(option.setter, it) },
+                                 )
+                             }
+                         }
+@@ -107,9 +117,7 @@ class RestoreBackupScreen(
+         }
+     }
+ 
+-    private fun LazyListScope.errorMessageItem(
+-        error: Any?,
+-    ) {
++    private fun LazyListScope.errorMessageItem(error: Any?) {
+         item {
+             SectionCard {
+                 Column(
+@@ -123,24 +131,24 @@ class RestoreBackupScreen(
+                                 if (error.sources.isNotEmpty()) {
+                                     appendLine()
+                                     withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
+-                                        appendLine(stringResource(MR.strings.backup_restore_missing_sources))
++                                        appendLine(
++                                            stringResource(
++                                                MR.strings.backup_restore_missing_sources
++                                            )
++                                        )
+                                     }
+-                                    error.sources.joinTo(
+-                                        this,
+-                                        separator = "\n- ",
+-                                        prefix = "- ",
+-                                    )
++                                    error.sources.joinTo(this, separator = "\n- ", prefix = "- ")
+                                 }
+                                 if (error.trackers.isNotEmpty()) {
+                                     appendLine()
+                                     withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
+-                                        appendLine(stringResource(MR.strings.backup_restore_missing_trackers))
++                                        appendLine(
++                                            stringResource(
++                                                MR.strings.backup_restore_missing_trackers
++                                            )
++                                        )
+                                     }
+-                                    error.trackers.joinTo(
+-                                        this,
+-                                        separator = "\n- ",
+-                                        prefix = "- ",
+-                                    )
++                                    error.trackers.joinTo(this, separator = "\n- ", prefix = "- ")
+                                 }
+                             }
+ 
+@@ -164,9 +172,7 @@ class RestoreBackupScreen(
+                         }
+                     }
+ 
+-                    SelectionContainer {
+-                        Text(text = msg)
+-                    }
++                    SelectionContainer { Text(text = msg) }
+                 }
+             }
+         }
+@@ -176,6 +182,9 @@ class RestoreBackupScreen(
+ class RestoreBackupViewModel(
+     private val context: Context,
+     private val uri: String,
++    private val validateBackup: (Uri, () -> Unit) -> BackupFileValidator.Results = { value, check ->
++        BackupFileValidator(context).validate(value, check)
++    },
+ ) : StateViewModel<RestoreBackupViewModel.State>(State()) {
+ 
+     companion object {
+@@ -183,48 +192,45 @@ class RestoreBackupViewModel(
+ 
+         val Factory = viewModelFactory {
+             initializer {
+-                RestoreBackupViewModel(
+-                    context = Injekt.get<Application>(),
+-                    uri = get(URI_KEY)!!,
+-                )
++                RestoreBackupViewModel(context = Injekt.get<Application>(), uri = get(URI_KEY)!!)
+             }
+         }
+     }
+ 
+     init {
+-        validate(uri.toUri())
++        viewModelScope.launch { validate(uri.toUri()) }
+     }
+ 
+     fun toggle(setter: (RestoreOptions, Boolean) -> RestoreOptions, enabled: Boolean) {
+-        mutableState.update {
+-            it.copy(
+-                options = setter(it.options, enabled),
+-            )
+-        }
++        mutableState.update { it.copy(options = setter(it.options, enabled)) }
+     }
+ 
+     fun startRestore() {
+-        BackupRestoreJob.start(
+-            context = context,
+-            uri = uri.toUri(),
+-            options = state.value.options,
+-        )
++        if (state.value.validating || !state.value.canRestore) return
++        BackupRestoreJob.start(context = context, uri = uri.toUri(), options = state.value.options)
+     }
+ 
+-    private fun validate(uri: Uri) {
+-        val results = try {
+-            BackupFileValidator(context).validate(uri)
+-        } catch (e: Exception) {
+-            setError(
+-                error = InvalidRestore(uri, e.message.toString()),
+-                canRestore = false,
+-            )
+-            return
+-        }
++    private suspend fun validate(uri: Uri) {
++        val results =
++            try {
++                withContext(Dispatchers.IO) {
++                    val caller = currentCoroutineContext()
++                    validateBackup(uri) { caller.ensureActive() }
++                }
++            } catch (e: CancellationException) {
++                throw e
++            } catch (e: BackupTooLargeException) {
++                setError(error = e.message.orEmpty(), canRestore = false)
++                return
++            } catch (e: Exception) {
++                setError(error = InvalidRestore(uri, e.message.toString()), canRestore = false)
++                return
++            }
+ 
+         if (results.missingSources.isNotEmpty() || results.missingTrackers.isNotEmpty()) {
+             setError(
+-                error = MissingRestoreComponents(uri, results.missingSources, results.missingTrackers),
++                error =
++                    MissingRestoreComponents(uri, results.missingSources, results.missingTrackers),
+                 canRestore = true,
+             )
+             return
+@@ -234,17 +240,13 @@ class RestoreBackupViewModel(
+     }
+ 
+     private fun setError(error: Any?, canRestore: Boolean) {
+-        mutableState.update {
+-            it.copy(
+-                error = error,
+-                canRestore = canRestore,
+-            )
+-        }
++        mutableState.update { it.copy(error = error, canRestore = canRestore, validating = false) }
+     }
+ 
+     @Immutable
+     data class State(
+         val error: Any? = null,
++        val validating: Boolean = true,
+         val canRestore: Boolean = false,
+         val options: RestoreOptions = RestoreOptions(),
+     )
+@@ -256,7 +258,4 @@ private data class MissingRestoreComponents(
+     val trackers: List<String>,
+ )
+ 
+-private data class InvalidRestore(
+-    val uri: Uri? = null,
+-    val message: String,
+-)
++private data class InvalidRestore(val uri: Uri? = null, val message: String)
 diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/widget/AppIconPreferenceWidget.kt b/app/src/main/java/eu/kanade/presentation/more/settings/widget/AppIconPreferenceWidget.kt
 new file mode 100644
 index 0000000..4891289
@@ -12019,6 +12282,259 @@ index 6707d1a..d91a88d 100644
  
          return super.getPackageName()
      }
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/data/backup/BackupDecoder.kt b/app/src/main/java/eu/kanade/tachiyomi/data/backup/BackupDecoder.kt
+index 5555308..dff89b2 100644
+--- a/app/src/main/java/eu/kanade/tachiyomi/data/backup/BackupDecoder.kt
++++ b/app/src/main/java/eu/kanade/tachiyomi/data/backup/BackupDecoder.kt
+@@ -3,6 +3,7 @@ package eu.kanade.tachiyomi.data.backup
+ import android.content.Context
+ import android.net.Uri
+ import eu.kanade.tachiyomi.data.backup.models.Backup
++import java.io.IOException
+ import kotlinx.serialization.SerializationException
+ import kotlinx.serialization.protobuf.ProtoBuf
+ import okio.buffer
+@@ -10,44 +11,63 @@ import okio.gzip
+ import okio.source
+ import tachiyomi.core.common.i18n.stringResource
+ import tachiyomi.i18n.MR
++import tachiyomi.i18n.at.ATMR
+ import uy.kohesive.injekt.Injekt
+ import uy.kohesive.injekt.api.get
+-import java.io.IOException
+ 
+ class BackupDecoder(
+     private val context: Context,
+     private val parser: ProtoBuf = Injekt.get(),
++    private val maxDecodedBytes: Long = BackupReadBudget.forHeap(Runtime.getRuntime().maxMemory()),
+ ) {
+-    /**
+-     * Decode a potentially-gzipped backup.
+-     */
+-    fun decode(uri: Uri): Backup {
+-        return context.contentResolver.openInputStream(uri)!!.use { inputStream ->
+-            val source = inputStream.source().buffer()
++    init {
++        require(maxDecodedBytes in 1..BackupReadBudget.MAX_DECODED_BYTES)
++    }
+ 
+-            val peeked = source.peek().apply {
+-                require(2)
+-            }
+-            val id1id2 = peeked.readShort()
+-            val backupString = when (id1id2.toInt()) {
+-                0x1f8b -> source.gzip().buffer() // 0x1f8b is gzip magic bytes
+-                MAGIC_JSON_SIGNATURE1, MAGIC_JSON_SIGNATURE2, MAGIC_JSON_SIGNATURE3 -> {
+-                    throw IOException(context.stringResource(MR.strings.invalid_backup_file_json))
++    /** Bound the raw or expanded payload before parsing; never write to the selected document. */
++    fun decode(uri: Uri, checkCancelled: () -> Unit = {}): Backup {
++        checkCancelled()
++        val input =
++            context.contentResolver.openInputStream(uri) ?: throw IOException("Cannot open backup")
++        val payload =
++            try {
++                input.source().buffer().use { source ->
++                    checkCancelled()
++                    val peeked = source.peek().apply { require(2) }
++                    when (peeked.readShort().toInt()) {
++                        0x1f8b ->
++                            source.gzip().buffer().use {
++                                BackupPayloadReader.read(it, maxDecodedBytes, checkCancelled)
++                            }
++                        MAGIC_JSON_SIGNATURE1,
++                        MAGIC_JSON_SIGNATURE2,
++                        MAGIC_JSON_SIGNATURE3 ->
++                            throw IOException(
++                                context.stringResource(MR.strings.invalid_backup_file_json)
++                            )
++                        else -> BackupPayloadReader.read(source, maxDecodedBytes, checkCancelled)
++                    }
+                 }
+-                else -> source
+-            }.use { it.readByteArray() }
+-
++            } catch (error: BackupReadLimitExceeded) {
++                throw BackupTooLargeException(
++                    context.stringResource(ATMR.strings.backup_read_limit_exceeded),
++                    error,
++                )
++            }
++        checkCancelled()
++        val backup =
+             try {
+-                parser.decodeFromByteArray(Backup.serializer(), backupString)
++                parser.decodeFromByteArray(Backup.serializer(), payload)
+             } catch (_: SerializationException) {
+                 throw IOException(context.stringResource(MR.strings.invalid_backup_file_unknown))
+             }
+-        }
++        checkCancelled()
++        return backup
+     }
+ 
+     companion object {
+-        private const val MAGIC_JSON_SIGNATURE1 = 0x7b7d // `{}`
+-        private const val MAGIC_JSON_SIGNATURE2 = 0x7b22 // `{"`
+-        private const val MAGIC_JSON_SIGNATURE3 = 0x7b0a // `{\n`
++        private const val MAGIC_JSON_SIGNATURE1 = 0x7b7d
++        private const val MAGIC_JSON_SIGNATURE2 = 0x7b22
++        private const val MAGIC_JSON_SIGNATURE3 = 0x7b0a
+     }
+ }
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/data/backup/BackupFileValidator.kt b/app/src/main/java/eu/kanade/tachiyomi/data/backup/BackupFileValidator.kt
+index 5a7b87c..8c4f4ef 100644
+--- a/app/src/main/java/eu/kanade/tachiyomi/data/backup/BackupFileValidator.kt
++++ b/app/src/main/java/eu/kanade/tachiyomi/data/backup/BackupFileValidator.kt
+@@ -3,13 +3,13 @@ package eu.kanade.tachiyomi.data.backup
+ import android.content.Context
+ import android.net.Uri
+ import eu.kanade.tachiyomi.data.track.TrackerManager
++import kotlinx.coroutines.CancellationException
+ import tachiyomi.domain.source.service.SourceManager
+ import uy.kohesive.injekt.Injekt
+ import uy.kohesive.injekt.api.get
+ 
+ class BackupFileValidator(
+     private val context: Context,
+-
+     private val sourceManager: SourceManager = Injekt.get(),
+     private val trackerManager: TrackerManager = Injekt.get(),
+ ) {
+@@ -19,42 +19,44 @@ class BackupFileValidator(
+      *
+      * @return List of missing sources or missing trackers.
+      */
+-    fun validate(uri: Uri): Results {
+-        val backup = try {
+-            BackupDecoder(context).decode(uri)
+-        } catch (e: Exception) {
+-            throw IllegalStateException(e)
+-        }
++    fun validate(uri: Uri, checkCancelled: () -> Unit = {}): Results {
++        val backup =
++            try {
++                BackupDecoder(context).decode(uri, checkCancelled)
++            } catch (e: CancellationException) {
++                throw e
++            } catch (e: BackupTooLargeException) {
++                throw e
++            } catch (e: Exception) {
++                throw IllegalStateException(e)
++            }
+ 
+         val sources = backup.backupSources.associate { it.sourceId to it.name }
+-        val missingSources = sources
+-            .filter { sourceManager.get(it.key) == null }
+-            .values.map {
+-                val id = it.toLongOrNull()
+-                if (id == null) {
+-                    it
+-                } else {
+-                    sourceManager.getOrStub(id).toString()
++        val missingSources =
++            sources
++                .filter { sourceManager.get(it.key) == null }
++                .values
++                .map {
++                    val id = it.toLongOrNull()
++                    if (id == null) {
++                        it
++                    } else {
++                        sourceManager.getOrStub(id).toString()
++                    }
+                 }
+-            }
+-            .distinct()
+-            .sorted()
++                .distinct()
++                .sorted()
+ 
+-        val trackers = backup.backupManga
+-            .flatMap { it.tracking }
+-            .map { it.syncId }
+-            .distinct()
+-        val missingTrackers = trackers
+-            .mapNotNull { trackerManager.get(it.toLong()) }
+-            .filter { !it.isLoggedIn }
+-            .map { it.name }
+-            .sorted()
++        val trackers = backup.backupManga.flatMap { it.tracking }.map { it.syncId }.distinct()
++        val missingTrackers =
++            trackers
++                .mapNotNull { trackerManager.get(it.toLong()) }
++                .filter { !it.isLoggedIn }
++                .map { it.name }
++                .sorted()
+ 
+         return Results(missingSources, missingTrackers)
+     }
+ 
+-    data class Results(
+-        val missingSources: List<String>,
+-        val missingTrackers: List<String>,
+-    )
++    data class Results(val missingSources: List<String>, val missingTrackers: List<String>)
+ }
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/data/backup/BackupPayloadReader.kt b/app/src/main/java/eu/kanade/tachiyomi/data/backup/BackupPayloadReader.kt
+new file mode 100644
+index 0000000..5978ba5
+--- /dev/null
++++ b/app/src/main/java/eu/kanade/tachiyomi/data/backup/BackupPayloadReader.kt
+@@ -0,0 +1,32 @@
++package eu.kanade.tachiyomi.data.backup
++
++import java.io.IOException
++import okio.Buffer
++import okio.BufferedSource
++
++internal class BackupReadLimitExceeded : IOException("Decoded backup exceeds the read budget")
++
++/** Caller owns the source. A sentinel byte also forces gzip trailer/CRC validation at the limit. */
++internal object BackupPayloadReader {
++    fun read(source: BufferedSource, maximum: Long, checkCancelled: () -> Unit): ByteArray {
++        val output = Buffer()
++        val chunk = ByteArray(64 * 1024)
++        var total = 0L
++        try {
++            while (true) {
++                checkCancelled()
++                val requested = minOf(chunk.size.toLong(), maximum - total + 1).toInt()
++                val count = source.read(chunk, 0, requested)
++                if (count < 0) break
++                if (count == 0) throw IOException("Backup source returned an empty read")
++                if (count > maximum - total) throw BackupReadLimitExceeded()
++                output.write(chunk, 0, count)
++                total += count
++            }
++            checkCancelled()
++            return output.readByteArray()
++        } finally {
++            output.clear()
++        }
++    }
++}
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/data/backup/BackupReadBudget.kt b/app/src/main/java/eu/kanade/tachiyomi/data/backup/BackupReadBudget.kt
+new file mode 100644
+index 0000000..b3ec96c
+--- /dev/null
++++ b/app/src/main/java/eu/kanade/tachiyomi/data/backup/BackupReadBudget.kt
+@@ -0,0 +1,16 @@
++package eu.kanade.tachiyomi.data.backup
++
++import java.io.IOException
++
++internal object BackupReadBudget {
++    const val MAX_DECODED_BYTES: Long = 64L * 1024 * 1024
++
++    // Leave heap for buffering, the byte array, decoded objects and the rest of the app.
++    fun forHeap(maxHeapBytes: Long): Long {
++        require(maxHeapBytes > 0)
++        return (maxHeapBytes / 8).coerceIn(1, MAX_DECODED_BYTES)
++    }
++}
++
++class BackupTooLargeException(message: String, cause: Throwable? = null) :
++    IOException(message, cause)
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/data/backup/create/BackupArchiveWriter.kt b/app/src/main/java/eu/kanade/tachiyomi/data/backup/create/BackupArchiveWriter.kt
 new file mode 100644
 index 0000000..f03f32b
@@ -12127,22 +12643,26 @@ index 2f7ed91..0c80060 100644
              logcat(LogPriority.ERROR, e)
              if (!isAutoBackup) notifier.showBackupError(e.message)
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/data/backup/create/BackupCreator.kt b/app/src/main/java/eu/kanade/tachiyomi/data/backup/create/BackupCreator.kt
-index 98036c0..5de6761 100644
+index 98036c0..6ff94ae 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/data/backup/create/BackupCreator.kt
 +++ b/app/src/main/java/eu/kanade/tachiyomi/data/backup/create/BackupCreator.kt
-@@ -4,7 +4,7 @@ import android.content.Context
+@@ -4,7 +4,9 @@ import android.content.Context
  import android.net.Uri
  import com.hippo.unifile.UniFile
  import eu.kanade.tachiyomi.BuildConfig
 -import eu.kanade.tachiyomi.data.backup.BackupFileValidator
 +import eu.kanade.tachiyomi.data.backup.BackupDecoder
++import eu.kanade.tachiyomi.data.backup.BackupReadBudget
++import eu.kanade.tachiyomi.data.backup.BackupTooLargeException
  import eu.kanade.tachiyomi.data.backup.create.creators.CategoriesBackupCreator
  import eu.kanade.tachiyomi.data.backup.create.creators.ExtensionStoresBackupCreator
  import eu.kanade.tachiyomi.data.backup.create.creators.MangaBackupCreator
-@@ -17,11 +17,15 @@ import eu.kanade.tachiyomi.data.backup.models.BackupManga
+@@ -17,11 +19,17 @@ import eu.kanade.tachiyomi.data.backup.models.BackupManga
  import eu.kanade.tachiyomi.data.backup.models.BackupPreference
  import eu.kanade.tachiyomi.data.backup.models.BackupSource
  import eu.kanade.tachiyomi.data.backup.models.BackupSourcePreferences
++import java.io.IOException
++import kotlin.time.Clock
 +import kotlinx.coroutines.CancellationException
 +import kotlinx.coroutines.Dispatchers
 +import kotlinx.coroutines.currentCoroutineContext
@@ -12158,7 +12678,7 @@ index 98036c0..5de6761 100644
  import tachiyomi.core.common.i18n.stringResource
  import tachiyomi.core.common.util.system.logcat
  import tachiyomi.domain.backup.service.BackupPreferences
-@@ -29,12 +33,10 @@ import tachiyomi.domain.manga.interactor.GetFavorites
+@@ -29,102 +37,230 @@ import tachiyomi.domain.manga.interactor.GetFavorites
  import tachiyomi.domain.manga.model.Manga
  import tachiyomi.domain.manga.repository.MangaRepository
  import tachiyomi.i18n.MR
@@ -12169,29 +12689,31 @@ index 98036c0..5de6761 100644
 -import java.text.SimpleDateFormat
 -import java.util.Date
 -import java.util.Locale
-+import java.io.IOException
- import kotlin.time.Clock
+-import kotlin.time.Clock
  
  class BackupCreator(
-@@ -51,40 +53,25 @@ class BackupCreator(
+     private val context: Context,
+     private val isAutoBackup: Boolean,
+-
+     private val parser: ProtoBuf = Injekt.get(),
+     private val getFavorites: GetFavorites = Injekt.get(),
+     private val backupPreferences: BackupPreferences = Injekt.get(),
+     private val mangaRepository: MangaRepository = Injekt.get(),
+-
+     private val categoriesBackupCreator: CategoriesBackupCreator = CategoriesBackupCreator(),
+     private val mangaBackupCreator: MangaBackupCreator = MangaBackupCreator(),
      private val preferenceBackupCreator: PreferenceBackupCreator = PreferenceBackupCreator(),
-     private val extensionStoresBackupCreator: ExtensionStoresBackupCreator = ExtensionStoresBackupCreator(),
+-    private val extensionStoresBackupCreator: ExtensionStoresBackupCreator = ExtensionStoresBackupCreator(),
++    private val extensionStoresBackupCreator: ExtensionStoresBackupCreator =
++        ExtensionStoresBackupCreator(),
      private val sourcesBackupCreator: SourcesBackupCreator = SourcesBackupCreator(),
 +    private val resolveFile: (Uri) -> UniFile? = { UniFile.fromUri(context, it) },
++    private val maxDecodedBytes: Long = BackupReadBudget.forHeap(Runtime.getRuntime().maxMemory()),
  ) {
  
 -    suspend fun backup(uri: Uri, options: BackupOptions): String {
-+    suspend fun backup(uri: Uri, options: BackupOptions): String = withContext(Dispatchers.IO) {
-+        backupMutex.withLock {
-+            createVerifiedBackup(uri, options)
-+        }
-+    }
-+
-+    private suspend fun createVerifiedBackup(uri: Uri, options: BackupOptions): String {
-         var file: UniFile? = null
-+        var cleanupOnFailure = false
-+        var verified = false
-         try {
+-        var file: UniFile? = null
+-        try {
 -            file = if (isAutoBackup) {
 -                // Get dir of file and create
 -                val dir = UniFile.fromUri(context, uri)
@@ -12213,25 +12735,47 @@ index 98036c0..5de6761 100644
 -                    target
 -                }
 -            }
--
++    init {
++        require(maxDecodedBytes in 1..BackupReadBudget.MAX_DECODED_BYTES)
++    }
+ 
 -            if (file == null || file.isDirectory) {
 -                throw IllegalStateException(context.stringResource(MR.strings.create_backup_file_error))
 -            }
--
++    suspend fun backup(uri: Uri, options: BackupOptions): String =
++        withContext(Dispatchers.IO) { backupMutex.withLock { createVerifiedBackup(uri, options) } }
+ 
+-            val nonFavoriteManga = if (options.readEntries) mangaRepository.getReadMangaNotInLibrary() else emptyList()
++    private suspend fun createVerifiedBackup(uri: Uri, options: BackupOptions): String {
++        var file: UniFile? = null
++        var cleanupOnFailure = false
++        var verified = false
++        try {
 +            val coroutineContext = currentCoroutineContext()
 +            val checkCancelled = { coroutineContext.ensureActive() }
 +            checkCancelled()
-             val nonFavoriteManga = if (options.readEntries) mangaRepository.getReadMangaNotInLibrary() else emptyList()
++            val nonFavoriteManga =
++                if (options.readEntries) mangaRepository.getReadMangaNotInLibrary() else emptyList()
              val backupManga = backupMangas(getFavorites.await() + nonFavoriteManga, options)
 -
-             val backup = Backup(
-                 backupManga = backupManga,
-                 backupCategories = backupCategories(options),
-@@ -93,38 +80,134 @@ class BackupCreator(
-                 backupExtensionStores = backupExtensionStores(options),
-                 backupSourcePreferences = backupSourcePreferences(options),
-             )
+-            val backup = Backup(
+-                backupManga = backupManga,
+-                backupCategories = backupCategories(options),
+-                backupSources = backupSources(backupManga),
+-                backupPreferences = backupAppPreferences(options),
+-                backupExtensionStores = backupExtensionStores(options),
+-                backupSourcePreferences = backupSourcePreferences(options),
+-            )
 -
++            val backup =
++                Backup(
++                    backupManga = backupManga,
++                    backupCategories = backupCategories(options),
++                    backupSources = backupSources(backupManga),
++                    backupPreferences = backupAppPreferences(options),
++                    backupExtensionStores = backupExtensionStores(options),
++                    backupSourcePreferences = backupSourcePreferences(options),
++                )
              val byteArray = parser.encodeToByteArray(Backup.serializer(), backup)
              if (byteArray.isEmpty()) {
                  throw IllegalStateException(context.stringResource(MR.strings.empty_backup_error))
@@ -12239,22 +12783,16 @@ index 98036c0..5de6761 100644
 -
 -            val outputStream = file.openOutputStream()
 -                ?: runCatching { context.contentResolver.openOutputStream(file.uri, "wt") }.getOrNull()
-+            checkCancelled()
-+            val target = resolveFile(uri)
-                 ?: throw IllegalStateException(context.stringResource(MR.strings.create_backup_file_error))
+-                ?: throw IllegalStateException(context.stringResource(MR.strings.create_backup_file_error))
 -
 -            outputStream.sink().gzip().buffer().use {
 -                it.write(byteArray)
 -                it.flush()
-+            val directory = target.takeIf { it.isDirectory }
-+            if (isAutoBackup && directory == null) throw IOException("Automatic backup requires a directory")
-+            val finalName = getFilename()
-+            val pendingName = "$finalName.pending"
-+            file = if (directory != null) directory.createFile(pendingName) else target
-+            val destination = file
-+                ?: throw IllegalStateException(context.stringResource(MR.strings.create_backup_file_error))
-+            if (destination.isDirectory || destination.length() > 0) {
-+                throw BackupTargetNotEmpty()
++            checkCancelled()
++            if (isAutoBackup && byteArray.size > maxDecodedBytes) {
++                throw BackupTooLargeException(
++                    context.stringResource(ATMR.strings.backup_read_limit_exceeded)
++                )
              }
 -            val fileUri = file.uri
 -
@@ -12263,21 +12801,44 @@ index 98036c0..5de6761 100644
 -                BackupFileValidator(context).validate(fileUri)
 -            }.onFailure { e ->
 -                logcat(LogPriority.WARN, e) { "Validação de backup ignorada: ${e.message}" }
-+            if (directory != null) {
-+                // Never treat a provider returning a different existing document as ours to overwrite/delete.
-+                if (destination.name != pendingName) throw BackupTargetNotEmpty()
-+            } else {
-+                // An explicit file may already contain data even if the provider reports unknown length as0.
-+                val input = try {
-+                    destination.openInputStream() ?: context.contentResolver.openInputStream(destination.uri)
-+                } catch (error: CancellationException) {
-+                    throw error
-+                } catch (error: Exception) {
-+                    throw BackupReadbackUnavailable(error)
-+                } ?: throw BackupReadbackUnavailable()
-+                if (input.use { it.read() != -1 }) throw BackupTargetNotEmpty()
++            val target =
++                resolveFile(uri)
++                    ?: throw IllegalStateException(
++                        context.stringResource(MR.strings.create_backup_file_error)
++                    )
++            val directory = target.takeIf { it.isDirectory }
++            if (isAutoBackup && directory == null)
++                throw IOException("Automatic backup requires a directory")
++            val finalName = getFilename()
++            val pendingName = "$finalName.pending"
++            file = if (directory != null) directory.createFile(pendingName) else target
++            val destination =
++                file
++                    ?: throw IllegalStateException(
++                        context.stringResource(MR.strings.create_backup_file_error)
++                    )
++            if (destination.isDirectory || destination.length() > 0) {
++                throw BackupTargetNotEmpty()
              }
 -
++            if (directory != null) {
++                // Never treat a provider returning a different existing document as ours to
++                // overwrite/delete.
++                if (destination.name != pendingName) throw BackupTargetNotEmpty()
++            } else {
++                // An explicit file may already contain data even if the provider reports unknown
++                // length as0.
++                val input =
++                    try {
++                        destination.openInputStream()
++                            ?: context.contentResolver.openInputStream(destination.uri)
++                    } catch (error: CancellationException) {
++                        throw error
++                    } catch (error: Exception) {
++                        throw BackupReadbackUnavailable(error)
++                    } ?: throw BackupReadbackUnavailable()
++                if (input.use { it.read() != -1 }) throw BackupTargetNotEmpty()
++            }
 +            cleanupOnFailure = true
 +            BackupArchiveWriter.writeVerified(
 +                payload = byteArray,
@@ -12287,7 +12848,8 @@ index 98036c0..5de6761 100644
 +                        ?: throw IOException("Cannot open backup destination")
 +                },
 +                openInput = {
-+                    destination.openInputStream() ?: context.contentResolver.openInputStream(destination.uri)
++                    destination.openInputStream()
++                        ?: context.contentResolver.openInputStream(destination.uri)
 +                },
 +                checkCancelled = checkCancelled,
 +            )
@@ -12299,13 +12861,19 @@ index 98036c0..5de6761 100644
 +                // Providers may change document URIs on rename; verify the final document too.
 +                BackupArchiveWriter.verify(
 +                    byteArray,
-+                    { destination.openInputStream() ?: context.contentResolver.openInputStream(destination.uri) },
++                    {
++                        destination.openInputStream()
++                            ?: context.contentResolver.openInputStream(destination.uri)
++                    },
 +                    checkCancelled,
 +                )
 +            }
 +            verified = true
              if (isAutoBackup) {
-                 backupPreferences.lastAutoBackupTimestamp.set(Clock.System.now().toEpochMilliseconds())
+-                backupPreferences.lastAutoBackupTimestamp.set(Clock.System.now().toEpochMilliseconds())
++                backupPreferences.lastAutoBackupTimestamp.set(
++                    Clock.System.now().toEpochMilliseconds()
++                )
 +                pruneVerifiedBackups(requireNotNull(directory), destination)
 +            }
 +            return destination.uri.toString()
@@ -12316,21 +12884,25 @@ index 98036c0..5de6761 100644
 +            if (cleanupOnFailure && !verified) cleanupFailedBackup(file)
 +            logcat(LogPriority.ERROR, error)
 +            throw when (error) {
-+                is BackupReadbackUnavailable -> IOException(
-+                    context.stringResource(ATMR.strings.backup_verify_unavailable),
-+                    error,
-+                )
-+                is BackupReadbackMismatch -> IOException(
-+                    context.stringResource(ATMR.strings.backup_verify_failed),
-+                    error,
-+                )
-+                is BackupTargetNotEmpty -> IOException(
-+                    context.stringResource(ATMR.strings.backup_target_not_empty),
-+                    error,
-+                )
++                is BackupReadbackUnavailable ->
++                    IOException(
++                        context.stringResource(ATMR.strings.backup_verify_unavailable),
++                        error,
++                    )
++                is BackupReadbackMismatch ->
++                    IOException(context.stringResource(ATMR.strings.backup_verify_failed), error)
++                is BackupTargetNotEmpty ->
++                    IOException(context.stringResource(ATMR.strings.backup_target_not_empty), error)
 +                else -> error
-             }
++            }
 +        }
++    }
++
++    private fun cleanupFailedBackup(file: UniFile?) {
++        runCatching { file?.delete() }
++            .onFailure { error ->
++                logcat(LogPriority.WARN, error) { "Could not remove incomplete backup" }
+             }
 +    }
  
 -            return fileUri.toString()
@@ -12338,53 +12910,104 @@ index 98036c0..5de6761 100644
 -            logcat(LogPriority.ERROR, e)
 -            file?.delete()
 -            throw e
-+    private fun cleanupFailedBackup(file: UniFile?) {
-+        runCatching { file?.delete() }.onFailure { error ->
-+            logcat(LogPriority.WARN, error) { "Could not remove incomplete backup" }
-+        }
-+    }
-+
 +    private suspend fun pruneVerifiedBackups(directory: UniFile, current: UniFile) {
 +        try {
 +            val currentId = current.uri.toString()
-+            val files = directory.listFiles().orEmpty()
-+                .filter { BackupRetention.isManaged(BuildConfig.APPLICATION_ID, it.name.orEmpty()) }
-+                .associateBy { it.uri.toString() }
-+            val entries = files.map { (id, candidate) ->
-+                currentCoroutineContext().ensureActive()
-+                val readable = if (id == currentId) {
-+                    true
-+                } else {
-+                    try {
-+                        val decoded = BackupDecoder(context, parser).decode(candidate.uri)
-+                        // Unknown-only protobufs can decode as empty; they must not displace useful copies.
-+                        decoded.backupManga.isNotEmpty() || decoded.backupCategories.isNotEmpty() ||
-+                            decoded.backupSources.isNotEmpty() || decoded.backupPreferences.isNotEmpty() ||
-+                            decoded.backupSourcePreferences.isNotEmpty() || decoded.backupExtensionStores.isNotEmpty()
-+                    } catch (error: CancellationException) {
-+                        throw error
-+                    } catch (error: Exception) {
-+                        logcat(LogPriority.WARN, error) { "Unverified old backup preserved" }
-+                        false
++            val files =
++                directory
++                    .listFiles()
++                    .orEmpty()
++                    .filter {
++                        BackupRetention.isManaged(BuildConfig.APPLICATION_ID, it.name.orEmpty())
 +                    }
++                    .associateBy { it.uri.toString() }
++            val entries =
++                files.map { (id, candidate) ->
++                    currentCoroutineContext().ensureActive()
++                    val readable =
++                        if (id == currentId) {
++                            true
++                        } else {
++                            try {
++                                val caller = currentCoroutineContext()
++                                val decoded =
++                                    BackupDecoder(context, parser, maxDecodedBytes).decode(
++                                        candidate.uri
++                                    ) {
++                                        caller.ensureActive()
++                                    }
++                                // Unknown-only protobufs can decode as empty; they must not
++                                // displace useful copies.
++                                decoded.backupManga.isNotEmpty() ||
++                                    decoded.backupCategories.isNotEmpty() ||
++                                    decoded.backupSources.isNotEmpty() ||
++                                    decoded.backupPreferences.isNotEmpty() ||
++                                    decoded.backupSourcePreferences.isNotEmpty() ||
++                                    decoded.backupExtensionStores.isNotEmpty()
++                            } catch (error: CancellationException) {
++                                throw error
++                            } catch (error: Exception) {
++                                logcat(LogPriority.WARN, error) {
++                                    "Unverified old backup preserved"
++                                }
++                                false
++                            }
++                        }
++                    BackupRetention.Entry(id, candidate.name.orEmpty(), readable)
 +                }
-+                BackupRetention.Entry(id, candidate.name.orEmpty(), readable)
-+            }
-+            BackupRetention.deletions(BuildConfig.APPLICATION_ID, currentId, entries, MAX_AUTO_BACKUPS)
++            BackupRetention.deletions(
++                    BuildConfig.APPLICATION_ID,
++                    currentId,
++                    entries,
++                    MAX_AUTO_BACKUPS,
++                )
 +                .forEach { id ->
 +                    currentCoroutineContext().ensureActive()
-+                    if (files[id]?.delete() != true) logcat(LogPriority.WARN) { "Could not remove an old backup" }
++                    if (files[id]?.delete() != true)
++                        logcat(LogPriority.WARN) { "Could not remove an old backup" }
 +                }
 +        } catch (error: CancellationException) {
 +            throw error
 +        } catch (error: Exception) {
-+            // A retention failure must not destroy the verified new copy or turn it into a failed write.
-+            logcat(LogPriority.WARN, error) { "Backup verified; old copies retained after cleanup failure" }
++            // A retention failure must not destroy the verified new copy or turn it into a failed
++            // write.
++            logcat(LogPriority.WARN, error) {
++                "Backup verified; old copies retained after cleanup failure"
++            }
          }
      }
  
-@@ -162,13 +245,12 @@ class BackupCreator(
-         return preferenceBackupCreator.createSource(includePrivatePreferences = options.privateSettings)
+@@ -134,7 +270,10 @@ class BackupCreator(
+         return categoriesBackupCreator()
+     }
+ 
+-    private suspend fun backupMangas(mangas: List<Manga>, options: BackupOptions): List<BackupManga> {
++    private suspend fun backupMangas(
++        mangas: List<Manga>,
++        options: BackupOptions,
++    ): List<BackupManga> {
+         if (!options.libraryEntries) return emptyList()
+ 
+         return mangaBackupCreator(mangas, options)
+@@ -147,7 +286,9 @@ class BackupCreator(
+     private fun backupAppPreferences(options: BackupOptions): List<BackupPreference> {
+         if (!options.appSettings) return emptyList()
+ 
+-        return preferenceBackupCreator.createApp(includePrivatePreferences = options.privateSettings)
++        return preferenceBackupCreator.createApp(
++            includePrivatePreferences = options.privateSettings
++        )
+     }
+ 
+     private suspend fun backupExtensionStores(options: BackupOptions): List<BackupExtensionStore> {
+@@ -159,16 +300,17 @@ class BackupCreator(
+     private fun backupSourcePreferences(options: BackupOptions): List<BackupSourcePreferences> {
+         if (!options.sourceSettings) return emptyList()
+ 
+-        return preferenceBackupCreator.createSource(includePrivatePreferences = options.privateSettings)
++        return preferenceBackupCreator.createSource(
++            includePrivatePreferences = options.privateSettings
++        )
      }
  
 +    private class BackupTargetNotEmpty : IOException("Backup destination contains existing data")
@@ -13106,7 +13729,7 @@ index 0ecf97e..87761ac 100644
          }
  
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/data/backup/restore/BackupRestorer.kt b/app/src/main/java/eu/kanade/tachiyomi/data/backup/restore/BackupRestorer.kt
-index ce21be4..01e1c3e 100644
+index ce21be4..dce57b7 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/data/backup/restore/BackupRestorer.kt
 +++ b/app/src/main/java/eu/kanade/tachiyomi/data/backup/restore/BackupRestorer.kt
 @@ -4,6 +4,7 @@ import android.content.Context
@@ -13176,7 +13799,7 @@ index ce21be4..01e1c3e 100644
      private var sourceMapping: Map<Long, String> = emptyMap()
  
      suspend fun restore(uri: Uri, options: RestoreOptions) {
-@@ -75,18 +78,14 @@ class BackupRestorer(
+@@ -75,18 +78,17 @@ class BackupRestorer(
  
          val logFile = writeErrorLog()
  
@@ -13192,14 +13815,17 @@ index ce21be4..01e1c3e 100644
  
      private suspend fun restoreFromFile(uri: Uri, options: RestoreOptions) {
 -        val backup = BackupDecoder(context).decode(uri)
-+        restoreBackup(BackupDecoder(context).decode(uri), options)
++        val caller = currentCoroutineContext()
++        val backup = BackupDecoder(context).decode(uri) { caller.ensureActive() }
++        caller.ensureActive()
++        restoreBackup(backup, options)
 +    }
  
 +    internal suspend fun restoreBackup(backup: Backup, options: RestoreOptions) {
          // Store source mapping for error messages
          val backupMaps = backup.backupSources
          sourceMapping = backupMaps.associate { it.sourceId to it.name }
-@@ -108,17 +107,42 @@ class BackupRestorer(
+@@ -108,17 +110,42 @@ class BackupRestorer(
          }
  
          coroutineScope {
@@ -13244,7 +13870,7 @@ index ce21be4..01e1c3e 100644
              }
              if (options.extensionStores) {
                  restoreExtensionStores(backup.backupExtensionStores)
-@@ -128,8 +152,8 @@ class BackupRestorer(
+@@ -128,8 +155,8 @@ class BackupRestorer(
          }
      }
  
@@ -13255,7 +13881,7 @@ index ce21be4..01e1c3e 100644
          categoriesRestorer(backupCategories)
  
          val progress = restoreProgress.incrementAndFetch()
-@@ -145,10 +169,9 @@ class BackupRestorer(
+@@ -145,10 +172,9 @@ class BackupRestorer(
          backupMangas: List<BackupManga>,
          backupCategories: List<BackupCategory>,
      ) = launch {
@@ -13269,7 +13895,7 @@ index ce21be4..01e1c3e 100644
                      database.transaction {
                          chunk.forEach {
                              ensureActive()
-@@ -162,26 +185,31 @@ class BackupRestorer(
+@@ -162,26 +188,31 @@ class BackupRestorer(
                      false
                  }
  
@@ -13317,7 +13943,7 @@ index ce21be4..01e1c3e 100644
      }
  
      private fun CoroutineScope.restoreAppPreferences(
-@@ -189,10 +217,7 @@ class BackupRestorer(
+@@ -189,10 +220,7 @@ class BackupRestorer(
          categories: List<BackupCategory>?,
      ) = launch {
          ensureActive()
@@ -13329,7 +13955,7 @@ index ce21be4..01e1c3e 100644
  
          val progress = restoreProgress.incrementAndFetch()
          notifier.showRestoreProgress(
-@@ -203,7 +228,9 @@ class BackupRestorer(
+@@ -203,7 +231,9 @@ class BackupRestorer(
          )
      }
  
@@ -13340,7 +13966,7 @@ index ce21be4..01e1c3e 100644
          ensureActive()
          preferenceRestorer.restoreSource(preferences)
  
-@@ -217,31 +244,29 @@ class BackupRestorer(
+@@ -217,31 +247,29 @@ class BackupRestorer(
      }
  
      private fun CoroutineScope.restoreExtensionStores(
@@ -61160,6 +61786,154 @@ index 0000000..7a0e07d
 +        }
 +    }
 +}
+diff --git a/app/src/test/java/eu/kanade/presentation/more/settings/screen/data/RestoreBackupViewModelTest.kt b/app/src/test/java/eu/kanade/presentation/more/settings/screen/data/RestoreBackupViewModelTest.kt
+new file mode 100644
+index 0000000..0b9ec6b
+--- /dev/null
++++ b/app/src/test/java/eu/kanade/presentation/more/settings/screen/data/RestoreBackupViewModelTest.kt
+@@ -0,0 +1,142 @@
++package eu.kanade.presentation.more.settings.screen.data
++
++import android.content.Context
++import android.net.Uri
++import androidx.lifecycle.ViewModelStore
++import eu.kanade.tachiyomi.data.backup.BackupFileValidator
++import eu.kanade.tachiyomi.data.backup.BackupTooLargeException
++import io.mockk.every
++import io.mockk.mockk
++import io.mockk.mockkStatic
++import io.mockk.unmockkStatic
++import java.util.concurrent.CountDownLatch
++import java.util.concurrent.Executors
++import java.util.concurrent.TimeUnit
++import java.util.concurrent.atomic.AtomicLong
++import kotlinx.coroutines.CancellationException
++import kotlinx.coroutines.Dispatchers
++import kotlinx.coroutines.asCoroutineDispatcher
++import kotlinx.coroutines.flow.first
++import kotlinx.coroutines.runBlocking
++import kotlinx.coroutines.test.resetMain
++import kotlinx.coroutines.test.setMain
++import kotlinx.coroutines.withTimeout
++import org.junit.jupiter.api.AfterEach
++import org.junit.jupiter.api.Assertions.assertEquals
++import org.junit.jupiter.api.Assertions.assertFalse
++import org.junit.jupiter.api.Assertions.assertNotNull
++import org.junit.jupiter.api.Assertions.assertNull
++import org.junit.jupiter.api.Assertions.assertTrue
++import org.junit.jupiter.api.BeforeEach
++import org.junit.jupiter.api.Test
++
++/**
++ * Real Main/IO dispatcher transitions; validator results are controlled, decoding is tested
++ * separately.
++ */
++class RestoreBackupViewModelTest {
++    private val main =
++        Executors.newSingleThreadExecutor { task ->
++                Thread(task, "restore-test-main").apply { isDaemon = true }
++            }
++            .asCoroutineDispatcher()
++    private val owner = ViewModelStore()
++    private val context = mockk<Context>()
++    private val uri = mockk<Uri>()
++    private val release = CountDownLatch(1)
++    private val empty = BackupFileValidator.Results(emptyList(), emptyList())
++
++    @BeforeEach
++    fun setup() {
++        Dispatchers.setMain(main)
++        mockkStatic(Uri::class)
++        every { Uri.parse("content://backup/test") } returns uri
++    }
++
++    @AfterEach
++    fun close() {
++        release.countDown()
++        owner.clear()
++        unmockkStatic(Uri::class)
++        Dispatchers.resetMain()
++        main.close()
++    }
++
++    private fun model(
++        validator: (Uri, () -> Unit) -> BackupFileValidator.Results
++    ): RestoreBackupViewModel =
++        runBlocking(main) {
++            RestoreBackupViewModel(context, "content://backup/test", validator).also {
++                owner.put("restore", it)
++            }
++        }
++
++    private fun finished(model: RestoreBackupViewModel) = runBlocking {
++        withTimeout(5000) { model.state.first { !it.validating } }
++    }
++
++    @Test
++    fun `slow validation runs off Main and restoration is disabled until completion`() {
++        val mainThread = runBlocking(main) { Thread.currentThread().id }
++        val workerThread = AtomicLong()
++        val entered = CountDownLatch(1)
++        val model = model { _, check ->
++            workerThread.set(Thread.currentThread().id)
++            entered.countDown()
++            kotlin.check(release.await(5, TimeUnit.SECONDS))
++            check()
++            empty
++        }
++        assertTrue(entered.await(5, TimeUnit.SECONDS))
++        assertTrue(workerThread.get() != mainThread)
++        assertTrue(model.state.value.validating)
++        assertFalse(model.state.value.canRestore)
++        runBlocking(main) {
++            model.startRestore()
++        } // Must not touch WorkManager while validation is pending.
++        release.countDown()
++        val result = finished(model)
++        assertTrue(result.canRestore)
++        assertNull(result.error)
++    }
++
++    @Test
++    fun `clearing the owner cancels a pending read without enabling restore or showing an error`() {
++        val entered = CountDownLatch(1)
++        val cancelled = CountDownLatch(1)
++        val model = model { _, check ->
++            entered.countDown()
++            kotlin.check(release.await(5, TimeUnit.SECONDS))
++            try {
++                check()
++            } catch (error: CancellationException) {
++                cancelled.countDown()
++                throw error
++            }
++            empty
++        }
++        assertTrue(entered.await(5, TimeUnit.SECONDS))
++        runBlocking(main) { owner.clear() }
++        release.countDown()
++        assertTrue(cancelled.await(5, TimeUnit.SECONDS))
++        assertFalse(model.state.value.canRestore)
++        assertNull(model.state.value.error)
++    }
++
++    @Test
++    fun `oversized readable backups report the device limit without labeling the file invalid`() {
++        val model = model { _, _ -> throw BackupTooLargeException("Too large for this device") }
++        val result = finished(model)
++        assertFalse(result.canRestore)
++        assertEquals("Too large for this device", result.error)
++        runBlocking(main) { model.startRestore() }
++    }
++
++    @Test
++    fun `missing sources remain a warning that permits the existing restore options`() {
++        val model = model { _, _ -> BackupFileValidator.Results(listOf("Source"), emptyList()) }
++        val result = finished(model)
++        assertTrue(result.canRestore)
++        assertNotNull(result.error)
++    }
++}
 diff --git a/app/src/test/java/eu/kanade/presentation/theme/PolarisThemeContrastTest.kt b/app/src/test/java/eu/kanade/presentation/theme/PolarisThemeContrastTest.kt
 new file mode 100644
 index 0000000..ccca485
@@ -61209,6 +61983,223 @@ index 0000000..ccca485
 +                    )
 +                }
 +            }
++        }
++    }
++}
+diff --git a/app/src/test/java/eu/kanade/tachiyomi/data/backup/BackupDecoderBoundedTest.kt b/app/src/test/java/eu/kanade/tachiyomi/data/backup/BackupDecoderBoundedTest.kt
+new file mode 100644
+index 0000000..695d63f
+--- /dev/null
++++ b/app/src/test/java/eu/kanade/tachiyomi/data/backup/BackupDecoderBoundedTest.kt
+@@ -0,0 +1,211 @@
++package eu.kanade.tachiyomi.data.backup
++
++import android.content.ContentResolver
++import android.content.Context
++import android.net.Uri
++import dev.icerock.moko.resources.StringResource
++import eu.kanade.tachiyomi.data.backup.models.Backup
++import eu.kanade.tachiyomi.data.backup.models.BackupManga
++import io.mockk.every
++import io.mockk.mockk
++import io.mockk.mockkStatic
++import io.mockk.unmockkStatic
++import io.mockk.verify
++import java.io.ByteArrayInputStream
++import java.io.ByteArrayOutputStream
++import java.util.zip.GZIPOutputStream
++import kotlinx.coroutines.CancellationException
++import kotlinx.serialization.protobuf.ProtoBuf
++import org.junit.jupiter.api.AfterEach
++import org.junit.jupiter.api.Assertions.assertEquals
++import org.junit.jupiter.api.Assertions.assertSame
++import org.junit.jupiter.api.Assertions.assertTrue
++import org.junit.jupiter.api.BeforeEach
++import org.junit.jupiter.api.Test
++import org.junit.jupiter.api.assertThrows
++import tachiyomi.core.common.i18n.stringResource
++
++class BackupDecoderBoundedTest {
++    private val context = mockk<Context>()
++    private val resolver = mockk<ContentResolver>()
++    private val uri = mockk<Uri>()
++    private val model =
++        Backup(
++            listOf(BackupManga(10, "/work", "Work").apply { description = "x".repeat(24 * 1024) })
++        )
++    private val payload = ProtoBuf.encodeToByteArray(Backup.serializer(), model)
++    private lateinit var input: TrackedInput
++
++    @BeforeEach
++    fun setup() {
++        mockkStatic("tachiyomi.core.common.i18n.LocalizeKt")
++        every { context.contentResolver } returns resolver
++        every { context.stringResource(any<StringResource>()) } returns "backup-too-large"
++    }
++
++    @AfterEach fun teardown() = unmockkStatic("tachiyomi.core.common.i18n.LocalizeKt")
++
++    @Test
++    fun `raw input stops at its decoded byte limit and closes without parsing all data`() {
++        source(payload)
++        assertThrows<BackupTooLargeException> { BackupDecoder(context, ProtoBuf, 1024).decode(uri) }
++        assertTrue(input.closed)
++        assertTrue(input.consumed < payload.size)
++    }
++
++    @Test
++    fun `small gzip cannot bypass the decoded byte budget`() {
++        val archive = gzip(payload)
++        assertTrue(archive.size < 1024 && payload.size > 1024)
++        source(archive)
++        assertThrows<BackupTooLargeException> { BackupDecoder(context, ProtoBuf, 1024).decode(uri) }
++        assertTrue(input.closed)
++    }
++
++    @Test
++    fun `cancelled reading stops before the payload is fully consumed`() {
++        source(payload)
++        assertThrows<CancellationException> {
++            BackupDecoder(context, ProtoBuf).decode(uri) {
++                if (::input.isInitialized && input.consumed > 0) throw CancellationException("stop")
++            }
++        }
++        assertTrue(input.closed)
++        assertTrue(input.consumed < payload.size)
++    }
++
++    @Test
++    fun `raw payload exactly at the ceiling remains compatible`() {
++        source(payload)
++        val decoded = BackupDecoder(context, ProtoBuf, payload.size.toLong()).decode(uri)
++        assertEquals(
++            model.backupManga.single().description,
++            decoded.backupManga.single().description,
++        )
++        assertTrue(input.closed)
++    }
++
++    @Test
++    fun `gzip exactly at the ceiling checks its trailer and decodes normally`() {
++        source(gzip(payload))
++        val decoded = BackupDecoder(context, ProtoBuf, payload.size.toLong()).decode(uri)
++        assertEquals("Work", decoded.backupManga.single().title)
++        assertTrue(input.closed)
++    }
++
++    @Test
++    fun `CRC failure at the exact payload limit is still rejected`() {
++        val archive =
++            gzip(payload).also { it[it.size - 8] = (it[it.size - 8].toInt() xor 1).toByte() }
++        source(archive)
++        assertThrows<java.io.IOException> {
++            BackupDecoder(context, ProtoBuf, payload.size.toLong()).decode(uri)
++        }
++        assertTrue(input.closed)
++    }
++
++    @Test
++    fun `trailing gzip bytes at the exact limit remain invalid`() {
++        source(gzip(payload) + byteArrayOf(1, 2))
++        assertThrows<java.io.IOException> {
++            BackupDecoder(context, ProtoBuf, payload.size.toLong()).decode(uri)
++        }
++        assertTrue(input.closed)
++    }
++
++    @Test
++    fun `truncated gzip closes its stream and is not accepted`() {
++        source(gzip(payload).dropLast(3).toByteArray())
++        assertThrows<java.io.IOException> { BackupDecoder(context, ProtoBuf).decode(uri) }
++        assertTrue(input.closed)
++    }
++
++    @Test
++    fun `invalid protobuf within the budget is rejected and closed`() {
++        source(byteArrayOf(10, 8))
++        assertThrows<java.io.IOException> { BackupDecoder(context, ProtoBuf).decode(uri) }
++        assertTrue(input.closed)
++    }
++
++    @Test
++    fun `empty or truncated header closes the selected document`() {
++        for (bytes in listOf(byteArrayOf(), byteArrayOf(31))) {
++            source(bytes)
++            assertThrows<java.io.IOException> { BackupDecoder(context, ProtoBuf).decode(uri) }
++            assertTrue(input.closed)
++        }
++    }
++
++    @Test
++    fun `unavailable document reports an IO failure`() {
++        every { resolver.openInputStream(uri) } returns null
++        assertThrows<java.io.IOException> { BackupDecoder(context, ProtoBuf).decode(uri) }
++    }
++
++    @Test
++    fun `invalid budget is rejected before opening a document`() {
++        source(payload)
++        for (limit in listOf(0L, -1L, Long.MAX_VALUE)) {
++            assertThrows<IllegalArgumentException> {
++                BackupDecoder(context, ProtoBuf, limit).decode(uri)
++            }
++        }
++        verify(exactly = 0) { resolver.openInputStream(any()) }
++    }
++
++    @Test
++    fun `already cancelled validation never opens the document`() {
++        source(payload)
++        val cancellation = CancellationException("before opening")
++        val error =
++            assertThrows<CancellationException> {
++                BackupDecoder(context, ProtoBuf).decode(uri) { throw cancellation }
++            }
++        assertSame(cancellation, error)
++        verify(exactly = 0) { resolver.openInputStream(any()) }
++    }
++
++    @Test
++    fun `cancellation after closing the input does not return a decoded backup`() {
++        source(payload)
++        assertThrows<CancellationException> {
++            BackupDecoder(context, ProtoBuf).decode(uri) {
++                if (::input.isInitialized && input.closed)
++                    throw CancellationException("before decode")
++            }
++        }
++        assertTrue(input.closed)
++    }
++
++    @Test
++    fun `read budget reserves heap and has an absolute ceiling without overflowing`() {
++        assertEquals(8L * 1024 * 1024, BackupReadBudget.forHeap(64L * 1024 * 1024))
++        assertEquals(32L * 1024 * 1024, BackupReadBudget.forHeap(256L * 1024 * 1024))
++        assertEquals(BackupReadBudget.MAX_DECODED_BYTES, BackupReadBudget.forHeap(Long.MAX_VALUE))
++        assertThrows<IllegalArgumentException> { BackupReadBudget.forHeap(0) }
++    }
++
++    private fun source(bytes: ByteArray) {
++        every { resolver.openInputStream(uri) } answers { TrackedInput(bytes).also { input = it } }
++    }
++
++    private fun gzip(bytes: ByteArray) =
++        ByteArrayOutputStream()
++            .also { output -> GZIPOutputStream(output).use { it.write(bytes) } }
++            .toByteArray()
++
++    private class TrackedInput(bytes: ByteArray) : ByteArrayInputStream(bytes) {
++        var consumed = 0
++        var closed = false
++
++        override fun read(): Int = super.read().also { if (it >= 0) consumed++ }
++
++        override fun read(b: ByteArray, off: Int, len: Int): Int =
++            super.read(b, off, len).also { if (it > 0) consumed += it }
++
++        override fun close() {
++            closed = true
++            super.close()
 +        }
 +    }
 +}
@@ -61711,10 +62702,10 @@ index 0000000..33b9649
 +}
 diff --git a/app/src/test/java/eu/kanade/tachiyomi/data/backup/create/BackupCreatorTransactionTest.kt b/app/src/test/java/eu/kanade/tachiyomi/data/backup/create/BackupCreatorTransactionTest.kt
 new file mode 100644
-index 0000000..57e51f4
+index 0000000..262f6e9
 --- /dev/null
 +++ b/app/src/test/java/eu/kanade/tachiyomi/data/backup/create/BackupCreatorTransactionTest.kt
-@@ -0,0 +1,282 @@
+@@ -0,0 +1,371 @@
 +package eu.kanade.tachiyomi.data.backup.create
 +
 +import android.content.ContentResolver
@@ -61725,6 +62716,8 @@ index 0000000..57e51f4
 +import dev.icerock.moko.resources.StringResource
 +import eu.kanade.tachiyomi.BuildConfig
 +import eu.kanade.tachiyomi.data.backup.BackupDecoder
++import eu.kanade.tachiyomi.data.backup.BackupReadBudget
++import eu.kanade.tachiyomi.data.backup.BackupTooLargeException
 +import eu.kanade.tachiyomi.data.backup.create.creators.CategoriesBackupCreator
 +import eu.kanade.tachiyomi.data.backup.create.creators.ExtensionStoresBackupCreator
 +import eu.kanade.tachiyomi.data.backup.create.creators.MangaBackupCreator
@@ -61740,6 +62733,15 @@ index 0000000..57e51f4
 +import io.mockk.mockkStatic
 +import io.mockk.unmockkStatic
 +import io.mockk.verify
++import java.io.ByteArrayInputStream
++import java.io.ByteArrayOutputStream
++import java.io.File
++import java.io.IOException
++import java.io.OutputStream
++import java.nio.file.Files
++import java.util.Date
++import java.util.concurrent.ConcurrentHashMap
++import java.util.zip.GZIPOutputStream
 +import kotlinx.coroutines.CancellationException
 +import kotlinx.coroutines.async
 +import kotlinx.coroutines.test.runTest
@@ -61758,17 +62760,11 @@ index 0000000..57e51f4
 +import tachiyomi.domain.backup.service.BackupPreferences
 +import tachiyomi.domain.manga.interactor.GetFavorites
 +import tachiyomi.domain.manga.repository.MangaRepository
-+import java.io.ByteArrayInputStream
-+import java.io.ByteArrayOutputStream
-+import java.io.File
-+import java.io.IOException
-+import java.io.OutputStream
-+import java.nio.file.Files
-+import java.util.Date
-+import java.util.concurrent.ConcurrentHashMap
-+import java.util.zip.GZIPOutputStream
 +
-+/** Actual creator and real gzip/protobuf/files; UniFile adapter simulates document provider failures. */
++/**
++ * Actual creator and real gzip/protobuf/files; UniFile adapter simulates document provider
++ * failures.
++ */
 +class BackupCreatorTransactionTest {
 +    @TempDir lateinit var folder: File
 +    private val context = mockk<Context>()
@@ -61778,14 +62774,15 @@ index 0000000..57e51f4
 +    private val favorites = mockk<GetFavorites>()
 +    private val sourceCreator = mockk<SourcesBackupCreator>()
 +    private val preferenceCreator = mockk<PreferenceBackupCreator>()
-+    private val options = BackupOptions(
-+        libraryEntries = false,
-+        categories = false,
-+        readEntries = false,
-+        appSettings = true,
-+        sourceSettings = false,
-+        extensionStores = false,
-+    )
++    private val options =
++        BackupOptions(
++            libraryEntries = false,
++            categories = false,
++            readEntries = false,
++            appSettings = true,
++            sourceSettings = false,
++            extensionStores = false,
++        )
 +    private val events = mutableListOf<String>()
 +    private val uriFiles = ConcurrentHashMap<Uri, File>()
 +    private val fileUris = ConcurrentHashMap<String, Uri>()
@@ -61796,27 +62793,31 @@ index 0000000..57e51f4
 +    private var cancelWrite = false
 +    private var unknownLength = false
 +
-+    @BeforeEach fun setup() {
++    @BeforeEach
++    fun setup() {
 +        mockkStatic("tachiyomi.core.common.i18n.LocalizeKt")
 +        every { context.stringResource(any<StringResource>()) } returns "backup-operation-failed"
 +        every { context.contentResolver } returns resolver
-+        every { resolver.openInputStream(any()) } answers { uriFiles.getValue(firstArg()).inputStream() }
++        every { resolver.openInputStream(any()) } answers
++            {
++                uriFiles.getValue(firstArg()).inputStream()
++            }
 +        every { preferences.lastAutoBackupTimestamp } returns timestamp
 +        coEvery { favorites.await() } returns emptyList()
 +        every { sourceCreator(any()) } returns emptyList()
-+        every { preferenceCreator.createApp(false) } returns listOf(
-+            BackupPreference("sample", StringPreferenceValue("ação")),
-+        )
++        every { preferenceCreator.createApp(false) } returns
++            listOf(BackupPreference("sample", StringPreferenceValue("ação")))
 +    }
 +
 +    @AfterEach fun teardown() = unmockkStatic("tachiyomi.core.common.i18n.LocalizeKt")
 +
-+    private fun uri(file: File): Uri = fileUris.getOrPut(file.path) {
-+        mockk<Uri>().also { value ->
-+            every { value.toString() } returns file.path
-+            uriFiles[value] = file
++    private fun uri(file: File): Uri =
++        fileUris.getOrPut(file.path) {
++            mockk<Uri>().also { value ->
++                every { value.toString() } returns file.path
++                uriFiles[value] = file
++            }
 +        }
-+    }
 +
 +    private fun document(initial: File, created: Boolean = false): UniFile {
 +        var file = initial
@@ -61825,64 +62826,122 @@ index 0000000..57e51f4
 +        every { node.name } answers { file.name }
 +        every { node.isDirectory } answers { file.isDirectory }
 +        every { node.length() } answers { if (unknownLength) 0 else file.length() }
-+        every { node.listFiles() } answers { file.listFiles().orEmpty().map { document(it) }.toTypedArray() }
-+        every { node.listFiles(any<FilenameFilter>()) } answers {
-+            val filter = firstArg<FilenameFilter>()
-+            file.listFiles().orEmpty().filter { filter.accept(node, it.name) }.map { document(it) }.toTypedArray()
-+        }
-+        every { node.createFile(any()) } answers {
-+            val child = File(file, firstArg<String>())
-+            check(child.createNewFile())
-+            events += "create:${child.name}"
-+            document(child, true)
-+        }
-+        every { node.openOutputStream() } answers {
-+            events += "write:${file.name}"
-+            if (created && (failWrite || cancelWrite)) {
-+                object : OutputStream() {
-+                    override fun write(value: Int) {
-+                        if (cancelWrite) throw CancellationException("Cancelled")
-+                        throw IOException("Disk full")
++        every { node.listFiles() } answers
++            {
++                file.listFiles().orEmpty().map { document(it) }.toTypedArray()
++            }
++        every { node.listFiles(any<FilenameFilter>()) } answers
++            {
++                val filter = firstArg<FilenameFilter>()
++                file
++                    .listFiles()
++                    .orEmpty()
++                    .filter { filter.accept(node, it.name) }
++                    .map { document(it) }
++                    .toTypedArray()
++            }
++        every { node.createFile(any()) } answers
++            {
++                val child = File(file, firstArg<String>())
++                check(child.createNewFile())
++                events += "create:${child.name}"
++                document(child, true)
++            }
++        every { node.openOutputStream() } answers
++            {
++                events += "write:${file.name}"
++                if (created && (failWrite || cancelWrite)) {
++                    object : OutputStream() {
++                        override fun write(value: Int) {
++                            if (cancelWrite) throw CancellationException("Cancelled")
++                            throw IOException("Disk full")
++                        }
 +                    }
++                } else {
++                    file.outputStream()
 +                }
-+            } else {
-+                file.outputStream()
 +            }
-+        }
-+        every { node.openInputStream() } answers {
-+            events += "read:${file.name}"
-+            if (created && denyRead) throw SecurityException("Write-only provider")
-+            if (created && corruptRead) ByteArrayInputStream(byteArrayOf(1, 2, 3)) else file.inputStream()
-+        }
-+        every { node.renameTo(any()) } answers {
-+            events += "rename:${file.name}"
-+            if (failRename) {
-+                false
-+            } else {
-+                val destination = File(file.parentFile, firstArg<String>())
-+                Files.move(file.toPath(), destination.toPath())
-+                file = destination
-+                true
++        every { node.openInputStream() } answers
++            {
++                events += "read:${file.name}"
++                if (created && denyRead) throw SecurityException("Write-only provider")
++                if (created && corruptRead) ByteArrayInputStream(byteArrayOf(1, 2, 3))
++                else file.inputStream()
 +            }
-+        }
-+        every { node.delete() } answers {
-+            events += "delete:${file.name}"
-+            file.delete()
-+        }
++        every { node.renameTo(any()) } answers
++            {
++                events += "rename:${file.name}"
++                if (failRename) {
++                    false
++                } else {
++                    val destination = File(file.parentFile, firstArg<String>())
++                    Files.move(file.toPath(), destination.toPath())
++                    file = destination
++                    true
++                }
++            }
++        every { node.delete() } answers
++            {
++                events += "delete:${file.name}"
++                file.delete()
++            }
 +        return node
 +    }
 +
-+    private fun creator(target: UniFile = document(folder), automatic: Boolean = true) = BackupCreator(
-+        context, automatic, ProtoBuf, favorites, preferences, mockk<MangaRepository>(),
-+        mockk<CategoriesBackupCreator>(), mockk<MangaBackupCreator>(), preferenceCreator,
-+        mockk<ExtensionStoresBackupCreator>(), sourceCreator, { target },
-+    )
++    private fun creator(
++        target: UniFile = document(folder),
++        automatic: Boolean = true,
++        maximum: Long = BackupReadBudget.forHeap(Runtime.getRuntime().maxMemory()),
++    ) =
++        BackupCreator(
++            context,
++            automatic,
++            ProtoBuf,
++            favorites,
++            preferences,
++            mockk<MangaRepository>(),
++            mockk<CategoriesBackupCreator>(),
++            mockk<MangaBackupCreator>(),
++            preferenceCreator,
++            mockk<ExtensionStoresBackupCreator>(),
++            sourceCreator,
++            { target },
++            maximum,
++        )
++
++    @Test
++    fun `oversized automatic backup leaves prior copies and timestamp intact before creating a file`() =
++        runTest {
++            val previous = oldCopies()
++            val target = document(folder)
++            assertThrows<BackupTooLargeException> {
++                creator(target, maximum = 1).backup(uri(folder), options)
++            }
++            assertPreserved(previous)
++            assertEquals(emptyList<String>(), events)
++            verify(exactly = 0) { target.createFile(any()) }
++            verify(exactly = 0) { timestamp.set(any()) }
++        }
++
++    @Test
++    fun `explicit manual export remains available with a smaller automatic reading budget`() =
++        runTest {
++            val result = creator(automatic = false, maximum = 1).backup(uri(folder), options)
++            val data = BackupDecoder(context, ProtoBuf).decode(fileUris.getValue(result))
++            assertEquals("sample", data.backupPreferences.single().key)
++            verify(exactly = 0) { timestamp.set(any()) }
++        }
 +
 +    private fun oldCopies(): Map<String, ByteArray> {
-+        val payload = ProtoBuf.encodeToByteArray(Backup.serializer(), Backup(listOf(BackupManga(10, "/old", "Old"))))
-+        val bytes = ByteArrayOutputStream().also { buffer ->
-+            GZIPOutputStream(buffer).use { it.write(payload) }
-+        }.toByteArray()
++        val payload =
++            ProtoBuf.encodeToByteArray(
++                Backup.serializer(),
++                Backup(listOf(BackupManga(10, "/old", "Old"))),
++            )
++        val bytes =
++            ByteArrayOutputStream()
++                .also { buffer -> GZIPOutputStream(buffer).use { it.write(payload) } }
++                .toByteArray()
 +        return (0..3).associate { minute ->
 +            val name = "${BuildConfig.APPLICATION_ID}_2026-01-01_00-0$minute.tachibk"
 +            File(folder, name).writeBytes(bytes)
@@ -61896,61 +62955,77 @@ index 0000000..57e51f4
 +        verify(exactly = 0) { timestamp.set(any()) }
 +    }
 +
-+    @Test fun `failed write preserves all four earlier copies and success timestamp`() = runTest {
++    @Test
++    fun `failed write preserves all four earlier copies and success timestamp`() = runTest {
 +        val copies = oldCopies()
 +        failWrite = true
 +        assertThrows<IOException> { creator().backup(uri(folder), options) }
 +        assertPreserved(copies)
 +    }
 +
-+    @Test fun `corrupt read back never prunes copies or records success`() = runTest {
++    @Test
++    fun `corrupt read back never prunes copies or records success`() = runTest {
 +        val copies = oldCopies()
 +        corruptRead = true
 +        val error = assertThrows<IOException> { creator().backup(uri(folder), options) }
-+        assertTrue(generateSequence<Throwable>(error) { it.cause }.any { it is BackupReadbackMismatch })
++        assertTrue(
++            generateSequence<Throwable>(error) { it.cause }.any { it is BackupReadbackMismatch }
++        )
 +        assertPreserved(copies)
 +    }
 +
-+    @Test fun `write only destination reports verification unavailable and preserves old copies`() = runTest {
-+        val copies = oldCopies()
-+        denyRead = true
-+        val error = assertThrows<IOException> { creator().backup(uri(folder), options) }
-+        assertTrue(generateSequence<Throwable>(error) { it.cause }.any { it is BackupReadbackUnavailable })
-+        assertPreserved(copies)
-+    }
++    @Test
++    fun `write only destination reports verification unavailable and preserves old copies`() =
++        runTest {
++            val copies = oldCopies()
++            denyRead = true
++            val error = assertThrows<IOException> { creator().backup(uri(folder), options) }
++            assertTrue(
++                generateSequence<Throwable>(error) { it.cause }
++                    .any { it is BackupReadbackUnavailable }
++            )
++            assertPreserved(copies)
++        }
 +
-+    @Test fun `cancelled creation preserves prior backups and cancellation identity`() = runTest {
++    @Test
++    fun `cancelled creation preserves prior backups and cancellation identity`() = runTest {
 +        val copies = oldCopies()
 +        cancelWrite = true
 +        assertThrows<CancellationException> { creator().backup(uri(folder), options) }
 +        assertPreserved(copies)
 +    }
 +
-+    @Test fun `provider refusing final rename cannot trigger retention`() = runTest {
++    @Test
++    fun `provider refusing final rename cannot trigger retention`() = runTest {
 +        val copies = oldCopies()
 +        failRename = true
 +        assertThrows<IOException> { creator().backup(uri(folder), options) }
 +        assertPreserved(copies)
 +    }
 +
-+    @Test fun `only a verified final document allows pruning the oldest copy`() = runTest {
++    @Test
++    fun `only a verified final document allows pruning the oldest copy`() = runTest {
 +        val copies = oldCopies()
 +        val location = creator().backup(uri(folder), options)
 +        assertFalse(location.endsWith(".pending"))
 +        val parsed = BackupDecoder(context, ProtoBuf).decode(fileUris.getValue(location))
-+        assertEquals("ação", (parsed.backupPreferences.single().value as StringPreferenceValue).value)
++        assertEquals(
++            "ação",
++            (parsed.backupPreferences.single().value as StringPreferenceValue).value,
++        )
 +        assertEquals(4, folder.listFiles()!!.size)
 +        assertFalse(File(folder, copies.keys.min()).exists())
-+        copies.filterKeys { it != copies.keys.min() }.forEach { (name, bytes) ->
-+            assertArrayEquals(bytes, File(folder, name).readBytes())
-+        }
++        copies
++            .filterKeys { it != copies.keys.min() }
++            .forEach { (name, bytes) -> assertArrayEquals(bytes, File(folder, name).readBytes()) }
 +        val firstDeletion = events.indexOfFirst { it.startsWith("delete:") }
 +        val finalRead = events.indexOf("read:${File(location).name}")
 +        assertTrue(finalRead >= 0 && firstDeletion > finalRead)
 +        verify(exactly = 1) { timestamp.set(any()) }
 +    }
 +
-+    @Test fun `unreadable old files never displace valid backup copies`() = runTest {
++    @Test
++    fun `unreadable old files never displace valid backup copies`() = runTest {
 +        oldCopies()
 +        val broken = File(folder, "${BuildConfig.APPLICATION_ID}_2026-11-01_00-00.tachibk")
 +        broken.writeText("incomplete")
@@ -61959,14 +63034,16 @@ index 0000000..57e51f4
 +        assertEquals(5, folder.listFiles()!!.size)
 +    }
 +
-+    @Test fun `manual export never truncates or deletes a nonempty selected document`() = runTest {
++    @Test
++    fun `manual export never truncates or deletes a nonempty selected document`() = runTest {
 +        val file = File(folder, "selected.tachibk").apply { writeText("precious existing data") }
 +        assertThrows<IOException> { creator(document(file), false).backup(uri(file), options) }
 +        assertEquals("precious existing data", file.readText())
 +        assertTrue(events.none { it.startsWith("write:") || it.startsWith("delete:") })
 +    }
 +
-+    @Test fun `unknown provider length cannot cause an existing document to be overwritten`() = runTest {
++    @Test
++    fun `unknown provider length cannot cause an existing document to be overwritten`() = runTest {
 +        val file = File(folder, "selected.tachibk").apply { writeText("existing data") }
 +        unknownLength = true
 +        assertThrows<IOException> { creator(document(file), false).backup(uri(file), options) }
@@ -61974,17 +63051,20 @@ index 0000000..57e51f4
 +        assertTrue(events.none { it.startsWith("write:") || it.startsWith("delete:") })
 +    }
 +
-+    @Test fun `backups with same timestamp have distinct names and other app namespaces are unmanaged`() {
++    @Test
++    fun `backups with same timestamp have distinct names and other app namespaces are unmanaged`() {
 +        val first = BackupRetention.filename(BuildConfig.APPLICATION_ID, Date(0))
 +        val second = BackupRetention.filename(BuildConfig.APPLICATION_ID, Date(0))
 +        assertTrue(first != second)
 +        assertTrue(BackupRetention.isManaged(BuildConfig.APPLICATION_ID, first))
 +        assertFalse(BackupRetention.isManaged(BuildConfig.APPLICATION_ID, first + ".pending"))
-+        val otherNamespace = first.replace(BuildConfig.APPLICATION_ID, BuildConfig.APPLICATION_ID.replace('.', 'X'))
++        val otherNamespace =
++            first.replace(BuildConfig.APPLICATION_ID, BuildConfig.APPLICATION_ID.replace('.', 'X'))
 +        assertFalse(BackupRetention.isManaged(BuildConfig.APPLICATION_ID, otherNamespace))
 +    }
 +
-+    @Test fun `two creator instances serialize writing and retain four complete archives`() = runTest {
++    @Test
++    fun `two creator instances serialize writing and retain four complete archives`() = runTest {
 +        oldCopies()
 +        val first = creator()
 +        val second = creator()
@@ -77326,7 +78406,7 @@ index 9839272..6d6b5be 100644
  sqldelight-androidxPaging = { module = "app.cash.sqldelight:androidx-paging3-extensions", version.ref = "sqldelight" }
  sqldelight-async = { module = "app.cash.sqldelight:async-extensions", version.ref = "sqldelight" }
 diff --git a/i18n-at/src/commonMain/moko-resources/base/strings.xml b/i18n-at/src/commonMain/moko-resources/base/strings.xml
-index 7ed4795..aa3df6d 100644
+index 7ed4795..658d6ab 100644
 --- a/i18n-at/src/commonMain/moko-resources/base/strings.xml
 +++ b/i18n-at/src/commonMain/moko-resources/base/strings.xml
 @@ -10,7 +10,7 @@
@@ -77338,7 +78418,7 @@ index 7ed4795..aa3df6d 100644
      <string name="pref_group_setup">Translation Setup</string>
      <string name="pref_translate_from">Translate From</string>
      <string name="pref_translate_to">Translate To</string>
-@@ -73,12 +73,311 @@
+@@ -73,12 +73,312 @@
      <string name="repository_add_error">Could not add this repository. Check your connection and try again.</string>
      <string name="repository_refresh_error">Repository added, but extension listings could not be refreshed. Refresh the Extensions screen.</string>
      <string name="chapter_group_version">Group/version: %1$s</string>
@@ -77651,9 +78731,10 @@ index 7ed4795..aa3df6d 100644
 +    <string name="storage_import_review_legacy">Older naming format — review the files</string>
 +    <string name="storage_import_review_required">Files need review</string>
 +    <string name="storage_import_review_retry">To try resuming a complete copy, import the same original file again in Documents. Older or incomplete folders remain available for review in your file manager. The document-cache cleanup does not remove them.</string>
++    <string name="backup_read_limit_exceeded">This backup exceeds the reading memory limit used by Polaris on this device. No existing backup was replaced. Use fewer optional fields when creating a backup, or a device with more memory.</string>
  </resources>
 diff --git a/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml b/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
-index d1748bc..7844564 100644
+index d1748bc..09a1ff7 100644
 --- a/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
 +++ b/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
 @@ -10,7 +10,7 @@
@@ -77665,7 +78746,7 @@ index d1748bc..7844564 100644
      <string name="pref_group_setup">Configuração da tradução</string>
      <string name="pref_translate_from">Traduzir de</string>
      <string name="pref_translate_to">Traduzir para</string>
-@@ -73,12 +73,311 @@
+@@ -73,12 +73,312 @@
      <string name="repository_add_error">Não foi possível adicionar o repositório. Confira a conexão e tente novamente.</string>
      <string name="repository_refresh_error">Repositório adicionado, mas não foi possível atualizar as extensões. Atualize a tela Extensões.</string>
      <string name="chapter_group_version">Grupo/versão: %1$s</string>
@@ -77978,6 +79059,7 @@ index d1748bc..7844564 100644
 +    <string name="storage_import_review_legacy">Formato antigo — confira os arquivos</string>
 +    <string name="storage_import_review_required">Arquivos precisam de revisão</string>
 +    <string name="storage_import_review_retry">Para tentar retomar uma cópia completa, importe novamente o mesmo arquivo original em Documentos. Pastas antigas ou incompletas ficam disponíveis para conferência no gerenciador de arquivos. A limpeza do cache de documentos não remove essas pastas.</string>
++    <string name="backup_read_limit_exceeded">Este backup excede o limite de memória de leitura usado pelo Polaris neste aparelho. Nenhum backup existente foi substituído. Reduza os dados opcionais ao criar um backup ou use um aparelho com mais memória.</string>
  </resources>
 diff --git a/i18n/src/commonMain/moko-resources/base/strings.xml b/i18n/src/commonMain/moko-resources/base/strings.xml
 index c0832ba..ebf8f48 100644

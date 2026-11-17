@@ -1,0 +1,50 @@
+{
+  "artifact": "org.opencv:opencv:4.12.0",
+  "min_sdk": 21,
+  "arm_native_libraries": [
+    {
+      "path": "jni/arm64-v8a/libc++_shared.so",
+      "bytes": 1292904
+    },
+    {
+      "path": "jni/arm64-v8a/libopencv_java4.so",
+      "bytes": 23465088
+    },
+    {
+      "path": "jni/armeabi-v7a/libc++_shared.so",
+      "bytes": 872872
+    },
+    {
+      "path": "jni/armeabi-v7a/libopencv_java4.so",
+      "bytes": 15622192
+    }
+  ],
+  "arm64_below_16k": [],
+  "jni_libraries": 8,
+  "native_inference_executed": false,
+  "dependency_changed_in_app": false,
+  "published_beta11_compared_libraries": [
+    {
+      "path": "lib/arm64-v8a/libopencv_java4.so",
+      "bytes": 17189512
+    },
+    {
+      "path": "lib/arm64-v8a/libc++_shared.so",
+      "bytes": 6238016
+    },
+    {
+      "path": "lib/armeabi-v7a/libopencv_java4.so",
+      "bytes": 10438812
+    },
+    {
+      "path": "lib/armeabi-v7a/libc++_shared.so",
+      "bytes": 4173552
+    }
+  ],
+  "published_native_bytes": 38039892,
+  "candidate_native_bytes": 41253056,
+  "raw_native_difference_bytes": 3213164,
+  "apk_size_measured_with_candidate": false,
+  "java_members_checked": 59,
+  "java_members_missing_or_changed": 0
+}

@@ -2,6 +2,18 @@
 
 Este arquivo registra a evolução real do código. **Revisões de desenvolvimento não são lançamentos públicos.** As datas abaixo usam America/Fortaleza, exceto quando houver indicação de UTC. O histórico de distribuição fica em [Releases](https://github.com/Hailton-Reis/Polaris/releases).
 
+## Desenvolvimento · P20261116.3 — 16/11/2026
+
+**Estado:** correções para a próxima versão; sem novo APK ou Release.
+
+- Decodificação raw/gzip limitada a 1/8 do heap máximo da VM, até 64 MiB de conteúdo descomprimido; cancelamento e fechamento/CRC preservados. O limite pode recusar backups legítimos maiores e não garante ausência de OOM.
+- Validação inicial da restauração movida para IO, com carregamento, ação bloqueada enquanto pendente e mensagem específica para excesso.
+- Criação automática recusa snapshot acima do orçamento antes de criar/podar arquivos ou mudar a data; exportação manual continua disponível. Snapshot/serialização ainda podem ter pico de memória.
+- Três falhas reproduzidas; 38 controles focados aprovados, 21 casos novos. 932 testes do app executados/aprovados e 85 anteriores de domain/UP-TO-DATE: 1.017 relatórios sem regressões. Overlay4/empacotamento27/comparador21 aprovados.
+- OpenCV oficial 4.12.0 inspecionado: ARM32/ARM64, minSdk21, PT_LOAD ARM64 de pelo menos 16 KiB e 59 referências Java presentes. Troca não integrada nem executada em aparelho; diferença bruta dos quatro binários ARM de +3.213.164 bytes, sem medir APK novo.
+
+[Escopo e limitações](docs/LEITURA_BACKUPS_P20261116_3.md) · [Evidências](integration/backup-read-budget/20261116/README.md).
+
 ## Desenvolvimento · P20261116.2 — 16/11/2026
 
 **Estado:** auditoria após a beta.11 pública; correções para uma próxima versão. Sem novo APK ou Release.

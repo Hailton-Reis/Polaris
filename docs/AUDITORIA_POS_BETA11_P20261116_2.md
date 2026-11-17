@@ -1,5 +1,7 @@
 # Auditoria após a beta.11 — P20261116.2
 
+**Continuação:** a [P20261116.3](LEITURA_BACKUPS_P20261116_3.md) implementa leitura limitada/cancelável de backups e validação fora da interface; também inspeciona uma candidata OpenCV sem integrá-la. O diagnóstico e os números abaixo conservam o estado P20261116.2.
+
 16/11/2026, America/Fortaleza. Base auditada: beta.11 publicada, P20261116.1/código 112, implementação 32a9c831c32b83f761001cf1a298348defaed2fa. Esta revisão é desenvolvimento para a próxima versão; não gera APK nem altera a Release pública. O próximo lançamento precisará de versão e código superiores aos da beta.11.
 
 ## Achados e decisões

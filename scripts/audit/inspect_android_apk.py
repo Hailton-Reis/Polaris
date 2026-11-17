@@ -8,18 +8,18 @@ import struct
 import zipfile
 
 
-def inspect(apk):
+def inspect(apk, native_root="lib"):
     groups = defaultdict(lambda: {'compressed_bytes': 0, 'uncompressed_bytes': 0, 'files': 0})
     native = []
     with zipfile.ZipFile(apk) as archive, apk.open('rb') as raw:
         files = archive.infolist()
         for info in files:
             name = info.filename
-            group = '/'.join(name.split('/')[:2]) if name.startswith('lib/') else 'DEX' if name.endswith('.dex') else name.split('/')[0]
+            group = '/'.join(name.split('/')[:2]) if name.startswith(native_root + '/') else 'DEX' if name.endswith('.dex') else name.split('/')[0]
             groups[group]['compressed_bytes'] += info.compress_size
             groups[group]['uncompressed_bytes'] += info.file_size
             groups[group]['files'] += 1
-            if not name.startswith('lib/') or not name.endswith('.so'):
+            if not name.startswith(native_root + '/') or not name.endswith('.so'):
                 continue
             with archive.open(info) as stream:
                 data = stream.read(65536)
@@ -42,7 +42,7 @@ def inspect(apk):
                 raise ValueError('No native PT_LOAD headers: ' + name)
             machine = struct.unpack_from('<H', data, 18)[0]
             abi = name.split('/')[1]
-            expected_machine = {'arm64-v8a': (64, 183), 'armeabi-v7a': (32, 40)}.get(abi)
+            expected_machine = {'arm64-v8a': (64, 183), 'armeabi-v7a': (32, 40), 'x86': (32, 3), 'x86_64': (64, 62)}.get(abi)
             raw.seek(info.header_offset)
             local_header = raw.read(30)
             if len(local_header) != 30 or local_header[:4] != b'PK\x03\x04':
@@ -59,7 +59,8 @@ def inspect(apk):
     with apk.open('rb') as stream:
         digest = hashlib.file_digest(stream, 'sha256').hexdigest()
     return {'scope': 'Static ZIP sizes, ARM ELF machine and PT_LOAD headers; not device execution, installed size or RAM',
-            'apk_sha256': digest, 'apk_bytes': apk.stat().st_size,
+            'apk_sha256': digest if native_root == 'lib' else None, 'apk_bytes': apk.stat().st_size if native_root == 'lib' else None,
+            'artifact_sha256': digest, 'artifact_bytes': apk.stat().st_size, 'native_root': native_root,
             'groups': dict(sorted(groups.items(), key=lambda item: -item[1]['compressed_bytes'])),
             'largest_entries': largest, 'native_libraries': native,
             'arm64_elf_below_16k': [n['path'] for n in native if '/arm64-v8a/' in n['path'] and n['elf_minimum_alignment'] < 16384]}
@@ -69,8 +70,9 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('apk', type=Path)
     parser.add_argument('--output', type=Path)
+    parser.add_argument('--native-root', choices=('lib', 'jni'), default='lib', help='Use jni for an AAR dependency')
     args = parser.parse_args()
-    result = inspect(args.apk)
+    result = inspect(args.apk, args.native_root)
     text = json.dumps(result, indent=2) + '\n'
     if args.output:
         args.output.write_text(text)

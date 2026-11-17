@@ -1,0 +1,955 @@
+{
+  "scope": "Public member presence/descriptors/static kind used by compiled OCR SDK; not full ABI, JNI or inference execution",
+  "consumer_sha256": "6486519b42c34111d4fa90a0b7f7fd24c7cd8a1f7bba000a35427a67e6e94df6",
+  "baseline_classes_sha256": "37dcd6750d7fdcf6ff51b4ac33bf328df7e5614336a5147150022ccb3ea0fa7c",
+  "candidate_classes_sha256": "60b7be2b59393bc1689b840d7b60fd75b811bb06477bdd03abee6fbc17afa5cf",
+  "consumer_classes": 52,
+  "references_checked": 59,
+  "members": [
+    {
+      "class": "org.opencv.android.Utils",
+      "member": "bitmapToMat",
+      "descriptor": "(Landroid/graphics/Bitmap;Lorg/opencv/core/Mat;)V",
+      "baseline": {
+        "found": true,
+        "static": true,
+        "declaring_class": "org.opencv.android.Utils"
+      },
+      "candidate": {
+        "found": true,
+        "static": true,
+        "declaring_class": "org.opencv.android.Utils"
+      },
+      "present_with_same_static_kind": true
+    },
+    {
+      "class": "org.opencv.android.Utils",
+      "member": "matToBitmap",
+      "descriptor": "(Lorg/opencv/core/Mat;Landroid/graphics/Bitmap;)V",
+      "baseline": {
+        "found": true,
+        "static": true,
+        "declaring_class": "org.opencv.android.Utils"
+      },
+      "candidate": {
+        "found": true,
+        "static": true,
+        "declaring_class": "org.opencv.android.Utils"
+      },
+      "present_with_same_static_kind": true
+    },
+    {
+      "class": "org.opencv.core.Core",
+      "member": "divide",
+      "descriptor": "(Lorg/opencv/core/Mat;Lorg/opencv/core/Scalar;Lorg/opencv/core/Mat;)V",
+      "baseline": {
+        "found": true,
+        "static": true,
+        "declaring_class": "org.opencv.core.Core"
+      },
+      "candidate": {
+        "found": true,
+        "static": true,
+        "declaring_class": "org.opencv.core.Core"
+      },
+      "present_with_same_static_kind": true
+    },
+    {
+      "class": "org.opencv.core.Core",
+      "member": "mean",
+      "descriptor": "(Lorg/opencv/core/Mat;Lorg/opencv/core/Mat;)Lorg/opencv/core/Scalar;",
+      "baseline": {
+        "found": true,
+        "static": true,
+        "declaring_class": "org.opencv.core.Core"
+      },
+      "candidate": {
+        "found": true,
+        "static": true,
+        "declaring_class": "org.opencv.core.Core"
+      },
+      "present_with_same_static_kind": true
+    },
+    {
+      "class": "org.opencv.core.Core",
+      "member": "multiply",
+      "descriptor": "(Lorg/opencv/core/Mat;Lorg/opencv/core/Scalar;Lorg/opencv/core/Mat;)V",
+      "baseline": {
+        "found": true,
+        "static": true,
+        "declaring_class": "org.opencv.core.Core"
+      },
+      "candidate": {
+        "found": true,
+        "static": true,
+        "declaring_class": "org.opencv.core.Core"
+      },
+      "present_with_same_static_kind": true
+    },
+    {
+      "class": "org.opencv.core.Core",
+      "member": "rotate",
+      "descriptor": "(Lorg/opencv/core/Mat;Lorg/opencv/core/Mat;I)V",
+      "baseline": {
+        "found": true,
+        "static": true,
+        "declaring_class": "org.opencv.core.Core"
+      },
+      "candidate": {
+        "found": true,
+        "static": true,
+        "declaring_class": "org.opencv.core.Core"
+      },
+      "present_with_same_static_kind": true
+    },
+    {
+      "class": "org.opencv.core.Core",
+      "member": "split",
+      "descriptor": "(Lorg/opencv/core/Mat;Ljava/util/List;)V",
+      "baseline": {
+        "found": true,
+        "static": true,
+        "declaring_class": "org.opencv.core.Core"
+      },
+      "candidate": {
+        "found": true,
+        "static": true,
+        "declaring_class": "org.opencv.core.Core"
+      },
+      "present_with_same_static_kind": true
+    },
+    {
+      "class": "org.opencv.core.Core",
+      "member": "subtract",
+      "descriptor": "(Lorg/opencv/core/Mat;Lorg/opencv/core/Scalar;Lorg/opencv/core/Mat;)V",
+      "baseline": {
+        "found": true,
+        "static": true,
+        "declaring_class": "org.opencv.core.Core"
+      },
+      "candidate": {
+        "found": true,
+        "static": true,
+        "declaring_class": "org.opencv.core.Core"
+      },
+      "present_with_same_static_kind": true
+    },
+    {
+      "class": "org.opencv.core.CvType",
+      "member": "CV_32FC1",
+      "descriptor": "I",
+      "baseline": {
+        "found": true,
+        "static": true,
+        "declaring_class": "org.opencv.core.CvType"
+      },
+      "candidate": {
+        "found": true,
+        "static": true,
+        "declaring_class": "org.opencv.core.CvType"
+      },
+      "present_with_same_static_kind": true
+    },
+    {
+      "class": "org.opencv.core.CvType",
+      "member": "CV_32FC3",
+      "descriptor": "I",
+      "baseline": {
+        "found": true,
+        "static": true,
+        "declaring_class": "org.opencv.core.CvType"
+      },
+      "candidate": {
+        "found": true,
+        "static": true,
+        "declaring_class": "org.opencv.core.CvType"
+      },
+      "present_with_same_static_kind": true
+    },
+    {
+      "class": "org.opencv.core.CvType",
+      "member": "CV_8UC1",
+      "descriptor": "I",
+      "baseline": {
+        "found": true,
+        "static": true,
+        "declaring_class": "org.opencv.core.CvType"
+      },
+      "candidate": {
+        "found": true,
+        "static": true,
+        "declaring_class": "org.opencv.core.CvType"
+      },
+      "present_with_same_static_kind": true
+    },
+    {
+      "class": "org.opencv.core.CvType",
+      "member": "CV_8UC3",
+      "descriptor": "I",
+      "baseline": {
+        "found": true,
+        "static": true,
+        "declaring_class": "org.opencv.core.CvType"
+      },
+      "candidate": {
+        "found": true,
+        "static": true,
+        "declaring_class": "org.opencv.core.CvType"
+      },
+      "present_with_same_static_kind": true
+    },
+    {
+      "class": "org.opencv.core.CvType",
+      "member": "CV_8UC4",
+      "descriptor": "I",
+      "baseline": {
+        "found": true,
+        "static": true,
+        "declaring_class": "org.opencv.core.CvType"
+      },
+      "candidate": {
+        "found": true,
+        "static": true,
+        "declaring_class": "org.opencv.core.CvType"
+      },
+      "present_with_same_static_kind": true
+    },
+    {
+      "class": "org.opencv.core.Mat",
+      "member": "<init>",
+      "descriptor": "()V",
+      "baseline": {
+        "found": true,
+        "static": false,
+        "declaring_class": "org.opencv.core.Mat"
+      },
+      "candidate": {
+        "found": true,
+        "static": false,
+        "declaring_class": "org.opencv.core.Mat"
+      },
+      "present_with_same_static_kind": true
+    },
+    {
+      "class": "org.opencv.core.Mat",
+      "member": "<init>",
+      "descriptor": "(III)V",
+      "baseline": {
+        "found": true,
+        "static": false,
+        "declaring_class": "org.opencv.core.Mat"
+      },
+      "candidate": {
+        "found": true,
+        "static": false,
+        "declaring_class": "org.opencv.core.Mat"
+      },
+      "present_with_same_static_kind": true
+    },
+    {
+      "class": "org.opencv.core.Mat",
+      "member": "<init>",
+      "descriptor": "(IIILorg/opencv/core/Scalar;)V",
+      "baseline": {
+        "found": true,
+        "static": false,
+        "declaring_class": "org.opencv.core.Mat"
+      },
+      "candidate": {
+        "found": true,
+        "static": false,
+        "declaring_class": "org.opencv.core.Mat"
+      },
+      "present_with_same_static_kind": true
+    },
+    {
+      "class": "org.opencv.core.Mat",
+      "member": "cols",
+      "descriptor": "()I",
+      "baseline": {
+        "found": true,
+        "static": false,
+        "declaring_class": "org.opencv.core.Mat"
+      },
+      "candidate": {
+        "found": true,
+        "static": false,
+        "declaring_class": "org.opencv.core.Mat"
+      },
+      "present_with_same_static_kind": true
+    },
+    {
+      "class": "org.opencv.core.Mat",
+      "member": "convertTo",
+      "descriptor": "(Lorg/opencv/core/Mat;I)V",
+      "baseline": {
+        "found": true,
+        "static": false,
+        "declaring_class": "org.opencv.core.Mat"
+      },
+      "candidate": {
+        "found": true,
+        "static": false,
+        "declaring_class": "org.opencv.core.Mat"
+      },
+      "present_with_same_static_kind": true
+    },
+    {
+      "class": "org.opencv.core.Mat",
+      "member": "copyTo",
+      "descriptor": "(Lorg/opencv/core/Mat;)V",
+      "baseline": {
+        "found": true,
+        "static": false,
+        "declaring_class": "org.opencv.core.Mat"
+      },
+      "candidate": {
+        "found": true,
+        "static": false,
+        "declaring_class": "org.opencv.core.Mat"
+      },
+      "present_with_same_static_kind": true
+    },
+    {
+      "class": "org.opencv.core.Mat",
+      "member": "empty",
+      "descriptor": "()Z",
+      "baseline": {
+        "found": true,
+        "static": false,
+        "declaring_class": "org.opencv.core.Mat"
+      },
+      "candidate": {
+        "found": true,
+        "static": false,
+        "declaring_class": "org.opencv.core.Mat"
+      },
+      "present_with_same_static_kind": true
+    },
+    {
+      "class": "org.opencv.core.Mat",
+      "member": "get",
+      "descriptor": "(II[F)I",
+      "baseline": {
+        "found": true,
+        "static": false,
+        "declaring_class": "org.opencv.core.Mat"
+      },
+      "candidate": {
+        "found": true,
+        "static": false,
+        "declaring_class": "org.opencv.core.Mat"
+      },
+      "present_with_same_static_kind": true
+    },
+    {
+      "class": "org.opencv.core.Mat",
+      "member": "ones",
+      "descriptor": "(III)Lorg/opencv/core/Mat;",
+      "baseline": {
+        "found": true,
+        "static": true,
+        "declaring_class": "org.opencv.core.Mat"
+      },
+      "candidate": {
+        "found": true,
+        "static": true,
+        "declaring_class": "org.opencv.core.Mat"
+      },
+      "present_with_same_static_kind": true
+    },
+    {
+      "class": "org.opencv.core.Mat",
+      "member": "put",
+      "descriptor": "(II[F)I",
+      "baseline": {
+        "found": true,
+        "static": false,
+        "declaring_class": "org.opencv.core.Mat"
+      },
+      "candidate": {
+        "found": true,
+        "static": false,
+        "declaring_class": "org.opencv.core.Mat"
+      },
+      "present_with_same_static_kind": true
+    },
+    {
+      "class": "org.opencv.core.Mat",
+      "member": "release",
+      "descriptor": "()V",
+      "baseline": {
+        "found": true,
+        "static": false,
+        "declaring_class": "org.opencv.core.Mat"
+      },
+      "candidate": {
+        "found": true,
+        "static": false,
+        "declaring_class": "org.opencv.core.Mat"
+      },
+      "present_with_same_static_kind": true
+    },
+    {
+      "class": "org.opencv.core.Mat",
+      "member": "rows",
+      "descriptor": "()I",
+      "baseline": {
+        "found": true,
+        "static": false,
+        "declaring_class": "org.opencv.core.Mat"
+      },
+      "candidate": {
+        "found": true,
+        "static": false,
+        "declaring_class": "org.opencv.core.Mat"
+      },
+      "present_with_same_static_kind": true
+    },
+    {
+      "class": "org.opencv.core.Mat",
+      "member": "submat",
+      "descriptor": "(IIII)Lorg/opencv/core/Mat;",
+      "baseline": {
+        "found": true,
+        "static": false,
+        "declaring_class": "org.opencv.core.Mat"
+      },
+      "candidate": {
+        "found": true,
+        "static": false,
+        "declaring_class": "org.opencv.core.Mat"
+      },
+      "present_with_same_static_kind": true
+    },
+    {
+      "class": "org.opencv.core.MatOfByte",
+      "member": "<init>",
+      "descriptor": "([B)V",
+      "baseline": {
+        "found": true,
+        "static": false,
+        "declaring_class": "org.opencv.core.MatOfByte"
+      },
+      "candidate": {
+        "found": true,
+        "static": false,
+        "declaring_class": "org.opencv.core.MatOfByte"
+      },
+      "present_with_same_static_kind": true
+    },
+    {
+      "class": "org.opencv.core.MatOfByte",
+      "member": "release",
+      "descriptor": "()V",
+      "baseline": {
+        "found": true,
+        "static": false,
+        "declaring_class": "org.opencv.core.Mat"
+      },
+      "candidate": {
+        "found": true,
+        "static": false,
+        "declaring_class": "org.opencv.core.Mat"
+      },
+      "present_with_same_static_kind": true
+    },
+    {
+      "class": "org.opencv.core.MatOfPoint",
+      "member": "<init>",
+      "descriptor": "()V",
+      "baseline": {
+        "found": true,
+        "static": false,
+        "declaring_class": "org.opencv.core.MatOfPoint"
+      },
+      "candidate": {
+        "found": true,
+        "static": false,
+        "declaring_class": "org.opencv.core.MatOfPoint"
+      },
+      "present_with_same_static_kind": true
+    },
+    {
+      "class": "org.opencv.core.MatOfPoint",
+      "member": "fromList",
+      "descriptor": "(Ljava/util/List;)V",
+      "baseline": {
+        "found": true,
+        "static": false,
+        "declaring_class": "org.opencv.core.MatOfPoint"
+      },
+      "candidate": {
+        "found": true,
+        "static": false,
+        "declaring_class": "org.opencv.core.MatOfPoint"
+      },
+      "present_with_same_static_kind": true
+    },
+    {
+      "class": "org.opencv.core.MatOfPoint",
+      "member": "release",
+      "descriptor": "()V",
+      "baseline": {
+        "found": true,
+        "static": false,
+        "declaring_class": "org.opencv.core.Mat"
+      },
+      "candidate": {
+        "found": true,
+        "static": false,
+        "declaring_class": "org.opencv.core.Mat"
+      },
+      "present_with_same_static_kind": true
+    },
+    {
+      "class": "org.opencv.core.MatOfPoint",
+      "member": "toArray",
+      "descriptor": "()[Lorg/opencv/core/Point;",
+      "baseline": {
+        "found": true,
+        "static": false,
+        "declaring_class": "org.opencv.core.MatOfPoint"
+      },
+      "candidate": {
+        "found": true,
+        "static": false,
+        "declaring_class": "org.opencv.core.MatOfPoint"
+      },
+      "present_with_same_static_kind": true
+    },
+    {
+      "class": "org.opencv.core.MatOfPoint",
+      "member": "toList",
+      "descriptor": "()Ljava/util/List;",
+      "baseline": {
+        "found": true,
+        "static": false,
+        "declaring_class": "org.opencv.core.MatOfPoint"
+      },
+      "candidate": {
+        "found": true,
+        "static": false,
+        "declaring_class": "org.opencv.core.MatOfPoint"
+      },
+      "present_with_same_static_kind": true
+    },
+    {
+      "class": "org.opencv.core.MatOfPoint2f",
+      "member": "<init>",
+      "descriptor": "()V",
+      "baseline": {
+        "found": true,
+        "static": false,
+        "declaring_class": "org.opencv.core.MatOfPoint2f"
+      },
+      "candidate": {
+        "found": true,
+        "static": false,
+        "declaring_class": "org.opencv.core.MatOfPoint2f"
+      },
+      "present_with_same_static_kind": true
+    },
+    {
+      "class": "org.opencv.core.MatOfPoint2f",
+      "member": "<init>",
+      "descriptor": "([Lorg/opencv/core/Point;)V",
+      "baseline": {
+        "found": true,
+        "static": false,
+        "declaring_class": "org.opencv.core.MatOfPoint2f"
+      },
+      "candidate": {
+        "found": true,
+        "static": false,
+        "declaring_class": "org.opencv.core.MatOfPoint2f"
+      },
+      "present_with_same_static_kind": true
+    },
+    {
+      "class": "org.opencv.core.MatOfPoint2f",
+      "member": "fromList",
+      "descriptor": "(Ljava/util/List;)V",
+      "baseline": {
+        "found": true,
+        "static": false,
+        "declaring_class": "org.opencv.core.MatOfPoint2f"
+      },
+      "candidate": {
+        "found": true,
+        "static": false,
+        "declaring_class": "org.opencv.core.MatOfPoint2f"
+      },
+      "present_with_same_static_kind": true
+    },
+    {
+      "class": "org.opencv.core.MatOfPoint2f",
+      "member": "release",
+      "descriptor": "()V",
+      "baseline": {
+        "found": true,
+        "static": false,
+        "declaring_class": "org.opencv.core.Mat"
+      },
+      "candidate": {
+        "found": true,
+        "static": false,
+        "declaring_class": "org.opencv.core.Mat"
+      },
+      "present_with_same_static_kind": true
+    },
+    {
+      "class": "org.opencv.core.Point",
+      "member": "<init>",
+      "descriptor": "()V",
+      "baseline": {
+        "found": true,
+        "static": false,
+        "declaring_class": "org.opencv.core.Point"
+      },
+      "candidate": {
+        "found": true,
+        "static": false,
+        "declaring_class": "org.opencv.core.Point"
+      },
+      "present_with_same_static_kind": true
+    },
+    {
+      "class": "org.opencv.core.Point",
+      "member": "<init>",
+      "descriptor": "(DD)V",
+      "baseline": {
+        "found": true,
+        "static": false,
+        "declaring_class": "org.opencv.core.Point"
+      },
+      "candidate": {
+        "found": true,
+        "static": false,
+        "declaring_class": "org.opencv.core.Point"
+      },
+      "present_with_same_static_kind": true
+    },
+    {
+      "class": "org.opencv.core.Point",
+      "member": "x",
+      "descriptor": "D",
+      "baseline": {
+        "found": true,
+        "static": false,
+        "declaring_class": "org.opencv.core.Point"
+      },
+      "candidate": {
+        "found": true,
+        "static": false,
+        "declaring_class": "org.opencv.core.Point"
+      },
+      "present_with_same_static_kind": true
+    },
+    {
+      "class": "org.opencv.core.Point",
+      "member": "y",
+      "descriptor": "D",
+      "baseline": {
+        "found": true,
+        "static": false,
+        "declaring_class": "org.opencv.core.Point"
+      },
+      "candidate": {
+        "found": true,
+        "static": false,
+        "declaring_class": "org.opencv.core.Point"
+      },
+      "present_with_same_static_kind": true
+    },
+    {
+      "class": "org.opencv.core.RotatedRect",
+      "member": "points",
+      "descriptor": "([Lorg/opencv/core/Point;)V",
+      "baseline": {
+        "found": true,
+        "static": false,
+        "declaring_class": "org.opencv.core.RotatedRect"
+      },
+      "candidate": {
+        "found": true,
+        "static": false,
+        "declaring_class": "org.opencv.core.RotatedRect"
+      },
+      "present_with_same_static_kind": true
+    },
+    {
+      "class": "org.opencv.core.RotatedRect",
+      "member": "size",
+      "descriptor": "Lorg/opencv/core/Size;",
+      "baseline": {
+        "found": true,
+        "static": false,
+        "declaring_class": "org.opencv.core.RotatedRect"
+      },
+      "candidate": {
+        "found": true,
+        "static": false,
+        "declaring_class": "org.opencv.core.RotatedRect"
+      },
+      "present_with_same_static_kind": true
+    },
+    {
+      "class": "org.opencv.core.Scalar",
+      "member": "<init>",
+      "descriptor": "(D)V",
+      "baseline": {
+        "found": true,
+        "static": false,
+        "declaring_class": "org.opencv.core.Scalar"
+      },
+      "candidate": {
+        "found": true,
+        "static": false,
+        "declaring_class": "org.opencv.core.Scalar"
+      },
+      "present_with_same_static_kind": true
+    },
+    {
+      "class": "org.opencv.core.Scalar",
+      "member": "<init>",
+      "descriptor": "(DDD)V",
+      "baseline": {
+        "found": true,
+        "static": false,
+        "declaring_class": "org.opencv.core.Scalar"
+      },
+      "candidate": {
+        "found": true,
+        "static": false,
+        "declaring_class": "org.opencv.core.Scalar"
+      },
+      "present_with_same_static_kind": true
+    },
+    {
+      "class": "org.opencv.core.Scalar",
+      "member": "val",
+      "descriptor": "[D",
+      "baseline": {
+        "found": true,
+        "static": false,
+        "declaring_class": "org.opencv.core.Scalar"
+      },
+      "candidate": {
+        "found": true,
+        "static": false,
+        "declaring_class": "org.opencv.core.Scalar"
+      },
+      "present_with_same_static_kind": true
+    },
+    {
+      "class": "org.opencv.core.Size",
+      "member": "<init>",
+      "descriptor": "(DD)V",
+      "baseline": {
+        "found": true,
+        "static": false,
+        "declaring_class": "org.opencv.core.Size"
+      },
+      "candidate": {
+        "found": true,
+        "static": false,
+        "declaring_class": "org.opencv.core.Size"
+      },
+      "present_with_same_static_kind": true
+    },
+    {
+      "class": "org.opencv.core.Size",
+      "member": "height",
+      "descriptor": "D",
+      "baseline": {
+        "found": true,
+        "static": false,
+        "declaring_class": "org.opencv.core.Size"
+      },
+      "candidate": {
+        "found": true,
+        "static": false,
+        "declaring_class": "org.opencv.core.Size"
+      },
+      "present_with_same_static_kind": true
+    },
+    {
+      "class": "org.opencv.core.Size",
+      "member": "width",
+      "descriptor": "D",
+      "baseline": {
+        "found": true,
+        "static": false,
+        "declaring_class": "org.opencv.core.Size"
+      },
+      "candidate": {
+        "found": true,
+        "static": false,
+        "declaring_class": "org.opencv.core.Size"
+      },
+      "present_with_same_static_kind": true
+    },
+    {
+      "class": "org.opencv.imgcodecs.Imgcodecs",
+      "member": "imdecode",
+      "descriptor": "(Lorg/opencv/core/Mat;I)Lorg/opencv/core/Mat;",
+      "baseline": {
+        "found": true,
+        "static": true,
+        "declaring_class": "org.opencv.imgcodecs.Imgcodecs"
+      },
+      "candidate": {
+        "found": true,
+        "static": true,
+        "declaring_class": "org.opencv.imgcodecs.Imgcodecs"
+      },
+      "present_with_same_static_kind": true
+    },
+    {
+      "class": "org.opencv.imgproc.Imgproc",
+      "member": "cvtColor",
+      "descriptor": "(Lorg/opencv/core/Mat;Lorg/opencv/core/Mat;I)V",
+      "baseline": {
+        "found": true,
+        "static": true,
+        "declaring_class": "org.opencv.imgproc.Imgproc"
+      },
+      "candidate": {
+        "found": true,
+        "static": true,
+        "declaring_class": "org.opencv.imgproc.Imgproc"
+      },
+      "present_with_same_static_kind": true
+    },
+    {
+      "class": "org.opencv.imgproc.Imgproc",
+      "member": "dilate",
+      "descriptor": "(Lorg/opencv/core/Mat;Lorg/opencv/core/Mat;Lorg/opencv/core/Mat;)V",
+      "baseline": {
+        "found": true,
+        "static": true,
+        "declaring_class": "org.opencv.imgproc.Imgproc"
+      },
+      "candidate": {
+        "found": true,
+        "static": true,
+        "declaring_class": "org.opencv.imgproc.Imgproc"
+      },
+      "present_with_same_static_kind": true
+    },
+    {
+      "class": "org.opencv.imgproc.Imgproc",
+      "member": "fillPoly",
+      "descriptor": "(Lorg/opencv/core/Mat;Ljava/util/List;Lorg/opencv/core/Scalar;)V",
+      "baseline": {
+        "found": true,
+        "static": true,
+        "declaring_class": "org.opencv.imgproc.Imgproc"
+      },
+      "candidate": {
+        "found": true,
+        "static": true,
+        "declaring_class": "org.opencv.imgproc.Imgproc"
+      },
+      "present_with_same_static_kind": true
+    },
+    {
+      "class": "org.opencv.imgproc.Imgproc",
+      "member": "findContours",
+      "descriptor": "(Lorg/opencv/core/Mat;Ljava/util/List;Lorg/opencv/core/Mat;II)V",
+      "baseline": {
+        "found": true,
+        "static": true,
+        "declaring_class": "org.opencv.imgproc.Imgproc"
+      },
+      "candidate": {
+        "found": true,
+        "static": true,
+        "declaring_class": "org.opencv.imgproc.Imgproc"
+      },
+      "present_with_same_static_kind": true
+    },
+    {
+      "class": "org.opencv.imgproc.Imgproc",
+      "member": "getPerspectiveTransform",
+      "descriptor": "(Lorg/opencv/core/Mat;Lorg/opencv/core/Mat;)Lorg/opencv/core/Mat;",
+      "baseline": {
+        "found": true,
+        "static": true,
+        "declaring_class": "org.opencv.imgproc.Imgproc"
+      },
+      "candidate": {
+        "found": true,
+        "static": true,
+        "declaring_class": "org.opencv.imgproc.Imgproc"
+      },
+      "present_with_same_static_kind": true
+    },
+    {
+      "class": "org.opencv.imgproc.Imgproc",
+      "member": "minAreaRect",
+      "descriptor": "(Lorg/opencv/core/MatOfPoint2f;)Lorg/opencv/core/RotatedRect;",
+      "baseline": {
+        "found": true,
+        "static": true,
+        "declaring_class": "org.opencv.imgproc.Imgproc"
+      },
+      "candidate": {
+        "found": true,
+        "static": true,
+        "declaring_class": "org.opencv.imgproc.Imgproc"
+      },
+      "present_with_same_static_kind": true
+    },
+    {
+      "class": "org.opencv.imgproc.Imgproc",
+      "member": "resize",
+      "descriptor": "(Lorg/opencv/core/Mat;Lorg/opencv/core/Mat;Lorg/opencv/core/Size;DDI)V",
+      "baseline": {
+        "found": true,
+        "static": true,
+        "declaring_class": "org.opencv.imgproc.Imgproc"
+      },
+      "candidate": {
+        "found": true,
+        "static": true,
+        "declaring_class": "org.opencv.imgproc.Imgproc"
+      },
+      "present_with_same_static_kind": true
+    },
+    {
+      "class": "org.opencv.imgproc.Imgproc",
+      "member": "threshold",
+      "descriptor": "(Lorg/opencv/core/Mat;Lorg/opencv/core/Mat;DDI)D",
+      "baseline": {
+        "found": true,
+        "static": true,
+        "declaring_class": "org.opencv.imgproc.Imgproc"
+      },
+      "candidate": {
+        "found": true,
+        "static": true,
+        "declaring_class": "org.opencv.imgproc.Imgproc"
+      },
+      "present_with_same_static_kind": true
+    },
+    {
+      "class": "org.opencv.imgproc.Imgproc",
+      "member": "warpPerspective",
+      "descriptor": "(Lorg/opencv/core/Mat;Lorg/opencv/core/Mat;Lorg/opencv/core/Mat;Lorg/opencv/core/Size;II)V",
+      "baseline": {
+        "found": true,
+        "static": true,
+        "declaring_class": "org.opencv.imgproc.Imgproc"
+      },
+      "candidate": {
+        "found": true,
+        "static": true,
+        "declaring_class": "org.opencv.imgproc.Imgproc"
+      },
+      "present_with_same_static_kind": true
+    }
+  ],
+  "missing_or_changed": []
+}
