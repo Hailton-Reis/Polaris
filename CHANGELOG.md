@@ -2,6 +2,15 @@
 
 Este arquivo registra a evolução real do código. **Revisões de desenvolvimento não são lançamentos públicos.** As datas abaixo usam America/Fortaleza, exceto quando houver indicação de UTC. O histórico de distribuição fica em [Releases](https://github.com/Hailton-Reis/Polaris/releases).
 
+## Desenvolvimento · P20261122.2 — correções dos testes no Galaxy A
+
+- O leitor mantém o visualizador quando só os dados da obra mudam e adia a procura de fontes na abertura de capítulos locais.
+- Backup de categorias, vínculos e marcações verificado por exportação e restauração. A recuperação tenta a fonte original primeiro e pode obter capítulos e capa de uma alternativa compatível.
+- Favoritos antigos confirmados como a mesma obra podem aparecer em um único cartão. As edições, os arquivos e as categorias são preservados.
+- **Preparar fontes** fica visível na aba Extensões. A instalação privada confirma o carregamento antes de mostrar sucesso. A remoção fica manual enquanto a ausência no catálogo puder ser temporária.
+
+[Correções e cenários para verificar nos aparelhos](docs/CORRECOES_TESTE_GALAXY.md).
+
 ## Desenvolvimento · P20261122.1 — abertura com catálogos grandes
 
 - Uma passagem para inventariar APKs de extensões. A checagem de atualizações reutiliza o catálogo carregado e roda fora da interface.

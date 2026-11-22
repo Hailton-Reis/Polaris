@@ -1,0 +1,17 @@
+{
+  "revision": "P20261122.2",
+  "base_commit": "7ce189eaaf0d2281aca60bc707df2d826d527b90",
+  "overlay_sha256": "424d666e7574baf224584a8fa2e1ccaf862a15534fb129a52304b066a2947c97",
+  "focused_tests_passed": 85,
+  "app_beta_passed": 1037,
+  "domain_release_passed": 87,
+  "total_passed": 1124,
+  "new_tests": 9,
+  "retained_tests": 1115,
+  "failed": 0,
+  "skipped": 0,
+  "overlay_checks_passed": 4,
+  "packaging_checks_passed": 27,
+  "physical_android_validation": false,
+  "apk_packaged": false
+}

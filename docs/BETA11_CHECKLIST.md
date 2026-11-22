@@ -2,7 +2,7 @@
 
 Base pública atual: beta.11/código 112 (P20261116.1, publicada em 16/11/2026). Base de engenharia: P20261112.1, commit 6952e5e.
 
-Última revisão de desenvolvimento em código: [P20261122.1](AUDITORIA_CATALOGO_GRANDE.md), com correções para abertura e busca após preparar centenas de fontes. O candidato reúne as melhorias anteriores de busca entre fontes, filtro por obra, backups e OCR. A confirmação no A12 e no outro Galaxy depende do próximo APK.
+Última revisão de desenvolvimento em código é a [P20261122.2](CORRECOES_TESTE_GALAXY.md), que corrige a abertura de capítulos locais, a recuperação de obras antigas e a instalação privada de extensões. Ela inclui as [correções de abertura e busca com centenas de fontes](AUDITORIA_CATALOGO_GRANDE.md). A confirmação no A12 e no outro Galaxy depende do próximo APK.
 Este checklist acompanha o trabalho autorizado em 13/11. Não é uma declaração de lançamento.
 
 | Frente | Estado |

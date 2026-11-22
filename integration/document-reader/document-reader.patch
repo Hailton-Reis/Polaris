@@ -4838,7 +4838,7 @@ index 79352cd..2d8a1e2 100644
              TextButton(onClick = onClickConfirm) {
                  Text(text = stringResource(MR.strings.action_ok))
 diff --git a/app/src/main/java/eu/kanade/presentation/browse/ExtensionsScreen.kt b/app/src/main/java/eu/kanade/presentation/browse/ExtensionsScreen.kt
-index 914cb5e..45db3ab 100644
+index 914cb5e..54c6741 100644
 --- a/app/src/main/java/eu/kanade/presentation/browse/ExtensionsScreen.kt
 +++ b/app/src/main/java/eu/kanade/presentation/browse/ExtensionsScreen.kt
 @@ -48,6 +48,7 @@ import eu.kanade.presentation.browse.components.ExtensionIcon
@@ -4857,7 +4857,7 @@ index 914cb5e..45db3ab 100644
  import tachiyomi.presentation.core.components.FastScrollLazyColumn
  import tachiyomi.presentation.core.components.material.PullRefresh
  import tachiyomi.presentation.core.components.material.padding
-@@ -94,21 +96,28 @@ fun ExtensionScreen(
+@@ -94,25 +96,35 @@ fun ExtensionScreen(
          when {
              state.isLoading -> LoadingScreen(Modifier.padding(contentPadding))
              state.isEmpty -> {
@@ -4897,7 +4897,22 @@ index 914cb5e..45db3ab 100644
                  )
              }
              else -> {
-@@ -148,25 +157,19 @@ private fun ExtensionContent(
+                 ExtensionContent(
++                    onPrepareSources = if (searchQuery.isNullOrBlank()) {
++                        { navigator.push(SourcePreparationScreen()) }
++                    } else null,
+                     state = state,
+                     contentPadding = contentPadding,
+                     onLongClickItem = onLongClickItem,
+@@ -132,6 +144,7 @@ fun ExtensionScreen(
+ 
+ @Composable
+ private fun ExtensionContent(
++    onPrepareSources: (() -> Unit)?,
+     state: ExtensionsViewModel.State,
+     contentPadding: PaddingValues,
+     onLongClickItem: (Extension) -> Unit,
+@@ -148,25 +161,29 @@ private fun ExtensionContent(
      var trustState by remember { mutableStateOf<Extension.Untrusted?>(null) }
      val installGranted = rememberRequestPackageInstallsPermissionState(initialValue = true)
  
@@ -4905,6 +4920,16 @@ index 914cb5e..45db3ab 100644
 -        contentPadding = contentPadding + topSmallPaddingValues,
 -    ) {
 +    FastScrollLazyColumn(contentPadding = contentPadding + topSmallPaddingValues) {
++        if (onPrepareSources != null) {
++            item(key = "prepare-sources") {
++                Button(
++                    onClick = onPrepareSources,
++                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
++                ) {
++                    Text(stringResource(ATMR.strings.preparation_title))
++                }
++            }
++        }
          if (!installGranted && state.installer?.requiresSystemPermission == true) {
              item(key = "extension-permissions-warning") {
                  WarningBanner(
@@ -4927,7 +4952,7 @@ index 914cb5e..45db3ab 100644
                  when (header) {
                      is ExtensionUiModel.Header.Resource -> {
                          val action: @Composable RowScope.() -> Unit =
-@@ -175,9 +178,10 @@ private fun ExtensionContent(
+@@ -175,9 +192,10 @@ private fun ExtensionContent(
                                      Button(onClick = { onClickUpdateAll() }) {
                                          Text(
                                              text = stringResource(MR.strings.ext_update_all),
@@ -4941,7 +4966,7 @@ index 914cb5e..45db3ab 100644
                                          )
                                      }
                                  }
-@@ -191,10 +195,7 @@ private fun ExtensionContent(
+@@ -191,10 +209,7 @@ private fun ExtensionContent(
                          )
                      }
                      is ExtensionUiModel.Header.Text -> {
@@ -4953,7 +4978,7 @@ index 914cb5e..45db3ab 100644
                      }
                  }
              }
-@@ -252,6 +253,7 @@ private fun ExtensionContent(
+@@ -252,6 +267,7 @@ private fun ExtensionContent(
      }
      if (trustState != null) {
          ExtensionTrustDialog(
@@ -4961,7 +4986,7 @@ index 914cb5e..45db3ab 100644
              onClickConfirm = {
                  onTrustExtension(trustState!!)
                  trustState = null
-@@ -260,9 +262,7 @@ private fun ExtensionContent(
+@@ -260,9 +276,7 @@ private fun ExtensionContent(
                  onUninstallExtension(trustState!!)
                  trustState = null
              },
@@ -4972,7 +4997,7 @@ index 914cb5e..45db3ab 100644
          )
      }
  }
-@@ -279,36 +279,25 @@ private fun ExtensionItem(
+@@ -279,36 +293,25 @@ private fun ExtensionItem(
  ) {
      val (extension, installStep) = item
      BaseBrowseItem(
@@ -5016,7 +5041,7 @@ index 914cb5e..45db3ab 100644
                  )
              }
          },
-@@ -336,9 +325,7 @@ private fun ExtensionItemContent(
+@@ -336,9 +339,7 @@ private fun ExtensionItemContent(
      installStep: InstallStep,
      modifier: Modifier = Modifier,
  ) {
@@ -5027,7 +5052,7 @@ index 914cb5e..45db3ab 100644
          Text(
              text = extension.name,
              maxLines = 1,
-@@ -355,24 +342,31 @@ private fun ExtensionItemContent(
+@@ -355,24 +356,31 @@ private fun ExtensionItemContent(
                  if (extension is Extension.Installed && extension.lang.isNotEmpty()) {
                      hasAlreadyShownAnElement = true
                      Text(
@@ -5069,7 +5094,7 @@ index 914cb5e..45db3ab 100644
                  if (warning != null) {
                      if (hasAlreadyShownAnElement) DotSeparatorNoSpaceText()
                      hasAlreadyShownAnElement = true
-@@ -385,20 +379,20 @@ private fun ExtensionItemContent(
+@@ -385,20 +393,20 @@ private fun ExtensionItemContent(
                  }
                  if (extension is Extension.Installed && !extension.isShared) {
                      if (hasAlreadyShownAnElement) DotSeparatorNoSpaceText()
@@ -5099,7 +5124,7 @@ index 914cb5e..45db3ab 100644
                      )
                  }
              }
-@@ -467,12 +461,11 @@ private fun ExtensionItemActions(
+@@ -467,12 +475,11 @@ private fun ExtensionItemActions(
                      }
                      is Extension.Available -> {
                          if (extension.sources.isNotEmpty()) {
@@ -5115,7 +5140,7 @@ index 914cb5e..45db3ab 100644
                                  )
                              }
                          }
-@@ -496,11 +489,7 @@ private fun ExtensionHeader(
+@@ -496,11 +503,7 @@ private fun ExtensionHeader(
      modifier: Modifier = Modifier,
      action: @Composable RowScope.() -> Unit = {},
  ) {
@@ -5128,7 +5153,7 @@ index 914cb5e..45db3ab 100644
  }
  
  @Composable
-@@ -515,9 +504,7 @@ private fun ExtensionHeader(
+@@ -515,9 +518,7 @@ private fun ExtensionHeader(
      ) {
          Text(
              text = text,
@@ -5139,7 +5164,7 @@ index 914cb5e..45db3ab 100644
              style = MaterialTheme.typography.header,
          )
          action()
-@@ -526,20 +513,64 @@ private fun ExtensionHeader(
+@@ -526,20 +527,64 @@ private fun ExtensionHeader(
  
  @Composable
  private fun ExtensionTrustDialog(
@@ -9907,7 +9932,7 @@ index a198c3f..9a3e84f 100644
                      preference = translationPreferences.translationEngineTemperature(),
                      title = stringResource(ATMR.strings.pref_engine_temperature),
 diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
-index 7f411fd..68e523e 100644
+index 7f411fd..0865768 100644
 --- a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
 +++ b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
 @@ -1,15 +1,18 @@
@@ -9972,7 +9997,7 @@ index 7f411fd..68e523e 100644
  
      // Identifies this overlay independently of the pinned upstream COMMIT_SHA.
 -    private const val POLARIS_READER_REVISION = "P20261031.2"
-+    private const val POLARIS_READER_REVISION = "P20261122.1"
++    private const val POLARIS_READER_REVISION = "P20261122.2"
  
      @Composable
      override fun Content() {
@@ -14902,19 +14927,21 @@ index 0000000..4eae5ab
 +    }
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/data/coil/MangaCoverFetcher.kt b/app/src/main/java/eu/kanade/tachiyomi/data/coil/MangaCoverFetcher.kt
-index 8ccd6d4..9dd2d22 100644
+index 8ccd6d4..423c26f 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/data/coil/MangaCoverFetcher.kt
 +++ b/app/src/main/java/eu/kanade/tachiyomi/data/coil/MangaCoverFetcher.kt
-@@ -16,6 +16,8 @@ import eu.kanade.tachiyomi.data.cache.CoverCache
+@@ -16,7 +16,10 @@ import eu.kanade.tachiyomi.data.cache.CoverCache
  import eu.kanade.tachiyomi.data.coil.MangaCoverFetcher.Companion.USE_CUSTOM_COVER_KEY
  import eu.kanade.tachiyomi.network.await
  import eu.kanade.tachiyomi.source.online.HttpSource
 +import java.io.File
 +import java.io.IOException
  import logcat.LogPriority
++import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
  import okhttp3.CacheControl
  import okhttp3.Call
-@@ -32,15 +34,12 @@ import tachiyomi.domain.manga.model.Manga
+ import okhttp3.Request
+@@ -32,15 +35,12 @@ import tachiyomi.domain.manga.model.Manga
  import tachiyomi.domain.manga.model.MangaCover
  import tachiyomi.domain.source.service.SourceManager
  import uy.kohesive.injekt.injectLazy
@@ -14932,7 +14959,7 @@ index 8ccd6d4..9dd2d22 100644
   *
   * Available request parameter:
   * - [USE_CUSTOM_COVER_KEY]: Use custom cover if set by user, default is true
-@@ -82,21 +81,20 @@ class MangaCoverFetcher(
+@@ -82,21 +82,20 @@ class MangaCoverFetcher(
  
      private fun fileLoader(file: File): FetchResult {
          return SourceFetchResult(
@@ -14962,7 +14989,7 @@ index 8ccd6d4..9dd2d22 100644
          return SourceFetchResult(
              source = ImageSource(source = source, fileSystem = FileSystem.SYSTEM),
              mimeType = "image/*",
-@@ -106,11 +104,12 @@ class MangaCoverFetcher(
+@@ -106,11 +105,12 @@ class MangaCoverFetcher(
  
      private suspend fun httpLoader(): FetchResult {
          // Only cache separately if it's a library item
@@ -14980,7 +15007,7 @@ index 8ccd6d4..9dd2d22 100644
          if (libraryCoverCacheFile?.exists() == true && options.diskCachePolicy.readEnabled) {
              return fileLoader(libraryCoverCacheFile)
          }
-@@ -155,9 +154,11 @@ class MangaCoverFetcher(
+@@ -155,9 +155,11 @@ class MangaCoverFetcher(
  
                  // Read from response if cache is unused or unusable
                  return SourceFetchResult(
@@ -14994,7 +15021,7 @@ index 8ccd6d4..9dd2d22 100644
                  )
              } catch (e: Exception) {
                  responseBody.close()
-@@ -180,14 +181,15 @@ class MangaCoverFetcher(
+@@ -180,14 +182,15 @@ class MangaCoverFetcher(
      }
  
      private fun newRequest(): Request {
@@ -15016,7 +15043,7 @@ index 8ccd6d4..9dd2d22 100644
  
          when {
              options.networkCachePolicy.readEnabled -> {
-@@ -214,7 +216,9 @@ class MangaCoverFetcher(
+@@ -214,7 +217,9 @@ class MangaCoverFetcher(
              }
              cacheFile.takeIf { it.exists() }
          } catch (e: Exception) {
@@ -15027,7 +15054,7 @@ index 8ccd6d4..9dd2d22 100644
              null
          }
      }
-@@ -227,7 +231,9 @@ class MangaCoverFetcher(
+@@ -227,7 +232,9 @@ class MangaCoverFetcher(
              }
              cacheFile.takeIf { it.exists() }
          } catch (e: Exception) {
@@ -15038,7 +15065,7 @@ index 8ccd6d4..9dd2d22 100644
              null
          }
      }
-@@ -236,9 +242,7 @@ class MangaCoverFetcher(
+@@ -236,9 +243,7 @@ class MangaCoverFetcher(
          cacheFile.parentFile?.mkdirs()
          cacheFile.delete()
          try {
@@ -15049,7 +15076,7 @@ index 8ccd6d4..9dd2d22 100644
          } catch (e: Exception) {
              cacheFile.delete()
              throw e
-@@ -253,21 +257,16 @@ class MangaCoverFetcher(
+@@ -253,21 +258,16 @@ class MangaCoverFetcher(
          }
      }
  
@@ -15074,7 +15101,7 @@ index 8ccd6d4..9dd2d22 100644
              throw e
          }
      }
-@@ -297,9 +296,7 @@ class MangaCoverFetcher(
+@@ -297,9 +297,7 @@ class MangaCoverFetcher(
          URL,
      }
  
@@ -15085,7 +15112,21 @@ index 8ccd6d4..9dd2d22 100644
  
          private val coverCache: CoverCache by injectLazy()
          private val sourceManager: SourceManager by injectLazy()
-@@ -319,9 +316,8 @@ class MangaCoverFetcher(
+@@ -312,16 +310,21 @@ class MangaCoverFetcher(
+                 coverFileLazy = lazy { coverCache.getCoverFile(data.thumbnailUrl) },
+                 customCoverFileLazy = lazy { coverCache.getCustomCoverFile(data.id) },
+                 diskCacheKeyLazy = lazy { imageLoader.components.key(data, options)!! },
+-                sourceLazy = lazy { sourceManager.get(data.source) as? HttpSource },
++                sourceLazy = lazy {
++                    sourceManager.coverSource(
++                        data.source,
++                        tachiyomi.domain.manga.model.WorkSources.from(data.memo).coverSourceId,
++                        data.thumbnailUrl,
++                    )
++                },
+                 callFactoryLazy = callFactoryLazy,
+                 imageLoader = imageLoader,
+             )
          }
      }
  
@@ -15097,7 +15138,16 @@ index 8ccd6d4..9dd2d22 100644
  
          private val coverCache: CoverCache by injectLazy()
          private val sourceManager: SourceManager by injectLazy()
-@@ -345,7 +341,8 @@ class MangaCoverFetcher(
+@@ -334,7 +337,7 @@ class MangaCoverFetcher(
+                 coverFileLazy = lazy { coverCache.getCoverFile(data.url) },
+                 customCoverFileLazy = lazy { coverCache.getCustomCoverFile(data.mangaId) },
+                 diskCacheKeyLazy = lazy { imageLoader.components.key(data, options)!! },
+-                sourceLazy = lazy { sourceManager.get(data.sourceId) as? HttpSource },
++                sourceLazy = lazy { sourceManager.coverSource(data.sourceId, data.alternativeSourceId, data.url) },
+                 callFactoryLazy = callFactoryLazy,
+                 imageLoader = imageLoader,
+             )
+@@ -345,8 +348,19 @@ class MangaCoverFetcher(
          val USE_CUSTOM_COVER_KEY = Extras.Key(true)
  
          private val CACHE_CONTROL_NO_STORE = CacheControl.Builder().noStore().build()
@@ -15107,6 +15157,17 @@ index 8ccd6d4..9dd2d22 100644
  
          private const val HTTP_NOT_MODIFIED = 304
      }
+ }
++
++private fun SourceManager.coverSource(originalId: Long, alternativeId: Long?, coverUrl: String?): HttpSource? {
++    if (alternativeId == null) return get(originalId) as? HttpSource
++    val source = get(alternativeId) as? HttpSource ?: return null
++    val origin = source.baseUrl.toHttpUrlOrNull() ?: return null
++    val cover = coverUrl?.toHttpUrlOrNull() ?: return null
++    // A recovered cover may come from a CDN or a backup. Only attach source headers
++    // to its own origin; the generic image client can still load public CDN URLs.
++    return source.takeIf { origin.host == cover.host && origin.scheme == cover.scheme && origin.port == cover.port }
++}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/data/download/ChapterImageRetry.kt b/app/src/main/java/eu/kanade/tachiyomi/data/download/ChapterImageRetry.kt
 new file mode 100644
 index 0000000..a8251f4
@@ -16536,7 +16597,7 @@ index de59138..a949e38 100644
      }
  }
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/data/library/LibraryUpdateJob.kt b/app/src/main/java/eu/kanade/tachiyomi/data/library/LibraryUpdateJob.kt
-index 8255de7..6d7a651 100644
+index 8255de7..5c071fe 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/data/library/LibraryUpdateJob.kt
 +++ b/app/src/main/java/eu/kanade/tachiyomi/data/library/LibraryUpdateJob.kt
 @@ -28,13 +28,23 @@ import eu.kanade.tachiyomi.util.system.isConnectedToWifi
@@ -16863,7 +16924,7 @@ index 8255de7..6d7a651 100644
  
          if (newUpdates.isNotEmpty()) {
              notifier.showUpdateNotifications(newUpdates)
-@@ -334,14 +397,16 @@ class LibraryUpdateJob(private val context: Context, workerParams: WorkerParamet
+@@ -334,14 +397,17 @@ class LibraryUpdateJob(private val context: Context, workerParams: WorkerParamet
      private suspend fun updateManga(manga: Manga, fetchWindow: Pair<Long, Long>): List<Chapter> {
          val source = sourceManager.getOrStub(manga.source)
  
@@ -16883,12 +16944,13 @@ index 8255de7..6d7a651 100644
 +                    fetchChapters = true,
 +                    fetchWindow = fetchWindow,
 +                    allowSourceDiscovery = recoverSources,
++                    recoverOnly = recoverSources,
 +                )
 +                .getOrThrow()
  
          return if (update.manga.favorite) update.newChapters else emptyList()
      }
-@@ -355,11 +420,7 @@ class LibraryUpdateJob(private val context: Context, workerParams: WorkerParamet
+@@ -355,11 +421,7 @@ class LibraryUpdateJob(private val context: Context, workerParams: WorkerParamet
          ensureActive()
  
          updatingManga.add(manga)
@@ -16901,7 +16963,7 @@ index 8255de7..6d7a651 100644
  
          block()
  
-@@ -367,35 +428,32 @@ class LibraryUpdateJob(private val context: Context, workerParams: WorkerParamet
+@@ -367,35 +429,32 @@ class LibraryUpdateJob(private val context: Context, workerParams: WorkerParamet
  
          updatingManga.remove(manga)
          completed.incrementAndFetch()
@@ -16949,7 +17011,7 @@ index 8255de7..6d7a651 100644
                      }
                  }
                  return file
-@@ -410,56 +468,75 @@ class LibraryUpdateJob(private val context: Context, workerParams: WorkerParamet
+@@ -410,56 +469,75 @@ class LibraryUpdateJob(private val context: Context, workerParams: WorkerParamet
          private const val WORK_NAME_MANUAL = "LibraryUpdate-manual"
  
          private const val ERROR_LOG_HELP_URL =
@@ -17064,7 +17126,7 @@ index 8255de7..6d7a651 100644
  
                  context.workManager.enqueueUniquePeriodicWork(
                      WORK_NAME_AUTO,
-@@ -471,24 +548,20 @@ class LibraryUpdateJob(private val context: Context, workerParams: WorkerParamet
+@@ -471,24 +549,20 @@ class LibraryUpdateJob(private val context: Context, workerParams: WorkerParamet
              }
          }
  
@@ -17097,7 +17159,7 @@ index 8255de7..6d7a651 100644
              wm.enqueueUniqueWork(WORK_NAME_MANUAL, ExistingWorkPolicy.KEEP, request)
  
              return true
-@@ -496,10 +569,12 @@ class LibraryUpdateJob(private val context: Context, workerParams: WorkerParamet
+@@ -496,10 +570,12 @@ class LibraryUpdateJob(private val context: Context, workerParams: WorkerParamet
  
          fun stop(context: Context) {
              val wm = context.workManager
@@ -21561,7 +21623,7 @@ index 0000000..1134341
 +    }
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/extension/ExtensionManager.kt b/app/src/main/java/eu/kanade/tachiyomi/extension/ExtensionManager.kt
-index 699e074..0747495 100644
+index 699e074..e92613f 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/extension/ExtensionManager.kt
 +++ b/app/src/main/java/eu/kanade/tachiyomi/extension/ExtensionManager.kt
 @@ -1,7 +1,10 @@
@@ -21593,7 +21655,7 @@ index 699e074..0747495 100644
  import kotlinx.coroutines.CoroutineScope
  import kotlinx.coroutines.SupervisorJob
  import kotlinx.coroutines.flow.Flow
-@@ -20,17 +29,25 @@ import kotlinx.coroutines.flow.MutableStateFlow
+@@ -20,17 +29,26 @@ import kotlinx.coroutines.flow.MutableStateFlow
  import kotlinx.coroutines.flow.SharingStarted
  import kotlinx.coroutines.flow.StateFlow
  import kotlinx.coroutines.flow.asStateFlow
@@ -21603,6 +21665,7 @@ index 699e074..0747495 100644
 +import kotlinx.coroutines.flow.distinctUntilChanged
  import kotlinx.coroutines.flow.map
  import kotlinx.coroutines.flow.stateIn
++import kotlinx.coroutines.flow.update
 +import kotlinx.coroutines.launch
 +import kotlinx.coroutines.withTimeout
 +import kotlinx.coroutines.sync.Mutex
@@ -21620,7 +21683,7 @@ index 699e074..0747495 100644
  
  /**
   * The manager of extensions installed as another apk which extend the available sources. It handles
-@@ -45,103 +62,223 @@ class ExtensionManager(
+@@ -45,119 +63,243 @@ class ExtensionManager(
      private val trustExtension: TrustExtension = Injekt.get(),
  ) {
  
@@ -21640,15 +21703,19 @@ index 699e074..0747495 100644
 -    /**
 -     * The installer which installs, updates and uninstalls the extensions.
 -     */
+-    private val installer by lazy { ExtensionInstaller(context) }
 +    /** The installer which installs, updates and uninstalls the extensions. */
-     private val installer by lazy { ExtensionInstaller(context) }
- 
--    private val iconMap = mutableMapOf<String, Drawable>()
++    private val packageLock = Mutex()
++    private val installer by lazy {
++        ExtensionInstaller(context, onPrivateInstalled = { reconcilePackage(it.pkgName, it.versionCode) })
++    }
++
 +    private suspend fun repositoryStillAuthorized(identity: RepositoryIdentity): Boolean =
 +        Injekt.get<ExtensionStoreRepository>().getAll().any {
 +            RepositoryIdentity.of(it) == identity
 +        }
-+
+ 
+-    private val iconMap = mutableMapOf<String, Drawable>()
 +    val preparationQueue by lazy {
 +        ExtensionPreparationQueue(
 +            scope = scope,
@@ -21753,7 +21820,8 @@ index 699e074..0747495 100644
  
      init {
 -        initExtensions()
-         ExtensionInstallReceiver(InstallationListener()).register(context)
+-        ExtensionInstallReceiver(InstallationListener()).register(context)
++        ExtensionInstallReceiver { reconcilePackage(it) }.register(context)
 +        // Binding an isolated service needs the main looper; never block it during construction.
 +        scope.launch(kotlinx.coroutines.Dispatchers.IO) {
 +            try {
@@ -21893,7 +21961,11 @@ index 699e074..0747495 100644
  
          enableAdditionalSubLanguages(extensions)
  
-@@ -151,13 +288,13 @@ class ExtensionManager(
+-        availableExtensionMapFlow.value = extensions.associateBy { it.pkgName }
++        isInitialized.first { it }
++        availableExtensionMapFlow.value = extensions.distinctBy { it.pkgName }.associateBy { it.pkgName }
+         updatedInstalledExtensionsStatuses(extensions)
+         setupAvailableExtensionsSourcesDataMap(extensions)
      }
  
      /**
@@ -21913,7 +21985,7 @@ index 699e074..0747495 100644
       */
      private fun enableAdditionalSubLanguages(extensions: List<Extension.Available>) {
          if (subLanguagesEnabledOnFirstRun || extensions.isEmpty()) {
-@@ -165,16 +302,16 @@ class ExtensionManager(
+@@ -165,16 +307,16 @@ class ExtensionManager(
          }
  
          // Use the source lang as some aren't present on the extension level.
@@ -21937,36 +22009,51 @@ index 699e074..0747495 100644
  
          preferences.enabledLanguages.set(defaultLanguages + languagesToEnable)
          subLanguagesEnabledOnFirstRun = true
-@@ -193,8 +330,9 @@ class ExtensionManager(
- 
-         val installedExtensionsMap = installedExtensionMapFlow.value.toMutableMap()
-         var changed = false
-+        val availableByPackage = availableExtensions.distinctBy { it.pkgName }.associateBy { it.pkgName }
-         for ((pkgName, extension) in installedExtensionsMap) {
+@@ -186,62 +328,48 @@ class ExtensionManager(
+      * @param availableExtensions The list of extensions given by the [api].
+      */
+     private fun updatedInstalledExtensionsStatuses(availableExtensions: List<Extension.Available>) {
+-        if (availableExtensions.isEmpty()) {
+-            preferences.extensionUpdatesCount.set(0)
+-            return
+-        }
+-
+-        val installedExtensionsMap = installedExtensionMapFlow.value.toMutableMap()
+-        var changed = false
+-        for ((pkgName, extension) in installedExtensionsMap) {
 -            val availableExt = availableExtensions.find { it.pkgName == pkgName }
-+            val availableExt = availableByPackage[pkgName]
- 
-             if (availableExt == null && !extension.isObsolete) {
-                 installedExtensionsMap[pkgName] = extension.copy(isObsolete = true)
-@@ -202,14 +340,10 @@ class ExtensionManager(
-             } else if (availableExt != null) {
-                 val hasUpdate = extension.updateExists(availableExt)
-                 if (extension.hasUpdate != hasUpdate) {
+-
+-            if (availableExt == null && !extension.isObsolete) {
+-                installedExtensionsMap[pkgName] = extension.copy(isObsolete = true)
+-                changed = true
+-            } else if (availableExt != null) {
+-                val hasUpdate = extension.updateExists(availableExt)
+-                if (extension.hasUpdate != hasUpdate) {
 -                    installedExtensionsMap[pkgName] = extension.copy(
 -                        hasUpdate = hasUpdate,
 -                        store = availableExt.store,
 -                    )
-+                    installedExtensionsMap[pkgName] =
-+                        extension.copy(hasUpdate = hasUpdate, store = availableExt.store)
-                 } else {
+-                } else {
 -                    installedExtensionsMap[pkgName] = extension.copy(
 -                        store = availableExt.store,
 -                    )
-+                    installedExtensionsMap[pkgName] = extension.copy(store = availableExt.store)
-                 }
-                 changed = true
+-                }
+-                changed = true
++        val availableByPackage = availableExtensions.distinctBy { it.pkgName }.associateBy { it.pkgName }
++        installedExtensionMapFlow.update { installed ->
++            installed.mapValues { (pkgName, extension) ->
++                val available = availableByPackage[pkgName]
++                if (available != null) {
++                    extension.copy(hasUpdate = extension.updateExists(available), isObsolete = false, store = available.store)
++                } else if (availableByPackage.isNotEmpty()) {
++                    extension.copy(isObsolete = true, hasUpdate = false)
++                } else extension
              }
-@@ -221,27 +355,33 @@ class ExtensionManager(
+         }
+-        if (changed) {
+-            installedExtensionMapFlow.value = installedExtensionsMap
+-        }
+         updatePendingUpdatesCount()
      }
  
      /**
@@ -22008,7 +22095,16 @@ index 699e074..0747495 100644
      }
  
      fun cancelInstallUpdateExtension(extension: Extension) {
-@@ -279,13 +419,31 @@ class ExtensionManager(
+@@ -267,7 +395,7 @@ class ExtensionManager(
+      * @param extension The extension to uninstall.
+      */
+     fun uninstallExtension(extension: Extension) {
+-        installer.uninstallApk(extension.pkgName)
++        installer.uninstallApk(extension.pkgName, privateOnly = extension is Extension.Installed && !extension.isShared)
+     }
+ 
+     /**
+@@ -279,88 +407,71 @@ class ExtensionManager(
      suspend fun trust(extension: Extension.Untrusted) {
          untrustedExtensionMapFlow.value[extension.pkgName] ?: return
  
@@ -22034,54 +22130,111 @@ index 699e074..0747495 100644
 -        ExtensionLoader.loadExtensionFromPkgName(context, extension.pkgName)
 -            .let { it as? LoadResult.Success }
 -            ?.let { registerNewExtension(it.extension) }
-+        when (val result = ExtensionLoader.loadExtensionFromPkgName(context, extension.pkgName)) {
-+            is LoadResult.Success -> {
-+                untrustedExtensionMapFlow.value -= extension.pkgName
-+                registerNewExtension(result.extension)
-+            }
-+            is LoadResult.Untrusted -> untrustedExtensionMapFlow.value += result.extension
-+            else -> Unit
-+        }
++        reconcilePackage(extension.pkgName)
      }
  
-     /**
-@@ -298,8 +456,8 @@ class ExtensionManager(
-     }
- 
-     /**
+-    /**
+-     * Registers the given extension in this and the source managers.
+-     *
+-     * @param extension The extension to be registered.
+-     */
+     private fun registerNewExtension(extension: Extension.Installed) {
+-        installedExtensionMapFlow.value += extension
+-    }
+-
+-    /**
 -     * Registers the given updated extension in this and the source managers previously removing
 -     * the outdated ones.
-+     * Registers the given updated extension in this and the source managers previously removing the
-+     * outdated ones.
-      *
-      * @param extension The extension to be registered.
-      */
-@@ -318,9 +476,7 @@ class ExtensionManager(
-         untrustedExtensionMapFlow.value -= pkgName
+-     *
+-     * @param extension The extension to be registered.
+-     */
+-    private fun registerUpdatedExtension(extension: Extension.Installed) {
+-        installedExtensionMapFlow.value += extension
+-    }
+-
+-    /**
+-     * Unregisters the extension in this and the source managers given its package name. Note this
+-     * method is called for every uninstalled application in the system.
+-     *
+-     * @param pkgName The package name of the uninstalled application.
+-     */
+-    private fun unregisterExtension(pkgName: String) {
+-        installedExtensionMapFlow.value -= pkgName
+-        untrustedExtensionMapFlow.value -= pkgName
++        val available = availableExtensionMapFlow.value[extension.pkgName]
++        val entry = if (available == null) extension
++            else extension.copy(hasUpdate = extension.updateExists(available), isObsolete = false, store = available.store)
++        untrustedExtensionMapFlow.update { it - entry.pkgName }
++        installedExtensionMapFlow.update { it + entry }
      }
  
 -    /**
 -     * Listener which receives events of the extensions being installed, updated or removed.
 -     */
-+    /** Listener which receives events of the extensions being installed, updated or removed. */
-     private inner class InstallationListener : ExtensionInstallReceiver.Listener {
- 
-         override fun onExtensionInstalled(extension: Extension.Installed) {
-@@ -346,9 +502,7 @@ class ExtensionManager(
+-    private inner class InstallationListener : ExtensionInstallReceiver.Listener {
+-
+-        override fun onExtensionInstalled(extension: Extension.Installed) {
+-            registerNewExtension(extension.withUpdateCheck())
+-            updatePendingUpdatesCount()
+-        }
+-
+-        override fun onExtensionUpdated(extension: Extension.Installed) {
+-            registerUpdatedExtension(extension.withUpdateCheck())
+-            updatePendingUpdatesCount()
+-        }
+-
+-        override fun onExtensionUntrusted(extension: Extension.Untrusted) {
+-            installedExtensionMapFlow.value -= extension.pkgName
+-            untrustedExtensionMapFlow.value += extension
+-            updatePendingUpdatesCount()
+-        }
+-
+-        override fun onPackageUninstalled(pkgName: String) {
+-            ExtensionLoader.uninstallPrivateExtension(context, pkgName)
+-            unregisterExtension(pkgName)
++    private suspend fun reconcilePackage(pkgName: String, expectedVersion: Long? = null): Boolean {
++        isInitialized.first { it }
++        return packageLock.withLock {
++            val loaded = try {
++                ExtensionLoader.loadExtensionFromPkgName(context, pkgName)
++            } catch (cancelled: kotlinx.coroutines.CancellationException) {
++                throw cancelled
++            } catch (error: Exception) {
++                logcat(LogPriority.ERROR, error) { "Failed to load extension $pkgName" }
++                LoadResult.Error
++            }
++            val accepted = when (loaded) {
++                is LoadResult.Success -> {
++                    registerNewExtension(loaded.extension)
++                    expectedVersion == null || loaded.extension.versionCode >= expectedVersion
++                }
++                is LoadResult.Untrusted -> {
++                    installedExtensionMapFlow.update { it - pkgName }
++                    untrustedExtensionMapFlow.update { it + loaded.extension }
++                    expectedVersion == null || loaded.extension.versionCode >= expectedVersion
++                }
++                else -> {
++                    installedExtensionMapFlow.update { it - pkgName }
++                    untrustedExtensionMapFlow.update { it - pkgName }
++                    false
++                }
++            }
+             updatePendingUpdatesCount()
++            accepted
          }
      }
  
 -    /**
 -     * Extension method to set the update field of an installed extension.
 -     */
-+    /** Extension method to set the update field of an installed extension. */
-     private fun Extension.Installed.withUpdateCheck(): Extension.Installed {
-         return if (updateExists()) {
-             copy(hasUpdate = true)
-@@ -357,10 +511,11 @@ class ExtensionManager(
-         }
-     }
- 
+-    private fun Extension.Installed.withUpdateCheck(): Extension.Installed {
+-        return if (updateExists()) {
+-            copy(hasUpdate = true)
+-        } else {
+-            this
+-        }
+-    }
+-
 -    private fun Extension.Installed.updateExists(availableExtension: Extension.Available? = null): Boolean {
 -        val availableExt = availableExtension
 -            ?: availableExtensionMapFlow.value[pkgName]
@@ -22094,7 +22247,7 @@ index 699e074..0747495 100644
  
          return (availableExt.versionCode > versionCode || availableExt.libVersion > libVersion)
      }
-@@ -373,9 +528,13 @@ class ExtensionManager(
+@@ -373,9 +484,13 @@ class ExtensionManager(
          }
      }
  
@@ -23157,8 +23310,142 @@ index 0000000..e998eaf
 +        )
 +    }
 +}
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/extension/util/ExtensionInstallReceiver.kt b/app/src/main/java/eu/kanade/tachiyomi/extension/util/ExtensionInstallReceiver.kt
+index ff8acf4..4ff1240 100644
+--- a/app/src/main/java/eu/kanade/tachiyomi/extension/util/ExtensionInstallReceiver.kt
++++ b/app/src/main/java/eu/kanade/tachiyomi/extension/util/ExtensionInstallReceiver.kt
+@@ -7,23 +7,19 @@ import android.content.IntentFilter
+ import androidx.core.content.ContextCompat
+ import androidx.core.net.toUri
+ import eu.kanade.tachiyomi.BuildConfig
+-import eu.kanade.tachiyomi.extension.model.Extension
+-import eu.kanade.tachiyomi.extension.model.LoadResult
+ import kotlinx.coroutines.CoroutineScope
++import kotlinx.coroutines.Dispatchers
+ import kotlinx.coroutines.SupervisorJob
+ import kotlinx.coroutines.launch
+-import logcat.LogPriority
+-import tachiyomi.core.common.util.system.logcat
+ 
+ /**
+- * Broadcast receiver that listens for the system's packages installed, updated or removed, and only
+- * notifies the given [listener] when the package is an extension.
++ * Reconciles package changes from Android and explicit extension reloads.
+  *
+  * @param listener The listener that should be notified of extension installation events.
+  */
+ internal class ExtensionInstallReceiver(private val listener: Listener) : BroadcastReceiver() {
+ 
+-    val scope = CoroutineScope(SupervisorJob())
++    val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+ 
+     fun register(context: Context) {
+         ContextCompat.registerReceiver(context, this, filter, ContextCompat.RECEIVER_NOT_EXPORTED)
+@@ -33,7 +29,6 @@ internal class ExtensionInstallReceiver(private val listener: Listener) : Broadc
+         addAction(Intent.ACTION_PACKAGE_ADDED)
+         addAction(Intent.ACTION_PACKAGE_REPLACED)
+         addAction(Intent.ACTION_PACKAGE_REMOVED)
+-        addAction(ACTION_EXTENSION_ADDED)
+         addAction(ACTION_EXTENSION_REPLACED)
+         addAction(ACTION_EXTENSION_REMOVED)
+         addDataScheme("package")
+@@ -46,88 +41,20 @@ internal class ExtensionInstallReceiver(private val listener: Listener) : Broadc
+     override fun onReceive(context: Context, intent: Intent?) {
+         if (intent == null) return
+ 
+-        when (intent.action) {
+-            Intent.ACTION_PACKAGE_ADDED, ACTION_EXTENSION_ADDED -> {
+-                if (isReplacing(intent)) return
+-
+-                scope.launch {
+-                    when (val result = getExtensionFromIntent(context, intent)) {
+-                        is LoadResult.Success -> listener.onExtensionInstalled(result.extension)
+-                        is LoadResult.Untrusted -> listener.onExtensionUntrusted(result.extension)
+-                        else -> {}
+-                    }
+-                }
+-            }
+-            Intent.ACTION_PACKAGE_REPLACED, ACTION_EXTENSION_REPLACED -> {
+-                scope.launch {
+-                    when (val result = getExtensionFromIntent(context, intent)) {
+-                        is LoadResult.Success -> listener.onExtensionUpdated(result.extension)
+-                        is LoadResult.Untrusted -> listener.onExtensionUntrusted(result.extension)
+-                        else -> {}
+-                    }
+-                }
+-            }
+-            Intent.ACTION_PACKAGE_REMOVED, ACTION_EXTENSION_REMOVED -> {
+-                if (isReplacing(intent)) return
+-
+-                val pkgName = getPackageNameFromIntent(intent)
+-                if (pkgName != null) {
+-                    listener.onPackageUninstalled(pkgName)
+-                }
+-            }
+-        }
++        val replacing = intent.getBooleanExtra(Intent.EXTRA_REPLACING, false)
++        if (replacing && (intent.action == Intent.ACTION_PACKAGE_ADDED || intent.action == Intent.ACTION_PACKAGE_REMOVED)) return
++        val pkgName = intent.data?.encodedSchemeSpecificPart ?: return
++        scope.launch { listener.onPackageChanged(pkgName) }
+     }
+ 
+-    /**
+-     * Returns true if this package is performing an update.
+-     *
+-     * @param intent The intent that triggered the event.
+-     */
+-    private fun isReplacing(intent: Intent): Boolean {
+-        return intent.getBooleanExtra(Intent.EXTRA_REPLACING, false)
+-    }
+-
+-    /**
+-     * Returns the extension triggered by the given intent.
+-     *
+-     * @param context The application context.
+-     * @param intent The intent containing the package name of the extension.
+-     */
+-    private suspend fun getExtensionFromIntent(context: Context, intent: Intent?): LoadResult {
+-        val pkgName = getPackageNameFromIntent(intent)
+-        if (pkgName == null) {
+-            logcat(LogPriority.WARN) { "Package name not found" }
+-            return LoadResult.Error
+-        }
+-        return ExtensionLoader.loadExtensionFromPkgName(context, pkgName)
+-    }
+-
+-    /**
+-     * Returns the package name of the installed, updated or removed application.
+-     */
+-    private fun getPackageNameFromIntent(intent: Intent?): String? {
+-        return intent?.data?.encodedSchemeSpecificPart
+-    }
+-
+-    /**
+-     * Listener that receives extension installation events.
+-     */
+-    interface Listener {
+-        fun onExtensionInstalled(extension: Extension.Installed)
+-        fun onExtensionUpdated(extension: Extension.Installed)
+-        fun onExtensionUntrusted(extension: Extension.Untrusted)
+-        fun onPackageUninstalled(pkgName: String)
++    fun interface Listener {
++        suspend fun onPackageChanged(pkgName: String)
+     }
+ 
+     companion object {
+-        private const val ACTION_EXTENSION_ADDED = "${BuildConfig.APPLICATION_ID}.ACTION_EXTENSION_ADDED"
+         private const val ACTION_EXTENSION_REPLACED = "${BuildConfig.APPLICATION_ID}.ACTION_EXTENSION_REPLACED"
+         private const val ACTION_EXTENSION_REMOVED = "${BuildConfig.APPLICATION_ID}.ACTION_EXTENSION_REMOVED"
+ 
+-        fun notifyAdded(context: Context, pkgName: String) {
+-            notify(context, pkgName, ACTION_EXTENSION_ADDED)
+-        }
+-
+         fun notifyReplaced(context: Context, pkgName: String) {
+             notify(context, pkgName, ACTION_EXTENSION_REPLACED)
+         }
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/extension/util/ExtensionInstaller.kt b/app/src/main/java/eu/kanade/tachiyomi/extension/util/ExtensionInstaller.kt
-index 4d9493f..fddb83c 100644
+index 4d9493f..6f32219 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/extension/util/ExtensionInstaller.kt
 +++ b/app/src/main/java/eu/kanade/tachiyomi/extension/util/ExtensionInstaller.kt
 @@ -9,23 +9,35 @@ import eu.kanade.tachiyomi.extension.installer.Installer
@@ -23197,13 +23484,14 @@ index 4d9493f..fddb83c 100644
  
  /**
   * The installer which installs, updates and uninstalls the extensions.
-@@ -34,14 +46,15 @@ import java.io.File
+@@ -34,14 +46,16 @@ import java.io.File
   */
  internal class ExtensionInstaller(
      private val context: Context,
 +    private val extensionInstaller: Preference<BasePreferences.ExtensionInstaller> =
 +        Injekt.get<BasePreferences>().extensionInstaller,
 +    private val httpClient: OkHttpClient = Injekt.get<NetworkHelper>().client,
++    private val onPrivateInstalled: suspend (Extension) -> Boolean,
  ) {
  
      private val scope = CoroutineScope(Dispatchers.IO)
@@ -23218,7 +23506,7 @@ index 4d9493f..fddb83c 100644
  
      /**
       * Adds the given extension to the downloads queue and returns an observable containing its
-@@ -51,51 +64,81 @@ internal class ExtensionInstaller(
+@@ -51,51 +65,81 @@ internal class ExtensionInstaller(
       * @param extension The extension to install.
       * @param isUpdateForPrivatelyInstalled If this is an update for a privately installed extension
       */
@@ -23291,7 +23579,7 @@ index 4d9493f..fddb83c 100644
 -                }
 +                beforePrivateInstall()
 +                currentCoroutineContext().ensureActive()
-+                installApk(downloadId, download, isUpdateForPrivatelyInstalled, privateIdentity)
++                installApk(downloadId, download, extension, isUpdateForPrivatelyInstalled, privateIdentity)
 +                handedToInstaller = true
 +            } catch (error: CancellationException) {
 +                throw error
@@ -23322,7 +23610,7 @@ index 4d9493f..fddb83c 100644
                  job.cancel()
              }
      }
-@@ -106,9 +149,14 @@ internal class ExtensionInstaller(
+@@ -106,9 +150,15 @@ internal class ExtensionInstaller(
       * @param tempFile The file of the extension to install. Delete after use.
       * @param isUpdateForPrivatelyInstalled If this install is an update for a privately installed extension
       */
@@ -23330,16 +23618,26 @@ index 4d9493f..fddb83c 100644
 +    private suspend fun installApk(
 +        downloadId: Long,
 +        tempFile: File,
++        extension: Extension,
 +        isUpdateForPrivatelyInstalled: Boolean = false,
 +        privateIdentity: ReviewedPrivateExtension? = null,
 +    ) {
          if (isUpdateForPrivatelyInstalled) {
 -            installApkPrivately(downloadId, tempFile)
-+            installApkPrivately(downloadId, tempFile, privateIdentity)
++            installApkPrivately(downloadId, tempFile, extension, privateIdentity)
              return
          }
  
-@@ -138,13 +186,31 @@ internal class ExtensionInstaller(
+@@ -123,7 +173,7 @@ internal class ExtensionInstaller(
+             }
+ 
+             BasePreferences.ExtensionInstaller.PRIVATE -> {
+-                installApkPrivately(downloadId, tempFile)
++                installApkPrivately(downloadId, tempFile, extension)
+             }
+ 
+             else -> {
+@@ -138,13 +188,34 @@ internal class ExtensionInstaller(
          }
      }
  
@@ -23347,13 +23645,16 @@ index 4d9493f..fddb83c 100644
 +    private suspend fun installApkPrivately(
 +        downloadId: Long,
 +        tempFile: File,
++        extension: Extension,
 +        identity: ReviewedPrivateExtension? = null,
 +    ) {
          try {
 -            if (ExtensionLoader.installPrivateExtensionFile(context, tempFile)) {
 +            val coroutineContext = currentCoroutineContext()
 +            val installed = if (identity == null) {
-+                ExtensionLoader.installPrivateExtensionFile(context, tempFile) { coroutineContext.ensureActive() }
++                ExtensionLoader.installPrivateExtensionFile(context, tempFile, extension.pkgName, extension.versionCode) {
++                    coroutineContext.ensureActive()
++                }
 +            } else {
 +                ExtensionLoader.installVerifiedPrivateExtensionFile(
 +                    context,
@@ -23363,7 +23664,7 @@ index 4d9493f..fddb83c 100644
 +                    coroutineContext.ensureActive()
 +                }
 +            }
-+            if (installed) {
++            if (installed && onPrivateInstalled(extension)) {
                  updateInstallStep(downloadId, InstallStep.Installed)
              } else {
                  updateInstallStep(downloadId, InstallStep.Error)
@@ -23373,7 +23674,7 @@ index 4d9493f..fddb83c 100644
          } catch (e: Exception) {
              logcat(LogPriority.ERROR, e) { "Failed to read downloaded extension file." }
              updateInstallStep(downloadId, InstallStep.Error)
-@@ -156,9 +222,16 @@ internal class ExtensionInstaller(
+@@ -156,9 +227,16 @@ internal class ExtensionInstaller(
      /**
       * Cancels extension install and remove from download manager and installer.
       */
@@ -23391,12 +23692,15 @@ index 4d9493f..fddb83c 100644
      }
  
      /**
-@@ -167,14 +240,14 @@ internal class ExtensionInstaller(
+@@ -166,15 +244,15 @@ internal class ExtensionInstaller(
+      *
       * @param pkgName The package name of the extension to uninstall
       */
-     fun uninstallApk(pkgName: String) {
+-    fun uninstallApk(pkgName: String) {
+-        if (context.isPackageInstalled(pkgName)) {
++    fun uninstallApk(pkgName: String, privateOnly: Boolean = false) {
 +        cancelInstall(pkgName)
-         if (context.isPackageInstalled(pkgName)) {
++        if (!privateOnly && context.isPackageInstalled(pkgName)) {
              @Suppress("DEPRECATION")
              val intent = Intent(Intent.ACTION_UNINSTALL_PACKAGE, "package:$pkgName".toUri())
                  .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -23408,7 +23712,7 @@ index 4d9493f..fddb83c 100644
          }
      }
  
-@@ -189,6 +262,7 @@ internal class ExtensionInstaller(
+@@ -189,6 +267,7 @@ internal class ExtensionInstaller(
      }
  
      companion object {
@@ -23417,7 +23721,7 @@ index 4d9493f..fddb83c 100644
          const val EXTRA_DOWNLOAD_ID = "ExtensionInstaller.extra.DOWNLOAD_ID"
      }
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/extension/util/ExtensionLoader.kt b/app/src/main/java/eu/kanade/tachiyomi/extension/util/ExtensionLoader.kt
-index 962fafa..a4bcb68 100644
+index 962fafa..7830a89 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/extension/util/ExtensionLoader.kt
 +++ b/app/src/main/java/eu/kanade/tachiyomi/extension/util/ExtensionLoader.kt
 @@ -10,40 +10,37 @@ import eu.kanade.domain.extension.interactor.TrustExtension
@@ -23476,7 +23780,7 @@ index 962fafa..a4bcb68 100644
  
      private const val EXTENSION_FEATURE = "tachiyomi.extension"
      private const val METADATA_SOURCE_CLASS = "tachiyomi.extension.class"
-@@ -54,120 +51,192 @@ internal object ExtensionLoader {
+@@ -54,120 +51,187 @@ internal object ExtensionLoader {
      private const val METADATA_EXTENSION_LIB = "tachiyomix.extensionLib"
      private const val METADATA_CONTENT_WARNING = "tachiyomix.contentWarning"
  
@@ -23529,9 +23833,11 @@ index 962fafa..a4bcb68 100644
 +    fun installPrivateExtensionFile(
 +        context: Context,
 +        file: File,
++        expectedPackageName: String,
++        expectedVersionCode: Long,
 +        checkCancelled: () -> Unit = {},
 +    ): Boolean {
-+        return replacePrivateExtension(context, file, null, checkCancelled)
++        return replacePrivateExtension(context, file, expectedPackageName, expectedVersionCode, null, checkCancelled)
 +    }
  
 -        val target = File(getPrivateExtensionDir(context), "${extension.packageName}.$PRIVATE_EXTENSION_EXTENSION")
@@ -23541,17 +23847,19 @@ index 962fafa..a4bcb68 100644
 +        file: File,
 +        identity: ReviewedPrivateExtension,
 +        checkCancelled: () -> Unit,
-+    ): Boolean = replacePrivateExtension(context, file, identity, checkCancelled)
++    ): Boolean = replacePrivateExtension(context, file, identity.packageName, identity.versionCode, identity, checkCancelled)
 +
 +    private fun replacePrivateExtension(
 +        context: Context,
 +        file: File,
++        expectedPackageName: String,
++        expectedVersionCode: Long,
 +        identity: ReviewedPrivateExtension?,
 +        checkCancelled: () -> Unit,
 +    ): Boolean {
 +        val candidate =
 +            context.packageManager.getPackageArchiveInfo(file.absolutePath, PACKAGE_FLAGS)?.takeIf {
-+                isPackageAnExtension(it)
++                isPackageAnExtension(it) && it.packageName == expectedPackageName
 +            } ?: return false
 +        val target =
 +            File(
@@ -23563,7 +23871,8 @@ index 962fafa..a4bcb68 100644
 -            file.copyAndSetReadOnlyTo(target, overwrite = true)
 -            if (currentExtension != null) {
 -                ExtensionInstallReceiver.notifyReplaced(context, extension.packageName)
-+            var replacing = false
+-            } else {
+-                ExtensionInstallReceiver.notifyAdded(context, extension.packageName)
 +            PrivateExtensionFiles.replace(file, target, checkCancelled) { staged ->
 +                // Verify the bytes actually staged, before replacing the working package.
 +                val extension =
@@ -23581,6 +23890,9 @@ index 962fafa..a4bcb68 100644
 +                        "Private extension is incompatible with this app or Android version"
 +                    )
 +                }
++                if (PackageInfoCompat.getLongVersionCode(extension) != expectedVersionCode) {
++                    throw IOException("Extension version differs from the selected catalog item")
++                }
 +                val verifiedSigners =
 +                    PrivateExtensionSignature.verify(staged, Build.VERSION.SDK_INT)
 +                val signatures = getSignatures(extension).orEmpty()
@@ -23592,14 +23904,8 @@ index 962fafa..a4bcb68 100644
 +                        extension.packageName,
 +                        verifiedSigners,
 +                    )
-+                    if (PackageInfoCompat.getLongVersionCode(extension) != identity.versionCode) {
-+                        throw IOException(
-+                            "Private extension version differs from the reviewed catalog"
-+                        )
-+                    }
 +                }
 +                val current = getExtensionPackageInfoFromPkgName(context, extension.packageName)
-+                replacing = current != null
 +                if (current != null) {
 +                    if (
 +                        PackageInfoCompat.getLongVersionCode(extension) <
@@ -23614,12 +23920,6 @@ index 962fafa..a4bcb68 100644
 +                        throw IOException("Extension signature does not match")
 +                    }
 +                }
-+            }
-+            if (replacing) {
-+                ExtensionInstallReceiver.notifyReplaced(context, candidate.packageName)
-             } else {
--                ExtensionInstallReceiver.notifyAdded(context, extension.packageName)
-+                ExtensionInstallReceiver.notifyAdded(context, candidate.packageName)
              }
              true
 -        } catch (e: Exception) {
@@ -23639,7 +23939,7 @@ index 962fafa..a4bcb68 100644
      fun uninstallPrivateExtension(context: Context, pkgName: String) {
 -        File(getPrivateExtensionDir(context), "$pkgName.$PRIVATE_EXTENSION_EXTENSION").delete()
 +        val target = File(getPrivateExtensionDir(context), "$pkgName.$PRIVATE_EXTENSION_EXTENSION")
-+        if (PrivateExtensionFiles.delete(target) || !target.exists()) {
++        if (PrivateExtensionFiles.delete(target)) {
 +            ExtensionInstallReceiver.notifyRemoved(context, pkgName)
 +        }
      }
@@ -23754,7 +24054,7 @@ index 962fafa..a4bcb68 100644
          }
      }
  
-@@ -189,33 +258,30 @@ internal object ExtensionLoader {
+@@ -189,33 +253,30 @@ internal object ExtensionLoader {
      }
  
      private fun getExtensionInfoFromPkgName(context: Context, pkgName: String): ExtensionInfo? {
@@ -23811,7 +24111,7 @@ index 962fafa..a4bcb68 100644
  
          return selectExtensionPackage(sharedPkg, privatePkg)
      }
-@@ -232,8 +298,9 @@ internal object ExtensionLoader {
+@@ -232,8 +293,9 @@ internal object ExtensionLoader {
          val appInfo = pkgInfo.applicationInfo!!
          val pkgName = pkgInfo.packageName
  
@@ -23823,7 +24123,7 @@ index 962fafa..a4bcb68 100644
          val versionName = pkgInfo.versionName
          val versionCode = PackageInfoCompat.getLongVersionCode(pkgInfo)
  
-@@ -243,11 +310,7 @@ internal object ExtensionLoader {
+@@ -243,11 +305,7 @@ internal object ExtensionLoader {
          }
  
          // Validate lib version
@@ -23836,7 +24136,7 @@ index 962fafa..a4bcb68 100644
          if (libVersion == null || libVersion !in SUPPORTED_LIB_VERSIONS) {
              logcat(LogPriority.WARN) {
                  "Lib version is $libVersion, while only version(s) ${SUPPORTED_LIB_VERSIONS.joinToString()} are supported"
-@@ -255,80 +318,133 @@ internal object ExtensionLoader {
+@@ -255,80 +313,133 @@ internal object ExtensionLoader {
              return LoadResult.Error
          }
  
@@ -24026,7 +24326,7 @@ index 962fafa..a4bcb68 100644
          return LoadResult.Success(extension)
      }
  
-@@ -338,15 +454,19 @@ internal object ExtensionLoader {
+@@ -338,15 +449,19 @@ internal object ExtensionLoader {
       * @param shared extension installed to system
       * @param private extension installed to data directory
       */
@@ -24049,7 +24349,7 @@ index 962fafa..a4bcb68 100644
          ) {
              shared
          } else {
-@@ -359,6 +479,14 @@ internal object ExtensionLoader {
+@@ -359,6 +474,14 @@ internal object ExtensionLoader {
       *
       * @param pkgInfo The package info of the application.
       */
@@ -24064,7 +24364,7 @@ index 962fafa..a4bcb68 100644
      private fun isPackageAnExtension(pkgInfo: PackageInfo): Boolean {
          return pkgInfo.reqFeatures.orEmpty().any { it.name == EXTENSION_FEATURE }
      }
-@@ -371,23 +499,22 @@ internal object ExtensionLoader {
+@@ -371,23 +494,22 @@ internal object ExtensionLoader {
       */
      private fun getSignatures(pkgInfo: PackageInfo): List<String>? {
          return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
@@ -24097,7 +24397,7 @@ index 962fafa..a4bcb68 100644
       */
      private fun ApplicationInfo.fixBasePaths(apkPath: String) {
          if (sourceDir == null) {
-@@ -398,8 +525,5 @@ internal object ExtensionLoader {
+@@ -398,8 +520,5 @@ internal object ExtensionLoader {
          }
      }
  
@@ -24763,10 +25063,10 @@ index 0000000..7c3c569
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalog.kt b/app/src/main/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalog.kt
 new file mode 100644
-index 0000000..01e8ca7
+index 0000000..2eaf32c
 --- /dev/null
 +++ b/app/src/main/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalog.kt
-@@ -0,0 +1,605 @@
+@@ -0,0 +1,629 @@
 +package eu.kanade.tachiyomi.source.selection
 +
 +import eu.kanade.domain.chapter.model.toRemoteSChapter
@@ -24889,6 +25189,7 @@ index 0000000..01e8ca7
 +        fetchDetails: Boolean,
 +        fetchChapters: Boolean,
 +        allowDiscovery: Boolean,
++        recoverOnly: Boolean = false,
 +    ): SMangaUpdate? {
 +        if (!fetchChapters || manga.source == MERGED_SOURCE_ID || source is INovelSource)
 +            return null
@@ -24960,23 +25261,8 @@ index 0000000..01e8ca7
 +            discover = true
 +        }
 +        rootCatalog?.let { catalogs += it }
-+        val reference = rootCatalog?.manga ?: manga.toSManga()
-+        val identity =
-+            settings.identity?.takeIf { now - it.checkedAt in 0 until 14 * DISCOVERY_TTL }
-+                ?: if (discover) resolveIdentity(reference) else settings.identity
-+        val searchTitles =
-+            (listOf(reference.title) + identity?.titles.orEmpty())
-+                .filter { it.isNotBlank() }
-+                .distinctBy(SourceMatching::title)
-+                .take(6)
-+        val referenceChapters =
-+            rootCatalog?.chapters?.takeIf { it.isNotEmpty() }?.map(::asChapter)
-+                ?: existing.filter {
-+                    (ChapterOrigin.from(it.memo)?.sourceId ?: manga.source) == manga.source
-+                }
-+
-+        suspend fun sampled(catalog: Catalog): Catalog {
-+            if (!discover) return catalog
++        suspend fun sampled(catalog: Catalog, checkImages: Boolean = discover): Catalog {
++            if (!checkImages || catalog.chapters.isEmpty()) return catalog
 +            val recent = settings.candidates.firstOrNull { it.key == catalog.binding.key }
 +            val ttl = if (recent?.readability == "sample_failed") 60_000L else HEALTH_TTL
 +            val cached =
@@ -25003,9 +25289,26 @@ index 0000000..01e8ca7
 +            return checked
 +        }
 +        if (catalogs.isNotEmpty()) {
-+            catalogs[0] = sampled(catalogs[0])
++            catalogs[0] = sampled(catalogs[0], checkImages = discover || recoverOnly && pinned == null)
 +            remember(checkNotNull(rootOutcome), catalogs[0])
++            if (recoverOnly && pinned == null && catalogs[0].chapters.isNotEmpty()) {
++                discover = catalogs[0].binding.readability != "sample_passed"
++            }
 +        }
++        val reference = rootCatalog?.manga ?: manga.toSManga()
++        val identity =
++            settings.identity?.takeIf { now - it.checkedAt in 0 until 14 * DISCOVERY_TTL }
++                ?: if (discover) resolveIdentity(reference) else settings.identity
++        val searchTitles =
++            (listOf(reference.title) + identity?.titles.orEmpty())
++                .filter { it.isNotBlank() }
++                .distinctBy(SourceMatching::title)
++                .take(6)
++        val referenceChapters =
++            rootCatalog?.chapters?.takeIf { it.isNotEmpty() }?.map(::asChapter)
++                ?: existing.filter {
++                    (ChapterOrigin.from(it.memo)?.sourceId ?: manga.source) == manga.source
++                }
 +
 +        fun compatible(catalog: Catalog): Boolean =
 +            pinned != null ||
@@ -25166,6 +25469,19 @@ index 0000000..01e8ca7
 +        if (catalogs.isEmpty() || catalogs.all { it.chapters.isEmpty() })
 +            throw NoChaptersException()
 +        catalogs.sortWith(catalogOrder(manga.source))
++        val originalCover = catalogs.firstOrNull {
++            it.binding.key == root.key && it.chapters.isNotEmpty() && it.binding.readability != "sample_failed"
++        }?.manga?.thumbnail_url?.takeUnless { it.isBlank() }
++        val replacementCover = if (originalCover == null) {
++            catalogs.firstOrNull {
++                it.binding.key != root.key && it.chapters.isNotEmpty() &&
++                    it.binding.readability != "sample_failed" && !it.manga.thumbnail_url.isNullOrBlank()
++            }
++        } else null
++        val replacementMetadata = catalogs.firstOrNull {
++            it.binding.key != root.key && it.chapters.isNotEmpty() &&
++                it.binding.readability == "sample_passed"
++        }?.manga
 +        val activeKeys = catalogs.map { it.binding.key }.toSet()
 +        val choices =
 +            (bindings + settings.candidates.filter { old -> bindings.none { it.key == old.key } })
@@ -25174,6 +25490,11 @@ index 0000000..01e8ca7
 +        val state =
 +            settings.copy(
 +                candidates = choices,
++                coverSourceId = when {
++                    originalCover != null -> null
++                    replacementCover != null -> replacementCover.binding.sourceId
++                    else -> settings.coverSourceId
++                },
 +                checkedAt =
 +                    if (discover || incomplete) System.currentTimeMillis() else settings.checkedAt,
 +                installedFingerprint = if (discover) fingerprint else settings.installedFingerprint,
@@ -25235,6 +25556,9 @@ index 0000000..01e8ca7
 +            (rootCatalog?.manga ?: manga.toSManga()).let { incoming ->
 +                incoming.copy().also {
 +                    it.url = manga.url
++                    it.thumbnail_url = originalCover ?: replacementCover?.manga?.thumbnail_url ?: manga.thumbnailUrl
++                    if (it.author.isNullOrBlank()) it.author = manga.author?.takeUnless(String::isBlank) ?: replacementMetadata?.author
++                    if (it.artist.isNullOrBlank()) it.artist = manga.artist?.takeUnless(String::isBlank) ?: replacementMetadata?.artist
 +                    it.memo = state.attach(JsonObject(manga.memo + cleanMemo(incoming.memo)))
 +                }
 +            }
@@ -25444,10 +25768,10 @@ index 0000000..bc465af
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/source/selection/LibraryWorkConsolidator.kt b/app/src/main/java/eu/kanade/tachiyomi/source/selection/LibraryWorkConsolidator.kt
 new file mode 100644
-index 0000000..6452fd0
+index 0000000..f134b39
 --- /dev/null
 +++ b/app/src/main/java/eu/kanade/tachiyomi/source/selection/LibraryWorkConsolidator.kt
-@@ -0,0 +1,134 @@
+@@ -0,0 +1,138 @@
 +package eu.kanade.tachiyomi.source.selection
 +
 +import eu.kanade.tachiyomi.source.INovelSource
@@ -25508,7 +25832,11 @@ index 0000000..6452fd0
 +                                source.lang,
 +                                source is HttpSource && source !is INovelSource ||
 +                                    source is StubSource &&
-+                                        WorkSources.from(manga.memo).identity != null,
++                                        WorkSources.from(manga.memo).let { work ->
++                                            work.identity != null || work.candidates.any {
++                                                it.active && it.available && it.readability == "sample_passed"
++                                            }
++                                        },
 +                            )
 +                        }
 +                val identities =
@@ -26324,7 +26652,7 @@ index 0000000..e6e84c1
 +        }
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/browse/extension/ExtensionsTab.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/browse/extension/ExtensionsTab.kt
-index efc3654..cd4ed11 100644
+index efc3654..3d2560d 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/ui/browse/extension/ExtensionsTab.kt
 +++ b/app/src/main/java/eu/kanade/tachiyomi/ui/browse/extension/ExtensionsTab.kt
 @@ -14,10 +14,12 @@ import androidx.compose.ui.platform.LocalContext
@@ -26336,7 +26664,7 @@ index efc3654..cd4ed11 100644
  import eu.kanade.presentation.components.TabContent
  import eu.kanade.presentation.more.settings.screen.browse.ExtensionStoresScreen
  import eu.kanade.presentation.more.settings.screen.browse.discovery.RepositoryDiscoveryScreen
-+import eu.kanade.presentation.more.settings.screen.browse.preparation.SourcePreparationScreen
++import eu.kanade.tachiyomi.data.library.LibraryUpdateJob
  import eu.kanade.tachiyomi.extension.model.Extension
  import eu.kanade.tachiyomi.ui.browse.extension.details.ExtensionDetailsScreen
  import eu.kanade.tachiyomi.ui.webview.WebViewScreen
@@ -26364,8 +26692,8 @@ index efc3654..cd4ed11 100644
 +        actions =
 +            listOf(
 +                AppBar.OverflowAction(
-+                    title = stringResource(ATMR.strings.preparation_title),
-+                    onClick = { navigator.push(SourcePreparationScreen()) },
++                    title = stringResource(ATMR.strings.recover_library_sources),
++                    onClick = { LibraryUpdateJob.startSourceRecovery(context) },
 +                ),
 +                AppBar.OverflowAction(
 +                    title = stringResource(ATMR.strings.repository_discovery),
@@ -26475,6 +26803,34 @@ index efc3654..cd4ed11 100644
              ) {
                  Text(text = stringResource(MR.strings.ext_remove))
              }
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/browse/extension/ExtensionsViewModel.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/browse/extension/ExtensionsViewModel.kt
+index 62ee9b7..b871740 100644
+--- a/app/src/main/java/eu/kanade/tachiyomi/ui/browse/extension/ExtensionsViewModel.kt
++++ b/app/src/main/java/eu/kanade/tachiyomi/ui/browse/extension/ExtensionsViewModel.kt
+@@ -29,6 +29,9 @@ import kotlinx.coroutines.flow.update
+ import kotlinx.coroutines.launch
+ import mihon.core.viewmodel.StateViewModel
+ import tachiyomi.core.common.util.lang.launchIO
++import tachiyomi.core.common.util.lang.withUIContext
++import eu.kanade.tachiyomi.util.system.toast
++import tachiyomi.i18n.at.ATMR
+ import tachiyomi.i18n.MR
+ import uy.kohesive.injekt.Injekt
+ import uy.kohesive.injekt.api.get
+@@ -179,7 +182,12 @@ class ExtensionsViewModel(
+ 
+     private suspend fun Flow<InstallStep>.collectToInstallUpdate(extension: Extension) =
+         this
+-            .onEach { installStep -> addDownloadState(extension, installStep) }
++            .onEach { installStep ->
++                addDownloadState(extension, installStep)
++                if (installStep == InstallStep.Error) {
++                    withUIContext { Injekt.get<Application>().toast(ATMR.strings.extension_install_failed) }
++                }
++            }
+             .takeWhile { installStep -> installStep != InstallStep.Installed }
+             .onCompletion { removeDownloadState(extension) }
+             .collect()
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/browse/extension/details/ExtensionDetailsScreen.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/browse/extension/details/ExtensionDetailsScreen.kt
 index 7ee326f..9f99188 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/ui/browse/extension/details/ExtensionDetailsScreen.kt
@@ -33314,7 +33670,7 @@ index e6fdae1..d219159 100644
      }
  }
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/reader/ReaderActivity.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/reader/ReaderActivity.kt
-index c878b34..5dca1c3 100644
+index c878b34..c68d994 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/ui/reader/ReaderActivity.kt
 +++ b/app/src/main/java/eu/kanade/tachiyomi/ui/reader/ReaderActivity.kt
 @@ -59,6 +59,7 @@ import eu.kanade.presentation.reader.appbars.ReaderAppBars
@@ -33334,7 +33690,22 @@ index c878b34..5dca1c3 100644
      private val readerPreferences = Injekt.get<ReaderPreferences>()
      private val preferences = Injekt.get<BasePreferences>()
  
-@@ -337,7 +340,8 @@ class ReaderActivity : BaseActivity() {
+@@ -208,9 +211,11 @@ class ReaderActivity : BaseActivity() {
+ 
+         viewModel.state
+             .map { it.manga }
+-            .distinctUntilChanged()
+-            .filterNotNull()
+-            .onEach { updateViewer() }
++            .readerModeChanges()
++            .onEach {
++                updateViewer()
++                viewModel.state.value.viewerChapters?.let(::setChapters)
++            }
+             .launchIn(lifecycleScope)
+ 
+         viewModel.state
+@@ -337,7 +342,8 @@ class ReaderActivity : BaseActivity() {
                      onShare = viewModel::shareImage,
                      onSave = viewModel::saveImage,
                      onAddManualTranslation = if (
@@ -33344,7 +33715,7 @@ index c878b34..5dca1c3 100644
                      ) {
                          viewModel::addManualTranslation
                      } else {
-@@ -353,6 +357,8 @@ class ReaderActivity : BaseActivity() {
+@@ -353,6 +359,8 @@ class ReaderActivity : BaseActivity() {
       * Called when the activity is destroyed. Cleans up the viewer, configuration and any view.
       */
      override fun onDestroy() {
@@ -33353,7 +33724,7 @@ index c878b34..5dca1c3 100644
          super.onDestroy()
          viewModel.state.value.viewer?.destroy()
          config = null
-@@ -361,6 +367,7 @@ class ReaderActivity : BaseActivity() {
+@@ -361,6 +369,7 @@ class ReaderActivity : BaseActivity() {
      }
  
      override fun onPause() {
@@ -33361,7 +33732,7 @@ index c878b34..5dca1c3 100644
          lifecycleScope.launchNonCancellable {
              viewModel.updateHistory()
          }
-@@ -373,6 +380,20 @@ class ReaderActivity : BaseActivity() {
+@@ -373,6 +382,20 @@ class ReaderActivity : BaseActivity() {
       */
      override fun onResume() {
          super.onResume()
@@ -33382,7 +33753,7 @@ index c878b34..5dca1c3 100644
          viewModel.restartReadTimer()
          setMenuVisibility(viewModel.state.value.menuVisible)
      }
-@@ -714,6 +735,7 @@ class ReaderActivity : BaseActivity() {
+@@ -714,6 +737,7 @@ class ReaderActivity : BaseActivity() {
       * bottom menu and delegates the change to the presenter.
       */
      fun onPageSelected(page: ReaderPage) {
@@ -33390,8 +33761,25 @@ index c878b34..5dca1c3 100644
          viewModel.onPageSelected(page)
      }
  
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/reader/ReaderModeChanges.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/reader/ReaderModeChanges.kt
+new file mode 100644
+index 0000000..f2fafb2
+--- /dev/null
++++ b/app/src/main/java/eu/kanade/tachiyomi/ui/reader/ReaderModeChanges.kt
+@@ -0,0 +1,11 @@
++package eu.kanade.tachiyomi.ui.reader
++
++import eu.kanade.domain.manga.model.readingMode
++import kotlinx.coroutines.flow.Flow
++import kotlinx.coroutines.flow.distinctUntilChanged
++import kotlinx.coroutines.flow.mapNotNull
++import tachiyomi.domain.manga.model.Manga
++
++/** Metadata refreshes must leave the current viewer and its decoded pages in place. */
++internal fun Flow<Manga?>.readerModeChanges(): Flow<Long> =
++    mapNotNull { it?.readingMode }.distinctUntilChanged()
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/reader/ReaderViewModel.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/reader/ReaderViewModel.kt
-index 291c3b5..f107057 100644
+index 291c3b5..25dea5a 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/ui/reader/ReaderViewModel.kt
 +++ b/app/src/main/java/eu/kanade/tachiyomi/ui/reader/ReaderViewModel.kt
 @@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModel
@@ -33665,7 +34053,7 @@ index 291c3b5..f107057 100644
          }
      }
  
-@@ -276,6 +287,101 @@ class ReaderViewModel @JvmOverloads constructor(
+@@ -276,6 +287,103 @@ class ReaderViewModel @JvmOverloads constructor(
       * Called when the user pressed the back button and is going to leave the reader. Used to
       * trigger deletion of the downloaded chapters.
       */
@@ -33741,8 +34129,10 @@ index 291c3b5..f107057 100644
 +                            replacements.getOrNull(position - 1),
 +                            replacements.getOrNull(position + 1),
 +                        )
-+                    viewers.ref()
-+                    old.unref()
++                    if (viewers != old) {
++                        viewers.ref()
++                        old.unref()
++                    }
 +                    val discarded =
 +                        chapterList.filter {
 +                            it !in replacements &&
@@ -33751,7 +34141,7 @@ index 291c3b5..f107057 100644
 +                    discarded.forEach { it.pageLoader?.recycle() }
 +                    chapterList.clear()
 +                    chapterList.addAll(replacements)
-+                    mutableState.update { it.copy(viewerChapters = viewers) }
++                    if (viewers != old) mutableState.update { it.copy(viewerChapters = viewers) }
 +                    downloadNextChapters()
 +                }
 +            } catch (cancelled: CancellationException) {
@@ -33767,7 +34157,7 @@ index 291c3b5..f107057 100644
      fun onActivityFinish() {
          deletePendingChapters()
      }
-@@ -288,16 +394,30 @@ class ReaderViewModel @JvmOverloads constructor(
+@@ -288,16 +396,30 @@ class ReaderViewModel @JvmOverloads constructor(
      private suspend fun init() {
          withIOContext {
              try {
@@ -33795,12 +34185,13 @@ index 291c3b5..f107057 100644
 +                        ::onImageFailure,
 +                    )
  
-                 loadChapter(loader!!, chapterList.first { chapterId == it.chapter.id })
-+                refreshReadingSequence()
+-                loadChapter(loader!!, chapterList.first { chapterId == it.chapter.id })
++                val opened = loadChapter(loader!!, chapterList.first { chapterId == it.chapter.id })
++                if (opened.currChapter.pageLoader?.isLocal == false) refreshReadingSequence()
              } catch (e: Throwable) {
                  if (e is CancellationException) {
                      throw e
-@@ -314,15 +434,92 @@ class ReaderViewModel @JvmOverloads constructor(
+@@ -314,15 +436,92 @@ class ReaderViewModel @JvmOverloads constructor(
      private suspend fun loadChapter(
          loader: ChapterLoader,
          chapter: ReaderChapter,
@@ -33900,7 +34291,7 @@ index 291c3b5..f107057 100644
  
          withUIContext {
              mutableState.update {
-@@ -341,8 +538,8 @@ class ReaderViewModel @JvmOverloads constructor(
+@@ -341,8 +540,8 @@ class ReaderViewModel @JvmOverloads constructor(
      }
  
      /**
@@ -33911,7 +34302,7 @@ index 291c3b5..f107057 100644
       */
      private fun loadNewChapter(chapter: ReaderChapter) {
          val loader = loader ?: return
-@@ -364,9 +561,7 @@ class ReaderViewModel @JvmOverloads constructor(
+@@ -364,9 +563,7 @@ class ReaderViewModel @JvmOverloads constructor(
          }
      }
  
@@ -33922,7 +34313,7 @@ index 291c3b5..f107057 100644
      private suspend fun loadAdjacent(chapter: ReaderChapter) {
          val loader = loader ?: return
  
-@@ -374,9 +569,7 @@ class ReaderViewModel @JvmOverloads constructor(
+@@ -374,9 +571,7 @@ class ReaderViewModel @JvmOverloads constructor(
  
          mutableState.update { it.copy(isLoadingAdjacentChapter = true) }
          try {
@@ -33933,7 +34324,7 @@ index 291c3b5..f107057 100644
          } catch (e: Throwable) {
              if (e is CancellationException) {
                  throw e
-@@ -392,27 +585,30 @@ class ReaderViewModel @JvmOverloads constructor(
+@@ -392,27 +587,30 @@ class ReaderViewModel @JvmOverloads constructor(
       * that the user doesn't have to wait too long to continue reading.
       */
      suspend fun preload(chapter: ReaderChapter) {
@@ -33974,7 +34365,7 @@ index 291c3b5..f107057 100644
              return
          }
  
-@@ -430,15 +626,13 @@ class ReaderViewModel @JvmOverloads constructor(
+@@ -430,15 +628,13 @@ class ReaderViewModel @JvmOverloads constructor(
      }
  
      fun onViewerLoaded(viewer: Viewer?) {
@@ -33994,13 +34385,15 @@ index 291c3b5..f107057 100644
       */
      fun onPageSelected(page: ReaderPage) {
          // InsertPage doesn't change page progress
-@@ -448,11 +642,13 @@ class ReaderViewModel @JvmOverloads constructor(
+@@ -448,11 +644,15 @@ class ReaderViewModel @JvmOverloads constructor(
  
          val selectedChapter = page.chapter
          val pages = selectedChapter.pages ?: return
 +        if (page.status is Page.State.Error)
 +            onImageFailure(selectedChapter, page, (page.status as Page.State.Error).error)
-+        if (page.index >= pages.lastIndex - 2 && state.value.viewerChapters?.nextChapter == null)
++        if (page.index >= (pages.lastIndex - 2).coerceAtLeast(if (selectedChapter.pageLoader?.isLocal == true) 1 else 0) &&
++            state.value.viewerChapters?.nextChapter == null
++        )
 +            refreshReadingSequence(forceDiscovery = true)
  
          // Save last page read and mark as read if needed
@@ -34011,7 +34404,7 @@ index 291c3b5..f107057 100644
  
          if (selectedChapter != getCurrentChapter()) {
              logcat { "Setting ${selectedChapter.chapter.url} as active" }
-@@ -468,41 +664,29 @@ class ReaderViewModel @JvmOverloads constructor(
+@@ -468,41 +668,29 @@ class ReaderViewModel @JvmOverloads constructor(
      }
  
      private fun downloadNextChapters() {
@@ -34066,7 +34459,7 @@ index 291c3b5..f107057 100644
       */
      private fun cancelQueuedDownloads(currentChapter: ReaderChapter): Download? {
          return downloadManager.getQueuedDownloadOrNull(currentChapter.chapter.id!!)?.also {
-@@ -511,8 +695,9 @@ class ReaderViewModel @JvmOverloads constructor(
+@@ -511,8 +699,9 @@ class ReaderViewModel @JvmOverloads constructor(
      }
  
      /**
@@ -34078,7 +34471,7 @@ index 291c3b5..f107057 100644
       * @param currentChapter current chapter, which is going to be marked as read.
       */
      private fun deleteChapterIfNeeded(currentChapter: ReaderChapter) {
-@@ -532,15 +717,12 @@ class ReaderViewModel @JvmOverloads constructor(
+@@ -532,15 +721,12 @@ class ReaderViewModel @JvmOverloads constructor(
      }
  
      /**
@@ -34096,7 +34489,7 @@ index 291c3b5..f107057 100644
          readerChapter.requestedPage = pageIndex
          chapterPageIndex = pageIndex
  
-@@ -556,7 +738,7 @@ class ReaderViewModel @JvmOverloads constructor(
+@@ -556,7 +742,7 @@ class ReaderViewModel @JvmOverloads constructor(
                      id = readerChapter.chapter.id!!,
                      read = readerChapter.chapter.read,
                      lastPageRead = readerChapter.chapter.last_page_read.toLong(),
@@ -34105,7 +34498,7 @@ index 291c3b5..f107057 100644
              )
          }
      }
-@@ -566,17 +748,13 @@ class ReaderViewModel @JvmOverloads constructor(
+@@ -566,17 +752,13 @@ class ReaderViewModel @JvmOverloads constructor(
          updateTrackChapterRead(readerChapter)
          deleteChapterIfNeeded(readerChapter)
  
@@ -34130,7 +34523,7 @@ index 291c3b5..f107057 100644
                      ChapterUpdate(id = chapter.id, read = true)
                  } else {
                      null
-@@ -589,9 +767,7 @@ class ReaderViewModel @JvmOverloads constructor(
+@@ -589,9 +771,7 @@ class ReaderViewModel @JvmOverloads constructor(
          chapterReadStartTime = Clock.System.now().toEpochMilliseconds()
      }
  
@@ -34141,7 +34534,7 @@ index 291c3b5..f107057 100644
      suspend fun updateHistory() {
          getCurrentChapter()?.let { readerChapter ->
              if (incognitoMode) return@let
-@@ -601,75 +777,71 @@ class ReaderViewModel @JvmOverloads constructor(
+@@ -601,75 +781,71 @@ class ReaderViewModel @JvmOverloads constructor(
              val sessionReadDuration = chapterReadStartTime?.let { endTime.time - it } ?: 0
  
              upsertHistory.await(HistoryUpdate(chapterId, endTime, sessionReadDuration))
@@ -34241,7 +34634,7 @@ index 291c3b5..f107057 100644
      fun getMangaReadingMode(resolveDefault: Boolean = true): Int {
          val default = readerPreferences.defaultReadingMode.get()
          val readingMode = ReadingMode.fromPreference(manga?.readingMode?.toInt())
-@@ -679,9 +851,7 @@ class ReaderViewModel @JvmOverloads constructor(
+@@ -679,9 +855,7 @@ class ReaderViewModel @JvmOverloads constructor(
          }
      }
  
@@ -34252,7 +34645,7 @@ index 291c3b5..f107057 100644
      fun setMangaReadingMode(readingMode: ReadingMode) {
          val manga = manga ?: return
          runBlocking(Dispatchers.IO) {
-@@ -693,19 +863,14 @@ class ReaderViewModel @JvmOverloads constructor(
+@@ -693,19 +867,14 @@ class ReaderViewModel @JvmOverloads constructor(
                  currChapter.requestedPage = currChapter.chapter.last_page_read
  
                  mutableState.update {
@@ -34274,7 +34667,7 @@ index 291c3b5..f107057 100644
      fun getMangaOrientation(resolveDefault: Boolean = true): Int {
          val default = readerPreferences.defaultOrientationType.get()
          val orientation = ReaderOrientation.fromPreference(manga?.readerOrientation?.toInt())
-@@ -715,9 +880,7 @@ class ReaderViewModel @JvmOverloads constructor(
+@@ -715,9 +884,7 @@ class ReaderViewModel @JvmOverloads constructor(
          }
      }
  
@@ -34285,7 +34678,7 @@ index 291c3b5..f107057 100644
      fun setMangaOrientationType(orientation: ReaderOrientation) {
          val manga = manga ?: return
          viewModelScope.launchIO {
-@@ -729,10 +892,7 @@ class ReaderViewModel @JvmOverloads constructor(
+@@ -729,10 +896,7 @@ class ReaderViewModel @JvmOverloads constructor(
                  currChapter.requestedPage = currChapter.chapter.last_page_read
  
                  mutableState.update {
@@ -34297,7 +34690,7 @@ index 291c3b5..f107057 100644
                  }
                  eventChannel.send(Event.SetOrientation(getMangaOrientation()))
                  eventChannel.send(Event.ReloadViewerChapters)
-@@ -749,13 +909,8 @@ class ReaderViewModel @JvmOverloads constructor(
+@@ -749,13 +913,8 @@ class ReaderViewModel @JvmOverloads constructor(
          }
      }
  
@@ -34313,7 +34706,7 @@ index 291c3b5..f107057 100644
          val chapter = page.chapter.chapter
          val filenameSuffix = " - ${page.number}"
          return DiskUtil.buildValidFilename(
-@@ -794,30 +949,37 @@ class ReaderViewModel @JvmOverloads constructor(
+@@ -794,30 +953,37 @@ class ReaderViewModel @JvmOverloads constructor(
          val position = dialog?.translationPosition
          val editor = page?.translationEditor
          if (page == null || position == null || editor == null) {
@@ -34371,7 +34764,7 @@ index 291c3b5..f107057 100644
          }
      }
  
-@@ -834,8 +996,8 @@ class ReaderViewModel @JvmOverloads constructor(
+@@ -834,8 +1000,8 @@ class ReaderViewModel @JvmOverloads constructor(
      }
  
      /**
@@ -34382,7 +34775,7 @@ index 291c3b5..f107057 100644
       */
      fun saveImage() {
          val page = (state.value.dialog as? Dialog.PageActions)?.page
-@@ -849,24 +1011,25 @@ class ReaderViewModel @JvmOverloads constructor(
+@@ -849,24 +1015,25 @@ class ReaderViewModel @JvmOverloads constructor(
          val filename = generateFilename(manga, page)
  
          // Pictures directory.
@@ -34422,7 +34815,7 @@ index 291c3b5..f107057 100644
                  withUIContext {
                      notifier.onComplete(uri)
                      eventChannel.send(Event.SavedImage(SaveImageResult.Success(uri)))
-@@ -898,23 +1061,25 @@ class ReaderViewModel @JvmOverloads constructor(
+@@ -898,23 +1065,25 @@ class ReaderViewModel @JvmOverloads constructor(
          try {
              viewModelScope.launchNonCancellable {
                  destDir.deleteRecursively()
@@ -34458,7 +34851,7 @@ index 291c3b5..f107057 100644
      fun setAsCover() {
          val page = (state.value.dialog as? Dialog.PageActions)?.page
          if (page?.status != Page.State.Ready) return
-@@ -922,16 +1087,17 @@ class ReaderViewModel @JvmOverloads constructor(
+@@ -922,16 +1091,17 @@ class ReaderViewModel @JvmOverloads constructor(
          val stream = page.stream ?: return
  
          viewModelScope.launchNonCancellable {
@@ -34485,7 +34878,7 @@ index 291c3b5..f107057 100644
              eventChannel.send(Event.SetCoverResult(result))
          }
      }
-@@ -944,12 +1110,13 @@ class ReaderViewModel @JvmOverloads constructor(
+@@ -944,12 +1114,13 @@ class ReaderViewModel @JvmOverloads constructor(
  
      sealed interface SaveImageResult {
          class Success(val uri: Uri) : SaveImageResult
@@ -34501,7 +34894,7 @@ index 291c3b5..f107057 100644
       */
      private fun updateTrackChapterRead(readerChapter: ReaderChapter) {
          if (incognitoMode) return
-@@ -972,7 +1139,9 @@ class ReaderViewModel @JvmOverloads constructor(
+@@ -972,7 +1143,9 @@ class ReaderViewModel @JvmOverloads constructor(
          val manga = manga ?: return
  
          viewModelScope.launchNonCancellable {
@@ -34512,7 +34905,7 @@ index 291c3b5..f107057 100644
          }
      }
  
-@@ -981,9 +1150,7 @@ class ReaderViewModel @JvmOverloads constructor(
+@@ -981,9 +1154,7 @@ class ReaderViewModel @JvmOverloads constructor(
       * are ignored.
       */
      private fun deletePendingChapters() {
@@ -34523,7 +34916,7 @@ index 291c3b5..f107057 100644
      }
  
      @Immutable
-@@ -995,9 +1162,7 @@ class ReaderViewModel @JvmOverloads constructor(
+@@ -995,9 +1166,7 @@ class ReaderViewModel @JvmOverloads constructor(
          val isLoadingAdjacentChapter: Boolean = false,
          val currentPage: Int = -1,
  
@@ -34534,7 +34927,7 @@ index 291c3b5..f107057 100644
          val viewer: Viewer? = null,
          val dialog: Dialog? = null,
          val menuVisible: Boolean = false,
-@@ -1012,9 +1177,13 @@ class ReaderViewModel @JvmOverloads constructor(
+@@ -1012,9 +1181,13 @@ class ReaderViewModel @JvmOverloads constructor(
  
      sealed interface Dialog {
          data object Loading : Dialog
@@ -34548,7 +34941,7 @@ index 291c3b5..f107057 100644
          data class PageActions(
              val page: ReaderPage,
              val translationPosition: ManualTranslationPosition?,
-@@ -1023,13 +1192,19 @@ class ReaderViewModel @JvmOverloads constructor(
+@@ -1023,13 +1196,19 @@ class ReaderViewModel @JvmOverloads constructor(
  
      sealed interface Event {
          data object ReloadViewerChapters : Event
@@ -35095,6 +35488,32 @@ index 0000000..651862b
 +        reader.close()
 +    }
 +}
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/reader/viewer/pager/PagerPageHolder.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/reader/viewer/pager/PagerPageHolder.kt
+index 501f41e..a2a0d79 100644
+--- a/app/src/main/java/eu/kanade/tachiyomi/ui/reader/viewer/pager/PagerPageHolder.kt
++++ b/app/src/main/java/eu/kanade/tachiyomi/ui/reader/viewer/pager/PagerPageHolder.kt
+@@ -215,6 +215,8 @@ class PagerPageHolder(
+                 }
+                 removeErrorLayout()
+             }
++        } catch (cancelled: kotlinx.coroutines.CancellationException) {
++            throw cancelled
+         } catch (e: Throwable) {
+             logcat(LogPriority.ERROR, e)
+             withUIContext {
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/reader/viewer/webtoon/WebtoonPageHolder.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/reader/viewer/webtoon/WebtoonPageHolder.kt
+index a9a6333..a179bfe 100644
+--- a/app/src/main/java/eu/kanade/tachiyomi/ui/reader/viewer/webtoon/WebtoonPageHolder.kt
++++ b/app/src/main/java/eu/kanade/tachiyomi/ui/reader/viewer/webtoon/WebtoonPageHolder.kt
+@@ -217,6 +217,8 @@ class WebtoonPageHolder(
+                 )
+                 removeErrorLayout()
+             }
++        } catch (cancelled: kotlinx.coroutines.CancellationException) {
++            throw cancelled
+         } catch (e: Throwable) {
+             logcat(LogPriority.ERROR, e)
+             withUIContext {
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/setting/track/TrackLoginActivity.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/setting/track/TrackLoginActivity.kt
 index f5f057b..354d551 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/ui/setting/track/TrackLoginActivity.kt
@@ -41478,7 +41897,7 @@ index cf639e4..6d59dd0 100644
              updateManga.awaitAll(listOfNotNull(currentMangaUpdate, targetMangaUpdate))
          } catch (e: Throwable) {
 diff --git a/app/src/main/java/mihon/domain/source/interactor/UpdateMangaFromRemote.kt b/app/src/main/java/mihon/domain/source/interactor/UpdateMangaFromRemote.kt
-index d016eaa..38236e7 100644
+index d016eaa..eb8a598 100644
 --- a/app/src/main/java/mihon/domain/source/interactor/UpdateMangaFromRemote.kt
 +++ b/app/src/main/java/mihon/domain/source/interactor/UpdateMangaFromRemote.kt
 @@ -1,26 +1,32 @@
@@ -41524,28 +41943,31 @@ index d016eaa..38236e7 100644
  ) {
      suspend operator fun invoke(
          manga: Manga,
-@@ -37,6 +44,7 @@ class UpdateMangaFromRemote(
+@@ -37,6 +44,8 @@ class UpdateMangaFromRemote(
          fetchChapters: Boolean = false,
          manualFetch: Boolean = false,
          fetchWindow: Pair<Long, Long> = Pair(0, 0),
 +        allowSourceDiscovery: Boolean = false,
++        recoverOnly: Boolean = false,
      ): Result<RemoteMangaUpdate> {
          val source = sourceManager.getOrStub(manga.source)
          return invoke(
-@@ -45,6 +53,8 @@ class UpdateMangaFromRemote(
+@@ -45,6 +54,9 @@ class UpdateMangaFromRemote(
              fetchDetails = fetchDetails,
              fetchChapters = fetchChapters,
              manualFetch = manualFetch,
 +            fetchWindow = fetchWindow,
 +            allowSourceDiscovery = allowSourceDiscovery,
++            recoverOnly = recoverOnly,
          )
      }
  
-@@ -55,29 +65,87 @@ class UpdateMangaFromRemote(
+@@ -55,29 +67,89 @@ class UpdateMangaFromRemote(
          fetchChapters: Boolean = false,
          manualFetch: Boolean = false,
          fetchWindow: Pair<Long, Long> = Pair(0, 0),
 +        allowSourceDiscovery: Boolean = false,
++        recoverOnly: Boolean = false,
      ): Result<RemoteMangaUpdate> {
          return try {
 -            val chapters = chapterRepository.getChapterByMangaId(manga.id)
@@ -41579,6 +42001,7 @@ index d016eaa..38236e7 100644
 +                        fetchDetails,
 +                        fetchChapters,
 +                        allowSourceDiscovery,
++                        recoverOnly = recoverOnly,
 +                    )
 +                        ?: source.getMangaUpdate(
 +                            manga =
@@ -41649,7 +42072,7 @@ index d016eaa..38236e7 100644
          } catch (e: Exception) {
              logcat(LogPriority.ERROR, e)
              Result.failure(e)
-@@ -89,53 +157,59 @@ class UpdateMangaFromRemote(
+@@ -89,53 +161,59 @@ class UpdateMangaFromRemote(
          remoteManga: SManga,
          manualFetch: Boolean,
      ): Boolean {
@@ -64874,10 +65297,10 @@ index 0000000..f10fe88
 +}
 diff --git a/app/src/test/java/eu/kanade/tachiyomi/data/backup/restore/BackupSqliteRestoreTest.kt b/app/src/test/java/eu/kanade/tachiyomi/data/backup/restore/BackupSqliteRestoreTest.kt
 new file mode 100644
-index 0000000..408040c
+index 0000000..8676d08
 --- /dev/null
 +++ b/app/src/test/java/eu/kanade/tachiyomi/data/backup/restore/BackupSqliteRestoreTest.kt
-@@ -0,0 +1,432 @@
+@@ -0,0 +1,478 @@
 +package eu.kanade.tachiyomi.data.backup.restore
 +
 +import android.content.ContentResolver
@@ -64957,10 +65380,10 @@ index 0000000..408040c
 +        unmockkStatic("tachiyomi.core.common.i18n.LocalizeKt")
 +    }
 +
-+    private suspend fun open(create: Boolean) {
++    private suspend fun open(create: Boolean, name: String = "backup-test.db") {
 +        driver =
 +            JdbcSqliteDriver(
-+                "jdbc:sqlite:${File(directory, "backup-test.db").absolutePath}",
++                "jdbc:sqlite:${File(directory, name).absolutePath}",
 +                java.util.Properties().apply { setProperty("foreign_keys", "true") },
 +            )
 +        driver.execute(null, "PRAGMA foreign_keys = ON", 0).await()
@@ -65067,6 +65490,52 @@ index 0000000..408040c
 +        restorer.restore(entry(4), emptyList())
 +        assertTrue(chapter().read && chapter().bookmark)
 +        assertEquals(20L, chapter().lastPageRead)
++    }
++
++    @Test
++    fun `export then restore preserves four library categories and their work assignments`() = runTest {
++        val prefs = mockk<LibraryPreferences>()
++        every { prefs.categorizedDisplaySettings } returns InMemoryPreference("categorized", false, false)
++        val names = listOf("Lendo", "Dropada", "Concluído", "A ler")
++        val inputCategories = names.mapIndexed { i, name -> BackupCategory(name, order = i.toLong() + 7, id = i.toLong() + 23, flags = 0) }
++        val entries = names.mapIndexed { i, name ->
++            entry(12, read = i == 2, bookmarked = i == 0).apply {
++                title = name
++                url = "/work-$i"
++                categories = if (i == 0) listOf(7, 10) else listOf(i.toLong() + 7)
++            }
++        }
++        CategoriesRestorer(database, categories, prefs)(inputCategories)
++        for (entry in entries) restorer.restore(entry, inputCategories)
++        val backup = Backup(
++            MangaBackupCreator(database, categories, GetHistory(HistoryRepositoryImpl(database)))(
++                mangas.getFavorites(),
++                BackupOptions(),
++            ),
++            backupCategories = CategoriesBackupCreator(categories)(),
++        )
++        val bytes = ByteArrayOutputStream().also { out ->
++            GZIPOutputStream(out).use {
++                it.write(ProtoBuf.encodeToByteArray(Backup.serializer(), backup))
++            }
++        }.toByteArray()
++        val exported = decode(bytes)
++        driver.close()
++        open(create = true, name = "restored-categories.db")
++        database.categoriesQueries.insert("Já existente", 0, 0)
++        coordinator().restoreBackup(exported, RestoreOptions(appSettings = false, sourceSettings = false, extensionStores = false))
++
++        val restored = mangas.getFavorites().associateBy { it.title }
++        assertEquals(names.toSet(), restored.keys)
++        for ((i, name) in names.withIndex()) {
++            val work = restored.getValue(name)
++            val expected = if (i == 0) setOf("Lendo", "A ler") else setOf(name)
++            assertEquals(expected, categories.await(work.id).map { it.name }.toSet())
++            val chapter = chapters.awaitNative(work.id).single()
++            assertEquals(i == 0, chapter.bookmark)
++            assertEquals(i == 2, chapter.read)
++            assertEquals(12L, chapter.lastPageRead)
++        }
 +    }
 +
 +    @Test
@@ -67745,10 +68214,10 @@ index 0000000..d399c28
 +}
 diff --git a/app/src/test/java/eu/kanade/tachiyomi/extension/util/ExtensionInstallerDownloadTest.kt b/app/src/test/java/eu/kanade/tachiyomi/extension/util/ExtensionInstallerDownloadTest.kt
 new file mode 100644
-index 0000000..84cac8c
+index 0000000..abc4154
 --- /dev/null
 +++ b/app/src/test/java/eu/kanade/tachiyomi/extension/util/ExtensionInstallerDownloadTest.kt
-@@ -0,0 +1,301 @@
+@@ -0,0 +1,324 @@
 +package eu.kanade.tachiyomi.extension.util
 +
 +import android.content.Context
@@ -67820,6 +68289,7 @@ index 0000000..84cac8c
 +        Executors.newCachedThreadPool { task -> Thread(task).apply { isDaemon = true } }
 +    private var server: HttpServer? = null
 +    private lateinit var installer: ExtensionInstaller
++    private val acceptLoadedPackage = java.util.concurrent.atomic.AtomicBoolean(true)
 +    private val cache
 +        get() = File(folder, "cache")
 +
@@ -67833,14 +68303,14 @@ index 0000000..84cac8c
 +        every { preference.get() } returns BasePreferences.ExtensionInstaller.PRIVATE
 +        mockkObject(ExtensionLoader, Installer.Companion)
 +        justRun { Installer.cancelInstallQueue(context, any()) }
-+        every { ExtensionLoader.installPrivateExtensionFile(context, any(), any()) } answers
++        every { ExtensionLoader.installPrivateExtensionFile(context, any(), any(), any(), any()) } answers
 +            {
-+                PrivateExtensionFiles.replace(secondArg(), target, thirdArg()) { staged ->
++                PrivateExtensionFiles.replace(secondArg(), target, arg(4)) { staged ->
 +                    assertArrayEquals(bytes, staged.readBytes())
 +                }
 +                true
 +            }
-+        installer = ExtensionInstaller(context, preference, client)
++        installer = ExtensionInstaller(context, preference, client) { acceptLoadedPackage.get() }
 +    }
 +
 +    @AfterEach
@@ -67857,6 +68327,28 @@ index 0000000..84cac8c
 +        client.dispatcher.executorService.shutdownNow()
 +        client.connectionPool.evictAll()
 +        folder.walk().forEach { it.setWritable(true) }
++    }
++
++    @Test
++    fun `uninstalling an already absent private archive emits no removal event`() {
++        every { context.filesDir } returns folder
++        every { ExtensionLoader.uninstallPrivateExtension(context, extension.pkgName) } answers { callOriginal() }
++
++        ExtensionLoader.uninstallPrivateExtension(context, extension.pkgName)
++
++        verify(exactly = 0) { context.sendBroadcast(any()) }
++    }
++
++    @Test
++    fun `a copied private archive that cannot load does not report installed`() = runBlocking {
++        acceptLoadedPackage.set(false)
++        val steps = installer.downloadAndInstall(serve(), extension).toList()
++        assertEquals(InstallStep.Error, steps.last())
++        verify {
++            ExtensionLoader.installPrivateExtensionFile(
++                context, any(), extension.pkgName, extension.versionCode, any(),
++            )
++        }
 +    }
 +
 +    @Test
@@ -67896,7 +68388,7 @@ index 0000000..84cac8c
 +                    .toList()
 +            assertEquals(InstallStep.Installed, steps.last())
 +            verify(exactly = 0) {
-+                ExtensionLoader.installPrivateExtensionFile(context, any(), any())
++                ExtensionLoader.installPrivateExtensionFile(context, any(), any(), any(), any())
 +            }
 +            assertEquals(BasePreferences.ExtensionInstaller.LEGACY, preference.get())
 +        }
@@ -67924,7 +68416,7 @@ index 0000000..84cac8c
 +            assertEquals(InstallStep.Error, steps.last())
 +            assertEquals("working", target.readText())
 +            verify(exactly = 0) {
-+                ExtensionLoader.installPrivateExtensionFile(context, any(), any())
++                ExtensionLoader.installPrivateExtensionFile(context, any(), any(), any(), any())
 +            }
 +            verify(exactly = 0) {
 +                ExtensionLoader.installVerifiedPrivateExtensionFile(context, any(), any(), any())
@@ -67983,7 +68475,7 @@ index 0000000..84cac8c
 +                installer.downloadAndInstall(serve(status = 503), extension).toList()
 +            }
 +        assertEquals(InstallStep.Error, steps.last())
-+        verify(exactly = 0) { ExtensionLoader.installPrivateExtensionFile(context, any(), any()) }
++        verify(exactly = 0) { ExtensionLoader.installPrivateExtensionFile(context, any(), any(), any(), any()) }
 +    }
 +
 +    @Test
@@ -67999,7 +68491,7 @@ index 0000000..84cac8c
 +            assertEquals(InstallStep.Idle, steps.last())
 +            assertArrayEquals(original, target.readBytes())
 +            verify(exactly = 0) {
-+                ExtensionLoader.installPrivateExtensionFile(context, any(), any())
++                ExtensionLoader.installPrivateExtensionFile(context, any(), any(), any(), any())
 +            }
 +        }
 +
@@ -68046,7 +68538,7 @@ index 0000000..84cac8c
 +            installer.cancelInstall(extension.pkgName)
 +            assertEquals(InstallStep.Idle, withTimeout(5000) { second.await() }.last())
 +            verify(exactly = 0) {
-+                ExtensionLoader.installPrivateExtensionFile(context, any(), any())
++                ExtensionLoader.installPrivateExtensionFile(context, any(), any(), any(), any())
 +            }
 +        }
 +}
@@ -68558,10 +69050,10 @@ index 0000000..a64600f
 +}
 diff --git a/app/src/test/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalogTest.kt b/app/src/test/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalogTest.kt
 new file mode 100644
-index 0000000..88cd40c
+index 0000000..2c1d152
 --- /dev/null
 +++ b/app/src/test/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalogTest.kt
-@@ -0,0 +1,1138 @@
+@@ -0,0 +1,1191 @@
 +package eu.kanade.tachiyomi.source.selection
 +
 +import eu.kanade.domain.source.service.SourcePreferences
@@ -68610,6 +69102,7 @@ index 0000000..88cd40c
 +        private val creator: String = "Jane Doe",
 +        private val matchQuery: Boolean = false,
 +        private val genre: String? = null,
++        private val cover: String? = null,
 +    ) : HttpSource() {
 +        override val baseUrl = "https://example.invalid"
 +        override val name = "Provider $id"
@@ -68626,6 +69119,7 @@ index 0000000..88cd40c
 +                it.title = title
 +                it.author = creator
 +                it.genre = genre
++                it.thumbnail_url = cover
 +            }
 +
 +        override suspend fun getSearchManga(
@@ -68703,6 +69197,57 @@ index 0000000..88cd40c
 +                read = true,
 +                lastPageRead = 4,
 +            )
++
++    @Test
++    fun `recovery tries the original and does not search alternatives when it can still be read`() = runTest {
++        val original = Provider(1, 2)
++        val alternative = Provider(2, 3)
++        val sampled = mutableListOf<Long>()
++        val catalog = AutomaticSourceCatalog(Manager(listOf(original, alternative)), preferences()) { source, _ ->
++            sampled += source.id
++            true
++        }
++        val result = catalog.fetch(original, work(), emptyList(), true, true, true, recoverOnly = true)!!
++        assertEquals(listOf(1L), sampled)
++        assertEquals(0, alternative.searches)
++        assertEquals(setOf(1L), result.chapters.map { ChapterOrigin.from(it.memo)?.sourceId }.toSet())
++    }
++
++    @Test
++    fun `recovery searches another provider if the original lists chapters but its pages fail`() = runTest {
++        val original = Provider(1, 2, cover = "https://example.invalid/broken.jpg")
++        val alternative = Provider(2, 3, cover = "https://example.invalid/readable.jpg")
++        val catalog = AutomaticSourceCatalog(Manager(listOf(original, alternative)), preferences()) { source, _ ->
++            source.id != original.id
++        }
++        val result = catalog.fetch(original, work(), emptyList(), true, true, true, recoverOnly = true)!!
++        assertEquals(1, alternative.searches)
++        assertEquals("https://example.invalid/readable.jpg", result.manga.thumbnail_url)
++        assertTrue(result.chapters.any { ChapterOrigin.from(it.memo)?.sourceId == 2L })
++    }
++
++    @Test
++    fun `an unavailable original recovers a cover from a readable matching provider without changing its URL`() = runTest {
++        val old = StubSource(1, "en", "Old")
++        val alternative = Provider(2, 3, cover = "https://example.invalid/new.jpg")
++        val catalog = catalog(Manager(listOf(alternative)), preferences())
++        val saved = work().copy(favorite = true, thumbnailUrl = "https://example.invalid/old.jpg")
++        val result = catalog.fetch(old, saved, listOf(oldChapter()), true, true, true)!!
++        assertEquals(saved.url, result.manga.url)
++        assertEquals("https://example.invalid/new.jpg", result.manga.thumbnail_url)
++        assertEquals(2L, WorkSources.from(result.manga.memo).coverSourceId)
++        assertTrue(result.chapters.any { ChapterOrigin.from(it.memo)?.sourceId == 2L })
++    }
++
++    @Test
++    fun `a working original keeps its own cover even when another provider extends the catalog`() = runTest {
++        val primary = Provider(1, 2, cover = "https://example.invalid/original.jpg")
++        val alternative = Provider(2, 3, cover = "https://example.invalid/alternative.jpg")
++        val result = catalog(Manager(listOf(primary, alternative)), preferences())
++            .fetch(primary, work(), emptyList(), true, true, true)!!
++        assertEquals("https://example.invalid/original.jpg", result.manga.thumbnail_url)
++        assertEquals(null, WorkSources.from(result.manga.memo).coverSourceId)
++    }
 +
 +    @Test
 +    fun `adult labeled matching alternatives are not adopted or image sampled`() = runTest {
@@ -69821,10 +70366,10 @@ index 0000000..aa5d0b8
 +}
 diff --git a/app/src/test/java/eu/kanade/tachiyomi/source/selection/LibraryWorkConsolidatorTest.kt b/app/src/test/java/eu/kanade/tachiyomi/source/selection/LibraryWorkConsolidatorTest.kt
 new file mode 100644
-index 0000000..b0e5c13
+index 0000000..58c4ae0
 --- /dev/null
 +++ b/app/src/test/java/eu/kanade/tachiyomi/source/selection/LibraryWorkConsolidatorTest.kt
-@@ -0,0 +1,223 @@
+@@ -0,0 +1,236 @@
 +package eu.kanade.tachiyomi.source.selection
 +
 +import eu.kanade.tachiyomi.source.*
@@ -69888,7 +70433,7 @@ index 0000000..b0e5c13
 +                )
 +        }
 +
-+    private class Fixture(initial: List<Manga>) {
++    private class Fixture(initial: List<Manga>, unavailable: Set<Long> = emptySet()) {
 +        var saved = initial
 +        val works = mockk<LibraryWorkRepository>()
 +        val chapters = mockk<ChapterRepository>()
@@ -69926,9 +70471,22 @@ index 0000000..b0e5c13
 +                LibraryWorkConsolidator(
 +                    works,
 +                    chapters,
-+                    Manager(initial.map { Provider(it.source, if (it.id == 1L) "pt-BR" else "en") }),
++                    Manager(initial.filterNot { it.source in unavailable }.map { Provider(it.source, if (it.id == 1L) "pt-BR" else "en") }),
 +                )
 +        }
++    }
++
++    @Test
++    fun `three legacy favorites can consolidate after source recovery with corroborated numbering`() = runTest {
++        val recovered = WorkSources(candidates = listOf(
++            WorkSource(8, "Current", "en", "/work", "The Star", "Jane", readability = "sample_passed"),
++        ))
++        val initial = (1L..3L).map { manga(it) }.map { it.copy(memo = recovered.attach(it.memo)) }
++        val f = Fixture(initial, unavailable = setOf(1, 2, 3))
++        assertEquals(1, f.service.reconcile())
++        assertEquals(3, f.saved.count { it.favorite })
++        val linked = f.saved.map { LibraryWork.from(it.memo) }.toSet().single()!!
++        assertEquals(3, linked.editions.size)
 +    }
 +
 +    @Test
@@ -74007,6 +74565,38 @@ index 0000000..a588cab
 +        }
 +        assertFalse(DocumentFormat.fromName("BOOK.EPUB") == null)
 +        assertNull(DocumentFormat.fromName("installer.apk"))
++    }
++}
+diff --git a/app/src/test/java/eu/kanade/tachiyomi/ui/reader/ReaderModeChangesTest.kt b/app/src/test/java/eu/kanade/tachiyomi/ui/reader/ReaderModeChangesTest.kt
+new file mode 100644
+index 0000000..34f6ea4
+--- /dev/null
++++ b/app/src/test/java/eu/kanade/tachiyomi/ui/reader/ReaderModeChangesTest.kt
+@@ -0,0 +1,26 @@
++package eu.kanade.tachiyomi.ui.reader
++
++import eu.kanade.tachiyomi.ui.reader.setting.ReadingMode
++import kotlinx.coroutines.flow.flowOf
++import kotlinx.coroutines.flow.toList
++import kotlinx.coroutines.test.runTest
++import org.junit.jupiter.api.Assertions.assertEquals
++import org.junit.jupiter.api.Test
++import tachiyomi.domain.manga.model.Manga
++
++class ReaderModeChangesTest {
++    @Test
++    fun `a refreshed cover or title does not recreate the viewer but changing reading mode does`() = runTest {
++        val mode = ReadingMode.WEBTOON.flagValue.toLong()
++        val paged = ReadingMode.LEFT_TO_RIGHT.flagValue.toLong()
++        val manga = Manga.create().copy(viewerFlags = mode, title = "Work")
++        val events = flowOf(
++            null,
++            manga,
++            manga.copy(thumbnailUrl = "https://example.invalid/cover.jpg"),
++            manga.copy(title = "Updated work"),
++            manga.copy(viewerFlags = paged),
++        ).readerModeChanges().toList()
++        assertEquals(listOf(mode, paged), events)
 +    }
 +}
 diff --git a/app/src/test/java/eu/kanade/tachiyomi/util/system/DeviceWorkloadPolicyTest.kt b/app/src/test/java/eu/kanade/tachiyomi/util/system/DeviceWorkloadPolicyTest.kt
@@ -81156,6 +81746,25 @@ index 0000000..81cc601
 +        fun without(memo: JsonObject) = JsonObject(memo - KEY)
 +    }
 +}
+diff --git a/domain/src/main/java/tachiyomi/domain/manga/model/MangaCover.kt b/domain/src/main/java/tachiyomi/domain/manga/model/MangaCover.kt
+index d2ca3b1..671c751 100644
+--- a/domain/src/main/java/tachiyomi/domain/manga/model/MangaCover.kt
++++ b/domain/src/main/java/tachiyomi/domain/manga/model/MangaCover.kt
+@@ -9,12 +9,14 @@ data class MangaCover(
+     val isMangaFavorite: Boolean,
+     val url: String?,
+     val lastModified: Long,
++    val alternativeSourceId: Long? = null,
+ )
+ 
+ fun Manga.asMangaCover(): MangaCover {
+     return MangaCover(
+         mangaId = id,
+         sourceId = source,
++        alternativeSourceId = WorkSources.from(memo).coverSourceId,
+         isMangaFavorite = favorite,
+         url = thumbnailUrl,
+         lastModified = coverLastModified,
 diff --git a/domain/src/main/java/tachiyomi/domain/manga/model/WorkIdentity.kt b/domain/src/main/java/tachiyomi/domain/manga/model/WorkIdentity.kt
 new file mode 100644
 index 0000000..8867b29
@@ -81232,10 +81841,10 @@ index 0000000..84cd5ad
 +}
 diff --git a/domain/src/main/java/tachiyomi/domain/manga/model/WorkSources.kt b/domain/src/main/java/tachiyomi/domain/manga/model/WorkSources.kt
 new file mode 100644
-index 0000000..cbdc5a2
+index 0000000..ddf36f0
 --- /dev/null
 +++ b/domain/src/main/java/tachiyomi/domain/manga/model/WorkSources.kt
-@@ -0,0 +1,51 @@
+@@ -0,0 +1,52 @@
 +package tachiyomi.domain.manga.model
 +
 +import kotlinx.serialization.Serializable
@@ -81274,6 +81883,7 @@ index 0000000..cbdc5a2
 +    val installedFingerprint: String = "",
 +    val identity: WorkIdentity? = null,
 +    val discoveryIncomplete: Boolean = false,
++    val coverSourceId: Long? = null,
 +) {
 +    fun attach(memo: JsonObject): JsonObject =
 +        JsonObject(memo + (KEY to json.encodeToJsonElement(this)))
@@ -81978,7 +82588,7 @@ index 9839272..0ac8bdd 100644
 \ No newline at end of file
 +voyager = ["voyager-navigator", "voyager-tabNavigator", "voyager-transitions"]
 diff --git a/i18n-at/src/commonMain/moko-resources/base/strings.xml b/i18n-at/src/commonMain/moko-resources/base/strings.xml
-index 7ed4795..1ee9804 100644
+index 7ed4795..cf5d2a7 100644
 --- a/i18n-at/src/commonMain/moko-resources/base/strings.xml
 +++ b/i18n-at/src/commonMain/moko-resources/base/strings.xml
 @@ -10,7 +10,7 @@
@@ -81990,7 +82600,7 @@ index 7ed4795..1ee9804 100644
      <string name="pref_group_setup">Translation Setup</string>
      <string name="pref_translate_from">Translate From</string>
      <string name="pref_translate_to">Translate To</string>
-@@ -73,12 +73,318 @@
+@@ -73,12 +73,320 @@
      <string name="repository_add_error">Could not add this repository. Check your connection and try again.</string>
      <string name="repository_refresh_error">Repository added, but extension listings could not be refreshed. Refresh the Extensions screen.</string>
      <string name="chapter_group_version">Group/version: %1$s</string>
@@ -82310,9 +82920,11 @@ index 7ed4795..1ee9804 100644
 +    <string name="storage_import_review_required">Files need review</string>
 +    <string name="storage_import_review_retry">To try resuming a complete copy, import the same original file again in Documents. Older or incomplete folders remain available for review in your file manager. The document-cache cleanup does not remove them.</string>
 +    <string name="backup_read_limit_exceeded">This backup exceeds the reading memory limit used by Polaris on this device. No existing backup was replaced. Use fewer optional fields when creating a backup, or a device with more memory.</string>
++    <string name="recover_library_sources">Recover library sources</string>
++    <string name="extension_install_failed">Could not install the extension. Check the repository version and compatibility.</string>
  </resources>
 diff --git a/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml b/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
-index d1748bc..c90db8a 100644
+index d1748bc..1feab2d 100644
 --- a/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
 +++ b/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
 @@ -10,7 +10,7 @@
@@ -82324,7 +82936,7 @@ index d1748bc..c90db8a 100644
      <string name="pref_group_setup">Configuração da tradução</string>
      <string name="pref_translate_from">Traduzir de</string>
      <string name="pref_translate_to">Traduzir para</string>
-@@ -73,12 +73,318 @@
+@@ -73,12 +73,320 @@
      <string name="repository_add_error">Não foi possível adicionar o repositório. Confira a conexão e tente novamente.</string>
      <string name="repository_refresh_error">Repositório adicionado, mas não foi possível atualizar as extensões. Atualize a tela Extensões.</string>
      <string name="chapter_group_version">Grupo/versão: %1$s</string>
@@ -82644,6 +83256,8 @@ index d1748bc..c90db8a 100644
 +    <string name="storage_import_review_required">Arquivos precisam de revisão</string>
 +    <string name="storage_import_review_retry">Para tentar retomar uma cópia completa, importe novamente o mesmo arquivo original em Documentos. Pastas antigas ou incompletas ficam disponíveis para conferência no gerenciador de arquivos. A limpeza do cache de documentos não remove essas pastas.</string>
 +    <string name="backup_read_limit_exceeded">Este backup excede o limite de memória de leitura usado pelo Polaris neste aparelho. Nenhum backup existente foi substituído. Reduza os dados opcionais ao criar um backup ou use um aparelho com mais memória.</string>
++    <string name="recover_library_sources">Recuperar fontes da biblioteca</string>
++    <string name="extension_install_failed">Não foi possível instalar a extensão. Confira a versão do repositório e a compatibilidade.</string>
  </resources>
 diff --git a/i18n/src/commonMain/moko-resources/base/strings.xml b/i18n/src/commonMain/moko-resources/base/strings.xml
 index c0832ba..ebf8f48 100644
