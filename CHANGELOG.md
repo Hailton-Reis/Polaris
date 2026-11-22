@@ -2,6 +2,14 @@
 
 Este arquivo registra a evolução real do código. **Revisões de desenvolvimento não são lançamentos públicos.** As datas abaixo usam America/Fortaleza, exceto quando houver indicação de UTC. O histórico de distribuição fica em [Releases](https://github.com/Hailton-Reis/Polaris/releases).
 
+## Desenvolvimento · P20261122.1 — abertura com catálogos grandes
+
+- Uma passagem para inventariar APKs de extensões. A checagem de atualizações reutiliza o catálogo carregado e roda fora da interface.
+- Ícones sob demanda e gravação de metadados apenas quando necessário. Busca com cinco operações ativas, fontes de mesmo nome preservadas e agrupamento fora da interface.
+- Liberação dos temporários internos de OCR em caso de falha. Downloads repetem automaticamente apenas erros transitórios.
+
+[Auditoria e verificação em aparelhos](docs/AUDITORIA_CATALOGO_GRANDE.md).
+
 ## Desenvolvimento · P20261117.6 — 17/11/2026
 
 **Estado:** concorrência adaptada à visibilidade para a próxima versão; sem novo APK/Release.

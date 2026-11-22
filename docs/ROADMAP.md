@@ -2,6 +2,10 @@
 
 O roadmap indica prioridades e critérios de verificação. Não representa prazo de entrega nem recurso já aprovado.
 
+## Abertura com centenas de fontes
+
+O relato de travamento em dois aparelhos Galaxy A priorizou a [auditoria de catálogos grandes](AUDITORIA_CATALOGO_GRANDE.md). O inventário de extensões, a checagem de atualizações e a busca receberam correções. O teste em aparelho deve preservar o catálogo, medir a abertura e verificar leitura e downloads. Os riscos na restauração da fila e na indexação das pastas ficaram registrados na auditoria.
+
 ## Após a beta.11 — auditoria P20261117.6
 
 A prioridade mais recente é tornar a busca entre fontes mais rápida e eficiente. A [P20261117.3](BUSCA_FONTES_P20261117_3.md) paraleliza a atualização dos catálogos confirmados e checagens de imagens, compartilha duas vagas por operação entre obras, evita buscas repetidas e distingue tentativas incompletas do cache diário. Provas de tempo são simuladas; faltam tempos/fontes reais e o novo pacote. Não relaxar a identificação de obras ou a numeração para ganhar velocidade.

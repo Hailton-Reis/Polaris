@@ -1,0 +1,26 @@
+{
+  "revision": "P20261122.1",
+  "base_commit": "c557d4a8fc78f3d18783e676b80a01eac00d95da",
+  "overlay_sha256": "5165b29f76b47e58206d5a9378b04dab22d6b7b642a3feb487f21c2ff1c650e7",
+  "mock_private_apk_inventory": {
+    "packages": 290,
+    "archive_metadata_reads": 290
+  },
+  "mock_global_search": {
+    "providers": 290,
+    "max_in_flight": 5,
+    "all_retained": true,
+    "startup_before_catalog_ready": true,
+    "grouped_partial_results": true
+  },
+  "app_beta_passed": 1028,
+  "domain_release_passed_cached": 87,
+  "total_passed": 1115,
+  "new_tests_vs_pr_baseline": 39,
+  "no_missing_tests_vs_pr_baseline": true,
+  "overlay_checks_passed": 4,
+  "packaging_checks_passed": 27,
+  "comparator_checks_passed": 21,
+  "physical_android_validation": false,
+  "apk_packaged": false
+}

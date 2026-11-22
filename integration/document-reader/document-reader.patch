@@ -4006,6 +4006,37 @@ index 3b4351b..bd46232 100644
      }
  
      fun trust(pkgName: String, versionCode: Long, signatureHash: String) {
+diff --git a/app/src/main/java/eu/kanade/domain/source/model/Source.kt b/app/src/main/java/eu/kanade/domain/source/model/Source.kt
+index 0e39197..75353a3 100644
+--- a/app/src/main/java/eu/kanade/domain/source/model/Source.kt
++++ b/app/src/main/java/eu/kanade/domain/source/model/Source.kt
+@@ -1,16 +1,18 @@
+ package eu.kanade.domain.source.model
+ 
++import androidx.compose.runtime.Composable
++import androidx.compose.runtime.State
++import androidx.compose.runtime.produceState
+ import androidx.compose.ui.graphics.ImageBitmap
+-import androidx.compose.ui.graphics.asImageBitmap
+-import androidx.core.graphics.drawable.toBitmap
+ import eu.kanade.tachiyomi.extension.ExtensionManager
+-import tachiyomi.domain.source.model.Source
+ import uy.kohesive.injekt.Injekt
+ import uy.kohesive.injekt.api.get
+ 
+-val Source.icon: ImageBitmap?
+-    get() {
+-        return Injekt.get<ExtensionManager>().getAppIconForSource(id)
+-            ?.toBitmap()
+-            ?.asImageBitmap()
++@Composable
++fun observeSourceIcon(sourceId: Long?): State<ImageBitmap?> =
++    produceState<ImageBitmap?>(null, sourceId) {
++        value = null
++        if (sourceId != null) {
++            Injekt.get<ExtensionManager>().observeSourceIcon(sourceId).collect { value = it }
++        }
+     }
 diff --git a/app/src/main/java/eu/kanade/domain/source/service/SourcePreferences.kt b/app/src/main/java/eu/kanade/domain/source/service/SourcePreferences.kt
 index d861014..382b0cf 100644
 --- a/app/src/main/java/eu/kanade/domain/source/service/SourcePreferences.kt
@@ -5323,6 +5354,29 @@ index 0000000..d721f6b
 +        }
 +    }
 +}
+diff --git a/app/src/main/java/eu/kanade/presentation/browse/components/BrowseIcons.kt b/app/src/main/java/eu/kanade/presentation/browse/components/BrowseIcons.kt
+index 9ec18bf..4b9af9c 100644
+--- a/app/src/main/java/eu/kanade/presentation/browse/components/BrowseIcons.kt
++++ b/app/src/main/java/eu/kanade/presentation/browse/components/BrowseIcons.kt
+@@ -29,7 +29,7 @@ import androidx.compose.ui.res.painterResource
+ import androidx.compose.ui.unit.dp
+ import androidx.core.graphics.drawable.toBitmap
+ import coil3.compose.AsyncImage
+-import eu.kanade.domain.source.model.icon
++import eu.kanade.domain.source.model.observeSourceIcon
+ import eu.kanade.presentation.util.rememberResourceBitmapPainter
+ import eu.kanade.tachiyomi.R
+ import eu.kanade.tachiyomi.extension.model.Extension
+@@ -47,7 +47,8 @@ fun SourceIcon(
+     source: Source,
+     modifier: Modifier = Modifier,
+ ) {
+-    val icon = source.icon
++    val iconState by observeSourceIcon(source.id.takeUnless { source.isNovel || source.isLocal() })
++    val icon = iconState
+ 
+     when {
+         source.isNovel -> {
 diff --git a/app/src/main/java/eu/kanade/presentation/browse/components/BrowseSourceToolbar.kt b/app/src/main/java/eu/kanade/presentation/browse/components/BrowseSourceToolbar.kt
 index 44de96e..8d57fc2 100644
 --- a/app/src/main/java/eu/kanade/presentation/browse/components/BrowseSourceToolbar.kt
@@ -6585,6 +6639,46 @@ index 0000000..4cba00e
 +        }
 +    }
 +}
+diff --git a/app/src/main/java/eu/kanade/presentation/library/components/LibraryBadges.kt b/app/src/main/java/eu/kanade/presentation/library/components/LibraryBadges.kt
+index c3a6d1f..6dee3a4 100644
+--- a/app/src/main/java/eu/kanade/presentation/library/components/LibraryBadges.kt
++++ b/app/src/main/java/eu/kanade/presentation/library/components/LibraryBadges.kt
+@@ -3,6 +3,7 @@ package eu.kanade.presentation.library.components
+ import androidx.compose.foundation.layout.Column
+ 
+ import androidx.compose.ui.Alignment
++import eu.kanade.domain.source.model.observeSourceIcon
+ import androidx.compose.ui.Modifier
+ import androidx.compose.foundation.Image
+ import androidx.compose.foundation.layout.size
+@@ -19,11 +20,6 @@ import androidx.compose.runtime.Composable
+ import androidx.compose.ui.tooling.preview.PreviewLightDark
+ import eu.kanade.presentation.theme.TachiyomiPreviewTheme
+ import tachiyomi.presentation.core.components.Badge
+-import androidx.compose.ui.graphics.asImageBitmap
+-import androidx.core.graphics.drawable.toBitmap
+-import eu.kanade.tachiyomi.extension.ExtensionManager
+-import uy.kohesive.injekt.Injekt
+-import uy.kohesive.injekt.api.get
+ 
+ 
+ 
+@@ -83,13 +79,8 @@ internal fun LanguageBadge(
+             iconColor = MaterialTheme.colorScheme.onTertiary,
+         )
+     } else if (sourceLanguage.isNotEmpty()) {
+-        val icon = try {
+-            val extensionManager = Injekt.get<ExtensionManager>()
+-            sourceId?.let { extensionManager.getAppIconForSource(it)?.toBitmap()?.asImageBitmap() }
+-        } catch (e: Throwable) {
+-            null
+-        }
+-        
++        val icon = observeSourceIcon(sourceId).value
++
+         if (icon != null) {
+             val flag = getFlagEmoji(sourceLanguage)
+             Column(
 diff --git a/app/src/main/java/eu/kanade/presentation/manga/ChapterSettingsDialog.kt b/app/src/main/java/eu/kanade/presentation/manga/ChapterSettingsDialog.kt
 index 1aa3af7..9410ddd 100644
 --- a/app/src/main/java/eu/kanade/presentation/manga/ChapterSettingsDialog.kt
@@ -9813,7 +9907,7 @@ index a198c3f..9a3e84f 100644
                      preference = translationPreferences.translationEngineTemperature(),
                      title = stringResource(ATMR.strings.pref_engine_temperature),
 diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
-index 7f411fd..0cb728b 100644
+index 7f411fd..68e523e 100644
 --- a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
 +++ b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
 @@ -1,15 +1,18 @@
@@ -9878,7 +9972,7 @@ index 7f411fd..0cb728b 100644
  
      // Identifies this overlay independently of the pinned upstream COMMIT_SHA.
 -    private const val POLARIS_READER_REVISION = "P20261031.2"
-+    private const val POLARIS_READER_REVISION = "P20261117.6"
++    private const val POLARIS_READER_REVISION = "P20261122.1"
  
      @Composable
      override fun Content() {
@@ -15013,6 +15107,44 @@ index 8ccd6d4..9dd2d22 100644
  
          private const val HTTP_NOT_MODIFIED = 304
      }
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/data/download/ChapterImageRetry.kt b/app/src/main/java/eu/kanade/tachiyomi/data/download/ChapterImageRetry.kt
+new file mode 100644
+index 0000000..a8251f4
+--- /dev/null
++++ b/app/src/main/java/eu/kanade/tachiyomi/data/download/ChapterImageRetry.kt
+@@ -0,0 +1,32 @@
++package eu.kanade.tachiyomi.data.download
++
++import eu.kanade.tachiyomi.network.HttpException
++import java.io.FileNotFoundException
++import java.io.IOException
++import java.security.cert.CertificateException
++import javax.net.ssl.SSLHandshakeException
++import javax.net.ssl.SSLPeerUnverifiedException
++import kotlinx.coroutines.CancellationException
++import kotlinx.coroutines.delay
++
++/**
++ * Bounded automatic retry for a page transfer, without repeating permanent/provider-limit errors.
++ */
++internal object ChapterImageRetry {
++    suspend fun after(error: Throwable, attempt: Long): Boolean {
++        if (error is CancellationException) throw error
++        if (attempt !in 0L..2L || !transient(error)) return false
++        delay(2_000L shl attempt.toInt())
++        return true
++    }
++
++    private fun transient(error: Throwable): Boolean =
++        when (error) {
++            is HttpException -> error.code in setOf(408, 416, 425, 500, 502, 503, 504)
++            is FileNotFoundException,
++            is SSLPeerUnverifiedException -> false
++            is SSLHandshakeException -> error.cause !is CertificateException
++            is IOException -> true
++            else -> false
++        }
++}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/data/download/DownloadManager.kt b/app/src/main/java/eu/kanade/tachiyomi/data/download/DownloadManager.kt
 index c45a189..d0cbd7e 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/data/download/DownloadManager.kt
@@ -15478,7 +15610,7 @@ index 32de76f..1f291bd 100644
          val legacyChapterDirNames = getLegacyChapterDirNames(chapterName, chapterScanlator, chapterUrl)
  
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/data/download/Downloader.kt b/app/src/main/java/eu/kanade/tachiyomi/data/download/Downloader.kt
-index d56914c..3fe3802 100644
+index d56914c..8a7dd3e 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/data/download/Downloader.kt
 +++ b/app/src/main/java/eu/kanade/tachiyomi/data/download/Downloader.kt
 @@ -2,7 +2,7 @@ package eu.kanade.tachiyomi.data.download
@@ -15490,17 +15622,23 @@ index d56914c..3fe3802 100644
  import eu.kanade.domain.manga.model.getComicInfo
  import eu.kanade.tachiyomi.data.cache.ChapterCache
  import eu.kanade.tachiyomi.data.download.model.Download
-@@ -16,6 +16,9 @@ import eu.kanade.tachiyomi.util.storage.DiskUtil
+@@ -16,13 +16,14 @@ import eu.kanade.tachiyomi.util.storage.DiskUtil
  import eu.kanade.tachiyomi.util.storage.DiskUtil.NOMEDIA_FILE
  import eu.kanade.tachiyomi.util.storage.saveTo
  import eu.kanade.translation.TranslationManager
 +import java.io.File
 +import java.util.Locale
-+import kotlin.time.Duration.Companion.seconds
  import kotlinx.coroutines.CancellationException
  import kotlinx.coroutines.CoroutineScope
  import kotlinx.coroutines.Dispatchers
-@@ -53,6 +56,7 @@ import tachiyomi.core.metadata.comicinfo.COMIC_INFO_FILE
+ import kotlinx.coroutines.Job
+ import kotlinx.coroutines.SupervisorJob
+ import kotlinx.coroutines.async
+-import kotlinx.coroutines.delay
+ import kotlinx.coroutines.flow.MutableStateFlow
+ import kotlinx.coroutines.flow.asFlow
+ import kotlinx.coroutines.flow.asStateFlow
+@@ -53,6 +54,7 @@ import tachiyomi.core.metadata.comicinfo.COMIC_INFO_FILE
  import tachiyomi.core.metadata.comicinfo.ComicInfo
  import tachiyomi.domain.category.interactor.GetCategories
  import tachiyomi.domain.chapter.model.Chapter
@@ -15508,7 +15646,7 @@ index d56914c..3fe3802 100644
  import tachiyomi.domain.download.service.DownloadPreferences
  import tachiyomi.domain.manga.model.Manga
  import tachiyomi.domain.source.service.SourceManager
-@@ -60,10 +64,6 @@ import tachiyomi.domain.track.interactor.GetTracks
+@@ -60,10 +62,6 @@ import tachiyomi.domain.track.interactor.GetTracks
  import tachiyomi.i18n.MR
  import uy.kohesive.injekt.Injekt
  import uy.kohesive.injekt.api.get
@@ -15519,7 +15657,7 @@ index d56914c..3fe3802 100644
  
  /**
   * This class is the one in charge of downloading chapters.
-@@ -82,38 +82,28 @@ class Downloader(
+@@ -82,38 +80,28 @@ class Downloader(
      private val getTracks: GetTracks = Injekt.get(),
  ) {
  
@@ -15566,7 +15704,7 @@ index d56914c..3fe3802 100644
  
      init {
          launchNow {
-@@ -143,9 +133,7 @@ class Downloader(
+@@ -143,9 +131,7 @@ class Downloader(
          return pending.isNotEmpty()
      }
  
@@ -15577,7 +15715,7 @@ index d56914c..3fe3802 100644
      fun stop(reason: String? = null) {
          cancelDownloaderJob()
          queueState.value
-@@ -168,9 +156,7 @@ class Downloader(
+@@ -168,9 +154,7 @@ class Downloader(
          DownloadJob.stop(context)
      }
  
@@ -15588,7 +15726,7 @@ index d56914c..3fe3802 100644
      fun pause() {
          cancelDownloaderJob()
          queueState.value
-@@ -179,9 +165,7 @@ class Downloader(
+@@ -179,9 +163,7 @@ class Downloader(
          isPaused = true
      }
  
@@ -15599,7 +15737,7 @@ index d56914c..3fe3802 100644
      fun clearQueue() {
          cancelDownloaderJob()
  
-@@ -189,56 +173,61 @@ class Downloader(
+@@ -189,56 +171,61 @@ class Downloader(
          notifier.dismissProgress()
      }
  
@@ -15702,7 +15840,7 @@ index d56914c..3fe3802 100644
      }
  
      private fun CoroutineScope.launchDownloadJob(download: Download) = launchIO {
-@@ -260,9 +249,7 @@ class Downloader(
+@@ -260,9 +247,7 @@ class Downloader(
          }
      }
  
@@ -15713,7 +15851,7 @@ index d56914c..3fe3802 100644
      private fun cancelDownloaderJob() {
          downloaderJob?.cancel()
          downloaderJob = null
-@@ -278,18 +265,23 @@ class Downloader(
+@@ -278,18 +263,23 @@ class Downloader(
      fun queueChapters(manga: Manga, chapters: List<Chapter>, autoStart: Boolean) {
          if (chapters.isEmpty()) return
  
@@ -15748,7 +15886,7 @@ index d56914c..3fe3802 100644
  
          if (chaptersToQueue.isNotEmpty()) {
              addAllToQueue(chaptersToQueue)
-@@ -297,14 +289,14 @@ class Downloader(
+@@ -297,14 +287,14 @@ class Downloader(
              // Start downloader if needed
              if (autoStart && wasEmpty) {
                  val queuedDownloads = queueState.value.count { it.source !is UnmeteredSource }
@@ -15769,7 +15907,7 @@ index d56914c..3fe3802 100644
                  ) {
                      notifier.onWarning(
                          context.stringResource(
-@@ -325,32 +317,45 @@ class Downloader(
+@@ -325,32 +315,45 @@ class Downloader(
       *
       * @param download the chapter to be downloaded.
       */
@@ -15832,7 +15970,7 @@ index d56914c..3fe3802 100644
              return
          }
  
-@@ -373,39 +378,49 @@ class Downloader(
+@@ -373,39 +376,49 @@ class Downloader(
  
          try {
              // If the page list already exists, start from the file
@@ -15909,7 +16047,7 @@ index d56914c..3fe3802 100644
                  .collect {
                      // Do when page is downloaded.
                      notifier.onProgressChange(download)
-@@ -418,12 +433,7 @@ class Downloader(
+@@ -418,12 +431,7 @@ class Downloader(
                  return
              }
  
@@ -15923,7 +16061,7 @@ index d56914c..3fe3802 100644
  
              // Only rename the directory if it's downloaded
              if (downloadPreferences.saveChaptersAsCBZ.get()) {
-@@ -439,28 +449,38 @@ class Downloader(
+@@ -439,28 +447,38 @@ class Downloader(
              DiskUtil.createNoMediaFile(tmpDir, context)
  
              download.status = Download.State.DOWNLOADED
@@ -15971,7 +16109,7 @@ index d56914c..3fe3802 100644
          }
      }
  
-@@ -481,19 +501,24 @@ class Downloader(
+@@ -481,19 +499,24 @@ class Downloader(
          val filename = "%0${digitCount}d".format(Locale.ENGLISH, page.number)
  
          // Try to find the image file
@@ -16006,7 +16144,7 @@ index d56914c..3fe3802 100644
  
              // When the page is ready, set page path, progress (just in case) and status
              splitTallImageIfNeeded(page, tmpDir)
-@@ -506,7 +531,12 @@ class Downloader(
+@@ -506,7 +529,12 @@ class Downloader(
              // Mark this page as error and allow to download the remaining
              page.progress = 0
              page.status = Page.State.Error(e)
@@ -16020,7 +16158,7 @@ index d56914c..3fe3802 100644
          }
      }
  
-@@ -518,32 +548,38 @@ class Downloader(
+@@ -518,41 +546,40 @@ class Downloader(
       * @param tmpDir the temporary directory of the download.
       * @param filename the filename of the image.
       */
@@ -16051,6 +16189,18 @@ index d56914c..3fe3802 100644
 -            } catch (e: HttpException) {
 -                if (e.code == 416) {
 -                    file.delete()
+-                }
+-                throw e
+-            }
+-            emit(file)
+-        }
+-            // Retry 3 times, waiting 2, 4 and 8 seconds between attempts.
+-            .retryWhen { _, attempt ->
+-                if (attempt < 3) {
+-                    delay((2L shl attempt.toInt()).seconds)
+-                    true
+-                } else {
+-                    false
 +                val file = tmpDir.findFile("$filename.tmp") ?: tmpDir.createFile("$filename.tmp")!!
 +
 +                try {
@@ -16072,15 +16222,14 @@ index d56914c..3fe3802 100644
 +                    }
 +                    throw e
                  }
--                throw e
 +                emit(file)
              }
--            emit(file)
--        }
-             // Retry 3 times, waiting 2, 4 and 8 seconds between attempts.
-             .retryWhen { _, attempt ->
-                 if (attempt < 3) {
-@@ -568,9 +604,7 @@ class Downloader(
++            // Retry transient transfers only; preserve partial files and the 416 reset above.
++            .retryWhen { error, attempt -> ChapterImageRetry.after(error, attempt) }
+             .first()
+     }
+ 
+@@ -568,9 +595,7 @@ class Downloader(
          tmpDir.findFile("$filename.tmp")?.delete()
          val tmpFile = tmpDir.createFile("$filename.tmp")!!
          cacheFile.inputStream().use { input ->
@@ -16091,7 +16240,7 @@ index d56914c..3fe3802 100644
          }
          val extension = ImageUtil.findImageType(cacheFile.inputStream()) ?: return tmpFile
          tmpFile.renameTo("$filename.${extension.extension}")
-@@ -586,7 +620,8 @@ class Downloader(
+@@ -586,7 +611,8 @@ class Downloader(
       * @param file the file where the image is already downloaded.
       */
      private fun getImageExtension(response: Response, file: UniFile): String {
@@ -16101,7 +16250,7 @@ index d56914c..3fe3802 100644
          return ImageUtil.getExtensionFromMimeType(mime) { file.openInputStream() }
      }
  
-@@ -595,8 +630,14 @@ class Downloader(
+@@ -595,8 +621,14 @@ class Downloader(
  
          try {
              val filenamePrefix = "%03d".format(Locale.ENGLISH, page.number)
@@ -16118,7 +16267,7 @@ index d56914c..3fe3802 100644
  
              // If the original page was previously split, then skip
              if (imageFile.name.orEmpty().startsWith("${filenamePrefix}__")) return
-@@ -613,10 +654,7 @@ class Downloader(
+@@ -613,10 +645,7 @@ class Downloader(
       * @param download the download to check.
       * @param tmpDir the directory where the download is currently stored.
       */
@@ -16130,7 +16279,7 @@ index d56914c..3fe3802 100644
          // Page list hasn't been initialized
          val downloadPageCount = download.pages?.size ?: return false
  
-@@ -626,16 +664,17 @@ class Downloader(
+@@ -626,16 +655,17 @@ class Downloader(
          }
  
          // Ensure that the chapter folder has all the pages
@@ -16157,7 +16306,7 @@ index d56914c..3fe3802 100644
          return downloadedImagesCount == downloadPageCount
      }
  
-@@ -646,53 +685,38 @@ class Downloader(
+@@ -646,53 +676,38 @@ class Downloader(
       * @param pagePrefix Expected page prefix (e.g., "001")
       */
      private fun isDownloadedPageImage(fileName: String, pagePrefix: String): Boolean =
@@ -16229,7 +16378,7 @@ index d56914c..3fe3802 100644
  
          // Remove the old file
          dir.findFile(COMIC_INFO_FILE)?.delete()
-@@ -702,18 +726,14 @@ class Downloader(
+@@ -702,18 +717,14 @@ class Downloader(
          }
      }
  
@@ -16250,7 +16399,7 @@ index d56914c..3fe3802 100644
              store.addAll(downloads)
              it + downloads
          }
-@@ -722,7 +742,10 @@ class Downloader(
+@@ -722,7 +733,10 @@ class Downloader(
      private fun removeFromQueue(download: Download) {
          _queueState.update {
              store.remove(download)
@@ -16262,7 +16411,7 @@ index d56914c..3fe3802 100644
                  download.status = Download.State.NOT_DOWNLOADED
              }
              it - download
-@@ -734,7 +757,10 @@ class Downloader(
+@@ -734,7 +748,10 @@ class Downloader(
              val downloads = queue.filter { predicate(it) }
              store.removeAll(downloads)
              downloads.forEach { download ->
@@ -16274,7 +16423,7 @@ index d56914c..3fe3802 100644
                      download.status = Download.State.NOT_DOWNLOADED
                  }
              }
-@@ -754,7 +780,10 @@ class Downloader(
+@@ -754,7 +771,10 @@ class Downloader(
      private fun internalClearQueue() {
          _queueState.update {
              it.forEach { download ->
@@ -21412,10 +21561,22 @@ index 0000000..1134341
 +    }
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/extension/ExtensionManager.kt b/app/src/main/java/eu/kanade/tachiyomi/extension/ExtensionManager.kt
-index 699e074..213687f 100644
+index 699e074..0747495 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/extension/ExtensionManager.kt
 +++ b/app/src/main/java/eu/kanade/tachiyomi/extension/ExtensionManager.kt
-@@ -9,10 +9,16 @@ import eu.kanade.tachiyomi.extension.api.ExtensionUpdateNotifier
+@@ -1,7 +1,10 @@
+ package eu.kanade.tachiyomi.extension
+ 
+ import android.content.Context
+-import android.graphics.drawable.Drawable
++import android.util.LruCache
++import androidx.compose.ui.graphics.ImageBitmap
++import androidx.compose.ui.graphics.asImageBitmap
++import androidx.core.graphics.drawable.toBitmap
+ import eu.kanade.domain.extension.interactor.TrustExtension
+ import eu.kanade.domain.source.service.SourcePreferences
+ import eu.kanade.tachiyomi.extension.api.ExtensionApi
+@@ -9,10 +12,16 @@ import eu.kanade.tachiyomi.extension.api.ExtensionUpdateNotifier
  import eu.kanade.tachiyomi.extension.model.Extension
  import eu.kanade.tachiyomi.extension.model.InstallStep
  import eu.kanade.tachiyomi.extension.model.LoadResult
@@ -21432,19 +21593,23 @@ index 699e074..213687f 100644
  import kotlinx.coroutines.CoroutineScope
  import kotlinx.coroutines.SupervisorJob
  import kotlinx.coroutines.flow.Flow
-@@ -20,17 +26,21 @@ import kotlinx.coroutines.flow.MutableStateFlow
+@@ -20,17 +29,25 @@ import kotlinx.coroutines.flow.MutableStateFlow
  import kotlinx.coroutines.flow.SharingStarted
  import kotlinx.coroutines.flow.StateFlow
  import kotlinx.coroutines.flow.asStateFlow
 +import kotlinx.coroutines.flow.combine
  import kotlinx.coroutines.flow.emptyFlow
 +import kotlinx.coroutines.flow.first
++import kotlinx.coroutines.flow.distinctUntilChanged
  import kotlinx.coroutines.flow.map
  import kotlinx.coroutines.flow.stateIn
 +import kotlinx.coroutines.launch
 +import kotlinx.coroutines.withTimeout
++import kotlinx.coroutines.sync.Mutex
++import kotlinx.coroutines.sync.withLock
  import logcat.LogPriority
 +import mihon.domain.extension.repository.ExtensionStoreRepository
++import tachiyomi.core.common.util.lang.withIOContext
  import tachiyomi.core.common.util.lang.withUIContext
  import tachiyomi.core.common.util.system.logcat
  import tachiyomi.domain.source.model.StubSource
@@ -21455,7 +21620,7 @@ index 699e074..213687f 100644
  
  /**
   * The manager of extensions installed as another apk which extend the available sources. It handles
-@@ -45,103 +55,205 @@ class ExtensionManager(
+@@ -45,103 +62,223 @@ class ExtensionManager(
      private val trustExtension: TrustExtension = Injekt.get(),
  ) {
  
@@ -21478,6 +21643,7 @@ index 699e074..213687f 100644
 +    /** The installer which installs, updates and uninstalls the extensions. */
      private val installer by lazy { ExtensionInstaller(context) }
  
+-    private val iconMap = mutableMapOf<String, Drawable>()
 +    private suspend fun repositoryStillAuthorized(identity: RepositoryIdentity): Boolean =
 +        Injekt.get<ExtensionStoreRepository>().getAll().any {
 +            RepositoryIdentity.of(it) == identity
@@ -21567,7 +21733,8 @@ index 699e074..213687f 100644
 +        )
 +    }
 +
-     private val iconMap = mutableMapOf<String, Drawable>()
++    private val iconCache = LruCache<Pair<String, Long>, ImageBitmap>(48)
++    private val iconLoadLock = Mutex()
  
 -    private val installedExtensionMapFlow = MutableStateFlow(emptyMap<String, Extension.Installed>())
 +    private val installedExtensionMapFlow =
@@ -21620,26 +21787,41 @@ index 699e074..213687f 100644
          }
      }
  
-     fun getAppIconForSource(sourceId: Long): Drawable? {
-         val pkgName = getExtensionPackage(sourceId) ?: return null
+-    fun getAppIconForSource(sourceId: Long): Drawable? {
+-        val pkgName = getExtensionPackage(sourceId) ?: return null
 -
 -        return iconMap[pkgName] ?: iconMap.getOrPut(pkgName) {
 -            ExtensionLoader.getExtensionPackageInfoFromPkgName(context, pkgName)!!.applicationInfo!!
 -                .loadIcon(context.packageManager)
 -        }
-+        if (
-+            installedExtensionsFlow.value.firstOrNull { it.pkgName == pkgName }?.executionMode !=
-+                "compatibility"
-+        )
-+            return null
-+
-+        return iconMap[pkgName]
-+            ?: iconMap.getOrPut(pkgName) {
-+                ExtensionLoader.getExtensionPackageInfoFromPkgName(context, pkgName)!!
-+                    .applicationInfo!!
-+                    .loadIcon(context.packageManager)
+-    }
++    fun observeSourceIcon(sourceId: Long): Flow<ImageBitmap?> =
++        installedExtensionsFlow
++            .map { extensions ->
++                extensions.firstOrNull {
++                    it.executionMode == "compatibility" && it.sources.any { source -> source.id == sourceId }
++                }?.let { it.pkgName to it.versionCode }
 +            }
-     }
++            .distinctUntilChanged()
++            .map { key ->
++                key?.let {
++                    withIOContext {
++                        iconCache[key] ?: iconLoadLock.withLock {
++                            iconCache[key] ?: try {
++                                ExtensionLoader.getExtensionPackageInfoFromPkgName(context, key.first)
++                                    ?.applicationInfo
++                                    ?.loadIcon(context.packageManager)
++                                    ?.toBitmap()
++                                    ?.asImageBitmap()
++                                    ?.also { iconCache.put(key, it) }
++                            } catch (error: Exception) {
++                                logcat(LogPriority.WARN, error) { "Could not load source icon for ${key.first}" }
++                                null
++                            }
++                        }
++                    }
++                }
++            }
  
      private var availableExtensionsSourcesData: Map<Long, StubSource> = emptyMap()
  
@@ -21659,8 +21841,14 @@ index 699e074..213687f 100644
 -    /**
 -     * Loads and registers the installed extensions.
 -     */
+-    private fun initExtensions() {
 +    /** Loads and registers the installed extensions. */
-     private fun initExtensions() {
++    internal suspend fun installedSnapshot(): Collection<Extension.Installed> {
++        isInitialized.first { it }
++        return installedExtensionMapFlow.value.values
++    }
++
++    private suspend fun initExtensions() {
          val extensions = ExtensionLoader.loadExtensions(context)
  
 -        installedExtensionMapFlow.value = extensions
@@ -21705,7 +21893,7 @@ index 699e074..213687f 100644
  
          enableAdditionalSubLanguages(extensions)
  
-@@ -151,13 +263,13 @@ class ExtensionManager(
+@@ -151,13 +288,13 @@ class ExtensionManager(
      }
  
      /**
@@ -21725,7 +21913,7 @@ index 699e074..213687f 100644
       */
      private fun enableAdditionalSubLanguages(extensions: List<Extension.Available>) {
          if (subLanguagesEnabledOnFirstRun || extensions.isEmpty()) {
-@@ -165,16 +277,16 @@ class ExtensionManager(
+@@ -165,16 +302,16 @@ class ExtensionManager(
          }
  
          // Use the source lang as some aren't present on the extension level.
@@ -21749,7 +21937,18 @@ index 699e074..213687f 100644
  
          preferences.enabledLanguages.set(defaultLanguages + languagesToEnable)
          subLanguagesEnabledOnFirstRun = true
-@@ -202,14 +314,10 @@ class ExtensionManager(
+@@ -193,8 +330,9 @@ class ExtensionManager(
+ 
+         val installedExtensionsMap = installedExtensionMapFlow.value.toMutableMap()
+         var changed = false
++        val availableByPackage = availableExtensions.distinctBy { it.pkgName }.associateBy { it.pkgName }
+         for ((pkgName, extension) in installedExtensionsMap) {
+-            val availableExt = availableExtensions.find { it.pkgName == pkgName }
++            val availableExt = availableByPackage[pkgName]
+ 
+             if (availableExt == null && !extension.isObsolete) {
+                 installedExtensionsMap[pkgName] = extension.copy(isObsolete = true)
+@@ -202,14 +340,10 @@ class ExtensionManager(
              } else if (availableExt != null) {
                  val hasUpdate = extension.updateExists(availableExt)
                  if (extension.hasUpdate != hasUpdate) {
@@ -21767,7 +21966,7 @@ index 699e074..213687f 100644
                  }
                  changed = true
              }
-@@ -221,27 +329,33 @@ class ExtensionManager(
+@@ -221,27 +355,33 @@ class ExtensionManager(
      }
  
      /**
@@ -21809,7 +22008,7 @@ index 699e074..213687f 100644
      }
  
      fun cancelInstallUpdateExtension(extension: Extension) {
-@@ -279,13 +393,31 @@ class ExtensionManager(
+@@ -279,13 +419,31 @@ class ExtensionManager(
      suspend fun trust(extension: Extension.Untrusted) {
          untrustedExtensionMapFlow.value[extension.pkgName] ?: return
  
@@ -21846,7 +22045,7 @@ index 699e074..213687f 100644
      }
  
      /**
-@@ -298,8 +430,8 @@ class ExtensionManager(
+@@ -298,8 +456,8 @@ class ExtensionManager(
      }
  
      /**
@@ -21857,7 +22056,7 @@ index 699e074..213687f 100644
       *
       * @param extension The extension to be registered.
       */
-@@ -318,9 +450,7 @@ class ExtensionManager(
+@@ -318,9 +476,7 @@ class ExtensionManager(
          untrustedExtensionMapFlow.value -= pkgName
      }
  
@@ -21868,7 +22067,7 @@ index 699e074..213687f 100644
      private inner class InstallationListener : ExtensionInstallReceiver.Listener {
  
          override fun onExtensionInstalled(extension: Extension.Installed) {
-@@ -346,9 +476,7 @@ class ExtensionManager(
+@@ -346,9 +502,7 @@ class ExtensionManager(
          }
      }
  
@@ -21879,7 +22078,7 @@ index 699e074..213687f 100644
      private fun Extension.Installed.withUpdateCheck(): Extension.Installed {
          return if (updateExists()) {
              copy(hasUpdate = true)
-@@ -357,10 +485,11 @@ class ExtensionManager(
+@@ -357,10 +511,11 @@ class ExtensionManager(
          }
      }
  
@@ -21895,7 +22094,7 @@ index 699e074..213687f 100644
  
          return (availableExt.versionCode > versionCode || availableExt.libVersion > libVersion)
      }
-@@ -373,9 +502,13 @@ class ExtensionManager(
+@@ -373,9 +528,13 @@ class ExtensionManager(
          }
      }
  
@@ -21954,6 +22153,50 @@ index 0000000..58ad4c4
 +            else -> Mode.COMPATIBILITY
 +        }
 +}
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/extension/api/ExtensionApi.kt b/app/src/main/java/eu/kanade/tachiyomi/extension/api/ExtensionApi.kt
+index 864f955..6f4cdb4 100644
+--- a/app/src/main/java/eu/kanade/tachiyomi/extension/api/ExtensionApi.kt
++++ b/app/src/main/java/eu/kanade/tachiyomi/extension/api/ExtensionApi.kt
+@@ -2,8 +2,7 @@ package eu.kanade.tachiyomi.extension.api
+ 
+ import android.content.Context
+ import eu.kanade.tachiyomi.extension.model.Extension
+-import eu.kanade.tachiyomi.extension.model.LoadResult
+-import eu.kanade.tachiyomi.extension.util.ExtensionLoader
++import eu.kanade.tachiyomi.extension.ExtensionManager
+ import mihon.domain.extension.interactor.UpdateExtensionStores
+ import mihon.domain.extension.repository.ExtensionStoreRepository
+ import tachiyomi.core.common.util.lang.withIOContext
+@@ -14,24 +13,22 @@ internal class ExtensionApi {
+     private val repository: ExtensionStoreRepository by injectLazy()
+ 
+     private val updateExtensionStores: UpdateExtensionStores by injectLazy()
++    private val extensionManager: ExtensionManager by injectLazy()
+ 
+     suspend fun findExtensions(): List<Extension.Available> {
+         return withIOContext { repository.fetchExtensions() }
+     }
+ 
+-    suspend fun checkForUpdates(context: Context) {
++    suspend fun checkForUpdates(context: Context) = withIOContext {
+         updateExtensionStores()
+ 
+-        val extensions = findExtensions()
+-
+-        val installedExtensions = ExtensionLoader.loadExtensions(context)
+-            .filterIsInstance<LoadResult.Success>()
+-            .map { it.extension }
++        val extensions = findExtensions().distinctBy { it.pkgName }.associateBy { it.pkgName }
++        val installedExtensions = extensionManager.installedSnapshot()
+ 
+         val extensionsWithUpdate = mutableListOf<Extension.Installed>()
+         for (installedExt in installedExtensions) {
+             val pkgName = installedExt.pkgName
+-            val availableExt = extensions.find { it.pkgName == pkgName } ?: continue
++            val availableExt = extensions[pkgName] ?: continue
+             val hasUpdatedVer = availableExt.versionCode > installedExt.versionCode
+             val hasUpdatedLib = availableExt.libVersion > installedExt.libVersion
+             val hasUpdate = hasUpdatedVer || hasUpdatedLib
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/extension/novel/NovelExtensionManager.kt b/app/src/main/java/eu/kanade/tachiyomi/extension/novel/NovelExtensionManager.kt
 index d273543..3e3cdb8 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/extension/novel/NovelExtensionManager.kt
@@ -23174,7 +23417,7 @@ index 4d9493f..fddb83c 100644
          const val EXTRA_DOWNLOAD_ID = "ExtensionInstaller.extra.DOWNLOAD_ID"
      }
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/extension/util/ExtensionLoader.kt b/app/src/main/java/eu/kanade/tachiyomi/extension/util/ExtensionLoader.kt
-index 962fafa..4bbb8de 100644
+index 962fafa..a4bcb68 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/extension/util/ExtensionLoader.kt
 +++ b/app/src/main/java/eu/kanade/tachiyomi/extension/util/ExtensionLoader.kt
 @@ -10,40 +10,37 @@ import eu.kanade.domain.extension.interactor.TrustExtension
@@ -23187,12 +23430,15 @@ index 962fafa..4bbb8de 100644
  import eu.kanade.tachiyomi.util.lang.Hash
 -import eu.kanade.tachiyomi.util.storage.copyAndSetReadOnlyTo
  import eu.kanade.tachiyomi.util.system.ChildFirstPathClassLoader
+-import kotlinx.coroutines.async
+-import kotlinx.coroutines.awaitAll
+-import kotlinx.coroutines.runBlocking
 +import java.io.File
 +import java.io.IOException
 +import kotlinx.coroutines.CancellationException
- import kotlinx.coroutines.async
- import kotlinx.coroutines.awaitAll
- import kotlinx.coroutines.runBlocking
++import kotlinx.coroutines.Dispatchers
++import kotlinx.coroutines.ensureActive
++import kotlinx.coroutines.withContext
  import logcat.LogPriority
  import tachiyomi.core.common.util.system.logcat
  import uy.kohesive.injekt.injectLazy
@@ -23230,7 +23476,7 @@ index 962fafa..4bbb8de 100644
  
      private const val EXTENSION_FEATURE = "tachiyomi.extension"
      private const val METADATA_SOURCE_CLASS = "tachiyomi.extension.class"
-@@ -54,62 +51,129 @@ internal object ExtensionLoader {
+@@ -54,120 +51,192 @@ internal object ExtensionLoader {
      private const val METADATA_EXTENSION_LIB = "tachiyomix.extensionLib"
      private const val METADATA_CONTENT_WARNING = "tachiyomix.contentWarning"
  
@@ -23399,8 +23645,13 @@ index 962fafa..4bbb8de 100644
      }
  
      /**
-@@ -120,53 +184,59 @@ internal object ExtensionLoader {
-     fun loadExtensions(context: Context): List<LoadResult> {
+-     * Return a list of all the available extensions initialized concurrently.
++     * Enumerate and load installed extensions off the UI thread, one package at a time.
+      *
+      * @param context The application context.
+      */
+-    fun loadExtensions(context: Context): List<LoadResult> {
++    suspend fun loadExtensions(context: Context): List<LoadResult> = withContext(Dispatchers.IO) {
          val pkgManager = context.packageManager
  
 -        val installedPkgs = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -23408,15 +23659,7 @@ index 962fafa..4bbb8de 100644
 -        } else {
 -            pkgManager.getInstalledPackages(PACKAGE_FLAGS)
 -        }
-+        val installedPkgs =
-+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-+                pkgManager.getInstalledPackages(
-+                    PackageManager.PackageInfoFlags.of(PACKAGE_FLAGS.toLong())
-+                )
-+            } else {
-+                pkgManager.getInstalledPackages(PACKAGE_FLAGS)
-+            }
- 
+-
 -        val sharedExtPkgs = installedPkgs
 -            .asSequence()
 -            .filter { isPackageAnExtension(it) }
@@ -23431,23 +23674,7 @@ index 962fafa..4bbb8de 100644
 -                if (it.canWrite()) {
 -                    it.setReadOnly()
 -                }
-+        val sharedExtPkgs =
-+            installedPkgs
-+                .asSequence()
-+                .filter { isPackageAnExtension(it) }
-+                .map { ExtensionInfo(packageInfo = it, isShared = true) }
-+
-+        val privateExtPkgs =
-+            getPrivateExtensionDir(context)
-+                .listFiles()
-+                ?.asSequence()
-+                ?.filter { it.isFile && it.extension == PRIVATE_EXTENSION_EXTENSION }
-+                ?.mapNotNull {
-+                    // Just in case, since Android 14+ requires them to be read-only
-+                    if (it.canWrite()) {
-+                        it.setReadOnly()
-+                    }
- 
+-
 -                val path = it.absolutePath
 -                pkgManager.getPackageArchiveInfo(path, PACKAGE_FLAGS)
 -                    ?.apply { applicationInfo!!.fixBasePaths(path) }
@@ -23464,42 +23691,70 @@ index 962fafa..4bbb8de 100644
 -                val privatePkg = privateExtPkgs
 -                    .singleOrNull { it.packageInfo.packageName == sharedPkg.packageInfo.packageName }
 -                selectExtensionPackage(sharedPkg, privatePkg)
--            }
++        val installedPkgs =
++            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
++                pkgManager.getInstalledPackages(
++                    PackageManager.PackageInfoFlags.of(PACKAGE_FLAGS.toLong())
++                )
++            } else {
++                pkgManager.getInstalledPackages(PACKAGE_FLAGS)
+             }
 -            .toList()
-+                    val path = it.absolutePath
-+                    pkgManager.getPackageArchiveInfo(path, PACKAGE_FLAGS)?.apply {
-+                        applicationInfo!!.fixBasePaths(path)
+ 
+-        if (extPkgs.isEmpty()) return emptyList()
++        val sharedExtPkgs =
++            installedPkgs
++                .asSequence()
++                .filter { isPackageAnExtension(it) }
++                .map { ExtensionInfo(packageInfo = it, isShared = true) }
++
++        val loaderContext = coroutineContext
++        val privateExtPkgs =
++            getPrivateExtensionDir(context)
++                .listFiles()
++                ?.asSequence()
++                ?.filter { it.isFile && it.extension == PRIVATE_EXTENSION_EXTENSION }
++                ?.mapNotNull {
++                    loaderContext.ensureActive()
++                    // Just in case, since Android 14+ requires them to be read-only
++                    if (it.canWrite()) {
++                        it.setReadOnly()
 +                    }
+ 
+-        // Load each extension concurrently and wait for completion
+-        return runBlocking {
+-            val deferred = extPkgs.map {
+-                async { loadExtension(context, it) }
++                    val path = it.absolutePath
++                    val info = pkgManager.getPackageArchiveInfo(path, PACKAGE_FLAGS)
++                        ?: return@mapNotNull null
++                    val application = info.applicationInfo ?: return@mapNotNull null
++                    application.fixBasePaths(path)
++                    info
 +                }
 +                ?.filter { isPackageAnExtension(it) }
 +                ?.map { ExtensionInfo(packageInfo = it, isShared = false) } ?: emptySequence()
 +
-+        val extPkgs =
-+            (sharedExtPkgs + privateExtPkgs)
-+                // Remove duplicates. Shared takes priority than private by default
-+                .distinctBy { it.packageInfo.packageName }
-+                // Compare version number
-+                .mapNotNull { sharedPkg ->
-+                    val privatePkg =
-+                        privateExtPkgs.singleOrNull {
-+                            it.packageInfo.packageName == sharedPkg.packageInfo.packageName
-+                        }
-+                    selectExtensionPackage(sharedPkg, privatePkg)
-+                }
-+                .toList()
- 
-         if (extPkgs.isEmpty()) return emptyList()
- 
-         // Load each extension concurrently and wait for completion
-         return runBlocking {
--            val deferred = extPkgs.map {
--                async { loadExtension(context, it) }
--            }
-+            val deferred = extPkgs.map { async { loadExtension(context, it) } }
-             deferred.awaitAll()
++        selectExtensionPackages(
++            sharedExtPkgs,
++            privateExtPkgs,
++            packageName = { it.packageInfo.packageName },
++            versionCode = { PackageInfoCompat.getLongVersionCode(it.packageInfo) },
++        ).map { info ->
++            ensureActive()
++            try {
++                loadExtension(context, info)
++            } catch (cancelled: CancellationException) {
++                throw cancelled
++            } catch (error: Exception) {
++                logcat(LogPriority.ERROR, error) { "Failed to load extension ${info.packageInfo.packageName}" }
++                LoadResult.Error
+             }
+-            deferred.awaitAll()
          }
      }
-@@ -189,33 +259,30 @@ internal object ExtensionLoader {
+ 
+@@ -189,33 +258,30 @@ internal object ExtensionLoader {
      }
  
      private fun getExtensionInfoFromPkgName(context: Context, pkgName: String): ExtensionInfo? {
@@ -23556,7 +23811,7 @@ index 962fafa..4bbb8de 100644
  
          return selectExtensionPackage(sharedPkg, privatePkg)
      }
-@@ -232,8 +299,9 @@ internal object ExtensionLoader {
+@@ -232,8 +298,9 @@ internal object ExtensionLoader {
          val appInfo = pkgInfo.applicationInfo!!
          val pkgName = pkgInfo.packageName
  
@@ -23568,7 +23823,7 @@ index 962fafa..4bbb8de 100644
          val versionName = pkgInfo.versionName
          val versionCode = PackageInfoCompat.getLongVersionCode(pkgInfo)
  
-@@ -243,11 +311,7 @@ internal object ExtensionLoader {
+@@ -243,11 +310,7 @@ internal object ExtensionLoader {
          }
  
          // Validate lib version
@@ -23581,7 +23836,7 @@ index 962fafa..4bbb8de 100644
          if (libVersion == null || libVersion !in SUPPORTED_LIB_VERSIONS) {
              logcat(LogPriority.WARN) {
                  "Lib version is $libVersion, while only version(s) ${SUPPORTED_LIB_VERSIONS.joinToString()} are supported"
-@@ -255,80 +319,133 @@ internal object ExtensionLoader {
+@@ -255,80 +318,133 @@ internal object ExtensionLoader {
              return LoadResult.Error
          }
  
@@ -23762,7 +24017,7 @@ index 962fafa..4bbb8de 100644
 +                isNsfw = isNsfw,
 +                sources = sources,
 +                pkgFactory = appInfo.metaData.getString(METADATA_SOURCE_FACTORY),
-+                icon = appInfo.loadIcon(pkgManager),
++                icon = null, // Icons are loaded when their rows are displayed.
 +                isShared = extensionInfo.isShared,
 +                securityWarnings = warnings,
 +                executionMode =
@@ -23771,7 +24026,7 @@ index 962fafa..4bbb8de 100644
          return LoadResult.Success(extension)
      }
  
-@@ -338,15 +455,19 @@ internal object ExtensionLoader {
+@@ -338,15 +454,19 @@ internal object ExtensionLoader {
       * @param shared extension installed to system
       * @param private extension installed to data directory
       */
@@ -23794,7 +24049,7 @@ index 962fafa..4bbb8de 100644
          ) {
              shared
          } else {
-@@ -359,6 +480,14 @@ internal object ExtensionLoader {
+@@ -359,6 +479,14 @@ internal object ExtensionLoader {
       *
       * @param pkgInfo The package info of the application.
       */
@@ -23809,7 +24064,7 @@ index 962fafa..4bbb8de 100644
      private fun isPackageAnExtension(pkgInfo: PackageInfo): Boolean {
          return pkgInfo.reqFeatures.orEmpty().any { it.name == EXTENSION_FEATURE }
      }
-@@ -371,23 +500,22 @@ internal object ExtensionLoader {
+@@ -371,23 +499,22 @@ internal object ExtensionLoader {
       */
      private fun getSignatures(pkgInfo: PackageInfo): List<String>? {
          return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
@@ -23842,7 +24097,7 @@ index 962fafa..4bbb8de 100644
       */
      private fun ApplicationInfo.fixBasePaths(apkPath: String) {
          if (sourceDir == null) {
-@@ -398,8 +526,5 @@ internal object ExtensionLoader {
+@@ -398,8 +525,5 @@ internal object ExtensionLoader {
          }
      }
  
@@ -23852,6 +24107,31 @@ index 962fafa..4bbb8de 100644
 -    )
 +    private data class ExtensionInfo(val packageInfo: PackageInfo, val isShared: Boolean)
  }
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/extension/util/ExtensionPackageInventory.kt b/app/src/main/java/eu/kanade/tachiyomi/extension/util/ExtensionPackageInventory.kt
+new file mode 100644
+index 0000000..4d45fc9
+--- /dev/null
++++ b/app/src/main/java/eu/kanade/tachiyomi/extension/util/ExtensionPackageInventory.kt
+@@ -0,0 +1,19 @@
++package eu.kanade.tachiyomi.extension.util
++
++/** Selects one package per name without re-reading an archive to resolve duplicates. */
++internal fun <P : Any> selectExtensionPackages(
++    shared: Sequence<P>,
++    privatePackages: Sequence<P>,
++    packageName: (P) -> String,
++    versionCode: (P) -> Long,
++): List<P> {
++    val selected = LinkedHashMap<String, P>()
++    for (candidate in shared + privatePackages) {
++        val name = packageName(candidate)
++        val current = selected[name]
++        if (current == null || versionCode(candidate) > versionCode(current)) {
++            selected[name] = candidate
++        }
++    }
++    return selected.values.toList()
++}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/extension/util/ExtensionSecurityAudit.kt b/app/src/main/java/eu/kanade/tachiyomi/extension/util/ExtensionSecurityAudit.kt
 new file mode 100644
 index 0000000..e1c1b75
@@ -24156,18 +24436,21 @@ index 0000000..43b5fc1
 +            .joinToString("") { "%02x".format(it) }
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/source/AndroidSourceManager.kt b/app/src/main/java/eu/kanade/tachiyomi/source/AndroidSourceManager.kt
-index 147e589..6bed3ee 100644
+index 147e589..07b3ce0 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/source/AndroidSourceManager.kt
 +++ b/app/src/main/java/eu/kanade/tachiyomi/source/AndroidSourceManager.kt
-@@ -4,6 +4,7 @@ import android.content.Context
+@@ -4,17 +4,23 @@ import android.content.Context
  import eu.kanade.tachiyomi.data.download.DownloadManager
  import eu.kanade.tachiyomi.extension.ExtensionManager
  import eu.kanade.tachiyomi.source.online.HttpSource
 +import java.util.concurrent.ConcurrentHashMap
++import kotlinx.coroutines.CancellationException
  import kotlinx.coroutines.CoroutineScope
  import kotlinx.coroutines.Dispatchers
  import kotlinx.coroutines.Job
-@@ -12,6 +13,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
++import kotlinx.coroutines.flow.collect
+ import kotlinx.coroutines.flow.Flow
+ import kotlinx.coroutines.flow.MutableStateFlow
  import kotlinx.coroutines.flow.StateFlow
  import kotlinx.coroutines.flow.asStateFlow
  import kotlinx.coroutines.flow.collectLatest
@@ -24175,7 +24458,12 @@ index 147e589..6bed3ee 100644
  import kotlinx.coroutines.flow.map
  import kotlinx.coroutines.launch
  import kotlinx.coroutines.runBlocking
-@@ -23,7 +25,6 @@ import tachiyomi.source.local.LocalSource
++import logcat.LogPriority
++import tachiyomi.core.common.util.system.logcat
+ import tachiyomi.domain.source.model.MERGED_SOURCE_ID
+ import tachiyomi.domain.source.model.StubSource
+ import tachiyomi.domain.source.repository.StubSourceRepository
+@@ -23,7 +29,6 @@ import tachiyomi.source.local.LocalSource
  import uy.kohesive.injekt.Injekt
  import uy.kohesive.injekt.api.get
  import uy.kohesive.injekt.injectLazy
@@ -24183,7 +24471,7 @@ index 147e589..6bed3ee 100644
  
  class AndroidSourceManager(
      private val context: Context,
-@@ -31,7 +32,8 @@ class AndroidSourceManager(
+@@ -31,7 +36,8 @@ class AndroidSourceManager(
      private val sourceRepository: StubSourceRepository,
  ) : SourceManager {
  
@@ -24193,7 +24481,7 @@ index 147e589..6bed3ee 100644
  
      private val _isInitialized = MutableStateFlow(false)
      override val isInitialized: StateFlow<Boolean> = _isInitialized.asStateFlow()
-@@ -48,48 +50,46 @@ class AndroidSourceManager(
+@@ -48,48 +54,71 @@ class AndroidSourceManager(
  
      init {
          scope.launch {
@@ -24234,31 +24522,51 @@ index 147e589..6bed3ee 100644
 +                    mangaExtensions.forEach { extension ->
 +                        extension.sources.forEach {
 +                            mutableMap[it.id] = it
-+                            registerStubSource(StubSource.from(it))
++                        }
++                    }
++                    novelExtensions.forEach { extension ->
++                        extension.sources.forEach {
++                            mutableMap[it.id] = it
 +                        }
                      }
--                }
++                    mutableMap
+                 }
 -                novelExtensions.forEach { extension ->
 -                    extension.sources.forEach {
 -                        mutableMap[it.id] = it
 -                        registerStubSource(StubSource.from(it))
-+                    novelExtensions.forEach { extension ->
-+                        extension.sources.forEach {
-+                            mutableMap[it.id] = it
-+                            registerStubSource(StubSource.from(it))
-+                        }
-                     }
-+                    mutableMap
-+                }
 +                .collectLatest { mutableMap ->
 +                    sourcesMapFlow.value = mutableMap
 +                    _isInitialized.value = true
++                }
++        }
++
++        scope.launch {
++            val persisted = mutableMapOf<Long, StubSource>()
++            // Publish the source index before persisting metadata. Process changes sequentially
++            // so a batch install cannot start hundreds of duplicate queries and folder renames.
++            sourcesMapFlow.collect { snapshot ->
++                for (source in snapshot.values) {
++                    when (source.id) {
++                        LocalSource.ID, MERGED_SOURCE_ID, TelegramSource.ID -> continue
++                    }
++                    val metadata = StubSource.from(source)
++                    if (persisted[metadata.id]?.sameMetadata(metadata) == true) continue
++                    try {
++                        persistStubSource(metadata)
++                        persisted[metadata.id] = metadata
++                    } catch (cancelled: CancellationException) {
++                        throw cancelled
++                    } catch (error: Exception) {
++                        logcat(LogPriority.WARN, error) { "Could not save metadata for source ${metadata.id}" }
+                     }
                  }
 -                mutableMap
 -            }.collectLatest { mutableMap ->
 -                sourcesMapFlow.value = mutableMap
 -                _isInitialized.value = true
--            }
++                persisted.keys.retainAll(snapshot.keys)
+             }
          }
  
          scope.launch {
@@ -24267,16 +24575,17 @@ index 147e589..6bed3ee 100644
 -                    val mutableMap = stubSourcesMap.toMutableMap()
 -                    sources.forEach {
 -                        mutableMap[it.id] = it
--                    }
--                }
 +            sourceRepository.subscribeAll().collectLatest { sources ->
-+                val mutableMap = stubSourcesMap.toMutableMap()
-+                sources.forEach { mutableMap[it.id] = it }
++                sources.forEach { source ->
++                    stubSourcesMap.compute(source.id) { _, current ->
++                        if (current == null || current.name.isBlank() || current.lang.isBlank()) source else current
+                     }
+                 }
 +            }
          }
      }
  
-@@ -98,9 +98,8 @@ class AndroidSourceManager(
+@@ -98,9 +127,8 @@ class AndroidSourceManager(
      }
  
      override fun getOrStub(sourceKey: Long): Source {
@@ -24288,7 +24597,7 @@ index 147e589..6bed3ee 100644
      }
  
      override fun getAll() = sourcesMapFlow.value.values.toList()
-@@ -112,6 +111,15 @@ class AndroidSourceManager(
+@@ -112,15 +140,28 @@ class AndroidSourceManager(
          return stubSourcesMap.values.filterNot { it.id in onlineSourceIds }
      }
  
@@ -24302,8 +24611,29 @@ index 147e589..6bed3ee 100644
 +    }
 +
      private fun registerStubSource(source: StubSource) {
-         scope.launch {
-             val dbSource = sourceRepository.getStubSource(source.id)
+-        scope.launch {
+-            val dbSource = sourceRepository.getStubSource(source.id)
+-            if (dbSource == source) return@launch
+-            sourceRepository.upsertStubSource(source.id, source.lang, source.name)
+-            if (dbSource != null) {
+-                downloadManager.renameSource(dbSource, source)
+-            }
+-        }
++        scope.launch { persistStubSource(source) }
++    }
++
++    private fun StubSource.sameMetadata(other: StubSource): Boolean =
++        name == other.name && lang == other.lang
++
++    private suspend fun persistStubSource(source: StubSource) {
++        val dbSource = sourceRepository.getStubSource(source.id)
++        stubSourcesMap[source.id] = source
++        if (dbSource?.sameMetadata(source) == true) return
++        sourceRepository.upsertStubSource(source.id, source.lang, source.name)
++        if (dbSource != null) downloadManager.renameSource(dbSource, source)
+     }
+ 
+     private suspend fun createStubSource(id: Long): StubSource {
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/source/selection/AdultContentFilter.kt b/app/src/main/java/eu/kanade/tachiyomi/source/selection/AdultContentFilter.kt
 new file mode 100644
 index 0000000..7c3c569
@@ -25840,10 +26170,10 @@ index 0000000..aaa0c39
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/source/selection/WorkSearchGrouping.kt b/app/src/main/java/eu/kanade/tachiyomi/source/selection/WorkSearchGrouping.kt
 new file mode 100644
-index 0000000..33ef661
+index 0000000..e6e84c1
 --- /dev/null
 +++ b/app/src/main/java/eu/kanade/tachiyomi/source/selection/WorkSearchGrouping.kt
-@@ -0,0 +1,147 @@
+@@ -0,0 +1,149 @@
 +package eu.kanade.tachiyomi.source.selection
 +
 +import tachiyomi.domain.manga.model.Manga
@@ -25953,8 +26283,10 @@ index 0000000..33ef661
 +                        .filter { index -> groups[index].all { compatible(it, favorite) } }
 +                        .singleOrNull()
 +                }
++                .entries
++                .groupBy({ it.value }, { it.key })
 +        return groups.mapIndexed { index, group ->
-+            val eligible = assignments.filterValues { it == index }.keys
++            val eligible = assignments[index].orEmpty()
 +            val saved = eligible.filter { candidate -> eligible.all { compatible(candidate, it) } }
 +            val editions = (saved + group).distinctBy { it.manga.source to it.manga.url }
 +            val primary = preferredManga(editions)
@@ -26864,7 +27196,7 @@ index a7c138d..82d1a66 100644
          }
      }
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/browse/source/globalsearch/GlobalSearchViewModel.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/browse/source/globalsearch/GlobalSearchViewModel.kt
-index cfb48e5..3d3cde0 100644
+index cfb48e5..101468e 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/ui/browse/source/globalsearch/GlobalSearchViewModel.kt
 +++ b/app/src/main/java/eu/kanade/tachiyomi/ui/browse/source/globalsearch/GlobalSearchViewModel.kt
 @@ -1,14 +1,29 @@
@@ -26898,7 +27230,7 @@ index cfb48e5..3d3cde0 100644
  
      companion object {
          val INITIAL_QUERY_KEY = CreationExtras.Key<String>()
-@@ -35,8 +50,136 @@ class GlobalSearchViewModel(
+@@ -35,8 +50,132 @@ class GlobalSearchViewModel(
          }
      }
  
@@ -26923,12 +27255,7 @@ index cfb48e5..3d3cde0 100644
 +                                    .identity != null,
 +                )
 +            }
-+        val hits =
-+            items.flatMap { (source, result) ->
-+                (result as? SearchItemResult.Success)?.result.orEmpty().map {
-+                    WorkSearchHit(it, source.name, source.lang)
-+                }
-+            }
++        val hits = items.toWorkSearchHits()
 +        val groups =
 +            unifiedWorkSearch.refine(
 +                query,
@@ -26986,7 +27313,8 @@ index cfb48e5..3d3cde0 100644
 +                }
 +            current.copy(
 +                workResults = persisted,
-+                items = updated.toSortedMap(sortComparator(updated)),
++                partialWorkResults = emptyList(),
++                items = sortedSourceResults(updated),
 +            )
 +        }
 +    }
@@ -27037,24 +27365,42 @@ index cfb48e5..3d3cde0 100644
      }
  }
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/browse/source/globalsearch/SearchViewModel.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/browse/source/globalsearch/SearchViewModel.kt
-index 03900aa..20d2af1 100644
+index 03900aa..099e985 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/ui/browse/source/globalsearch/SearchViewModel.kt
 +++ b/app/src/main/java/eu/kanade/tachiyomi/ui/browse/source/globalsearch/SearchViewModel.kt
-@@ -7,11 +7,13 @@ import androidx.lifecycle.viewModelScope
+@@ -7,16 +7,27 @@ import androidx.lifecycle.viewModelScope
  import eu.kanade.domain.source.service.SourcePreferences
  import eu.kanade.tachiyomi.extension.ExtensionManager
  import eu.kanade.tachiyomi.source.Source
-+import java.util.concurrent.Executors
++import eu.kanade.tachiyomi.source.selection.WorkSearchGroup
++import eu.kanade.tachiyomi.source.selection.WorkSearchGrouping
++import eu.kanade.tachiyomi.source.selection.WorkSearchHit
++import java.net.SocketTimeoutException
++import kotlin.time.Duration.Companion.milliseconds
++import kotlin.time.TimeSource
++import kotlinx.coroutines.CancellationException
++import kotlinx.coroutines.ExperimentalCoroutinesApi
  import kotlinx.coroutines.Job
- import kotlinx.coroutines.asCoroutineDispatcher
- import kotlinx.coroutines.async
- import kotlinx.coroutines.awaitAll
+-import kotlinx.coroutines.asCoroutineDispatcher
+-import kotlinx.coroutines.async
+-import kotlinx.coroutines.awaitAll
++import kotlinx.coroutines.ensureActive
++import kotlinx.coroutines.flow.asFlow
  import kotlinx.coroutines.flow.collectLatest
 +import kotlinx.coroutines.flow.drop
  import kotlinx.coroutines.flow.filterNotNull
++import kotlinx.coroutines.flow.first
++import kotlinx.coroutines.flow.flatMapMerge
++import kotlinx.coroutines.flow.flow
  import kotlinx.coroutines.flow.update
  import kotlinx.coroutines.isActive
-@@ -27,18 +29,22 @@ import tachiyomi.domain.manga.model.Manga
+ import kotlinx.coroutines.launch
+-import kotlinx.coroutines.withContext
++import kotlinx.coroutines.withTimeoutOrNull
+ import mihon.core.viewmodel.StateViewModel
+ import mihon.domain.manga.model.toDomainManga
+ import tachiyomi.core.common.preference.toggle
+@@ -27,19 +38,22 @@ import tachiyomi.domain.manga.model.Manga
  import tachiyomi.domain.source.service.SourceManager
  import uy.kohesive.injekt.Injekt
  import uy.kohesive.injekt.api.get
@@ -27073,13 +27419,14 @@ index 03900aa..20d2af1 100644
 +        Injekt.get(),
  ) : StateViewModel<SearchViewModel.State>(initialState) {
  
+-    private val coroutineDispatcher = Executors.newFixedThreadPool(5).asCoroutineDispatcher()
 +    protected val searchSourceManager: SourceManager
 +        get() = sourceManager
 +
-     private val coroutineDispatcher = Executors.newFixedThreadPool(5).asCoroutineDispatcher()
      private var searchJob: Job? = null
  
-@@ -65,28 +71,39 @@ abstract class SearchViewModel(
+     private val enabledLanguages = sourcePreferences.enabledLanguages.get()
+@@ -65,28 +79,44 @@ abstract class SearchViewModel(
                  mutableState.update { it.copy(onlyShowHasResults = state) }
              }
          }
@@ -27089,7 +27436,12 @@ index 03900aa..20d2af1 100644
 +                lastQuery = null
 +                lastSourceFilter = null
 +                mutableState.update { current ->
-+                    current.copy(items = emptyMap(), workResults = null, resolvingWorks = false)
++                    current.copy(
++                        items = emptyMap(),
++                        workResults = null,
++                        partialWorkResults = emptyList(),
++                        resolvingWorks = false,
++                    )
 +                }
 +                search()
 +            }
@@ -27125,7 +27477,15 @@ index 03900aa..20d2af1 100644
              )
      }
  
-@@ -124,7 +141,9 @@ abstract class SearchViewModel(
+@@ -117,6 +147,7 @@ abstract class SearchViewModel(
+         preferences.globalSearchFilterState.toggle()
+     }
+ 
++    @OptIn(ExperimentalCoroutinesApi::class)
+     fun search() {
+         val query = state.value.searchQuery
+         val sourceFilter = state.value.sourceFilter
+@@ -124,71 +155,134 @@ abstract class SearchViewModel(
          if (query.isNullOrBlank()) return
  
          val sameQuery = this.lastQuery == query
@@ -27136,31 +27496,31 @@ index 03900aa..20d2af1 100644
  
          this.lastQuery = query
          this.lastSourceFilter = sourceFilter
-@@ -133,62 +152,97 @@ abstract class SearchViewModel(
  
-         val sources = getSelectedSources()
+         searchJob?.cancel()
  
+-        val sources = getSelectedSources()
+-
 -        // Reuse previous results if possible
 -        if (sameQuery) {
-+        mutableState.update {
-+            it.copy(workResults = null, resolvingWorks = it.unifiedSearch, hasSearched = true)
-+        }
-+        // Reuse successful source results when changing filters, not on an explicit retry.
-+        if (reuseResults) {
-             val existingResults = state.value.items
-             updateItems(
+-            val existingResults = state.value.items
+-            updateItems(
 -                sources
 -                    .associateWith { existingResults[it] ?: SearchItemResult.Loading },
-+                sources.associateWith {
-+                    (existingResults[it] as? SearchItemResult.Success) ?: SearchItemResult.Loading
-+                }
-             )
-         } else {
+-            )
+-        } else {
 -            updateItems(
 -                sources
 -                    .associateWith { SearchItemResult.Loading },
--            )
-+            updateItems(sources.associateWith { SearchItemResult.Loading })
++        val previousItems = if (reuseResults) state.value.items else emptyMap()
++        mutableState.update {
++            it.copy(
++                items = emptyMap(),
++                workResults = null,
++                partialWorkResults = emptyList(),
++                resolvingWorks = it.unifiedSearch,
++                hasSearched = true,
+             )
          }
  
 -        searchJob = viewModelScope.launchIO {
@@ -27170,46 +27530,18 @@ index 03900aa..20d2af1 100644
 -                        return@async
 +        searchJob =
 +            viewModelScope.launchIO {
-+                sources
-+                    .map { source ->
-+                        async {
-+                            if (state.value.items[source] !is SearchItemResult.Loading) {
-+                                return@async
-+                            }
-+
-+                            try {
-+                                val page =
-+                                    withContext(coroutineDispatcher) {
-+                                        source.getSearchManga(1, query, source.getFilterList())
-+                                    }
-+
-+                                val visibility = contentFilter.snapshot()
-+                                val titles =
-+                                    page.mangas
-+                                        .filter { visibility.allows(it) }
-+                                        .take(if (state.value.unifiedSearch) 100 else Int.MAX_VALUE)
-+                                        .map { it.toDomainManga(source.id) }
-+                                        .distinctBy { it.url }
-+                                        .let { networkToLocalManga(it) }
-+                                        .let { titles ->
-+                                            val currentVisibility = contentFilter.snapshot()
-+                                            titles.filter { currentVisibility.allows(it) }
-+                                        }
-+
-+                                if (isActive) {
-+                                    updateItem(source, SearchItemResult.Success(titles))
-+                                }
-+                            } catch (e: Exception) {
-+                                if (isActive) {
-+                                    updateItem(source, SearchItemResult.Error(e))
-+                                }
-+                            }
-+                        }
++                sourceManager.isInitialized.first { it }
++                val sources = getSelectedSources()
++                coroutineContext.ensureActive()
++                // Keep successful source results when changing filters, and refetch on explicit
++                // retry.
++                updateItems(
++                    sources.associateWith { source ->
++                        (previousItems[source] as? SearchItemResult.Success)
++                            ?: SearchItemResult.Loading
                      }
 -
-+                    .awaitAll()
-+                if (isActive) {
-                     try {
+-                    try {
 -                        val page = withContext(coroutineDispatcher) {
 -                            source.getSearchManga(1, query, source.getFilterList())
 -                        }
@@ -27221,11 +27553,71 @@ index 03900aa..20d2af1 100644
 -
 -                        if (isActive) {
 -                            updateItem(source, SearchItemResult.Success(titles))
--                        }
++                )
++                var lastPreview: TimeSource.Monotonic.ValueTimeMark? = null
++                var previewedItems: Map<Source, SearchItemResult>? = null
++                fun publishPreview(force: Boolean) {
++                    val snapshot = state.value
++                    if (!snapshot.unifiedSearch || snapshot.items === previewedItems) return
++                    if (!force && lastPreview?.elapsedNow()?.let { it < 350.milliseconds } == true)
++                        return
++                    val hits = snapshot.items.toWorkSearchHits()
++                    if (hits.isEmpty() && !force) return
++                    val grouped = WorkSearchGrouping.group(hits)
++                    coroutineContext.ensureActive()
++                    mutableState.update { current ->
++                        if (current.items === snapshot.items)
++                            current.copy(partialWorkResults = grouped)
++                        else current
++                    }
++                    previewedItems = snapshot.items
++                    lastPreview = TimeSource.Monotonic.markNow()
++                }
++                if (reuseResults) publishPreview(force = false)
++                sources
++                    .asFlow()
++                    .flatMapMerge(concurrency = 5) { source ->
++                        flow {
++                            if (state.value.items[source] !is SearchItemResult.Loading) return@flow
++                            val result =
++                                try {
++                                    val page =
++                                        withTimeoutOrNull(30_000L) {
++                                            source.getSearchManga(1, query, source.getFilterList())
++                                        } ?: throw SocketTimeoutException("Source search timed out")
++
++                                    val visibility = contentFilter.snapshot()
++                                    val titles =
++                                        page.mangas
++                                            .filter { visibility.allows(it) }
++                                            .take(
++                                                if (state.value.unifiedSearch) 100
++                                                else Int.MAX_VALUE
++                                            )
++                                            .map { it.toDomainManga(source.id) }
++                                            .distinctBy { it.url }
++                                            .let { networkToLocalManga(it) }
++                                    SearchItemResult.Success(titles)
++                                } catch (cancelled: CancellationException) {
++                                    throw cancelled
++                                } catch (error: Exception) {
++                                    SearchItemResult.Error(error)
++                                }
++                            emit(source to result)
+                         }
 -                    } catch (e: Exception) {
 -                        if (isActive) {
 -                            updateItem(source, SearchItemResult.Error(e))
--                        }
++                    }
++                    .collect { (source, result) ->
++                        updateItem(source, result)
++                        if (result is SearchItemResult.Success && !result.isEmpty) {
++                            publishPreview(force = false)
+                         }
+                     }
++                if (isActive) {
++                    try {
++                        publishPreview(force = true)
 +                        refineResults(query, state.value.items)
 +                    } catch (cancelled: kotlinx.coroutines.CancellationException) {
 +                        throw cancelled
@@ -27234,21 +27626,16 @@ index 03900aa..20d2af1 100644
 +                        android.util.Log.w("PolarisWorkSearch", "Work enrichment failed", error)
 +                    } finally {
 +                        if (isActive) mutableState.update { it.copy(resolvingWorks = false) }
-                     }
++                    }
                  }
              }
 -                .awaitAll()
 -        }
-+    }
-+
+     }
+ 
 +    protected open suspend fun refineResults(query: String, items: Map<Source, SearchItemResult>) =
 +        Unit
 +
-+    override fun onCleared() {
-+        coroutineDispatcher.close()
-+        super.onCleared()
-     }
- 
      private fun updateItems(items: Map<Source, SearchItemResult>) {
 -        mutableState.update {
 -            it.copy(
@@ -27256,9 +27643,13 @@ index 03900aa..20d2af1 100644
 -                    .toSortedMap(sortComparator(items)),
 -            )
 -        }
-+        mutableState.update { it.copy(items = items.toSortedMap(sortComparator(items))) }
++        mutableState.update { it.copy(items = sortedSourceResults(items)) }
      }
  
++    protected fun sortedSourceResults(
++        items: Map<Source, SearchItemResult>
++    ): Map<Source, SearchItemResult> = items.toSortedMap(sortComparator(items).thenBy { it.id })
++
      private fun updateItem(source: Source, result: SearchItemResult) {
 -        updateItems(state.value.items + (source to result))
 +        val visibility = contentFilter.snapshot()
@@ -27268,12 +27659,12 @@ index 03900aa..20d2af1 100644
 +            else result
 +        mutableState.update { current ->
 +            val updated = current.items + (source to filtered)
-+            current.copy(items = updated.toSortedMap(sortComparator(updated)))
++            current.copy(items = sortedSourceResults(updated))
 +        }
      }
  
      fun setMigrateDialog(currentId: Long, target: Manga) {
-@@ -210,8 +264,30 @@ abstract class SearchViewModel(
+@@ -210,8 +304,17 @@ abstract class SearchViewModel(
          val onlyShowHasResults: Boolean = false,
          val items: Map<Source, SearchItemResult> = mapOf(),
          val dialog: Dialog? = null,
@@ -27281,30 +27672,31 @@ index 03900aa..20d2af1 100644
 +        val unifiedSearch: Boolean = false,
 +        val showSourceResults: Boolean = false,
 +        val resolvingWorks: Boolean = false,
-+        val workResults: List<eu.kanade.tachiyomi.source.selection.WorkSearchGroup>? = null,
++        val workResults: List<WorkSearchGroup>? = null,
++        val partialWorkResults: List<WorkSearchGroup> = emptyList(),
      ) {
          val progress: Int = items.count { it.value !is SearchItemResult.Loading }
-+        val workHits
-+            get() =
-+                items.flatMap { (source, result) ->
-+                    (result as? SearchItemResult.Success)?.result.orEmpty().map {
-+                        eu.kanade.tachiyomi.source.selection.WorkSearchHit(
-+                            it,
-+                            source.name,
-+                            source.lang,
-+                        )
-+                    }
-+                }
-+
 +        val visibleWorks
-+            get() =
-+                workResults
-+                    ?: eu.kanade.tachiyomi.source.selection.WorkSearchGrouping.group(workHits)
++            get() = workResults ?: partialWorkResults
 +
          val total: Int = items.size
          val filteredItems = items.filter { (_, result) -> result.isVisible(onlyShowHasResults) }
      }
-@@ -229,13 +305,9 @@ enum class SourceFilter {
+@@ -221,6 +324,13 @@ abstract class SearchViewModel(
+     }
+ }
+ 
++internal fun Map<Source, SearchItemResult>.toWorkSearchHits(): List<WorkSearchHit> =
++    flatMap { (source, result) ->
++        (result as? SearchItemResult.Success)?.result.orEmpty().map {
++            WorkSearchHit(it, source.name, source.lang)
++        }
++    }
++
+ enum class SourceFilter {
+     All,
+     PinnedOnly,
+@@ -229,13 +339,9 @@ enum class SourceFilter {
  sealed interface SearchItemResult {
      data object Loading : SearchItemResult
  
@@ -64955,6 +65347,136 @@ index 0000000..b6fc1ed
 +            )) assertFalse(SourcePreferenceNamespace.valid(key), key)
 +    }
 +}
+diff --git a/app/src/test/java/eu/kanade/tachiyomi/data/download/ChapterImageRetryTest.kt b/app/src/test/java/eu/kanade/tachiyomi/data/download/ChapterImageRetryTest.kt
+new file mode 100644
+index 0000000..be23406
+--- /dev/null
++++ b/app/src/test/java/eu/kanade/tachiyomi/data/download/ChapterImageRetryTest.kt
+@@ -0,0 +1,124 @@
++package eu.kanade.tachiyomi.data.download
++
++import eu.kanade.tachiyomi.network.HttpException
++import java.io.FileNotFoundException
++import java.io.IOException
++import java.security.cert.CertificateException
++import javax.net.ssl.SSLHandshakeException
++import javax.net.ssl.SSLPeerUnverifiedException
++import kotlinx.coroutines.CancellationException
++import kotlinx.coroutines.async
++import kotlinx.coroutines.cancelAndJoin
++import kotlinx.coroutines.flow.first
++import kotlinx.coroutines.flow.flow
++import kotlinx.coroutines.flow.retryWhen
++import kotlinx.coroutines.test.runCurrent
++import kotlinx.coroutines.test.runTest
++import org.junit.jupiter.api.Assertions.*
++import org.junit.jupiter.api.Test
++
++class ChapterImageRetryTest {
++    @Test
++    fun `authentication missing pages and rate limiting stop without blind repeated requests`() =
++        runTest {
++            for (code in listOf(400, 401, 403, 404, 410, 429)) {
++                var requests = 0
++                val error = HttpException(code)
++                val result = runCatching {
++                    flow<Unit> {
++                            requests++
++                            throw error
++                        }
++                        .retryWhen { e, n -> ChapterImageRetry.after(e, n) }
++                        .first()
++                }
++                assertSame(error, result.exceptionOrNull())
++                assertEquals(1, requests, "HTTP $code")
++            }
++            assertEquals(0L, testScheduler.currentTime)
++        }
++
++    @Test
++    fun `temporary transfers retain the bounded two four eight second backoff`() = runTest {
++        var requests = 0
++        val error = IOException("network interrupted")
++        val result = runCatching {
++            flow<Unit> {
++                    requests++
++                    throw error
++                }
++                .retryWhen { e, n -> ChapterImageRetry.after(e, n) }
++                .first()
++        }
++        assertSame(error, result.exceptionOrNull())
++        assertEquals(4, requests)
++        assertEquals(14_000L, testScheduler.currentTime)
++    }
++
++    @Test
++    fun `a transient provider failure can succeed without duplicating a completed transfer`() =
++        runTest {
++            var requests = 0
++            val result =
++                flow {
++                        if (++requests <= 2) throw HttpException(503)
++                        emit("complete")
++                    }
++                    .retryWhen { e, n -> ChapterImageRetry.after(e, n) }
++                    .first()
++            assertEquals("complete", result)
++            assertEquals(3, requests)
++            assertEquals(6_000L, testScheduler.currentTime)
++        }
++
++    @Test
++    fun `an invalid range can retry after the existing caller clears its partial file`() = runTest {
++        assertTrue(ChapterImageRetry.after(HttpException(416), 0))
++        assertEquals(2_000L, testScheduler.currentTime)
++    }
++
++    @Test
++    fun `certificate file and programming errors do not trigger automatic retries`() = runTest {
++        val certificate =
++            SSLHandshakeException("untrusted").also {
++                it.initCause(CertificateException("invalid"))
++            }
++        for (error in
++            listOf(
++                certificate,
++                SSLPeerUnverifiedException("host"),
++                FileNotFoundException("storage"),
++                IllegalArgumentException("invalid image"),
++            )) {
++            assertFalse(ChapterImageRetry.after(error, 0))
++        }
++        assertEquals(0L, testScheduler.currentTime)
++    }
++
++    @Test
++    fun `cancellation is preserved without a new request`() = runTest {
++        val cancelled = CancellationException("cancelled")
++        assertSame(
++            cancelled,
++            runCatching { ChapterImageRetry.after(cancelled, 0) }.exceptionOrNull(),
++        )
++        assertEquals(0L, testScheduler.currentTime)
++    }
++
++    @Test
++    fun `cancelling during backoff prevents the next transfer`() = runTest {
++        var requests = 0
++        val pending = async {
++            flow<Unit> {
++                    requests++
++                    throw IOException("offline")
++                }
++                .retryWhen { e, n -> ChapterImageRetry.after(e, n) }
++                .first()
++        }
++        runCurrent()
++        pending.cancelAndJoin()
++        assertEquals(1, requests)
++        assertTrue(pending.isCancelled)
++    }
++}
 diff --git a/app/src/test/java/eu/kanade/tachiyomi/data/download/model/DownloadOriginRouteTest.kt b/app/src/test/java/eu/kanade/tachiyomi/data/download/model/DownloadOriginRouteTest.kt
 new file mode 100644
 index 0000000..0a4fb4c
@@ -67527,6 +68049,41 @@ index 0000000..84cac8c
 +                ExtensionLoader.installPrivateExtensionFile(context, any(), any())
 +            }
 +        }
++}
+diff --git a/app/src/test/java/eu/kanade/tachiyomi/extension/util/ExtensionPackageInventoryTest.kt b/app/src/test/java/eu/kanade/tachiyomi/extension/util/ExtensionPackageInventoryTest.kt
+new file mode 100644
+index 0000000..666d863
+--- /dev/null
++++ b/app/src/test/java/eu/kanade/tachiyomi/extension/util/ExtensionPackageInventoryTest.kt
+@@ -0,0 +1,29 @@
++package eu.kanade.tachiyomi.extension.util
++
++import org.junit.jupiter.api.Assertions.assertEquals
++import org.junit.jupiter.api.Test
++
++class ExtensionPackageInventoryTest {
++    private data class Package(val name: String, val version: Long, val shared: Boolean)
++
++    @Test
++    fun `opening with 290 private extensions reads every archive once and keeps the complete catalog`() {
++        val packages = List(290) { Package("extension.$it", 1, false) }
++        var archiveReads = 0
++        val archives = packages.asSequence().map { archiveReads++; it }
++        val result = selectExtensionPackages(emptySequence(), archives, Package::name, Package::version)
++        assertEquals(packages, result)
++        assertEquals(290, archiveReads)
++    }
++
++    @Test
++    fun `newer private package wins while equal versions keep the shared installation`() {
++        val shared = sequenceOf(Package("equal", 5, true), Package("newer", 5, true), Package("older", 5, true))
++        val privatePackages = sequenceOf(Package("equal", 5, false), Package("newer", 6, false), Package("older", 4, false), Package("private", 3, false))
++        val result = selectExtensionPackages(shared, privatePackages, Package::name, Package::version)
++        assertEquals(
++            listOf(Package("equal", 5, true), Package("newer", 6, false), Package("older", 5, true), Package("private", 3, false)),
++            result,
++        )
++    }
 +}
 diff --git a/app/src/test/java/eu/kanade/tachiyomi/extension/util/ExtensionSecurityAuditTest.kt b/app/src/test/java/eu/kanade/tachiyomi/extension/util/ExtensionSecurityAuditTest.kt
 new file mode 100644
@@ -71096,10 +71653,10 @@ index 0000000..cd59c85
 +}
 diff --git a/app/src/test/java/eu/kanade/tachiyomi/ui/browse/source/globalsearch/AdultSearchViewModelTest.kt b/app/src/test/java/eu/kanade/tachiyomi/ui/browse/source/globalsearch/AdultSearchViewModelTest.kt
 new file mode 100644
-index 0000000..13829b1
+index 0000000..93abb86
 --- /dev/null
 +++ b/app/src/test/java/eu/kanade/tachiyomi/ui/browse/source/globalsearch/AdultSearchViewModelTest.kt
-@@ -0,0 +1,199 @@
+@@ -0,0 +1,276 @@
 +package eu.kanade.tachiyomi.ui.browse.source.globalsearch
 +
 +import androidx.lifecycle.ViewModelStore
@@ -71154,7 +71711,7 @@ index 0000000..13829b1
 +        private val gate: CompletableDeferred<Unit>? = null,
 +    ) : HttpSource() {
 +        override val baseUrl = "https://example.invalid"
-+        override val name = "Provider $id"
++        override val name = "Provider"
 +        override val lang = "en"
 +        override val supportsLatest = false
 +        val calls = AtomicInteger()
@@ -71172,15 +71729,16 @@ index 0000000..13829b1
 +        }
 +    }
 +
-+    private class Manager(private val entries: List<Provider>) : SourceManager {
-+        override val isInitialized = MutableStateFlow(true)
++    private class Manager(private val entries: List<Provider>, initialized: Boolean = true) :
++        SourceManager {
++        override val isInitialized = MutableStateFlow(initialized)
 +        override val sources = MutableStateFlow<List<Source>>(entries)
 +
 +        override fun get(sourceKey: Long): Source? = entries.find { it.id == sourceKey }
 +
 +        override fun getOrStub(sourceKey: Long): Source = get(sourceKey) ?: error("missing")
 +
-+        override fun getAll(): List<Source> = entries
++        override fun getAll(): List<Source> = if (isInitialized.value) entries else emptyList()
 +
 +        override fun getOnlineSources(): List<HttpSource> = entries
 +
@@ -71192,9 +71750,14 @@ index 0000000..13829b1
 +        manager: SourceManager,
 +        normalizer: NetworkToLocalManga,
 +        filter: AdultContentFilter,
++        unifiedSearch: Boolean = false,
 +    ) :
 +        SearchViewModel(
-+            State(searchQuery = "star", sourceFilter = SourceFilter.All),
++            State(
++                searchQuery = "star",
++                sourceFilter = SourceFilter.All,
++                unifiedSearch = unifiedSearch,
++            ),
 +            sourcePreferences = prefs,
 +            sourceManager = manager,
 +            extensionManager = mockk(),
@@ -71263,6 +71826,77 @@ index 0000000..13829b1
 +            assertEquals(setOf("/safe", "/unlabeled"), persisted.map { it.url }.toSet())
 +            val result = ready.items.getValue(mixed) as SearchItemResult.Success
 +            assertEquals(listOf("/safe"), result.result.map { it.url })
++        }
++
++    @Test
++    fun `unified search publishes grouped results while another source is still loading`() =
++        runBlocking {
++            val gate = CompletableDeferred<Unit>()
++            val first = Provider(1, listOf(row("/first", "Action")))
++            val second = Provider(2, listOf(row("/second", "Action")), gate)
++            val prefs = prefs()
++            val normalizer = mockk<NetworkToLocalManga>()
++            coEvery { normalizer(any<List<Manga>>()) } coAnswers { firstArg<List<Manga>>() }
++            val model =
++                Model(
++                    prefs,
++                    Manager(listOf(first, second)),
++                    normalizer,
++                    AdultContentFilter(),
++                    unifiedSearch = true,
++                )
++            store.put("search", model)
++
++            model.search()
++            val partial = withTimeout(10_000) { model.state.first { it.visibleWorks.isNotEmpty() } }
++            assertEquals("/first", partial.visibleWorks.single().representative.url)
++            assertEquals(1, partial.progress)
++            gate.complete(Unit)
++            val complete =
++                withTimeout(10_000) { model.state.first { !it.resolvingWorks && it.progress == 2 } }
++            assertEquals(
++                setOf("/first", "/second"),
++                complete.visibleWorks.map { it.representative.url }.toSet(),
++            )
++        }
++
++    @Test
++    fun `a search requested during startup runs once the sources are available`() = runBlocking {
++        val provider = Provider(1, listOf(row("/safe", "Action")))
++        val manager = Manager(listOf(provider), initialized = false)
++        val prefs = prefs()
++        val normalizer = mockk<NetworkToLocalManga>()
++        coEvery { normalizer(any<List<Manga>>()) } coAnswers { firstArg<List<Manga>>() }
++        val model = Model(prefs, manager, normalizer, AdultContentFilter())
++        store.put("search", model)
++
++        model.search()
++        assertEquals(0, provider.calls.get())
++        manager.isInitialized.value = true
++        val ready = withTimeout(10_000) { model.state.first { it.total == 1 && it.progress == 1 } }
++        assertEquals(1, provider.calls.get())
++        assertFalse((ready.items.getValue(provider) as SearchItemResult.Success).isEmpty)
++    }
++
++    @Test
++    fun `a large search holds five suspending requests per search and preserves sources with the same name`() =
++        runBlocking {
++            val gate = CompletableDeferred<Unit>()
++            val providers = (1L..290L).map { Provider(it, emptyList(), gate) }
++            val prefs = prefs()
++            val normalizer = mockk<NetworkToLocalManga>()
++            coEvery { normalizer(any<List<Manga>>()) } coAnswers { firstArg<List<Manga>>() }
++            val model = Model(prefs, Manager(providers), normalizer, AdultContentFilter())
++            store.put("search", model)
++
++            model.search()
++            withTimeout(10_000) { providers.take(5).forEach { it.started.await() } }
++            assertTrue(providers.drop(5).none { it.calls.get() > 0 })
++            gate.complete(Unit)
++            val ready =
++                withTimeout(15_000) { model.state.first { it.total == 290 && it.progress == 290 } }
++            assertEquals(290, ready.items.size)
++            assertTrue(providers.all { it.calls.get() == 1 })
 +        }
 +
 +    @Test
@@ -74571,6 +75205,208 @@ index 0000000..7452ed1
 +        }
 +    }
 +}
+diff --git a/app/src/test/java/eu/kanade/translation/recognizer/BitmapNativeResourceTest.kt b/app/src/test/java/eu/kanade/translation/recognizer/BitmapNativeResourceTest.kt
+new file mode 100644
+index 0000000..381336a
+--- /dev/null
++++ b/app/src/test/java/eu/kanade/translation/recognizer/BitmapNativeResourceTest.kt
+@@ -0,0 +1,196 @@
++package eu.kanade.translation.recognizer
++
++import android.graphics.Bitmap
++import com.paddle.ocr.util.BitmapUtils
++import com.paddle.ocr.util.OpenCvMatFactory
++import io.mockk.*
++import org.junit.jupiter.api.*
++import org.junit.jupiter.api.Assertions.*
++import org.junit.jupiter.params.ParameterizedTest
++import org.junit.jupiter.params.provider.EnumSource
++import org.junit.jupiter.params.provider.ValueSource
++import org.opencv.android.Utils
++import org.opencv.core.Mat
++import org.opencv.core.MatOfByte
++import org.opencv.imgcodecs.Imgcodecs
++import org.opencv.imgproc.Imgproc
++
++class BitmapNativeResourceTest {
++    enum class Failure {
++        RGBA_ALLOC,
++        DST_ALLOC,
++        TRANSFER,
++        CONVERT,
++    }
++
++    private val source = bitmap()
++    private val copy = bitmap()
++    private val output = bitmap()
++    private val inputMat = matrix()
++    private val rgba = matrix()
++    private val dst = matrix()
++    private val bytes = byteArrayOf(1, 2, 3)
++    private val encoded =
++        mockk<MatOfByte> {
++            every { release() } just Runs
++            every { fromArray(*bytes) } just Runs
++        }
++
++    @BeforeEach
++    fun prepare() {
++        mockkObject(OpenCvMatFactory)
++        mockkStatic(Utils::class, Imgproc::class, Imgcodecs::class, Bitmap::class)
++        every { source.copy(Bitmap.Config.ARGB_8888, false) } returns copy
++        every { OpenCvMatFactory.create(any(), any(), any()) } returns rgba
++        every { OpenCvMatFactory.empty() } returns dst
++        every { OpenCvMatFactory.bytes() } returns encoded
++        every { Utils.bitmapToMat(copy, rgba) } just Runs
++        every { Imgproc.cvtColor(any<Mat>(), any<Mat>(), any()) } just Runs
++        every { Bitmap.createBitmap(20, 10, Bitmap.Config.ARGB_8888) } returns output
++        every { Utils.matToBitmap(any<Mat>(), output) } just Runs
++        every { Imgcodecs.imdecode(encoded, Imgcodecs.IMREAD_COLOR) } returns dst
++    }
++
++    @AfterEach fun close() = unmockkAll()
++
++    @ParameterizedTest
++    @EnumSource(Failure::class)
++    fun `conversion failure closes its owned bitmap and all matrices created so far`(
++        stage: Failure
++    ) {
++        val error = IllegalStateException(stage.name)
++        when (stage) {
++            Failure.RGBA_ALLOC ->
++                every { OpenCvMatFactory.create(any(), any(), any()) } throws error
++            Failure.DST_ALLOC -> every { OpenCvMatFactory.empty() } throws error
++            Failure.TRANSFER -> every { Utils.bitmapToMat(copy, rgba) } throws error
++            Failure.CONVERT ->
++                every { Imgproc.cvtColor(rgba, dst, Imgproc.COLOR_RGBA2BGR) } throws error
++        }
++        assertSame(
++            error,
++            assertThrows(IllegalStateException::class.java) { BitmapUtils.bitmapToBGRMat(source) },
++        )
++        verify(exactly = 1) { copy.recycle() }
++        verify(exactly = if (stage == Failure.RGBA_ALLOC) 0 else 1) { rgba.release() }
++        verify(exactly = if (stage in setOf(Failure.TRANSFER, Failure.CONVERT)) 1 else 0) {
++            dst.release()
++        }
++        verify(exactly = 0) { source.recycle() }
++    }
++
++    @ParameterizedTest
++    @ValueSource(booleans = [true, false])
++    fun `successful RGB and BGR conversions transfer the output and keep the original bitmap`(
++        rgb: Boolean
++    ) {
++        val result =
++            if (rgb) BitmapUtils.bitmapToRGBMat(source) else BitmapUtils.bitmapToBGRMat(source)
++        assertSame(dst, result)
++        verify(exactly = 1) {
++            Imgproc.cvtColor(rgba, dst, if (rgb) Imgproc.COLOR_RGBA2RGB else Imgproc.COLOR_RGBA2BGR)
++        }
++        verify(exactly = 1) {
++            rgba.release()
++            copy.recycle()
++        }
++        verify(exactly = 0) {
++            dst.release()
++            source.recycle()
++        }
++    }
++
++    @Test
++    fun `copy failure never recycles the caller bitmap`() {
++        val error = IllegalStateException("copy failed")
++        every { source.copy(Bitmap.Config.ARGB_8888, false) } throws error
++        assertSame(
++            error,
++            assertThrows(IllegalStateException::class.java) { BitmapUtils.bitmapToRGBMat(source) },
++        )
++        verify(exactly = 0) {
++            source.recycle()
++            copy.recycle()
++            rgba.release()
++            dst.release()
++        }
++    }
++
++    @Test
++    fun `an aliased input is never recycled when allocation fails`() {
++        every { source.copy(Bitmap.Config.ARGB_8888, false) } returns source
++        every { OpenCvMatFactory.create(any(), any(), any()) } throws
++            IllegalStateException("allocation")
++        assertThrows(IllegalStateException::class.java) { BitmapUtils.bitmapToBGRMat(source) }
++        verify(exactly = 0) { source.recycle() }
++    }
++
++    @Test
++    fun `failed conversion to bitmap recycles the new bitmap and closes its matrix`() {
++        val error = IllegalStateException("bitmap transfer")
++        every { Utils.matToBitmap(dst, output) } throws error
++        assertSame(
++            error,
++            assertThrows(IllegalStateException::class.java) { BitmapUtils.bgrMatToBitmap(inputMat) },
++        )
++        verify(exactly = 1) {
++            output.recycle()
++            dst.release()
++        }
++        verify(exactly = 0) { inputMat.release() }
++    }
++
++    @Test
++    fun `successful conversion to bitmap transfers only the bitmap`() {
++        assertSame(output, BitmapUtils.bgrMatToBitmap(inputMat))
++        verify(exactly = 1) { dst.release() }
++        verify(exactly = 0) {
++            output.recycle()
++            inputMat.release()
++        }
++    }
++
++    @Test
++    fun `encoded byte population failure closes the matrix allocated before it`() {
++        val error = IllegalStateException("encoded bytes")
++        every { encoded.fromArray(*bytes) } throws error
++        assertSame(
++            error,
++            assertThrows(IllegalStateException::class.java) { BitmapUtils.imdecodeBGR(bytes) },
++        )
++        verify(exactly = 1) { encoded.release() }
++    }
++
++    @Test
++    fun `decode failure closes encoded bytes and preserves its exception`() {
++        val error = IllegalStateException("decode")
++        every { Imgcodecs.imdecode(encoded, Imgcodecs.IMREAD_COLOR) } throws error
++        assertSame(
++            error,
++            assertThrows(IllegalStateException::class.java) { BitmapUtils.imdecodeBGR(bytes) },
++        )
++        verify(exactly = 1) { encoded.release() }
++    }
++
++    @Test
++    fun `successful decode closes only encoded bytes and transfers the decoded matrix`() {
++        assertSame(dst, BitmapUtils.imdecodeBGR(bytes))
++        verify(exactly = 1) { encoded.release() }
++        verify(exactly = 0) { dst.release() }
++        assertArrayEquals(byteArrayOf(1, 2, 3), bytes)
++    }
++
++    private fun bitmap(): Bitmap =
++        mockk<Bitmap> {
++            every { height } returns 10
++            every { width } returns 20
++            every { recycle() } just Runs
++        }
++
++    private fun matrix(): Mat =
++        mockk<Mat> {
++            every { rows() } returns 10
++            every { cols() } returns 20
++            every { release() } just Runs
++        }
++}
 diff --git a/app/src/test/java/eu/kanade/translation/recognizer/CaptionSurfaceRegressionTest.kt b/app/src/test/java/eu/kanade/translation/recognizer/CaptionSurfaceRegressionTest.kt
 new file mode 100644
 index 0000000..a733d65
@@ -75087,6 +75923,192 @@ index 0000000..d7a0f5f
 +            x = left
 +            y = top
 +        }
++}
+diff --git a/app/src/test/java/eu/kanade/translation/recognizer/QuadTextCropResourceTest.kt b/app/src/test/java/eu/kanade/translation/recognizer/QuadTextCropResourceTest.kt
+new file mode 100644
+index 0000000..c9e0c6a
+--- /dev/null
++++ b/app/src/test/java/eu/kanade/translation/recognizer/QuadTextCropResourceTest.kt
+@@ -0,0 +1,180 @@
++package eu.kanade.translation.recognizer
++
++import android.graphics.PointF
++import com.paddle.ocr.model.OCRBox
++import com.paddle.ocr.postprocess.QuadTextCrop
++import com.paddle.ocr.util.OpenCvMatFactory
++import io.mockk.*
++import org.junit.jupiter.api.AfterEach
++import org.junit.jupiter.api.Assertions.*
++import org.junit.jupiter.api.BeforeEach
++import org.junit.jupiter.api.Test
++import org.junit.jupiter.params.ParameterizedTest
++import org.junit.jupiter.params.provider.EnumSource
++import org.opencv.core.*
++import org.opencv.imgproc.Imgproc
++
++class QuadTextCropResourceTest {
++    enum class Failure {
++        RECT_FILL,
++        RECT_CALC,
++        SOURCE_ALLOC,
++        SOURCE_FILL,
++        DEST_POINTS_ALLOC,
++        DEST_POINTS_FILL,
++        TRANSFORM,
++        DEST_ALLOC,
++        WARP,
++        DIMENSIONS,
++        ROTATED_ALLOC,
++        ROTATE,
++    }
++
++    private val source = matrix()
++    private val rect = points()
++    private val srcPoints = points()
++    private val dstPoints = points()
++    private val transform = matrix()
++    private val dst = matrix()
++    private val rotated = matrix()
++
++    @BeforeEach
++    fun prepare() {
++        // Initialize Java version constants before MockK records calls to Core's static methods.
++        Class.forName(Core::class.java.name)
++        mockkObject(OpenCvMatFactory)
++        mockkStatic(Imgproc::class, Core::class)
++        every { OpenCvMatFactory.points() } returnsMany listOf(rect, srcPoints, dstPoints)
++        every { OpenCvMatFactory.create(any(), any(), any()) } returns dst
++        every { OpenCvMatFactory.empty() } returns rotated
++        every { Imgproc.minAreaRect(rect) } returns
++            RotatedRect(Point(50.0, 10.0), Size(100.0, 20.0), 0.0)
++        every { Imgproc.getPerspectiveTransform(srcPoints, dstPoints) } returns transform
++        every { Imgproc.warpPerspective(source, dst, transform, any(), any(), any()) } just Runs
++        every { Core.rotate(dst, rotated, Core.ROTATE_90_COUNTERCLOCKWISE) } just Runs
++    }
++
++    @AfterEach fun close() = unmockkAll()
++
++    @ParameterizedTest
++    @EnumSource(Failure::class)
++    fun `each failing native stage closes all resources created before it without closing the input`(
++        stage: Failure
++    ) {
++        val error =
++            if (stage == Failure.DEST_ALLOC) OutOfMemoryError("synthetic allocation failure")
++            else IllegalStateException(stage.name)
++        val released: List<Mat> =
++            when (stage) {
++                Failure.RECT_FILL -> {
++                    every { rect.fromList(any()) } throws error
++                    listOf(rect)
++                }
++                Failure.RECT_CALC -> {
++                    every { Imgproc.minAreaRect(rect) } throws error
++                    listOf(rect)
++                }
++                Failure.SOURCE_ALLOC -> {
++                    every { OpenCvMatFactory.points() } returns rect andThenThrows error
++                    listOf(rect)
++                }
++                Failure.SOURCE_FILL -> {
++                    every { srcPoints.fromList(any()) } throws error
++                    listOf(rect, srcPoints)
++                }
++                Failure.DEST_POINTS_ALLOC -> {
++                    every { OpenCvMatFactory.points() } returns
++                        rect andThen
++                        srcPoints andThenThrows
++                        error
++                    listOf(rect, srcPoints)
++                }
++                Failure.DEST_POINTS_FILL -> {
++                    every { dstPoints.fromList(any()) } throws error
++                    listOf(rect, srcPoints, dstPoints)
++                }
++                Failure.TRANSFORM -> {
++                    every { Imgproc.getPerspectiveTransform(srcPoints, dstPoints) } throws error
++                    listOf(rect, srcPoints, dstPoints)
++                }
++                Failure.DEST_ALLOC -> {
++                    every { OpenCvMatFactory.create(any(), any(), any()) } throws error
++                    listOf(rect, srcPoints, dstPoints, transform)
++                }
++                Failure.WARP -> {
++                    every {
++                        Imgproc.warpPerspective(source, dst, transform, any(), any(), any())
++                    } throws error
++                    listOf(rect, srcPoints, dstPoints, transform, dst)
++                }
++                Failure.DIMENSIONS -> {
++                    every { dst.rows() } throws error
++                    listOf(rect, srcPoints, dstPoints, transform, dst)
++                }
++                Failure.ROTATED_ALLOC -> {
++                    every { dst.rows() } returns 200
++                    every { OpenCvMatFactory.empty() } throws error
++                    listOf(rect, srcPoints, dstPoints, transform, dst)
++                }
++                Failure.ROTATE -> {
++                    every { dst.rows() } returns 200
++                    every { Core.rotate(dst, rotated, Core.ROTATE_90_COUNTERCLOCKWISE) } throws
++                        error
++                    listOf(rect, srcPoints, dstPoints, transform, dst, rotated)
++                }
++            }
++        assertSame(error, assertThrows(Throwable::class.java) { QuadTextCrop.crop(source, box()) })
++        for (mat in listOf(source, rect, srcPoints, dstPoints, transform, dst, rotated)) {
++            verify(exactly = if (released.any { it === mat }) 1 else 0) { mat.release() }
++        }
++    }
++
++    @Test
++    fun `a successful horizontal crop transfers only the returned destination`() {
++        assertSame(dst, QuadTextCrop.crop(source, box()))
++        listOf(rect, srcPoints, dstPoints, transform).forEach { mat ->
++            verify(exactly = 1) { mat.release() }
++        }
++        verify(exactly = 0) {
++            dst.release()
++            source.release()
++            rotated.release()
++        }
++    }
++
++    @Test
++    fun `a successful rotation closes its intermediate and transfers only the rotated crop`() {
++        every { dst.rows() } returns 200
++        assertSame(rotated, QuadTextCrop.crop(source, box()))
++        listOf(rect, srcPoints, dstPoints, transform, dst).forEach { mat ->
++            verify(exactly = 1) { mat.release() }
++        }
++        verify(exactly = 0) {
++            rotated.release()
++            source.release()
++        }
++    }
++
++    private fun matrix(): Mat =
++        mockk<Mat> {
++            every { release() } just Runs
++            every { rows() } returns 20
++            every { cols() } returns 100
++        }
++
++    private fun points(): MatOfPoint2f =
++        mockk<MatOfPoint2f> {
++            every { release() } just Runs
++            every { fromList(any()) } just Runs
++        }
++
++    private fun box() =
++        OCRBox(
++            listOf(0f to 0f, 100f to 0f, 100f to 20f, 0f to 20f).map { (px, py) ->
++                mockk<PointF>().apply {
++                    x = px
++                    y = py
++                }
++            }
++        )
 +}
 diff --git a/app/src/test/java/eu/kanade/translation/recognizer/SpeechBubbleBackgroundRegressionTest.kt b/app/src/test/java/eu/kanade/translation/recognizer/SpeechBubbleBackgroundRegressionTest.kt
 index d53cceb..9ab7fcc 100644
@@ -81636,10 +82658,10 @@ index c0832ba..ebf8f48 100644
      <!-- Generic strings -->
      <string name="on">On</string>
 diff --git a/ppocr-sdk/MODELS.md b/ppocr-sdk/MODELS.md
-index 9f9c128..4a68c5e 100644
+index 9f9c128..456a1fb 100644
 --- a/ppocr-sdk/MODELS.md
 +++ b/ppocr-sdk/MODELS.md
-@@ -16,3 +16,15 @@ no runtime download path. SDK preprocessing, grouping and postprocessing are unc
+@@ -16,3 +16,30 @@ no runtime download path. SDK preprocessing, grouping and postprocessing are unc
  | Recognition dictionary/config | [PP-OCRv6_small_rec_onnx_infer](https://paddle-model-ecology.bj.bcebos.com/paddlex/official_inference_model/paddle3.0.0/PP-OCRv6_small_rec_onnx_infer.tar) | `d267ab077a44a0eedb1ea8f8c542d263f211de8e9d7a029bf9fcfff7e5a88fb1` | `src/main/assets/models/rec/inference.yml` | 150,579 bytes | `ab078671bb49f06228eadccd34f1bb501e157f7a047095ffb943ba81512c77d1` |
  
  The PaddleOCR source and official models are distributed under Apache License 2.0.
@@ -81655,6 +82677,21 @@ index 9f9c128..4a68c5e 100644
 +
 +JVM ownership checks execute the production engine with mocked model loading, detection,
 +cropping, recognition and Mats. No native inference or OpenCV allocation is executed by them.
++
++## Polaris internal resource lifetime patch — P20261118.1
++
++`postprocess/QuadTextCrop.kt` closes point matrices, perspective transforms, failed output
++matrices and failed rotation intermediates with staged try/finally ownership. Successful output
++Mats are transferred to the caller; the source page is never released by the crop function.
++`util/BitmapUtils.kt` protects bitmap copies even when a subsequent allocation fails, closes
++encoded-byte Mats when population fails, and recycles a newly created bitmap if export fails.
++Caller-owned input bitmaps/Mats and successful returned outputs remain owned by the caller.
++
++`util/OpenCvMatFactory.kt` is a small allocation boundary using the original OpenCV constructors;
++it does not implement an alternative geometry or inference pipeline. JVM tests replace these
++allocations and native operation boundaries with fakes, while executing the real ownership and
++geometry orchestration code. They do not execute JNI, measure RAM, or prove device image quality.
++Official models, geometry/interpolation/orientation and recognition behavior are unchanged.
 diff --git a/ppocr-sdk/build.gradle.kts b/ppocr-sdk/build.gradle.kts
 index f854e6a..2bd189d 100644
 --- a/ppocr-sdk/build.gradle.kts
@@ -81720,6 +82757,237 @@ index 0a03198..7632da7 100644
              }
          }
  
+diff --git a/ppocr-sdk/src/main/java/com/paddle/ocr/postprocess/QuadTextCrop.kt b/ppocr-sdk/src/main/java/com/paddle/ocr/postprocess/QuadTextCrop.kt
+index e8b5bb2..badf53d 100644
+--- a/ppocr-sdk/src/main/java/com/paddle/ocr/postprocess/QuadTextCrop.kt
++++ b/ppocr-sdk/src/main/java/com/paddle/ocr/postprocess/QuadTextCrop.kt
+@@ -15,15 +15,15 @@
+ package com.paddle.ocr.postprocess
+ 
+ import com.paddle.ocr.model.OCRBox
++import com.paddle.ocr.util.OpenCvMatFactory
++import kotlin.math.hypot
++import kotlin.math.max
+ import org.opencv.core.Core
+ import org.opencv.core.CvType
+ import org.opencv.core.Mat
+-import org.opencv.core.MatOfPoint2f
+ import org.opencv.core.Point
+ import org.opencv.core.Size
+ import org.opencv.imgproc.Imgproc
+-import kotlin.math.hypot
+-import kotlin.math.max
+ 
+ object QuadTextCrop {
+     private const val VERTICAL_CROP_RATIO = 1.5
+@@ -32,10 +32,14 @@ object QuadTextCrop {
+         // Align with PaddleX CropByPolys.get_minarea_rect_crop: recompute minAreaRect
+         // from the detected quad before perspective transform.
+         val rectPoints = box.points.map { Point(it.x.toDouble(), it.y.toDouble()) }
+-        val rectInput = MatOfPoint2f()
+-        rectInput.fromList(rectPoints)
+-        val boundingBox = Imgproc.minAreaRect(rectInput)
+-        rectInput.release()
++        val rectInput = OpenCvMatFactory.points()
++        val boundingBox =
++            try {
++                rectInput.fromList(rectPoints)
++                Imgproc.minAreaRect(rectInput)
++            } finally {
++                rectInput.release()
++            }
+ 
+         val boxPoints = Array(4) { Point() }
+         boundingBox.points(boxPoints)
+@@ -49,38 +53,58 @@ object QuadTextCrop {
+         val dstW = max(widthTop, widthBottom).toInt().coerceAtLeast(1)
+         val dstH = max(heightLeft, heightRight).toInt().coerceAtLeast(1)
+ 
+-        val srcPts = MatOfPoint2f()
+-        srcPts.fromList(ordered)
+-        val dstPts = MatOfPoint2f()
+-        dstPts.fromList(
+-            listOf(
+-                Point(0.0, 0.0),
+-                Point(dstW.toDouble(), 0.0),
+-                Point(dstW.toDouble(), dstH.toDouble()),
+-                Point(0.0, dstH.toDouble()),
+-            )
+-        )
+-        val m = Imgproc.getPerspectiveTransform(srcPts, dstPts)
+-        srcPts.release()
+-        dstPts.release()
+-
+-        val dst = Mat(dstH, dstW, CvType.CV_8UC3)
+-        Imgproc.warpPerspective(
+-            src,
+-            dst,
+-            m,
+-            Size(dstW.toDouble(), dstH.toDouble()),
+-            Imgproc.INTER_CUBIC,
+-            Core.BORDER_REPLICATE,
+-        )
+-        m.release()
++        val srcPts = OpenCvMatFactory.points()
++        val m =
++            try {
++                srcPts.fromList(ordered)
++                val dstPts = OpenCvMatFactory.points()
++                try {
++                    dstPts.fromList(
++                        listOf(
++                            Point(0.0, 0.0),
++                            Point(dstW.toDouble(), 0.0),
++                            Point(dstW.toDouble(), dstH.toDouble()),
++                            Point(0.0, dstH.toDouble()),
++                        )
++                    )
++                    Imgproc.getPerspectiveTransform(srcPts, dstPts)
++                } finally {
++                    dstPts.release()
++                }
++            } finally {
++                srcPts.release()
++            }
+ 
+-        if (dst.rows().toDouble() / dst.cols() >= VERTICAL_CROP_RATIO) {
+-            val rotated = Mat()
+-            Core.rotate(dst, rotated, Core.ROTATE_90_COUNTERCLOCKWISE)
+-            dst.release()
+-            return rotated
++        try {
++            val dst = OpenCvMatFactory.create(dstH, dstW, CvType.CV_8UC3)
++            var transferred = false
++            try {
++                Imgproc.warpPerspective(
++                    src,
++                    dst,
++                    m,
++                    Size(dstW.toDouble(), dstH.toDouble()),
++                    Imgproc.INTER_CUBIC,
++                    Core.BORDER_REPLICATE,
++                )
++                if (dst.rows().toDouble() / dst.cols() >= VERTICAL_CROP_RATIO) {
++                    val rotated = OpenCvMatFactory.empty()
++                    var rotationTransferred = false
++                    try {
++                        Core.rotate(dst, rotated, Core.ROTATE_90_COUNTERCLOCKWISE)
++                        rotationTransferred = true
++                        return rotated
++                    } finally {
++                        if (!rotationTransferred) rotated.release()
++                    }
++                }
++                transferred = true
++                return dst
++            } finally {
++                if (!transferred) dst.release()
++            }
++        } finally {
++            m.release()
+         }
+-        return dst
+     }
+ }
+diff --git a/ppocr-sdk/src/main/java/com/paddle/ocr/util/BitmapUtils.kt b/ppocr-sdk/src/main/java/com/paddle/ocr/util/BitmapUtils.kt
+index a504e70..b41e268 100644
+--- a/ppocr-sdk/src/main/java/com/paddle/ocr/util/BitmapUtils.kt
++++ b/ppocr-sdk/src/main/java/com/paddle/ocr/util/BitmapUtils.kt
+@@ -18,15 +18,15 @@ import android.graphics.Bitmap
+ import org.opencv.android.Utils
+ import org.opencv.core.CvType
+ import org.opencv.core.Mat
+-import org.opencv.core.MatOfByte
+ import org.opencv.imgcodecs.Imgcodecs
+ import org.opencv.imgproc.Imgproc
+ 
+ object BitmapUtils {
+ 
+     fun imdecodeBGR(imageBytes: ByteArray): Mat {
+-        val encoded = MatOfByte(*imageBytes)
++        val encoded = OpenCvMatFactory.bytes()
+         return try {
++            encoded.fromArray(*imageBytes)
+             Imgcodecs.imdecode(encoded, Imgcodecs.IMREAD_COLOR)
+         } finally {
+             encoded.release()
+@@ -42,11 +42,16 @@ object BitmapUtils {
+     }
+ 
+     fun bgrMatToBitmap(mat: Mat): Bitmap {
+-        val rgba = Mat()
++        val rgba = OpenCvMatFactory.empty()
+         return try {
+             Imgproc.cvtColor(mat, rgba, Imgproc.COLOR_BGR2RGBA)
+-            Bitmap.createBitmap(rgba.cols(), rgba.rows(), Bitmap.Config.ARGB_8888).also { bitmap ->
++            val bitmap = Bitmap.createBitmap(rgba.cols(), rgba.rows(), Bitmap.Config.ARGB_8888)
++            try {
+                 Utils.matToBitmap(rgba, bitmap)
++                bitmap
++            } catch (error: Throwable) {
++                bitmap.recycle()
++                throw error
+             }
+         } finally {
+             rgba.release()
+@@ -54,19 +59,24 @@ object BitmapUtils {
+     }
+ 
+     private fun bitmapToMat(bitmap: Bitmap, colorConversionCode: Int): Mat {
+-        val bmp = bitmap.copy(Bitmap.Config.ARGB_8888, false)
+-        val rgba = Mat(bmp.height, bmp.width, CvType.CV_8UC4)
+-        val dst = Mat()
++        val bmp = checkNotNull(bitmap.copy(Bitmap.Config.ARGB_8888, false)) { "Bitmap copy failed" }
+         return try {
+-            Utils.bitmapToMat(bmp, rgba)
+-            Imgproc.cvtColor(rgba, dst, colorConversionCode)
+-            dst
+-        } catch (t: Throwable) {
+-            dst.release()
+-            throw t
++            val rgba = OpenCvMatFactory.create(bmp.height, bmp.width, CvType.CV_8UC4)
++            try {
++                val dst = OpenCvMatFactory.empty()
++                try {
++                    Utils.bitmapToMat(bmp, rgba)
++                    Imgproc.cvtColor(rgba, dst, colorConversionCode)
++                    dst
++                } catch (error: Throwable) {
++                    dst.release()
++                    throw error
++                }
++            } finally {
++                rgba.release()
++            }
+         } finally {
+-            bmp.recycle()
+-            rgba.release()
++            if (bmp !== bitmap) bmp.recycle()
+         }
+     }
+ }
+diff --git a/ppocr-sdk/src/main/java/com/paddle/ocr/util/OpenCvMatFactory.kt b/ppocr-sdk/src/main/java/com/paddle/ocr/util/OpenCvMatFactory.kt
+new file mode 100644
+index 0000000..9602568
+--- /dev/null
++++ b/ppocr-sdk/src/main/java/com/paddle/ocr/util/OpenCvMatFactory.kt
+@@ -0,0 +1,16 @@
++package com.paddle.ocr.util
++
++import org.opencv.core.Mat
++import org.opencv.core.MatOfByte
++import org.opencv.core.MatOfPoint2f
++
++/** Allocation boundary; callers own each returned native resource until it is transferred. */
++object OpenCvMatFactory {
++    fun empty(): Mat = Mat()
++
++    fun create(rows: Int, cols: Int, type: Int): Mat = Mat(rows, cols, type)
++
++    fun points(): MatOfPoint2f = MatOfPoint2f()
++
++    fun bytes(): MatOfByte = MatOfByte()
++}
 diff --git a/presentation-widget/build.gradle.kts b/presentation-widget/build.gradle.kts
 index 9793514..074bd01 100644
 --- a/presentation-widget/build.gradle.kts
