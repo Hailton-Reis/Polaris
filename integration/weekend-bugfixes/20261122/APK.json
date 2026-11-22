@@ -1,0 +1,38 @@
+{
+  "status": "SIGNED_INTERNAL_BETA_FOR_DEVICE_TESTS",
+  "revision": "P20261122.2",
+  "version": "0.1.0-beta.12",
+  "version_code": 113,
+  "previous_public_version": "0.1.0-beta.11",
+  "previous_public_version_code": 112,
+  "application_id": "app.mihon.tachiyomiat.dev",
+  "signer_sha256": "3ae747069cc9015ca1777f94fd56b030501f45d6af380426a572ad60e94d8227",
+  "same_id_and_signer_as_previous_public_beta": true,
+  "apk": "Polaris-0.1.0-beta.12-universal.apk",
+  "apk_bytes": 262780402,
+  "apk_sha256": "3d1783e917fd1dc8e8d20ab20dc2ff2119e46d500584e61572707ad2dce76c9f",
+  "abis": [
+    "arm64-v8a",
+    "armeabi-v7a"
+  ],
+  "compiled_build_checks": {
+    "variant": "beta",
+    "debuggable": false,
+    "test_only": false,
+    "profileable_by_shell": false,
+    "compiled_identity_verified": true
+  },
+  "production_dex_checks": {
+    "dex_files": 8,
+    "class_definitions": 68772,
+    "forbidden_classes": []
+  },
+  "unit_tests_passed": 1124,
+  "zipalign_16k_passed": true,
+  "native_library_count": 31,
+  "arm64_libraries_below_16k": [],
+  "apk_available_in_workspace": true,
+  "physical_device_tested": false,
+  "published_as_github_release": false,
+  "source_overlay_sha256": "29daa2302daf7f35cd773e31096c3c54a8783681df18da31adc9e84b8f8a3d2f"
+}

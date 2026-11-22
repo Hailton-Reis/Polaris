@@ -21,7 +21,7 @@ index 79aff85..c2e70c6 100644
 +# Generated native build state
 +**/.cxx/
 diff --git a/app/build.gradle.kts b/app/build.gradle.kts
-index 63e2698..dba9833 100644
+index 63e2698..9ac7cfe 100644
 --- a/app/build.gradle.kts
 +++ b/app/build.gradle.kts
 @@ -3,6 +3,7 @@ import mihon.gradle.getBuildTime
@@ -47,8 +47,8 @@ index 63e2698..dba9833 100644
  
 -        versionCode = 101
 -        versionName = "0.20.4-Y40"
-+        versionCode = 112
-+        versionName = "0.1.0-beta.11"
++        versionCode = 113
++        versionName = "0.1.0-beta.12"
  
          buildConfigField("String", "COMMIT_COUNT", "\"${getLatestCommitCount()}\"")
          buildConfigField("String", "COMMIT_SHA", "\"${getLatestCommitSha()}\"")
