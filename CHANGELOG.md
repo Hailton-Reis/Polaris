@@ -2,6 +2,13 @@
 
 Este arquivo registra a evolução real do código. **Revisões de desenvolvimento não são lançamentos públicos.** As datas abaixo usam America/Fortaleza, exceto quando houver indicação de UTC. O histórico de distribuição fica em [Releases](https://github.com/Hailton-Reis/Polaris/releases).
 
+## Desenvolvimento · gestão de fontes e backups
+
+- A tela Fontes abre em **Instalados**. Fontes locais e fontes de extensões têm seções próprias, com as atualizações no topo. **Internas** mostra os arquivos locais e **Externas** lista extensões para instalar. A migração e as light novels ficam no menu.
+- **Preparar fontes** abre na seleção de repositórios. **Consultar** lista os resultados em português e inglês por padrão. A confirmação de confiança continua na adição do repositório e na instalação. A atualização em lote processa um pacote por vez.
+- A atualização consulta os detalhes de obras sem capa. A recuperação pode buscar uma alternativa com capa mesmo quando a fonte atual tem capítulos legíveis.
+- Novos backups usam o prefixo Polaris. A rotação continua reconhecendo os nomes antigos e compara as datas independentemente do prefixo.
+
 ## Desenvolvimento · prioridade para a obra aberta
 
 - A descoberta da obra aberta entra na fila de fontes na frente das atualizações pendentes da biblioteca. A busca pelo capítulo aberto pode encerrar ao encontrar uma alternativa legível com a mesma numeração.

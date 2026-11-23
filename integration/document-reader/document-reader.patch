@@ -4838,10 +4838,18 @@ index 79352cd..2d8a1e2 100644
              TextButton(onClick = onClickConfirm) {
                  Text(text = stringResource(MR.strings.action_ok))
 diff --git a/app/src/main/java/eu/kanade/presentation/browse/ExtensionsScreen.kt b/app/src/main/java/eu/kanade/presentation/browse/ExtensionsScreen.kt
-index 914cb5e..54c6741 100644
+index 914cb5e..49a6456 100644
 --- a/app/src/main/java/eu/kanade/presentation/browse/ExtensionsScreen.kt
 +++ b/app/src/main/java/eu/kanade/presentation/browse/ExtensionsScreen.kt
-@@ -48,6 +48,7 @@ import eu.kanade.presentation.browse.components.ExtensionIcon
+@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Row
+ import androidx.compose.foundation.layout.RowScope
+ import androidx.compose.foundation.layout.padding
+ import androidx.compose.foundation.layout.size
++import androidx.compose.foundation.lazy.LazyListScope
+ import androidx.compose.foundation.lazy.items
+ import androidx.compose.material.icons.Icons
+ import androidx.compose.material.icons.outlined.Close
+@@ -48,6 +49,7 @@ import eu.kanade.presentation.browse.components.ExtensionIcon
  import eu.kanade.presentation.components.WarningBanner
  import eu.kanade.presentation.manga.components.DotSeparatorNoSpaceText
  import eu.kanade.presentation.more.settings.screen.browse.ExtensionStoresScreen
@@ -4849,7 +4857,7 @@ index 914cb5e..54c6741 100644
  import eu.kanade.presentation.util.rememberRequestPackageInstallsPermissionState
  import eu.kanade.tachiyomi.extension.model.Extension
  import eu.kanade.tachiyomi.extension.model.InstallStep
-@@ -56,6 +57,7 @@ import eu.kanade.tachiyomi.ui.browse.extension.ExtensionsViewModel
+@@ -56,6 +58,7 @@ import eu.kanade.tachiyomi.ui.browse.extension.ExtensionsViewModel
  import eu.kanade.tachiyomi.util.system.LocaleHelper
  import eu.kanade.tachiyomi.util.system.launchRequestPackageInstallsPermission
  import tachiyomi.i18n.MR
@@ -4857,15 +4865,25 @@ index 914cb5e..54c6741 100644
  import tachiyomi.presentation.core.components.FastScrollLazyColumn
  import tachiyomi.presentation.core.components.material.PullRefresh
  import tachiyomi.presentation.core.components.material.padding
-@@ -94,25 +96,35 @@ fun ExtensionScreen(
+@@ -83,6 +86,7 @@ fun ExtensionScreen(
+     onOpenExtension: (Extension.Installed) -> Unit,
+     onClickUpdateAll: () -> Unit,
+     onRefresh: () -> Unit,
++    sources: (LazyListScope.() -> Unit)? = null,
+ ) {
+     val navigator = LocalNavigator.currentOrThrow
+ 
+@@ -93,27 +97,38 @@ fun ExtensionScreen(
+     ) {
          when {
              state.isLoading -> LoadingScreen(Modifier.padding(contentPadding))
-             state.isEmpty -> {
+-            state.isEmpty -> {
 -                val msg = if (!searchQuery.isNullOrEmpty()) {
 -                    MR.strings.no_results_found
 -                } else {
 -                    MR.strings.empty_screen
 -                }
++            state.isEmpty && sources == null -> {
 +                val msg =
 +                    if (!searchQuery.isNullOrEmpty()) {
 +                        MR.strings.no_results_found
@@ -4902,17 +4920,20 @@ index 914cb5e..54c6741 100644
 +                        { navigator.push(SourcePreparationScreen()) }
 +                    } else null,
                      state = state,
++                    sources = sources,
                      contentPadding = contentPadding,
                      onLongClickItem = onLongClickItem,
-@@ -132,6 +144,7 @@ fun ExtensionScreen(
+                     onClickItemCancel = onClickItemCancel,
+@@ -132,6 +147,8 @@ fun ExtensionScreen(
  
  @Composable
  private fun ExtensionContent(
 +    onPrepareSources: (() -> Unit)?,
++    sources: (LazyListScope.() -> Unit)?,
      state: ExtensionsViewModel.State,
      contentPadding: PaddingValues,
      onLongClickItem: (Extension) -> Unit,
-@@ -148,25 +161,29 @@ private fun ExtensionContent(
+@@ -148,25 +165,34 @@ private fun ExtensionContent(
      var trustState by remember { mutableStateOf<Extension.Untrusted?>(null) }
      val installGranted = rememberRequestPackageInstallsPermissionState(initialValue = true)
  
@@ -4943,16 +4964,21 @@ index 914cb5e..54c6741 100644
              }
          }
  
++        var sourcesShown = false
          state.items.forEach { (header, items) ->
 -            item(
 -                contentType = "header",
 -                key = "extensionHeader-${header.hashCode()}",
 -            ) {
++            if (!sourcesShown && header != ExtensionUiModel.Header.Resource(MR.strings.ext_updates_pending)) {
++                sources?.invoke(this)
++                sourcesShown = true
++            }
 +            item(contentType = "header", key = "extensionHeader-${header.hashCode()}") {
                  when (header) {
                      is ExtensionUiModel.Header.Resource -> {
                          val action: @Composable RowScope.() -> Unit =
-@@ -175,9 +192,10 @@ private fun ExtensionContent(
+@@ -175,9 +201,10 @@ private fun ExtensionContent(
                                      Button(onClick = { onClickUpdateAll() }) {
                                          Text(
                                              text = stringResource(MR.strings.ext_update_all),
@@ -4966,7 +4992,7 @@ index 914cb5e..54c6741 100644
                                          )
                                      }
                                  }
-@@ -191,10 +209,7 @@ private fun ExtensionContent(
+@@ -191,10 +218,7 @@ private fun ExtensionContent(
                          )
                      }
                      is ExtensionUiModel.Header.Text -> {
@@ -4978,7 +5004,11 @@ index 914cb5e..54c6741 100644
                      }
                  }
              }
-@@ -252,6 +267,7 @@ private fun ExtensionContent(
+@@ -249,9 +273,11 @@ private fun ExtensionContent(
+                 )
+             }
+         }
++        if (!sourcesShown) sources?.invoke(this)
      }
      if (trustState != null) {
          ExtensionTrustDialog(
@@ -4986,7 +5016,7 @@ index 914cb5e..54c6741 100644
              onClickConfirm = {
                  onTrustExtension(trustState!!)
                  trustState = null
-@@ -260,9 +276,7 @@ private fun ExtensionContent(
+@@ -260,9 +286,7 @@ private fun ExtensionContent(
                  onUninstallExtension(trustState!!)
                  trustState = null
              },
@@ -4997,7 +5027,7 @@ index 914cb5e..54c6741 100644
          )
      }
  }
-@@ -279,36 +293,25 @@ private fun ExtensionItem(
+@@ -279,36 +303,25 @@ private fun ExtensionItem(
  ) {
      val (extension, installStep) = item
      BaseBrowseItem(
@@ -5041,7 +5071,7 @@ index 914cb5e..54c6741 100644
                  )
              }
          },
-@@ -336,9 +339,7 @@ private fun ExtensionItemContent(
+@@ -336,9 +349,7 @@ private fun ExtensionItemContent(
      installStep: InstallStep,
      modifier: Modifier = Modifier,
  ) {
@@ -5052,7 +5082,7 @@ index 914cb5e..54c6741 100644
          Text(
              text = extension.name,
              maxLines = 1,
-@@ -355,24 +356,31 @@ private fun ExtensionItemContent(
+@@ -355,24 +366,31 @@ private fun ExtensionItemContent(
                  if (extension is Extension.Installed && extension.lang.isNotEmpty()) {
                      hasAlreadyShownAnElement = true
                      Text(
@@ -5094,7 +5124,7 @@ index 914cb5e..54c6741 100644
                  if (warning != null) {
                      if (hasAlreadyShownAnElement) DotSeparatorNoSpaceText()
                      hasAlreadyShownAnElement = true
-@@ -385,20 +393,20 @@ private fun ExtensionItemContent(
+@@ -385,20 +403,20 @@ private fun ExtensionItemContent(
                  }
                  if (extension is Extension.Installed && !extension.isShared) {
                      if (hasAlreadyShownAnElement) DotSeparatorNoSpaceText()
@@ -5124,7 +5154,7 @@ index 914cb5e..54c6741 100644
                      )
                  }
              }
-@@ -467,12 +475,11 @@ private fun ExtensionItemActions(
+@@ -467,12 +485,11 @@ private fun ExtensionItemActions(
                      }
                      is Extension.Available -> {
                          if (extension.sources.isNotEmpty()) {
@@ -5140,7 +5170,7 @@ index 914cb5e..54c6741 100644
                                  )
                              }
                          }
-@@ -496,11 +503,7 @@ private fun ExtensionHeader(
+@@ -496,11 +513,7 @@ private fun ExtensionHeader(
      modifier: Modifier = Modifier,
      action: @Composable RowScope.() -> Unit = {},
  ) {
@@ -5153,7 +5183,7 @@ index 914cb5e..54c6741 100644
  }
  
  @Composable
-@@ -515,9 +518,7 @@ private fun ExtensionHeader(
+@@ -515,9 +528,7 @@ private fun ExtensionHeader(
      ) {
          Text(
              text = text,
@@ -5164,7 +5194,7 @@ index 914cb5e..54c6741 100644
              style = MaterialTheme.typography.header,
          )
          action()
-@@ -526,20 +527,64 @@ private fun ExtensionHeader(
+@@ -526,20 +537,64 @@ private fun ExtensionHeader(
  
  @Composable
  private fun ExtensionTrustDialog(
@@ -5302,6 +5332,19 @@ index 4887205..72f9fd9 100644
                      subtitle = LocaleHelper.getLocalizedDisplayName(source.lang),
                      onClick = { onClickSource(source) },
                      modifier = Modifier.animateItem(),
+diff --git a/app/src/main/java/eu/kanade/presentation/browse/SourcesScreen.kt b/app/src/main/java/eu/kanade/presentation/browse/SourcesScreen.kt
+index e796fe3..988aa74 100644
+--- a/app/src/main/java/eu/kanade/presentation/browse/SourcesScreen.kt
++++ b/app/src/main/java/eu/kanade/presentation/browse/SourcesScreen.kt
+@@ -107,7 +107,7 @@ private fun SourceHeader(
+ }
+ 
+ @Composable
+-private fun SourceItem(
++internal fun SourceItem(
+     source: Source,
+     onClickItem: (Source, Listing) -> Unit,
+     onLongClickItem: (Source) -> Unit,
 diff --git a/app/src/main/java/eu/kanade/presentation/browse/UnifiedWorkSearchContent.kt b/app/src/main/java/eu/kanade/presentation/browse/UnifiedWorkSearchContent.kt
 new file mode 100644
 index 0000000..d721f6b
@@ -5719,6 +5762,26 @@ index dd67afb..d78cab1 100644
              )
          }
  
+diff --git a/app/src/main/java/eu/kanade/presentation/components/TabbedScreen.kt b/app/src/main/java/eu/kanade/presentation/components/TabbedScreen.kt
+index 1f246cf..37cc12d 100644
+--- a/app/src/main/java/eu/kanade/presentation/components/TabbedScreen.kt
++++ b/app/src/main/java/eu/kanade/presentation/components/TabbedScreen.kt
+@@ -39,6 +39,7 @@ fun TabbedScreen(
+     tabs: List<TabContent>,
+     state: PagerState = rememberPagerState { tabs.size },
+     searchQuery: String? = null,
++    navigateUp: (() -> Unit)? = null,
+     onChangeSearchQuery: (String?) -> Unit = {},
+ ) {
+     val scope = rememberCoroutineScope()
+@@ -51,6 +52,7 @@ fun TabbedScreen(
+ 
+             SearchToolbar(
+                 titleContent = { AppBarTitle(stringResource(titleRes)) },
++                navigateUp = navigateUp,
+                 searchEnabled = searchEnabled,
+                 searchQuery = if (searchEnabled) searchQuery else null,
+                 onChangeSearchQuery = onChangeSearchQuery,
 diff --git a/app/src/main/java/eu/kanade/presentation/documents/DocumentImportDialog.kt b/app/src/main/java/eu/kanade/presentation/documents/DocumentImportDialog.kt
 new file mode 100644
 index 0000000..7d94070
@@ -10380,10 +10443,10 @@ index 0000000..ea07c89
 +}
 diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/browse/preparation/SourcePreparationScreen.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/browse/preparation/SourcePreparationScreen.kt
 new file mode 100644
-index 0000000..209555d
+index 0000000..31a7003
 --- /dev/null
 +++ b/app/src/main/java/eu/kanade/presentation/more/settings/screen/browse/preparation/SourcePreparationScreen.kt
-@@ -0,0 +1,569 @@
+@@ -0,0 +1,527 @@
 +package eu.kanade.presentation.more.settings.screen.browse.preparation
 +
 +import androidx.activity.compose.BackHandler
@@ -10425,15 +10488,13 @@ index 0000000..209555d
 +import cafe.adriel.voyager.navigator.currentOrThrow
 +import eu.kanade.presentation.browse.components.rememberExtensionRiskNotice
 +import eu.kanade.presentation.components.AppBar
-+import eu.kanade.presentation.more.settings.screen.SearchableSettings
-+import eu.kanade.presentation.more.settings.screen.SettingsDataScreen
 +import eu.kanade.presentation.more.settings.screen.browse.discovery.RepositoryCatalog
 +import eu.kanade.presentation.util.Screen
 +import eu.kanade.tachiyomi.extension.preparation.PreparationSelection
 +import eu.kanade.tachiyomi.extension.preparation.PreparationStatus
 +import eu.kanade.tachiyomi.extension.preparation.RepositoryIdentity
-+import eu.kanade.tachiyomi.ui.setting.SettingsScreen
 +import eu.kanade.tachiyomi.util.system.LocaleHelper
++import tachiyomi.i18n.MR
 +import tachiyomi.i18n.at.ATMR
 +import tachiyomi.presentation.core.components.material.Scaffold
 +import tachiyomi.presentation.core.i18n.stringResource
@@ -10446,30 +10507,26 @@ index 0000000..209555d
 +        val model = viewModel<SourcePreparationViewModel>()
 +        val state by model.state.collectAsState()
 +        val batch by model.queue.state.collectAsState()
-+        var page by rememberSaveable { mutableIntStateOf(0) }
++        var page by rememberSaveable { mutableIntStateOf(1) }
++        var showFilters by rememberSaveable { mutableStateOf(false) }
++        var showAddRepository by rememberSaveable { mutableStateOf(false) }
 +        var url by rememberSaveable { mutableStateOf("") }
 +        var query by rememberSaveable { mutableStateOf("") }
-+        val restoreKey = stringResource(SettingsDataScreen.restorePreferenceKeyString)
-+        val importBackup = {
-+            SearchableSettings.highlightKey = restoreKey
-+            navigator.push(SettingsScreen(SettingsScreen.Destination.DataAndStorage))
-+        }
 +        val plan = remember(state) { state.plan }
 +        val activeBatch = batch.entries.isNotEmpty()
-+        LaunchedEffect(state.consent, activeBatch) { if (!state.consent && !activeBatch) page = 0 }
 +        val listState = rememberLazyListState()
 +        LaunchedEffect(page, activeBatch, state.error) { listState.scrollToItem(0) }
-+        BackHandler(enabled = page > 0 && !activeBatch) { page-- }
++        BackHandler(enabled = page > 1 && !activeBatch) { page-- }
 +        Scaffold(
 +            topBar = { behavior ->
 +                AppBar(
 +                    title = stringResource(ATMR.strings.preparation_title),
-+                    navigateUp = { if (page > 0 && !activeBatch) page-- else navigator.pop() },
++                    navigateUp = { if (page > 1 && !activeBatch) page-- else navigator.pop() },
 +                    scrollBehavior = behavior,
 +                )
 +            },
 +            bottomBar = {
-+                if ((page == 2 && !activeBatch) || (activeBatch && batch.running)) {
++                if (!activeBatch || batch.running) {
 +                    Surface(tonalElevation = 2.dp) {
 +                        Column(Modifier.fillMaxWidth().navigationBarsPadding().padding(16.dp)) {
 +                            if (activeBatch) {
@@ -10479,13 +10536,28 @@ index 0000000..209555d
 +                                ) {
 +                                    Text(stringResource(ATMR.strings.preparation_cancel))
 +                                }
++                            } else if (page == 1) {
++                                Button(
++                                    onClick = {
++                                        model.loadCatalog()
++                                        page = 2
++                                    },
++                                    enabled = !state.busy && state.selectedRepositories.isNotEmpty(),
++                                    modifier = Modifier.fillMaxWidth(),
++                                ) {
++                                    Text(stringResource(ATMR.strings.preparation_load_sources))
++                                }
 +                            } else {
 +                                Button(
-+                                    onClick = { requestRiskNotice { model.prepare() } },
++                                    onClick = {
++                                        requestRiskNotice {
++                                            model.consent(true)
++                                            model.prepare()
++                                        }
++                                    },
 +                                    modifier = Modifier.fillMaxWidth(),
 +                                    enabled =
 +                                        !state.busy &&
-+                                            state.consent &&
 +                                            state.catalogLoaded &&
 +                                            plan.extensions.isNotEmpty(),
 +                                ) {
@@ -10565,21 +10637,7 @@ index 0000000..209555d
 +                                    batch.entries.count { it.status == PreparationStatus.CANCELLED },
 +                                )
 +                            )
-+                            Text(stringResource(ATMR.strings.preparation_lifetime))
-+                            if (!state.consent) {
-+                                Text(stringResource(ATMR.strings.preparation_risks))
-+                                PreparationCheck(
-+                                    stringResource(ATMR.strings.preparation_consent),
-+                                    false,
-+                                    enabled = !batch.running,
-+                                    onChange = model::consent,
-+                                )
-+                            }
-+                            if (batch.running) {
-+                                OutlinedButton(onClick = model.queue::cancel) {
-+                                    Text(stringResource(ATMR.strings.preparation_cancel))
-+                                }
-+                            } else {
++                            if (!batch.running) {
 +                                if (
 +                                    batch.entries.any {
 +                                        it.status == PreparationStatus.FAILED ||
@@ -10589,10 +10647,10 @@ index 0000000..209555d
 +                                    Button(
 +                                        onClick = {
 +                                            requestRiskNotice {
-+                                                model.queue.retryFailures(state.consent)
++                                                model.consent(true)
++                                                model.queue.retryFailures(true)
 +                                            }
 +                                        },
-+                                        enabled = state.consent,
 +                                    ) {
 +                                        Text(stringResource(ATMR.strings.preparation_retry))
 +                                    }
@@ -10600,7 +10658,7 @@ index 0000000..209555d
 +                                OutlinedButton(
 +                                    onClick = {
 +                                        model.queue.clear()
-+                                        page = 0
++                                        page = 1
 +                                    }
 +                                ) {
 +                                    Text(stringResource(ATMR.strings.preparation_review))
@@ -10640,36 +10698,6 @@ index 0000000..209555d
 +                            }
 +                        }
 +                    }
-+                    page == 0 -> {
-+                        item {
-+                            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-+                                Text(
-+                                    stringResource(ATMR.strings.preparation_intro),
-+                                    style = MaterialTheme.typography.titleMedium,
-+                                )
-+                                Text(stringResource(ATMR.strings.preparation_backup_intro))
-+                                OutlinedButton(onClick = { importBackup() }) {
-+                                    Text(stringResource(ATMR.strings.preparation_import))
-+                                }
-+                                Text(stringResource(ATMR.strings.preparation_risks))
-+                                PreparationCheck(
-+                                    stringResource(ATMR.strings.preparation_consent),
-+                                    state.consent,
-+                                    enabled = true,
-+                                    onChange = model::consent,
-+                                )
-+                                Button(
-+                                    onClick = { page = 1 },
-+                                    enabled = state.consent && state.loaded,
-+                                ) {
-+                                    Text(stringResource(ATMR.strings.preparation_continue))
-+                                }
-+                                TextButton(onClick = { navigator.pop() }) {
-+                                    Text(stringResource(ATMR.strings.preparation_later))
-+                                }
-+                            }
-+                        }
-+                    }
 +                    page == 1 -> {
 +                        item {
 +                            Text(
@@ -10683,13 +10711,8 @@ index 0000000..209555d
 +                                PreparationCheck(
 +                                    store.name,
 +                                    identity in state.selectedRepositories,
-+                                    enabled = !state.busy && identity.canVerify && state.consent,
++                                    enabled = !state.busy && identity.canVerify,
 +                                    onChange = { model.selectRepository(identity) },
-+                                )
-+                                Text(store.indexUrl, style = MaterialTheme.typography.bodySmall)
-+                                Text(
-+                                    stringResource(ATMR.strings.preparation_key, store.signingKey),
-+                                    style = MaterialTheme.typography.bodySmall,
 +                                )
 +                                if (!identity.canVerify) {
 +                                    Text(stringResource(ATMR.strings.preparation_unsigned))
@@ -10698,33 +10721,37 @@ index 0000000..209555d
 +                        }
 +                        item {
 +                            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-+                                Text(stringResource(ATMR.strings.preparation_suggestions))
-+                                RepositoryCatalog.entries.forEach { entry ->
-+                                    OutlinedButton(
-+                                        onClick = { model.previewRepository(entry.indexUrl) },
-+                                        enabled = !state.busy && state.consent,
-+                                    ) {
-+                                        Text(
-+                                            stringResource(
-+                                                ATMR.strings.preparation_check_repo,
-+                                                entry.name,
-+                                            )
-+                                        )
-+                                    }
++                                TextButton(onClick = { showAddRepository = !showAddRepository }) {
++                                    Text(stringResource(MR.strings.extensionStores))
 +                                }
-+                                OutlinedTextField(
-+                                    value = url,
-+                                    onValueChange = { url = it },
-+                                    label = { Text(stringResource(ATMR.strings.preparation_link)) },
-+                                    enabled = !state.busy,
-+                                    singleLine = true,
-+                                    modifier = Modifier.fillMaxWidth(),
-+                                )
-+                                OutlinedButton(
-+                                    onClick = { model.previewRepository(url) },
-+                                    enabled = url.isNotBlank() && !state.busy && state.consent,
-+                                ) {
-+                                    Text(stringResource(ATMR.strings.preparation_check_link))
++                                if (showAddRepository) {
++                                    RepositoryCatalog.entries.forEach { entry ->
++                                        OutlinedButton(
++                                            onClick = { model.previewRepository(entry.indexUrl) },
++                                            enabled = !state.busy,
++                                        ) {
++                                            Text(
++                                                stringResource(
++                                                    ATMR.strings.preparation_check_repo,
++                                                    entry.name,
++                                                )
++                                            )
++                                        }
++                                    }
++                                    OutlinedTextField(
++                                        value = url,
++                                        onValueChange = { url = it },
++                                        label = { Text(stringResource(ATMR.strings.preparation_link)) },
++                                        enabled = !state.busy,
++                                        singleLine = true,
++                                        modifier = Modifier.fillMaxWidth(),
++                                    )
++                                    OutlinedButton(
++                                        onClick = { model.previewRepository(url) },
++                                        enabled = url.isNotBlank() && !state.busy,
++                                    ) {
++                                        Text(stringResource(ATMR.strings.preparation_check_link))
++                                    }
 +                                }
 +                            }
 +                        }
@@ -10745,8 +10772,13 @@ index 0000000..209555d
 +                                    )
 +                                    Text(stringResource(ATMR.strings.preparation_key_warning))
 +                                    Button(
-+                                        onClick = { model.confirmRepository() },
-+                                        enabled = !state.busy && state.consent,
++                                        onClick = {
++                                            requestRiskNotice {
++                                                model.consent(true)
++                                                model.confirmRepository()
++                                            }
++                                        },
++                                        enabled = !state.busy,
 +                                    ) {
 +                                        Text(stringResource(ATMR.strings.preparation_add_repo))
 +                                    }
@@ -10757,20 +10789,6 @@ index 0000000..209555d
 +                                        Text(stringResource(ATMR.strings.preparation_dismiss))
 +                                    }
 +                                }
-+                            }
-+                        }
-+                        item {
-+                            Button(
-+                                onClick = {
-+                                    model.loadCatalog()
-+                                    page = 2
-+                                },
-+                                enabled =
-+                                    state.selectedRepositories.isNotEmpty() &&
-+                                        !state.busy &&
-+                                        state.consent,
-+                            ) {
-+                                Text(stringResource(ATMR.strings.preparation_load_sources))
 +                            }
 +                        }
 +                    }
@@ -10790,42 +10808,45 @@ index 0000000..209555d
 +                                        color = MaterialTheme.colorScheme.error,
 +                                    )
 +                                }
-+                                OutlinedButton(
-+                                    onClick = { model.loadCatalog() },
-+                                    enabled = !state.busy,
++                                if (!showFilters && state.selection == PreparationSelection.LANGUAGES &&
++                                    state.languages == setOf("en", "pt", "pt-BR") && !state.includeNsfw
 +                                ) {
-+                                    Text(stringResource(ATMR.strings.preparation_refresh_catalog))
++                                    Text(stringResource(ATMR.strings.preparation_default_filters))
 +                                }
-+                                PreparationSelection.entries.forEach { choice ->
++                                TextButton(onClick = { showFilters = !showFilters }) {
++                                    Text(stringResource(MR.strings.action_filter))
++                                }
++                                if (showFilters) {
++                                    PreparationSelection.entries.forEach { choice ->
++                                        PreparationCheck(
++                                            stringResource(
++                                                when (choice) {
++                                                    PreparationSelection.LIBRARY ->
++                                                        ATMR.strings.preparation_library
++                                                    PreparationSelection.LANGUAGES ->
++                                                        ATMR.strings.preparation_languages
++                                                    PreparationSelection.MANUAL ->
++                                                        ATMR.strings.preparation_manual
++                                                }
++                                            ),
++                                            choice == state.selection,
++                                            enabled = !state.busy,
++                                            onChange = { model.selection(choice) },
++                                        )
++                                    }
 +                                    PreparationCheck(
-+                                        stringResource(
-+                                            when (choice) {
-+                                                PreparationSelection.LIBRARY ->
-+                                                    ATMR.strings.preparation_library
-+                                                PreparationSelection.LANGUAGES ->
-+                                                    ATMR.strings.preparation_languages
-+                                                PreparationSelection.MANUAL ->
-+                                                    ATMR.strings.preparation_manual
-+                                            }
-+                                        ),
-+                                        choice == state.selection,
++                                        stringResource(ATMR.strings.preparation_nsfw),
++                                        state.includeNsfw,
 +                                        enabled = !state.busy,
-+                                        onChange = { model.selection(choice) },
++                                        onChange = model::includeNsfw,
 +                                    )
-+                                }
-+                                PreparationCheck(
-+                                    stringResource(ATMR.strings.preparation_nsfw),
-+                                    state.includeNsfw,
-+                                    enabled = !state.busy,
-+                                    onChange = model::includeNsfw,
-+                                )
-+                                if (state.selection == PreparationSelection.LANGUAGES) {
-+                                    Text(stringResource(ATMR.strings.preparation_language_help))
-+                                    OutlinedButton(
-+                                        onClick = model::allLanguages,
-+                                        enabled = !state.busy,
-+                                    ) {
-+                                        Text(stringResource(ATMR.strings.preparation_all_languages))
++                                    if (state.selection == PreparationSelection.LANGUAGES) {
++                                        OutlinedButton(
++                                            onClick = model::allLanguages,
++                                            enabled = !state.busy,
++                                        ) {
++                                            Text(stringResource(ATMR.strings.preparation_all_languages))
++                                        }
 +                                    }
 +                                }
 +                                if (
@@ -10861,7 +10882,6 @@ index 0000000..209555d
 +                                        plan.extensions.size,
 +                                    )
 +                                )
-+                                Text(stringResource(ATMR.strings.preparation_download_notice))
 +                                if (state.catalogLoaded && plan.extensions.isEmpty()) {
 +                                    Text(stringResource(ATMR.strings.preparation_empty))
 +                                }
@@ -10877,7 +10897,7 @@ index 0000000..209555d
 +                                }
 +                            }
 +                        }
-+                        if (state.selection == PreparationSelection.LANGUAGES) {
++                        if (state.selection == PreparationSelection.LANGUAGES && showFilters) {
 +                            items(
 +                                state.available
 +                                    .flatMap { it.sources.map { source -> source.lang } + it.lang }
@@ -10919,7 +10939,8 @@ index 0000000..209555d
 +                                    onChange = { model.manualPackage(extension.pkgName) },
 +                                )
 +                            }
-+                        } else {
++                        }
++                        if (state.selection != PreparationSelection.MANUAL) {
 +                            items(plan.extensions, key = { it.pkgName }) { extension ->
 +                                Text(extension.name)
 +                            }
@@ -10955,10 +10976,10 @@ index 0000000..209555d
 +}
 diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/browse/preparation/SourcePreparationViewModel.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/browse/preparation/SourcePreparationViewModel.kt
 new file mode 100644
-index 0000000..1209024
+index 0000000..82307f3
 --- /dev/null
 +++ b/app/src/main/java/eu/kanade/presentation/more/settings/screen/browse/preparation/SourcePreparationViewModel.kt
-@@ -0,0 +1,312 @@
+@@ -0,0 +1,306 @@
 +package eu.kanade.presentation.more.settings.screen.browse.preparation
 +
 +import androidx.lifecycle.ViewModel
@@ -11038,12 +11059,7 @@ index 0000000..1209024
 +    private val preferences: SourcePreferences = Injekt.get(),
 +    private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
 +) : ViewModel() {
-+    val state =
-+        MutableStateFlow(
-+            SourcePreparationState(
-+                languages = preferences.enabledLanguages.get() + setOf("pt-BR", "pt", "en")
-+            )
-+        )
++    val state = MutableStateFlow(SourcePreparationState())
 +    val queue = extensions.preparationQueue
 +    private var operation: Job? = null
 +    private var storesJob: Job? = null
@@ -11079,10 +11095,12 @@ index 0000000..1209024
 +                    .catch { state.update { it.copy(error = PreparationError.STORES) } }
 +                    .collect { stores ->
 +                        state.update { old ->
-+                            val selected =
-+                                old.selectedRepositories.intersect(
-+                                    stores.map(RepositoryIdentity::of).toSet()
-+                                )
++                            val identities = stores.map(RepositoryIdentity::of).filter { it.canVerify }
++                            val selected = if (!old.loaded) {
++                                identities.take(1).toSet()
++                            } else {
++                                old.selectedRepositories.intersect(identities.toSet())
++                            }
 +                            old.copy(
 +                                loaded = true,
 +                                stores = stores,
@@ -11109,7 +11127,6 @@ index 0000000..1209024
 +        if (
 +            state.value.busy ||
 +                queue.state.value.running ||
-+                !state.value.consent ||
 +                !identity.canVerify
 +        ) {
 +            return
@@ -11161,7 +11178,6 @@ index 0000000..1209024
 +    }
 +
 +    fun previewRepository(url: String) = operate {
-+        check(state.value.consent)
 +        check(RepositoryIdentity.isHttps(url.trim()))
 +        val store = withTimeout(45_000) { service.fetch(url.trim()).getOrThrow() }
 +        if (!RepositoryIdentity.of(store).canVerify) {
@@ -11187,7 +11203,6 @@ index 0000000..1209024
 +
 +    fun loadCatalog() =
 +        operate(PreparationError.CATALOG) {
-+            check(state.value.consent)
 +            val snapshot = state.value
 +            check(snapshot.selectedRepositories.isNotEmpty())
 +            val selected =
@@ -13324,10 +13339,10 @@ index 98036c0..6ff94ae 100644
  }
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/data/backup/create/BackupRetention.kt b/app/src/main/java/eu/kanade/tachiyomi/data/backup/create/BackupRetention.kt
 new file mode 100644
-index 0000000..7e93785
+index 0000000..63d624f
 --- /dev/null
 +++ b/app/src/main/java/eu/kanade/tachiyomi/data/backup/create/BackupRetention.kt
-@@ -0,0 +1,60 @@
+@@ -0,0 +1,73 @@
 +package eu.kanade.tachiyomi.data.backup.create
 +
 +import java.text.ParsePosition
@@ -13342,16 +13357,29 @@ index 0000000..7e93785
 +
 +    fun filename(applicationId: String, now: Date = Date()): String {
 +        val date = SimpleDateFormat("yyyy-MM-dd_HH-mm-ss-SSS", Locale.ENGLISH).format(now)
-+        return "${applicationId}_${date}_${UUID.randomUUID().toString().replace("-", "")}.tachibk"
++        return "${displayPrefix(applicationId)}_${date}_${UUID.randomUUID().toString().replace("-", "")}.tachibk"
 +    }
 +
-+    fun isManaged(applicationId: String, name: String): Boolean {
++    private fun displayPrefix(applicationId: String): String = when (applicationId) {
++        "app.mihon.tachiyomiat.dev" -> "Polaris"
++        "app.mihon.tachiyomiat" -> "Polaris-release"
++        else -> if (applicationId.startsWith("app.mihon.tachiyomiat.")) {
++            "Polaris-" + applicationId.substringAfter("app.mihon.tachiyomiat.")
++        } else applicationId
++    }
++
++    fun isManaged(applicationId: String, name: String): Boolean =
++        dateKey(applicationId, name) != null
++
++    private fun dateKey(applicationId: String, name: String): String? {
++        val prefixes = setOf(applicationId, displayPrefix(applicationId))
++        val prefixPattern = prefixes.joinToString("|") { Regex.escape(it) }
 +        val match =
 +            Regex(
-+                    "${Regex.escape(applicationId)}_(\\d{4}-\\d{2}-\\d{2}_\\d{2}-\\d{2})" +
++                    "(?:$prefixPattern)_(\\d{4}-\\d{2}-\\d{2}_\\d{2}-\\d{2})" +
 +                        "(?:-(\\d{2}-\\d{3})_[a-f0-9]{32})?\\.tachibk"
 +                )
-+                .matchEntire(name) ?: return false
++                .matchEntire(name) ?: return null
 +        val seconds = match.groupValues[2]
 +        val timestamp = match.groupValues[1] + if (seconds.isEmpty()) "" else "-$seconds"
 +        // A matching prefix is insufficient to claim ownership of an existing file.
@@ -13366,7 +13394,7 @@ index 0000000..7e93785
 +                    timeZone = TimeZone.getTimeZone("UTC")
 +                }
 +        val position = ParsePosition(0)
-+        return parser.parse(timestamp, position) != null && position.index == timestamp.length
++        return timestamp.takeIf { parser.parse(it, position) != null && position.index == it.length }
 +    }
 +
 +    /** Incomplete/unreadable copies never displace a known valid copy in the retention count. */
@@ -13383,7 +13411,7 @@ index 0000000..7e93785
 +        return entries
 +            .distinctBy { it.id }
 +            .filter { it.id != currentId && it.verified && isManaged(applicationId, it.name) }
-+            .sortedByDescending { it.name }
++            .sortedWith(compareByDescending<Entry> { dateKey(applicationId, it.name) }.thenByDescending { it.name })
 +            .drop(maximum - 1)
 +            .map { it.id }
 +    }
@@ -25063,10 +25091,10 @@ index 0000000..7c3c569
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalog.kt b/app/src/main/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalog.kt
 new file mode 100644
-index 0000000..a0753c0
+index 0000000..22a9944
 --- /dev/null
 +++ b/app/src/main/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalog.kt
-@@ -0,0 +1,660 @@
+@@ -0,0 +1,661 @@
 +package eu.kanade.tachiyomi.source.selection
 +
 +import eu.kanade.domain.chapter.model.toRemoteSChapter
@@ -25232,7 +25260,7 @@ index 0000000..a0753c0
 +                                binding,
 +                                existing,
 +                                root,
-+                                fetchDetails || discover || binding.key != root.key,
++                                fetchDetails || discover || binding.key != root.key || manga.thumbnailUrl.isNullOrBlank(),
 +                                provider,
 +                                thumbnail = manga.thumbnailUrl.takeIf {
 +                                    binding.key == root.key && settings.coverSourceId == null
@@ -25298,7 +25326,8 @@ index 0000000..a0753c0
 +            catalogs[0] = sampled(catalogs[0], checkImages = discover || recoverOnly && pinned == null)
 +            remember(checkNotNull(rootOutcome), catalogs[0])
 +            if (recoverOnly && pinned == null && catalogs[0].chapters.isNotEmpty()) {
-+                discover = catalogs[0].binding.readability != "sample_passed"
++                discover = catalogs[0].binding.readability != "sample_passed" ||
++                    (catalogs[0].manga.thumbnail_url.isNullOrBlank() && discover)
 +            }
 +        }
 +        val reference = rootCatalog?.manga ?: manga.toSManga()
@@ -26689,11 +26718,130 @@ index 0000000..e6e84c1
 +            else -> 3
 +        }
 +}
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/browse/BrowseTab.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/browse/BrowseTab.kt
+index c666b82..4db6156 100644
+--- a/app/src/main/java/eu/kanade/tachiyomi/ui/browse/BrowseTab.kt
++++ b/app/src/main/java/eu/kanade/tachiyomi/ui/browse/BrowseTab.kt
+@@ -11,6 +11,11 @@ import androidx.compose.runtime.getValue
+ import androidx.compose.ui.platform.LocalContext
+ import androidx.lifecycle.viewmodel.compose.viewModel
+ import cafe.adriel.voyager.navigator.Navigator
++import cafe.adriel.voyager.navigator.LocalNavigator
++import cafe.adriel.voyager.navigator.currentOrThrow
++import eu.kanade.presentation.components.AppBar
++import eu.kanade.presentation.util.Screen
++import tachiyomi.i18n.at.ATMR
+ import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
+ import cafe.adriel.voyager.navigator.tab.TabOptions
+ import eu.kanade.presentation.components.TabbedScreen
+@@ -62,38 +67,35 @@ data object BrowseTab : Tab {
+         val extensionsViewModel = viewModel<ExtensionsViewModel>()
+         val extensionsState by extensionsViewModel.state.collectAsState()
+ 
+-        val novelsViewModel = viewModel<eu.kanade.tachiyomi.ui.browse.novel.NovelsViewModel>()
+-
++        val navigator = LocalNavigator.currentOrThrow
++        val additionalActions = listOf(
++            AppBar.OverflowAction(
++                title = stringResource(ATMR.strings.browse_novels),
++                onClick = { navigator.push(BrowseExtrasScreen(0)) },
++            ),
++            AppBar.OverflowAction(
++                title = stringResource(MR.strings.label_migration),
++                onClick = { navigator.push(BrowseExtrasScreen(2)) },
++            ),
++        )
+         val tabs = listOf(
++            extensionsTab(extensionsViewModel, installed = true),
+             sourcesTab(),
+-            extensionsTab(extensionsViewModel),
+-            novelSourcesTab(),
+-            novelsTab(novelsViewModel),
+-            migrateSourceTab(),
+-        )
++            extensionsTab(extensionsViewModel, installed = false),
++        ).map { it.copy(actions = it.actions + additionalActions) }
+ 
+         val state = rememberPagerState { tabs.size }
+-        val novelSearchQuery by novelsViewModel.searchQuery.collectAsState()
+ 
+         TabbedScreen(
+-            titleRes = MR.strings.browse,
++            titleRes = MR.strings.label_sources,
+             tabs = tabs,
+             state = state,
+-            searchQuery = when (state.currentPage) {
+-                1 -> extensionsState.searchQuery
+-                3 -> novelSearchQuery
+-                else -> null
+-            },
+-            onChangeSearchQuery = { query ->
+-                when (state.currentPage) {
+-                    1 -> extensionsViewModel.search(query)
+-                    3 -> novelsViewModel.search(query)
+-                }
+-            },
++            searchQuery = extensionsState.searchQuery,
++            onChangeSearchQuery = extensionsViewModel::search,
+         )
+         LaunchedEffect(Unit) {
+             switchToExtensionTabChannel.receiveAsFlow()
+-                .collectLatest { state.scrollToPage(1) }
++                .collectLatest { state.scrollToPage(0) }
+         }
+ 
+         LaunchedEffect(Unit) {
+@@ -101,3 +103,22 @@ data object BrowseTab : Tab {
+         }
+     }
+ }
++
++
++private data class BrowseExtrasScreen(val initialPage: Int) : Screen() {
++    @Composable
++    override fun Content() {
++        val navigator = LocalNavigator.currentOrThrow
++        val novels = viewModel<eu.kanade.tachiyomi.ui.browse.novel.NovelsViewModel>()
++        val tabs = listOf(novelSourcesTab(), novelsTab(novels), migrateSourceTab())
++        val query by novels.searchQuery.collectAsState()
++        TabbedScreen(
++            titleRes = MR.strings.browse,
++            tabs = tabs,
++            state = rememberPagerState(initialPage = initialPage) { tabs.size },
++            searchQuery = query,
++            navigateUp = { navigator.pop() },
++            onChangeSearchQuery = novels::search,
++        )
++    }
++}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/browse/extension/ExtensionsTab.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/browse/extension/ExtensionsTab.kt
-index efc3654..3d2560d 100644
+index efc3654..3b313f1 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/ui/browse/extension/ExtensionsTab.kt
 +++ b/app/src/main/java/eu/kanade/tachiyomi/ui/browse/extension/ExtensionsTab.kt
-@@ -14,10 +14,12 @@ import androidx.compose.ui.platform.LocalContext
+@@ -1,6 +1,22 @@
+ package eu.kanade.tachiyomi.ui.browse.extension
+ 
+ import androidx.activity.compose.BackHandler
++import androidx.compose.foundation.layout.padding
++import androidx.compose.foundation.lazy.LazyListScope
++import androidx.compose.foundation.lazy.items
++import androidx.compose.material.icons.Icons
++import androidx.compose.material.icons.outlined.TravelExplore
++import androidx.compose.ui.Modifier
++import androidx.compose.ui.unit.dp
++import androidx.lifecycle.viewmodel.compose.viewModel
++import eu.kanade.presentation.browse.SourceItem
++import eu.kanade.presentation.browse.SourceOptionsDialog
++import eu.kanade.presentation.browse.SourceUiModel
++import eu.kanade.tachiyomi.ui.browse.source.SourcesFilterScreen
++import eu.kanade.tachiyomi.ui.browse.source.SourcesViewModel
++import eu.kanade.tachiyomi.ui.browse.source.browse.BrowseSourceScreen
++import eu.kanade.tachiyomi.ui.browse.source.globalsearch.GlobalSearchScreen
++import tachiyomi.source.local.isLocal
+ import androidx.compose.material3.AlertDialog
+ import androidx.compose.material3.Text
+ import androidx.compose.material3.TextButton
+@@ -14,10 +30,12 @@ import androidx.compose.ui.platform.LocalContext
  import cafe.adriel.voyager.navigator.LocalNavigator
  import cafe.adriel.voyager.navigator.currentOrThrow
  import eu.kanade.presentation.browse.ExtensionScreen
@@ -26706,29 +26854,51 @@ index efc3654..3d2560d 100644
  import eu.kanade.tachiyomi.extension.model.Extension
  import eu.kanade.tachiyomi.ui.browse.extension.details.ExtensionDetailsScreen
  import eu.kanade.tachiyomi.ui.webview.WebViewScreen
-@@ -27,10 +29,9 @@ import tachiyomi.i18n.at.ATMR
+@@ -27,45 +45,91 @@ import tachiyomi.i18n.at.ATMR
  import tachiyomi.presentation.core.i18n.stringResource
  
  @Composable
 -fun extensionsTab(
 -    extensionsViewModel: ExtensionsViewModel,
 -): TabContent {
-+fun extensionsTab(extensionsViewModel: ExtensionsViewModel): TabContent {
++fun extensionsTab(extensionsViewModel: ExtensionsViewModel, installed: Boolean): TabContent {
      val navigator = LocalNavigator.currentOrThrow
 +    val requestRiskNotice = rememberExtensionRiskNotice()
      val context = LocalContext.current
  
      val state by extensionsViewModel.state.collectAsState()
-@@ -40,24 +41,27 @@ fun extensionsTab(
-         titleRes = MR.strings.label_extensions,
-         badgeNumber = state.updates.takeIf { it > 0 },
++    val sourceModel = viewModel<SourcesViewModel>()
++    val sourceState by sourceModel.state.collectAsState()
++    val extensionGroups = state.items.filterValues { group ->
++        group.firstOrNull()?.extension?.let { (it !is Extension.Available) == installed } == true
++    }
+     var privateExtensionToUninstall by remember { mutableStateOf<Extension?>(null) }
+ 
+     return TabContent(
+-        titleRes = MR.strings.label_extensions,
+-        badgeNumber = state.updates.takeIf { it > 0 },
++        titleRes = if (installed) ATMR.strings.browse_installed_sources else ATMR.strings.browse_external_sources,
++        badgeNumber = state.updates.takeIf { installed && it > 0 },
          searchEnabled = true,
 -        actions = listOf(
 -            AppBar.OverflowAction(
 -                title = stringResource(ATMR.strings.repository_discovery),
 -                onClick = { navigator.push(RepositoryDiscoveryScreen()) },
+-            ),
+-            AppBar.OverflowAction(
+-                title = stringResource(MR.strings.action_filter),
+-                onClick = { navigator.push(ExtensionFilterScreen()) },
+-            ),
+-            AppBar.OverflowAction(
+-                title = stringResource(MR.strings.extensionStores),
+-                onClick = { navigator.push(ExtensionStoresScreen()) },
 +        actions =
 +            listOf(
++                AppBar.Action(
++                    title = stringResource(MR.strings.action_global_search),
++                    icon = Icons.Outlined.TravelExplore,
++                    onClick = { navigator.push(GlobalSearchScreen()) },
++                ),
 +                AppBar.OverflowAction(
 +                    title = stringResource(ATMR.strings.recover_library_sources),
 +                    onClick = { LibraryUpdateJob.startSourceRecovery(context) },
@@ -26739,21 +26909,16 @@ index efc3654..3d2560d 100644
 +                ),
 +                AppBar.OverflowAction(
 +                    title = stringResource(MR.strings.action_filter),
-+                    onClick = { navigator.push(ExtensionFilterScreen()) },
++                    onClick = {
++                        if (installed) navigator.push(SourcesFilterScreen())
++                        else navigator.push(ExtensionFilterScreen())
++                    },
 +                ),
 +                AppBar.OverflowAction(
 +                    title = stringResource(MR.strings.extensionStores),
 +                    onClick = { navigator.push(ExtensionStoresScreen()) },
 +                ),
              ),
--            AppBar.OverflowAction(
--                title = stringResource(MR.strings.action_filter),
--                onClick = { navigator.push(ExtensionFilterScreen()) },
--            ),
--            AppBar.OverflowAction(
--                title = stringResource(MR.strings.extensionStores),
--                onClick = { navigator.push(ExtensionStoresScreen()) },
--            ),
 -        ),
          content = { contentPadding, _ ->
 -            BackHandler(enabled = state.searchQuery != null) {
@@ -26762,8 +26927,39 @@ index efc3654..3d2560d 100644
 +            BackHandler(enabled = state.searchQuery != null) { extensionsViewModel.search(null) }
  
              ExtensionScreen(
-                 state = state,
-@@ -65,7 +69,8 @@ fun extensionsTab(
+-                state = state,
++                state = state.copy(items = extensionGroups),
++                sources = if (!installed) null else {
++                    val slot: LazyListScope.() -> Unit = {
++                        val visible = sourceState.items.filterIsInstance<SourceUiModel.Item>().filter {
++                            it.source.visualName.contains(state.searchQuery.orEmpty(), ignoreCase = true)
++                        }
++                        visible.groupBy { it.source.isLocal() }.toSortedMap(compareByDescending { it })
++                            .forEach { (local, rows) ->
++                                item(key = "installed-source-heading-$local") {
++                                    Text(
++                                        stringResource(
++                                            if (local) ATMR.strings.browse_internal_sources
++                                            else ATMR.strings.browse_active_extensions,
++                                        ),
++                                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
++                                    )
++                                }
++                                items(rows, key = { "installed-source-${it.source.id}" }) { row ->
++                                    SourceItem(
++                                        source = row.source,
++                                        onClickItem = { source, listing ->
++                                            navigator.push(BrowseSourceScreen(source.id, listing.query))
++                                        },
++                                        onClickPin = sourceModel::togglePin,
++                                        onLongClickItem = sourceModel::showSourceDialog,
++                                    )
++                                }
++                            }
++                    }
++                    slot
++                },
+                 contentPadding = contentPadding,
                  searchQuery = state.searchQuery,
                  onLongClickItem = { extension ->
                      when (extension) {
@@ -26773,7 +26969,7 @@ index efc3654..3d2560d 100644
                          else -> {
                              if (context.isPackageInstalled(extension.pkgName)) {
                                  extensionsViewModel.uninstallExtension(extension)
-@@ -76,7 +81,9 @@ fun extensionsTab(
+@@ -76,7 +140,9 @@ fun extensionsTab(
                      }
                  },
                  onClickItemCancel = extensionsViewModel::cancelInstallUpdateExtension,
@@ -26784,7 +26980,7 @@ index efc3654..3d2560d 100644
                  onOpenWebView = { extension ->
                      extension.sources.getOrNull(0)?.let {
                          navigator.push(
-@@ -84,27 +91,27 @@ fun extensionsTab(
+@@ -84,27 +150,41 @@ fun extensionsTab(
                                  url = it.baseUrl,
                                  initialTitle = it.name,
                                  sourceId = it.id,
@@ -26807,6 +27003,20 @@ index efc3654..3d2560d 100644
                  onRefresh = extensionsViewModel::findAvailableExtensions,
              )
  
++            if (installed) sourceState.dialog?.let { dialog ->
++                SourceOptionsDialog(
++                    source = dialog.source,
++                    onClickPin = {
++                        sourceModel.togglePin(dialog.source)
++                        sourceModel.closeDialog()
++                    },
++                    onClickDisable = {
++                        sourceModel.toggleSource(dialog.source)
++                        sourceModel.closeDialog()
++                    },
++                    onDismiss = sourceModel::closeDialog,
++                )
++            }
              privateExtensionToUninstall?.let { extension ->
                  ExtensionUninstallConfirmation(
                      extensionName = extension.name,
@@ -26821,7 +27031,7 @@ index efc3654..3d2560d 100644
                  )
              }
          },
-@@ -118,9 +125,7 @@ private fun ExtensionUninstallConfirmation(
+@@ -118,9 +198,7 @@ private fun ExtensionUninstallConfirmation(
      onDismissRequest: () -> Unit,
  ) {
      AlertDialog(
@@ -26832,7 +27042,7 @@ index efc3654..3d2560d 100644
          text = {
              Text(text = stringResource(MR.strings.remove_private_extension_message, extensionName))
          },
-@@ -129,7 +134,7 @@ private fun ExtensionUninstallConfirmation(
+@@ -129,7 +207,7 @@ private fun ExtensionUninstallConfirmation(
                  onClick = {
                      onClickConfirm()
                      onDismissRequest()
@@ -26842,9 +27052,18 @@ index efc3654..3d2560d 100644
                  Text(text = stringResource(MR.strings.ext_remove))
              }
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/browse/extension/ExtensionsViewModel.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/browse/extension/ExtensionsViewModel.kt
-index 62ee9b7..b871740 100644
+index 62ee9b7..6290562 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/ui/browse/extension/ExtensionsViewModel.kt
 +++ b/app/src/main/java/eu/kanade/tachiyomi/ui/browse/extension/ExtensionsViewModel.kt
+@@ -12,7 +12,7 @@ import eu.kanade.tachiyomi.extension.model.Extension
+ import eu.kanade.tachiyomi.extension.model.InstallStep
+ import eu.kanade.tachiyomi.source.online.HttpSource
+ import eu.kanade.tachiyomi.util.system.LocaleHelper
+-import kotlinx.coroutines.delay
++import kotlinx.coroutines.Job
+ import kotlinx.coroutines.flow.Flow
+ import kotlinx.coroutines.flow.MutableStateFlow
+ import kotlinx.coroutines.flow.collect
 @@ -29,6 +29,9 @@ import kotlinx.coroutines.flow.update
  import kotlinx.coroutines.launch
  import mihon.core.viewmodel.StateViewModel
@@ -26855,20 +27074,70 @@ index 62ee9b7..b871740 100644
  import tachiyomi.i18n.MR
  import uy.kohesive.injekt.Injekt
  import uy.kohesive.injekt.api.get
-@@ -179,7 +182,12 @@ class ExtensionsViewModel(
+@@ -142,13 +145,23 @@ class ExtensionsViewModel(
+         }
+     }
  
-     private suspend fun Flow<InstallStep>.collectToInstallUpdate(extension: Extension) =
++    private var bulkUpdate: Job? = null
++
+     fun updateAllExtensions() {
+-        viewModelScope.launchIO {
+-            state.value.items.values.flatten()
+-                .map { it.extension }
+-                .filterIsInstance<Extension.Installed>()
+-                .filter { it.hasUpdate }
+-                .forEach(::updateExtension)
++        if (bulkUpdate?.isActive == true) return
++        val pending = state.value.items.values.flatten()
++            .map { it.extension }
++            .filterIsInstance<Extension.Installed>()
++            .filter { it.hasUpdate }
++            .distinctBy { it.pkgName }
++        bulkUpdate = viewModelScope.launchIO {
++            var hadFailure = false
++            for (extension in pending) {
++                if (extension.pkgName in currentDownloads.value) continue
++                extensionManager.updateExtension(extension)
++                    .collectToInstallUpdate(extension) { hadFailure = true }
++            }
++            if (hadFailure) showInstallError()
+         }
+     }
+ 
+@@ -177,9 +190,21 @@ class ExtensionsViewModel(
+         currentDownloads.update { it - extension.pkgName }
+     }
+ 
+-    private suspend fun Flow<InstallStep>.collectToInstallUpdate(extension: Extension) =
++    private suspend fun showInstallError() = withUIContext {
++        Injekt.get<Application>().toast(ATMR.strings.extension_install_failed)
++    }
++
++    private suspend fun Flow<InstallStep>.collectToInstallUpdate(
++        extension: Extension,
++        onError: suspend () -> Unit = { showInstallError() },
++    ) =
          this
 -            .onEach { installStep -> addDownloadState(extension, installStep) }
 +            .onEach { installStep ->
 +                addDownloadState(extension, installStep)
 +                if (installStep == InstallStep.Error) {
-+                    withUIContext { Injekt.get<Application>().toast(ATMR.strings.extension_install_failed) }
++                    onError()
 +                }
 +            }
              .takeWhile { installStep -> installStep != InstallStep.Installed }
              .onCompletion { removeDownloadState(extension) }
              .collect()
+@@ -194,9 +219,6 @@ class ExtensionsViewModel(
+ 
+             extensionManager.findAvailableExtensions()
+ 
+-            // Fake slower refresh so it doesn't seem like it's not doing anything
+-            delay(1.seconds)
+-
+             mutableState.update { it.copy(isRefreshing = false) }
+         }
+     }
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/browse/extension/details/ExtensionDetailsScreen.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/browse/extension/details/ExtensionDetailsScreen.kt
 index 7ee326f..9f99188 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/ui/browse/extension/details/ExtensionDetailsScreen.kt
@@ -27226,6 +27495,38 @@ index 9fc8ef9..5bcbb2c 100644
                                      )
                                  }
                              },
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/browse/source/SourcesTab.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/browse/source/SourcesTab.kt
+index 13cea08..f067a98 100644
+--- a/app/src/main/java/eu/kanade/tachiyomi/ui/browse/source/SourcesTab.kt
++++ b/app/src/main/java/eu/kanade/tachiyomi/ui/browse/source/SourcesTab.kt
+@@ -20,6 +20,9 @@ import eu.kanade.tachiyomi.ui.browse.source.globalsearch.GlobalSearchScreen
+ import kotlinx.coroutines.flow.collectLatest
+ import kotlinx.coroutines.launch
+ import tachiyomi.i18n.MR
++import tachiyomi.i18n.at.ATMR
++import tachiyomi.source.local.isLocal
++import eu.kanade.presentation.browse.SourceUiModel
+ import tachiyomi.presentation.core.i18n.stringResource
+ 
+ @Composable
+@@ -29,7 +32,7 @@ fun Screen.sourcesTab(): TabContent {
+     val state by viewModel.state.collectAsState()
+ 
+     return TabContent(
+-        titleRes = MR.strings.label_sources,
++        titleRes = ATMR.strings.browse_internal_sources,
+         actions = listOf(
+             AppBar.Action(
+                 title = stringResource(MR.strings.action_global_search),
+@@ -44,7 +47,7 @@ fun Screen.sourcesTab(): TabContent {
+         ),
+         content = { contentPadding, snackbarHostState ->
+             SourcesScreen(
+-                state = state,
++                state = state.copy(items = state.items.filterIsInstance<SourceUiModel.Item>().filter { it.source.isLocal() }),
+                 contentPadding = contentPadding,
+                 onClickItem = { source, listing ->
+                     navigator.push(BrowseSourceScreen(source.id, listing.query))
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/browse/source/browse/BrowseSourceViewModel.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/browse/source/browse/BrowseSourceViewModel.kt
 index bfbf986..8a6cc9d 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/ui/browse/source/browse/BrowseSourceViewModel.kt
@@ -63104,10 +63405,10 @@ index 0000000..249ef72
 +}
 diff --git a/app/src/test/java/eu/kanade/presentation/more/settings/screen/browse/preparation/SourcePreparationViewModelTest.kt b/app/src/test/java/eu/kanade/presentation/more/settings/screen/browse/preparation/SourcePreparationViewModelTest.kt
 new file mode 100644
-index 0000000..7a0e07d
+index 0000000..6c29863
 --- /dev/null
 +++ b/app/src/test/java/eu/kanade/presentation/more/settings/screen/browse/preparation/SourcePreparationViewModelTest.kt
-@@ -0,0 +1,335 @@
+@@ -0,0 +1,332 @@
 +package eu.kanade.presentation.more.settings.screen.browse.preparation
 +
 +import androidx.lifecycle.ViewModelStore
@@ -63190,8 +63491,8 @@ index 0000000..7a0e07d
 +                runCurrent()
 +                assertTrue(vm.state.value.loaded)
 +                assertFalse(vm.state.value.consent)
-+                assertTrue(vm.state.value.selectedRepositories.isEmpty())
-+                assertEquals(setOf("ja", "pt-BR", "pt", "en"), vm.state.value.languages)
++                assertEquals(setOf(RepositoryIdentity.of(store())), vm.state.value.selectedRepositories)
++                assertEquals(setOf("pt-BR", "pt", "en"), vm.state.value.languages)
 +                assertEquals(setOf("ja"), preference.get())
 +                vm.prepare()
 +                runCurrent()
@@ -63317,8 +63618,7 @@ index 0000000..7a0e07d
 +                )
 +            owner.put("test", vm)
 +            runCurrent()
-+            vm.consent(true)
-+            vm.selectRepository(RepositoryIdentity.of(one))
++            assertEquals(setOf(RepositoryIdentity.of(one)), vm.state.value.selectedRepositories)
 +            vm.selectRepository(RepositoryIdentity.of(two))
 +            vm.loadCatalog()
 +            advanceUntilIdle()
@@ -63379,8 +63679,6 @@ index 0000000..7a0e07d
 +                )
 +            owner.put("test", vm)
 +            runCurrent()
-+            vm.consent(true)
-+            vm.selectRepository(RepositoryIdentity.of(store()))
 +            vm.loadCatalog()
 +            advanceUntilIdle()
 +            assertTrue(vm.state.value.catalogLoaded)
@@ -64359,7 +64657,7 @@ index 0000000..33b9649
 +}
 diff --git a/app/src/test/java/eu/kanade/tachiyomi/data/backup/create/BackupCreatorTransactionTest.kt b/app/src/test/java/eu/kanade/tachiyomi/data/backup/create/BackupCreatorTransactionTest.kt
 new file mode 100644
-index 0000000..262f6e9
+index 0000000..a25e1d2
 --- /dev/null
 +++ b/app/src/test/java/eu/kanade/tachiyomi/data/backup/create/BackupCreatorTransactionTest.kt
 @@ -0,0 +1,371 @@
@@ -64716,7 +65014,7 @@ index 0000000..262f6e9
 +        assertTrue(BackupRetention.isManaged(BuildConfig.APPLICATION_ID, first))
 +        assertFalse(BackupRetention.isManaged(BuildConfig.APPLICATION_ID, first + ".pending"))
 +        val otherNamespace =
-+            first.replace(BuildConfig.APPLICATION_ID, BuildConfig.APPLICATION_ID.replace('.', 'X'))
++            "other-app_" + first.substringAfter('_')
 +        assertFalse(BackupRetention.isManaged(BuildConfig.APPLICATION_ID, otherNamespace))
 +    }
 +
@@ -64736,10 +65034,10 @@ index 0000000..262f6e9
 +}
 diff --git a/app/src/test/java/eu/kanade/tachiyomi/data/backup/create/BackupRetentionTest.kt b/app/src/test/java/eu/kanade/tachiyomi/data/backup/create/BackupRetentionTest.kt
 new file mode 100644
-index 0000000..e44fc4b
+index 0000000..da6d21c
 --- /dev/null
 +++ b/app/src/test/java/eu/kanade/tachiyomi/data/backup/create/BackupRetentionTest.kt
-@@ -0,0 +1,78 @@
+@@ -0,0 +1,92 @@
 +package eu.kanade.tachiyomi.data.backup.create
 +
 +import java.util.Date
@@ -64752,6 +65050,20 @@ index 0000000..e44fc4b
 +
 +    private fun entry(id: String, date: String, verified: Boolean = true) =
 +        BackupRetention.Entry(id, "${app}_${date}.tachibk", verified)
++
++    @Test
++    fun `Polaris names retain older backups in date order across both prefixes`() {
++        val packageId = "app.mihon.tachiyomiat.dev"
++        val name = BackupRetention.filename(packageId, Date(0))
++        assertTrue(name.startsWith("Polaris_"))
++        assertTrue(BackupRetention.isManaged(packageId, name))
++        val entries = listOf(
++            BackupRetention.Entry("old", "Polaris_2026-11-20_08-00.tachibk", true),
++            BackupRetention.Entry("recent", "${packageId}_2026-11-21_08-00.tachibk", true),
++            BackupRetention.Entry("current", "Polaris_2026-11-22_08-00.tachibk", true),
++        )
++        assertEquals(listOf("old"), BackupRetention.deletions(packageId, "current", entries, 2))
++    }
 +
 +    @Test
 +    fun `both historical and current backup names remain recognized`() {
@@ -69094,10 +69406,10 @@ index 0000000..a64600f
 +}
 diff --git a/app/src/test/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalogTest.kt b/app/src/test/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalogTest.kt
 new file mode 100644
-index 0000000..6e622ee
+index 0000000..e1ef44a
 --- /dev/null
 +++ b/app/src/test/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalogTest.kt
-@@ -0,0 +1,1227 @@
+@@ -0,0 +1,1237 @@
 +package eu.kanade.tachiyomi.source.selection
 +
 +import eu.kanade.domain.source.service.SourcePreferences
@@ -69245,7 +69557,7 @@ index 0000000..6e622ee
 +
 +    @Test
 +    fun `recovery tries the original and does not search alternatives when it can still be read`() = runTest {
-+        val original = Provider(1, 2)
++        val original = Provider(1, 2, cover = "https://example.invalid/original.jpg")
 +        val alternative = Provider(2, 3)
 +        val sampled = mutableListOf<Long>()
 +        val catalog = AutomaticSourceCatalog(Manager(listOf(original, alternative)), preferences()) { source, _ ->
@@ -69256,6 +69568,16 @@ index 0000000..6e622ee
 +        assertEquals(listOf(1L), sampled)
 +        assertEquals(0, alternative.searches)
 +        assertEquals(setOf(1L), result.chapters.map { ChapterOrigin.from(it.memo)?.sourceId }.toSet())
++    }
++
++    @Test
++    fun `background recovery can complete a missing cover despite a readable original`() = runTest {
++        val original = Provider(1, 2)
++        val alternate = Provider(2, 3, cover = "https://example.invalid/recovered.jpg")
++        val catalog = catalog(Manager(listOf(original, alternate)), preferences())
++        val result = catalog.fetch(original, work(), emptyList(), false, true, true, recoverOnly = true)!!
++        assertEquals("https://example.invalid/recovered.jpg", result.manga.thumbnail_url)
++        assertEquals(2L, WorkSources.from(result.manga.memo).coverSourceId)
 +    }
 +
 +    @Test
@@ -82703,7 +83025,7 @@ index 9839272..0ac8bdd 100644
 \ No newline at end of file
 +voyager = ["voyager-navigator", "voyager-tabNavigator", "voyager-transitions"]
 diff --git a/i18n-at/src/commonMain/moko-resources/base/strings.xml b/i18n-at/src/commonMain/moko-resources/base/strings.xml
-index 7ed4795..cf5d2a7 100644
+index 7ed4795..c35050a 100644
 --- a/i18n-at/src/commonMain/moko-resources/base/strings.xml
 +++ b/i18n-at/src/commonMain/moko-resources/base/strings.xml
 @@ -10,7 +10,7 @@
@@ -82715,7 +83037,7 @@ index 7ed4795..cf5d2a7 100644
      <string name="pref_group_setup">Translation Setup</string>
      <string name="pref_translate_from">Translate From</string>
      <string name="pref_translate_to">Translate To</string>
-@@ -73,12 +73,320 @@
+@@ -73,12 +73,326 @@
      <string name="repository_add_error">Could not add this repository. Check your connection and try again.</string>
      <string name="repository_refresh_error">Repository added, but extension listings could not be refreshed. Refresh the Extensions screen.</string>
      <string name="chapter_group_version">Group/version: %1$s</string>
@@ -82883,7 +83205,7 @@ index 7ed4795..cf5d2a7 100644
 +    <string name="preparation_key_warning">Adding this repository authorizes extensions signed with this certificate. If a repository you already use has changed its certificate, confirm the change with its maintainer before continuing.</string>
 +    <string name="preparation_add_repo">Add and select repository</string>
 +    <string name="preparation_dismiss">Dismiss</string>
-+    <string name="preparation_load_sources">Find available sources</string>
++    <string name="preparation_load_sources">Consult</string>
 +    <string name="preparation_choose">Choose what to prepare</string>
 +    <string name="preparation_partial_catalog">Could not load %1$s. You can retry or continue with the other loaded repositories.</string>
 +    <string name="preparation_refresh_catalog">Reload catalogs</string>
@@ -83037,9 +83359,15 @@ index 7ed4795..cf5d2a7 100644
 +    <string name="backup_read_limit_exceeded">This backup exceeds the reading memory limit used by Polaris on this device. No existing backup was replaced. Use fewer optional fields when creating a backup, or a device with more memory.</string>
 +    <string name="recover_library_sources">Recover library sources</string>
 +    <string name="extension_install_failed">Could not install the extension. Check the repository version and compatibility.</string>
++    <string name="browse_installed_sources">Installed</string>
++    <string name="browse_internal_sources">Internal</string>
++    <string name="browse_external_sources">External</string>
++    <string name="browse_active_extensions">Extension sources</string>
++    <string name="browse_novels">Light novels</string>
++    <string name="preparation_default_filters">English and Portuguese · Adult sources hidden</string>
  </resources>
 diff --git a/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml b/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
-index d1748bc..1feab2d 100644
+index d1748bc..aa12ae3 100644
 --- a/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
 +++ b/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
 @@ -10,7 +10,7 @@
@@ -83051,7 +83379,7 @@ index d1748bc..1feab2d 100644
      <string name="pref_group_setup">Configuração da tradução</string>
      <string name="pref_translate_from">Traduzir de</string>
      <string name="pref_translate_to">Traduzir para</string>
-@@ -73,12 +73,320 @@
+@@ -73,12 +73,326 @@
      <string name="repository_add_error">Não foi possível adicionar o repositório. Confira a conexão e tente novamente.</string>
      <string name="repository_refresh_error">Repositório adicionado, mas não foi possível atualizar as extensões. Atualize a tela Extensões.</string>
      <string name="chapter_group_version">Grupo/versão: %1$s</string>
@@ -83219,7 +83547,7 @@ index d1748bc..1feab2d 100644
 +    <string name="preparation_key_warning">Adicionar este repositório autoriza extensões assinadas com este certificado. Se um repositório que você já usa mudou de certificado, confirme a mudança com o mantenedor antes de continuar.</string>
 +    <string name="preparation_add_repo">Adicionar e selecionar repositório</string>
 +    <string name="preparation_dismiss">Dispensar</string>
-+    <string name="preparation_load_sources">Consultar fontes disponíveis</string>
++    <string name="preparation_load_sources">Consultar</string>
 +    <string name="preparation_choose">Escolha o que preparar</string>
 +    <string name="preparation_partial_catalog">Não foi possível consultar %1$s. Você pode tentar novamente ou continuar com os outros repositórios carregados.</string>
 +    <string name="preparation_refresh_catalog">Consultar catálogos novamente</string>
@@ -83373,6 +83701,12 @@ index d1748bc..1feab2d 100644
 +    <string name="backup_read_limit_exceeded">Este backup excede o limite de memória de leitura usado pelo Polaris neste aparelho. Nenhum backup existente foi substituído. Reduza os dados opcionais ao criar um backup ou use um aparelho com mais memória.</string>
 +    <string name="recover_library_sources">Recuperar fontes da biblioteca</string>
 +    <string name="extension_install_failed">Não foi possível instalar a extensão. Confira a versão do repositório e a compatibilidade.</string>
++    <string name="browse_installed_sources">Instalados</string>
++    <string name="browse_internal_sources">Internas</string>
++    <string name="browse_external_sources">Externas</string>
++    <string name="browse_active_extensions">Fontes de extensões</string>
++    <string name="browse_novels">Light novels</string>
++    <string name="preparation_default_filters">Português e inglês · Fontes adultas ocultas</string>
  </resources>
 diff --git a/i18n/src/commonMain/moko-resources/base/strings.xml b/i18n/src/commonMain/moko-resources/base/strings.xml
 index c0832ba..ebf8f48 100644
