@@ -2,6 +2,11 @@
 
 Este arquivo registra a evolução real do código. **Revisões de desenvolvimento não são lançamentos públicos.** As datas abaixo usam America/Fortaleza, exceto quando houver indicação de UTC. O histórico de distribuição fica em [Releases](https://github.com/Hailton-Reis/Polaris/releases).
 
+## Desenvolvimento · recuperação da primeira página e de capas
+
+- Ao recuperar um capítulo, consultas a catálogos já conhecidos têm um limite mais curto. A busca preserva tempo para encontrar uma edição do mesmo capítulo em outra fonte.
+- Uma capa de favorito que retorna HTTP 404 ou 410 pode ser recuperada ao abrir a obra. A busca ignora temporariamente os endereços que retornaram esses códigos e preserva capas personalizadas.
+
 ## Desenvolvimento · atalho para documentos
 
 - A barra da **Biblioteca** dá acesso direto a **Documentos**. A tela coloca a importação de arquivos e links antes da preparação de idiomas.
