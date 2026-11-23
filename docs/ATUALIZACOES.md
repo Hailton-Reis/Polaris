@@ -18,7 +18,7 @@ A [P20261117.6](CONCORRENCIA_FONTES_P20261117_6.md) adapta a concorrência das a
 
 Em **Configurações → Atualizações do aplicativo**:
 
-- **Buscar atualizações automaticamente** começa ativado. Ao abrir o app, ele consulta as Releases do Polaris, com no máximo uma tentativa automática por dia por canal. Não há consulta periódica com o app fechado.
+- **Buscar atualizações automaticamente** começa ativado. A beta.12 limita a consulta automática a uma por dia por canal. Na próxima revisão, o Polaris consulta as Releases a cada nova abertura do app e reaproveita a consulta ao voltar para a janela aberta ou girar a tela.
 - **Receber atualizações experimentais** começa **desativado**, inclusive quando o aplicativo instalado é um beta. Ative para incluir betas e outras prévias publicadas.
 - **Verificar atualizações** consulta imediatamente, mesmo com a busca automática desligada, respeitando a escolha do canal experimental. Também fica em **Sobre**.
 

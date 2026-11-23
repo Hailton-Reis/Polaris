@@ -2,6 +2,12 @@
 
 Este arquivo registra a evolução real do código. **Revisões de desenvolvimento não são lançamentos públicos.** As datas abaixo usam America/Fortaleza, exceto quando houver indicação de UTC. O histórico de distribuição fica em [Releases](https://github.com/Hailton-Reis/Polaris/releases).
 
+## Desenvolvimento · reconhecimento de obras e abertura do app
+
+- O catálogo pode confirmar títulos em idiomas diferentes, títulos compostos por dois nomes equivalentes e sinopses idênticas quando a fonte omite a autoria. Numeração incompatível, identidades conflitantes e separações escolhidas pelo usuário continuam respeitadas.
+- A consulta automática da versão roda a cada nova abertura do app, com uma consulta por janela e sem repetir após rotação da tela.
+- **Fontes** mostra as fontes prontas para leitura. Instalação, atualizações de extensões e repositórios ficam em **Gerenciar fontes**.
+
 ## Desenvolvimento · gestão de fontes e backups
 
 - A tela Fontes abre em **Instalados**. Fontes locais e fontes de extensões têm seções próprias, com as atualizações no topo. **Internas** mostra os arquivos locais e **Externas** lista extensões para instalar. A migração e as light novels ficam no menu.

@@ -3381,7 +3381,7 @@ index 172b28c..0d2d43d 100644
              android:name="android.webkit.WebView.MetricsOptOut"
              android:value="true" />
 diff --git a/app/src/main/java/eu/kanade/domain/DomainModule.kt b/app/src/main/java/eu/kanade/domain/DomainModule.kt
-index b7eaaf7..3ed614a 100644
+index b7eaaf7..24cc63c 100644
 --- a/app/src/main/java/eu/kanade/domain/DomainModule.kt
 +++ b/app/src/main/java/eu/kanade/domain/DomainModule.kt
 @@ -26,6 +26,7 @@ import eu.kanade.domain.track.interactor.AddTracks
@@ -3412,7 +3412,16 @@ index b7eaaf7..3ed614a 100644
  import tachiyomi.domain.chapter.interactor.SetMangaDefaultChapterFlags
  import tachiyomi.domain.chapter.interactor.ShouldUpdateDbChapter
  import tachiyomi.domain.chapter.interactor.UpdateChapter
-@@ -135,11 +136,20 @@ class DomainModule : InjektModule {
+@@ -92,6 +93,8 @@ import tachiyomi.domain.manga.interactor.UpdateMangaNotes
+ import tachiyomi.domain.manga.interactor.UpdateMergedSettings
+ import tachiyomi.domain.manga.repository.MangaMergeRepository
+ import tachiyomi.domain.manga.repository.MangaRepository
++import eu.kanade.domain.manga.model.toSManga
++import tachiyomi.domain.manga.model.WorkSources
+ import tachiyomi.domain.release.interactor.GetApplicationRelease
+ import tachiyomi.domain.release.service.ReleaseService
+ import tachiyomi.domain.source.interactor.GetRemoteManga
+@@ -135,11 +138,33 @@ class DomainModule : InjektModule {
          addFactory { CreateMergedManga(get(), get()) }
          addFactory { GetDuplicateLibraryManga(get()) }
          addFactory { GetFavorites(get()) }
@@ -3425,7 +3434,20 @@ index b7eaaf7..3ed614a 100644
 +            tachiyomi.domain.chapter.interactor.GetLibraryWorkChapters(get(), get(), get())
 +        }
 +        addSingletonFactory {
-+            eu.kanade.tachiyomi.source.selection.LibraryWorkConsolidator(get(), get(), get())
++            val repository = get<MangaRepository>()
++            val resolver = eu.kanade.tachiyomi.source.selection.WorkIdentityResolver(
++                get<eu.kanade.tachiyomi.network.NetworkHelper>().client
++            )
++            eu.kanade.tachiyomi.source.selection.LibraryWorkConsolidator(
++                get(), get(), get(),
++                identify = { resolver.resolve(it.toSManga()) },
++                persistIdentity = { id, identity ->
++                    repository.updateMemo(id) { memo ->
++                        val sources = WorkSources.from(memo)
++                        if (sources.identity != null) memo else sources.copy(identity = identity).attach(memo)
++                    }
++                },
++            )
 +        }
 +        addFactory { GetLibraryManga(get(), get()) }
 +        addFactory { GetMangaWithChapters(get(), get(), get(), get()) }
@@ -3436,7 +3458,7 @@ index b7eaaf7..3ed614a 100644
          addFactory { GetUpcomingManga(get()) }
          addFactory { ResetViewerFlags(get()) }
          addFactory { SetMangaChapterFlags(get()) }
-@@ -154,7 +164,19 @@ class DomainModule : InjektModule {
+@@ -154,7 +179,19 @@ class DomainModule : InjektModule {
          addFactory { SetExcludedScanlators(get()) }
          addFactory {
              MigrateMangaUseCase(
@@ -3457,7 +3479,7 @@ index b7eaaf7..3ed614a 100644
              )
          }
  
-@@ -173,13 +195,15 @@ class DomainModule : InjektModule {
+@@ -173,13 +210,15 @@ class DomainModule : InjektModule {
  
          addSingletonFactory<ChapterRepository> { ChapterRepositoryImpl(get()) }
          addFactory { GetChapter(get()) }
@@ -3477,7 +3499,7 @@ index b7eaaf7..3ed614a 100644
          addFactory { GetAvailableScanlators(get()) }
          addFactory { FilterChaptersForDownload(get(), get(), get()) }
  
-@@ -223,6 +247,36 @@ class DomainModule : InjektModule {
+@@ -223,6 +262,36 @@ class DomainModule : InjektModule {
          addFactory { ToggleIncognito(get()) }
          addFactory { GetIncognitoState(get(), get(), get()) }
  
@@ -5763,7 +5785,7 @@ index dd67afb..d78cab1 100644
          }
  
 diff --git a/app/src/main/java/eu/kanade/presentation/components/TabbedScreen.kt b/app/src/main/java/eu/kanade/presentation/components/TabbedScreen.kt
-index 1f246cf..37cc12d 100644
+index 1f246cf..0bbb94f 100644
 --- a/app/src/main/java/eu/kanade/presentation/components/TabbedScreen.kt
 +++ b/app/src/main/java/eu/kanade/presentation/components/TabbedScreen.kt
 @@ -39,6 +39,7 @@ fun TabbedScreen(
@@ -5782,6 +5804,15 @@ index 1f246cf..37cc12d 100644
                  searchEnabled = searchEnabled,
                  searchQuery = if (searchEnabled) searchQuery else null,
                  onChangeSearchQuery = onChangeSearchQuery,
+@@ -88,7 +90,7 @@ fun TabbedScreen(
+                         )
+                     }
+                 }
+-            } else {
++            } else if (tabs.size > 1) {
+                 TabRow(
+                     selectedTabIndex = state.currentPage,
+                     modifier = Modifier.zIndex(1f),
 diff --git a/app/src/main/java/eu/kanade/presentation/documents/DocumentImportDialog.kt b/app/src/main/java/eu/kanade/presentation/documents/DocumentImportDialog.kt
 new file mode 100644
 index 0000000..7d94070
@@ -8453,10 +8484,10 @@ index 1ac6581..a07a6b3 100644
  }
 diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsAppUpdatesScreen.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsAppUpdatesScreen.kt
 new file mode 100644
-index 0000000..2c690cc
+index 0000000..198213a
 --- /dev/null
 +++ b/app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsAppUpdatesScreen.kt
-@@ -0,0 +1,67 @@
+@@ -0,0 +1,59 @@
 +package eu.kanade.presentation.more.settings.screen
 +
 +import androidx.compose.foundation.layout.size
@@ -8493,19 +8524,11 @@ index 0000000..2c690cc
 +                preference = preferences.automatic(),
 +                title = stringResource(ATMR.strings.polaris_updates_automatic),
 +                subtitle = stringResource(ATMR.strings.polaris_updates_automatic_summary),
-+                onValueChanged = {
-+                    preferences.resetChecks()
-+                    true
-+                },
 +            ),
 +            Preference.PreferenceItem.SwitchPreference(
 +                preference = preferences.experimental(),
 +                title = stringResource(ATMR.strings.polaris_updates_experimental),
 +                subtitle = stringResource(ATMR.strings.polaris_updates_experimental_summary),
-+                onValueChanged = {
-+                    preferences.resetChecks()
-+                    true
-+                },
 +            ),
 +            Preference.PreferenceItem.TextPreference(
 +                title = stringResource(MR.strings.check_for_updates),
@@ -20847,10 +20870,10 @@ index 0000000..fcacb2b
 +        TrackerOAuthGate(Injekt.get()).consume(uri.scheme, uri.host, state)
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/data/updater/AppUpdateChecker.kt b/app/src/main/java/eu/kanade/tachiyomi/data/updater/AppUpdateChecker.kt
-index 02b4af4..bf1be6d 100644
+index 02b4af4..548d929 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/data/updater/AppUpdateChecker.kt
 +++ b/app/src/main/java/eu/kanade/tachiyomi/data/updater/AppUpdateChecker.kt
-@@ -1,38 +1,67 @@
+@@ -1,38 +1,64 @@
  package eu.kanade.tachiyomi.data.updater
  
 +import android.os.Build
@@ -20892,12 +20915,9 @@ index 02b4af4..bf1be6d 100644
 +    suspend fun checkForUpdate(forceCheck: Boolean = false): GetApplicationRelease.Result = withIOContext {
 +        val preferences = PolarisUpdatePreferences(preferenceStore)
 +        val experimental = preferences.experimental().get()
-+        val now = System.currentTimeMillis()
-+        if (!preferences.shouldCheck(forceCheck, experimental, now)) {
++        if (!preferences.shouldCheck(forceCheck)) {
 +            return@withIOContext GetApplicationRelease.Result.NoNewUpdate
          }
-+        // Throttle attempts as well as successful checks; manual checks always bypass this timestamp.
-+        preferences.lastCheck(experimental).set(now)
 +        val client = PolarisUpdateClient(
 +            fetchPage = { page ->
 +                val url = "https://api.github.com/repos/$GITHUB_REPO/releases?per_page=100&page=$page"
@@ -21619,36 +21639,20 @@ index 0000000..af39e5a
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/data/updater/PolarisUpdatePreferences.kt b/app/src/main/java/eu/kanade/tachiyomi/data/updater/PolarisUpdatePreferences.kt
 new file mode 100644
-index 0000000..1134341
+index 0000000..0d005a6
 --- /dev/null
 +++ b/app/src/main/java/eu/kanade/tachiyomi/data/updater/PolarisUpdatePreferences.kt
-@@ -0,0 +1,27 @@
+@@ -0,0 +1,11 @@
 +package eu.kanade.tachiyomi.data.updater
 +
-+import tachiyomi.core.common.preference.Preference
 +import tachiyomi.core.common.preference.PreferenceStore
 +
 +class PolarisUpdatePreferences(store: PreferenceStore) {
 +    private val automaticPreference = store.getBoolean("polaris_check_app_updates", true)
 +    private val experimentalPreference = store.getBoolean("polaris_experimental_updates", false)
-+    private val stableCheck = store.getLong(Preference.appStateKey("polaris_app_update_check_false"), 0)
-+    private val experimentalCheck = store.getLong(Preference.appStateKey("polaris_app_update_check_true"), 0)
 +    fun automatic() = automaticPreference
 +    fun experimental() = experimentalPreference
-+    fun lastCheck(experimental: Boolean) = if (experimental) experimentalCheck else stableCheck
-+
-+    fun resetChecks() {
-+        lastCheck(false).set(0)
-+        lastCheck(true).set(0)
-+    }
-+
-+    fun shouldCheck(force: Boolean, experimental: Boolean, now: Long): Boolean =
-+        force || (automatic().get() && isDue(experimental, now))
-+
-+    fun isDue(experimental: Boolean, now: Long): Boolean {
-+        val last = lastCheck(experimental).get()
-+        return last == 0L || now < last || now - last >= 24 * 60 * 60 * 1000L
-+    }
++    fun shouldCheck(force: Boolean): Boolean = force || automatic().get()
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/extension/ExtensionManager.kt b/app/src/main/java/eu/kanade/tachiyomi/extension/ExtensionManager.kt
 index 699e074..e92613f 100644
@@ -25834,10 +25838,10 @@ index 0000000..39f91a6
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/source/selection/LibraryWorkConsolidator.kt b/app/src/main/java/eu/kanade/tachiyomi/source/selection/LibraryWorkConsolidator.kt
 new file mode 100644
-index 0000000..f134b39
+index 0000000..5f26b8f
 --- /dev/null
 +++ b/app/src/main/java/eu/kanade/tachiyomi/source/selection/LibraryWorkConsolidator.kt
-@@ -0,0 +1,138 @@
+@@ -0,0 +1,175 @@
 +package eu.kanade.tachiyomi.source.selection
 +
 +import eu.kanade.tachiyomi.source.INovelSource
@@ -25854,22 +25858,26 @@ index 0000000..f134b39
 +import tachiyomi.domain.source.model.StubSource
 +import tachiyomi.domain.source.service.SourceManager
 +
-+/** Offline metadata/numbering corroboration. Association is atomic; native records never move. */
++/** Local association with optional catalogue enrichment. Native records never move. */
 +class LibraryWorkConsolidator(
 +    private val works: LibraryWorkRepository,
 +    private val chapters: ChapterRepository,
 +    private val sources: SourceManager,
++    private val identify: suspend (Manga) -> WorkIdentity? = { null },
++    private val persistIdentity: suspend (Long, WorkIdentity) -> Boolean = { _, _ -> false },
 +) {
 +    private val lock = Mutex()
++    private val checkedTitles = mutableSetOf<String>()
 +
 +    suspend fun observe() {
 +        combine(works.subscribeFavorites(), sources.sources) { favorites, providers ->
 +                fingerprint(favorites) to providers.map { it.id to it.javaClass.name }
 +            }
 +            .distinctUntilChanged()
-+            .collectLatest {
++            .collect {
 +                try {
 +                    reconcile()
++                    if (lock.withLock { enrichIdentities(works.favorites()) }) reconcile()
 +                } catch (cancelled: CancellationException) {
 +                    throw cancelled
 +                } catch (error: Exception) {
@@ -25887,6 +25895,7 @@ index 0000000..f134b39
 +            var committed = 0
 +            repeat(2) {
 +                val favorites = works.favorites()
++                val identities = favorites.mapNotNull { WorkSources.from(it.memo).identity }.distinct()
 +                val hits =
 +                    favorites
 +                        .filter { !LibraryWork.separated(it.memo) }
@@ -25899,16 +25908,13 @@ index 0000000..f134b39
 +                                source is HttpSource && source !is INovelSource ||
 +                                    source is StubSource &&
 +                                        WorkSources.from(manga.memo).let { work ->
-+                                            work.identity != null || work.candidates.any {
++                                            identities.any { it.recognizes(manga.title, manga.author, manga.artist, manga.description) } ||
++                                                work.candidates.any {
 +                                                it.active && it.available && it.readability == "sample_passed"
 +                                            }
 +                                        },
 +                            )
 +                        }
-+                val identities =
-+                    hits
-+                        .mapNotNull { WorkSources.from(it.manga.memo).identity }
-+                        .distinctBy { it.catalogId }
 +                val groups =
 +                    WorkSearchGrouping.group(hits.filter { it.isComic }, identities = identities)
 +                var retry = false
@@ -25958,6 +25964,39 @@ index 0000000..f134b39
 +            committed
 +        }
 +
++    private suspend fun enrichIdentities(favorites: List<Manga>): Boolean {
++        // Limit remote lookups to possible duplicates. Existing catalog aliases are reused locally.
++        val eligible = favorites.filter {
++            !LibraryWork.separated(it.memo) &&
++                sources.getOrStub(it.source).let { source ->
++                    source is StubSource || source is HttpSource && source !is INovelSource
++                }
++        }
++        val creators = eligible.associateWith { WorkIdentityText.people(it.author, it.artist) }
++        val names = eligible.associateWith {
++            setOf(WorkIdentityText.title(it.title)) + WorkIdentityText.compoundTitles(it.title)
++        }
++        val byName = names.values.flatten().groupingBy { it }.eachCount()
++        val byCreator = creators.values.flatten().groupingBy { it }.eachCount()
++        val known = eligible.mapNotNull { WorkSources.from(it.memo).identity }.distinct()
++        var changed = false
++        val candidates = eligible.asSequence().filter { manga ->
++            val key = WorkIdentityText.title(manga.title)
++            key !in checkedTitles &&
++                (names.getValue(manga).any { byName.getValue(it) > 1 } ||
++                    creators.getValue(manga).any { byCreator.getValue(it) > 1 }) &&
++                known.none { it.recognizes(manga.title, manga.author, manga.artist, manga.description) }
++        }.distinctBy { WorkIdentityText.title(it.title) }.take(4).toList()
++        for (manga in candidates) {
++            val identity = identify(manga)
++            checkedTitles += WorkIdentityText.title(manga.title)
++            if (identity != null && identity.recognizes(manga.title, manga.author, manga.artist, manga.description)) {
++                if (persistIdentity(manga.id, identity)) changed = true
++            }
++        }
++        return changed
++    }
++
 +    private fun fingerprint(mangas: List<Manga>) =
 +        mangas.map { manga ->
 +            listOf(
@@ -25967,7 +26006,9 @@ index 0000000..f134b39
 +                manga.title,
 +                manga.author,
 +                manga.artist,
++                manga.description,
 +                manga.lastUpdate,
++                WorkSources.from(manga.memo).candidates.any { it.active && it.available && it.readability == "sample_passed" },
 +                WorkSources.from(manga.memo).identity,
 +                WorkSources.from(manga.memo).pinned,
 +                LibraryWork.from(manga.memo),
@@ -26061,10 +26102,10 @@ index 0000000..b135eb0
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/source/selection/SourceMatching.kt b/app/src/main/java/eu/kanade/tachiyomi/source/selection/SourceMatching.kt
 new file mode 100644
-index 0000000..706eefd
+index 0000000..67aaaa0
 --- /dev/null
 +++ b/app/src/main/java/eu/kanade/tachiyomi/source/selection/SourceMatching.kt
-@@ -0,0 +1,66 @@
+@@ -0,0 +1,70 @@
 +package eu.kanade.tachiyomi.source.selection
 +
 +import eu.kanade.tachiyomi.source.model.SManga
@@ -26097,7 +26138,7 @@ index 0000000..706eefd
 +        val names =
 +            (listOf(reference) + identity?.titles.orEmpty()).map(::title).filter { it.isNotBlank() }
 +        val other = title(candidate)
-+        if (other in names) return true
++        if (other in names || identity?.matchesTitle(candidate) == true) return true
 +        // Small spelling variation only. Translations require a corroborated catalogue alias.
 +        return names.any { known ->
 +            known.length >= 10 &&
@@ -26124,6 +26165,10 @@ index 0000000..706eefd
 +
 +    fun sameWork(reference: SManga, candidate: SManga, identity: WorkIdentity? = null): Boolean {
 +        if (!titleMatches(reference.title, candidate.title, identity)) return false
++        if (identity != null &&
++            identity.recognizes(reference.title, reference.author, reference.artist, reference.description) &&
++            identity.recognizes(candidate.title, candidate.author, candidate.artist, candidate.description)
++        ) return true
 +        val creators =
 +            people(reference.author, reference.artist) +
 +                identity?.creators.orEmpty().flatMap { people(it) }
@@ -26442,10 +26487,10 @@ index 0000000..d421506
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/source/selection/WorkIdentityResolver.kt b/app/src/main/java/eu/kanade/tachiyomi/source/selection/WorkIdentityResolver.kt
 new file mode 100644
-index 0000000..aaa0c39
+index 0000000..713057e
 --- /dev/null
 +++ b/app/src/main/java/eu/kanade/tachiyomi/source/selection/WorkIdentityResolver.kt
-@@ -0,0 +1,117 @@
+@@ -0,0 +1,116 @@
 +package eu.kanade.tachiyomi.source.selection
 +
 +import eu.kanade.tachiyomi.network.GET
@@ -26457,6 +26502,7 @@ index 0000000..aaa0c39
 +import okhttp3.HttpUrl.Companion.toHttpUrl
 +import okhttp3.OkHttpClient
 +import tachiyomi.domain.manga.model.WorkIdentity
++import tachiyomi.domain.manga.model.WorkIdentityText
 +
 +/** Public catalogue metadata; no account, LLM or executable repository is downloaded here. */
 +class WorkIdentityResolver(private val client: OkHttpClient) {
@@ -26476,7 +26522,7 @@ index 0000000..aaa0c39
 +                        "https://api.mangadex.org/manga"
 +                            .toHttpUrl()
 +                            .newBuilder()
-+                            .addQueryParameter("title", reference.title.take(200))
++                            .addQueryParameter("title", (WorkIdentityText.compoundTitles(reference.title).firstOrNull() ?: reference.title).take(200))
 +                            .addQueryParameter("limit", "10")
 +                url.addQueryParameter("includes[]", "author")
 +                    .addQueryParameter("includes[]", "artist")
@@ -26518,12 +26564,6 @@ index 0000000..aaa0c39
 +                        }
 +                        .distinct()
 +                        .take(32)
-+                if (
-+                    titles.none {
-+                        SourceMatching.title(it) == SourceMatching.title(reference.title)
-+                    }
-+                )
-+                    return@mapNotNull null
 +                val creators =
 +                    item["relationships"]
 +                        ?.jsonArray
@@ -26552,7 +26592,11 @@ index 0000000..aaa0c39
 +                    titles,
 +                    creators.distinct(),
 +                    System.currentTimeMillis(),
-+                )
++                    (attributes["description"] as? JsonObject)?.values.orEmpty()
++                        .mapNotNull { (it as? JsonPrimitive)?.contentOrNull }
++                        .mapNotNull(WorkIdentityText::synopsisKey)
++                        .toSet(),
++                ).takeIf { it.matchesTitle(reference.title) }
 +            }
 +        return matches.singleOrNull()
 +    }
@@ -26565,10 +26609,10 @@ index 0000000..aaa0c39
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/source/selection/WorkSearchGrouping.kt b/app/src/main/java/eu/kanade/tachiyomi/source/selection/WorkSearchGrouping.kt
 new file mode 100644
-index 0000000..e6e84c1
+index 0000000..4b9e4d1
 --- /dev/null
 +++ b/app/src/main/java/eu/kanade/tachiyomi/source/selection/WorkSearchGrouping.kt
-@@ -0,0 +1,149 @@
+@@ -0,0 +1,131 @@
 +package eu.kanade.tachiyomi.source.selection
 +
 +import tachiyomi.domain.manga.model.Manga
@@ -26598,21 +26642,10 @@ index 0000000..e6e84c1
 +            val creators: Set<String>,
 +            val ids: Set<String>,
 +        )
-+        data class Catalog(val id: String, val names: Set<String>, val creators: Set<String>)
-+        val catalogs =
-+            identities
-+                .filter { CATALOG_ID.matches(it.catalogId) }
-+                .map { identity ->
-+                    Catalog(
-+                        identity.catalogId,
-+                        identity.titles.map(SourceMatching::title).toSet(),
-+                        identity.creators.flatMap { SourceMatching.people(it) }.toSet(),
-+                    )
-+                }
-+        val catalogIndex = mutableMapOf<String, MutableList<Catalog>>()
-+        catalogs.forEach { catalog ->
-+            catalog.names.forEach { title ->
-+                catalogIndex.getOrPut(title) { mutableListOf() } += catalog
++        val catalogIndex = mutableMapOf<String, MutableList<WorkIdentity>>()
++        identities.forEach { identity ->
++            identity.titles.map(SourceMatching::title).forEach { title ->
++                catalogIndex.getOrPut(title) { mutableListOf() } += identity
 +            }
 +        }
 +        val signatures =
@@ -26623,15 +26656,16 @@ index 0000000..e6e84c1
 +                    val title = SourceMatching.title(manga.title)
 +                    val people = SourceMatching.people(manga.author, manga.artist)
 +                    val supported =
-+                        catalogIndex[title].orEmpty().filter { catalog ->
-+                            people.any { it in catalog.creators }
-+                        }
++                        (listOf(title) + tachiyomi.domain.manga.model.WorkIdentityText.compoundTitles(manga.title))
++                            .flatMap { catalogIndex[it].orEmpty() }
++                            .distinct()
++                            .filter { it.recognizes(manga.title, manga.author, manga.artist, manga.description) }
 +                    Signature(
-+                        (listOf(title) + supported.flatMap { it.names })
++                        (listOf(title) + supported.flatMap { it.titles.map(SourceMatching::title) })
 +                            .filter(String::isNotBlank)
 +                            .toSet(),
 +                        people,
-+                        supported.map { it.id }.toSet(),
++                        supported.map { it.catalogId }.toSet(),
 +                    )
 +                }
 +        fun compatible(a: WorkSearchHit, b: WorkSearchHit): Boolean {
@@ -26640,12 +26674,9 @@ index 0000000..e6e84c1
 +            val left = signatures.getValue(a.manga)
 +            val right = signatures.getValue(b.manga)
 +            if (left.ids.size > 1 || right.ids.size > 1) return false
-+            if (left.ids.isNotEmpty() && right.ids.isNotEmpty() && left.ids != right.ids)
-+                return false
-+            if (a.manga.source == b.manga.source && (left.ids.isEmpty() || left.ids != right.ids))
-+                return false
-+            return left.creators.any { it in right.creators } &&
-+                left.names.any { it in right.names }
++            if (left.ids.isNotEmpty() && right.ids.isNotEmpty()) return left.ids == right.ids
++            return a.manga.source != b.manga.source &&
++                left.creators.any { it in right.creators } && left.names.any { it in right.names }
 +        }
 +        val groups = mutableListOf<MutableList<WorkSearchHit>>()
 +        val titleIndex = mutableMapOf<String, MutableSet<Int>>()
@@ -26665,7 +26696,7 @@ index 0000000..e6e84c1
 +                groups[index] += hit
 +                nativeIndex[hit.manga.source to hit.manga.url] = index
 +                val signature = signatures.getValue(hit.manga)
-+                if (hit.isComic && signature.creators.isNotEmpty())
++                if (hit.isComic && (signature.creators.isNotEmpty() || signature.ids.isNotEmpty()))
 +                    signature.names.forEach { name ->
 +                        titleIndex.getOrPut(name) { mutableSetOf() } += index
 +                    }
@@ -26705,11 +26736,6 @@ index 0000000..e6e84c1
 +            .first()
 +            .manga
 +
-+    private val CATALOG_ID =
-+        Regex(
-+            "mangadex:[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}"
-+        )
-+
 +    private fun languageRank(language: String): Int =
 +        when (language.lowercase().replace('_', '-')) {
 +            "pt-br" -> 0
@@ -26719,7 +26745,7 @@ index 0000000..e6e84c1
 +        }
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/browse/BrowseTab.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/browse/BrowseTab.kt
-index c666b82..4db6156 100644
+index c666b82..d97b4b4 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/ui/browse/BrowseTab.kt
 +++ b/app/src/main/java/eu/kanade/tachiyomi/ui/browse/BrowseTab.kt
 @@ -11,6 +11,11 @@ import androidx.compose.runtime.getValue
@@ -26734,14 +26760,27 @@ index c666b82..4db6156 100644
  import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
  import cafe.adriel.voyager.navigator.tab.TabOptions
  import eu.kanade.presentation.components.TabbedScreen
-@@ -62,38 +67,35 @@ data object BrowseTab : Tab {
-         val extensionsViewModel = viewModel<ExtensionsViewModel>()
-         val extensionsState by extensionsViewModel.state.collectAsState()
+@@ -59,41 +64,33 @@ data object BrowseTab : Tab {
+     override fun Content() {
+         val context = LocalContext.current
  
+-        val extensionsViewModel = viewModel<ExtensionsViewModel>()
+-        val extensionsState by extensionsViewModel.state.collectAsState()
+-
 -        val novelsViewModel = viewModel<eu.kanade.tachiyomi.ui.browse.novel.NovelsViewModel>()
 -
+-        val tabs = listOf(
+-            sourcesTab(),
+-            extensionsTab(extensionsViewModel),
+-            novelSourcesTab(),
+-            novelsTab(novelsViewModel),
+-            migrateSourceTab(),
 +        val navigator = LocalNavigator.currentOrThrow
 +        val additionalActions = listOf(
++            AppBar.OverflowAction(
++                title = stringResource(ATMR.strings.browse_manage_sources),
++                onClick = { navigator.push(BrowseManagementScreen()) },
++            ),
 +            AppBar.OverflowAction(
 +                title = stringResource(ATMR.strings.browse_novels),
 +                onClick = { navigator.push(BrowseExtrasScreen(0)) },
@@ -26750,26 +26789,16 @@ index c666b82..4db6156 100644
 +                title = stringResource(MR.strings.label_migration),
 +                onClick = { navigator.push(BrowseExtrasScreen(2)) },
 +            ),
-+        )
-         val tabs = listOf(
-+            extensionsTab(extensionsViewModel, installed = true),
-             sourcesTab(),
--            extensionsTab(extensionsViewModel),
--            novelSourcesTab(),
--            novelsTab(novelsViewModel),
--            migrateSourceTab(),
--        )
-+            extensionsTab(extensionsViewModel, installed = false),
-+        ).map { it.copy(actions = it.actions + additionalActions) }
- 
-         val state = rememberPagerState { tabs.size }
+         )
+-
+-        val state = rememberPagerState { tabs.size }
 -        val novelSearchQuery by novelsViewModel.searchQuery.collectAsState()
- 
+-
++        val sources = sourcesTab()
          TabbedScreen(
 -            titleRes = MR.strings.browse,
-+            titleRes = MR.strings.label_sources,
-             tabs = tabs,
-             state = state,
+-            tabs = tabs,
+-            state = state,
 -            searchQuery = when (state.currentPage) {
 -                1 -> extensionsState.searchQuery
 -                3 -> novelSearchQuery
@@ -26781,21 +26810,46 @@ index c666b82..4db6156 100644
 -                    3 -> novelsViewModel.search(query)
 -                }
 -            },
-+            searchQuery = extensionsState.searchQuery,
-+            onChangeSearchQuery = extensionsViewModel::search,
++            titleRes = MR.strings.label_sources,
++            tabs = listOf(sources.copy(actions = sources.actions + additionalActions)),
          )
          LaunchedEffect(Unit) {
              switchToExtensionTabChannel.receiveAsFlow()
 -                .collectLatest { state.scrollToPage(1) }
-+                .collectLatest { state.scrollToPage(0) }
++                .collectLatest {
++                    if (navigator.lastItem !is BrowseManagementScreen) {
++                        navigator.push(BrowseManagementScreen())
++                    }
++                }
          }
  
          LaunchedEffect(Unit) {
-@@ -101,3 +103,22 @@ data object BrowseTab : Tab {
+@@ -101,3 +98,43 @@ data object BrowseTab : Tab {
          }
      }
  }
 +
++
++private class BrowseManagementScreen : Screen() {
++    @Composable
++    override fun Content() {
++        val navigator = LocalNavigator.currentOrThrow
++        val extensions = viewModel<ExtensionsViewModel>()
++        val state by extensions.state.collectAsState()
++        val tabs = listOf(
++            extensionsTab(extensions, installed = true),
++            sourcesTab(internalOnly = true),
++            extensionsTab(extensions, installed = false),
++        )
++        TabbedScreen(
++            titleRes = ATMR.strings.browse_manage_sources,
++            tabs = tabs,
++            searchQuery = state.searchQuery,
++            onChangeSearchQuery = extensions::search,
++            navigateUp = { navigator.pop() },
++        )
++    }
++}
 +
 +private data class BrowseExtrasScreen(val initialPage: Int) : Screen() {
 +    @Composable
@@ -27496,10 +27550,10 @@ index 9fc8ef9..5bcbb2c 100644
                                  }
                              },
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/browse/source/SourcesTab.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/browse/source/SourcesTab.kt
-index 13cea08..f067a98 100644
+index 13cea08..8c691c4 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/ui/browse/source/SourcesTab.kt
 +++ b/app/src/main/java/eu/kanade/tachiyomi/ui/browse/source/SourcesTab.kt
-@@ -20,6 +20,9 @@ import eu.kanade.tachiyomi.ui.browse.source.globalsearch.GlobalSearchScreen
+@@ -20,16 +20,19 @@ import eu.kanade.tachiyomi.ui.browse.source.globalsearch.GlobalSearchScreen
  import kotlinx.coroutines.flow.collectLatest
  import kotlinx.coroutines.launch
  import tachiyomi.i18n.MR
@@ -27509,21 +27563,26 @@ index 13cea08..f067a98 100644
  import tachiyomi.presentation.core.i18n.stringResource
  
  @Composable
-@@ -29,7 +32,7 @@ fun Screen.sourcesTab(): TabContent {
+-fun Screen.sourcesTab(): TabContent {
++fun Screen.sourcesTab(internalOnly: Boolean = false): TabContent {
+     val navigator = LocalNavigator.currentOrThrow
+     val viewModel = viewModel<SourcesViewModel>()
      val state by viewModel.state.collectAsState()
  
      return TabContent(
 -        titleRes = MR.strings.label_sources,
-+        titleRes = ATMR.strings.browse_internal_sources,
++        titleRes = if (internalOnly) ATMR.strings.browse_internal_sources else MR.strings.label_sources,
          actions = listOf(
              AppBar.Action(
                  title = stringResource(MR.strings.action_global_search),
-@@ -44,7 +47,7 @@ fun Screen.sourcesTab(): TabContent {
+@@ -44,7 +47,9 @@ fun Screen.sourcesTab(): TabContent {
          ),
          content = { contentPadding, snackbarHostState ->
              SourcesScreen(
 -                state = state,
-+                state = state.copy(items = state.items.filterIsInstance<SourceUiModel.Item>().filter { it.source.isLocal() }),
++                state = if (internalOnly) {
++                    state.copy(items = state.items.filterIsInstance<SourceUiModel.Item>().filter { it.source.isLocal() })
++                } else state,
                  contentPadding = contentPadding,
                  onClickItem = { source, listing ->
                      navigator.push(BrowseSourceScreen(source.id, listing.query))
@@ -31236,10 +31295,29 @@ index a52f2fb..04e7bc8 100644
          }
      }
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/main/MainActivity.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/main/MainActivity.kt
-index ffdfc30..503db88 100644
+index ffdfc30..0e3a3bc 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/ui/main/MainActivity.kt
 +++ b/app/src/main/java/eu/kanade/tachiyomi/ui/main/MainActivity.kt
-@@ -318,6 +318,8 @@ class MainActivity : BaseActivity() {
+@@ -82,6 +82,10 @@ import eu.kanade.tachiyomi.data.cache.ChapterCache
+ import eu.kanade.tachiyomi.data.download.DownloadCache
+ import eu.kanade.tachiyomi.data.notification.NotificationReceiver
+ import eu.kanade.tachiyomi.data.updater.AppUpdateChecker
++import androidx.lifecycle.ViewModel
++import androidx.lifecycle.ViewModelProvider
++import androidx.lifecycle.viewModelScope
++import kotlinx.coroutines.async
+ import eu.kanade.tachiyomi.extension.api.ExtensionApi
+ import eu.kanade.tachiyomi.ui.base.activity.BaseActivity
+ import eu.kanade.tachiyomi.ui.browse.source.browse.BrowseSourceScreen
+@@ -311,16 +315,20 @@ class MainActivity : BaseActivity() {
+         LaunchedEffect(Unit) {
+             if (updaterEnabled) {
+                 try {
+-                    val result = AppUpdateChecker().checkForUpdate()
++                    val result = ViewModelProvider(this@MainActivity)[LaunchUpdateViewModel::class.java].takeResult()
+                     if (result is GetApplicationRelease.Result.NewUpdate) {
+                         val updateScreen = NewUpdateScreen(
+                             versionName = result.release.version,
                              changelogInfo = result.release.info,
                              releaseLink = result.release.releaseLink,
                              downloadLink = result.release.downloadLink,
@@ -31248,6 +31326,32 @@ index ffdfc30..503db88 100644
                          )
                          navigator.push(updateScreen)
                      }
++                } catch (cancelled: kotlinx.coroutines.CancellationException) {
++                    throw cancelled
+                 } catch (e: Exception) {
+                     logcat(LogPriority.ERROR, e)
+                 }
+@@ -605,3 +613,20 @@ class MainActivity : BaseActivity() {
+ private const val SPLASH_MIN_DURATION = 500 // ms
+ private const val SPLASH_MAX_DURATION = 5000 // ms
+ private const val SPLASH_EXIT_ANIM_DURATION = 400L // ms
++
++
++// Retained across configuration changes. A new launcher activity gets a new check.
++internal class LaunchUpdateViewModel(
++    private val fetchUpdate: suspend () -> GetApplicationRelease.Result = { AppUpdateChecker().checkForUpdate() },
++) : ViewModel() {
++    private val check by lazy { viewModelScope.async { fetchUpdate() } }
++    private var delivered = false
++
++    suspend fun takeResult(): GetApplicationRelease.Result? {
++        if (delivered) return null
++        val result = check.await()
++        if (delivered) return null
++        delivered = true
++        return result
++    }
++}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/manga/MangaScreen.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/manga/MangaScreen.kt
 index a7c9284..6f9d1ca 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/ui/manga/MangaScreen.kt
@@ -67602,12 +67706,21 @@ index 0000000..873739c
 +}
 diff --git a/app/src/test/java/eu/kanade/tachiyomi/data/updater/PolarisUpdatePreferencesTest.kt b/app/src/test/java/eu/kanade/tachiyomi/data/updater/PolarisUpdatePreferencesTest.kt
 new file mode 100644
-index 0000000..52defe4
+index 0000000..136c86d
 --- /dev/null
 +++ b/app/src/test/java/eu/kanade/tachiyomi/data/updater/PolarisUpdatePreferencesTest.kt
-@@ -0,0 +1,40 @@
+@@ -0,0 +1,51 @@
 +package eu.kanade.tachiyomi.data.updater
 +
++import eu.kanade.tachiyomi.ui.main.LaunchUpdateViewModel
++import kotlinx.coroutines.Dispatchers
++import kotlinx.coroutines.test.StandardTestDispatcher
++import kotlinx.coroutines.test.resetMain
++import kotlinx.coroutines.test.runTest
++import kotlinx.coroutines.test.setMain
++import org.junit.jupiter.api.Assertions.assertEquals
++import org.junit.jupiter.api.Assertions.assertNull
++import tachiyomi.domain.release.interactor.GetApplicationRelease
 +import org.junit.jupiter.api.Assertions.assertFalse
 +import org.junit.jupiter.api.Assertions.assertTrue
 +import org.junit.jupiter.api.Test
@@ -67622,28 +67735,30 @@ index 0000000..52defe4
 +    }
 +
 +    @Test
-+    fun `check intervals are independent by channel and handle clock rollback`() {
++    fun `successive launches can check and manual checks bypass disabled automation`() {
 +        val preferences = PolarisUpdatePreferences(InMemoryPreferenceStore())
-+        val now = 5 * 24 * 60 * 60 * 1000L
-+        preferences.lastCheck(false).set(now)
-+        assertFalse(preferences.isDue(false, now + 1000))
-+        assertTrue(preferences.isDue(true, now + 1000))
-+        assertTrue(preferences.isDue(false, now - 1))
-+        assertTrue(preferences.isDue(false, now + 24 * 60 * 60 * 1000L))
-+        preferences.resetChecks()
-+        assertTrue(preferences.isDue(false, now + 1000))
-+    }
-+
-+    @Test
-+    fun `manual checks bypass disabled automation and the daily interval`() {
-+        val preferences = PolarisUpdatePreferences(InMemoryPreferenceStore())
-+        val now = 123_456L
-+        preferences.lastCheck(false).set(now)
-+        assertFalse(preferences.shouldCheck(false, false, now))
-+        assertTrue(preferences.shouldCheck(true, false, now))
++        repeat(2) { assertTrue(preferences.shouldCheck(false)) }
 +        preferences.automatic().set(false)
-+        assertFalse(preferences.shouldCheck(false, true, now))
-+        assertTrue(preferences.shouldCheck(true, true, now))
++        assertFalse(preferences.shouldCheck(false))
++        assertTrue(preferences.shouldCheck(true))
++    }
++    @Test
++    fun `retained launcher delivers once and a new launcher checks again`() = runTest {
++        Dispatchers.setMain(StandardTestDispatcher(testScheduler))
++        try {
++            var checks = 0
++            fun launcher() = LaunchUpdateViewModel {
++                checks++
++                GetApplicationRelease.Result.NoNewUpdate
++            }
++            val active = launcher()
++            assertEquals(GetApplicationRelease.Result.NoNewUpdate, active.takeResult())
++            assertNull(active.takeResult())
++            assertEquals(GetApplicationRelease.Result.NoNewUpdate, launcher().takeResult())
++            assertEquals(2, checks)
++        } finally {
++            Dispatchers.resetMain()
++        }
 +    }
 +}
 diff --git a/app/src/test/java/eu/kanade/tachiyomi/extension/ExtensionRiskAcknowledgementTest.kt b/app/src/test/java/eu/kanade/tachiyomi/extension/ExtensionRiskAcknowledgementTest.kt
@@ -70785,10 +70900,10 @@ index 0000000..4e7e2f9
 +}
 diff --git a/app/src/test/java/eu/kanade/tachiyomi/source/selection/LibraryWorkConsolidatorTest.kt b/app/src/test/java/eu/kanade/tachiyomi/source/selection/LibraryWorkConsolidatorTest.kt
 new file mode 100644
-index 0000000..58c4ae0
+index 0000000..00f6a4e
 --- /dev/null
 +++ b/app/src/test/java/eu/kanade/tachiyomi/source/selection/LibraryWorkConsolidatorTest.kt
-@@ -0,0 +1,236 @@
+@@ -0,0 +1,271 @@
 +package eu.kanade.tachiyomi.source.selection
 +
 +import eu.kanade.tachiyomi.source.*
@@ -70893,6 +71008,41 @@ index 0000000..58c4ae0
 +                    Manager(initial.filterNot { it.source in unavailable }.map { Provider(it.source, if (it.id == 1L) "pt-BR" else "en") }),
 +                )
 +        }
++    }
++
++    @Test
++    fun `confirmed bilingual titles and matching synopsis group an old edition without authorship or chapters`() = runTest {
++        val en = "The Beginning After the End"
++        val pt = "O Começo Depois do Fim"
++        val synopsis = "After losing everything he had conquered in his previous life, a king awakens in another world and must learn to protect his new family."
++        val identity = WorkIdentity(
++            "mangadex:58223ca1-9897-4d19-b72f-9e147ccab8f3",
++            listOf(en, pt),
++            listOf("TurtleMe"),
++            1,
++            setOf(requireNotNull(WorkIdentityText.synopsisKey(synopsis))),
++        )
++        val main = manga(1, en, "TurtleMe").let { it.copy(memo = WorkSources(identity = identity).attach(it.memo)) }
++        val restored = manga(2, "$en ($pt)", null).copy(description = synopsis)
++        val f = Fixture(listOf(main, restored), unavailable = setOf(2L))
++        coEvery { f.chapters.getChapterByMangaId(2, any()) } returns emptyList()
++        assertEquals(1, f.service.reconcile())
++        assertTrue(LibraryWork.compatible(f.saved))
++        assertEquals(setOf(1L, 2L), f.saved.map { it.id }.toSet())
++    }
++
++    @Test
++    fun `matching synopsis does not associate a contradictory creator or series qualifier`() {
++        val title = "The Beginning After the End"
++        val synopsis = "After losing everything he had conquered in his previous life, a king awakens in another world and must learn to protect his new family."
++        val identity = WorkIdentity(
++            "mangadex:58223ca1-9897-4d19-b72f-9e147ccab8f3",
++            listOf(title), listOf("TurtleMe"), 1,
++            setOf(requireNotNull(WorkIdentityText.synopsisKey(synopsis))),
++        )
++        assertFalse(identity.recognizes(title, "Different creator", null, synopsis))
++        assertFalse(identity.recognizes("$title (Remake)", null, null, synopsis))
++        assertTrue(identity.recognizes(title, null, null, synopsis))
 +    }
 +
 +    @Test
@@ -81241,10 +81391,10 @@ index 0000000..90b949a
 +}
 diff --git a/domain/src/main/java/tachiyomi/domain/chapter/model/ChapterNumbering.kt b/domain/src/main/java/tachiyomi/domain/chapter/model/ChapterNumbering.kt
 new file mode 100644
-index 0000000..2015d72
+index 0000000..5dbb16c
 --- /dev/null
 +++ b/domain/src/main/java/tachiyomi/domain/chapter/model/ChapterNumbering.kt
-@@ -0,0 +1,70 @@
+@@ -0,0 +1,72 @@
 +package tachiyomi.domain.chapter.model
 +
 +import java.math.BigDecimal
@@ -81310,7 +81460,9 @@ index 0000000..2015d72
 +        val profiles = chapters.map(::Profile)
 +        return profiles.indices.all { a ->
 +            profiles.indices.all { b ->
-+                a == b || compatible(profiles[a], profiles[b], corroborated)
++                a == b ||
++                    corroborated && (profiles[a].empty || profiles[b].empty) ||
++                    compatible(profiles[a], profiles[b], corroborated)
 +            }
 +        }
 +    }
@@ -82046,10 +82198,10 @@ index 9713e54..230dd1f 100644
  }
 diff --git a/domain/src/main/java/tachiyomi/domain/manga/model/LibraryWork.kt b/domain/src/main/java/tachiyomi/domain/manga/model/LibraryWork.kt
 new file mode 100644
-index 0000000..81cc601
+index 0000000..bdcef3c
 --- /dev/null
 +++ b/domain/src/main/java/tachiyomi/domain/manga/model/LibraryWork.kt
-@@ -0,0 +1,133 @@
+@@ -0,0 +1,111 @@
 +package tachiyomi.domain.manga.model
 +
 +import kotlinx.serialization.Serializable
@@ -82110,51 +82262,29 @@ index 0000000..81cc601
 +
 +        private fun people(vararg values: String?) = WorkIdentityText.people(*values)
 +
-+        private val catalogId =
-+            Regex(
-+                "mangadex:[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}"
-+            )
-+
 +        fun sharedIdentity(members: List<Manga>): Boolean =
-+            members
-+                .flatMap { listOfNotNull(WorkSources.from(it.memo).identity) }
-+                .any { identity ->
-+                    identity.catalogId.matches(catalogId) &&
-+                        members.all { member ->
-+                            normalized(member.title) in identity.titles.map(::normalized) &&
-+                                people(member.author, member.artist)
-+                                    .intersect(identity.creators.flatMap { people(it) }.toSet())
-+                                    .isNotEmpty()
-+                        }
-+                }
++            identityIds(members).let { ids -> ids.isNotEmpty() && ids.first().size == 1 && ids.all { it == ids.first() } }
++
++        private fun identityIds(members: List<Manga>): List<Set<String>> {
++            val identities = members.mapNotNull { WorkSources.from(it.memo).identity }
++            return members.map { member ->
++                identities.filter { it.recognizes(member.title, member.author, member.artist, member.description) }
++                    .mapTo(mutableSetOf()) { it.catalogId }
++            }
++        }
 +
 +        fun compatible(members: List<Manga>): Boolean {
-+            val identities = members.mapNotNull { WorkSources.from(it.memo).identity }
 +            val names = members.map { normalized(it.title) }
 +            val creators = members.map { people(it.author, it.artist) }
-+            val ids =
-+                members.indices.map { index ->
-+                    identities
-+                        .filter { identity ->
-+                            identity.catalogId.matches(catalogId) &&
-+                                names[index] in identity.titles.map(::normalized) &&
-+                                creators[index]
-+                                    .intersect(identity.creators.flatMap { people(it) }.toSet())
-+                                    .isNotEmpty()
-+                        }
-+                        .map { it.catalogId }
-+                        .toSet()
-+                }
++            val ids = identityIds(members)
 +            return members.indices.all { a ->
 +                members.indices.all { b ->
-+                    a == b ||
-+                        ids[a].size <= 1 &&
-+                            ids[b].size <= 1 &&
-+                            creators[a].intersect(creators[b]).isNotEmpty() &&
-+                            (ids[a].isEmpty() || ids[b].isEmpty() || ids[a] == ids[b]) &&
-+                            (names[a] == names[b] || ids[a].intersect(ids[b]).isNotEmpty()) &&
-+                            (members[a].source != members[b].source ||
-+                                ids[a].intersect(ids[b]).isNotEmpty())
++                    a == b || ids[a].size <= 1 && ids[b].size <= 1 &&
++                        when {
++                            ids[a].isNotEmpty() && ids[b].isNotEmpty() -> ids[a] == ids[b]
++                            else -> members[a].source != members[b].source && names[a] == names[b] &&
++                                creators[a].any { it in creators[b] }
++                        }
 +                }
 +            }
 +        }
@@ -82204,10 +82334,10 @@ index d2ca3b1..671c751 100644
          lastModified = coverLastModified,
 diff --git a/domain/src/main/java/tachiyomi/domain/manga/model/WorkIdentity.kt b/domain/src/main/java/tachiyomi/domain/manga/model/WorkIdentity.kt
 new file mode 100644
-index 0000000..8867b29
+index 0000000..35da8af
 --- /dev/null
 +++ b/domain/src/main/java/tachiyomi/domain/manga/model/WorkIdentity.kt
-@@ -0,0 +1,12 @@
+@@ -0,0 +1,33 @@
 +package tachiyomi.domain.manga.model
 +
 +import kotlinx.serialization.Serializable
@@ -82219,15 +82349,37 @@ index 0000000..8867b29
 +    val titles: List<String>,
 +    val creators: List<String>,
 +    val checkedAt: Long,
-+)
++    val synopsisKeys: Set<String> = emptySet(),
++) {
++    fun matchesTitle(title: String): Boolean {
++        val aliases = titles.map(WorkIdentityText::title).toSet()
++        return WorkIdentityText.title(title) in aliases ||
++            WorkIdentityText.compoundTitles(title).let { it.size == 2 && aliases.containsAll(it) }
++    }
++
++    fun recognizes(title: String, author: String?, artist: String?, synopsis: String?): Boolean {
++        if (!CATALOG_ID.matches(catalogId) || !matchesTitle(title)) return false
++        val people = WorkIdentityText.people(author, artist)
++        if (people.isNotEmpty()) {
++            return creators.any { creator -> WorkIdentityText.people(creator).any { it in people } }
++        }
++        return WorkIdentityText.synopsisKey(synopsis)?.let { it in synopsisKeys } == true
++    }
++
++    companion object {
++        private val CATALOG_ID =
++            Regex("mangadex:[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}")
++    }
++}
 diff --git a/domain/src/main/java/tachiyomi/domain/manga/model/WorkIdentityText.kt b/domain/src/main/java/tachiyomi/domain/manga/model/WorkIdentityText.kt
 new file mode 100644
-index 0000000..84cd5ad
+index 0000000..21174dd
 --- /dev/null
 +++ b/domain/src/main/java/tachiyomi/domain/manga/model/WorkIdentityText.kt
-@@ -0,0 +1,50 @@
+@@ -0,0 +1,64 @@
 +package tachiyomi.domain.manga.model
 +
++import java.security.MessageDigest
 +import tachiyomi.domain.chapter.model.ChapterVersions
 +
 +/** Shared conservative text normalization for discovery and persisted work associations. */
@@ -82242,6 +82394,19 @@ index 0000000..84cd5ad
 +            )
 +            .replace(Regex("[^\\p{L}\\p{N}]+"), " ")
 +            .trim()
++
++    fun compoundTitles(value: String): List<String> =
++        Regex("^(.{3,300}?)\\s*\\((.{3,300})\\)\\s*$")
++            .matchEntire(value)
++            ?.groupValues?.drop(1)?.map(::title).orEmpty()
++
++    /** Exact, substantial synopsis evidence, independent of punctuation and HTML tags. */
++    fun synopsisKey(value: String?): String? {
++        val text = title(value.orEmpty().take(4000).replace(Regex("<[^>]+>"), " "))
++        if (text.length < 120 || text.split(' ').distinct().size < 18) return null
++        return MessageDigest.getInstance("SHA-256").digest(text.toByteArray())
++            .joinToString("") { "%02x".format(it) }
++    }
 +
 +    fun people(vararg values: String?): Set<String> =
 +        values
@@ -83025,7 +83190,7 @@ index 9839272..0ac8bdd 100644
 \ No newline at end of file
 +voyager = ["voyager-navigator", "voyager-tabNavigator", "voyager-transitions"]
 diff --git a/i18n-at/src/commonMain/moko-resources/base/strings.xml b/i18n-at/src/commonMain/moko-resources/base/strings.xml
-index 7ed4795..c35050a 100644
+index 7ed4795..b8a3fb5 100644
 --- a/i18n-at/src/commonMain/moko-resources/base/strings.xml
 +++ b/i18n-at/src/commonMain/moko-resources/base/strings.xml
 @@ -10,7 +10,7 @@
@@ -83037,7 +83202,7 @@ index 7ed4795..c35050a 100644
      <string name="pref_group_setup">Translation Setup</string>
      <string name="pref_translate_from">Translate From</string>
      <string name="pref_translate_to">Translate To</string>
-@@ -73,12 +73,326 @@
+@@ -73,12 +73,327 @@
      <string name="repository_add_error">Could not add this repository. Check your connection and try again.</string>
      <string name="repository_refresh_error">Repository added, but extension listings could not be refreshed. Refresh the Extensions screen.</string>
      <string name="chapter_group_version">Group/version: %1$s</string>
@@ -83146,7 +83311,7 @@ index 7ed4795..c35050a 100644
 +    <string name="polaris_updates_title">Application updates</string>
 +    <string name="polaris_updates_channel_hint">Stable releases and optional experimental updates.</string>
 +    <string name="polaris_updates_automatic">Check for updates automatically</string>
-+    <string name="polaris_updates_automatic_summary">Checks GitHub when opening the app, at most once a day per channel. Only notifies: downloading and installing require your choice.</string>
++    <string name="polaris_updates_automatic_summary">Checks GitHub once each time the app starts. Downloading and installing require your choice.</string>
 +    <string name="polaris_updates_experimental">Receive experimental updates</string>
 +    <string name="polaris_updates_experimental_summary">Includes published beta and other prerelease versions. They may contain bugs. Off by default; switching off never downgrades or uninstalls the current version.</string>
 +    <string name="polaris_updates_check_hint">Check now using your experimental release preference.</string>
@@ -83365,9 +83530,10 @@ index 7ed4795..c35050a 100644
 +    <string name="browse_active_extensions">Extension sources</string>
 +    <string name="browse_novels">Light novels</string>
 +    <string name="preparation_default_filters">English and Portuguese · Adult sources hidden</string>
++    <string name="browse_manage_sources">Manage sources</string>
  </resources>
 diff --git a/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml b/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
-index d1748bc..aa12ae3 100644
+index d1748bc..e012472 100644
 --- a/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
 +++ b/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
 @@ -10,7 +10,7 @@
@@ -83379,7 +83545,7 @@ index d1748bc..aa12ae3 100644
      <string name="pref_group_setup">Configuração da tradução</string>
      <string name="pref_translate_from">Traduzir de</string>
      <string name="pref_translate_to">Traduzir para</string>
-@@ -73,12 +73,326 @@
+@@ -73,12 +73,327 @@
      <string name="repository_add_error">Não foi possível adicionar o repositório. Confira a conexão e tente novamente.</string>
      <string name="repository_refresh_error">Repositório adicionado, mas não foi possível atualizar as extensões. Atualize a tela Extensões.</string>
      <string name="chapter_group_version">Grupo/versão: %1$s</string>
@@ -83488,7 +83654,7 @@ index d1748bc..aa12ae3 100644
 +    <string name="polaris_updates_title">Atualizações do aplicativo</string>
 +    <string name="polaris_updates_channel_hint">Versões estáveis e opção de receber versões experimentais.</string>
 +    <string name="polaris_updates_automatic">Buscar atualizações automaticamente</string>
-+    <string name="polaris_updates_automatic_summary">Consulta o GitHub ao abrir o app, no máximo uma vez por dia por canal. Apenas avisa: baixar e instalar dependem da sua escolha.</string>
++    <string name="polaris_updates_automatic_summary">Consulta o GitHub uma vez a cada abertura do app. Você escolhe se quer baixar e instalar.</string>
 +    <string name="polaris_updates_experimental">Receber atualizações experimentais</string>
 +    <string name="polaris_updates_experimental_summary">Inclui versões beta e outras prévias publicadas. Podem conter falhas. Desativada por padrão; não faz downgrade nem desinstala a versão atual ao desligar.</string>
 +    <string name="polaris_updates_check_hint">Verifica agora, respeitando sua escolha de versões experimentais.</string>
@@ -83707,6 +83873,7 @@ index d1748bc..aa12ae3 100644
 +    <string name="browse_active_extensions">Fontes de extensões</string>
 +    <string name="browse_novels">Light novels</string>
 +    <string name="preparation_default_filters">Português e inglês · Fontes adultas ocultas</string>
++    <string name="browse_manage_sources">Gerenciar fontes</string>
  </resources>
 diff --git a/i18n/src/commonMain/moko-resources/base/strings.xml b/i18n/src/commonMain/moko-resources/base/strings.xml
 index c0832ba..ebf8f48 100644
