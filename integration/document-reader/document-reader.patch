@@ -25063,10 +25063,10 @@ index 0000000..7c3c569
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalog.kt b/app/src/main/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalog.kt
 new file mode 100644
-index 0000000..2eaf32c
+index 0000000..a0753c0
 --- /dev/null
 +++ b/app/src/main/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalog.kt
-@@ -0,0 +1,629 @@
+@@ -0,0 +1,660 @@
 +package eu.kanade.tachiyomi.source.selection
 +
 +import eu.kanade.domain.chapter.model.toRemoteSChapter
@@ -25085,6 +25085,7 @@ index 0000000..2eaf32c
 +import kotlinx.coroutines.CancellationException
 +import kotlinx.coroutines.flow.asFlow
 +import kotlinx.coroutines.flow.buffer
++import kotlinx.coroutines.flow.firstOrNull
 +import kotlinx.coroutines.flow.flatMapMerge
 +import kotlinx.coroutines.flow.flow
 +import kotlinx.coroutines.sync.Mutex
@@ -25190,6 +25191,8 @@ index 0000000..2eaf32c
 +        fetchChapters: Boolean,
 +        allowDiscovery: Boolean,
 +        recoverOnly: Boolean = false,
++        foreground: Boolean = false,
++        requestedChapter: ChapterVersions.Key? = null,
 +    ): SMangaUpdate? {
 +        if (!fetchChapters || manga.source == MERGED_SOURCE_ID || source is INovelSource)
 +            return null
@@ -25231,6 +25234,9 @@ index 0000000..2eaf32c
 +                                root,
 +                                fetchDetails || discover || binding.key != root.key,
 +                                provider,
++                                thumbnail = manga.thumbnailUrl.takeIf {
++                                    binding.key == root.key && settings.coverSourceId == null
++                                },
 +                            ),
 +                        )
 +                    } ?: Outcome(binding, null, timedOut = true)
@@ -25391,7 +25397,14 @@ index 0000000..2eaf32c
 +                            result.artist,
 +                            cleanMemo(result.memo),
 +                        )
-+                    Outcome(binding, load(binding, existing, root, false, provider))
++                    Outcome(
++                        binding,
++                        load(
++                            binding, existing, root, false, provider,
++                            resolvedDetails = result,
++                            thumbnail = match.thumbnail_url,
++                        ),
++                    )
 +                } ?: Outcome(null, null, timedOut = true)
 +            } catch (error: CancellationException) {
 +                throw error
@@ -25422,7 +25435,7 @@ index 0000000..2eaf32c
 +                    flow {
 +                        val prepared =
 +                            withTimeoutOrNull(PROVIDER_PIPELINE_TIMEOUT) {
-+                                providerConcurrency.withPermit { prepare(loadSafely(binding)) }
++                                providerConcurrency.withPermit(priority = foreground) { prepare(loadSafely(binding)) }
 +                            } ?: Prepared(Outcome(binding, null, timedOut = true), null)
 +                        emit(prepared)
 +                    }
@@ -25439,8 +25452,18 @@ index 0000000..2eaf32c
 +                        .mapTo(hashSetOf()) { it.binding.sourceId }
 +                // Budget includes waiting for the app-wide alternative-provider slots.
 +                // No work owns the whole discovery queue while other works wait.
-+                val completed =
-+                    withTimeoutOrNull(DISCOVERY_TIMEOUT) {
++                fun hasUsableAlternative(): Boolean = catalogs.any { catalog ->
++                    catalog.binding.key != root.key && catalog.binding.readability == "sample_passed" &&
++                        if (requestedChapter != null) {
++                            catalog.chapters.any { ChapterVersions.key(asChapter(it)) == requestedChapter }
++                        } else {
++                            foreground && rootCatalog?.chapters.isNullOrEmpty() && !catalog.manga.thumbnail_url.isNullOrBlank()
++                        }
++                }
++                val stoppedEarly =
++                    if (hasUsableAlternative()) {
++                        true
++                    } else withTimeoutOrNull(DISCOVERY_TIMEOUT) {
 +                        enabled
 +                            .filter { it.id != manga.source && it.id !in refreshed }
 +                            .asFlow()
@@ -25448,7 +25471,7 @@ index 0000000..2eaf32c
 +                                flow {
 +                                    val prepared =
 +                                        withTimeoutOrNull(PROVIDER_PIPELINE_TIMEOUT) {
-+                                            providerConcurrency.withPermit {
++                                            providerConcurrency.withPermit(priority = foreground) {
 +                                                prepare(search(provider, alreadyKnown))
 +                                            }
 +                                        } ?: Prepared(Outcome(null, null, timedOut = true), null)
@@ -25456,10 +25479,12 @@ index 0000000..2eaf32c
 +                                }
 +                            }
 +                            .buffer(PARALLEL_PROVIDERS)
-+                            .collect(::collect)
-+                        true
++                            .firstOrNull { prepared ->
++                                collect(prepared)
++                                hasUsableAlternative()
++                            } != null
 +                    }
-+                if (completed != true) incomplete = true
++                if (stoppedEarly != false) incomplete = true
 +            }
 +        }
 +        if (pinned == null) {
@@ -25587,14 +25612,17 @@ index 0000000..2eaf32c
 +        root: WorkSource,
 +        details: Boolean,
 +        provider: HttpSource,
++        resolvedDetails: SManga? = null,
++        thumbnail: String? = null,
 +    ): Catalog {
 +        val request =
-+            SManga.create().also {
++            (resolvedDetails?.copy() ?: SManga.create()).also {
 +                it.url = binding.url
 +                it.title = binding.title
 +                it.author = binding.author
 +                it.artist = binding.artist
 +                it.memo = binding.sourceMemo
++                if (it.thumbnail_url.isNullOrBlank()) it.thumbnail_url = thumbnail
 +            }
 +        val previous =
 +            existing
@@ -25608,6 +25636,9 @@ index 0000000..2eaf32c
 +                }
 +                .map { it.toRemoteSChapter() }
 +        val update = provider.getMangaUpdate(request, previous, details, true)
++        if (update.manga.thumbnail_url.isNullOrBlank()) {
++            update.manga.thumbnail_url = request.thumbnail_url
++        }
 +        check(update.chapters.size <= MAX_CHAPTERS_PER_CATALOG) {
 +            "Catálogo excede o limite de comparação automática"
 +        }
@@ -25698,10 +25729,10 @@ index 0000000..2eaf32c
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/source/selection/ChapterLoadFallback.kt b/app/src/main/java/eu/kanade/tachiyomi/source/selection/ChapterLoadFallback.kt
 new file mode 100644
-index 0000000..bc465af
+index 0000000..39f91a6
 --- /dev/null
 +++ b/app/src/main/java/eu/kanade/tachiyomi/source/selection/ChapterLoadFallback.kt
-@@ -0,0 +1,64 @@
+@@ -0,0 +1,70 @@
 +package eu.kanade.tachiyomi.source.selection
 +
 +import kotlinx.coroutines.CancellationException
@@ -25736,11 +25767,12 @@ index 0000000..bc465af
 +            .distinctBy { it.id }
 +            .take(3)
 +
-+    suspend fun <T> load(
++    suspend fun <T : Any> load(
 +        requested: T,
 +        alternatives: suspend () -> List<T>,
 +        fetch: suspend (T) -> Unit,
 +        discard: (T) -> Unit,
++        discoverAlternatives: (suspend () -> List<T>)? = null,
 +    ): T {
 +        val firstError =
 +            try {
@@ -25752,18 +25784,23 @@ index 0000000..bc465af
 +                discard(requested)
 +                error
 +            }
-+        for (candidate in alternatives().take(3)) {
-+            try {
-+                fetch(candidate)
-+                return candidate
-+            } catch (cancelled: CancellationException) {
-+                discard(candidate)
-+                throw cancelled
-+            } catch (_: Exception) {
-+                discard(candidate)
++        suspend fun tryCandidates(candidates: List<T>): T? {
++            for (candidate in candidates.take(3)) {
++                try {
++                    fetch(candidate)
++                    return candidate
++                } catch (cancelled: CancellationException) {
++                    discard(candidate)
++                    throw cancelled
++                } catch (_: Exception) {
++                    discard(candidate)
++                }
 +            }
++            return null
 +        }
-+        throw firstError
++        return tryCandidates(alternatives())
++            ?: discoverAlternatives?.let { tryCandidates(it()) }
++            ?: throw firstError
 +    }
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/source/selection/LibraryWorkConsolidator.kt b/app/src/main/java/eu/kanade/tachiyomi/source/selection/LibraryWorkConsolidator.kt
@@ -25912,19 +25949,19 @@ index 0000000..f134b39
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/source/selection/SourceDiscoveryConcurrency.kt b/app/src/main/java/eu/kanade/tachiyomi/source/selection/SourceDiscoveryConcurrency.kt
 new file mode 100644
-index 0000000..ddbd8a9
+index 0000000..b135eb0
 --- /dev/null
 +++ b/app/src/main/java/eu/kanade/tachiyomi/source/selection/SourceDiscoveryConcurrency.kt
-@@ -0,0 +1,76 @@
+@@ -0,0 +1,77 @@
 +package eu.kanade.tachiyomi.source.selection
 +
 +import kotlinx.coroutines.CompletableDeferred
 +import kotlinx.coroutines.currentCoroutineContext
 +import kotlinx.coroutines.ensureActive
 +
-+/** FIFO admission for alternative-source operations, shared across works in this process. */
++/** Admission for alternative sources, with foreground requests queued before background work. */
 +class SourceDiscoveryConcurrency(initialForeground: Boolean = false) {
-+    private class Waiter {
++    private class Waiter(val priority: Boolean) {
 +        val ready = CompletableDeferred<Unit>()
 +        var admitted = false
 +    }
@@ -25943,11 +25980,12 @@ index 0000000..ddbd8a9
 +        ready.forEach { it.ready.complete(Unit) }
 +    }
 +
-+    suspend fun <T> withPermit(block: suspend () -> T): T {
-+        val waiter = Waiter()
++    suspend fun <T> withPermit(priority: Boolean = false, block: suspend () -> T): T {
++        val waiter = Waiter(priority)
 +        val ready =
 +            synchronized(lock) {
-+                waiting.addLast(waiter)
++                val aheadOf = if (priority) waiting.indexOfFirst { !it.priority } else -1
++                if (aheadOf >= 0) waiting.add(aheadOf, waiter) else waiting.addLast(waiter)
 +                admitWaiting()
 +            }
 +        ready.forEach { it.ready.complete(Unit) }
@@ -31398,7 +31436,7 @@ index a7c9284..6f9d1ca 100644
          val manga = manga_ ?: return
          val source = source_ as? HttpSource ?: return
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/manga/MangaViewModel.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/manga/MangaViewModel.kt
-index 54a5838..357eeb2 100644
+index 54a5838..a98b575 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/ui/manga/MangaViewModel.kt
 +++ b/app/src/main/java/eu/kanade/tachiyomi/ui/manga/MangaViewModel.kt
 @@ -36,17 +36,18 @@ import eu.kanade.tachiyomi.data.download.DownloadManager
@@ -31609,7 +31647,7 @@ index 54a5838..357eeb2 100644
              updateSuccessState { it.copy(isRefreshingData = false) }
          }
      }
-@@ -317,88 +328,129 @@ class MangaViewModel(
+@@ -317,88 +328,131 @@ class MangaViewModel(
                          references = references,
                          refreshChild = { childId ->
                              val child = mangaRepository.getMangaById(childId)
@@ -31653,6 +31691,7 @@ index 54a5838..357eeb2 100644
 +                                source = state.source,
 +                                manga = state.manga,
 +                                allowSourceDiscovery = false,
++                                foreground = true,
 +                                fetchDetails = fetchDetails,
 +                                fetchChapters = fetchChapters,
 +                                manualFetch = manualFetch,
@@ -31676,6 +31715,7 @@ index 54a5838..357eeb2 100644
 +                                updateMangaFromRemote(
 +                                        manga = update.manga,
 +                                        allowSourceDiscovery = true,
++                                        foreground = true,
 +                                        fetchDetails = false,
 +                                        fetchChapters = true,
 +                                    )
@@ -31780,7 +31820,7 @@ index 54a5838..357eeb2 100644
                      }
                      withUIContext { onRemoved() }
                  }
-@@ -409,7 +461,9 @@ class MangaViewModel(
+@@ -409,7 +463,9 @@ class MangaViewModel(
                      val duplicates = getDuplicateLibraryManga(manga)
  
                      if (duplicates.isNotEmpty()) {
@@ -31791,7 +31831,7 @@ index 54a5838..357eeb2 100644
                          return@launchIO
                      }
                  }
-@@ -450,10 +504,11 @@ class MangaViewModel(
+@@ -450,10 +506,11 @@ class MangaViewModel(
              val selection = getMangaCategoryIds(manga)
              updateSuccessState { successState ->
                  successState.copy(
@@ -31807,7 +31847,7 @@ index 54a5838..357eeb2 100644
                  )
              }
          }
-@@ -461,9 +516,7 @@ class MangaViewModel(
+@@ -461,9 +518,7 @@ class MangaViewModel(
  
      fun showSetFetchIntervalDialog() {
          val manga = successState?.manga ?: return
@@ -31818,7 +31858,7 @@ index 54a5838..357eeb2 100644
      }
  
      fun setFetchInterval(manga: Manga, interval: Int) {
-@@ -471,7 +524,7 @@ class MangaViewModel(
+@@ -471,7 +526,7 @@ class MangaViewModel(
              if (
                  updateManga.awaitUpdateFetchInterval(
                      // Custom intervals are negative
@@ -31827,7 +31867,7 @@ index 54a5838..357eeb2 100644
                  )
              ) {
                  val updatedManga = mangaRepository.getMangaById(manga.id)
-@@ -480,20 +533,25 @@ class MangaViewModel(
+@@ -480,20 +535,25 @@ class MangaViewModel(
          }
      }
  
@@ -31861,7 +31901,7 @@ index 54a5838..357eeb2 100644
      }
  
      /**
-@@ -506,23 +564,24 @@ class MangaViewModel(
+@@ -506,23 +566,24 @@ class MangaViewModel(
      }
  
      /**
@@ -31892,7 +31932,7 @@ index 54a5838..357eeb2 100644
      }
  
      /**
-@@ -537,7 +596,9 @@ class MangaViewModel(
+@@ -537,7 +598,9 @@ class MangaViewModel(
  
      private fun moveMangaToCategory(categoryIds: List<Long>) {
          viewModelScope.launchIO {
@@ -31903,7 +31943,7 @@ index 54a5838..357eeb2 100644
          }
      }
  
-@@ -556,48 +617,56 @@ class MangaViewModel(
+@@ -556,48 +619,56 @@ class MangaViewModel(
  
      private fun observeDownloads() {
          viewModelScope.launchIO {
@@ -31987,7 +32027,7 @@ index 54a5838..357eeb2 100644
                          state.copy(chapters = newChapters)
                      }
                  }
-@@ -609,37 +678,43 @@ class MangaViewModel(
+@@ -609,37 +680,43 @@ class MangaViewModel(
              val modifiedIndex = successState.chapters.indexOfFirst { it.id == download.chapter.id }
              if (modifiedIndex < 0) return@updateSuccessState successState
  
@@ -32048,7 +32088,7 @@ index 54a5838..357eeb2 100644
              successState.copy(chapters = newChapters)
          }
      }
-@@ -647,41 +722,42 @@ class MangaViewModel(
+@@ -647,41 +724,42 @@ class MangaViewModel(
      private fun List<Chapter>.toChapterListItems(manga: Manga): List<ChapterList.Item> {
          val isLocal = manga.isLocal()
          return map { chapter ->
@@ -32124,7 +32164,7 @@ index 54a5838..357eeb2 100644
  
              ChapterList.Item(
                  chapter = chapter,
-@@ -694,16 +770,19 @@ class MangaViewModel(
+@@ -694,16 +772,19 @@ class MangaViewModel(
      }
  
      /**
@@ -32150,7 +32190,7 @@ index 54a5838..357eeb2 100644
       */
      private fun executeChapterSwipeAction(
          chapterItem: ChapterList.Item,
-@@ -718,36 +797,32 @@ class MangaViewModel(
+@@ -718,36 +799,32 @@ class MangaViewModel(
                  bookmarkChapters(listOf(chapter), !chapter.bookmark)
              }
              LibraryPreferences.ChapterSwipeAction.Download -> {
@@ -32201,7 +32241,7 @@ index 54a5838..357eeb2 100644
              .map { it.chapter }
      }
  
-@@ -760,14 +835,13 @@ class MangaViewModel(
+@@ -760,14 +837,13 @@ class MangaViewModel(
      private fun getBookmarkedChapters(): List<Chapter> {
          val chapterItems = if (skipFiltered) filteredChapters.orEmpty() else allChapters.orEmpty()
          return chapterItems
@@ -32220,7 +32260,7 @@ index 54a5838..357eeb2 100644
          val successState = successState ?: return
  
          viewModelScope.launchNonCancellable {
-@@ -783,14 +857,13 @@ class MangaViewModel(
+@@ -783,14 +859,13 @@ class MangaViewModel(
              }
  
              if (!isFavorited && !successState.hasPromptedToAddBefore) {
@@ -32242,7 +32282,7 @@ index 54a5838..357eeb2 100644
                  if (result == SnackbarResult.ActionPerformed && !isFavorited) {
                      toggleFavorite()
                  }
-@@ -798,10 +871,7 @@ class MangaViewModel(
+@@ -798,10 +873,7 @@ class MangaViewModel(
          }
      }
  
@@ -32254,7 +32294,7 @@ index 54a5838..357eeb2 100644
          when (action) {
              ChapterDownloadAction.START -> {
                  startDownload(items.map { it.chapter }, false)
-@@ -814,8 +884,7 @@ class MangaViewModel(
+@@ -814,8 +886,7 @@ class MangaViewModel(
                  startDownload(listOf(chapter), true)
              }
              ChapterDownloadAction.CANCEL -> {
@@ -32264,7 +32304,7 @@ index 54a5838..357eeb2 100644
              }
              ChapterDownloadAction.DELETE -> {
                  deleteChapters(items.map { it.chapter })
-@@ -823,23 +892,17 @@ class MangaViewModel(
+@@ -823,23 +894,17 @@ class MangaViewModel(
          }
      }
  
@@ -32295,7 +32335,7 @@ index 54a5838..357eeb2 100644
                      if (downloaded) {
                          translationManager.completeRequestedDownload(manga, item.chapter)
                      } else {
-@@ -856,24 +919,39 @@ class MangaViewModel(
+@@ -856,24 +921,39 @@ class MangaViewModel(
                  }
              }
              ChapterTranslationAction.CANCEL -> {
@@ -32345,7 +32385,7 @@ index 54a5838..357eeb2 100644
                                  currentState.copy(chapters = newChapters)
                              }
                          }
-@@ -886,37 +964,54 @@ class MangaViewModel(
+@@ -886,37 +966,54 @@ class MangaViewModel(
      }
  
      fun toggleAutomaticTranslation() {
@@ -32419,7 +32459,7 @@ index 54a5838..357eeb2 100644
          if (chaptersToDownload.isNotEmpty()) {
              startDownload(chaptersToDownload, false)
          }
-@@ -938,19 +1033,31 @@ class MangaViewModel(
+@@ -938,19 +1035,31 @@ class MangaViewModel(
  
      /**
       * Mark the selected chapter list as read/unread.
@@ -32456,7 +32496,7 @@ index 54a5838..357eeb2 100644
                  return@launchIO
              }
  
-@@ -958,23 +1065,34 @@ class MangaViewModel(
+@@ -958,23 +1067,34 @@ class MangaViewModel(
  
              val tracks = getTracks.await(mangaId)
              val maxChapterNumber = chapters.maxOf { it.chapterNumber }
@@ -32499,7 +32539,7 @@ index 54a5838..357eeb2 100644
  
              if (result == SnackbarResult.ActionPerformed) {
                  trackChapter.await(context, mangaId, maxChapterNumber)
-@@ -982,10 +1100,9 @@ class MangaViewModel(
+@@ -982,10 +1102,9 @@ class MangaViewModel(
          }
      }
  
@@ -32513,7 +32553,7 @@ index 54a5838..357eeb2 100644
              .filter { it.first != null }
              .forEach { (track, e) ->
                  logcat(LogPriority.ERROR, e) {
-@@ -997,7 +1114,7 @@ class MangaViewModel(
+@@ -997,7 +1116,7 @@ class MangaViewModel(
                              MR.strings.track_error,
                              track!!.name,
                              e.message ?: "",
@@ -32522,7 +32562,7 @@ index 54a5838..357eeb2 100644
                      )
                  }
              }
-@@ -1005,6 +1122,7 @@ class MangaViewModel(
+@@ -1005,6 +1124,7 @@ class MangaViewModel(
  
      /**
       * Downloads the given list of chapters with the manager.
@@ -32530,7 +32570,7 @@ index 54a5838..357eeb2 100644
       * @param chapters the list of chapters to download.
       */
      private fun downloadChapters(chapters: List<Chapter>) {
-@@ -1015,9 +1133,11 @@ class MangaViewModel(
+@@ -1015,9 +1135,11 @@ class MangaViewModel(
  
      /**
       * Bookmarks the given list of chapters.
@@ -32542,7 +32582,7 @@ index 54a5838..357eeb2 100644
          viewModelScope.launchIO {
              chapters
                  .filterNot { it.bookmark == bookmarked }
-@@ -1033,17 +1153,16 @@ class MangaViewModel(
+@@ -1033,17 +1155,16 @@ class MangaViewModel(
       * @param chapters the list of chapters to delete.
       */
      fun deleteChapters(chapters: List<Chapter>) {
@@ -32565,7 +32605,7 @@ index 54a5838..357eeb2 100644
                      }
                  }
              } catch (e: Throwable) {
-@@ -1065,16 +1184,18 @@ class MangaViewModel(
+@@ -1065,16 +1186,18 @@ class MangaViewModel(
  
      /**
       * Sets the read filter and requests an UI update.
@@ -32589,7 +32629,7 @@ index 54a5838..357eeb2 100644
          viewModelScope.launchNonCancellable {
              setMangaChapterFlags.awaitSetUnreadFilter(manga, flag)
          }
-@@ -1082,16 +1203,18 @@ class MangaViewModel(
+@@ -1082,16 +1205,18 @@ class MangaViewModel(
  
      /**
       * Sets the download filter and requests an UI update.
@@ -32613,7 +32653,7 @@ index 54a5838..357eeb2 100644
  
          viewModelScope.launchNonCancellable {
              setMangaChapterFlags.awaitSetDownloadedFilter(manga, flag)
-@@ -1100,16 +1223,18 @@ class MangaViewModel(
+@@ -1100,16 +1225,18 @@ class MangaViewModel(
  
      /**
       * Sets the bookmark filter and requests an UI update.
@@ -32637,7 +32677,7 @@ index 54a5838..357eeb2 100644
  
          viewModelScope.launchNonCancellable {
              setMangaChapterFlags.awaitSetBookmarkFilter(manga, flag)
-@@ -1118,6 +1243,7 @@ class MangaViewModel(
+@@ -1118,6 +1245,7 @@ class MangaViewModel(
  
      /**
       * Sets the active display mode.
@@ -32645,7 +32685,7 @@ index 54a5838..357eeb2 100644
       * @param mode the mode to set.
       */
      fun setDisplayMode(mode: Long) {
-@@ -1130,6 +1256,7 @@ class MangaViewModel(
+@@ -1130,6 +1258,7 @@ class MangaViewModel(
  
      /**
       * Sets the sorting method and requests an UI update.
@@ -32653,7 +32693,7 @@ index 54a5838..357eeb2 100644
       * @param sort the sorting mode.
       */
      fun setSorting(sort: Long) {
-@@ -1147,86 +1274,96 @@ class MangaViewModel(
+@@ -1147,86 +1276,96 @@ class MangaViewModel(
              if (applyToExisting) {
                  setMangaDefaultChapterFlags.awaitAll()
              }
@@ -32806,7 +32846,7 @@ index 54a5838..357eeb2 100644
              selectedPositions[0] = -1
              selectedPositions[1] = -1
              successState.copy(chapters = newChapters)
-@@ -1235,10 +1372,13 @@ class MangaViewModel(
+@@ -1235,10 +1374,13 @@ class MangaViewModel(
  
      fun invertSelection() {
          updateSuccessState { successState ->
@@ -32824,7 +32864,7 @@ index 54a5838..357eeb2 100644
              selectedPositions[0] = -1
              selectedPositions[1] = -1
              successState.copy(chapters = newChapters)
-@@ -1254,15 +1394,19 @@ class MangaViewModel(
+@@ -1254,15 +1396,19 @@ class MangaViewModel(
  
          viewModelScope.launchIO {
              combine(
@@ -32853,7 +32893,7 @@ index 54a5838..357eeb2 100644
                  .distinctUntilChanged()
                  .collectLatest { (trackingCount, hasLoggedInTrackers) ->
                      updateSuccessState {
-@@ -1282,12 +1426,22 @@ class MangaViewModel(
+@@ -1282,12 +1428,22 @@ class MangaViewModel(
              val manga: Manga,
              val initialSelection: List<CheckboxState<Category>>,
          ) : Dialog
@@ -32877,7 +32917,7 @@ index 54a5838..357eeb2 100644
          data object FullCover : Dialog
      }
  
-@@ -1299,6 +1453,43 @@ class MangaViewModel(
+@@ -1299,6 +1455,43 @@ class MangaViewModel(
          updateSuccessState { it.copy(dialog = Dialog.DeleteChapters(chapters)) }
      }
  
@@ -32921,7 +32961,7 @@ index 54a5838..357eeb2 100644
      fun showSettingsDialog() {
          updateSuccessState { it.copy(dialog = Dialog.SettingsSheet) }
      }
-@@ -1317,14 +1508,11 @@ class MangaViewModel(
+@@ -1317,14 +1510,11 @@ class MangaViewModel(
      }
  
      fun setExcludedScanlators(excludedScanlators: Set<String>) {
@@ -32938,7 +32978,7 @@ index 54a5838..357eeb2 100644
  
          @Immutable
          data class Success(
-@@ -1342,13 +1530,31 @@ class MangaViewModel(
+@@ -1342,13 +1532,31 @@ class MangaViewModel(
              val hideMissingChapters: Boolean = false,
              val autoTranslateEnabled: Boolean = false,
          ) : State {
@@ -32975,7 +33015,7 @@ index 54a5838..357eeb2 100644
  
              val chapterListItems by lazy {
                  if (hideMissingChapters) {
-@@ -1356,21 +1562,22 @@ class MangaViewModel(
+@@ -1356,21 +1564,22 @@ class MangaViewModel(
                  }
  
                  processedChapters.insertSeparators { before, after ->
@@ -33010,7 +33050,7 @@ index 54a5838..357eeb2 100644
                          .takeIf { it > 0 }
                          ?.let { missingCount ->
                              ChapterList.MissingCount(
-@@ -1388,15 +1595,23 @@ class MangaViewModel(
+@@ -1388,15 +1597,23 @@ class MangaViewModel(
                  get() = scanlatorFilterActive || manga.chaptersFiltered()
  
              val hasDownloadedChaptersToTranslate: Boolean
@@ -33038,7 +33078,7 @@ index 54a5838..357eeb2 100644
                  val isLocalManga = manga.isLocal()
                  val unreadFilter = manga.unreadFilter
                  val downloadedFilter = manga.downloadedFilter
-@@ -1405,7 +1620,9 @@ class MangaViewModel(
+@@ -1405,7 +1622,9 @@ class MangaViewModel(
                      .filter { (chapter) -> applyFilter(unreadFilter) { !chapter.read } }
                      .filter { (chapter) -> applyFilter(bookmarkedFilter) { chapter.bookmark } }
                      .filter { applyFilter(downloadedFilter) { it.isDownloaded || isLocalManga } }
@@ -33049,7 +33089,7 @@ index 54a5838..357eeb2 100644
              }
          }
      }
-@@ -1413,11 +1630,7 @@ class MangaViewModel(
+@@ -1413,11 +1632,7 @@ class MangaViewModel(
  
  @Immutable
  sealed class ChapterList {
@@ -33779,7 +33819,7 @@ index 0000000..f2fafb2
 +internal fun Flow<Manga?>.readerModeChanges(): Flow<Long> =
 +    mapNotNull { it?.readingMode }.distinctUntilChanged()
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/reader/ReaderViewModel.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/reader/ReaderViewModel.kt
-index 291c3b5..25dea5a 100644
+index 291c3b5..d3c4d44 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/ui/reader/ReaderViewModel.kt
 +++ b/app/src/main/java/eu/kanade/tachiyomi/ui/reader/ReaderViewModel.kt
 @@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModel
@@ -34191,7 +34231,7 @@ index 291c3b5..25dea5a 100644
              } catch (e: Throwable) {
                  if (e is CancellationException) {
                      throw e
-@@ -314,15 +436,92 @@ class ReaderViewModel @JvmOverloads constructor(
+@@ -314,15 +436,88 @@ class ReaderViewModel @JvmOverloads constructor(
      private suspend fun loadChapter(
          loader: ChapterLoader,
          chapter: ReaderChapter,
@@ -34205,52 +34245,48 @@ index 291c3b5..25dea5a 100644
 -            chapterList.getOrNull(chapterPos - 1),
 -            chapterList.getOrNull(chapterPos + 1),
 -        )
++        val work = manga ?: error("No work loaded")
++        val requested = chapter.chapter.toDomainChapter()!!
++        val chapterKey = ChapterVersions.key(requested)
++        suspend fun knownAlternatives(): List<ReaderChapter> {
++            val settings = WorkSources.from(getManga.await(work.id)?.memo ?: work.memo)
++            val versions = getChaptersByMangaId.await(work.id, applyScanlatorFilter = false)
++            val downloads = versions
++                .filter { ChapterVersions.key(it) == chapterKey && downloadManager.isChapterDownloaded(it, work) }
++                .map { it.id }
++                .toSet()
++            val hidden = Injekt.get<eu.kanade.domain.source.service.SourcePreferences>().disabledSources.get()
++            return ChapterLoadFallback.candidates(
++                requested,
++                versions.filter { it.id !in failedReadingEditions },
++                work.source,
++                settings.pinned?.sourceId,
++                sourceManager.getOnlineSources().filter { it.id.toString() !in hidden }.map { it.id }.toSet(),
++                downloads,
++                basePreferences.downloadedOnly.get(),
++            ).map(::ReaderChapter)
++        }
 +        val loaded =
 +            ChapterLoadFallback.load(
 +                requested = chapter,
-+                alternatives = {
-+                    val work = manga ?: error("No work loaded")
++                alternatives = { knownAlternatives() },
++                discoverAlternatives = {
 +                    val settings = WorkSources.from(getManga.await(work.id)?.memo ?: work.memo)
-+                    // Discovery may have added an edition after the reader's initial snapshot.
-+                    var versions = getChaptersByMangaId.await(work.id, applyScanlatorFilter = false)
-+                    if (!basePreferences.downloadedOnly.get() && settings.pinned == null) {
-+                        // A failed chapter can invalidate an otherwise recent catalogue sample.
-+                        Injekt.get<eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalog>()
-+                            .invalidate(work.id)
-+                        Injekt.get<mihon.domain.source.interactor.UpdateMangaFromRemote>()(
-+                            manga = work,
-+                            fetchChapters = true,
-+                            allowSourceDiscovery = true,
-+                        )
-+                        versions = getChaptersByMangaId.await(work.id, applyScanlatorFilter = false)
++                    if (basePreferences.downloadedOnly.get() || settings.pinned != null) {
++                        emptyList()
++                    } else {
++                        Injekt.get<eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalog>().invalidate(work.id)
++                        withTimeoutOrNull(25_000L) {
++                            Injekt.get<mihon.domain.source.interactor.UpdateMangaFromRemote>()(
++                                manga = work,
++                                fetchChapters = true,
++                                allowSourceDiscovery = true,
++                                foreground = true,
++                                requestedChapter = chapterKey,
++                            )
++                        }
++                        knownAlternatives()
 +                    }
-+                    val downloads =
-+                        versions
-+                            .filter {
-+                                ChapterVersions.key(it) ==
-+                                    ChapterVersions.key(chapter.chapter.toDomainChapter()!!) &&
-+                                    downloadManager.isChapterDownloaded(it, work)
-+                            }
-+                            .map { it.id }
-+                            .toSet()
-+                    val hidden =
-+                        Injekt.get<eu.kanade.domain.source.service.SourcePreferences>()
-+                            .disabledSources
-+                            .get()
-+                    ChapterLoadFallback.candidates(
-+                            chapter.chapter.toDomainChapter()!!,
-+                            versions.filter { it.id !in failedReadingEditions },
-+                            work.source,
-+                            settings.pinned?.sourceId,
-+                            sourceManager
-+                                .getOnlineSources()
-+                                .filter { it.id.toString() !in hidden }
-+                                .map { it.id }
-+                                .toSet(),
-+                            downloads,
-+                            basePreferences.downloadedOnly.get(),
-+                        )
-+                        .map(::ReaderChapter)
 +                },
 +                fetch = { candidate ->
 +                    if (candidate === chapter && imageError != null) throw imageError
@@ -34291,7 +34327,7 @@ index 291c3b5..25dea5a 100644
  
          withUIContext {
              mutableState.update {
-@@ -341,8 +540,8 @@ class ReaderViewModel @JvmOverloads constructor(
+@@ -341,8 +536,8 @@ class ReaderViewModel @JvmOverloads constructor(
      }
  
      /**
@@ -34302,7 +34338,7 @@ index 291c3b5..25dea5a 100644
       */
      private fun loadNewChapter(chapter: ReaderChapter) {
          val loader = loader ?: return
-@@ -364,9 +563,7 @@ class ReaderViewModel @JvmOverloads constructor(
+@@ -364,9 +559,7 @@ class ReaderViewModel @JvmOverloads constructor(
          }
      }
  
@@ -34313,7 +34349,7 @@ index 291c3b5..25dea5a 100644
      private suspend fun loadAdjacent(chapter: ReaderChapter) {
          val loader = loader ?: return
  
-@@ -374,9 +571,7 @@ class ReaderViewModel @JvmOverloads constructor(
+@@ -374,9 +567,7 @@ class ReaderViewModel @JvmOverloads constructor(
  
          mutableState.update { it.copy(isLoadingAdjacentChapter = true) }
          try {
@@ -34324,7 +34360,7 @@ index 291c3b5..25dea5a 100644
          } catch (e: Throwable) {
              if (e is CancellationException) {
                  throw e
-@@ -392,27 +587,30 @@ class ReaderViewModel @JvmOverloads constructor(
+@@ -392,27 +583,30 @@ class ReaderViewModel @JvmOverloads constructor(
       * that the user doesn't have to wait too long to continue reading.
       */
      suspend fun preload(chapter: ReaderChapter) {
@@ -34365,7 +34401,7 @@ index 291c3b5..25dea5a 100644
              return
          }
  
-@@ -430,15 +628,13 @@ class ReaderViewModel @JvmOverloads constructor(
+@@ -430,15 +624,13 @@ class ReaderViewModel @JvmOverloads constructor(
      }
  
      fun onViewerLoaded(viewer: Viewer?) {
@@ -34385,7 +34421,7 @@ index 291c3b5..25dea5a 100644
       */
      fun onPageSelected(page: ReaderPage) {
          // InsertPage doesn't change page progress
-@@ -448,11 +644,15 @@ class ReaderViewModel @JvmOverloads constructor(
+@@ -448,11 +640,15 @@ class ReaderViewModel @JvmOverloads constructor(
  
          val selectedChapter = page.chapter
          val pages = selectedChapter.pages ?: return
@@ -34404,7 +34440,7 @@ index 291c3b5..25dea5a 100644
  
          if (selectedChapter != getCurrentChapter()) {
              logcat { "Setting ${selectedChapter.chapter.url} as active" }
-@@ -468,41 +668,29 @@ class ReaderViewModel @JvmOverloads constructor(
+@@ -468,41 +664,29 @@ class ReaderViewModel @JvmOverloads constructor(
      }
  
      private fun downloadNextChapters() {
@@ -34459,7 +34495,7 @@ index 291c3b5..25dea5a 100644
       */
      private fun cancelQueuedDownloads(currentChapter: ReaderChapter): Download? {
          return downloadManager.getQueuedDownloadOrNull(currentChapter.chapter.id!!)?.also {
-@@ -511,8 +699,9 @@ class ReaderViewModel @JvmOverloads constructor(
+@@ -511,8 +695,9 @@ class ReaderViewModel @JvmOverloads constructor(
      }
  
      /**
@@ -34471,7 +34507,7 @@ index 291c3b5..25dea5a 100644
       * @param currentChapter current chapter, which is going to be marked as read.
       */
      private fun deleteChapterIfNeeded(currentChapter: ReaderChapter) {
-@@ -532,15 +721,12 @@ class ReaderViewModel @JvmOverloads constructor(
+@@ -532,15 +717,12 @@ class ReaderViewModel @JvmOverloads constructor(
      }
  
      /**
@@ -34489,7 +34525,7 @@ index 291c3b5..25dea5a 100644
          readerChapter.requestedPage = pageIndex
          chapterPageIndex = pageIndex
  
-@@ -556,7 +742,7 @@ class ReaderViewModel @JvmOverloads constructor(
+@@ -556,7 +738,7 @@ class ReaderViewModel @JvmOverloads constructor(
                      id = readerChapter.chapter.id!!,
                      read = readerChapter.chapter.read,
                      lastPageRead = readerChapter.chapter.last_page_read.toLong(),
@@ -34498,7 +34534,7 @@ index 291c3b5..25dea5a 100644
              )
          }
      }
-@@ -566,17 +752,13 @@ class ReaderViewModel @JvmOverloads constructor(
+@@ -566,17 +748,13 @@ class ReaderViewModel @JvmOverloads constructor(
          updateTrackChapterRead(readerChapter)
          deleteChapterIfNeeded(readerChapter)
  
@@ -34523,7 +34559,7 @@ index 291c3b5..25dea5a 100644
                      ChapterUpdate(id = chapter.id, read = true)
                  } else {
                      null
-@@ -589,9 +771,7 @@ class ReaderViewModel @JvmOverloads constructor(
+@@ -589,9 +767,7 @@ class ReaderViewModel @JvmOverloads constructor(
          chapterReadStartTime = Clock.System.now().toEpochMilliseconds()
      }
  
@@ -34534,7 +34570,7 @@ index 291c3b5..25dea5a 100644
      suspend fun updateHistory() {
          getCurrentChapter()?.let { readerChapter ->
              if (incognitoMode) return@let
-@@ -601,75 +781,71 @@ class ReaderViewModel @JvmOverloads constructor(
+@@ -601,75 +777,71 @@ class ReaderViewModel @JvmOverloads constructor(
              val sessionReadDuration = chapterReadStartTime?.let { endTime.time - it } ?: 0
  
              upsertHistory.await(HistoryUpdate(chapterId, endTime, sessionReadDuration))
@@ -34634,7 +34670,7 @@ index 291c3b5..25dea5a 100644
      fun getMangaReadingMode(resolveDefault: Boolean = true): Int {
          val default = readerPreferences.defaultReadingMode.get()
          val readingMode = ReadingMode.fromPreference(manga?.readingMode?.toInt())
-@@ -679,9 +855,7 @@ class ReaderViewModel @JvmOverloads constructor(
+@@ -679,9 +851,7 @@ class ReaderViewModel @JvmOverloads constructor(
          }
      }
  
@@ -34645,7 +34681,7 @@ index 291c3b5..25dea5a 100644
      fun setMangaReadingMode(readingMode: ReadingMode) {
          val manga = manga ?: return
          runBlocking(Dispatchers.IO) {
-@@ -693,19 +867,14 @@ class ReaderViewModel @JvmOverloads constructor(
+@@ -693,19 +863,14 @@ class ReaderViewModel @JvmOverloads constructor(
                  currChapter.requestedPage = currChapter.chapter.last_page_read
  
                  mutableState.update {
@@ -34667,7 +34703,7 @@ index 291c3b5..25dea5a 100644
      fun getMangaOrientation(resolveDefault: Boolean = true): Int {
          val default = readerPreferences.defaultOrientationType.get()
          val orientation = ReaderOrientation.fromPreference(manga?.readerOrientation?.toInt())
-@@ -715,9 +884,7 @@ class ReaderViewModel @JvmOverloads constructor(
+@@ -715,9 +880,7 @@ class ReaderViewModel @JvmOverloads constructor(
          }
      }
  
@@ -34678,7 +34714,7 @@ index 291c3b5..25dea5a 100644
      fun setMangaOrientationType(orientation: ReaderOrientation) {
          val manga = manga ?: return
          viewModelScope.launchIO {
-@@ -729,10 +896,7 @@ class ReaderViewModel @JvmOverloads constructor(
+@@ -729,10 +892,7 @@ class ReaderViewModel @JvmOverloads constructor(
                  currChapter.requestedPage = currChapter.chapter.last_page_read
  
                  mutableState.update {
@@ -34690,7 +34726,7 @@ index 291c3b5..25dea5a 100644
                  }
                  eventChannel.send(Event.SetOrientation(getMangaOrientation()))
                  eventChannel.send(Event.ReloadViewerChapters)
-@@ -749,13 +913,8 @@ class ReaderViewModel @JvmOverloads constructor(
+@@ -749,13 +909,8 @@ class ReaderViewModel @JvmOverloads constructor(
          }
      }
  
@@ -34706,7 +34742,7 @@ index 291c3b5..25dea5a 100644
          val chapter = page.chapter.chapter
          val filenameSuffix = " - ${page.number}"
          return DiskUtil.buildValidFilename(
-@@ -794,30 +953,37 @@ class ReaderViewModel @JvmOverloads constructor(
+@@ -794,30 +949,37 @@ class ReaderViewModel @JvmOverloads constructor(
          val position = dialog?.translationPosition
          val editor = page?.translationEditor
          if (page == null || position == null || editor == null) {
@@ -34764,7 +34800,7 @@ index 291c3b5..25dea5a 100644
          }
      }
  
-@@ -834,8 +1000,8 @@ class ReaderViewModel @JvmOverloads constructor(
+@@ -834,8 +996,8 @@ class ReaderViewModel @JvmOverloads constructor(
      }
  
      /**
@@ -34775,7 +34811,7 @@ index 291c3b5..25dea5a 100644
       */
      fun saveImage() {
          val page = (state.value.dialog as? Dialog.PageActions)?.page
-@@ -849,24 +1015,25 @@ class ReaderViewModel @JvmOverloads constructor(
+@@ -849,24 +1011,25 @@ class ReaderViewModel @JvmOverloads constructor(
          val filename = generateFilename(manga, page)
  
          // Pictures directory.
@@ -34815,7 +34851,7 @@ index 291c3b5..25dea5a 100644
                  withUIContext {
                      notifier.onComplete(uri)
                      eventChannel.send(Event.SavedImage(SaveImageResult.Success(uri)))
-@@ -898,23 +1065,25 @@ class ReaderViewModel @JvmOverloads constructor(
+@@ -898,23 +1061,25 @@ class ReaderViewModel @JvmOverloads constructor(
          try {
              viewModelScope.launchNonCancellable {
                  destDir.deleteRecursively()
@@ -34851,7 +34887,7 @@ index 291c3b5..25dea5a 100644
      fun setAsCover() {
          val page = (state.value.dialog as? Dialog.PageActions)?.page
          if (page?.status != Page.State.Ready) return
-@@ -922,16 +1091,17 @@ class ReaderViewModel @JvmOverloads constructor(
+@@ -922,16 +1087,17 @@ class ReaderViewModel @JvmOverloads constructor(
          val stream = page.stream ?: return
  
          viewModelScope.launchNonCancellable {
@@ -34878,7 +34914,7 @@ index 291c3b5..25dea5a 100644
              eventChannel.send(Event.SetCoverResult(result))
          }
      }
-@@ -944,12 +1114,13 @@ class ReaderViewModel @JvmOverloads constructor(
+@@ -944,12 +1110,13 @@ class ReaderViewModel @JvmOverloads constructor(
  
      sealed interface SaveImageResult {
          class Success(val uri: Uri) : SaveImageResult
@@ -34894,7 +34930,7 @@ index 291c3b5..25dea5a 100644
       */
      private fun updateTrackChapterRead(readerChapter: ReaderChapter) {
          if (incognitoMode) return
-@@ -972,7 +1143,9 @@ class ReaderViewModel @JvmOverloads constructor(
+@@ -972,7 +1139,9 @@ class ReaderViewModel @JvmOverloads constructor(
          val manga = manga ?: return
  
          viewModelScope.launchNonCancellable {
@@ -34905,7 +34941,7 @@ index 291c3b5..25dea5a 100644
          }
      }
  
-@@ -981,9 +1154,7 @@ class ReaderViewModel @JvmOverloads constructor(
+@@ -981,9 +1150,7 @@ class ReaderViewModel @JvmOverloads constructor(
       * are ignored.
       */
      private fun deletePendingChapters() {
@@ -34916,7 +34952,7 @@ index 291c3b5..25dea5a 100644
      }
  
      @Immutable
-@@ -995,9 +1166,7 @@ class ReaderViewModel @JvmOverloads constructor(
+@@ -995,9 +1162,7 @@ class ReaderViewModel @JvmOverloads constructor(
          val isLoadingAdjacentChapter: Boolean = false,
          val currentPage: Int = -1,
  
@@ -34927,7 +34963,7 @@ index 291c3b5..25dea5a 100644
          val viewer: Viewer? = null,
          val dialog: Dialog? = null,
          val menuVisible: Boolean = false,
-@@ -1012,9 +1181,13 @@ class ReaderViewModel @JvmOverloads constructor(
+@@ -1012,9 +1177,13 @@ class ReaderViewModel @JvmOverloads constructor(
  
      sealed interface Dialog {
          data object Loading : Dialog
@@ -34941,7 +34977,7 @@ index 291c3b5..25dea5a 100644
          data class PageActions(
              val page: ReaderPage,
              val translationPosition: ManualTranslationPosition?,
-@@ -1023,13 +1196,19 @@ class ReaderViewModel @JvmOverloads constructor(
+@@ -1023,13 +1192,19 @@ class ReaderViewModel @JvmOverloads constructor(
  
      sealed interface Event {
          data object ReloadViewerChapters : Event
@@ -41897,7 +41933,7 @@ index cf639e4..6d59dd0 100644
              updateManga.awaitAll(listOfNotNull(currentMangaUpdate, targetMangaUpdate))
          } catch (e: Throwable) {
 diff --git a/app/src/main/java/mihon/domain/source/interactor/UpdateMangaFromRemote.kt b/app/src/main/java/mihon/domain/source/interactor/UpdateMangaFromRemote.kt
-index d016eaa..eb8a598 100644
+index d016eaa..f1e3d35 100644
 --- a/app/src/main/java/mihon/domain/source/interactor/UpdateMangaFromRemote.kt
 +++ b/app/src/main/java/mihon/domain/source/interactor/UpdateMangaFromRemote.kt
 @@ -1,26 +1,32 @@
@@ -41943,31 +41979,37 @@ index d016eaa..eb8a598 100644
  ) {
      suspend operator fun invoke(
          manga: Manga,
-@@ -37,6 +44,8 @@ class UpdateMangaFromRemote(
+@@ -37,6 +44,10 @@ class UpdateMangaFromRemote(
          fetchChapters: Boolean = false,
          manualFetch: Boolean = false,
          fetchWindow: Pair<Long, Long> = Pair(0, 0),
 +        allowSourceDiscovery: Boolean = false,
 +        recoverOnly: Boolean = false,
++        foreground: Boolean = false,
++        requestedChapter: ChapterVersions.Key? = null,
      ): Result<RemoteMangaUpdate> {
          val source = sourceManager.getOrStub(manga.source)
          return invoke(
-@@ -45,6 +54,9 @@ class UpdateMangaFromRemote(
+@@ -45,6 +56,11 @@ class UpdateMangaFromRemote(
              fetchDetails = fetchDetails,
              fetchChapters = fetchChapters,
              manualFetch = manualFetch,
 +            fetchWindow = fetchWindow,
 +            allowSourceDiscovery = allowSourceDiscovery,
 +            recoverOnly = recoverOnly,
++            foreground = foreground,
++            requestedChapter = requestedChapter,
          )
      }
  
-@@ -55,29 +67,89 @@ class UpdateMangaFromRemote(
+@@ -55,29 +71,93 @@ class UpdateMangaFromRemote(
          fetchChapters: Boolean = false,
          manualFetch: Boolean = false,
          fetchWindow: Pair<Long, Long> = Pair(0, 0),
 +        allowSourceDiscovery: Boolean = false,
 +        recoverOnly: Boolean = false,
++        foreground: Boolean = false,
++        requestedChapter: ChapterVersions.Key? = null,
      ): Result<RemoteMangaUpdate> {
          return try {
 -            val chapters = chapterRepository.getChapterByMangaId(manga.id)
@@ -42002,6 +42044,8 @@ index d016eaa..eb8a598 100644
 +                        fetchChapters,
 +                        allowSourceDiscovery,
 +                        recoverOnly = recoverOnly,
++                        foreground = foreground,
++                        requestedChapter = requestedChapter,
 +                    )
 +                        ?: source.getMangaUpdate(
 +                            manga =
@@ -42072,7 +42116,7 @@ index d016eaa..eb8a598 100644
          } catch (e: Exception) {
              logcat(LogPriority.ERROR, e)
              Result.failure(e)
-@@ -89,53 +161,59 @@ class UpdateMangaFromRemote(
+@@ -89,53 +169,59 @@ class UpdateMangaFromRemote(
          remoteManga: SManga,
          manualFetch: Boolean,
      ): Boolean {
@@ -69050,10 +69094,10 @@ index 0000000..a64600f
 +}
 diff --git a/app/src/test/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalogTest.kt b/app/src/test/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalogTest.kt
 new file mode 100644
-index 0000000..2c1d152
+index 0000000..6e622ee
 --- /dev/null
 +++ b/app/src/test/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalogTest.kt
-@@ -0,0 +1,1191 @@
+@@ -0,0 +1,1227 @@
 +package eu.kanade.tachiyomi.source.selection
 +
 +import eu.kanade.domain.source.service.SourcePreferences
@@ -69111,6 +69155,7 @@ index 0000000..2c1d152
 +        var delayMillis = 0L
 +        var cancel = false
 +        var searches = 0
++        var echoChapterMetadata = false
 +        var incomingUrls = emptyList<String>()
 +
 +        private fun info() =
@@ -69145,7 +69190,7 @@ index 0000000..2c1d152
 +            if (fail) error("provider unavailable")
 +            incomingUrls = chapters.map { it.url }
 +            return SMangaUpdate(
-+                info(),
++                if (echoChapterMetadata && !fetchDetails) manga else info(),
 +                if (!fetchChapters) {
 +                    chapters
 +                } else {
@@ -69237,6 +69282,41 @@ index 0000000..2c1d152
 +        assertEquals("https://example.invalid/new.jpg", result.manga.thumbnail_url)
 +        assertEquals(2L, WorkSources.from(result.manga.memo).coverSourceId)
 +        assertTrue(result.chapters.any { ChapterOrigin.from(it.memo)?.sourceId == 2L })
++    }
++
++    @Test
++    fun `foreground recovery retains a discovered cover and commits before a slow source`() = runTest {
++        val missing = StubSource(1, "pt-BR", "Old source")
++        val ready = Provider(2, 4, lang = "pt-BR", cover = "https://example.invalid/new.jpg").also {
++            it.echoChapterMetadata = true
++        }
++        val slow = Provider(3, 4, lang = "pt-BR").also { it.delayMillis = 40_000 }
++        val catalog = catalog(Manager(listOf(ready, slow)), preferences())
++        val result = catalog.fetch(
++            missing, work(), listOf(oldChapter()), false, true, true, foreground = true,
++        )!!
++        assertEquals("https://example.invalid/new.jpg", result.manga.thumbnail_url)
++        val settings = WorkSources.from(result.manga.memo)
++        assertEquals(2L, settings.coverSourceId)
++        assertTrue(settings.discoveryIncomplete)
++        assertTrue(result.chapters.any { ChapterOrigin.from(it.memo)?.sourceId == 2L })
++        assertFalse(result.chapters.any { ChapterOrigin.from(it.memo)?.sourceId == 3L })
++    }
++
++    @Test
++    fun `reader discovery keeps searching until an alternative has the requested chapter`() = runTest {
++        val missing = StubSource(1, "en", "Old source")
++        val short = Provider(2, 2, cover = "https://example.invalid/short.jpg")
++        val complete = Provider(3, 5)
++        val catalog = catalog(Manager(listOf(short, complete)), preferences())
++        val chapter = oldChapter().copy(chapterNumber = 5.0, name = "Chapter 5")
++        val key = ChapterVersions.key(chapter)
++        val result = catalog.fetch(
++            missing, work(), listOf(oldChapter()), false, true, true,
++            foreground = true,
++            requestedChapter = key,
++        )!!
++        assertTrue(result.chapters.any { it.chapter_number == 5f && ChapterOrigin.from(it.memo)?.sourceId == 3L })
 +    }
 +
 +    @Test
@@ -70247,10 +70327,10 @@ index 0000000..2c1d152
 +}
 diff --git a/app/src/test/java/eu/kanade/tachiyomi/source/selection/ChapterLoadFallbackTest.kt b/app/src/test/java/eu/kanade/tachiyomi/source/selection/ChapterLoadFallbackTest.kt
 new file mode 100644
-index 0000000..aa5d0b8
+index 0000000..4e7e2f9
 --- /dev/null
 +++ b/app/src/test/java/eu/kanade/tachiyomi/source/selection/ChapterLoadFallbackTest.kt
-@@ -0,0 +1,113 @@
+@@ -0,0 +1,130 @@
 +package eu.kanade.tachiyomi.source.selection
 +
 +import kotlinx.coroutines.CancellationException
@@ -70341,6 +70421,23 @@ index 0000000..aa5d0b8
 +        assertEquals(3, selected)
 +        assertEquals(listOf(1, 2, 3), attempts)
 +        assertEquals(listOf(1, 2), discarded)
++    }
++
++    @Test
++    fun `a working cached edition opens without waiting for discovery`() = runTest {
++        var discoveries = 0
++        val result = ChapterLoadFallback.load(
++            requested = 1,
++            alternatives = { listOf(2) },
++            fetch = { if (it == 1) error("Missing source") },
++            discard = {},
++            discoverAlternatives = {
++                discoveries++
++                listOf(3)
++            },
++        )
++        assertEquals(2, result)
++        assertEquals(0, discoveries)
 +    }
 +
 +    @Test
@@ -71046,10 +71143,10 @@ index 0000000..d44b93c
 +}
 diff --git a/app/src/test/java/eu/kanade/tachiyomi/source/selection/SourceDiscoveryConcurrencyTest.kt b/app/src/test/java/eu/kanade/tachiyomi/source/selection/SourceDiscoveryConcurrencyTest.kt
 new file mode 100644
-index 0000000..ec333bd
+index 0000000..5949f76
 --- /dev/null
 +++ b/app/src/test/java/eu/kanade/tachiyomi/source/selection/SourceDiscoveryConcurrencyTest.kt
-@@ -0,0 +1,251 @@
+@@ -0,0 +1,269 @@
 +package eu.kanade.tachiyomi.source.selection
 +
 +import java.util.concurrent.atomic.AtomicBoolean
@@ -71071,6 +71168,24 @@ index 0000000..ec333bd
 +import org.junit.jupiter.api.Test
 +
 +class SourceDiscoveryConcurrencyTest {
++    @Test
++    fun `foreground requests pass background waiters without interrupting active work`() = runTest {
++        val limiter = SourceDiscoveryConcurrency()
++        val gate = CompletableDeferred<Unit>()
++        val order = mutableListOf<String>()
++        val current = async { limiter.withPermit { gate.await() } }
++        runCurrent()
++        val background = async { limiter.withPermit { order += "background" } }
++        val foreground = async { limiter.withPermit(priority = true) { order += "foreground" } }
++        runCurrent()
++        assertEquals(emptyList<String>(), order)
++        gate.complete(Unit)
++        current.await()
++        background.await()
++        foreground.await()
++        assertEquals(listOf("foreground", "background"), order)
++    }
++
 +    @Test
 +    fun `concurrent dispatcher threads respect the shared limit and background drain`() =
 +        runBlocking {

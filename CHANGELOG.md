@@ -2,6 +2,12 @@
 
 Este arquivo registra a evolução real do código. **Revisões de desenvolvimento não são lançamentos públicos.** As datas abaixo usam America/Fortaleza, exceto quando houver indicação de UTC. O histórico de distribuição fica em [Releases](https://github.com/Hailton-Reis/Polaris/releases).
 
+## Desenvolvimento · prioridade para a obra aberta
+
+- A descoberta da obra aberta entra na fila de fontes na frente das atualizações pendentes da biblioteca. A busca pelo capítulo aberto pode encerrar ao encontrar uma alternativa legível com a mesma numeração.
+- O leitor tenta as edições compatíveis já conhecidas antes de ampliar a busca. A edição favoritada conserva o registro, o progresso e os arquivos locais.
+- A busca preserva a capa obtida no catálogo ou nos detalhes da fonte alternativa durante a consulta de capítulos.
+
 ## Desenvolvimento · P20261122.2 — correções dos testes no Galaxy A
 
 - O leitor mantém o visualizador quando só os dados da obra mudam e adia a procura de fontes na abertura de capítulos locais.
