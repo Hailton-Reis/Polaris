@@ -25380,10 +25380,10 @@ index 0000000..7c3c569
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalog.kt b/app/src/main/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalog.kt
 new file mode 100644
-index 0000000..33c7bea
+index 0000000..0f0cc3f
 --- /dev/null
 +++ b/app/src/main/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalog.kt
-@@ -0,0 +1,728 @@
+@@ -0,0 +1,731 @@
 +package eu.kanade.tachiyomi.source.selection
 +
 +import eu.kanade.domain.chapter.model.toRemoteSChapter
@@ -25651,6 +25651,8 @@ index 0000000..33c7bea
 +                        else reference.copy().also { it.title = recoveryTitle }
 +                    resolveIdentity(lookup)
 +                } else settings.identity
++        val recoveringLinkedChapter = foreground && manga.favorite && requestedChapter != null &&
++            rootCatalog?.chapters.isNullOrEmpty() && identity?.matchesTitle(reference.title) == true
 +        val searchTitles =
 +            (listOf(recoveryTitle, reference.title) + identity?.titles.orEmpty())
 +                .filter { it.isNotBlank() }
@@ -25742,7 +25744,8 @@ index 0000000..33c7bea
 +                    result.url = match.url
 +                    if (!contentFilter.snapshot().allows(result))
 +                        return@withTimeoutOrNull Outcome(null, null)
-+                    val verified = if (recoveringFavorite) {
++                    val linkedChapterMatch = recoveringLinkedChapter && identity?.matchesTitle(result.title) == true
++                    val verified = if (recoveringFavorite || linkedChapterMatch) {
 +                        SourceMatching.matchesRestoredFavorite(reference, result, identity)
 +                    } else {
 +                        SourceMatching.sameWork(reference, result, identity)
@@ -26935,13 +26938,14 @@ index 0000000..d421506
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/source/selection/WorkIdentityResolver.kt b/app/src/main/java/eu/kanade/tachiyomi/source/selection/WorkIdentityResolver.kt
 new file mode 100644
-index 0000000..713057e
+index 0000000..aeed355
 --- /dev/null
 +++ b/app/src/main/java/eu/kanade/tachiyomi/source/selection/WorkIdentityResolver.kt
-@@ -0,0 +1,116 @@
+@@ -0,0 +1,166 @@
 +package eu.kanade.tachiyomi.source.selection
 +
 +import eu.kanade.tachiyomi.network.GET
++import eu.kanade.tachiyomi.network.POST
 +import eu.kanade.tachiyomi.network.awaitSuccess
 +import eu.kanade.tachiyomi.source.model.SManga
 +import kotlinx.coroutines.CancellationException
@@ -26949,48 +26953,91 @@ index 0000000..713057e
 +import kotlinx.serialization.json.*
 +import okhttp3.HttpUrl.Companion.toHttpUrl
 +import okhttp3.OkHttpClient
++import okhttp3.MediaType.Companion.toMediaType
++import okhttp3.Request
++import okhttp3.RequestBody.Companion.toRequestBody
 +import tachiyomi.domain.manga.model.WorkIdentity
 +import tachiyomi.domain.manga.model.WorkIdentityText
 +
 +/** Public catalogue metadata; no account, LLM or executable repository is downloaded here. */
 +class WorkIdentityResolver(private val client: OkHttpClient) {
 +    suspend fun resolve(reference: SManga): WorkIdentity? {
-+        return try {
-+            withTimeoutOrNull(5_000L) {
-+                val direct =
-+                    UUID.find(reference.url)?.value?.takeIf {
-+                        // A random UUID from another provider is not a MangaDex identity.
-+                        reference.memo["polaris.identity.mangadex"]?.jsonPrimitive?.content == it ||
-+                            reference.url.startsWith("https://mangadex.org/title/")
-+                    }
-+                val url =
-+                    if (direct != null)
-+                        "https://api.mangadex.org/manga/$direct".toHttpUrl().newBuilder()
-+                    else
-+                        "https://api.mangadex.org/manga"
-+                            .toHttpUrl()
-+                            .newBuilder()
-+                            .addQueryParameter("title", (WorkIdentityText.compoundTitles(reference.title).firstOrNull() ?: reference.title).take(200))
-+                            .addQueryParameter("limit", "10")
-+                url.addQueryParameter("includes[]", "author")
-+                    .addQueryParameter("includes[]", "artist")
-+                client.newCall(GET(url.build().toString())).awaitSuccess().use { response ->
-+                    val source = response.body.source()
-+                    source.request(MAX_BYTES + 1)
-+                    check(source.buffer.size <= MAX_BYTES) { "Catalogue metadata too large" }
-+                    val parsed = Json.parseToJsonElement(source.readUtf8()).jsonObject
-+                    val data = parsed["data"] ?: return@use null
-+                    select(reference, if (data is JsonArray) data else JsonArray(listOf(data)))
-+                }
-+            }
++        val direct = UUID.find(reference.url)?.value?.takeIf {
++            // A random UUID from another provider is not a MangaDex identity.
++            (reference.memo["polaris.identity.mangadex"] as? JsonPrimitive)?.contentOrNull == it ||
++                reference.url.startsWith("https://mangadex.org/title/")
++        }
++        val title = WorkIdentityText.compoundTitles(reference.title).firstOrNull() ?: reference.title
++        if (direct == null && title.isBlank()) return null
++        val primary = lookup { select(reference, mangaDexRecords(title, direct)) }
++        if (primary != null || direct != null) return primary
++
++        return lookup {
++            val linked = findAssociatedTitle(title) ?: return@lookup null
++            select(reference, mangaDexRecords(linked.title), linked)
++        }
++    }
++
++    private suspend fun lookup(block: suspend () -> WorkIdentity?): WorkIdentity? =
++        try {
++            withTimeoutOrNull(5_000L) { block() }
 +        } catch (error: CancellationException) {
 +            throw error
 +        } catch (_: Exception) {
 +            null
 +        }
++
++    private suspend fun mangaDexRecords(title: String, direct: String? = null): JsonArray {
++        val url = "https://api.mangadex.org/manga".toHttpUrl().newBuilder()
++        if (direct != null) url.addPathSegment(direct)
++        else url.addQueryParameter("title", title.take(200)).addQueryParameter("limit", "10")
++        url.addQueryParameter("includes[]", "author").addQueryParameter("includes[]", "artist")
++        return when (val data = requestJson(GET(url.build().toString()))["data"]) {
++            is JsonArray -> data
++            is JsonObject -> JsonArray(listOf(data))
++            else -> JsonArray(emptyList())
++        }
 +    }
 +
-+    internal fun select(reference: SManga, records: JsonArray): WorkIdentity? {
++    private suspend fun findAssociatedTitle(query: String): LinkedTitles? {
++        val payload = buildJsonObject {
++            put("search", query.take(200))
++            put("perpage", 5)
++            putJsonArray("filter_types") {
++                add("novel")
++                add("drama cd")
++            }
++        }.toString().toRequestBody("application/json".toMediaType())
++        val results = requestJson(POST("$MANGA_UPDATES/search", body = payload))["results"] as? JsonArray
++        val record = (results?.firstOrNull() as? JsonObject)?.get("record") as? JsonObject
++        val id = (record?.get("series_id") as? JsonPrimitive)?.longOrNull?.takeIf { it > 0 } ?: return null
++        return associatedTitle(query, id, requestJson(GET("$MANGA_UPDATES/$id")))
++    }
++
++    internal fun associatedTitle(query: String, id: Long, record: JsonObject): LinkedTitles? {
++        if ((record["series_id"] as? JsonPrimitive)?.longOrNull != id) return null
++        val type = (record["type"] as? JsonPrimitive)?.contentOrNull?.lowercase()
++        if (type !in setOf("manga", "manhwa", "manhua", "webtoon", "oel", "doujinshi")) return null
++        val title = (record["title"] as? JsonPrimitive)?.contentOrNull?.takeIf { it.length in 2..300 } ?: return null
++        val associated = (record["associated"] as? JsonArray).orEmpty()
++            .mapNotNull { ((it as? JsonObject)?.get("title") as? JsonPrimitive)?.contentOrNull }
++        val normalized = WorkIdentityText.title(query)
++        val alias = associated.firstOrNull { it.length in 2..300 && WorkIdentityText.title(it) == normalized }
++            ?: return null
++        return LinkedTitles(id.toString(36), title, alias)
++    }
++
++    private suspend fun requestJson(request: Request): JsonObject =
++        client.newCall(request).awaitSuccess().use { response ->
++            val source = response.body.source()
++            source.request(MAX_BYTES + 1)
++            check(source.buffer.size <= MAX_BYTES) { "Catalogue metadata too large" }
++            Json.parseToJsonElement(source.readUtf8()).jsonObject
++        }
++
++    internal data class LinkedTitles(val mangaUpdatesId: String, val title: String, val alias: String)
++
++    internal fun select(reference: SManga, records: JsonArray, linked: LinkedTitles? = null): WorkIdentity? {
 +        val people = SourceMatching.people(reference.author, reference.artist)
 +        val matches =
 +            records.take(10).mapNotNull { record ->
@@ -27003,8 +27050,13 @@ index 0000000..713057e
 +                    listOf("en", "pt-br", "pt").flatMap { language ->
 +                        alternate.mapNotNull { it[language] }
 +                    }
++                val linkedAlias = linked?.let {
++                    val mangaUpdatesId = ((attributes["links"] as? JsonObject)?.get("mu") as? JsonPrimitive)?.contentOrNull
++                    if (mangaUpdatesId != it.mangaUpdatesId) return@mapNotNull null
++                    listOf(JsonPrimitive(it.alias))
++                }.orEmpty()
 +                val titles =
-+                    (preferred +
++                    (linkedAlias + preferred +
 +                            attributes["title"]?.jsonObject?.values.orEmpty() +
 +                            alternate.flatMap { it.values })
 +                        .mapNotNull {
@@ -27050,6 +27102,7 @@ index 0000000..713057e
 +    }
 +
 +    companion object {
++        private const val MANGA_UPDATES = "https://api.mangaupdates.com/v1/series"
 +        private const val MAX_BYTES = 2 * 1024 * 1024L
 +        private val UUID =
 +            Regex("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}")
@@ -70319,10 +70372,10 @@ index 0000000..a64600f
 +}
 diff --git a/app/src/test/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalogTest.kt b/app/src/test/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalogTest.kt
 new file mode 100644
-index 0000000..4613dd7
+index 0000000..8a8cd51
 --- /dev/null
 +++ b/app/src/test/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalogTest.kt
-@@ -0,0 +1,1326 @@
+@@ -0,0 +1,1354 @@
 +package eu.kanade.tachiyomi.source.selection
 +
 +import eu.kanade.domain.source.service.SourcePreferences
@@ -70554,6 +70607,34 @@ index 0000000..4613dd7
 +            requestedChapter = key,
 +        )!!
 +        assertTrue(result.chapters.any { it.chapter_number == 5f && ChapterOrigin.from(it.memo)?.sourceId == 3L })
++    }
++
++    @Test
++    fun `reader recovers the requested chapter through verified aliases with incomplete credits`() = runTest {
++        val pt = "O Tutorial é Muito Difícil"
++        val en = "The Tutorial Is Too Hard"
++        val source = Provider(2, 3, "en", en, "", matchQuery = true)
++        val missing = StubSource(1, "pt-br", "Old source")
++        val saved = work().copy(title = pt, author = null, favorite = true)
++        val identity = tachiyomi.domain.manga.model.WorkIdentity(
++            "mangadex:5c0a6150-502b-4d88-a46e-50b83768fe8f",
++            listOf(pt, en),
++            listOf("Gandara"),
++            System.currentTimeMillis(),
++        )
++        val catalog = AutomaticSourceCatalog(
++            Manager(listOf(source)), preferences(), resolveIdentity = { identity }, checkReadability = { _, _ -> true },
++        )
++        val chapter = oldChapter()
++        val result = catalog.fetch(
++            missing, saved, listOf(chapter), false, true, true, foreground = true,
++            requestedChapter = ChapterVersions.key(chapter),
++        )!!
++
++        assertTrue(result.chapters.any {
++            it.chapter_number == 1f && ChapterOrigin.from(it.memo)?.sourceId == source.id
++        })
++        assertEquals(2, source.searches)
 +    }
 +
 +    @Test
@@ -73335,15 +73416,19 @@ index 0000000..77af1ae
 +}
 diff --git a/app/src/test/java/eu/kanade/tachiyomi/source/selection/WorkIdentityResolverTest.kt b/app/src/test/java/eu/kanade/tachiyomi/source/selection/WorkIdentityResolverTest.kt
 new file mode 100644
-index 0000000..49df019
+index 0000000..210daf1
 --- /dev/null
 +++ b/app/src/test/java/eu/kanade/tachiyomi/source/selection/WorkIdentityResolverTest.kt
-@@ -0,0 +1,116 @@
+@@ -0,0 +1,175 @@
 +package eu.kanade.tachiyomi.source.selection
 +
 +import eu.kanade.tachiyomi.source.model.SManga
++import kotlinx.coroutines.runBlocking
 +import kotlinx.serialization.json.*
 +import okhttp3.OkHttpClient
++import okhttp3.Protocol
++import okhttp3.Response
++import okhttp3.ResponseBody.Companion.toResponseBody
 +import org.junit.jupiter.api.Assertions.*
 +import org.junit.jupiter.api.Test
 +
@@ -73439,6 +73524,61 @@ index 0000000..49df019
 +                identity,
 +            )
 +        )
++    }
++
++    @Test
++    fun `Brazilian alias missing from MangaDex resolves through the linked MangaUpdates manhwa`() = runBlocking {
++        val requests = mutableListOf<String>()
++        val client = OkHttpClient.Builder().addInterceptor { chain ->
++            val request = chain.request()
++            val route = request.url.encodedPath
++            val title = request.url.queryParameter("title")
++            requests += "${request.method} $route"
++            val data = when {
++                route == "/manga" && title == "O Tutorial é Muito Difícil" -> """{"data":[]}"""
++                route == "/v1/series/search" -> """{"results":[{"record":{"series_id":32908411241}}]}"""
++                route == "/v1/series/32908411241" -> """
++                    {"series_id":32908411241,"title":"The Tutorial Is Too Tough!","type":"Manhwa",
++                     "associated":[{"title":"O tutorial é muito difícil"}]}
++                """.trimIndent()
++                route == "/manga" && title == "The Tutorial Is Too Tough!" -> """{"data":[${tutorialRecord("f48tgmh")}]}"""
++                else -> error("Unexpected catalogue request")
++            }
++            Response.Builder().request(request).protocol(Protocol.HTTP_1_1)
++                .code(200).message("OK").body(data.toResponseBody()).build()
++        }.build()
++        val restored = work("O Tutorial é Muito Difícil", null)
++        val identity = requireNotNull(WorkIdentityResolver(client).resolve(restored))
++
++        assertTrue(SourceMatching.sameWork(restored, work("The Tutorial Is Too Hard", "Gandara"), identity))
++        assertTrue(SourceMatching.sameWork(restored, work("The Tutorial Is Too Tough!", "Gandara"), identity))
++        assertFalse(SourceMatching.sameWork(restored, work("The Tutorial Is Too Hard (Novel)", "Gandara"), identity))
++        assertEquals(listOf("GET /manga", "POST /v1/series/search", "GET /v1/series/32908411241", "GET /manga"), requests)
++    }
++
++    @Test
++    fun `fallback enriches only the linked record and keeps creator checks`() {
++        val ref = work("O Tutorial é Muito Difícil", null)
++        val alias = WorkIdentityResolver.LinkedTitles("f48tgmh", "The Tutorial Is Too Tough!", ref.title)
++
++        assertNull(resolver.select(ref, JsonArray(listOf(tutorialRecord("different"))), alias))
++        assertNull(resolver.select(work(ref.title, "Other"), JsonArray(listOf(tutorialRecord("f48tgmh"))), alias))
++    }
++
++    private fun tutorialRecord(mangaUpdatesId: String) = buildJsonObject {
++        put("id", "5c0a6150-502b-4d88-a46e-50b83768fe8f")
++        put("type", "manga")
++        putJsonObject("attributes") {
++            putJsonObject("title") { put("en", "The Tutorial Is Too Tough!") }
++            putJsonObject("links") { put("mu", mangaUpdatesId) }
++            putJsonArray("altTitles") { add(buildJsonObject { put("en", "The Tutorial Is Too Hard") }) }
++        }
++        putJsonArray("relationships") {
++            add(buildJsonObject {
++                put("type", "author")
++                putJsonObject("attributes") { put("name", "Gandara") }
++            })
++        }
 +    }
 +
 +    @Test
