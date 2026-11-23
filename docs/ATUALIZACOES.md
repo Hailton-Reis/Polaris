@@ -1,5 +1,11 @@
 # Atualizações do Polaris
 
+## Beta.12 publicada — 22/11/2026
+
+A beta.12 (código 113) está disponível como pré-lançamento para Android 8 ou superior, em um APK universal ARM32/ARM64. No Polaris, ative **Receber atualizações experimentais** e toque em **Verificar atualizações**. Pelo navegador, baixe o APK da Release e instale por cima da beta.11. A assinatura e o identificador foram conferidos contra a beta.11. [Release beta.12](https://github.com/Hailton-Reis/Polaris/releases/tag/v0.1.0-beta.12).
+
+O APK e o manifesto de atualização foram conferidos no download público. A verificação nos Galaxy A segue pendente. [Registro de publicação](../.github/releases/v0.1.0-beta.12.publication.json).
+
 ## Beta.11 publicada — 16/11/2026
 
 A [Release beta.11](https://github.com/Hailton-Reis/Polaris/releases/tag/v0.1.0-beta.11) está pública como pré-lançamento: P20261116.1/código 112, um APK universal ARM32/ARM64 de 259.481.310 bytes, com o identificador e certificado originais da beta.10. Para recebê-la, ative **Receber atualizações experimentais** e toque em **Verificar atualizações**. O download direto também está na Release.

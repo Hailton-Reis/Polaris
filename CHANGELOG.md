@@ -2,6 +2,17 @@
 
 Este arquivo registra a evolução real do código. **Revisões de desenvolvimento não são lançamentos públicos.** As datas abaixo usam America/Fortaleza, exceto quando houver indicação de UTC. O histórico de distribuição fica em [Releases](https://github.com/Hailton-Reis/Polaris/releases).
 
+## 0.1.0-beta.12 — 22/11/2026
+
+**Publicada como pré-lançamento.** P20261122.2 · código 113 · APK universal ARM32/ARM64 com a mesma assinatura da beta.11.
+
+- Menos trabalho na abertura e na busca com centenas de fontes. A busca exibe resultados conforme chegam.
+- Leitura local preserva o visualizador quando a obra é atualizada. A recuperação da biblioteca prioriza a fonte original e pode obter capítulos e capa de uma alternativa.
+- Backups preservam categorias e marcações incluídas. Obras confirmadas como equivalentes podem aparecer em um único cartão.
+- Preparo na aba Extensões, confirmação do carregamento após instalação privada e filtro adulto por obra em fontes mistas.
+
+Compilação e 1.124 testes automatizados aprovados. A validação nos Galaxy A segue pendente. [Release](https://github.com/Hailton-Reis/Polaris/releases/tag/v0.1.0-beta.12).
+
 ## 0.1.0-beta.11 — 16/11/2026
 
 **Publicada como pré-lançamento.** P20261116.1/código 112; um APK ARM32/ARM64, 259.481.310 bytes, com a assinatura da beta.10 e depuração desativada.

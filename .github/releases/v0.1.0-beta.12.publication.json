@@ -1,0 +1,47 @@
+{
+  "status": "PUBLIC_DOWNLOADS_AND_UPDATER_METADATA_VERIFIED",
+  "release_id": 454745727,
+  "url": "https://github.com/Hailton-Reis/Polaris/releases/tag/v0.1.0-beta.12",
+  "published_at": "2026-11-23T01:37:03Z",
+  "source_commit": "2e3826c2c6b883c7f57c652754821e9c611affa2",
+  "assets": [
+    {
+      "name": "Polaris-0.1.0-beta.12-universal.apk",
+      "bytes": 262780402,
+      "sha256": "3d1783e917fd1dc8e8d20ab20dc2ff2119e46d500584e61572707ad2dce76c9f"
+    },
+    {
+      "name": "COMECE_AQUI.md",
+      "bytes": 3401,
+      "sha256": "1c5947aa7ea8f0d4f42e45c16d379508e718c9ef32f95ca3f27be24d4cf4f225"
+    },
+    {
+      "name": "RELEASE_NOTES.md",
+      "bytes": 1899,
+      "sha256": "8a1a47876cbf25143c7bdc172d614f43e4859f9133d701d210646385a11a014a"
+    },
+    {
+      "name": "VALIDACAO.json",
+      "bytes": 1297,
+      "sha256": "25496b9b233a70baa0671c6f608aecdb8beb429c7288b5229601b745bbd12d23"
+    },
+    {
+      "name": "manifest.json",
+      "bytes": 2171,
+      "sha256": "406c742a4b61771bac0f9904e9eb68248e7d5422cbc304a6f15a8766c8de85fe"
+    },
+    {
+      "name": "SHA256SUMS.txt",
+      "bytes": 427,
+      "sha256": "5ede1389934ae12405d00def06fb48e1a8f3e492274fa2bcc54a3f3a1fa1be10"
+    }
+  ],
+  "public_updater_manifest_verified": true,
+  "experimental_channel_required": true,
+  "physical_update_install_and_data_continuity": "PENDING",
+  "tag": "v0.1.0-beta.12",
+  "publisher_run": "https://github.com/Hailton-Reis/Polaris/actions/runs/45095451629",
+  "publisher_commit": "7dbabf7212bd1660539f7eeba128d4b0be256178",
+  "transport_ref_removed": true,
+  "unit_tests_passed": 1124
+}
