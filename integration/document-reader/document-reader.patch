@@ -7228,18 +7228,38 @@ index 0000000..e76ddfa
 +    )
 +}
 diff --git a/app/src/main/java/eu/kanade/presentation/manga/MangaScreen.kt b/app/src/main/java/eu/kanade/presentation/manga/MangaScreen.kt
-index d7597c6..7c2b90a 100644
+index d7597c6..6c14034 100644
 --- a/app/src/main/java/eu/kanade/presentation/manga/MangaScreen.kt
 +++ b/app/src/main/java/eu/kanade/presentation/manga/MangaScreen.kt
-@@ -65,6 +65,7 @@ import eu.kanade.tachiyomi.ui.manga.MangaViewModel
+@@ -65,6 +65,8 @@ import eu.kanade.tachiyomi.ui.manga.MangaViewModel
  import eu.kanade.tachiyomi.util.system.copyToClipboard
  import eu.kanade.translation.model.Translation
  import tachiyomi.domain.chapter.model.Chapter
++import tachiyomi.domain.chapter.model.ChapterOrigin
 +import tachiyomi.domain.chapter.model.ChapterVersions
  import tachiyomi.domain.chapter.service.missingChaptersCount
  import tachiyomi.domain.library.service.LibraryPreferences
  import tachiyomi.domain.manga.model.Manga
-@@ -90,7 +91,7 @@ fun MangaScreen(
+@@ -79,6 +81,18 @@ import tachiyomi.presentation.core.util.shouldExpandFAB
+ import tachiyomi.source.local.isLocal
+ import kotlin.time.Instant
+ 
++@Composable
++private fun rememberRecoveredSource(state: MangaViewModel.State.Success): String? {
++    if (state.source !is StubSource) return null
++    return remember(state.chapters) {
++        state.chapters.asSequence()
++            .mapNotNull { ChapterOrigin.from(it.chapter.memo) }
++            .filter { it.available && it.sourceName.isNotBlank() }
++            .minByOrNull { it.rank }
++            ?.sourceName
++    }
++}
++
+ @Composable
+ fun MangaScreen(
+     state: MangaViewModel.State.Success,
+@@ -90,7 +104,7 @@ fun MangaScreen(
      navigateUp: () -> Unit,
      onChapterClicked: (Chapter) -> Unit,
      onDownloadChapter: ((List<ChapterList.Item>, ChapterDownloadAction) -> Unit)?,
@@ -7248,7 +7268,7 @@ index d7597c6..7c2b90a 100644
      onTranslationChapter: ((ChapterList.Item, ChapterTranslationAction) -> Unit)?,
      onAddToLibraryClicked: () -> Unit,
      onWebViewClicked: (() -> Unit)?,
-@@ -230,7 +231,7 @@ private fun MangaScreenSmallImpl(
+@@ -230,7 +244,7 @@ private fun MangaScreenSmallImpl(
      navigateUp: () -> Unit,
      onChapterClicked: (Chapter) -> Unit,
      onDownloadChapter: ((List<ChapterList.Item>, ChapterDownloadAction) -> Unit)?,
@@ -7257,7 +7277,23 @@ index d7597c6..7c2b90a 100644
      onTranslationChapter: ((ChapterList.Item, ChapterTranslationAction) -> Unit)?,
      onAddToLibraryClicked: () -> Unit,
      onWebViewClicked: (() -> Unit)?,
-@@ -447,7 +448,7 @@ private fun MangaScreenSmallImpl(
+@@ -394,12 +408,13 @@ private fun MangaScreenSmallImpl(
+                         key = MangaScreenItem.INFO_BOX,
+                         contentType = MangaScreenItem.INFO_BOX,
+                     ) {
++                        val recoveredSource = rememberRecoveredSource(state)
+                         MangaInfoBox(
+                             isTabletUi = false,
+                             appBarPadding = topPadding,
+                             manga = state.manga,
+-                            sourceName = remember { state.source.getNameForMangaInfo() },
+-                            isStubSource = remember { state.source is StubSource },
++                            sourceName = recoveredSource ?: state.source.getNameForMangaInfo(),
++                            isStubSource = recoveredSource == null && state.source is StubSource,
+                             onCoverClick = onCoverClicked,
+                             doSearch = onSearch,
+                         )
+@@ -447,7 +462,7 @@ private fun MangaScreenSmallImpl(
                          }
                          ChapterHeader(
                              enabled = !isAnySelected,
@@ -7266,7 +7302,7 @@ index d7597c6..7c2b90a 100644
                              missingChapterCount = missingChapterCount,
                              onClick = onFilterClicked,
                          )
-@@ -463,7 +464,7 @@ private fun MangaScreenSmallImpl(
+@@ -463,7 +478,7 @@ private fun MangaScreenSmallImpl(
                          onDownloadChapter = onDownloadChapter,
                          onChapterSelected = onChapterSelected,
                          onChapterSwipe = onChapterSwipe,
@@ -7275,7 +7311,7 @@ index d7597c6..7c2b90a 100644
                      )
                  }
              }
-@@ -481,7 +482,7 @@ fun MangaScreenLargeImpl(
+@@ -481,7 +496,7 @@ fun MangaScreenLargeImpl(
      navigateUp: () -> Unit,
      onChapterClicked: (Chapter) -> Unit,
      onDownloadChapter: ((List<ChapterList.Item>, ChapterDownloadAction) -> Unit)?,
@@ -7284,7 +7320,23 @@ index d7597c6..7c2b90a 100644
      onTranslationChapter: ((ChapterList.Item, ChapterTranslationAction) -> Unit)?,
      onAddToLibraryClicked: () -> Unit,
      onWebViewClicked: (() -> Unit)?,
-@@ -693,7 +694,7 @@ fun MangaScreenLargeImpl(
+@@ -639,12 +654,13 @@ fun MangaScreenLargeImpl(
+                             .verticalScroll(rememberScrollState())
+                             .padding(bottom = contentPadding.calculateBottomPadding()),
+                     ) {
++                        val recoveredSource = rememberRecoveredSource(state)
+                         MangaInfoBox(
+                             isTabletUi = true,
+                             appBarPadding = contentPadding.calculateTopPadding(),
+                             manga = state.manga,
+-                            sourceName = remember { state.source.getNameForMangaInfo() },
+-                            isStubSource = remember { state.source is StubSource },
++                            sourceName = recoveredSource ?: state.source.getNameForMangaInfo(),
++                            isStubSource = recoveredSource == null && state.source is StubSource,
+                             onCoverClick = onCoverClicked,
+                             doSearch = onSearch,
+                         )
+@@ -693,7 +709,7 @@ fun MangaScreenLargeImpl(
                                  }
                                  ChapterHeader(
                                      enabled = !isAnySelected,
@@ -7293,7 +7345,7 @@ index d7597c6..7c2b90a 100644
                                      missingChapterCount = missingChapterCount,
                                      onClick = onFilterButtonClicked,
                                  )
-@@ -709,7 +710,7 @@ fun MangaScreenLargeImpl(
+@@ -709,7 +725,7 @@ fun MangaScreenLargeImpl(
                                  onDownloadChapter = onDownloadChapter,
                                  onChapterSelected = onChapterSelected,
                                  onChapterSwipe = onChapterSwipe,
@@ -7302,7 +7354,7 @@ index d7597c6..7c2b90a 100644
                              )
                          }
                      }
-@@ -783,7 +784,7 @@ private fun LazyListScope.sharedChapterItems(
+@@ -783,7 +799,7 @@ private fun LazyListScope.sharedChapterItems(
      chapterSwipeEndAction: LibraryPreferences.ChapterSwipeAction,
      onChapterClicked: (Chapter) -> Unit,
      onDownloadChapter: ((List<ChapterList.Item>, ChapterDownloadAction) -> Unit)?,
@@ -7311,7 +7363,7 @@ index d7597c6..7c2b90a 100644
      onTranslationChapter: ((ChapterList.Item, ChapterTranslationAction) -> Unit)?,
      onChapterSelected: (ChapterList.Item, Boolean, Boolean) -> Unit,
      onChapterSwipe: (ChapterList.Item, LibraryPreferences.ChapterSwipeAction) -> Unit,
-@@ -812,7 +813,7 @@ private fun LazyListScope.sharedChapterItems(
+@@ -812,7 +828,7 @@ private fun LazyListScope.sharedChapterItems(
                              formatChapterNumber(item.chapter.chapterNumber),
                          )
                      } else {
@@ -7320,7 +7372,7 @@ index d7597c6..7c2b90a 100644
                      },
                      date = relativeDateText(item.chapter.dateUpload),
                      readProgress = item.chapter.lastPageRead
-@@ -823,13 +824,14 @@ private fun LazyListScope.sharedChapterItems(
+@@ -823,13 +839,14 @@ private fun LazyListScope.sharedChapterItems(
                                  it + 1,
                              )
                          },
@@ -7337,7 +7389,7 @@ index d7597c6..7c2b90a 100644
                      translationStateProvider = { item.translationState },
                      downloadProgressProvider = { item.downloadProgress },
                      chapterSwipeStartAction = chapterSwipeStartAction,
-@@ -845,10 +847,11 @@ private fun LazyListScope.sharedChapterItems(
+@@ -845,10 +862,11 @@ private fun LazyListScope.sharedChapterItems(
                              onToggleSelection = { onChapterSelected(item, !item.selected, false) },
                              onChapterClicked = onChapterClicked,
                          )
@@ -25328,10 +25380,10 @@ index 0000000..7c3c569
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalog.kt b/app/src/main/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalog.kt
 new file mode 100644
-index 0000000..55701ae
+index 0000000..33c7bea
 --- /dev/null
 +++ b/app/src/main/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalog.kt
-@@ -0,0 +1,674 @@
+@@ -0,0 +1,728 @@
 +package eu.kanade.tachiyomi.source.selection
 +
 +import eu.kanade.domain.chapter.model.toRemoteSChapter
@@ -25351,6 +25403,7 @@ index 0000000..55701ae
 +import kotlinx.coroutines.CancellationException
 +import kotlinx.coroutines.flow.asFlow
 +import kotlinx.coroutines.flow.buffer
++import kotlinx.coroutines.flow.first
 +import kotlinx.coroutines.flow.firstOrNull
 +import kotlinx.coroutines.flow.flatMapMerge
 +import kotlinx.coroutines.flow.flow
@@ -25418,7 +25471,10 @@ index 0000000..55701ae
 +                active.all { it.readability == "sample_failed" } &&
 +                active.all { now - it.healthCheckedAt >= 60_000L }
 +        val ttl = if (settings.discoveryIncomplete) PARTIAL_DISCOVERY_TTL else DISCOVERY_TTL
++        val missingFavoriteCover = manga.favorite && manga.thumbnailUrl.isNullOrBlank() &&
++            now - settings.checkedAt >= PARTIAL_DISCOVERY_TTL
 +        return manga.id in invalidated ||
++            missingFavoriteCover ||
 +            now - settings.checkedAt >= ttl ||
 +            failedSamples ||
 +            settings.installedFingerprint != fingerprint(enabled)
@@ -25466,6 +25522,9 @@ index 0000000..55701ae
 +        val pinned = settings.pinned
 +        val original = source as? HttpSource
 +        if (original == null && source !is StubSource && settings.candidates.isEmpty()) return null
++        if (foreground && manga.favorite && source is StubSource && !sourceManager.isInitialized.value) {
++            withTimeoutOrNull(SOURCE_STARTUP_TIMEOUT) { sourceManager.isInitialized.first { it } }
++        }
 +        val root =
 +            settings.candidates.firstOrNull { it.sourceId == manga.source && it.url == manga.url }
 +                ?: WorkSource(
@@ -25482,12 +25541,13 @@ index 0000000..55701ae
 +        val fingerprint = fingerprint(enabled)
 +        val now = System.currentTimeMillis()
 +        val failedCover = CoverLinkFailures.failedAt(manga.thumbnailUrl)
-+        val coverNeedsRecovery = failedCover != null && failedCover > settings.checkedAt
++        val failedCoverNeedsRecovery = failedCover != null && failedCover > settings.checkedAt
++        val coverNeedsRecovery = failedCoverNeedsRecovery || (manga.favorite && manga.thumbnailUrl.isNullOrBlank())
 +        fun hasUsableCover(url: String?): Boolean =
 +            !url.isNullOrBlank() && CoverLinkFailures.failedAt(url) == null
 +
 +        var discover = pinned == null && (allowDiscovery || source is StubSource) &&
-+            (needsDiscovery(manga) || coverNeedsRecovery)
++            (needsDiscovery(manga) || failedCoverNeedsRecovery)
 +        val catalogs = mutableListOf<Catalog>()
 +        val bindings = mutableListOf<WorkSource>()
 +        suspend fun loadSafely(binding: WorkSource): Outcome {
@@ -25532,6 +25592,8 @@ index 0000000..55701ae
 +        val rootOutcome = if (pinned == null || pinned.key == root.key) loadSafely(root) else null
 +        rootOutcome?.let { remember(it) }
 +        val rootCatalog = rootOutcome?.catalog
++        val recoveringFavorite = foreground && manga.favorite && pinned == null &&
++            requestedChapter == null && rootCatalog?.chapters.isNullOrEmpty()
 +        // A restored missing provider and a failing provider can recover without changing source
 +        // IDs.
 +        // Healthy background updates still do not search every extension.
@@ -25552,7 +25614,8 @@ index 0000000..55701ae
 +                    cached.readability
 +                } else {
 +                    val provider = sourceManager.get(catalog.binding.sourceId) as? HttpSource
-+                    if (provider != null && checkReadability(provider, catalog.chapters))
++                    val sample = if (recoveringFavorite) catalog.chapters.take(1) else catalog.chapters
++                    if (provider != null && checkReadability(provider, sample))
 +                        "sample_passed"
 +                    else "sample_failed"
 +                }
@@ -25578,11 +25641,18 @@ index 0000000..55701ae
 +            }
 +        }
 +        val reference = rootCatalog?.manga ?: manga.toSManga()
++        val recoveryTitle =
++            if (recoveringFavorite) SourceMatching.restoredSearchTitle(reference.title) else reference.title
 +        val identity =
 +            settings.identity?.takeIf { now - it.checkedAt in 0 until 14 * DISCOVERY_TTL }
-+                ?: if (discover) resolveIdentity(reference) else settings.identity
++                ?: if (discover) {
++                    val lookup =
++                        if (recoveryTitle == reference.title) reference
++                        else reference.copy().also { it.title = recoveryTitle }
++                    resolveIdentity(lookup)
++                } else settings.identity
 +        val searchTitles =
-+            (listOf(reference.title) + identity?.titles.orEmpty())
++            (listOf(recoveryTitle, reference.title) + identity?.titles.orEmpty())
 +                .filter { it.isNotBlank() }
 +                .distinctBy(SourceMatching::title)
 +                .take(6)
@@ -25633,7 +25703,7 @@ index 0000000..55701ae
 +        }
 +        suspend fun search(provider: HttpSource, alreadyKnown: Set<String>): Outcome {
 +            return try {
-+                withTimeoutOrNull(SEARCH_TIMEOUT) {
++                withTimeoutOrNull(if (recoveringFavorite) RECOVERY_PROVIDER_TIMEOUT else SEARCH_TIMEOUT) {
 +                    var matches = emptyList<SManga>()
 +                    for (query in searchTitles) {
 +                        val page = provider.getSearchManga(1, query, provider.getFilterList())
@@ -25643,25 +25713,41 @@ index 0000000..55701ae
 +                                .filter {
 +                                    visibility.allows(it) &&
 +                                        SourceMatching.titleMatches(
-+                                            reference.title,
-+                                            it.title,
++                                            recoveryTitle,
++                                            if (recoveringFavorite) SourceMatching.restoredSearchTitle(it.title) else it.title,
 +                                            identity,
 +                                        )
 +                                }
 +                                .distinctBy { it.url }
-+                        if (matches.isNotEmpty()) break
++                        if (recoveringFavorite && matches.size > 1) {
++                            val queryTitle = SourceMatching.restoredTitle(query)
++                            val exact = matches.filter { SourceMatching.restoredTitle(it.title) == queryTitle }
++                            if (exact.isNotEmpty()) matches = exact
++                        }
++                        if (if (recoveringFavorite) matches.size == 1 else matches.isNotEmpty()) break
 +                    }
 +                    if (matches.size != 1) return@withTimeoutOrNull Outcome(null, null)
 +                    val match = matches.single()
 +                    // A confirmed URL was already attempted during this refresh.
 +                    if ("${provider.id}:${match.url}" in alreadyKnown)
 +                        return@withTimeoutOrNull Outcome(null, null)
-+                    val result = provider.getMangaUpdate(match, emptyList(), true, false).manga
++                    val result = try {
++                        provider.getMangaUpdate(match, emptyList(), true, false).manga
++                    } catch (error: CancellationException) {
++                        throw error
++                    } catch (error: Exception) {
++                        if (!recoveringFavorite) throw error
++                        match.copy()
++                    }
 +                    result.url = match.url
 +                    if (!contentFilter.snapshot().allows(result))
 +                        return@withTimeoutOrNull Outcome(null, null)
-+                    if (!SourceMatching.sameWork(reference, result, identity))
-+                        return@withTimeoutOrNull Outcome(null, null)
++                    val verified = if (recoveringFavorite) {
++                        SourceMatching.matchesRestoredFavorite(reference, result, identity)
++                    } else {
++                        SourceMatching.sameWork(reference, result, identity)
++                    }
++                    if (!verified) return@withTimeoutOrNull Outcome(null, null)
 +                    val binding =
 +                        WorkSource(
 +                            provider.id,
@@ -25728,23 +25814,29 @@ index 0000000..55701ae
 +                        .mapTo(hashSetOf()) { it.binding.sourceId }
 +                // Budget includes waiting for the app-wide alternative-provider slots.
 +                // No work owns the whole discovery queue while other works wait.
-+                fun hasUsableAlternative(): Boolean = catalogs.any { catalog ->
-+                    catalog.binding.key != root.key && catalog.binding.readability == "sample_passed" &&
-+                        if (requestedChapter != null) {
-+                            catalog.chapters.any { ChapterVersions.key(asChapter(it)) == requestedChapter }
-+                        } else {
-+                            foreground &&
-+                                (rootCatalog?.chapters.isNullOrEmpty() || coverNeedsRecovery) &&
-+                                hasUsableCover(catalog.manga.thumbnail_url)
-+                        }
-+                }
-+                val stoppedEarly =
-+                    if (hasUsableAlternative()) {
-+                        true
-+                    } else withTimeoutOrNull(DISCOVERY_TIMEOUT) {
-+                        enabled
-+                            .filter { it.id != manga.source && it.id !in refreshed }
-+                            .asFlow()
++                fun hasUsableAlternative(languagePriority: Int? = null): Boolean =
++                    catalogs.any { catalog ->
++                        catalog.binding.key != root.key &&
++                            catalog.binding.readability == "sample_passed" &&
++                            (languagePriority == null || languageRank(catalog.binding.language) <= languagePriority) &&
++                            if (requestedChapter != null) {
++                                catalog.chapters.any { ChapterVersions.key(asChapter(it)) == requestedChapter }
++                            } else {
++                                foreground &&
++                                    (rootCatalog?.chapters.isNullOrEmpty() || coverNeedsRecovery) &&
++                                    hasUsableCover(catalog.manga.thumbnail_url)
++                            }
++                    }
++
++                val providers = enabled.filter { it.id != manga.source && it.id !in refreshed }
++                suspend fun searchProviders(
++                    providers: List<HttpSource>,
++                    budget: Long,
++                    ready: () -> Boolean,
++                ): Boolean? {
++                    if (ready()) return true
++                    return withTimeoutOrNull(budget) {
++                        providers.asFlow()
 +                            .flatMapMerge(concurrency = PARALLEL_PROVIDERS) { provider ->
 +                                flow {
 +                                    val prepared =
@@ -25759,10 +25851,20 @@ index 0000000..55701ae
 +                            .buffer(PARALLEL_PROVIDERS)
 +                            .firstOrNull { prepared ->
 +                                collect(prepared)
-+                                hasUsableAlternative()
++                                ready()
 +                            } != null
 +                    }
-+                if (stoppedEarly != false) incomplete = true
++                }
++
++                if (recoveringFavorite) {
++                    for ((priority, group) in providers.groupBy { languageRank(it.lang) }) {
++                        val stopped = searchProviders(group, RECOVERY_LANGUAGE_TIMEOUT) { hasUsableAlternative(priority) }
++                        if (stopped != false) incomplete = true
++                        if (stopped == true) break
++                    }
++                } else if (searchProviders(providers, DISCOVERY_TIMEOUT) { hasUsableAlternative() } != false) {
++                    incomplete = true
++                }
 +            }
 +        }
 +        if (pinned == null) {
@@ -25989,7 +26091,8 @@ index 0000000..55701ae
 +            when (language.lowercase().replace('_', '-')) {
 +                "pt-br" -> 0
 +                "pt" -> 1
-+                else -> 2
++                "en" -> 2
++                else -> 3
 +            }
 +
 +        private const val HEALTH_TTL = 10 * 60 * 1000L
@@ -25999,6 +26102,9 @@ index 0000000..55701ae
 +        private const val PARALLEL_PROVIDERS = SourceDiscoveryConcurrency.FOREGROUND_LIMIT
 +        private const val PROVIDER_PIPELINE_TIMEOUT = 60_000L
 +        private const val SEARCH_TIMEOUT = 30_000L
++        private const val SOURCE_STARTUP_TIMEOUT = 5_000L
++        private const val RECOVERY_PROVIDER_TIMEOUT = 6_000L
++        private const val RECOVERY_LANGUAGE_TIMEOUT = 16_000L
 +        private const val READER_CATALOG_TIMEOUT = 4_000L
 +        private const val CATALOG_TIMEOUT = 30_000L
 +        private const val DISCOVERY_TIMEOUT = 60_000L
@@ -26413,15 +26519,16 @@ index 0000000..b135eb0
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/source/selection/SourceMatching.kt b/app/src/main/java/eu/kanade/tachiyomi/source/selection/SourceMatching.kt
 new file mode 100644
-index 0000000..67aaaa0
+index 0000000..915e8c3
 --- /dev/null
 +++ b/app/src/main/java/eu/kanade/tachiyomi/source/selection/SourceMatching.kt
-@@ -0,0 +1,70 @@
+@@ -0,0 +1,101 @@
 +package eu.kanade.tachiyomi.source.selection
 +
 +import eu.kanade.tachiyomi.source.model.SManga
 +import tachiyomi.domain.chapter.model.Chapter
 +import tachiyomi.domain.manga.model.WorkIdentity
++import tachiyomi.domain.manga.model.WorkIdentityText
 +
 +/** Similarity alone cannot join a remake, novel or unrelated work to a library entry. */
 +internal object SourceMatching {
@@ -26472,6 +26579,36 @@ index 0000000..67aaaa0
 +            previous = next
 +        }
 +        return previous.last()
++    }
++
++    private val localeSuffix = Regex(
++        """\s+(?:(?:mangá|manga|manhwa|manhua|webtoon)\s+)?[\[(](?:pt(?:[-_]br)?|en)[\])]\s*$""",
++        RegexOption.IGNORE_CASE,
++    )
++
++    fun restoredSearchTitle(value: String): String = value.replace(localeSuffix, "").trim()
++
++    fun restoredTitle(value: String): String = title(restoredSearchTitle(value))
++
++    fun matchesRestoredFavorite(reference: SManga, candidate: SManga, identity: WorkIdentity?): Boolean {
++        if (sameWork(reference, candidate, identity)) return true
++
++        val expected = people(reference.author, reference.artist) +
++            identity?.creators.orEmpty().flatMap { people(it) }
++        val actual = people(candidate.author, candidate.artist)
++        val sharedCreator = expected.any { it in actual }
++        if (expected.isNotEmpty() && actual.isNotEmpty() && !sharedCreator) return false
++
++        val name = restoredTitle(reference.title)
++        val knownAlias = identity?.matchesTitle(restoredSearchTitle(reference.title)) == true &&
++            identity.matchesTitle(restoredSearchTitle(candidate.title))
++        if (!knownAlias && (name.isEmpty() || name != restoredTitle(candidate.title))) return false
++
++        val synopsis = WorkIdentityText.synopsisKey(reference.description)
++        val sameSynopsis = synopsis != null && synopsis == WorkIdentityText.synopsisKey(candidate.description)
++        val distinctive = (name.length >= 12 && name.count { it == ' ' } >= 2) ||
++            (name.length >= 18 && ' ' in name)
++        return sharedCreator || knownAlias || sameSynopsis || distinctive
 +    }
 +
 +    fun sameWork(reference: SManga, candidate: SManga, identity: WorkIdentity? = null): Boolean {
@@ -70182,10 +70319,10 @@ index 0000000..a64600f
 +}
 diff --git a/app/src/test/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalogTest.kt b/app/src/test/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalogTest.kt
 new file mode 100644
-index 0000000..004339e
+index 0000000..4613dd7
 --- /dev/null
 +++ b/app/src/test/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalogTest.kt
-@@ -0,0 +1,1271 @@
+@@ -0,0 +1,1326 @@
 +package eu.kanade.tachiyomi.source.selection
 +
 +import eu.kanade.domain.source.service.SourcePreferences
@@ -70241,6 +70378,7 @@ index 0000000..004339e
 +        override val name = "Provider $id"
 +        override val supportsLatest = false
 +        var fail = false
++        var failDetails = false
 +        var delayMillis = 0L
 +        var cancel = false
 +        var searches = 0
@@ -70276,7 +70414,7 @@ index 0000000..004339e
 +        ): SMangaUpdate {
 +            if (delayMillis > 0) delay(delayMillis)
 +            if (cancel) throw CancellationException("parent cancelled")
-+            if (fail) error("provider unavailable")
++            if (fail || failDetails && fetchDetails) error("provider unavailable")
 +            incomingUrls = chapters.map { it.url }
 +            return SMangaUpdate(
 +                if (echoChapterMetadata && !fetchDetails) manga else info(),
@@ -71221,6 +71359,60 @@ index 0000000..004339e
 +        assertTrue(result.chapters.any { it.url == oldChapter().url })
 +        assertEquals("/work", result.manga.url)
 +        assertEquals(1L, work().source)
++    }
++
++    @Test
++    fun `an opened favorite with only a distinctive title recovers Portuguese cover and chapters first`() = runTest {
++        val title = "A Jornada do Retorno"
++        val english = Provider(2, 12, "en", title, cover = "https://example.invalid/en.jpg")
++        val brazil = Provider(3, 3, "pt-BR", title, matchQuery = true, cover = "https://example.invalid/br.jpg").also {
++            it.delayMillis = 1_000L
++            it.failDetails = true
++        }
++        val original = StubSource(1, "", "Old source")
++        val restored = work().copy(title = "$title [PT-BR]", author = null, favorite = true)
++        val result = catalog(Manager(listOf(english, brazil)), preferences())
++            .fetch(original, restored, emptyList(), false, true, false, foreground = true)!!
++
++        assertEquals("https://example.invalid/br.jpg", result.manga.thumbnail_url)
++        assertEquals(3L, WorkSources.from(result.manga.memo).coverSourceId)
++        assertEquals(3, result.chapters.size)
++        assertTrue(result.chapters.all { ChapterOrigin.from(it.memo)?.sourceId == brazil.id })
++        assertEquals(0, english.searches)
++        assertEquals(restored.url, result.manga.url)
++    }
++
++    @Test
++    fun `an opened restored favorite falls back to English after mismatched and stalled Portuguese sources`() = runTest {
++        val title = "A Jornada do Retorno"
++        val conflicting = Provider(2, 9, "pt-br", title, "Another Author")
++        val stalled = Provider(3, 9, "pt-br", title).also { it.delayMillis = 40_000L }
++        val english = Provider(4, 3, "en", title, cover = "https://example.invalid/en.jpg")
++        val original = StubSource(1, "", "Old source")
++        val restored = work().copy(title = title, favorite = true)
++        val result = catalog(Manager(listOf(english, conflicting, stalled)), preferences())
++            .fetch(original, restored, emptyList(), false, true, false, foreground = true)!!
++
++        assertEquals("https://example.invalid/en.jpg", result.manga.thumbnail_url)
++        assertTrue(result.chapters.all { ChapterOrigin.from(it.memo)?.sourceId == english.id })
++        assertEquals(1, conflicting.searches)
++        assertEquals(1, stalled.searches)
++        assertEquals(1, english.searches)
++    }
++
++    @Test
++    fun `a favorite without a cover can retry before the daily catalogue refresh`() = runTest {
++        val original = Provider(1, 3)
++        val catalog = catalog(Manager(listOf(original)), preferences())
++        val saved = work().copy(favorite = true, thumbnailUrl = null)
++        val result = catalog.fetch(original, saved, emptyList(), false, true, true)!!
++        val settings = WorkSources.from(result.manga.memo)
++        val recent = saved.copy(memo = settings.attach(saved.memo))
++
++        assertFalse(catalog.needsDiscovery(recent))
++        assertTrue(catalog.needsDiscovery(
++            saved.copy(memo = settings.copy(checkedAt = settings.checkedAt - 120_000L).attach(saved.memo)),
++        ))
 +    }
 +
 +    @Test

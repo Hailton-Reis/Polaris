@@ -2,6 +2,11 @@
 
 Este arquivo registra a evolução real do código. **Revisões de desenvolvimento não são lançamentos públicos.** As datas abaixo usam America/Fortaleza, exceto quando houver indicação de UTC. O histórico de distribuição fica em [Releases](https://github.com/Hailton-Reis/Polaris/releases).
 
+## Desenvolvimento · recuperação de favoritos restaurados
+
+- Ao abrir um favorito sem capítulos da fonte original, o Polaris pode associar uma edição com título distintivo e inequívoco mesmo quando o backup omitiu a autoria. A busca começa pelo português brasileiro e recorre ao inglês quando necessário.
+- Capas ausentes podem ser buscadas antes da próxima consulta diária. A tela pode exibir o nome da fonte que forneceu os capítulos recuperados.
+
 ## Desenvolvimento · correção da aba Instalados
 
 - A aba **Instalados** mostra cada fonte uma vez, mesmo quando ela também aparece como última usada. Isso corrige o fechamento ao renderizar a lista.
