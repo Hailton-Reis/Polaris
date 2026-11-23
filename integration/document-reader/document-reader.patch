@@ -27180,7 +27180,7 @@ index c666b82..d97b4b4 100644
 +    }
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/browse/extension/ExtensionsTab.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/browse/extension/ExtensionsTab.kt
-index efc3654..cb0e638 100644
+index efc3654..384bcac 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/ui/browse/extension/ExtensionsTab.kt
 +++ b/app/src/main/java/eu/kanade/tachiyomi/ui/browse/extension/ExtensionsTab.kt
 @@ -1,6 +1,22 @@
@@ -27219,7 +27219,7 @@ index efc3654..cb0e638 100644
  import eu.kanade.tachiyomi.extension.model.Extension
  import eu.kanade.tachiyomi.ui.browse.extension.details.ExtensionDetailsScreen
  import eu.kanade.tachiyomi.ui.webview.WebViewScreen
-@@ -27,45 +45,91 @@ import tachiyomi.i18n.at.ATMR
+@@ -27,45 +45,94 @@ import tachiyomi.i18n.at.ATMR
  import tachiyomi.presentation.core.i18n.stringResource
  
  @Composable
@@ -27236,6 +27236,13 @@ index efc3654..cb0e638 100644
 +    val sourceState by sourceModel.state.collectAsState()
 +    val extensionGroups = state.items.filterValues { group ->
 +        group.firstOrNull()?.extension?.let { (it !is Extension.Available) == installed } == true
++    }
++    val installedSources = if (installed) {
++        remember(sourceState.items, state.searchQuery) {
++            installedSourceGroups(sourceState.items, state.searchQuery)
++        }
++    } else {
++        emptyMap()
 +    }
      var privateExtensionToUninstall by remember { mutableStateOf<Extension?>(null) }
  
@@ -27296,31 +27303,27 @@ index efc3654..cb0e638 100644
 +                state = state.copy(items = extensionGroups),
 +                sources = if (!installed) null else {
 +                    val slot: LazyListScope.() -> Unit = {
-+                        val visible = sourceState.items.filterIsInstance<SourceUiModel.Item>().filter {
-+                            it.source.visualName.contains(state.searchQuery.orEmpty(), ignoreCase = true)
-+                        }
-+                        visible.groupBy { it.source.isLocal() }.toSortedMap(compareByDescending { it })
-+                            .forEach { (local, rows) ->
-+                                item(key = "installed-source-heading-$local") {
-+                                    Text(
-+                                        stringResource(
-+                                            if (local) ATMR.strings.browse_internal_sources
-+                                            else ATMR.strings.browse_active_extensions,
-+                                        ),
-+                                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-+                                    )
-+                                }
-+                                items(rows, key = { "installed-source-${it.source.id}" }) { row ->
-+                                    SourceItem(
-+                                        source = row.source,
-+                                        onClickItem = { source, listing ->
-+                                            navigator.push(BrowseSourceScreen(source.id, listing.query))
-+                                        },
-+                                        onClickPin = sourceModel::togglePin,
-+                                        onLongClickItem = sourceModel::showSourceDialog,
-+                                    )
-+                                }
++                        installedSources.forEach { (local, rows) ->
++                            item(key = "installed-source-heading-$local") {
++                                Text(
++                                    stringResource(
++                                        if (local) ATMR.strings.browse_internal_sources
++                                        else ATMR.strings.browse_active_extensions,
++                                    ),
++                                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
++                                )
 +                            }
++                            items(rows, key = { "installed-source-${it.source.id}" }) { row ->
++                                SourceItem(
++                                    source = row.source,
++                                    onClickItem = { source, listing ->
++                                        navigator.push(BrowseSourceScreen(source.id, listing.query))
++                                    },
++                                    onClickPin = sourceModel::togglePin,
++                                    onLongClickItem = sourceModel::showSourceDialog,
++                                )
++                            }
++                        }
 +                    }
 +                    slot
 +                },
@@ -27334,7 +27337,7 @@ index efc3654..cb0e638 100644
                          else -> {
                              if (context.isPackageInstalled(extension.pkgName)) {
                                  extensionsViewModel.uninstallExtension(extension)
-@@ -76,7 +140,12 @@ fun extensionsTab(
+@@ -76,7 +143,12 @@ fun extensionsTab(
                      }
                  },
                  onClickItemCancel = extensionsViewModel::cancelInstallUpdateExtension,
@@ -27348,7 +27351,7 @@ index efc3654..cb0e638 100644
                  onOpenWebView = { extension ->
                      extension.sources.getOrNull(0)?.let {
                          navigator.push(
-@@ -84,27 +153,41 @@ fun extensionsTab(
+@@ -84,33 +156,58 @@ fun extensionsTab(
                                  url = it.baseUrl,
                                  initialTitle = it.name,
                                  sourceId = it.id,
@@ -27399,7 +27402,24 @@ index efc3654..cb0e638 100644
                  )
              }
          },
-@@ -118,9 +201,7 @@ private fun ExtensionUninstallConfirmation(
+     )
+ }
+ 
++internal fun installedSourceGroups(
++    items: List<SourceUiModel>,
++    query: String?,
++): Map<Boolean, List<SourceUiModel.Item>> =
++    items.filterIsInstance<SourceUiModel.Item>()
++        .filter { it.source.visualName.contains(query.orEmpty(), ignoreCase = true) }
++        // The source screen lists the last-used shortcut ahead of its regular row.
++        .distinctBy { it.source.id }
++        .groupBy { it.source.isLocal() }
++        .toSortedMap(compareByDescending { it })
++
+ @Composable
+ private fun ExtensionUninstallConfirmation(
+     extensionName: String,
+@@ -118,9 +215,7 @@ private fun ExtensionUninstallConfirmation(
      onDismissRequest: () -> Unit,
  ) {
      AlertDialog(
@@ -27410,7 +27430,7 @@ index efc3654..cb0e638 100644
          text = {
              Text(text = stringResource(MR.strings.remove_private_extension_message, extensionName))
          },
-@@ -129,7 +210,7 @@ private fun ExtensionUninstallConfirmation(
+@@ -129,7 +224,7 @@ private fun ExtensionUninstallConfirmation(
                  onClick = {
                      onClickConfirm()
                      onDismissRequest()
@@ -85563,3 +85583,51 @@ index 4c2f77e..14c7e84 100644
              }
          }
      }
+diff --git a/app/src/test/java/eu/kanade/tachiyomi/ui/browse/extension/InstalledSourceGroupsTest.kt b/app/src/test/java/eu/kanade/tachiyomi/ui/browse/extension/InstalledSourceGroupsTest.kt
+new file mode 100644
+index 0000000..d8d7e81
+--- /dev/null
++++ b/app/src/test/java/eu/kanade/tachiyomi/ui/browse/extension/InstalledSourceGroupsTest.kt
+@@ -0,0 +1,42 @@
++package eu.kanade.tachiyomi.ui.browse.extension
++
++import eu.kanade.presentation.browse.SourceUiModel
++import org.junit.jupiter.api.Assertions.assertEquals
++import org.junit.jupiter.api.Test
++import tachiyomi.domain.source.model.Pin
++import tachiyomi.domain.source.model.Pins
++import tachiyomi.domain.source.model.Source
++import tachiyomi.source.local.LocalSource
++
++class InstalledSourceGroupsTest {
++    private val pinned = Source(1L, "pt-BR", "Catálogo", true, false, pin = Pins.pinned)
++    private val recent = pinned.copy(isUsedLast = true, pin = pinned.pin - Pin.Actual)
++    private val otherCatalog = pinned.copy(id = 2L, pin = Pins.unpinned)
++    private val local = Source(LocalSource.ID, "", "Arquivos locais", false, false)
++
++    private val items = listOf(
++        SourceUiModel.Header("last_used"),
++        SourceUiModel.Item(recent),
++        SourceUiModel.Header("pinned"),
++        SourceUiModel.Item(pinned),
++        SourceUiModel.Item(otherCatalog),
++        SourceUiModel.Item(local),
++    )
++
++    @Test
++    fun `last used and regular rows render once while different source IDs remain`() {
++        val groups = installedSourceGroups(items, query = null)
++
++        assertEquals(listOf(true, false), groups.keys.toList())
++        assertEquals(listOf(local), groups.getValue(true).map { it.source })
++        assertEquals(listOf(recent, otherCatalog), groups.getValue(false).map { it.source })
++    }
++
++    @Test
++    fun `search keeps matching locale and deduplicates the last used source`() {
++        val groups = installedSourceGroups(items, query = "(pt-br)")
++
++        assertEquals(listOf(false), groups.keys.toList())
++        assertEquals(listOf(1L, 2L), groups.getValue(false).map { it.source.id })
++    }
++}

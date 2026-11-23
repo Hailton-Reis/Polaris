@@ -2,6 +2,10 @@
 
 Este arquivo registra a evolução real do código. **Revisões de desenvolvimento não são lançamentos públicos.** As datas abaixo usam America/Fortaleza, exceto quando houver indicação de UTC. O histórico de distribuição fica em [Releases](https://github.com/Hailton-Reis/Polaris/releases).
 
+## Desenvolvimento · correção da aba Instalados
+
+- A aba **Instalados** mostra cada fonte uma vez, mesmo quando ela também aparece como última usada. Isso corrige o fechamento ao renderizar a lista.
+
 ## Polaris 0.1.0-beta.13 · P20261123.1
 
 ### Recuperação da primeira página e de capas
