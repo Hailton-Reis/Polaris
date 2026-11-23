@@ -16888,10 +16888,17 @@ index de59138..a949e38 100644
      }
  }
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/data/library/LibraryUpdateJob.kt b/app/src/main/java/eu/kanade/tachiyomi/data/library/LibraryUpdateJob.kt
-index 8255de7..5c071fe 100644
+index 8255de7..a8039bc 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/data/library/LibraryUpdateJob.kt
 +++ b/app/src/main/java/eu/kanade/tachiyomi/data/library/LibraryUpdateJob.kt
-@@ -28,13 +28,23 @@ import eu.kanade.tachiyomi.util.system.isConnectedToWifi
+@@ -22,19 +22,30 @@ import eu.kanade.tachiyomi.data.download.DownloadManager
+ import eu.kanade.tachiyomi.data.notification.Notifications
+ import eu.kanade.tachiyomi.source.model.SManga
+ import eu.kanade.tachiyomi.source.model.UpdateStrategy
++import eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalog
+ import eu.kanade.tachiyomi.util.storage.getUriCompat
+ import eu.kanade.tachiyomi.util.system.createFileInCacheDir
+ import eu.kanade.tachiyomi.util.system.isConnectedToWifi
  import eu.kanade.tachiyomi.util.system.isRunning
  import eu.kanade.tachiyomi.util.system.setForegroundSafely
  import eu.kanade.tachiyomi.util.system.workManager
@@ -16915,7 +16922,7 @@ index 8255de7..5c071fe 100644
  import kotlinx.datetime.TimeZone
  import kotlinx.datetime.toLocalDateTime
  import logcat.LogPriority
-@@ -60,20 +70,12 @@ import tachiyomi.domain.manga.interactor.FetchInterval
+@@ -60,20 +71,12 @@ import tachiyomi.domain.manga.interactor.FetchInterval
  import tachiyomi.domain.manga.interactor.GetLibraryManga
  import tachiyomi.domain.manga.interactor.GetManga
  import tachiyomi.domain.manga.model.Manga
@@ -16937,23 +16944,27 @@ index 8255de7..5c071fe 100644
  
  @OptIn(ExperimentalAtomicApi::class)
  class LibraryUpdateJob(private val context: Context, workerParams: WorkerParameters) :
-@@ -91,8 +93,15 @@ class LibraryUpdateJob(private val context: Context, workerParams: WorkerParamet
+@@ -87,12 +90,19 @@ class LibraryUpdateJob(private val context: Context, workerParams: WorkerParamet
+     private val fetchInterval: FetchInterval = Injekt.get()
+     private val filterChaptersForDownload: FilterChaptersForDownload = Injekt.get()
+     private val updateMangaFromRemote: UpdateMangaFromRemote = Injekt.get()
++    private val sourceCatalog: AutomaticSourceCatalog = Injekt.get()
++    private val recoverySlot = Semaphore(1)
+ 
      private val notifier = LibraryUpdateNotifier(context)
  
      private var mangaToUpdate: List<LibraryManga> = mutableListOf()
 +    private val recoverSources = inputData.getBoolean(KEY_RECOVER_SOURCES, false)
  
      override suspend fun doWork(): Result {
-+        if (recoverSources) {
-+            if (context.workManager.isRunning(WORK_NAME_AUTO)) return Result.retry()
-+            if (withTimeoutOrNull(30_000L) { sourceManager.isInitialized.first { it } } != true) {
-+                return Result.retry()
-+            }
++        if (recoverSources && context.workManager.isRunning(WORK_NAME_AUTO)) return Result.retry()
++        if (withTimeoutOrNull(30_000L) { sourceManager.isInitialized.first { it } } != true) {
++            return Result.retry()
 +        }
          if (tags.contains(WORK_NAME_AUTO)) {
              if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
                  val preferences = Injekt.get<LibraryPreferences>()
-@@ -154,64 +163,91 @@ class LibraryUpdateJob(private val context: Context, workerParams: WorkerParamet
+@@ -154,64 +164,92 @@ class LibraryUpdateJob(private val context: Context, workerParams: WorkerParamet
      private suspend fun addMangaToQueue(categoryId: Long) {
          val libraryManga = getLibraryManga.await()
  
@@ -17004,6 +17015,7 @@ index 8255de7..5c071fe 100644
 +                .filter {
 +                    when {
 +                        recoverSources -> true
++                        WORK_NAME_MANUAL in tags && sourceCatalog.needsLibraryRecovery(it.manga) -> true
 +                        it.manga.updateStrategy == UpdateStrategy.ONLY_FETCH_ONCE &&
 +                            it.totalChapters > 0L -> {
 +                            skippedUpdates.add(
@@ -17091,7 +17103,7 @@ index 8255de7..5c071fe 100644
  
          notifier.showQueueSizeWarningNotificationIfNeeded(mangaToUpdate)
  
-@@ -220,32 +256,42 @@ class LibraryUpdateJob(private val context: Context, workerParams: WorkerParamet
+@@ -220,32 +258,42 @@ class LibraryUpdateJob(private val context: Context, workerParams: WorkerParamet
              logcat {
                  skippedUpdates
                      .groupBy { it.second }
@@ -17142,7 +17154,7 @@ index 8255de7..5c071fe 100644
                  .map { mangaInSource ->
                      async {
                          semaphore.withPermit {
-@@ -264,33 +310,45 @@ class LibraryUpdateJob(private val context: Context, workerParams: WorkerParamet
+@@ -264,33 +312,45 @@ class LibraryUpdateJob(private val context: Context, workerParams: WorkerParamet
                                      manga,
                                  ) {
                                      try {
@@ -17203,7 +17215,7 @@ index 8255de7..5c071fe 100644
                                          failedUpdates.add(manga to errorMessage)
                                      }
                                  }
-@@ -302,6 +360,11 @@ class LibraryUpdateJob(private val context: Context, workerParams: WorkerParamet
+@@ -302,6 +362,11 @@ class LibraryUpdateJob(private val context: Context, workerParams: WorkerParamet
          }
  
          notifier.cancelProgressNotification()
@@ -17215,33 +17227,31 @@ index 8255de7..5c071fe 100644
  
          if (newUpdates.isNotEmpty()) {
              notifier.showUpdateNotifications(newUpdates)
-@@ -334,14 +397,17 @@ class LibraryUpdateJob(private val context: Context, workerParams: WorkerParamet
+@@ -333,16 +398,18 @@ class LibraryUpdateJob(private val context: Context, workerParams: WorkerParamet
+      */
      private suspend fun updateManga(manga: Manga, fetchWindow: Pair<Long, Long>): List<Chapter> {
          val source = sourceManager.getOrStub(manga.source)
- 
+-
 -        val update = updateMangaFromRemote(
--            source = source,
--            manga = manga,
++        val repair = recoverSources || sourceCatalog.needsLibraryRecovery(manga)
++        suspend fun refresh() = updateMangaFromRemote(
+             source = source,
+             manga = manga,
 -            fetchDetails = libraryPreferences.autoUpdateMetadata.get(),
--            fetchChapters = true,
--            fetchWindow = fetchWindow,
++            fetchDetails = repair || libraryPreferences.autoUpdateMetadata.get(),
+             fetchChapters = true,
+             fetchWindow = fetchWindow,
 -        )
 -            .getOrThrow()
-+        val update =
-+            updateMangaFromRemote(
-+                    source = source,
-+                    manga = manga,
-+                    fetchDetails = libraryPreferences.autoUpdateMetadata.get(),
-+                    fetchChapters = true,
-+                    fetchWindow = fetchWindow,
-+                    allowSourceDiscovery = recoverSources,
-+                    recoverOnly = recoverSources,
-+                )
-+                .getOrThrow()
++            allowSourceDiscovery = repair,
++            recoverOnly = repair,
++        ).getOrThrow()
  
++        val update = if (repair) recoverySlot.withPermit { refresh() } else refresh()
          return if (update.manga.favorite) update.newChapters else emptyList()
      }
-@@ -355,11 +421,7 @@ class LibraryUpdateJob(private val context: Context, workerParams: WorkerParamet
+ 
+@@ -355,11 +422,7 @@ class LibraryUpdateJob(private val context: Context, workerParams: WorkerParamet
          ensureActive()
  
          updatingManga.add(manga)
@@ -17254,7 +17264,7 @@ index 8255de7..5c071fe 100644
  
          block()
  
-@@ -367,35 +429,32 @@ class LibraryUpdateJob(private val context: Context, workerParams: WorkerParamet
+@@ -367,35 +430,32 @@ class LibraryUpdateJob(private val context: Context, workerParams: WorkerParamet
  
          updatingManga.remove(manga)
          completed.incrementAndFetch()
@@ -17302,7 +17312,7 @@ index 8255de7..5c071fe 100644
                      }
                  }
                  return file
-@@ -410,56 +469,75 @@ class LibraryUpdateJob(private val context: Context, workerParams: WorkerParamet
+@@ -410,56 +470,75 @@ class LibraryUpdateJob(private val context: Context, workerParams: WorkerParamet
          private const val WORK_NAME_MANUAL = "LibraryUpdate-manual"
  
          private const val ERROR_LOG_HELP_URL =
@@ -17417,7 +17427,7 @@ index 8255de7..5c071fe 100644
  
                  context.workManager.enqueueUniquePeriodicWork(
                      WORK_NAME_AUTO,
-@@ -471,24 +549,20 @@ class LibraryUpdateJob(private val context: Context, workerParams: WorkerParamet
+@@ -471,24 +550,20 @@ class LibraryUpdateJob(private val context: Context, workerParams: WorkerParamet
              }
          }
  
@@ -17450,7 +17460,7 @@ index 8255de7..5c071fe 100644
              wm.enqueueUniqueWork(WORK_NAME_MANUAL, ExistingWorkPolicy.KEEP, request)
  
              return true
-@@ -496,10 +570,12 @@ class LibraryUpdateJob(private val context: Context, workerParams: WorkerParamet
+@@ -496,10 +571,12 @@ class LibraryUpdateJob(private val context: Context, workerParams: WorkerParamet
  
          fun stop(context: Context) {
              val wm = context.workManager
@@ -25380,10 +25390,10 @@ index 0000000..7c3c569
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalog.kt b/app/src/main/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalog.kt
 new file mode 100644
-index 0000000..0f0cc3f
+index 0000000..c36c1b7
 --- /dev/null
 +++ b/app/src/main/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalog.kt
-@@ -0,0 +1,731 @@
+@@ -0,0 +1,741 @@
 +package eu.kanade.tachiyomi.source.selection
 +
 +import eu.kanade.domain.chapter.model.toRemoteSChapter
@@ -25456,6 +25466,16 @@ index 0000000..0f0cc3f
 +
 +    fun invalidate(workId: Long) {
 +        invalidated += workId
++    }
++
++    fun needsLibraryRecovery(manga: Manga): Boolean {
++        if (!manga.favorite || manga.source == MERGED_SOURCE_ID) return false
++        val source = sourceManager.get(manga.source)
++        if (source != null && (source !is HttpSource || source is INovelSource)) return false
++        val settings = WorkSources.from(manga.memo)
++        if (settings.pinned != null) return false
++        return source == null || manga.thumbnailUrl.isNullOrBlank() ||
++            CoverLinkFailures.failedAt(manga.thumbnailUrl)?.let { it > settings.checkedAt } == true
 +    }
 +
 +    fun needsDiscovery(manga: Manga): Boolean {
@@ -25592,7 +25612,7 @@ index 0000000..0f0cc3f
 +        val rootOutcome = if (pinned == null || pinned.key == root.key) loadSafely(root) else null
 +        rootOutcome?.let { remember(it) }
 +        val rootCatalog = rootOutcome?.catalog
-+        val recoveringFavorite = foreground && manga.favorite && pinned == null &&
++        val recoveringFavorite = (foreground || recoverOnly) && manga.favorite && pinned == null &&
 +            requestedChapter == null && rootCatalog?.chapters.isNullOrEmpty()
 +        // A restored missing provider and a failing provider can recover without changing source
 +        // IDs.
@@ -25825,7 +25845,7 @@ index 0000000..0f0cc3f
 +                            if (requestedChapter != null) {
 +                                catalog.chapters.any { ChapterVersions.key(asChapter(it)) == requestedChapter }
 +                            } else {
-+                                foreground &&
++                                (foreground || recoverOnly) &&
 +                                    (rootCatalog?.chapters.isNullOrEmpty() || coverNeedsRecovery) &&
 +                                    hasUsableCover(catalog.manga.thumbnail_url)
 +                            }
@@ -70372,10 +70392,10 @@ index 0000000..a64600f
 +}
 diff --git a/app/src/test/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalogTest.kt b/app/src/test/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalogTest.kt
 new file mode 100644
-index 0000000..8a8cd51
+index 0000000..f475f82
 --- /dev/null
 +++ b/app/src/test/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalogTest.kt
-@@ -0,0 +1,1354 @@
+@@ -0,0 +1,1388 @@
 +package eu.kanade.tachiyomi.source.selection
 +
 +import eu.kanade.domain.source.service.SourcePreferences
@@ -71494,6 +71514,40 @@ index 0000000..8a8cd51
 +        assertTrue(catalog.needsDiscovery(
 +            saved.copy(memo = settings.copy(checkedAt = settings.checkedAt - 120_000L).attach(saved.memo)),
 +        ))
++    }
++
++    @Test
++    fun `library refresh targets missing sources and covers while leaving healthy or pinned favorites alone`() {
++        val primary = Provider(1, 3)
++        val catalog = catalog(Manager(listOf(primary)), preferences())
++        val saved = work().copy(favorite = true, thumbnailUrl = "https://example.invalid/cover.jpg")
++        val pin = WorkSource(1, primary.name, primary.lang, saved.url, saved.title)
++
++        assertFalse(catalog.needsLibraryRecovery(saved))
++        assertTrue(catalog.needsLibraryRecovery(saved.copy(source = 42)))
++        assertTrue(catalog.needsLibraryRecovery(saved.copy(thumbnailUrl = null)))
++        assertFalse(catalog.needsLibraryRecovery(
++            saved.copy(thumbnailUrl = null, memo = WorkSources(pinned = pin).attach(saved.memo)),
++        ))
++        assertFalse(catalog.needsLibraryRecovery(saved.copy(source = 42, favorite = false)))
++    }
++
++    @Test
++    fun `library recovery restores a favorite with missing source using Brazilian title and cover`() = runTest {
++        val title = "A Jornada do Retorno"
++        val br = Provider(2, 3, "pt-br", title, matchQuery = true, cover = "https://example.invalid/br.jpg")
++        val en = Provider(3, 3, "en", title, cover = "https://example.invalid/en.jpg")
++        val old = StubSource(1, "", "Old source")
++        val saved = work().copy(title = "$title [PT-BR]", favorite = true, author = null)
++        val catalog = catalog(Manager(listOf(en, br)), preferences())
++
++        assertTrue(catalog.needsLibraryRecovery(saved))
++        val result = catalog.fetch(old, saved, emptyList(), true, true, true, recoverOnly = true)!!
++
++        assertEquals("https://example.invalid/br.jpg", result.manga.thumbnail_url)
++        assertTrue(result.chapters.all { ChapterOrigin.from(it.memo)?.sourceId == br.id })
++        assertEquals(3, result.chapters.size)
++        assertEquals(0, en.searches)
 +    }
 +
 +    @Test

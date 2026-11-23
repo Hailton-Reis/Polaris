@@ -2,6 +2,11 @@
 
 Este arquivo registra a evolução real do código. **Revisões de desenvolvimento não são lançamentos públicos.** As datas abaixo usam America/Fortaleza, exceto quando houver indicação de UTC. O histórico de distribuição fica em [Releases](https://github.com/Hailton-Reis/Polaris/releases).
 
+## Desenvolvimento · recuperação durante a atualização da biblioteca
+
+- A atualização da biblioteca tenta recuperar favoritos com fonte ausente ou capa faltando. Na atualização manual, essas obras podem passar pelos filtros de leitura dentro das categorias selecionadas.
+- A recuperação processa uma obra por vez e prioriza fontes brasileiras. A atualização agendada continua respeitando os filtros configurados.
+
 ## Polaris 0.1.0-beta.15 · P20261123.3
 
 ### Busca por títulos alternativos
