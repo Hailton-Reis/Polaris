@@ -2,7 +2,9 @@
 
 Este arquivo registra a evolução real do código. **Revisões de desenvolvimento não são lançamentos públicos.** As datas abaixo usam America/Fortaleza, exceto quando houver indicação de UTC. O histórico de distribuição fica em [Releases](https://github.com/Hailton-Reis/Polaris/releases).
 
-## Desenvolvimento · busca por títulos alternativos
+## Polaris 0.1.0-beta.15 · P20261123.3
+
+### Busca por títulos alternativos
 
 - Quando a consulta ao MangaDex não resolve o título da biblioteca, o Polaris pode confirmar um título alternativo no MangaUpdates e aproveitar o vínculo entre os registros dos dois catálogos.
 - O leitor usa o vínculo confirmado entre títulos para procurar a mesma numeração em outra edição, inclusive quando faltam créditos na fonte de leitura.
