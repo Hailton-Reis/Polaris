@@ -6043,7 +6043,7 @@ index 0000000..7d94070
 +)
 diff --git a/app/src/main/java/eu/kanade/presentation/documents/DocumentsScreen.kt b/app/src/main/java/eu/kanade/presentation/documents/DocumentsScreen.kt
 new file mode 100644
-index 0000000..c7fb353
+index 0000000..f17583f
 --- /dev/null
 +++ b/app/src/main/java/eu/kanade/presentation/documents/DocumentsScreen.kt
 @@ -0,0 +1,446 @@
@@ -6307,17 +6307,8 @@ index 0000000..c7fb353
 +                modifier = Modifier.padding(horizontal = 16.dp),
 +                verticalArrangement = Arrangement.spacedBy(12.dp),
 +            ) {
-+                item { EnglishPreparationCard() }
 +                item {
 +                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-+                        Text(
-+                            stringResource(ATMR.strings.document_supported),
-+                            style = MaterialTheme.typography.bodySmall,
-+                        )
-+                        Text(
-+                            stringResource(ATMR.strings.document_local_selection_hint),
-+                            style = MaterialTheme.typography.bodySmall,
-+                        )
 +                        if (state.selecting) CircularProgressIndicator()
 +                        Button(
 +                            onClick = { picker.launch(arrayOf("*/*")) },
@@ -6326,6 +6317,14 @@ index 0000000..c7fb353
 +                        ) {
 +                            Text(stringResource(ATMR.strings.document_import))
 +                        }
++                        Text(
++                            stringResource(ATMR.strings.document_supported),
++                            style = MaterialTheme.typography.bodySmall,
++                        )
++                        Text(
++                            stringResource(ATMR.strings.document_local_selection_hint),
++                            style = MaterialTheme.typography.bodySmall,
++                        )
 +                        OutlinedTextField(
 +                            value = link,
 +                            onValueChange = { link = it },
@@ -6354,6 +6353,7 @@ index 0000000..c7fb353
 +                        }
 +                    }
 +                }
++                item { EnglishPreparationCard() }
 +                item {
 +                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
 +                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -6881,6 +6881,62 @@ index c3a6d1f..6dee3a4 100644
          if (icon != null) {
              val flag = getFlagEmoji(sourceLanguage)
              Column(
+diff --git a/app/src/main/java/eu/kanade/presentation/library/components/LibraryToolbar.kt b/app/src/main/java/eu/kanade/presentation/library/components/LibraryToolbar.kt
+index af699f2..95b735f 100644
+--- a/app/src/main/java/eu/kanade/presentation/library/components/LibraryToolbar.kt
++++ b/app/src/main/java/eu/kanade/presentation/library/components/LibraryToolbar.kt
+@@ -3,6 +3,7 @@ package eu.kanade.presentation.library.components
+ import androidx.compose.foundation.isSystemInDarkTheme
+ import androidx.compose.foundation.layout.Row
+ import androidx.compose.material.icons.Icons
++import androidx.compose.material.icons.outlined.Description
+ import androidx.compose.material.icons.outlined.FilterList
+ import androidx.compose.material.icons.outlined.FlipToBack
+ import androidx.compose.material.icons.outlined.SelectAll
+@@ -20,6 +21,7 @@ import eu.kanade.presentation.components.AppBar
+ import eu.kanade.presentation.components.AppBarActions
+ import eu.kanade.presentation.components.SearchToolbar
+ import tachiyomi.i18n.MR
++import tachiyomi.i18n.at.ATMR
+ import tachiyomi.presentation.core.components.Pill
+ import tachiyomi.presentation.core.i18n.stringResource
+ import tachiyomi.presentation.core.theme.active
+@@ -33,6 +35,7 @@ fun LibraryToolbar(
+     onClickSelectAll: () -> Unit,
+     onClickInvertSelection: () -> Unit,
+     onClickFilter: () -> Unit,
++    onClickDocuments: () -> Unit,
+     onClickRefresh: () -> Unit,
+     onClickGlobalUpdate: () -> Unit,
+     onClickOpenRandomManga: () -> Unit,
+@@ -52,6 +55,7 @@ fun LibraryToolbar(
+         searchQuery = searchQuery,
+         onSearchQueryChange = onSearchQueryChange,
+         onClickFilter = onClickFilter,
++        onClickDocuments = onClickDocuments,
+         onClickRefresh = onClickRefresh,
+         onClickGlobalUpdate = onClickGlobalUpdate,
+         onClickOpenRandomManga = onClickOpenRandomManga,
+@@ -66,6 +70,7 @@ private fun LibraryRegularToolbar(
+     searchQuery: String?,
+     onSearchQueryChange: (String?) -> Unit,
+     onClickFilter: () -> Unit,
++    onClickDocuments: () -> Unit,
+     onClickRefresh: () -> Unit,
+     onClickGlobalUpdate: () -> Unit,
+     onClickOpenRandomManga: () -> Unit,
+@@ -96,6 +101,11 @@ private fun LibraryRegularToolbar(
+             val filterTint = if (hasFilters) MaterialTheme.colorScheme.active else LocalContentColor.current
+             AppBarActions(
+                 listOf(
++                    AppBar.Action(
++                        title = stringResource(ATMR.strings.document_kind_documents),
++                        icon = Icons.Outlined.Description,
++                        onClick = onClickDocuments,
++                    ),
+                     AppBar.Action(
+                         title = stringResource(MR.strings.action_filter),
+                         icon = Icons.Outlined.FilterList,
 diff --git a/app/src/main/java/eu/kanade/presentation/manga/ChapterSettingsDialog.kt b/app/src/main/java/eu/kanade/presentation/manga/ChapterSettingsDialog.kt
 index 1aa3af7..9410ddd 100644
 --- a/app/src/main/java/eu/kanade/presentation/manga/ChapterSettingsDialog.kt
@@ -30742,7 +30798,7 @@ index 0000000..0932073
 +    }
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/library/LibraryTab.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/library/LibraryTab.kt
-index 50f5ee9..8e40074 100644
+index 50f5ee9..530d52e 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/ui/library/LibraryTab.kt
 +++ b/app/src/main/java/eu/kanade/tachiyomi/ui/library/LibraryTab.kt
 @@ -4,7 +4,19 @@ import androidx.activity.compose.BackHandler
@@ -30765,7 +30821,15 @@ index 50f5ee9..8e40074 100644
  import androidx.compose.material.icons.Icons
  import androidx.compose.material.icons.automirrored.outlined.HelpOutline
  import androidx.compose.material3.SnackbarHost
-@@ -89,6 +101,8 @@ data object LibraryTab : Tab {
+@@ -28,6 +40,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
+ import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
+ import cafe.adriel.voyager.navigator.tab.TabOptions
+ import eu.kanade.presentation.category.components.ChangeCategoryDialog
++import eu.kanade.presentation.documents.DocumentsScreen
+ import eu.kanade.presentation.library.DeleteLibraryMangaDialog
+ import eu.kanade.presentation.library.LibrarySettingsDialog
+ import eu.kanade.presentation.library.components.LibraryContent
+@@ -89,6 +102,8 @@ data object LibraryTab : Tab {
          val viewModel = viewModel<LibraryViewModel>()
          val settingsViewModel = viewModel<LibrarySettingsViewModel>()
          val state by viewModel.state.collectAsState()
@@ -30774,7 +30838,7 @@ index 50f5ee9..8e40074 100644
  
          val snackbarHostState = remember { SnackbarHostState() }
  
-@@ -112,33 +126,40 @@ data object LibraryTab : Tab {
+@@ -112,33 +127,41 @@ data object LibraryTab : Tab {
                      defaultCategoryTitle = stringResource(MR.strings.label_default),
                      page = state.coercedActiveCategoryIndex,
                  )
@@ -30806,6 +30870,7 @@ index 50f5ee9..8e40074 100644
 +                        onClickSelectAll = viewModel::selectAll,
 +                        onClickInvertSelection = viewModel::invertSelection,
 +                        onClickFilter = viewModel::showSettingsDialog,
++                        onClickDocuments = { navigator.push(DocumentsScreen()) },
 +                        onClickRefresh = { onClickRefresh(state.activeCategory) },
 +                        onClickGlobalUpdate = { onClickRefresh(null) },
 +                        onClickOpenRandomManga = {
@@ -30840,7 +30905,7 @@ index 50f5ee9..8e40074 100644
              },
              bottomBar = {
                  LibraryBottomActionMenu(
-@@ -218,6 +239,41 @@ data object LibraryTab : Tab {
+@@ -218,6 +241,41 @@ data object LibraryTab : Tab {
              }
          }
  

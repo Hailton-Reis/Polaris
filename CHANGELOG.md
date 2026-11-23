@@ -2,6 +2,10 @@
 
 Este arquivo registra a evolução real do código. **Revisões de desenvolvimento não são lançamentos públicos.** As datas abaixo usam America/Fortaleza, exceto quando houver indicação de UTC. O histórico de distribuição fica em [Releases](https://github.com/Hailton-Reis/Polaris/releases).
 
+## Desenvolvimento · atalho para documentos
+
+- A barra da **Biblioteca** dá acesso direto a **Documentos**. A tela coloca a importação de arquivos e links antes da preparação de idiomas.
+
 ## Desenvolvimento · revisão de duplicatas e falhas de extensão
 
 - A biblioteca destaca possíveis duplicatas que ainda precisam de revisão. É possível abrir cada obra do par e comparar as fontes e os capítulos. As sugestões não alteram os registros.
