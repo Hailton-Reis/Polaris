@@ -2,6 +2,11 @@
 
 Este arquivo registra a evolução real do código. **Revisões de desenvolvimento não são lançamentos públicos.** As datas abaixo usam America/Fortaleza, exceto quando houver indicação de UTC. O histórico de distribuição fica em [Releases](https://github.com/Hailton-Reis/Polaris/releases).
 
+## Desenvolvimento · revisão de duplicatas e falhas de extensão
+
+- A biblioteca destaca possíveis duplicatas que ainda precisam de revisão. É possível abrir cada obra do par e comparar as fontes e os capítulos. As sugestões não alteram os registros.
+- A lista de extensões mostra o motivo da falha por pacote e permite repetir só os casos com erro. As linhas por idioma reutilizam o identificador real do APK durante a instalação.
+
 ## Desenvolvimento · reconhecimento de obras e abertura do app
 
 - O catálogo pode confirmar títulos em idiomas diferentes, títulos compostos por dois nomes equivalentes e sinopses idênticas quando a fonte omite a autoria. Numeração incompatível, identidades conflitantes e separações escolhidas pelo usuário continuam respeitadas.
