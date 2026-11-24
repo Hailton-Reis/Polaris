@@ -1,0 +1,86 @@
+{
+  "repository": "Hailton-Reis/Polaris",
+  "tag": "v0.1.0-beta.17",
+  "revision": "P20261124.2",
+  "source_commit": "51865edf20c1afeb2a847fa12ecac0a1f6ef13dd",
+  "version_code": 118,
+  "minimum_android_api": 26,
+  "application_id": "app.mihon.tachiyomiat.dev",
+  "signer_sha256": "3ae747069cc9015ca1777f94fd56b030501f45d6af380426a572ad60e94d8227",
+  "distribution": "universal-arm",
+  "artifacts": [
+    {
+      "abi": "arm64-v8a",
+      "file": "Polaris-0.1.0-beta.17-universal.apk",
+      "bytes": 262822694,
+      "sha256": "27985388ebab410f95567a8f057fd70a1c1bf258b87efaf5efb44bf4da069605",
+      "parts": [
+        {
+          "file": "Polaris-0.1.0-beta.17-universal.apk.001",
+          "bytes": 98000000,
+          "sha256": "84026d6e5ba79a4a16286d1ba6f99539bb2aebb01b151cd2fbf32c8428098e53"
+        },
+        {
+          "file": "Polaris-0.1.0-beta.17-universal.apk.002",
+          "bytes": 98000000,
+          "sha256": "4f69b958438f55ec24f9bf4115eef78c1f813034f9d098727534b322fe834065"
+        },
+        {
+          "file": "Polaris-0.1.0-beta.17-universal.apk.003",
+          "bytes": 66822694,
+          "sha256": "9787f3e9a8c66dbb9caaa50b963289eb524de0eed39938b062c1275154558938"
+        }
+      ]
+    },
+    {
+      "abi": "armeabi-v7a",
+      "file": "Polaris-0.1.0-beta.17-universal.apk",
+      "bytes": 262822694,
+      "sha256": "27985388ebab410f95567a8f057fd70a1c1bf258b87efaf5efb44bf4da069605",
+      "parts": [
+        {
+          "file": "Polaris-0.1.0-beta.17-universal.apk.001",
+          "bytes": 98000000,
+          "sha256": "84026d6e5ba79a4a16286d1ba6f99539bb2aebb01b151cd2fbf32c8428098e53"
+        },
+        {
+          "file": "Polaris-0.1.0-beta.17-universal.apk.002",
+          "bytes": 98000000,
+          "sha256": "4f69b958438f55ec24f9bf4115eef78c1f813034f9d098727534b322fe834065"
+        },
+        {
+          "file": "Polaris-0.1.0-beta.17-universal.apk.003",
+          "bytes": 66822694,
+          "sha256": "9787f3e9a8c66dbb9caaa50b963289eb524de0eed39938b062c1275154558938"
+        }
+      ]
+    }
+  ],
+  "files": [
+    {
+      "file": "COMECE_AQUI.md",
+      "bytes": 338,
+      "sha256": "b49bfea6a0e3aa1af84b3fd29576eaab0fac743afcbea058482af2a2258982fe"
+    },
+    {
+      "file": "RELEASE_NOTES.md",
+      "bytes": 828,
+      "sha256": "c094da9804fc3081326aee1bfda2d265651d3465528fa2d8d912098425bb61a3"
+    },
+    {
+      "file": "VALIDACAO.json",
+      "bytes": 410,
+      "sha256": "2e5d0a54dda54256a1f2bc564c1433e3c4951677c829e9623c412762e6c72e5b"
+    },
+    {
+      "file": "manifest.json",
+      "bytes": 2206,
+      "sha256": "200a051c56c152dd56806cab03e254fd3467c22cc26cbee43da9c89a3203f91e"
+    },
+    {
+      "file": "SHA256SUMS.txt",
+      "bytes": 427,
+      "sha256": "49befb3f7674dba5720224a19e923ae1f414b8a9bb51f720d1fdf23a6f9a4362"
+    }
+  ]
+}
