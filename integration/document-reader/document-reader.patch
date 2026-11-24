@@ -16888,7 +16888,7 @@ index de59138..a949e38 100644
      }
  }
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/data/library/LibraryUpdateJob.kt b/app/src/main/java/eu/kanade/tachiyomi/data/library/LibraryUpdateJob.kt
-index 8255de7..a8039bc 100644
+index 8255de7..1d2c7ca 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/data/library/LibraryUpdateJob.kt
 +++ b/app/src/main/java/eu/kanade/tachiyomi/data/library/LibraryUpdateJob.kt
 @@ -22,19 +22,30 @@ import eu.kanade.tachiyomi.data.download.DownloadManager
@@ -17015,7 +17015,7 @@ index 8255de7..a8039bc 100644
 +                .filter {
 +                    when {
 +                        recoverSources -> true
-+                        WORK_NAME_MANUAL in tags && sourceCatalog.needsLibraryRecovery(it.manga) -> true
++                        WORK_NAME_MANUAL in tags && needsManualRecovery(it) -> true
 +                        it.manga.updateStrategy == UpdateStrategy.ONLY_FETCH_ONCE &&
 +                            it.totalChapters > 0L -> {
 +                            skippedUpdates.add(
@@ -17161,7 +17161,7 @@ index 8255de7..a8039bc 100644
 -                                        val newChapters = updateManga(manga, fetchWindow)
 -                                            .sortedByDescending { it.sourceOrder }
 +                                        val newChapters =
-+                                            updateManga(manga, fetchWindow).sortedByDescending {
++                                            updateManga(libraryManga, fetchWindow).sortedByDescending {
 +                                                it.sourceOrder
 +                                            }
  
@@ -17227,13 +17227,26 @@ index 8255de7..a8039bc 100644
  
          if (newUpdates.isNotEmpty()) {
              notifier.showUpdateNotifications(newUpdates)
-@@ -333,16 +398,18 @@ class LibraryUpdateJob(private val context: Context, workerParams: WorkerParamet
+@@ -331,18 +396,35 @@ class LibraryUpdateJob(private val context: Context, workerParams: WorkerParamet
+      * @param manga the manga to update.
+      * @return a pair of the inserted and removed chapters.
       */
-     private suspend fun updateManga(manga: Manga, fetchWindow: Pair<Long, Long>): List<Chapter> {
-         val source = sourceManager.getOrStub(manga.source)
--
+-    private suspend fun updateManga(manga: Manga, fetchWindow: Pair<Long, Long>): List<Chapter> {
+-        val source = sourceManager.getOrStub(manga.source)
++    private fun needsManualRecovery(entry: LibraryManga): Boolean =
++        sourceCatalog.needsLibraryRecovery(
++            entry.manga,
++            missingChapters = entry.totalChapters == 0L,
++            resumeIncompleteDiscovery = true,
++        )
+ 
 -        val update = updateMangaFromRemote(
-+        val repair = recoverSources || sourceCatalog.needsLibraryRecovery(manga)
++    private suspend fun updateManga(entry: LibraryManga, fetchWindow: Pair<Long, Long>): List<Chapter> {
++        val manga = entry.manga
++        val source = sourceManager.getOrStub(manga.source)
++        val manual = WORK_NAME_MANUAL in tags
++        val repair = recoverSources || sourceCatalog.needsLibraryRecovery(manga) ||
++            (manual && needsManualRecovery(entry))
 +        suspend fun refresh() = updateMangaFromRemote(
              source = source,
              manga = manga,
@@ -17243,15 +17256,20 @@ index 8255de7..a8039bc 100644
              fetchWindow = fetchWindow,
 -        )
 -            .getOrThrow()
-+            allowSourceDiscovery = repair,
++            allowSourceDiscovery = repair || manual,
 +            recoverOnly = repair,
++            completeDiscovery = manual,
 +        ).getOrThrow()
  
-+        val update = if (repair) recoverySlot.withPermit { refresh() } else refresh()
++        val update = if (repair || manual && sourceCatalog.needsDiscovery(manga)) {
++            recoverySlot.withPermit { refresh() }
++        } else {
++            refresh()
++        }
          return if (update.manga.favorite) update.newChapters else emptyList()
      }
  
-@@ -355,11 +422,7 @@ class LibraryUpdateJob(private val context: Context, workerParams: WorkerParamet
+@@ -355,11 +437,7 @@ class LibraryUpdateJob(private val context: Context, workerParams: WorkerParamet
          ensureActive()
  
          updatingManga.add(manga)
@@ -17264,7 +17282,7 @@ index 8255de7..a8039bc 100644
  
          block()
  
-@@ -367,35 +430,32 @@ class LibraryUpdateJob(private val context: Context, workerParams: WorkerParamet
+@@ -367,35 +445,32 @@ class LibraryUpdateJob(private val context: Context, workerParams: WorkerParamet
  
          updatingManga.remove(manga)
          completed.incrementAndFetch()
@@ -17312,7 +17330,7 @@ index 8255de7..a8039bc 100644
                      }
                  }
                  return file
-@@ -410,56 +470,75 @@ class LibraryUpdateJob(private val context: Context, workerParams: WorkerParamet
+@@ -410,56 +485,75 @@ class LibraryUpdateJob(private val context: Context, workerParams: WorkerParamet
          private const val WORK_NAME_MANUAL = "LibraryUpdate-manual"
  
          private const val ERROR_LOG_HELP_URL =
@@ -17327,7 +17345,11 @@ index 8255de7..a8039bc 100644
 +        /** Key for category to update. */
          private const val KEY_CATEGORY = "category"
 +        private const val KEY_RECOVER_SOURCES = "recover_sources"
-+
+ 
+-        fun setupTask(
+-            context: Context,
+-            prefInterval: Int? = null,
+-        ) {
 +        fun startSourceRecovery(context: Context) {
 +            val request =
 +                OneTimeWorkRequestBuilder<LibraryUpdateJob>()
@@ -17344,11 +17366,7 @@ index 8255de7..a8039bc 100644
 +                request,
 +            )
 +        }
- 
--        fun setupTask(
--            context: Context,
--            prefInterval: Int? = null,
--        ) {
++
 +        fun setupTask(context: Context, prefInterval: Int? = null) {
              val preferences = Injekt.get<LibraryPreferences>()
              val interval = prefInterval ?: preferences.autoUpdateInterval.get()
@@ -17427,7 +17445,7 @@ index 8255de7..a8039bc 100644
  
                  context.workManager.enqueueUniquePeriodicWork(
                      WORK_NAME_AUTO,
-@@ -471,24 +550,20 @@ class LibraryUpdateJob(private val context: Context, workerParams: WorkerParamet
+@@ -471,24 +565,20 @@ class LibraryUpdateJob(private val context: Context, workerParams: WorkerParamet
              }
          }
  
@@ -17460,7 +17478,7 @@ index 8255de7..a8039bc 100644
              wm.enqueueUniqueWork(WORK_NAME_MANUAL, ExistingWorkPolicy.KEEP, request)
  
              return true
-@@ -496,10 +571,12 @@ class LibraryUpdateJob(private val context: Context, workerParams: WorkerParamet
+@@ -496,10 +586,12 @@ class LibraryUpdateJob(private val context: Context, workerParams: WorkerParamet
  
          fun stop(context: Context) {
              val wm = context.workManager
@@ -25390,10 +25408,10 @@ index 0000000..7c3c569
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalog.kt b/app/src/main/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalog.kt
 new file mode 100644
-index 0000000..c36c1b7
+index 0000000..a0d9144
 --- /dev/null
 +++ b/app/src/main/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalog.kt
-@@ -0,0 +1,741 @@
+@@ -0,0 +1,749 @@
 +package eu.kanade.tachiyomi.source.selection
 +
 +import eu.kanade.domain.chapter.model.toRemoteSChapter
@@ -25468,13 +25486,18 @@ index 0000000..c36c1b7
 +        invalidated += workId
 +    }
 +
-+    fun needsLibraryRecovery(manga: Manga): Boolean {
++    fun needsLibraryRecovery(
++        manga: Manga,
++        missingChapters: Boolean = false,
++        resumeIncompleteDiscovery: Boolean = false,
++    ): Boolean {
 +        if (!manga.favorite || manga.source == MERGED_SOURCE_ID) return false
 +        val source = sourceManager.get(manga.source)
 +        if (source != null && (source !is HttpSource || source is INovelSource)) return false
 +        val settings = WorkSources.from(manga.memo)
 +        if (settings.pinned != null) return false
-+        return source == null || manga.thumbnailUrl.isNullOrBlank() ||
++        return source == null || missingChapters || manga.thumbnailUrl.isNullOrBlank() ||
++            (resumeIncompleteDiscovery && settings.discoveryIncomplete) ||
 +            CoverLinkFailures.failedAt(manga.thumbnailUrl)?.let { it > settings.checkedAt } == true
 +    }
 +
@@ -25535,6 +25558,7 @@ index 0000000..c36c1b7
 +        recoverOnly: Boolean = false,
 +        foreground: Boolean = false,
 +        requestedChapter: ChapterVersions.Key? = null,
++        completeDiscovery: Boolean = false,
 +    ): SMangaUpdate? {
 +        if (!fetchChapters || manga.source == MERGED_SOURCE_ID || source is INovelSource)
 +            return null
@@ -25612,7 +25636,7 @@ index 0000000..c36c1b7
 +        val rootOutcome = if (pinned == null || pinned.key == root.key) loadSafely(root) else null
 +        rootOutcome?.let { remember(it) }
 +        val rootCatalog = rootOutcome?.catalog
-+        val recoveringFavorite = (foreground || recoverOnly) && manga.favorite && pinned == null &&
++        val recoveringFavorite = (foreground || recoverOnly || completeDiscovery) && manga.favorite && pinned == null &&
 +            requestedChapter == null && rootCatalog?.chapters.isNullOrEmpty()
 +        // A restored missing provider and a failing provider can recover without changing source
 +        // IDs.
@@ -25655,7 +25679,7 @@ index 0000000..c36c1b7
 +                checkImages = requestedChapter == null && (discover || recoverOnly && pinned == null),
 +            )
 +            remember(checkNotNull(rootOutcome), catalogs[0])
-+            if (recoverOnly && pinned == null && catalogs[0].chapters.isNotEmpty()) {
++            if (recoverOnly && !completeDiscovery && pinned == null && catalogs[0].chapters.isNotEmpty()) {
 +                discover = catalogs[0].binding.readability != "sample_passed" ||
 +                    (!hasUsableCover(catalogs[0].manga.thumbnail_url) && discover)
 +            }
@@ -25677,7 +25701,7 @@ index 0000000..c36c1b7
 +            (listOf(recoveryTitle, reference.title) + identity?.titles.orEmpty())
 +                .filter { it.isNotBlank() }
 +                .distinctBy(SourceMatching::title)
-+                .take(6)
++                .take(if (completeDiscovery) 12 else 6)
 +        val referenceChapters =
 +            rootCatalog?.chapters?.takeIf { it.isNotEmpty() }?.map(::asChapter)
 +                ?: existing.filter {
@@ -25725,71 +25749,66 @@ index 0000000..c36c1b7
 +        }
 +        suspend fun search(provider: HttpSource, alreadyKnown: Set<String>): Outcome {
 +            return try {
-+                withTimeoutOrNull(if (recoveringFavorite) RECOVERY_PROVIDER_TIMEOUT else SEARCH_TIMEOUT) {
-+                    var matches = emptyList<SManga>()
++                withTimeoutOrNull(if (recoveringFavorite && !completeDiscovery) RECOVERY_PROVIDER_TIMEOUT else SEARCH_TIMEOUT) {
++                    val attemptedUrls = mutableSetOf<String>()
 +                    for (query in searchTitles) {
 +                        val page = provider.getSearchManga(1, query, provider.getFilterList())
 +                        val visibility = contentFilter.snapshot()
-+                        matches =
-+                            page.mangas
-+                                .filter {
-+                                    visibility.allows(it) &&
-+                                        SourceMatching.titleMatches(
-+                                            recoveryTitle,
-+                                            if (recoveringFavorite) SourceMatching.restoredSearchTitle(it.title) else it.title,
-+                                            identity,
-+                                        )
-+                                }
-+                                .distinctBy { it.url }
-+                        if (recoveringFavorite && matches.size > 1) {
++                        val matches = page.mangas
++                            .filter {
++                                visibility.allows(it) &&
++                                    SourceMatching.titleMatches(
++                                        recoveryTitle,
++                                        if (recoveringFavorite) SourceMatching.restoredSearchTitle(it.title) else it.title,
++                                        identity,
++                                    )
++                            }
++                            .distinctBy { it.url }
++                            .filterNot { it.url in attemptedUrls || "${provider.id}:${it.url}" in alreadyKnown }
++                        val match = if (matches.size > 1 && (recoveringFavorite || completeDiscovery)) {
 +                            val queryTitle = SourceMatching.restoredTitle(query)
-+                            val exact = matches.filter { SourceMatching.restoredTitle(it.title) == queryTitle }
-+                            if (exact.isNotEmpty()) matches = exact
++                            matches.singleOrNull { SourceMatching.restoredTitle(it.title) == queryTitle }
++                        } else {
++                            matches.singleOrNull()
++                        } ?: continue
++                        attemptedUrls += match.url
++
++                        val result = try {
++                            provider.getMangaUpdate(match, emptyList(), true, false).manga
++                        } catch (error: CancellationException) {
++                            throw error
++                        } catch (_: Exception) {
++                            if (!recoveringFavorite) continue
++                            match.copy()
 +                        }
-+                        if (if (recoveringFavorite) matches.size == 1 else matches.isNotEmpty()) break
-+                    }
-+                    if (matches.size != 1) return@withTimeoutOrNull Outcome(null, null)
-+                    val match = matches.single()
-+                    // A confirmed URL was already attempted during this refresh.
-+                    if ("${provider.id}:${match.url}" in alreadyKnown)
-+                        return@withTimeoutOrNull Outcome(null, null)
-+                    val result = try {
-+                        provider.getMangaUpdate(match, emptyList(), true, false).manga
-+                    } catch (error: CancellationException) {
-+                        throw error
-+                    } catch (error: Exception) {
-+                        if (!recoveringFavorite) throw error
-+                        match.copy()
-+                    }
-+                    result.url = match.url
-+                    if (!contentFilter.snapshot().allows(result))
-+                        return@withTimeoutOrNull Outcome(null, null)
-+                    val linkedChapterMatch = recoveringLinkedChapter && identity?.matchesTitle(result.title) == true
-+                    val verified = if (recoveringFavorite || linkedChapterMatch) {
-+                        SourceMatching.matchesRestoredFavorite(reference, result, identity)
-+                    } else {
-+                        SourceMatching.sameWork(reference, result, identity)
-+                    }
-+                    if (!verified) return@withTimeoutOrNull Outcome(null, null)
-+                    val binding =
-+                        WorkSource(
-+                            provider.id,
-+                            provider.name,
-+                            provider.lang,
-+                            result.url,
-+                            result.title,
-+                            result.author,
-+                            result.artist,
-+                            cleanMemo(result.memo),
++                        result.url = match.url
++                        if (!contentFilter.snapshot().allows(result)) continue
++                        val linkedChapterMatch = recoveringLinkedChapter && identity?.matchesTitle(result.title) == true
++                        val verified = if (recoveringFavorite || linkedChapterMatch) {
++                            SourceMatching.matchesRestoredFavorite(reference, result, identity)
++                        } else {
++                            SourceMatching.sameWork(reference, result, identity)
++                        }
++                        if (!verified) continue
++                        val binding = WorkSource(
++                            provider.id, provider.name, provider.lang, result.url, result.title,
++                            result.author, result.artist, cleanMemo(result.memo),
 +                        )
-+                    Outcome(
-+                        binding,
-+                        load(
-+                            binding, existing, root, false, provider,
-+                            resolvedDetails = result,
-+                            thumbnail = match.thumbnail_url,
-+                        ),
-+                    )
++                        val found = try {
++                            load(
++                                binding, existing, root, false, provider,
++                                resolvedDetails = result, thumbnail = match.thumbnail_url,
++                            )
++                        } catch (error: CancellationException) {
++                            throw error
++                        } catch (_: Exception) {
++                            continue
++                        }
++                        if (found.chapters.isNotEmpty() && compatible(found)) {
++                            return@withTimeoutOrNull Outcome(binding, found)
++                        }
++                    }
++                    Outcome(null, null)
 +                } ?: Outcome(null, null, timedOut = true)
 +            } catch (error: CancellationException) {
 +                throw error
@@ -25805,6 +25824,18 @@ index 0000000..c36c1b7
 +                ?.takeIf { pinned != null || contentFilter.snapshot().allows(it.manga) }
 +                ?.let(::retain)
 +        }
++        suspend fun runProvider(binding: WorkSource? = null, request: suspend () -> Prepared): Prepared {
++            val completed = if (completeDiscovery) {
++                providerConcurrency.withPermit(priority = foreground) {
++                    withTimeoutOrNull(PROVIDER_PIPELINE_TIMEOUT) { request() }
++                }
++            } else {
++                withTimeoutOrNull(PROVIDER_PIPELINE_TIMEOUT) {
++                    providerConcurrency.withPermit(priority = foreground) { request() }
++                }
++            }
++            return completed ?: Prepared(Outcome(binding, null, timedOut = true), null)
++        }
 +        if (pinned != null) {
 +            if (pinned.key != root.key) {
 +                val binding = settings.candidates.find { it.key == pinned.key } ?: pinned
@@ -25818,11 +25849,7 @@ index 0000000..c36c1b7
 +                .asFlow()
 +                .flatMapMerge(concurrency = PARALLEL_PROVIDERS) { binding ->
 +                    flow {
-+                        val prepared =
-+                            withTimeoutOrNull(PROVIDER_PIPELINE_TIMEOUT) {
-+                                providerConcurrency.withPermit(priority = foreground) { prepare(loadSafely(binding)) }
-+                            } ?: Prepared(Outcome(binding, null, timedOut = true), null)
-+                        emit(prepared)
++                        emit(runProvider(binding) { prepare(loadSafely(binding)) })
 +                    }
 +                }
 +                .buffer(PARALLEL_PROVIDERS)
@@ -25835,8 +25862,6 @@ index 0000000..c36c1b7
 +                            it.chapters.isNotEmpty() && it.binding.readability != "sample_failed"
 +                        }
 +                        .mapTo(hashSetOf()) { it.binding.sourceId }
-+                // Budget includes waiting for the app-wide alternative-provider slots.
-+                // No work owns the whole discovery queue while other works wait.
 +                fun hasUsableAlternative(languagePriority: Int? = null): Boolean =
 +                    catalogs.any { catalog ->
 +                        catalog.binding.key != root.key &&
@@ -25852,6 +25877,18 @@ index 0000000..c36c1b7
 +                    }
 +
 +                val providers = enabled.filter { it.id != manga.source && it.id !in refreshed }
++                fun candidates(providers: List<HttpSource>) =
++                    providers.asFlow()
++                        .flatMapMerge(concurrency = PARALLEL_PROVIDERS) { provider ->
++                            flow {
++                                emit(runProvider {
++                                    val outcome = search(provider, alreadyKnown)
++                                    Prepared(outcome, outcome.catalog?.let { sampled(it) })
++                                })
++                            }
++                        }
++                        .buffer(PARALLEL_PROVIDERS)
++
 +                suspend fun searchProviders(
 +                    providers: List<HttpSource>,
 +                    budget: Long,
@@ -25859,27 +25896,16 @@ index 0000000..c36c1b7
 +                ): Boolean? {
 +                    if (ready()) return true
 +                    return withTimeoutOrNull(budget) {
-+                        providers.asFlow()
-+                            .flatMapMerge(concurrency = PARALLEL_PROVIDERS) { provider ->
-+                                flow {
-+                                    val prepared =
-+                                        withTimeoutOrNull(PROVIDER_PIPELINE_TIMEOUT) {
-+                                            providerConcurrency.withPermit(priority = foreground) {
-+                                                prepare(search(provider, alreadyKnown))
-+                                            }
-+                                        } ?: Prepared(Outcome(null, null, timedOut = true), null)
-+                                    emit(prepared)
-+                                }
-+                            }
-+                            .buffer(PARALLEL_PROVIDERS)
-+                            .firstOrNull { prepared ->
-+                                collect(prepared)
-+                                ready()
-+                            } != null
++                        candidates(providers).firstOrNull { prepared ->
++                            collect(prepared)
++                            ready()
++                        } != null
 +                    }
 +                }
 +
-+                if (recoveringFavorite) {
++                if (completeDiscovery) {
++                    candidates(providers).collect(::collect)
++                } else if (recoveringFavorite) {
 +                    for ((priority, group) in providers.groupBy { languageRank(it.lang) }) {
 +                        val stopped = searchProviders(group, RECOVERY_LANGUAGE_TIMEOUT) { hasUsableAlternative(priority) }
 +                        if (stopped != false) incomplete = true
@@ -26958,10 +26984,10 @@ index 0000000..d421506
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/source/selection/WorkIdentityResolver.kt b/app/src/main/java/eu/kanade/tachiyomi/source/selection/WorkIdentityResolver.kt
 new file mode 100644
-index 0000000..aeed355
+index 0000000..ffff93e
 --- /dev/null
 +++ b/app/src/main/java/eu/kanade/tachiyomi/source/selection/WorkIdentityResolver.kt
-@@ -0,0 +1,166 @@
+@@ -0,0 +1,178 @@
 +package eu.kanade.tachiyomi.source.selection
 +
 +import eu.kanade.tachiyomi.network.GET
@@ -27041,10 +27067,10 @@ index 0000000..aeed355
 +        val title = (record["title"] as? JsonPrimitive)?.contentOrNull?.takeIf { it.length in 2..300 } ?: return null
 +        val associated = (record["associated"] as? JsonArray).orEmpty()
 +            .mapNotNull { ((it as? JsonObject)?.get("title") as? JsonPrimitive)?.contentOrNull }
-+        val normalized = WorkIdentityText.title(query)
-+        val alias = associated.firstOrNull { it.length in 2..300 && WorkIdentityText.title(it) == normalized }
++        val normalized = portugueseAliasKey(query)
++        val alias = associated.firstOrNull { it.length in 2..300 && portugueseAliasKey(it) == normalized }
 +            ?: return null
-+        return LinkedTitles(id.toString(36), title, alias)
++        return LinkedTitles(id.toString(36), title, query, alias)
 +    }
 +
 +    private suspend fun requestJson(request: Request): JsonObject =
@@ -27055,7 +27081,17 @@ index 0000000..aeed355
 +            Json.parseToJsonElement(source.readUtf8()).jsonObject
 +        }
 +
-+    internal data class LinkedTitles(val mangaUpdatesId: String, val title: String, val alias: String)
++    internal data class LinkedTitles(
++        val mangaUpdatesId: String,
++        val title: String,
++        val alias: String,
++        val catalogAlias: String = alias,
++    )
++
++    private fun portugueseAliasKey(title: String): String =
++        WorkIdentityText.title(title)
++            .replace(LEADING_ARTICLE, "")
++            .replace(CONTRACTED_ARTICLE, "de")
 +
 +    internal fun select(reference: SManga, records: JsonArray, linked: LinkedTitles? = null): WorkIdentity? {
 +        val people = SourceMatching.people(reference.author, reference.artist)
@@ -27073,7 +27109,7 @@ index 0000000..aeed355
 +                val linkedAlias = linked?.let {
 +                    val mangaUpdatesId = ((attributes["links"] as? JsonObject)?.get("mu") as? JsonPrimitive)?.contentOrNull
 +                    if (mangaUpdatesId != it.mangaUpdatesId) return@mapNotNull null
-+                    listOf(JsonPrimitive(it.alias))
++                    listOf(it.alias, it.catalogAlias, it.title).map(::JsonPrimitive)
 +                }.orEmpty()
 +                val titles =
 +                    (linkedAlias + preferred +
@@ -27122,6 +27158,8 @@ index 0000000..aeed355
 +    }
 +
 +    companion object {
++        private val LEADING_ARTICLE = Regex("^(?:o|a|os|as) ")
++        private val CONTRACTED_ARTICLE = Regex("""\b(?:do|da|dos|das|de (?:um|uma|o|a|os|as))\b""")
 +        private const val MANGA_UPDATES = "https://api.mangaupdates.com/v1/series"
 +        private const val MAX_BYTES = 2 * 1024 * 1024L
 +        private val UUID =
@@ -43140,7 +43178,7 @@ index cf639e4..6d59dd0 100644
              updateManga.awaitAll(listOfNotNull(currentMangaUpdate, targetMangaUpdate))
          } catch (e: Throwable) {
 diff --git a/app/src/main/java/mihon/domain/source/interactor/UpdateMangaFromRemote.kt b/app/src/main/java/mihon/domain/source/interactor/UpdateMangaFromRemote.kt
-index d016eaa..f1e3d35 100644
+index d016eaa..83ca317 100644
 --- a/app/src/main/java/mihon/domain/source/interactor/UpdateMangaFromRemote.kt
 +++ b/app/src/main/java/mihon/domain/source/interactor/UpdateMangaFromRemote.kt
 @@ -1,26 +1,32 @@
@@ -43186,7 +43224,7 @@ index d016eaa..f1e3d35 100644
  ) {
      suspend operator fun invoke(
          manga: Manga,
-@@ -37,6 +44,10 @@ class UpdateMangaFromRemote(
+@@ -37,6 +44,11 @@ class UpdateMangaFromRemote(
          fetchChapters: Boolean = false,
          manualFetch: Boolean = false,
          fetchWindow: Pair<Long, Long> = Pair(0, 0),
@@ -43194,10 +43232,11 @@ index d016eaa..f1e3d35 100644
 +        recoverOnly: Boolean = false,
 +        foreground: Boolean = false,
 +        requestedChapter: ChapterVersions.Key? = null,
++        completeDiscovery: Boolean = false,
      ): Result<RemoteMangaUpdate> {
          val source = sourceManager.getOrStub(manga.source)
          return invoke(
-@@ -45,6 +56,11 @@ class UpdateMangaFromRemote(
+@@ -45,6 +57,12 @@ class UpdateMangaFromRemote(
              fetchDetails = fetchDetails,
              fetchChapters = fetchChapters,
              manualFetch = manualFetch,
@@ -43206,10 +43245,11 @@ index d016eaa..f1e3d35 100644
 +            recoverOnly = recoverOnly,
 +            foreground = foreground,
 +            requestedChapter = requestedChapter,
++            completeDiscovery = completeDiscovery,
          )
      }
  
-@@ -55,29 +71,93 @@ class UpdateMangaFromRemote(
+@@ -55,29 +73,95 @@ class UpdateMangaFromRemote(
          fetchChapters: Boolean = false,
          manualFetch: Boolean = false,
          fetchWindow: Pair<Long, Long> = Pair(0, 0),
@@ -43217,6 +43257,7 @@ index d016eaa..f1e3d35 100644
 +        recoverOnly: Boolean = false,
 +        foreground: Boolean = false,
 +        requestedChapter: ChapterVersions.Key? = null,
++        completeDiscovery: Boolean = false,
      ): Result<RemoteMangaUpdate> {
          return try {
 -            val chapters = chapterRepository.getChapterByMangaId(manga.id)
@@ -43253,6 +43294,7 @@ index d016eaa..f1e3d35 100644
 +                        recoverOnly = recoverOnly,
 +                        foreground = foreground,
 +                        requestedChapter = requestedChapter,
++                        completeDiscovery = completeDiscovery,
 +                    )
 +                        ?: source.getMangaUpdate(
 +                            manga =
@@ -43323,7 +43365,7 @@ index d016eaa..f1e3d35 100644
          } catch (e: Exception) {
              logcat(LogPriority.ERROR, e)
              Result.failure(e)
-@@ -89,53 +169,59 @@ class UpdateMangaFromRemote(
+@@ -89,53 +173,59 @@ class UpdateMangaFromRemote(
          remoteManga: SManga,
          manualFetch: Boolean,
      ): Boolean {
@@ -70392,10 +70434,10 @@ index 0000000..a64600f
 +}
 diff --git a/app/src/test/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalogTest.kt b/app/src/test/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalogTest.kt
 new file mode 100644
-index 0000000..f475f82
+index 0000000..67c0edc
 --- /dev/null
 +++ b/app/src/test/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalogTest.kt
-@@ -0,0 +1,1388 @@
+@@ -0,0 +1,1440 @@
 +package eu.kanade.tachiyomi.source.selection
 +
 +import eu.kanade.domain.source.service.SourcePreferences
@@ -70455,6 +70497,8 @@ index 0000000..f475f82
 +        var delayMillis = 0L
 +        var cancel = false
 +        var searches = 0
++        var searchDelayMillis = 0L
++        var searchResults: ((String, SManga) -> List<SManga>)? = null
 +        var echoChapterMetadata = false
 +        var incomingUrls = emptyList<String>()
 +
@@ -70473,8 +70517,10 @@ index 0000000..f475f82
 +            filters: FilterList,
 +        ): MangasPage {
 +            searches++
++            if (searchDelayMillis > 0) delay(searchDelayMillis)
++            val entry = info()
 +            return MangasPage(
-+                if (!matchQuery || query == title) listOf(info()) else emptyList(),
++                searchResults?.invoke(query, entry) ?: if (!matchQuery || query == title) listOf(entry) else emptyList(),
 +                false,
 +            )
 +        }
@@ -71548,6 +71594,54 @@ index 0000000..f475f82
 +        assertTrue(result.chapters.all { ChapterOrigin.from(it.memo)?.sourceId == br.id })
 +        assertEquals(3, result.chapters.size)
 +        assertEquals(0, en.searches)
++    }
++
++    @Test
++    fun `complete recovery checks later sources even after the normal discovery deadline`() = runTest {
++        val title = "A Jornada do Retorno"
++        val slow = (2L..7L).map { id ->
++            Provider(id, 0, "pt-br", title).also { it.searchDelayMillis = 12_000L }
++        }
++        val late = Provider(8, 3, "pt-br", title, cover = "https://example.invalid/late.jpg")
++        val scan = AutomaticSourceCatalog(
++            Manager(slow + late), preferences(), providerConcurrency = SourceDiscoveryConcurrency(),
++            checkReadability = { _, _ -> true },
++        )
++        val saved = work().copy(title = title, favorite = true, author = null)
++        val old = StubSource(1, "", "Old source")
++
++        val result = scan.fetch(old, saved, emptyList(), true, true, true,
++            recoverOnly = true, completeDiscovery = true)!!
++
++        assertTrue(slow.all { it.searches == 1 })
++        assertEquals(1, late.searches)
++        assertEquals("https://example.invalid/late.jpg", result.manga.thumbnail_url)
++        assertFalse(WorkSources.from(result.manga.memo).discoveryIncomplete)
++    }
++
++    @Test
++    fun `an ambiguous saved title does not prevent trying the next verified alias`() = runTest {
++        val pt = "O Ponto de Vista do Leitor Onisciente"
++        val en = "Omniscient Reader"
++        val provider = Provider(2, 3, "en", en).also {
++            it.searchResults = { query, entry ->
++                if (query == pt) listOf(
++                    entry.copy().also { candidate -> candidate.title = pt; candidate.url = "/ambiguous-1" },
++                    entry.copy().also { candidate -> candidate.title = pt; candidate.url = "/ambiguous-2" },
++                ) else listOf(entry)
++            }
++        }
++        val identity = tachiyomi.domain.manga.model.WorkIdentity(
++            "mangadex:9a414441-bbad-43f1-a3a7-dc262ca790a3", listOf(pt, en), listOf("Jane Doe"),
++            System.currentTimeMillis(),
++        )
++        val scan = AutomaticSourceCatalog(Manager(listOf(provider)), preferences(),
++            resolveIdentity = { identity }, checkReadability = { _, _ -> true })
++        val result = scan.fetch(StubSource(1, "", "Old"), work().copy(title = pt),
++            emptyList(), true, true, true)!!
++
++        assertEquals(2, provider.searches)
++        assertTrue(result.chapters.all { ChapterOrigin.from(it.memo)?.mangaUrl == "/work" })
 +    }
 +
 +    @Test
@@ -73470,10 +73564,10 @@ index 0000000..77af1ae
 +}
 diff --git a/app/src/test/java/eu/kanade/tachiyomi/source/selection/WorkIdentityResolverTest.kt b/app/src/test/java/eu/kanade/tachiyomi/source/selection/WorkIdentityResolverTest.kt
 new file mode 100644
-index 0000000..210daf1
+index 0000000..96d31ed
 --- /dev/null
 +++ b/app/src/test/java/eu/kanade/tachiyomi/source/selection/WorkIdentityResolverTest.kt
-@@ -0,0 +1,175 @@
+@@ -0,0 +1,190 @@
 +package eu.kanade.tachiyomi.source.selection
 +
 +import eu.kanade.tachiyomi.source.model.SManga
@@ -73617,6 +73711,21 @@ index 0000000..210daf1
 +
 +        assertNull(resolver.select(ref, JsonArray(listOf(tutorialRecord("different"))), alias))
 +        assertNull(resolver.select(work(ref.title, "Other"), JsonArray(listOf(tutorialRecord("f48tgmh"))), alias))
++    }
++
++    @Test
++    fun `linked titles tolerate Portuguese article variants but preserve meaningful words`() {
++        val record = Json.parseToJsonElement("""
++            {"series_id":50369844984,"title":"Omniscient Reader","type":"Manhwa",
++             "associated":[{"title":"Ponto de vista de um leitor onisciente"}]}
++        """).jsonObject
++        val saved = "O Ponto de Vista do Leitor Onisciente"
++        val match = requireNotNull(resolver.associatedTitle(saved, 50369844984L, record))
++
++        assertEquals("n50wl4o", match.mangaUpdatesId)
++        assertEquals(saved, match.alias)
++        assertEquals("Ponto de vista de um leitor onisciente", match.catalogAlias)
++        assertNull(resolver.associatedTitle("O Retorno do Leitor Onisciente", 50369844984L, record))
 +    }
 +
 +    private fun tutorialRecord(mangaUpdatesId: String) = buildJsonObject {

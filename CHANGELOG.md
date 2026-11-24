@@ -2,6 +2,11 @@
 
 Este arquivo registra a evolução real do código. **Revisões de desenvolvimento não são lançamentos públicos.** As datas abaixo usam America/Fortaleza, exceto quando houver indicação de UTC. O histórico de distribuição fica em [Releases](https://github.com/Hailton-Reis/Polaris/releases).
 
+## Desenvolvimento · busca completa de fontes na atualização manual
+
+- A atualização manual percorre as fontes elegíveis quando a descoberta está pendente. Cada consulta tem seu limite individual e a busca em lote continua depois de encontrar a primeira edição.
+- O Polaris testa outros títulos confirmados quando uma busca retorna obras ambíguas ou sem capítulos compatíveis. A confirmação entre catálogos reconhece diferenças de artigos no título salvo.
+
 ## Desenvolvimento · recuperação durante a atualização da biblioteca
 
 - A atualização da biblioteca tenta recuperar favoritos com fonte ausente ou capa faltando. Na atualização manual, essas obras podem passar pelos filtros de leitura dentro das categorias selecionadas.
