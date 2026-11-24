@@ -2,17 +2,19 @@
 
 Este arquivo registra a evolução real do código. **Revisões de desenvolvimento não são lançamentos públicos.** As datas abaixo usam America/Fortaleza, exceto quando houver indicação de UTC. O histórico de distribuição fica em [Releases](https://github.com/Hailton-Reis/Polaris/releases).
 
-## Desenvolvimento · recuperação de endereço e novas tentativas
+## Polaris 0.1.0-beta.16 · P20261124.1
+
+### Recuperação de endereço e novas tentativas
 
 - Se o endereço antigo não fornecer capítulos, a procura pode localizar a obra em outro endereço da mesma fonte. A busca mantém o título salvo como referência para evitar aproveitar detalhes de outra obra.
 - Quando a fonte original excede o limite de espera, a atualização preserva o resultado encontrado e mantém a consulta elegível para nova tentativa.
 
-## Desenvolvimento · busca completa de fontes na atualização manual
+### Busca completa de fontes na atualização manual
 
 - A atualização manual percorre as fontes elegíveis quando a descoberta está pendente. Cada consulta tem seu limite individual e a busca em lote continua depois de encontrar a primeira edição.
 - O Polaris testa outros títulos confirmados quando uma busca retorna obras ambíguas ou sem capítulos compatíveis. A confirmação entre catálogos reconhece diferenças de artigos no título salvo.
 
-## Desenvolvimento · recuperação durante a atualização da biblioteca
+### Recuperação durante a atualização da biblioteca
 
 - A atualização da biblioteca tenta recuperar favoritos com fonte ausente ou capa faltando. Na atualização manual, essas obras podem passar pelos filtros de leitura dentro das categorias selecionadas.
 - A recuperação processa uma obra por vez e prioriza fontes brasileiras. A atualização agendada continua respeitando os filtros configurados.
