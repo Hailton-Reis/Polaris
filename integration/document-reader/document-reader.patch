@@ -25408,7 +25408,7 @@ index 0000000..7c3c569
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalog.kt b/app/src/main/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalog.kt
 new file mode 100644
-index 0000000..a0d9144
+index 0000000..7a237e5
 --- /dev/null
 +++ b/app/src/main/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalog.kt
 @@ -0,0 +1,749 @@
@@ -25684,7 +25684,7 @@ index 0000000..a0d9144
 +                    (!hasUsableCover(catalogs[0].manga.thumbnail_url) && discover)
 +            }
 +        }
-+        val reference = rootCatalog?.manga ?: manga.toSManga()
++        val reference = rootCatalog?.takeIf { it.chapters.isNotEmpty() }?.manga ?: manga.toSManga()
 +        val recoveryTitle =
 +            if (recoveringFavorite) SourceMatching.restoredSearchTitle(reference.title) else reference.title
 +        val identity =
@@ -25816,7 +25816,7 @@ index 0000000..a0d9144
 +                Outcome(null, null)
 +            }
 +        }
-+        var incomplete = false
++        var incomplete = rootOutcome?.timedOut == true
 +        fun collect(prepared: Prepared) {
 +            remember(prepared.outcome, prepared.retained)
 +            incomplete = incomplete || prepared.outcome.timedOut
@@ -25876,7 +25876,7 @@ index 0000000..a0d9144
 +                            }
 +                    }
 +
-+                val providers = enabled.filter { it.id != manga.source && it.id !in refreshed }
++                val providers = enabled.filter { it.id !in refreshed }
 +                fun candidates(providers: List<HttpSource>) =
 +                    providers.asFlow()
 +                        .flatMapMerge(concurrency = PARALLEL_PROVIDERS) { provider ->
@@ -26007,7 +26007,7 @@ index 0000000..a0d9144
 +                    }
 +            }
 +        val remote =
-+            (rootCatalog?.manga ?: manga.toSManga()).let { incoming ->
++            reference.let { incoming ->
 +                incoming.copy().also {
 +                    it.url = manga.url
 +                    it.thumbnail_url = originalCover ?: replacementCover?.manga?.thumbnail_url ?: manga.thumbnailUrl
@@ -70434,10 +70434,10 @@ index 0000000..a64600f
 +}
 diff --git a/app/src/test/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalogTest.kt b/app/src/test/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalogTest.kt
 new file mode 100644
-index 0000000..67c0edc
+index 0000000..6c3e6ae
 --- /dev/null
 +++ b/app/src/test/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalogTest.kt
-@@ -0,0 +1,1440 @@
+@@ -0,0 +1,1484 @@
 +package eu.kanade.tachiyomi.source.selection
 +
 +import eu.kanade.domain.source.service.SourcePreferences
@@ -70500,6 +70500,7 @@ index 0000000..67c0edc
 +        var searchDelayMillis = 0L
 +        var searchResults: ((String, SManga) -> List<SManga>)? = null
 +        var echoChapterMetadata = false
++        var emptyCatalogMetadata: SManga? = null
 +        var incomingUrls = emptyList<String>()
 +
 +        private fun info() =
@@ -70535,6 +70536,10 @@ index 0000000..67c0edc
 +            if (cancel) throw CancellationException("parent cancelled")
 +            if (fail || failDetails && fetchDetails) error("provider unavailable")
 +            incomingUrls = chapters.map { it.url }
++            val emptyCatalog = emptyCatalogMetadata
++            if (emptyCatalog != null && emptyCatalog.url == manga.url) {
++                return SMangaUpdate(emptyCatalog, emptyList())
++            }
 +            return SMangaUpdate(
 +                if (echoChapterMetadata && !fetchDetails) manga else info(),
 +                if (!fetchChapters) {
@@ -71429,6 +71434,45 @@ index 0000000..67c0edc
 +            assertEquals(4, result.chapters.size)
 +            assertEquals("The Star", result.manga.title)
 +        }
++
++    @Test
++    fun `an installed source can recover a moved work without using unrelated metadata from its old URL`() = runTest {
++        val title = "A Jornada do Retorno"
++        val provider = Provider(1, 3, "pt-br", title, matchQuery = true, cover = "https://example.invalid/new.jpg")
++        provider.emptyCatalogMetadata = SManga.create().also {
++            it.url = "/obsolete"
++            it.title = "A Different Work"
++            it.author = "Unrelated Author"
++        }
++        val saved = work().copy(url = "/obsolete", title = title, favorite = true)
++        val scan = catalog(Manager(listOf(provider)), preferences())
++        val result = scan.fetch(
++            provider, saved, listOf(oldChapter()), true, true, true,
++            recoverOnly = true, completeDiscovery = true,
++        )!!
++
++        assertEquals(1, provider.searches)
++        assertEquals(title, result.manga.title)
++        assertEquals(saved.author, result.manga.author)
++        assertEquals("/obsolete", result.manga.url)
++        assertEquals("https://example.invalid/new.jpg", result.manga.thumbnail_url)
++        val origins = result.chapters.map { ChapterOrigin.from(it.memo)!! }
++        assertEquals(3, origins.count { it.available && it.sourceId == provider.id && it.mangaUrl == "/work" })
++        assertTrue(origins.any { !it.available && it.mangaUrl == "/obsolete" })
++    }
++
++    @Test
++    fun `a successful alternative does not hide that the original timed out during a complete refresh`() = runTest {
++        val original = Provider(1, 2).also { it.delayMillis = 40_000 }
++        val replacement = Provider(2, 3)
++        val scan = catalog(Manager(listOf(original, replacement)), preferences())
++        val result = scan.fetch(
++            original, work(), emptyList(), true, true, true, completeDiscovery = true,
++        )!!
++
++        assertEquals(3, result.chapters.size)
++        assertTrue(WorkSources.from(result.manga.memo).discoveryIncomplete)
++    }
 +
 +    @Test
 +    fun `pin restricts network refresh while keeping original stored chapters`() = runTest {
