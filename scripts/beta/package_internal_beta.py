@@ -13,9 +13,9 @@ import zipfile
 import zlib
 
 ROOT = Path(__file__).resolve().parents[2]
-REVISION = 'P20261124.1'
-VERSION = '0.1.0-beta.16'
-VERSION_CODE = 117
+REVISION = 'P20261124.2'
+VERSION = '0.1.0-beta.17'
+VERSION_CODE = 118
 ARM_ABIS = ['arm64-v8a', 'armeabi-v7a']
 APPLICATION_ID = 'app.mihon.tachiyomiat.dev'
 DEBUG_COMPONENTS = (
