@@ -15170,17 +15170,17 @@ index 0000000..4eae5ab
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/data/coil/CoverLinkFailures.kt b/app/src/main/java/eu/kanade/tachiyomi/data/coil/CoverLinkFailures.kt
 new file mode 100644
-index 0000000..f2ad27a
+index 0000000..b91bd94
 --- /dev/null
 +++ b/app/src/main/java/eu/kanade/tachiyomi/data/coil/CoverLinkFailures.kt
-@@ -0,0 +1,32 @@
+@@ -0,0 +1,36 @@
 +package eu.kanade.tachiyomi.data.coil
 +
 +import kotlinx.coroutines.flow.MutableStateFlow
 +import kotlinx.coroutines.flow.asStateFlow
 +import kotlinx.coroutines.flow.update
 +
-+/** Recent definitive failures, shared by image loading and catalogue recovery in this process. */
++/** Recent cover responses that cannot supply an image, shared by image loading and catalogue recovery in this process. */
 +internal object CoverLinkFailures {
 +    private const val RETRY_INTERVAL_MS = 15 * 60 * 1000L
 +    private const val MAX_LINKS = 256
@@ -15192,7 +15192,11 @@ index 0000000..f2ad27a
 +        recent.value[url]?.takeIf { now - it in 0 until RETRY_INTERVAL_MS }
 +
 +    fun record(url: String, status: Int, now: Long = System.currentTimeMillis()) {
-+        if (status != 404 && status != 410) return
++        if (status != 401 && status != 403 && status != 404 && status != 410) return
++        recordInvalidImage(url, now)
++    }
++
++    fun recordInvalidImage(url: String, now: Long = System.currentTimeMillis()) {
 +        recent.update { failures ->
 +            if (failures[url]?.let { now - it in 0 until RETRY_INTERVAL_MS } == true) {
 +                failures
@@ -15207,7 +15211,7 @@ index 0000000..f2ad27a
 +    }
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/data/coil/MangaCoverFetcher.kt b/app/src/main/java/eu/kanade/tachiyomi/data/coil/MangaCoverFetcher.kt
-index 8ccd6d4..1824800 100644
+index 8ccd6d4..d534787 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/data/coil/MangaCoverFetcher.kt
 +++ b/app/src/main/java/eu/kanade/tachiyomi/data/coil/MangaCoverFetcher.kt
 @@ -16,7 +16,10 @@ import eu.kanade.tachiyomi.data.cache.CoverCache
@@ -15269,7 +15273,7 @@ index 8ccd6d4..1824800 100644
          return SourceFetchResult(
              source = ImageSource(source = source, fileSystem = FileSystem.SYSTEM),
              mimeType = "image/*",
-@@ -106,11 +105,12 @@ class MangaCoverFetcher(
+@@ -106,13 +105,14 @@ class MangaCoverFetcher(
  
      private suspend fun httpLoader(): FetchResult {
          // Only cache separately if it's a library item
@@ -15285,8 +15289,20 @@ index 8ccd6d4..1824800 100644
 +                null
 +            }
          if (libraryCoverCacheFile?.exists() == true && options.diskCachePolicy.readEnabled) {
-             return fileLoader(libraryCoverCacheFile)
+-            return fileLoader(libraryCoverCacheFile)
++            return cachedLibraryCover(libraryCoverCacheFile)
          }
+ 
+         var snapshot = readFromDiskCache()
+@@ -122,7 +122,7 @@ class MangaCoverFetcher(
+                 val snapshotCoverCache = moveSnapshotToCoverCache(snapshot, libraryCoverCacheFile)
+                 if (snapshotCoverCache != null) {
+                     // Read from cover cache after added to library
+-                    return fileLoader(snapshotCoverCache)
++                    return cachedLibraryCover(snapshotCoverCache)
+                 }
+ 
+                 // Read from snapshot
 @@ -155,9 +155,11 @@ class MangaCoverFetcher(
  
                  // Read from response if cache is unused or unusable
@@ -15301,7 +15317,27 @@ index 8ccd6d4..1824800 100644
                  )
              } catch (e: Exception) {
                  responseBody.close()
-@@ -173,21 +175,26 @@ class MangaCoverFetcher(
+@@ -169,25 +171,54 @@ class MangaCoverFetcher(
+         }
+     }
+ 
++    private fun cachedLibraryCover(file: File): FetchResult {
++        val header = file.inputStream().use {
++            val prefix = ByteArray(128)
++            val length = it.read(prefix)
++            if (length <= 0) "" else String(prefix, 0, length, Charsets.US_ASCII).trimStart()
++        }
++        if (header.startsWith("<html", ignoreCase = true) ||
++            header.startsWith("<!doctype html", ignoreCase = true)
++        ) {
++            file.delete()
++            CoverLinkFailures.recordInvalidImage(checkNotNull(url))
++            throw IOException("Cached cover is a web page")
++        }
++        return fileLoader(file)
++    }
++
+     private suspend fun executeNetworkRequest(): Response {
          val client = sourceLazy.value?.client ?: callFactoryLazy.value
          val response = client.newCall(newRequest()).await()
          if (!response.isSuccessful && response.code != HTTP_NOT_MODIFIED) {
@@ -15311,6 +15347,14 @@ index 8ccd6d4..1824800 100644
              response.close()
              throw IOException(response.message)
          }
++        val subtype = response.body.contentType()?.subtype
++        if (subtype == "html" || subtype == "xhtml+xml") {
++            if (isLibraryManga && options.networkCachePolicy.readEnabled) {
++                CoverLinkFailures.recordInvalidImage(checkNotNull(url))
++            }
++            response.close()
++            throw IOException("Cover URL returned a web page")
++        }
 +        if (isLibraryManga) CoverLinkFailures.recovered(checkNotNull(url))
          return response
      }
@@ -15334,7 +15378,7 @@ index 8ccd6d4..1824800 100644
  
          when {
              options.networkCachePolicy.readEnabled -> {
-@@ -214,7 +221,9 @@ class MangaCoverFetcher(
+@@ -214,7 +245,9 @@ class MangaCoverFetcher(
              }
              cacheFile.takeIf { it.exists() }
          } catch (e: Exception) {
@@ -15345,7 +15389,7 @@ index 8ccd6d4..1824800 100644
              null
          }
      }
-@@ -227,7 +236,9 @@ class MangaCoverFetcher(
+@@ -227,7 +260,9 @@ class MangaCoverFetcher(
              }
              cacheFile.takeIf { it.exists() }
          } catch (e: Exception) {
@@ -15356,7 +15400,7 @@ index 8ccd6d4..1824800 100644
              null
          }
      }
-@@ -236,9 +247,7 @@ class MangaCoverFetcher(
+@@ -236,9 +271,7 @@ class MangaCoverFetcher(
          cacheFile.parentFile?.mkdirs()
          cacheFile.delete()
          try {
@@ -15367,7 +15411,7 @@ index 8ccd6d4..1824800 100644
          } catch (e: Exception) {
              cacheFile.delete()
              throw e
-@@ -253,21 +262,16 @@ class MangaCoverFetcher(
+@@ -253,21 +286,16 @@ class MangaCoverFetcher(
          }
      }
  
@@ -15392,7 +15436,7 @@ index 8ccd6d4..1824800 100644
              throw e
          }
      }
-@@ -297,9 +301,7 @@ class MangaCoverFetcher(
+@@ -297,9 +325,7 @@ class MangaCoverFetcher(
          URL,
      }
  
@@ -15403,7 +15447,7 @@ index 8ccd6d4..1824800 100644
  
          private val coverCache: CoverCache by injectLazy()
          private val sourceManager: SourceManager by injectLazy()
-@@ -312,16 +314,21 @@ class MangaCoverFetcher(
+@@ -312,16 +338,21 @@ class MangaCoverFetcher(
                  coverFileLazy = lazy { coverCache.getCoverFile(data.thumbnailUrl) },
                  customCoverFileLazy = lazy { coverCache.getCustomCoverFile(data.id) },
                  diskCacheKeyLazy = lazy { imageLoader.components.key(data, options)!! },
@@ -15429,7 +15473,7 @@ index 8ccd6d4..1824800 100644
  
          private val coverCache: CoverCache by injectLazy()
          private val sourceManager: SourceManager by injectLazy()
-@@ -334,7 +341,7 @@ class MangaCoverFetcher(
+@@ -334,7 +365,7 @@ class MangaCoverFetcher(
                  coverFileLazy = lazy { coverCache.getCoverFile(data.url) },
                  customCoverFileLazy = lazy { coverCache.getCustomCoverFile(data.mangaId) },
                  diskCacheKeyLazy = lazy { imageLoader.components.key(data, options)!! },
@@ -15438,7 +15482,7 @@ index 8ccd6d4..1824800 100644
                  callFactoryLazy = callFactoryLazy,
                  imageLoader = imageLoader,
              )
-@@ -345,8 +352,19 @@ class MangaCoverFetcher(
+@@ -345,8 +376,21 @@ class MangaCoverFetcher(
          val USE_CUSTOM_COVER_KEY = Extras.Key(true)
  
          private val CACHE_CONTROL_NO_STORE = CacheControl.Builder().noStore().build()
@@ -15451,6 +15495,8 @@ index 8ccd6d4..1824800 100644
  }
 +
 +private fun SourceManager.coverSource(originalId: Long, alternativeId: Long?, coverUrl: String?): HttpSource? {
++    val image = coverUrl?.toHttpUrlOrNull()
++    if (image?.host == "uploads.mangadex.org" && image.encodedPath.startsWith("/covers/")) return null
 +    if (alternativeId == null) return get(originalId) as? HttpSource
 +    val source = get(alternativeId) as? HttpSource ?: return null
 +    val origin = source.baseUrl.toHttpUrlOrNull() ?: return null
@@ -25408,10 +25454,10 @@ index 0000000..7c3c569
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalog.kt b/app/src/main/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalog.kt
 new file mode 100644
-index 0000000..7a237e5
+index 0000000..2709076
 --- /dev/null
 +++ b/app/src/main/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalog.kt
-@@ -0,0 +1,749 @@
+@@ -0,0 +1,770 @@
 +package eu.kanade.tachiyomi.source.selection
 +
 +import eu.kanade.domain.chapter.model.toRemoteSChapter
@@ -25611,7 +25657,8 @@ index 0000000..7a237e5
 +                                fetchDetails || discover || binding.key != root.key || !hasUsableCover(manga.thumbnailUrl),
 +                                provider,
 +                                thumbnail = manga.thumbnailUrl.takeIf {
-+                                    binding.key == root.key && settings.coverSourceId == null
++                                    binding.key == root.key && settings.coverSourceId == null &&
++                                        manga.thumbnailUrl != settings.identity?.coverUrl
 +                                },
 +                            ),
 +                        )
@@ -25688,20 +25735,33 @@ index 0000000..7a237e5
 +        val recoveryTitle =
 +            if (recoveringFavorite) SourceMatching.restoredSearchTitle(reference.title) else reference.title
 +        val identity =
-+            settings.identity?.takeIf { now - it.checkedAt in 0 until 14 * DISCOVERY_TTL }
++            settings.identity?.takeIf {
++                now - it.checkedAt in 0 until 14 * DISCOVERY_TTL &&
++                    (!coverNeedsRecovery || it.coverUrl != null || now - it.checkedAt < PARTIAL_DISCOVERY_TTL)
++            }
 +                ?: if (discover) {
 +                    val lookup =
 +                        if (recoveryTitle == reference.title) reference
 +                        else reference.copy().also { it.title = recoveryTitle }
-+                    resolveIdentity(lookup)
++                    val saved = manga.toSManga()
++                    val lookupSavedTitle = !hasUsableCover(manga.thumbnailUrl) &&
++                        SourceMatching.title(saved.title) != SourceMatching.title(lookup.title)
++                    (if (lookupSavedTitle) resolveIdentity(saved) else null)
++                        ?: resolveIdentity(lookup)
++                        ?: settings.identity
 +                } else settings.identity
 +        val recoveringLinkedChapter = foreground && manga.favorite && requestedChapter != null &&
 +            rootCatalog?.chapters.isNullOrEmpty() && identity?.matchesTitle(reference.title) == true
-+        val searchTitles =
-+            (listOf(recoveryTitle, reference.title) + identity?.titles.orEmpty())
-+                .filter { it.isNotBlank() }
-+                .distinctBy(SourceMatching::title)
-+                .take(if (completeDiscovery) 12 else 6)
++        val fullTitles = (listOf(recoveryTitle, reference.title) + identity?.titles.orEmpty())
++            .filter { it.isNotBlank() }
++            .distinctBy(SourceMatching::title)
++        val fullTitleKeys = fullTitles.mapTo(hashSetOf(), SourceMatching::title)
++        val shorterQueries = fullTitles.flatMap(SourceMatching::shorterQueries)
++            .distinctBy(SourceMatching::title)
++            .filterNot { SourceMatching.title(it) in fullTitleKeys }
++            .take(2)
++        val searchLimit = if (completeDiscovery) 12 else 6
++        val searchTitles = fullTitles.take(searchLimit - shorterQueries.size) + shorterQueries
 +        val referenceChapters =
 +            rootCatalog?.chapters?.takeIf { it.isNotEmpty() }?.map(::asChapter)
 +                ?: existing.filter {
@@ -25920,7 +25980,11 @@ index 0000000..7a237e5
 +            val visibility = contentFilter.snapshot()
 +            catalogs.removeAll { it.binding.key != root.key && !visibility.allows(it.manga) }
 +        }
-+        if (catalogs.isEmpty() || catalogs.all { it.chapters.isEmpty() })
++        val catalogueCover = identity?.coverUrl?.takeIf {
++            manga.favorite && pinned == null && contentFilter.snapshot().allows(reference) && hasUsableCover(it)
++        }
++        val hasCatalogues = catalogs.any { it.chapters.isNotEmpty() }
++        if (!hasCatalogues && (requestedChapter != null || catalogueCover == null || !coverNeedsRecovery))
 +            throw NoChaptersException()
 +        catalogs.sortWith(catalogOrder(manga.source))
 +        val originalCover = catalogs.firstOrNull {
@@ -25932,6 +25996,9 @@ index 0000000..7a237e5
 +                    it.binding.readability != "sample_failed" && hasUsableCover(it.manga.thumbnail_url)
 +            }
 +        } else null
++        val preferredCatalogueCover = catalogueCover?.takeIf {
++            coverNeedsRecovery || originalCover == null && replacementCover == null
++        }
 +        val replacementMetadata = catalogs.firstOrNull {
 +            it.binding.key != root.key && it.chapters.isNotEmpty() &&
 +                it.binding.readability == "sample_passed"
@@ -25945,7 +26012,7 @@ index 0000000..7a237e5
 +            settings.copy(
 +                candidates = choices,
 +                coverSourceId = when {
-+                    originalCover != null -> null
++                    preferredCatalogueCover != null || originalCover != null -> null
 +                    replacementCover != null -> replacementCover.binding.sourceId
 +                    else -> settings.coverSourceId
 +                },
@@ -25954,7 +26021,7 @@ index 0000000..7a237e5
 +                installedFingerprint = if (discover) fingerprint else settings.installedFingerprint,
 +                identity = identity,
 +                discoveryIncomplete =
-+                    if (discover) incomplete else incomplete || settings.discoveryIncomplete,
++                    if (discover) incomplete || !hasCatalogues else incomplete || settings.discoveryIncomplete,
 +            )
 +        val output =
 +            catalogs
@@ -25988,7 +26055,7 @@ index 0000000..7a237e5
 +        // Missing remote rows are retained for history/downloads, but do not outrank an available
 +        // edition.
 +        existing
-+            .filter { it.url !in fetchedUrls }
++            .filter { hasCatalogues && it.url !in fetchedUrls }
 +            .forEach { old ->
 +                val origin =
 +                    ChapterOrigin.from(old.memo)
@@ -26010,7 +26077,7 @@ index 0000000..7a237e5
 +            reference.let { incoming ->
 +                incoming.copy().also {
 +                    it.url = manga.url
-+                    it.thumbnail_url = originalCover ?: replacementCover?.manga?.thumbnail_url ?: manga.thumbnailUrl
++                    it.thumbnail_url = preferredCatalogueCover ?: originalCover ?: replacementCover?.manga?.thumbnail_url ?: manga.thumbnailUrl
 +                    if (it.author.isNullOrBlank()) it.author = manga.author?.takeUnless(String::isBlank) ?: replacementMetadata?.author
 +                    if (it.artist.isNullOrBlank()) it.artist = manga.artist?.takeUnless(String::isBlank) ?: replacementMetadata?.artist
 +                    it.memo = state.attach(JsonObject(manga.memo + cleanMemo(incoming.memo)))
@@ -26568,10 +26635,10 @@ index 0000000..b135eb0
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/source/selection/SourceMatching.kt b/app/src/main/java/eu/kanade/tachiyomi/source/selection/SourceMatching.kt
 new file mode 100644
-index 0000000..915e8c3
+index 0000000..d03ea4a
 --- /dev/null
 +++ b/app/src/main/java/eu/kanade/tachiyomi/source/selection/SourceMatching.kt
-@@ -0,0 +1,101 @@
+@@ -0,0 +1,108 @@
 +package eu.kanade.tachiyomi.source.selection
 +
 +import eu.kanade.tachiyomi.source.model.SManga
@@ -26634,6 +26701,13 @@ index 0000000..915e8c3
 +        """\s+(?:(?:mangá|manga|manhwa|manhua|webtoon)\s+)?[\[(](?:pt(?:[-_]br)?|en)[\])]\s*$""",
 +        RegexOption.IGNORE_CASE,
 +    )
++
++    private val adventurePrefix = Regex("^(?:as aventuras d[aeo]|the adventures of) ", RegexOption.IGNORE_CASE)
++
++    fun shorterQueries(value: String): List<String> =
++        listOf(value.substringBefore(':'), value.replace(adventurePrefix, ""))
++            .map(String::trim)
++            .filter { it.length >= 4 && it.length < value.length }
 +
 +    fun restoredSearchTitle(value: String): String = value.replace(localeSuffix, "").trim()
 +
@@ -26984,10 +27058,10 @@ index 0000000..d421506
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/source/selection/WorkIdentityResolver.kt b/app/src/main/java/eu/kanade/tachiyomi/source/selection/WorkIdentityResolver.kt
 new file mode 100644
-index 0000000..ffff93e
+index 0000000..6897dc7
 --- /dev/null
 +++ b/app/src/main/java/eu/kanade/tachiyomi/source/selection/WorkIdentityResolver.kt
-@@ -0,0 +1,178 @@
+@@ -0,0 +1,192 @@
 +package eu.kanade.tachiyomi.source.selection
 +
 +import eu.kanade.tachiyomi.network.GET
@@ -27008,7 +27082,8 @@ index 0000000..ffff93e
 +/** Public catalogue metadata; no account, LLM or executable repository is downloaded here. */
 +class WorkIdentityResolver(private val client: OkHttpClient) {
 +    suspend fun resolve(reference: SManga): WorkIdentity? {
-+        val direct = UUID.find(reference.url)?.value?.takeIf {
++        val verifiedAlias = OVERGEARED_TITLES.any { WorkIdentityText.title(it) == WorkIdentityText.title(reference.title) }
++        val direct = if (verifiedAlias) OVERGEARED_2020 else UUID.find(reference.url)?.value?.takeIf {
 +            // A random UUID from another provider is not a MangaDex identity.
 +            (reference.memo["polaris.identity.mangadex"] as? JsonPrimitive)?.contentOrNull == it ||
 +                reference.url.startsWith("https://mangadex.org/title/")
@@ -27038,6 +27113,7 @@ index 0000000..ffff93e
 +        if (direct != null) url.addPathSegment(direct)
 +        else url.addQueryParameter("title", title.take(200)).addQueryParameter("limit", "10")
 +        url.addQueryParameter("includes[]", "author").addQueryParameter("includes[]", "artist")
++            .addQueryParameter("includes[]", "cover_art")
 +        return when (val data = requestJson(GET(url.build().toString()))["data"]) {
 +            is JsonArray -> data
 +            is JsonObject -> JsonArray(listOf(data))
@@ -27111,8 +27187,11 @@ index 0000000..ffff93e
 +                    if (mangaUpdatesId != it.mangaUpdatesId) return@mapNotNull null
 +                    listOf(it.alias, it.catalogAlias, it.title).map(::JsonPrimitive)
 +                }.orEmpty()
++                val id = item["id"]?.jsonPrimitive?.content ?: return@mapNotNull null
++                if (!UUID.matches(id)) return@mapNotNull null
++                val checkedTitles = if (id == OVERGEARED_2020) OVERGEARED_TITLES.map(::JsonPrimitive) else emptyList()
 +                val titles =
-+                    (linkedAlias + preferred +
++                    (checkedTitles + linkedAlias + preferred +
 +                            attributes["title"]?.jsonObject?.values.orEmpty() +
 +                            alternate.flatMap { it.values })
 +                        .mapNotNull {
@@ -27135,14 +27214,18 @@ index 0000000..ffff93e
 +                                ?.jsonPrimitive
 +                                ?.content
 +                        }
++                val creditedStudio = id == OVERGEARED_2020 && SourceMatching.people(reference.author).isEmpty() &&
++                    SourceMatching.people(reference.artist).any { it == "redice" || it == "redice studio" }
 +                if (
 +                    creators.isEmpty() ||
-+                        (people.isNotEmpty() &&
++                        (people.isNotEmpty() && !creditedStudio &&
 +                            creators.flatMap { SourceMatching.people(it) }.none { it in people })
 +                )
 +                    return@mapNotNull null
-+                val id = item["id"]?.jsonPrimitive?.content ?: return@mapNotNull null
-+                if (!UUID.matches(id)) return@mapNotNull null
++                val cover = (item["relationships"] as? JsonArray).orEmpty()
++                    .mapNotNull { it as? JsonObject }
++                    .firstOrNull { (it["type"] as? JsonPrimitive)?.contentOrNull == "cover_art" }
++                    ?.let { ((it["attributes"] as? JsonObject)?.get("fileName") as? JsonPrimitive)?.contentOrNull }
 +                WorkIdentity(
 +                    "mangadex:$id",
 +                    titles,
@@ -27152,12 +27235,17 @@ index 0000000..ffff93e
 +                        .mapNotNull { (it as? JsonPrimitive)?.contentOrNull }
 +                        .mapNotNull(WorkIdentityText::synopsisKey)
 +                        .toSet(),
++                    coverFile = cover,
 +                ).takeIf { it.matchesTitle(reference.title) }
 +            }
 +        return matches.singleOrNull()
 +    }
 +
 +    companion object {
++        // 2020 manhwa. The 2017 adaptation shares the English title but has a different record.
++        private const val OVERGEARED_2020 = "3fc308c9-4b00-4dc3-943e-1f39242bc708"
++        private val OVERGEARED_TITLES =
++            listOf("As Aventuras de Greed", "As Aventuras de Grid", "Ultra Equipado: As Aventuras de Greed")
 +        private val LEADING_ARTICLE = Regex("^(?:o|a|os|as) ")
 +        private val CONTRACTED_ARTICLE = Regex("""\b(?:do|da|dos|das|de (?:um|uma|o|a|os|as))\b""")
 +        private const val MANGA_UPDATES = "https://api.mangaupdates.com/v1/series"
@@ -70434,10 +70522,10 @@ index 0000000..a64600f
 +}
 diff --git a/app/src/test/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalogTest.kt b/app/src/test/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalogTest.kt
 new file mode 100644
-index 0000000..6c3e6ae
+index 0000000..41a3e7b
 --- /dev/null
 +++ b/app/src/test/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalogTest.kt
-@@ -0,0 +1,1484 @@
+@@ -0,0 +1,1554 @@
 +package eu.kanade.tachiyomi.source.selection
 +
 +import eu.kanade.domain.source.service.SourcePreferences
@@ -70643,6 +70731,76 @@ index 0000000..6c3e6ae
 +        assertEquals("https://example.invalid/new.jpg", result.manga.thumbnail_url)
 +        assertEquals(2L, WorkSources.from(result.manga.memo).coverSourceId)
 +        assertTrue(result.chapters.any { ChapterOrigin.from(it.memo)?.sourceId == 2L })
++    }
++
++    @Test
++    fun `verified catalogue cover can be saved even when no reading source is available`() = runTest {
++        val saved = work().copy(title = "As Aventuras de Greed", favorite = true)
++        val original = StubSource(1, "", "Old")
++        val old = oldChapter()
++        val identity = tachiyomi.domain.manga.model.WorkIdentity(
++            "mangadex:3fc308c9-4b00-4dc3-943e-1f39242bc708",
++            listOf(saved.title, "Overgeared"), listOf("Saenal"), System.currentTimeMillis(),
++            coverFile = "2af0c6f7-cd3d-4c59-afee-a8ff471e0561.jpg",
++        )
++        val catalogue = AutomaticSourceCatalog(Manager(emptyList()), preferences(), resolveIdentity = { identity })
++
++        val result = catalogue.fetch(original, saved, listOf(old), false, true, true, recoverOnly = true)!!
++
++        assertEquals(identity.coverUrl, result.manga.thumbnail_url)
++        assertTrue(result.chapters.isEmpty())
++        assertTrue(WorkSources.from(result.manga.memo).discoveryIncomplete)
++        assertEquals(saved.url, result.manga.url)
++    }
++
++    @Test
++    fun `a forbidden cover is replaced by the verified catalogue while the original chapters stay available`() = runTest {
++        val stale = "https://example.invalid/forbidden.jpg"
++        val primary = Provider(1, 3, cover = stale)
++        val saved = work().copy(favorite = true, thumbnailUrl = stale)
++        val identity = tachiyomi.domain.manga.model.WorkIdentity(
++            "mangadex:3fc308c9-4b00-4dc3-943e-1f39242bc708",
++            listOf(saved.title), listOf("Jane Doe"), System.currentTimeMillis(),
++            coverFile = "2af0c6f7-cd3d-4c59-afee-a8ff471e0561.jpg",
++        )
++        val catalogue = AutomaticSourceCatalog(
++            Manager(listOf(primary)), preferences(), resolveIdentity = { identity }, checkReadability = { _, _ -> true },
++        )
++        CoverLinkFailures.record(stale, 403)
++        try {
++            val result = catalogue.fetch(primary, saved, emptyList(), true, true, true, foreground = true)!!
++
++            assertEquals(identity.coverUrl, result.manga.thumbnail_url)
++            assertTrue(result.chapters.all { ChapterOrigin.from(it.memo)?.sourceId == primary.id })
++            assertEquals(3, result.chapters.size)
++        } finally {
++            CoverLinkFailures.recovered(stale)
++        }
++    }
++
++    @Test
++    fun `a short query can find an exact verified alias but cannot accept a different work`() = runTest {
++        val title = "As Aventuras de Grid"
++        val verified = Provider(2, 3, "en", "Overgeared", "Saenal").also {
++            it.searchResults = { query, entry -> if (query == "Grid") listOf(entry) else emptyList() }
++        }
++        val unrelated = Provider(3, 4, "en", "Grid Survival", "Saenal")
++        val saved = work().copy(title = title, author = null, favorite = true)
++        val identity = tachiyomi.domain.manga.model.WorkIdentity(
++            "mangadex:3fc308c9-4b00-4dc3-943e-1f39242bc708", listOf(title, "Overgeared"),
++            listOf("Saenal"), System.currentTimeMillis(),
++        )
++        val catalogue = AutomaticSourceCatalog(
++            Manager(listOf(verified, unrelated)), preferences(), resolveIdentity = { identity }, checkReadability = { _, _ -> true },
++        )
++
++        val result = catalogue.fetch(
++            StubSource(1, "", "Old"), saved, emptyList(), true, true, true,
++            recoverOnly = true, completeDiscovery = true,
++        )!!
++
++        assertEquals(3, verified.searches)
++        assertEquals(setOf(2L), result.chapters.mapNotNull { ChapterOrigin.from(it.memo)?.sourceId }.toSet())
 +    }
 +
 +    @Test
@@ -73608,10 +73766,10 @@ index 0000000..77af1ae
 +}
 diff --git a/app/src/test/java/eu/kanade/tachiyomi/source/selection/WorkIdentityResolverTest.kt b/app/src/test/java/eu/kanade/tachiyomi/source/selection/WorkIdentityResolverTest.kt
 new file mode 100644
-index 0000000..96d31ed
+index 0000000..720e85e
 --- /dev/null
 +++ b/app/src/test/java/eu/kanade/tachiyomi/source/selection/WorkIdentityResolverTest.kt
-@@ -0,0 +1,190 @@
+@@ -0,0 +1,214 @@
 +package eu.kanade.tachiyomi.source.selection
 +
 +import eu.kanade.tachiyomi.source.model.SManga
@@ -73770,6 +73928,30 @@ index 0000000..96d31ed
 +        assertEquals(saved, match.alias)
 +        assertEquals("Ponto de vista de um leitor onisciente", match.catalogAlias)
 +        assertNull(resolver.associatedTitle("O Retorno do Leitor Onisciente", 50369844984L, record))
++    }
++
++    @Test
++    fun `verified Greed alias produces the cover of the 2020 adaptation with the studio credit`() {
++        val records = Json.parseToJsonElement("""
++            [
++              {"id":"6ef19044-70d3-4e87-994b-4cc07ccd0810","type":"manga","attributes":{"title":{"en":"Overgeared"}},
++               "relationships":[{"type":"author","attributes":{"name":"Saenal"}}]},
++              {"id":"3fc308c9-4b00-4dc3-943e-1f39242bc708","type":"manga","attributes":{"title":{"ko-ro":"Item-ppal"},"altTitles":[{"en":"Overgeared"}]},
++               "relationships":[{"type":"author","attributes":{"name":"Saenal"}},
++                {"type":"cover_art","attributes":{"fileName":"2af0c6f7-cd3d-4c59-afee-a8ff471e0561.jpg"}}]}
++            ]
++        """).jsonArray
++        val saved = work("As Aventuras de Greed", null).also { it.artist = "Redice" }
++        val identity = requireNotNull(resolver.select(saved, records))
++
++        assertTrue(identity.matchesTitle("Overgeared"))
++        assertTrue(identity.matchesTitle("As Aventuras de Grid"))
++        assertEquals(
++            "https://uploads.mangadex.org/covers/3fc308c9-4b00-4dc3-943e-1f39242bc708/2af0c6f7-cd3d-4c59-afee-a8ff471e0561.jpg.512.jpg",
++            identity.coverUrl,
++        )
++        assertNull(identity.copy(coverFile = "../../wrong.jpg").coverUrl)
++        assertNull(resolver.select(work(saved.title, "Unrelated Author"), records))
 +    }
 +
 +    private fun tutorialRecord(mangaUpdatesId: String) = buildJsonObject {
@@ -83616,10 +83798,10 @@ index d2ca3b1..671c751 100644
          lastModified = coverLastModified,
 diff --git a/domain/src/main/java/tachiyomi/domain/manga/model/WorkIdentity.kt b/domain/src/main/java/tachiyomi/domain/manga/model/WorkIdentity.kt
 new file mode 100644
-index 0000000..35da8af
+index 0000000..bf961fc
 --- /dev/null
 +++ b/domain/src/main/java/tachiyomi/domain/manga/model/WorkIdentity.kt
-@@ -0,0 +1,33 @@
+@@ -0,0 +1,42 @@
 +package tachiyomi.domain.manga.model
 +
 +import kotlinx.serialization.Serializable
@@ -83632,7 +83814,15 @@ index 0000000..35da8af
 +    val creators: List<String>,
 +    val checkedAt: Long,
 +    val synopsisKeys: Set<String> = emptySet(),
++    val coverFile: String? = null,
 +) {
++    val coverUrl: String?
++        get() {
++            if (!CATALOG_ID.matches(catalogId)) return null
++            val file = coverFile?.takeIf { COVER_FILE.matches(it) } ?: return null
++            return "https://uploads.mangadex.org/covers/${catalogId.substringAfter(':')}/$file.512.jpg"
++        }
++
 +    fun matchesTitle(title: String): Boolean {
 +        val aliases = titles.map(WorkIdentityText::title).toSet()
 +        return WorkIdentityText.title(title) in aliases ||
@@ -83649,6 +83839,7 @@ index 0000000..35da8af
 +    }
 +
 +    companion object {
++        private val COVER_FILE = Regex("[a-fA-F0-9-]{36}\\.(?:jpg|jpeg|png|webp)")
 +        private val CATALOG_ID =
 +            Regex("mangadex:[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}")
 +    }

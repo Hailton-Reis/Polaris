@@ -2,6 +2,11 @@
 
 Este arquivo registra a evolução real do código. **Revisões de desenvolvimento não são lançamentos públicos.** As datas abaixo usam America/Fortaleza, exceto quando houver indicação de UTC. O histórico de distribuição fica em [Releases](https://github.com/Hailton-Reis/Polaris/releases).
 
+## Desenvolvimento · recuperação de capas de catálogo
+
+- Capas ausentes ou inválidas podem ser recuperadas de um catálogo com identidade confirmada, inclusive quando nenhuma fonte fornece capítulos. A recuperação preserva capas personalizadas e os capítulos salvos.
+- A busca tenta fragmentos selecionados após os títulos completos e ainda exige confirmação da obra. **As Aventuras de Greed** e **As Aventuras de Grid** reconhecem a edição de 2020 de **Overgeared**.
+
 ## Polaris 0.1.0-beta.16 · P20261124.1
 
 ### Recuperação de endereço e novas tentativas
