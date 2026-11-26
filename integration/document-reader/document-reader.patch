@@ -15544,7 +15544,7 @@ index 0000000..a8251f4
 +        }
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/data/download/DownloadManager.kt b/app/src/main/java/eu/kanade/tachiyomi/data/download/DownloadManager.kt
-index c45a189..d0cbd7e 100644
+index c45a189..3c36051 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/data/download/DownloadManager.kt
 +++ b/app/src/main/java/eu/kanade/tachiyomi/data/download/DownloadManager.kt
 @@ -43,18 +43,14 @@ class DownloadManager(
@@ -15623,12 +15623,12 @@ index c45a189..d0cbd7e 100644
 -        downloader.queueChapters(manga, chapters, autoStart)
 +        if (chapters.any { it.mangaId != manga.id }) {
 +            launchIO {
-+                val repository = Injekt.get<tachiyomi.domain.manga.repository.MangaRepository>()
++                val getManga = Injekt.get<tachiyomi.domain.manga.interactor.GetManga>()
 +                chapters
 +                    .groupBy { it.mangaId }
 +                    .forEach { (ownerId, owned) ->
 +                        val owner =
-+                            if (ownerId == manga.id) manga else repository.getMangaById(ownerId)
++                            if (ownerId == manga.id) manga else getManga.await(ownerId) ?: return@forEach
 +                        downloader.queueChapters(owner, owned, autoStart)
 +                    }
 +            }
@@ -15707,12 +15707,12 @@ index c45a189..d0cbd7e 100644
      fun deleteChapters(chapters: List<Chapter>, manga: Manga, source: Source) {
 +        if (chapters.any { it.mangaId != manga.id }) {
 +            launchIO {
-+                val repository = Injekt.get<tachiyomi.domain.manga.repository.MangaRepository>()
++                val getManga = Injekt.get<tachiyomi.domain.manga.interactor.GetManga>()
 +                chapters
 +                    .groupBy { it.mangaId }
 +                    .forEach { (ownerId, owned) ->
 +                        val owner =
-+                            if (ownerId == manga.id) manga else repository.getMangaById(ownerId)
++                            if (ownerId == manga.id) manga else getManga.await(ownerId) ?: return@forEach
 +                        deleteChapters(owned, owner, sourceManager.getOrStub(owner.source))
 +                    }
 +            }
@@ -15769,7 +15769,7 @@ index c45a189..d0cbd7e 100644
  
              // Delete source directory if empty
              val sourceDir = provider.findSourceDir(source)
-@@ -298,13 +360,11 @@ class DownloadManager(
+@@ -298,14 +360,22 @@ class DownloadManager(
          pendingDeleter.addChapters(getChaptersToDelete(chapters, manga), manga)
      }
  
@@ -15779,13 +15779,26 @@ index c45a189..d0cbd7e 100644
 +    /** Triggers the execution of the deletion of pending chapters. */
      fun deletePendingChapters() {
          val pendingChapters = pendingDeleter.getPendingChapters()
-         for ((manga, chapters) in pendingChapters) {
+-        for ((manga, chapters) in pendingChapters) {
 -            val source = sourceManager.get(manga.source) ?: continue
-+            val source = sourceManager.getOrStub(manga.source)
-             deleteChapters(chapters, manga, source)
+-            deleteChapters(chapters, manga, source)
++        if (pendingChapters.isEmpty()) return
++        launchIO {
++            val getManga = Injekt.get<tachiyomi.domain.manga.interactor.GetManga>()
++            val getChapter = Injekt.get<tachiyomi.domain.chapter.interactor.GetChapter>()
++            for ((manga, queued) in pendingChapters) {
++                val current = getManga.await(manga.id) ?: continue
++                val chapters = queued.mapNotNull { saved ->
++                    getChapter.await(saved.id)?.takeIf {
++                        it.read && it.url == saved.url && (saved.mangaId == -1L || it.mangaId == saved.mangaId)
++                    }
++                }
++                deleteChapters(chapters, current, sourceManager.getOrStub(current.source))
++            }
          }
      }
-@@ -325,13 +385,17 @@ class DownloadManager(
+ 
+@@ -325,13 +395,17 @@ class DownloadManager(
          if (capitalizationChanged) {
              val tempName = newName + Downloader.TMP_DIR_SUFFIX
              if (!oldFolder.renameTo(tempName)) {
@@ -15805,7 +15818,7 @@ index c45a189..d0cbd7e 100644
          }
      }
  
-@@ -350,7 +414,7 @@ class DownloadManager(
+@@ -350,7 +424,7 @@ class DownloadManager(
  
          // just to be safe, don't allow downloads for this manga while renaming it
          translationManager.pendingDownloads.cancel(
@@ -15814,7 +15827,7 @@ index c45a189..d0cbd7e 100644
          )
          downloader.removeFromQueue(manga)
  
-@@ -358,7 +422,9 @@ class DownloadManager(
+@@ -358,7 +432,9 @@ class DownloadManager(
          if (capitalizationChanged) {
              val tempName = newName + Downloader.TMP_DIR_SUFFIX
              if (!oldFolder.renameTo(tempName)) {
@@ -15825,7 +15838,7 @@ index c45a189..d0cbd7e 100644
                  return
              }
          }
-@@ -366,7 +432,9 @@ class DownloadManager(
+@@ -366,7 +442,9 @@ class DownloadManager(
          if (oldFolder.renameTo(newName)) {
              cache.renameManga(manga, oldFolder, newTitle)
          } else {
@@ -15836,7 +15849,7 @@ index c45a189..d0cbd7e 100644
          }
      }
  
-@@ -378,19 +446,28 @@ class DownloadManager(
+@@ -378,19 +456,28 @@ class DownloadManager(
       * @param oldChapter the existing chapter with the old name.
       * @param newChapter the target chapter with the new name.
       */
@@ -15875,7 +15888,7 @@ index c45a189..d0cbd7e 100644
          if (oldDownload.isFile && oldDownload.extension == "cbz") {
              newName += ".cbz"
          }
-@@ -401,22 +478,24 @@ class DownloadManager(
+@@ -401,22 +488,24 @@ class DownloadManager(
              cache.removeChapter(oldChapter, manga)
              cache.addChapter(newName, mangaDir, manga)
          } else {
@@ -15911,7 +15924,7 @@ index c45a189..d0cbd7e 100644
  
          return if (!downloadPreferences.removeBookmarkedChapters.get()) {
              filteredCategoryManga.filterNot { it.bookmark }
-@@ -425,32 +504,29 @@ class DownloadManager(
+@@ -425,32 +514,29 @@ class DownloadManager(
          }
      }
  
@@ -16008,7 +16021,7 @@ index 32de76f..1f291bd 100644
          val legacyChapterDirNames = getLegacyChapterDirNames(chapterName, chapterScanlator, chapterUrl)
  
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/data/download/Downloader.kt b/app/src/main/java/eu/kanade/tachiyomi/data/download/Downloader.kt
-index d56914c..8a7dd3e 100644
+index d56914c..3ad0d3f 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/data/download/Downloader.kt
 +++ b/app/src/main/java/eu/kanade/tachiyomi/data/download/Downloader.kt
 @@ -2,7 +2,7 @@ package eu.kanade.tachiyomi.data.download
@@ -16305,7 +16318,20 @@ index d56914c..8a7dd3e 100644
                  ) {
                      notifier.onWarning(
                          context.stringResource(
-@@ -325,32 +315,45 @@ class Downloader(
+@@ -315,9 +305,11 @@ class Downloader(
+                         NotificationHandler.openUrl(context, LibraryUpdateNotifier.HELP_WARNING_URL),
+                     )
+                 }
+-                DownloadJob.start(context)
+             }
+         }
++        if (autoStart && queueState.value.isNotEmpty() && !isRunning) {
++            if (DownloadJob.isRunning(context)) start() else DownloadJob.start(context)
++        }
+     }
+ 
+     /**
+@@ -325,32 +317,45 @@ class Downloader(
       *
       * @param download the chapter to be downloaded.
       */
@@ -16368,7 +16394,7 @@ index d56914c..8a7dd3e 100644
              return
          }
  
-@@ -373,39 +376,49 @@ class Downloader(
+@@ -373,39 +378,49 @@ class Downloader(
  
          try {
              // If the page list already exists, start from the file
@@ -16445,7 +16471,7 @@ index d56914c..8a7dd3e 100644
                  .collect {
                      // Do when page is downloaded.
                      notifier.onProgressChange(download)
-@@ -418,12 +431,7 @@ class Downloader(
+@@ -418,12 +433,7 @@ class Downloader(
                  return
              }
  
@@ -16459,7 +16485,7 @@ index d56914c..8a7dd3e 100644
  
              // Only rename the directory if it's downloaded
              if (downloadPreferences.saveChaptersAsCBZ.get()) {
-@@ -439,28 +447,38 @@ class Downloader(
+@@ -439,28 +449,38 @@ class Downloader(
              DiskUtil.createNoMediaFile(tmpDir, context)
  
              download.status = Download.State.DOWNLOADED
@@ -16507,7 +16533,7 @@ index d56914c..8a7dd3e 100644
          }
      }
  
-@@ -481,19 +499,24 @@ class Downloader(
+@@ -481,19 +501,24 @@ class Downloader(
          val filename = "%0${digitCount}d".format(Locale.ENGLISH, page.number)
  
          // Try to find the image file
@@ -16542,7 +16568,7 @@ index d56914c..8a7dd3e 100644
  
              // When the page is ready, set page path, progress (just in case) and status
              splitTallImageIfNeeded(page, tmpDir)
-@@ -506,7 +529,12 @@ class Downloader(
+@@ -506,7 +531,12 @@ class Downloader(
              // Mark this page as error and allow to download the remaining
              page.progress = 0
              page.status = Page.State.Error(e)
@@ -16556,7 +16582,7 @@ index d56914c..8a7dd3e 100644
          }
      }
  
-@@ -518,41 +546,40 @@ class Downloader(
+@@ -518,41 +548,40 @@ class Downloader(
       * @param tmpDir the temporary directory of the download.
       * @param filename the filename of the image.
       */
@@ -16627,7 +16653,7 @@ index d56914c..8a7dd3e 100644
              .first()
      }
  
-@@ -568,9 +595,7 @@ class Downloader(
+@@ -568,9 +597,7 @@ class Downloader(
          tmpDir.findFile("$filename.tmp")?.delete()
          val tmpFile = tmpDir.createFile("$filename.tmp")!!
          cacheFile.inputStream().use { input ->
@@ -16638,7 +16664,7 @@ index d56914c..8a7dd3e 100644
          }
          val extension = ImageUtil.findImageType(cacheFile.inputStream()) ?: return tmpFile
          tmpFile.renameTo("$filename.${extension.extension}")
-@@ -586,7 +611,8 @@ class Downloader(
+@@ -586,7 +613,8 @@ class Downloader(
       * @param file the file where the image is already downloaded.
       */
      private fun getImageExtension(response: Response, file: UniFile): String {
@@ -16648,7 +16674,7 @@ index d56914c..8a7dd3e 100644
          return ImageUtil.getExtensionFromMimeType(mime) { file.openInputStream() }
      }
  
-@@ -595,8 +621,14 @@ class Downloader(
+@@ -595,8 +623,14 @@ class Downloader(
  
          try {
              val filenamePrefix = "%03d".format(Locale.ENGLISH, page.number)
@@ -16665,7 +16691,7 @@ index d56914c..8a7dd3e 100644
  
              // If the original page was previously split, then skip
              if (imageFile.name.orEmpty().startsWith("${filenamePrefix}__")) return
-@@ -613,10 +645,7 @@ class Downloader(
+@@ -613,10 +647,7 @@ class Downloader(
       * @param download the download to check.
       * @param tmpDir the directory where the download is currently stored.
       */
@@ -16677,7 +16703,7 @@ index d56914c..8a7dd3e 100644
          // Page list hasn't been initialized
          val downloadPageCount = download.pages?.size ?: return false
  
-@@ -626,16 +655,17 @@ class Downloader(
+@@ -626,16 +657,17 @@ class Downloader(
          }
  
          // Ensure that the chapter folder has all the pages
@@ -16704,7 +16730,7 @@ index d56914c..8a7dd3e 100644
          return downloadedImagesCount == downloadPageCount
      }
  
-@@ -646,53 +676,38 @@ class Downloader(
+@@ -646,53 +678,38 @@ class Downloader(
       * @param pagePrefix Expected page prefix (e.g., "001")
       */
      private fun isDownloadedPageImage(fileName: String, pagePrefix: String): Boolean =
@@ -16776,7 +16802,7 @@ index d56914c..8a7dd3e 100644
  
          // Remove the old file
          dir.findFile(COMIC_INFO_FILE)?.delete()
-@@ -702,18 +717,14 @@ class Downloader(
+@@ -702,18 +719,14 @@ class Downloader(
          }
      }
  
@@ -16797,7 +16823,7 @@ index d56914c..8a7dd3e 100644
              store.addAll(downloads)
              it + downloads
          }
-@@ -722,7 +733,10 @@ class Downloader(
+@@ -722,7 +735,10 @@ class Downloader(
      private fun removeFromQueue(download: Download) {
          _queueState.update {
              store.remove(download)
@@ -16809,7 +16835,7 @@ index d56914c..8a7dd3e 100644
                  download.status = Download.State.NOT_DOWNLOADED
              }
              it - download
-@@ -734,7 +748,10 @@ class Downloader(
+@@ -734,7 +750,10 @@ class Downloader(
              val downloads = queue.filter { predicate(it) }
              store.removeAll(downloads)
              downloads.forEach { download ->
@@ -16821,7 +16847,7 @@ index d56914c..8a7dd3e 100644
                      download.status = Download.State.NOT_DOWNLOADED
                  }
              }
-@@ -754,7 +771,10 @@ class Downloader(
+@@ -754,7 +773,10 @@ class Downloader(
      private fun internalClearQueue() {
          _queueState.update {
              it.forEach { download ->
@@ -86446,3 +86472,32 @@ index 0000000..d8d7e81
 +        assertEquals(listOf(1L, 2L), groups.getValue(false).map { it.source.id })
 +    }
 +}
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/data/download/DownloadPendingDeleter.kt b/app/src/main/java/eu/kanade/tachiyomi/data/download/DownloadPendingDeleter.kt
+index 26e09a7..15aa323 100644
+--- a/app/src/main/java/eu/kanade/tachiyomi/data/download/DownloadPendingDeleter.kt
++++ b/app/src/main/java/eu/kanade/tachiyomi/data/download/DownloadPendingDeleter.kt
+@@ -128,7 +128,7 @@ class DownloadPendingDeleter(
+     /**
+      * Returns a chapter entry from a chapter model.
+      */
+-    private fun Chapter.toEntry() = ChapterEntry(id, url, name, scanlator)
++    private fun Chapter.toEntry() = ChapterEntry(id, url, name, scanlator, mangaId)
+ 
+     /**
+      * Returns a manga model from a manga entry.
+@@ -144,6 +144,7 @@ class DownloadPendingDeleter(
+      * Returns a chapter model from a chapter entry.
+      */
+     private fun ChapterEntry.toModel() = Chapter.create().copy(
++        mangaId = mangaId ?: -1,
+         id = id,
+         url = url,
+         name = name,
+@@ -168,6 +169,7 @@ class DownloadPendingDeleter(
+         val url: String,
+         val name: String,
+         val scanlator: String? = null,
++        val mangaId: Long? = null,
+     )
+ 
+     /**

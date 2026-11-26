@@ -2,6 +2,11 @@
 
 Este arquivo registra a evolução real do código. **Revisões de desenvolvimento não são lançamentos públicos.** As datas abaixo usam America/Fortaleza, exceto quando houver indicação de UTC. O histórico de distribuição fica em [Releases](https://github.com/Hailton-Reis/Polaris/releases).
 
+## Desenvolvimento · fila de downloads e saída do leitor
+
+- O botão de download inicia a fila mesmo quando já há capítulos na fila parada.
+- Ao sair do leitor, a exclusão automática consulta a obra e o capítulo atuais. Entradas antigas sem obra válida são ignoradas, mantendo as preferências de categorias e capítulos marcados.
+
 ## Polaris 0.1.0-beta.17 · P20261124.2
 
 ### Capas e busca de capítulos
