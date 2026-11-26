@@ -25480,10 +25480,10 @@ index 0000000..7c3c569
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalog.kt b/app/src/main/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalog.kt
 new file mode 100644
-index 0000000..ba6f754
+index 0000000..c46acd7
 --- /dev/null
 +++ b/app/src/main/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalog.kt
-@@ -0,0 +1,792 @@
+@@ -0,0 +1,797 @@
 +package eu.kanade.tachiyomi.source.selection
 +
 +import eu.kanade.domain.chapter.model.toRemoteSChapter
@@ -25810,7 +25810,9 @@ index 0000000..ba6f754
 +            .filterNot { SourceMatching.title(it) in fullTitleKeys }
 +            .take(2)
 +        val searchLimit = if (completeDiscovery) 12 else 6
-+        val searchTitles = fullTitles.take(searchLimit - shorterQueries.size) + shorterQueries
++        val additionalQueries = SourceMatching.additionalQueries(identity)
++        val searchTitles = (fullTitles.take(searchLimit - shorterQueries.size) + shorterQueries + additionalQueries)
++            .distinctBy(SourceMatching::title)
 +        val referenceChapters =
 +            rootCatalog?.chapters?.takeIf { it.isNotEmpty() }?.map(::asChapter)
 +                ?: existing.filter {
@@ -25825,7 +25827,8 @@ index 0000000..ba6f754
 +                        catalog.chapters.map(::asChapter),
 +                        corroboratedIdentity =
 +                            identity != null &&
-+                                SourceMatching.sameWork(reference, catalog.manga, identity),
++                                (SourceMatching.sameWork(reference, catalog.manga, identity) ||
++                                    SourceMatching.confirmsAdditionalTitle(catalog.manga, identity)),
 +                    ))
 +
 +        suspend fun prepare(outcome: Outcome): Prepared =
@@ -25865,11 +25868,11 @@ index 0000000..ba6f754
 +                        val matches = page.mangas
 +                            .filter {
 +                                visibility.allows(it) &&
-+                                    SourceMatching.titleMatches(
++                                    (SourceMatching.isAdditionalTitle(it.title, identity) || SourceMatching.titleMatches(
 +                                        recoveryTitle,
 +                                        if (recoveringFavorite) SourceMatching.restoredSearchTitle(it.title) else it.title,
 +                                        identity,
-+                                    )
++                                    ))
 +                            }
 +                            .distinctBy { it.url }
 +                            .filterNot { it.url in attemptedUrls || "${provider.id}:${it.url}" in alreadyKnown }
@@ -25892,7 +25895,9 @@ index 0000000..ba6f754
 +                        result.url = match.url
 +                        if (!contentFilter.snapshot().allows(result)) continue
 +                        val linkedChapterMatch = recoveringLinkedChapter && identity?.matchesTitle(result.title) == true
-+                        val verified = if (recoveringFavorite || linkedChapterMatch) {
++                        val verified = if (SourceMatching.isAdditionalTitle(result.title, identity)) {
++                            SourceMatching.confirmsAdditionalTitle(result, identity)
++                        } else if (recoveringFavorite || linkedChapterMatch) {
 +                            SourceMatching.matchesRestoredFavorite(reference, result, identity)
 +                        } else {
 +                            SourceMatching.sameWork(reference, result, identity)
@@ -26688,10 +26693,10 @@ index 0000000..b135eb0
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/source/selection/SourceMatching.kt b/app/src/main/java/eu/kanade/tachiyomi/source/selection/SourceMatching.kt
 new file mode 100644
-index 0000000..d03ea4a
+index 0000000..daf8011
 --- /dev/null
 +++ b/app/src/main/java/eu/kanade/tachiyomi/source/selection/SourceMatching.kt
-@@ -0,0 +1,108 @@
+@@ -0,0 +1,125 @@
 +package eu.kanade.tachiyomi.source.selection
 +
 +import eu.kanade.tachiyomi.source.model.SManga
@@ -26756,6 +26761,23 @@ index 0000000..d03ea4a
 +    )
 +
 +    private val adventurePrefix = Regex("^(?:as aventuras d[aeo]|the adventures of) ", RegexOption.IGNORE_CASE)
++
++    private val overgearedQueries = listOf("Ultra Equipado", "Super Equipado", "Hiper Equipado")
++    private const val OVERGEARED_2020 = "mangadex:3fc308c9-4b00-4dc3-943e-1f39242bc708"
++
++    fun additionalQueries(identity: WorkIdentity?): List<String> =
++        if (identity?.catalogId == OVERGEARED_2020) overgearedQueries else emptyList()
++
++    fun isAdditionalTitle(title: String, identity: WorkIdentity?): Boolean =
++        additionalQueries(identity).any { restoredTitle(it) == restoredTitle(title) }
++
++    fun confirmsAdditionalTitle(candidate: SManga, identity: WorkIdentity?): Boolean {
++        if (identity == null || !isAdditionalTitle(candidate.title, identity)) return false
++        val creators = people(candidate.author, candidate.artist)
++        val distinctiveCredits = people("Lee Dong-uk (이동욱)", "Team Argo", "Monohumbug")
++        val synopsis = WorkIdentityText.synopsisKey(candidate.description)
++        return creators.any { it in distinctiveCredits } || synopsis != null && synopsis in identity.synopsisKeys
++    }
 +
 +    fun shorterQueries(value: String): List<String> =
 +        listOf(value.substringBefore(':'), value.replace(adventurePrefix, ""))
@@ -73911,10 +73933,10 @@ index 0000000..77af1ae
 +}
 diff --git a/app/src/test/java/eu/kanade/tachiyomi/source/selection/WorkIdentityResolverTest.kt b/app/src/test/java/eu/kanade/tachiyomi/source/selection/WorkIdentityResolverTest.kt
 new file mode 100644
-index 0000000..720e85e
+index 0000000..722a7d4
 --- /dev/null
 +++ b/app/src/test/java/eu/kanade/tachiyomi/source/selection/WorkIdentityResolverTest.kt
-@@ -0,0 +1,214 @@
+@@ -0,0 +1,227 @@
 +package eu.kanade.tachiyomi.source.selection
 +
 +import eu.kanade.tachiyomi.source.model.SManga
@@ -74097,6 +74119,19 @@ index 0000000..720e85e
 +        )
 +        assertNull(identity.copy(coverFile = "../../wrong.jpg").coverUrl)
 +        assertNull(resolver.select(work(saved.title, "Unrelated Author"), records))
++    }
++
++    @Test
++    fun `equipment search variants require evidence specific to the 2020 adaptation`() {
++        val identity = tachiyomi.domain.manga.model.WorkIdentity(
++            "mangadex:3fc308c9-4b00-4dc3-943e-1f39242bc708",
++            listOf("Overgeared"), listOf("Saenal", "Team Argo"), 0,
++        )
++
++        assertTrue(SourceMatching.isAdditionalTitle("Super Equipado", identity))
++        assertTrue(SourceMatching.isAdditionalTitle("Hiper Equipado", identity))
++        assertFalse(SourceMatching.confirmsAdditionalTitle(work("Super Equipado", "Saenal"), identity))
++        assertTrue(SourceMatching.confirmsAdditionalTitle(work("Hiper Equipado", "Team Argo"), identity))
 +    }
 +
 +    private fun tutorialRecord(mangaUpdatesId: String) = buildJsonObject {
