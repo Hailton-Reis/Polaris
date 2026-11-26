@@ -25480,10 +25480,10 @@ index 0000000..7c3c569
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalog.kt b/app/src/main/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalog.kt
 new file mode 100644
-index 0000000..794146b
+index 0000000..ba6f754
 --- /dev/null
 +++ b/app/src/main/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalog.kt
-@@ -0,0 +1,791 @@
+@@ -0,0 +1,792 @@
 +package eu.kanade.tachiyomi.source.selection
 +
 +import eu.kanade.domain.chapter.model.toRemoteSChapter
@@ -25581,7 +25581,7 @@ index 0000000..794146b
 +        val provider = sourceManager.get(manga.source)
 +        if (provider != null && (provider !is HttpSource || provider is INovelSource)) return false
 +        val enabled = enabledSources()
-+        if (enabled.isEmpty() || settings.pinned != null) return false
++        if (settings.pinned != null) return false
 +        val now = System.currentTimeMillis()
 +        val active = settings.candidates.filter { it.active }
 +        val failedSamples =
@@ -25591,6 +25591,7 @@ index 0000000..794146b
 +        val ttl = if (settings.discoveryIncomplete) PARTIAL_DISCOVERY_TTL else DISCOVERY_TTL
 +        val missingFavoriteCover = manga.favorite && manga.thumbnailUrl.isNullOrBlank() &&
 +            now - settings.checkedAt >= PARTIAL_DISCOVERY_TTL
++        if (enabled.isEmpty()) return missingFavoriteCover
 +        return manga.id in invalidated ||
 +            missingFavoriteCover ||
 +            now - settings.checkedAt >= ttl ||
@@ -26353,10 +26354,10 @@ index 0000000..39f91a6
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/source/selection/LibraryDuplicateReview.kt b/app/src/main/java/eu/kanade/tachiyomi/source/selection/LibraryDuplicateReview.kt
 new file mode 100644
-index 0000000..2eea759
+index 0000000..37e6930
 --- /dev/null
 +++ b/app/src/main/java/eu/kanade/tachiyomi/source/selection/LibraryDuplicateReview.kt
-@@ -0,0 +1,59 @@
+@@ -0,0 +1,64 @@
 +package eu.kanade.tachiyomi.source.selection
 +
 +import tachiyomi.domain.manga.model.LibraryWork
@@ -26394,7 +26395,9 @@ index 0000000..2eea759
 +                    .distinct()
 +                    .filter { it.matchesTitle(manga.title) }
 +                    .flatMap { it.titles }
-+                val keys = (listOf(primary) + compound + aliases.map(WorkIdentityText::title))
++                val reviewed = ReviewedLibraryTitles.find(manga.title)
++                val keys = (listOf(primary) + compound + aliases.map(WorkIdentityText::title) +
++                    listOfNotNull(reviewed?.id))
 +                    .filter(String::isNotBlank)
 +                    .distinct()
 +                val knownRoot = confirmedRoots[manga.id]
@@ -26406,7 +26409,10 @@ index 0000000..2eea759
 +                        val second = knownRoot?.let(byId::get) ?: manga
 +                        val keyPair = minOf(first.id, second.id) to maxOf(first.id, second.id)
 +                        if (seen.add(keyPair)) {
-+                            add(PossibleLibraryDuplicate(first, second))
++                            val preferSecond = ReviewedLibraryTitles.isPortuguese(second.title) &&
++                                !ReviewedLibraryTitles.isPortuguese(first.title)
++                            add(if (preferSecond) PossibleLibraryDuplicate(second, first)
++                                else PossibleLibraryDuplicate(first, second))
 +                            if (size == 100) return@buildList
 +                        }
 +                    }
@@ -27105,10 +27111,10 @@ index 0000000..d421506
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/source/selection/WorkIdentityResolver.kt b/app/src/main/java/eu/kanade/tachiyomi/source/selection/WorkIdentityResolver.kt
 new file mode 100644
-index 0000000..6897dc7
+index 0000000..54e1dbc
 --- /dev/null
 +++ b/app/src/main/java/eu/kanade/tachiyomi/source/selection/WorkIdentityResolver.kt
-@@ -0,0 +1,192 @@
+@@ -0,0 +1,203 @@
 +package eu.kanade.tachiyomi.source.selection
 +
 +import eu.kanade.tachiyomi.network.GET
@@ -27130,14 +27136,16 @@ index 0000000..6897dc7
 +class WorkIdentityResolver(private val client: OkHttpClient) {
 +    suspend fun resolve(reference: SManga): WorkIdentity? {
 +        val verifiedAlias = OVERGEARED_TITLES.any { WorkIdentityText.title(it) == WorkIdentityText.title(reference.title) }
-+        val direct = if (verifiedAlias) OVERGEARED_2020 else UUID.find(reference.url)?.value?.takeIf {
++        val reviewed = ReviewedLibraryTitles.find(reference.title)
++            ?.takeIf { ReviewedLibraryTitles.isPortuguese(reference.title) }
++        val direct = if (verifiedAlias) OVERGEARED_2020 else reviewed?.id ?: UUID.find(reference.url)?.value?.takeIf {
 +            // A random UUID from another provider is not a MangaDex identity.
 +            (reference.memo["polaris.identity.mangadex"] as? JsonPrimitive)?.contentOrNull == it ||
 +                reference.url.startsWith("https://mangadex.org/title/")
 +        }
 +        val title = WorkIdentityText.compoundTitles(reference.title).firstOrNull() ?: reference.title
 +        if (direct == null && title.isBlank()) return null
-+        val primary = lookup { select(reference, mangaDexRecords(title, direct)) }
++        val primary = lookup { select(reference, mangaDexRecords(title, direct), reviewed = reviewed) }
 +        if (primary != null || direct != null) return primary
 +
 +        return lookup {
@@ -27216,7 +27224,12 @@ index 0000000..6897dc7
 +            .replace(LEADING_ARTICLE, "")
 +            .replace(CONTRACTED_ARTICLE, "de")
 +
-+    internal fun select(reference: SManga, records: JsonArray, linked: LinkedTitles? = null): WorkIdentity? {
++    internal fun select(
++        reference: SManga,
++        records: JsonArray,
++        linked: LinkedTitles? = null,
++        reviewed: ReviewedLibraryTitles.Entry? = null,
++    ): WorkIdentity? {
 +        val people = SourceMatching.people(reference.author, reference.artist)
 +        val matches =
 +            records.take(10).mapNotNull { record ->
@@ -27236,7 +27249,11 @@ index 0000000..6897dc7
 +                }.orEmpty()
 +                val id = item["id"]?.jsonPrimitive?.content ?: return@mapNotNull null
 +                if (!UUID.matches(id)) return@mapNotNull null
-+                val checkedTitles = if (id == OVERGEARED_2020) OVERGEARED_TITLES.map(::JsonPrimitive) else emptyList()
++                val checkedTitles = when {
++                    id == OVERGEARED_2020 -> OVERGEARED_TITLES
++                    reviewed != null && reviewed.id == id -> reviewed.portuguese + reviewed.english
++                    else -> emptyList()
++                }.map(::JsonPrimitive)
 +                val titles =
 +                    (checkedTitles + linkedAlias + preferred +
 +                            attributes["title"]?.jsonObject?.values.orEmpty() +
@@ -31263,7 +31280,7 @@ index 0000000..0932073
 +    }
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/library/LibraryTab.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/library/LibraryTab.kt
-index 50f5ee9..530d52e 100644
+index 50f5ee9..7631182 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/ui/library/LibraryTab.kt
 +++ b/app/src/main/java/eu/kanade/tachiyomi/ui/library/LibraryTab.kt
 @@ -4,7 +4,19 @@ import androidx.activity.compose.BackHandler
@@ -31370,7 +31387,7 @@ index 50f5ee9..530d52e 100644
              },
              bottomBar = {
                  LibraryBottomActionMenu(
-@@ -218,6 +241,41 @@ data object LibraryTab : Tab {
+@@ -218,6 +241,46 @@ data object LibraryTab : Tab {
              }
          }
  
@@ -31383,6 +31400,11 @@ index 50f5ee9..530d52e 100644
 +                        Text(stringResource(ATMR.strings.library_duplicate_help))
 +                        LazyColumn(Modifier.heightIn(max = 400.dp)) {
 +                            items(duplicateSuggestions, key = { "${it.first.id}:${it.second.id}" }) { pair ->
++                                if (eu.kanade.tachiyomi.source.selection.ReviewedLibraryTitles.isPortuguese(pair.first.title) &&
++                                    !eu.kanade.tachiyomi.source.selection.ReviewedLibraryTitles.isPortuguese(pair.second.title)
++                                ) {
++                                    Text(stringResource(ATMR.strings.library_duplicate_preferred_title, pair.first.title))
++                                }
 +                                listOf(pair.first, pair.second).forEach { manga ->
 +                                    TextButton(
 +                                        onClick = {
@@ -32298,7 +32320,7 @@ index ffdfc30..0e3a3bc 100644
 +    }
 +}
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/manga/MangaScreen.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/manga/MangaScreen.kt
-index a7c9284..6f9d1ca 100644
+index a7c9284..a0cc42e 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/ui/manga/MangaScreen.kt
 +++ b/app/src/main/java/eu/kanade/tachiyomi/ui/manga/MangaScreen.kt
 @@ -32,7 +32,7 @@ import eu.kanade.presentation.manga.ChapterSettingsDialog
@@ -32392,13 +32414,13 @@ index a7c9284..6f9d1ca 100644
 +                viewModel::runChapterDownloadActions.takeIf {
 +                    (!successState.source.isLocalOrStub() ||
 +                        successState.chapters.any { chapter ->
-+                            tachiyomi.domain.chapter.model.ChapterStorage.from(chapter.chapter)
-+                                ?.source
-+                                ?.let {
-+                                    Injekt.get<tachiyomi.domain.source.service.SourceManager>()
-+                                        .get(it)
-+                                        ?.isLocalOrStub() == false
-+                                } == true
++                            val origin = tachiyomi.domain.chapter.model.ChapterOrigin.from(chapter.chapter.memo)
++                            val sourceId = origin?.sourceId
++                                ?: tachiyomi.domain.chapter.model.ChapterStorage.from(chapter.chapter)?.source
++                            sourceId?.let {
++                                val provider = Injekt.get<tachiyomi.domain.source.service.SourceManager>().get(it)
++                                provider is eu.kanade.tachiyomi.source.online.HttpSource
++                            } == true
 +                        }) && successState.source !is MergedSource
 +                },
 +            onTranslationChapter =
@@ -72329,10 +72351,10 @@ index 0000000..4e7e2f9
 +}
 diff --git a/app/src/test/java/eu/kanade/tachiyomi/source/selection/LibraryDuplicateReviewTest.kt b/app/src/test/java/eu/kanade/tachiyomi/source/selection/LibraryDuplicateReviewTest.kt
 new file mode 100644
-index 0000000..542303a
+index 0000000..ced57a7
 --- /dev/null
 +++ b/app/src/test/java/eu/kanade/tachiyomi/source/selection/LibraryDuplicateReviewTest.kt
-@@ -0,0 +1,42 @@
+@@ -0,0 +1,54 @@
 +package eu.kanade.tachiyomi.source.selection
 +
 +import kotlinx.serialization.json.JsonObject
@@ -72347,6 +72369,18 @@ index 0000000..542303a
 +class LibraryDuplicateReviewTest {
 +    private fun manga(id: Long, title: String) =
 +        Manga.create().copy(id = id, source = id, url = "/$id", title = title, favorite = true)
++
++    @Test
++    fun `reviewed aliases suggest the Portuguese title without merging separate editions`() {
++        val english = manga(1, "A Returner's Magic Should Be Special")
++        val portuguese = manga(2, "Um Mago Retornado Deve Ser Especial")
++        val book = manga(3, "A Returner's Magic Should Be Special (Book Version)")
++
++        assertEquals(
++            listOf(PossibleLibraryDuplicate(portuguese, english)),
++            LibraryDuplicateReview.suggestions(listOf(english, book, portuguese)),
++        )
++    }
 +
 +    @Test
 +    fun `bilingual candidate with missing authorship is suggested without associating it`() {
@@ -84779,7 +84813,7 @@ index 9839272..0ac8bdd 100644
 \ No newline at end of file
 +voyager = ["voyager-navigator", "voyager-tabNavigator", "voyager-transitions"]
 diff --git a/i18n-at/src/commonMain/moko-resources/base/strings.xml b/i18n-at/src/commonMain/moko-resources/base/strings.xml
-index 7ed4795..a92547e 100644
+index 7ed4795..dfd4abd 100644
 --- a/i18n-at/src/commonMain/moko-resources/base/strings.xml
 +++ b/i18n-at/src/commonMain/moko-resources/base/strings.xml
 @@ -10,7 +10,7 @@
@@ -84791,7 +84825,7 @@ index 7ed4795..a92547e 100644
      <string name="pref_group_setup">Translation Setup</string>
      <string name="pref_translate_from">Translate From</string>
      <string name="pref_translate_to">Translate To</string>
-@@ -73,12 +73,338 @@
+@@ -73,12 +73,339 @@
      <string name="repository_add_error">Could not add this repository. Check your connection and try again.</string>
      <string name="repository_refresh_error">Repository added, but extension listings could not be refreshed. Refresh the Extensions screen.</string>
      <string name="chapter_group_version">Group/version: %1$s</string>
@@ -85130,10 +85164,11 @@ index 7ed4795..a92547e 100644
 +    <string name="extension_failure_repository">The package is unavailable in the repository</string>
 +    <string name="library_review_duplicates">Review possible duplicates (%1$d)</string>
 +    <string name="library_duplicate_title">Possible duplicates</string>
++    <string name="library_duplicate_preferred_title">Suggested title: %1$s</string>
 +    <string name="library_duplicate_help">Open each work to compare the title, source, and chapters. Suggestions leave the library records in place.</string>
  </resources>
 diff --git a/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml b/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
-index d1748bc..99185da 100644
+index d1748bc..d003183 100644
 --- a/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
 +++ b/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
 @@ -10,7 +10,7 @@
@@ -85145,7 +85180,7 @@ index d1748bc..99185da 100644
      <string name="pref_group_setup">Configuração da tradução</string>
      <string name="pref_translate_from">Traduzir de</string>
      <string name="pref_translate_to">Traduzir para</string>
-@@ -73,12 +73,338 @@
+@@ -73,12 +73,339 @@
      <string name="repository_add_error">Não foi possível adicionar o repositório. Confira a conexão e tente novamente.</string>
      <string name="repository_refresh_error">Repositório adicionado, mas não foi possível atualizar as extensões. Atualize a tela Extensões.</string>
      <string name="chapter_group_version">Grupo/versão: %1$s</string>
@@ -85484,6 +85519,7 @@ index d1748bc..99185da 100644
 +    <string name="extension_failure_repository">Pacote indisponível no repositório</string>
 +    <string name="library_review_duplicates">Revisar possíveis duplicatas (%1$d)</string>
 +    <string name="library_duplicate_title">Possíveis duplicatas</string>
++    <string name="library_duplicate_preferred_title">Título sugerido: %1$s</string>
 +    <string name="library_duplicate_help">Abra cada obra para comparar título, fonte e capítulos. As sugestões mantêm os registros da biblioteca.</string>
  </resources>
 diff --git a/i18n/src/commonMain/moko-resources/base/strings.xml b/i18n/src/commonMain/moko-resources/base/strings.xml
@@ -86501,3 +86537,46 @@ index 26e09a7..15aa323 100644
      )
  
      /**
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/source/selection/ReviewedLibraryTitles.kt b/app/src/main/java/eu/kanade/tachiyomi/source/selection/ReviewedLibraryTitles.kt
+new file mode 100644
+index 0000000..981980d
+--- /dev/null
++++ b/app/src/main/java/eu/kanade/tachiyomi/source/selection/ReviewedLibraryTitles.kt
+@@ -0,0 +1,37 @@
++package eu.kanade.tachiyomi.source.selection
++
++import tachiyomi.domain.manga.model.WorkIdentityText
++
++/** Reviewed names of the listed manhwa editions. The IDs identify the catalogue records. */
++internal object ReviewedLibraryTitles {
++    data class Entry(val id: String, val portuguese: List<String>, val english: List<String>)
++
++    private val entries = listOf(
++        Entry(
++            "6a468761-5bd6-4de0-a0cb-47cb456ac2e0",
++            listOf("Um Mago Retornado Deve Ser Especial", "Um Mago Retornado Tem Que Ser Especial",
++                "A Magia de um Retornado Tem de Ser Especial"),
++            listOf("A Returner's Magic Should Be Special", "A Returners Magic Should Be Special"),
++        ),
++        Entry(
++            "b17b675e-fb9f-4903-b4db-7c7deb2d1cac",
++            listOf("O Jogador Retorna Depois de 10 Mil Anos", "O Jogador Retorna Após 10 Mil Anos",
++                "O Jogador Retorna Após Dez Mil Anos"),
++            listOf("Player Who Returned 10,000 Years Later", "Player Who Returned 10000 Years Later",
++                "After Ten Millennia in Hell"),
++        ),
++        Entry(
++            "ade0306c-f4b6-4890-9edb-1ddf04df2039",
++            listOf("Upando Sozinho: Ragnarok"),
++            listOf("Solo Leveling: Ragnarok"),
++        ),
++    )
++    private val portuguese = entries.flatMap { it.portuguese }.mapTo(hashSetOf(), WorkIdentityText::title)
++    private val byTitle = entries.flatMap { entry ->
++        (entry.portuguese + entry.english).map { WorkIdentityText.title(it) to entry }
++    }.toMap()
++
++    fun find(title: String): Entry? = byTitle[WorkIdentityText.title(title)]
++
++    fun isPortuguese(title: String): Boolean = WorkIdentityText.title(title) in portuguese
++}
