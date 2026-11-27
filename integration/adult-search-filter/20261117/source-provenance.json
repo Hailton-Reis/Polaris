@@ -1,0 +1,163 @@
+{
+  "previous_audit_commit": "ef3584f40117fc7ce461cce575867c2031f48394",
+  "overlay_prerequisite": "f037c5d85575e30694295df5d079e97dcc4a35b9",
+  "overlay": {
+    "path": "integration/document-reader/document-reader.patch",
+    "bytes": 4161255,
+    "sha256": "7454073a37c995dd17bf808751cc0b8b83cb7367d044913701f82a9a61406829"
+  },
+  "baseline_files": [
+    {
+      "path": "app/src/main/java/eu/kanade/domain/source/service/SourcePreferences.kt",
+      "sha256": "a94505d57cc581455d411c9297186ea0e4b2b17437d472dcd7e1cee2b3e05045"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/ui/browse/source/globalsearch/SearchViewModel.kt",
+      "sha256": "78045e44270a549be79e47a4f3d91b6316b6b66662b2906810a30a8ac08e154f"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/ui/browse/source/globalsearch/GlobalSearchViewModel.kt",
+      "sha256": "7bbac71bd65e4692009d26e43be4c717370cf7d7604668811e199bed095e4132"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/ui/browse/source/browse/BrowseSourceViewModel.kt",
+      "sha256": "9d49086432fa62a6e7898a567a5dc8dbf48c25bb8b8b163428d0ca3e7783be85"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/source/selection/UnifiedWorkSearch.kt",
+      "sha256": "b05e4097cb0ad79fcc9a6eaafad0c91a4b8288247f4873ca2473fb3256a4b8b9"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalog.kt",
+      "sha256": "5b2a2cadbc6773234da7100856c3c41063cd7f3c69c5811b2a4307b858f2a97b"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/source/selection/WorkSearchGrouping.kt",
+      "sha256": "1ecdbb2ef97cfd8392b475a47db06c73534da88a5bbed5ad36d090737db2edbd"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/domain/DomainModule.kt",
+      "sha256": "1ec274d08b8ca4fedb7b1a97b4ca9bb9a4f1f2ddc788da9716be5863508fec01"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsBrowseScreen.kt",
+      "sha256": "f030172f326a826f046c023600bcca1e9c72fd63e2b5f8fdb16c278d24ea6bf0"
+    },
+    {
+      "path": "i18n-at/src/commonMain/moko-resources/base/strings.xml",
+      "sha256": "7633b49cf7a39b43f0b791fef85036cd5d874a092df684171c4bf656a7081294"
+    },
+    {
+      "path": "i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml",
+      "sha256": "92929219c9e6cc04fa876f4b182acb32192f3a64c776c881b514f45c1bfc9b71"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/source/selection/UnifiedWorkSearchTest.kt",
+      "sha256": "18df3e92f03cbf41e9fb3cde0b9dea9d9b491f03374fee10c838af4ad416436e"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalogTest.kt",
+      "sha256": "04d1d533487e644d1090d209fe8be885d06b0933bfba08881b191611b4a97f88"
+    }
+  ],
+  "production_unchanged_for_red": true,
+  "files": [
+    {
+      "path": "app/src/main/java/eu/kanade/domain/source/service/SourcePreferences.kt",
+      "bytes": 5032,
+      "sha256": "fbec9f7699e7ef68c86da202b767d9b810b50d268102bf7dfffb014b78e19aae"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/ui/browse/source/globalsearch/SearchViewModel.kt",
+      "bytes": 12207,
+      "sha256": "82f1bfcc2d90564d64db611fe0ddd48daf5bba08db3ddfb42c5c93402079d7e0"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/ui/browse/source/globalsearch/GlobalSearchViewModel.kt",
+      "bytes": 7641,
+      "sha256": "867e94fe8b86b689c510a7d6ba0d4d94b3409f234f9bc06f7a4caca10be99d14"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/ui/browse/source/browse/BrowseSourceViewModel.kt",
+      "bytes": 13969,
+      "sha256": "e9cec6cc371603a3d2b300c5d949359e532a066ec4ebe05f229fa8b0d2e31666"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/source/selection/UnifiedWorkSearch.kt",
+      "bytes": 11790,
+      "sha256": "a589d1af7abcd629ddd317051b183419376aff65fc37e8e72313601b20b4bde2"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalog.kt",
+      "bytes": 27432,
+      "sha256": "497a6a72cd658c010ad2ff9b820986690515f53a1e97c65bcf9e15d5fe77be39"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/source/selection/WorkSearchGrouping.kt",
+      "bytes": 6357,
+      "sha256": "198724276aa956e0b8189e0019c8f95ae5f5e311e2e65dc85148a8913444f6d2"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/domain/DomainModule.kt",
+      "bytes": 14372,
+      "sha256": "42e9289e0611dac1f2e96479a174c77ca3bcfe3dca66904a41cfb147db74e7bf"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/presentation/more/settings/screen/SettingsBrowseScreen.kt",
+      "bytes": 4634,
+      "sha256": "f50bce32a841eb825533861160698a2877522c93ca9636b5aec684d01b433b58"
+    },
+    {
+      "path": "i18n-at/src/commonMain/moko-resources/base/strings.xml",
+      "bytes": 38988,
+      "sha256": "5b3a8b7836d72cb43922e137c2456fef86c8fe2ec36dceb4d55cca8013daa013"
+    },
+    {
+      "path": "i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml",
+      "bytes": 41164,
+      "sha256": "40577e843e51681252c6c6c3cdcc296d7d835ce950418344d10f49a742f021ec"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/source/selection/UnifiedWorkSearchTest.kt",
+      "bytes": 13706,
+      "sha256": "21a8a7fa98a659b956cd073eb94c24b7625d1a40cee38c1be3e33c09825f044d"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalogTest.kt",
+      "bytes": 42846,
+      "sha256": "adcad175a5f699982a3b084f0e7ee2692d2d02b4b10190e0373d7c867ced8bb9"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/source/selection/AdultContentFilter.kt",
+      "bytes": 5177,
+      "sha256": "ce9499fc2e01e64192652d0568e0d50802e402f1fe9ed56c43afedc498b87511"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/source/selection/AdultContentFilterTest.kt",
+      "bytes": 7187,
+      "sha256": "04ec8a98a9047ef2f4ea196102d70c00cfec1d0b89adea7605445825f68dba04"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/ui/browse/source/globalsearch/AdultSearchViewModelTest.kt",
+      "bytes": 7836,
+      "sha256": "6336b067a84e27ea70f7177e99125c4a57d25883dfe2735484ea6a6fc2024b05"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt",
+      "bytes": 10970,
+      "sha256": "7ffcb33a884f727420277175b565d70ac6256cf1e410ba33623ddb2fd0c73a10"
+    }
+  ],
+  "engineering_scripts": [
+    {
+      "path": "scripts/beta/package_internal_beta.py",
+      "bytes": 17621,
+      "sha256": "a871ddab1c2fa6ad111743e4cf6b761353affaca81508f3eb8c4f3df3b650bc8"
+    },
+    {
+      "path": "scripts/r001/test_apply_document_reader.py",
+      "bytes": 6424,
+      "sha256": "77778eadc8c31a5a64dc7d1ab7178298f0867e1591ab43aa8aff695a61b66b31"
+    }
+  ]
+}

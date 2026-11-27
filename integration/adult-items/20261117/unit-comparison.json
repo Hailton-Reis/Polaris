@@ -1,0 +1,105 @@
+{
+  "status": "NO_UNEXPECTED_UNIT_REGRESSIONS",
+  "baseline": {
+    "total": 1064,
+    "passed": 1064,
+    "failed": 0,
+    "skipped": 0
+  },
+  "patched": {
+    "total": 1064,
+    "passed": 1064,
+    "failed": 0,
+    "skipped": 0
+  },
+  "preexisting_failures_still_present": 0,
+  "missing_baseline_tests": [
+    [
+      "app",
+      "eu.kanade.tachiyomi.source.selection.AdultContentFilterTest",
+      "declared adult providers are hidden even if individual results have no labels()"
+    ],
+    [
+      "app",
+      "eu.kanade.tachiyomi.source.selection.AdultContentFilterTest",
+      "disabling the filter bypasses labels and source lookup and a new snapshot follows changes()"
+    ],
+    [
+      "app",
+      "eu.kanade.tachiyomi.source.selection.AdultContentFilterTest",
+      "source snapshots do not retain a mutable external source set()"
+    ],
+    [
+      "app",
+      "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "declared adult sources are not queried even when their manga metadata has no labels()"
+    ],
+    [
+      "app",
+      "eu.kanade.tachiyomi.source.selection.UnifiedWorkSearchTest",
+      "a declared adult provider is not searched for localized aliases()"
+    ],
+    [
+      "app",
+      "eu.kanade.tachiyomi.ui.browse.source.globalsearch.AdultSearchViewModelTest",
+      "enabling filtering cancels an in flight adult provider and clears its source row()"
+    ],
+    [
+      "app",
+      "eu.kanade.tachiyomi.ui.browse.source.globalsearch.AdultSearchViewModelTest",
+      "flagged providers are not queried and adult rows are filtered before local persistence()"
+    ]
+  ],
+  "new_failures_or_skips": [],
+  "android_runtime_verified": false,
+  "raw_comparison_status": "REGRESSION_DETECTED",
+  "expected_policy_replacements": [
+    {
+      "classname": "eu.kanade.tachiyomi.source.selection.AdultContentFilterTest",
+      "superseded": [
+        "declared adult providers are hidden even if individual results have no labels()",
+        "disabling the filter bypasses labels and source lookup and a new snapshot follows changes()",
+        "source snapshots do not retain a mutable external source set()"
+      ],
+      "replacements": [
+        "an unknown work stays available even when another work on the same source is adult()",
+        "disabling the filter allows adult works and new snapshots follow setting changes()",
+        "filtering is per work and never blocks an entire mixed source()"
+      ]
+    },
+    {
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "superseded": [
+        "declared adult sources are not queried even when their manga metadata has no labels()"
+      ],
+      "replacements": [
+        "unlabeled alternatives from mixed sources remain available instead of blocking the source()"
+      ]
+    },
+    {
+      "classname": "eu.kanade.tachiyomi.source.selection.UnifiedWorkSearchTest",
+      "superseded": [
+        "a declared adult provider is not searched for localized aliases()"
+      ],
+      "replacements": [
+        "mixed sources remain eligible for aliases while their adult rows are hidden()"
+      ]
+    },
+    {
+      "classname": "eu.kanade.tachiyomi.ui.browse.source.globalsearch.AdultSearchViewModelTest",
+      "superseded": [
+        "enabling filtering cancels an in flight adult provider and clears its source row()",
+        "flagged providers are not queried and adult rows are filtered before local persistence()"
+      ],
+      "replacements": [
+        "all mixed providers are queried and only their adult rows are filtered before persistence()",
+        "enabling filtering restarts an in flight search and removes adult rows while retaining both providers()"
+      ]
+    }
+  ],
+  "unexpected_missing_baseline_tests": [],
+  "report_tasks": {
+    "app": "testBetaUnitTest",
+    "domain": "testReleaseUnitTest"
+  }
+}

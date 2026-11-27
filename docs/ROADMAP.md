@@ -2,7 +2,23 @@
 
 O roadmap indica prioridades e critérios de verificação. Não representa prazo de entrega nem recurso já aprovado.
 
+## Abertura com centenas de fontes
+
+O relato de travamento em dois aparelhos Galaxy A priorizou a [auditoria de catálogos grandes](AUDITORIA_CATALOGO_GRANDE.md). O inventário de extensões, a checagem de atualizações e a busca receberam correções. O teste em aparelho deve preservar o catálogo, medir a abertura e verificar leitura e downloads. Os riscos na restauração da fila e na indexação das pastas ficaram registrados na auditoria.
+
+## Após a beta.11 — auditoria P20261117.6
+
+A prioridade mais recente é tornar a busca entre fontes mais rápida e eficiente. A [P20261117.3](BUSCA_FONTES_P20261117_3.md) paraleliza a atualização dos catálogos confirmados e checagens de imagens, compartilha duas vagas por operação entre obras, evita buscas repetidas e distingue tentativas incompletas do cache diário. Provas de tempo são simuladas; faltam tempos/fontes reais e o novo pacote. Não relaxar a identificação de obras ou a numeração para ganhar velocidade.
+
+A beta.11 foi publicada e instalada pelo mantenedor; relatos dos testes em aparelhos serão incorporados. A [auditoria pós-beta.11](AUDITORIA_POS_BETA11_P20261116_2.md) corrige limites e retomada do downloader. A [continuação P20261116.3](LEITURA_BACKUPS_P20261116_3.md) limita/cancela a leitura de backups e move a validação para IO; a criação automática preserva as cópias anteriores em falha por tamanho, e a exportação manual permanece disponível. A política de entrada não garante o pico do grafo/serialização: medições nos aparelhos seguem pendentes.
+
+O [OpenCV oficial 4.12.0 foi integrado e compilado](OPENCV_P20261117_1.md), com ARM32/ARM64 e API mínima do app mantida em 26. A saída mesclada confirmou os quatro binários OpenCV/C++ oficiais, os outros 27 inalterados, PT_LOAD/congruência ARM64 para 16 KiB e importações do runtime conferidas. Ainda faltam APK final/alinhamento ZIP, carregamento JNI e execução OCR/qualidade/pico em aparelhos ARM32/ARM64 e sistema de páginas de 16 KiB. O acréscimo nativo bruto é de 3.213.164 bytes; não há medida de APK novo. Conta/nuvem e sandbox continuam adiadas. Essas correções ficam para a próxima versão, sem APK/Release nesta revisão; antes de publicar, aumentar versão e código acima de 112.
+
+A [P20261117.5](FONTES_MISTAS_P20261117_5.md) mantém o filtro +18 padrão, agora por obra, preservando fontes mistas; liberar conteúdo sensível pede confirmação. Obras sem identificação podem escapar; biblioteca preservada. A [P20261117.6](CONCORRENCIA_FONTES_P20261117_6.md) aplica quatro operações alternativas com o app visível e uma em segundo plano, compartilhadas entre obras. A busca geral mantém cinco tarefas. O agendamento existente da biblioteca continua opcional e inalterado; não há novo trabalho periódico. Fontes reais, bateria e tempos precisam ser medidos.
+
 ## Prioridades atuais — decisão P20261114.4
+
+A [P20261117.2](LIMPEZA_RECORTE_OCR_P20261117_2.md) corrige a liberação explícita dos recortes Paddle já devolvidos ao motor quando a preparação de um lote falha. Mantém ordem/índices, agrupamento e confiança. Temporários internos de corte/conversão e medições de pico continuam para auditoria; essa correção não substitui os aceites em aparelhos.
 
 Sandbox inteira pausada, [arquivada e removida dos fontes compilados](ARQUIVAMENTO_SANDBOX_P20261115_2.md) nesta beta. Não ampliar controles, ações, login isolado, OAuth/Cloudflare ou novels isoladas agora. Esses itens históricos não bloqueiam a conclusão da beta. O [aviso único de extensões](PAUSA_SANDBOX_E_AVISO_P20261114_4.md) exige as duas confirmações pedidas pelo usuário, sem substituir verificações de assinatura/integridade.
 
@@ -10,7 +26,7 @@ As quatro frentes ativas são armazenamento, backups, leitura e distribuição. 
 
 ## Consolidação da beta.11
 
-O [checklist atual](BETA11_CHECKLIST.md) acompanha as frentes autorizadas em 13/11. Proteções de armazenamento/backups/leitura e o [APK não depurável P20261116.1](DISTRIBUICAO_BETA_P20261116_1.md) têm candidatas verificadas. Atualização preservando dados, SAF/SQLite/interface Android, leitores externos e qualidade/memória nos aparelhos continuam para o aceite final antes da publicação. As revisões históricas de sandbox abaixo estão pausadas por decisão atual.
+O [checklist atual](BETA11_CHECKLIST.md) acompanha as frentes autorizadas em 13/11. Proteções de armazenamento/backups/leitura e o [APK não depurável P20261116.1](DISTRIBUICAO_BETA_P20261116_1.md) foram consolidados na beta.11 publicada. Atualização preservando dados, SAF/SQLite/interface Android, leitores externos e qualidade/memória nos aparelhos continuam para o aceite durante a rodada atual. As revisões históricas de sandbox abaixo estão pausadas por decisão atual.
 
 Conta do Polaris com login Google e sincronização em nuvem é uma evolução desejada, mas foi **adiada por decisão do usuário**. Não priorizar configuração de Google Cloud ou provisionamento de contas agora. O backup local existente é preservado.
 

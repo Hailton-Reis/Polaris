@@ -1,0 +1,130 @@
+{
+  "previous_audit_commit": "58812b85b421e6fd18e49dcb2c8811cc9e0efe46",
+  "published_beta11_source_commit": "32a9c831c32b83f761001cf1a298348defaed2fa",
+  "overlay_prerequisite": "f037c5d85575e30694295df5d079e97dcc4a35b9",
+  "overlay_bytes": 4067683,
+  "overlay_unicode_codepoints": 4065880,
+  "overlay_sha256": "797f8107d07d0379101dbe386ae284ff9b24a83f4c51d1d63ca64132c68486f5",
+  "overlay_git_blob_sha": "0470f6979bf729d5cc21d8d3cce2cbfb3387ec1d",
+  "baseline_files": [
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/data/backup/BackupDecoder.kt",
+      "sha256": "8a93eb2d8b0219f1c8bda1ddbb98cf506edf139daf0a1cef6ae71b81d663d950"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/data/backup/BackupFileValidator.kt",
+      "sha256": "656022f481dcdced575bb15298981fcc62bcf8de0da642e686b687180f6575be"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/data/backup/create/BackupCreator.kt",
+      "sha256": "8f026c164c56058cb69dbd8d21c598279f57187e70d2ec31d729c651204be1e7"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/data/backup/restore/BackupRestorer.kt",
+      "sha256": "7046c512d8ec82360aea14a022d58899fe117ba8b0034186a00e556c7362c17f"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/presentation/more/settings/screen/data/RestoreBackupScreen.kt",
+      "sha256": "5268f0b9f16b78802ccd089f2946e69bcdef407e4726479f650bb6823d381c1b"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/data/backup/create/BackupCreatorTransactionTest.kt",
+      "sha256": "99b8f07fdfb2a1d9564daa30cdc0d06c423d5e397bc13245470fcb53d9ff972d"
+    }
+  ],
+  "files": [
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/data/backup/BackupReadBudget.kt",
+      "bytes": 512,
+      "sha256": "741e02330d075c4d281fb934b15528a2700edbd04940a6ff3ae5d8d4024a27ad"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/data/backup/BackupPayloadReader.kt",
+      "bytes": 1191,
+      "sha256": "c4eac904b14d6053e1267e7e97eb857f89f70b9c53d3f4025775ca972b1319b2"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/data/backup/BackupDecoder.kt",
+      "bytes": 2836,
+      "sha256": "9c73e7c6c386fbfbcc78930869fd4020b7bb066267ff10e4db309aacdc8ef7f5"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/data/backup/BackupFileValidator.kt",
+      "bytes": 2066,
+      "sha256": "522e23e30eeaa208e31be1ceef23d8ad55c19cc6987892e1f6c40b94dc239d8e"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/data/backup/create/BackupCreator.kt",
+      "bytes": 14307,
+      "sha256": "9ca32be667b3db94b25057faff1b53dd0ff2f730901cd8bc58cdd61810d355d7"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/data/backup/restore/BackupRestorer.kt",
+      "bytes": 10889,
+      "sha256": "6d60b38354bc0342e5faf4657925095b2f3a897475e206093d047fbb2eb5ab75"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/presentation/more/settings/screen/data/RestoreBackupScreen.kt",
+      "bytes": 10459,
+      "sha256": "c657dd5019185ede13b6f226541acd31bfb69022d5e718598994867d8844e94f"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt",
+      "bytes": 10970,
+      "sha256": "a1ebcd07d5774858a54db8f9c9b3c6400756d2bad19f69354db45dddd2128085"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/data/backup/BackupDecoderBoundedTest.kt",
+      "bytes": 7762,
+      "sha256": "d1c145028d5808b730494e7ff5dd462f6bf2c7d151942ffd081fc80bc7f85ccc"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/data/backup/create/BackupCreatorTransactionTest.kt",
+      "bytes": 15326,
+      "sha256": "6dd203c0e8ad721febe9c2321a57cdb0a1769760c0f5a4057d2a232461a72f88"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/presentation/more/settings/screen/data/RestoreBackupViewModelTest.kt",
+      "bytes": 5139,
+      "sha256": "cdd46f11415e4bc2e02cf91bc5b5280ac5d995cfa032790059a6110075d6ac91"
+    },
+    {
+      "path": "i18n-at/src/commonMain/moko-resources/base/strings.xml",
+      "bytes": 38569,
+      "sha256": "a0c5aa80e6083765d18546e2b07f93c5e41fc6941145aa2f2baa9f24a780cf22"
+    },
+    {
+      "path": "i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml",
+      "bytes": 40734,
+      "sha256": "f7e3471cfb89a6121b0a8c2f2428dc87daa091def1db3baa2f419d59e1d9a6aa"
+    }
+  ],
+  "engineering_scripts": [
+    {
+      "path": "scripts/audit/inspect_android_apk.py",
+      "sha256": "77b069f22e8f66d9a9da803ff3e298324f5b742f60ad234f168e0dea6ab119ef"
+    },
+    {
+      "path": "scripts/audit/check_java_api_references.py",
+      "sha256": "d0ab359d8887869a8047c8cc821a93fb5236ca22123983ffdf942077fd71ec1e"
+    },
+    {
+      "path": "scripts/beta/package_internal_beta.py",
+      "sha256": "a5b8c2f22ab5bef44d2dd5a6ecda1e0930cf6b2e371809a55eb875cb2dfb8d83"
+    },
+    {
+      "path": "scripts/r001/test_apply_document_reader.py",
+      "sha256": "571012848da1592ac2fd3b0216014320ebe0bc3487c4ed90f7b03f4f1ec70bde"
+    }
+  ],
+  "native_dependency_declarations": [
+    {
+      "path": "ppocr-sdk/build.gradle.kts",
+      "sha256": "c6395382bc312fcad36612cd3c17e0365b8f40d2e053f5256b321a17d323a69a"
+    },
+    {
+      "path": "gradle/libs.versions.toml",
+      "sha256": "cdec539bb1f80ba13d49294083bb9819e2b175d674030fb15add165aebba0c14"
+    }
+  ]
+}

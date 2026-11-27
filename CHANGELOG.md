@@ -2,6 +2,201 @@
 
 Este arquivo registra a evolução real do código. **Revisões de desenvolvimento não são lançamentos públicos.** As datas abaixo usam America/Fortaleza, exceto quando houver indicação de UTC. O histórico de distribuição fica em [Releases](https://github.com/Hailton-Reis/Polaris/releases).
 
+## Desenvolvimento · fila de downloads e saída do leitor
+
+- O botão de download inicia a fila mesmo quando já há capítulos na fila parada.
+- Ao sair do leitor, a exclusão automática consulta a obra e o capítulo atuais. Entradas antigas sem obra válida são ignoradas, mantendo as preferências de categorias e capítulos marcados.
+
+## Polaris 0.1.0-beta.17 · P20261124.2
+
+### Capas e busca de capítulos
+
+- Capas confirmadas podem ser gravadas enquanto a consulta aos capítulos continua. A etapa de capítulos reaproveita a identidade encontrada.
+- A comparação das edições reutiliza os identificadores calculados para os capítulos de cada catálogo.
+
+### Recuperação de capas de catálogo
+
+- Capas ausentes ou inválidas podem ser recuperadas de um catálogo com identidade confirmada, inclusive quando nenhuma fonte fornece capítulos. A recuperação preserva capas personalizadas e os capítulos salvos.
+- A busca tenta fragmentos selecionados após os títulos completos e ainda exige confirmação da obra. **As Aventuras de Greed** e **As Aventuras de Grid** reconhecem a edição de 2020 de **Overgeared**.
+
+## Polaris 0.1.0-beta.16 · P20261124.1
+
+### Recuperação de endereço e novas tentativas
+
+- Se o endereço antigo não fornecer capítulos, a procura pode localizar a obra em outro endereço da mesma fonte. A busca mantém o título salvo como referência para evitar aproveitar detalhes de outra obra.
+- Quando a fonte original excede o limite de espera, a atualização preserva o resultado encontrado e mantém a consulta elegível para nova tentativa.
+
+### Busca completa de fontes na atualização manual
+
+- A atualização manual percorre as fontes elegíveis quando a descoberta está pendente. Cada consulta tem seu limite individual e a busca em lote continua depois de encontrar a primeira edição.
+- O Polaris testa outros títulos confirmados quando uma busca retorna obras ambíguas ou sem capítulos compatíveis. A confirmação entre catálogos reconhece diferenças de artigos no título salvo.
+
+### Recuperação durante a atualização da biblioteca
+
+- A atualização da biblioteca tenta recuperar favoritos com fonte ausente ou capa faltando. Na atualização manual, essas obras podem passar pelos filtros de leitura dentro das categorias selecionadas.
+- A recuperação processa uma obra por vez e prioriza fontes brasileiras. A atualização agendada continua respeitando os filtros configurados.
+
+## Polaris 0.1.0-beta.15 · P20261123.3
+
+### Busca por títulos alternativos
+
+- Quando a consulta ao MangaDex não resolve o título da biblioteca, o Polaris pode confirmar um título alternativo no MangaUpdates e aproveitar o vínculo entre os registros dos dois catálogos.
+- O leitor usa o vínculo confirmado entre títulos para procurar a mesma numeração em outra edição, inclusive quando faltam créditos na fonte de leitura.
+
+## Polaris 0.1.0-beta.14 · P20261123.2
+
+### Recuperação de favoritos restaurados
+
+- Ao abrir um favorito sem capítulos da fonte original, o Polaris pode associar uma edição com título distintivo e inequívoco mesmo quando o backup omitiu a autoria. A busca começa pelo português brasileiro e recorre ao inglês quando necessário.
+- Capas ausentes podem ser buscadas antes da próxima consulta diária. A tela pode exibir o nome da fonte que forneceu os capítulos recuperados.
+
+### Correção da aba Instalados
+
+- A aba **Instalados** mostra cada fonte uma vez, mesmo quando ela também aparece como última usada. Isso corrige o fechamento ao renderizar a lista.
+
+## Polaris 0.1.0-beta.13 · P20261123.1
+
+### Recuperação da primeira página e de capas
+
+- Ao recuperar um capítulo, consultas a catálogos já conhecidos têm um limite mais curto. A busca preserva tempo para encontrar uma edição do mesmo capítulo em outra fonte.
+- Uma capa de favorito que retorna HTTP 404 ou 410 pode ser recuperada ao abrir a obra. A busca ignora temporariamente os endereços que retornaram esses códigos e preserva capas personalizadas.
+
+## Desenvolvimento · atalho para documentos
+
+- A barra da **Biblioteca** dá acesso direto a **Documentos**. A tela coloca a importação de arquivos e links antes da preparação de idiomas.
+
+## Desenvolvimento · revisão de duplicatas e falhas de extensão
+
+- A biblioteca destaca possíveis duplicatas que ainda precisam de revisão. É possível abrir cada obra do par e comparar as fontes e os capítulos. As sugestões não alteram os registros.
+- A lista de extensões mostra o motivo da falha por pacote e permite repetir só os casos com erro. As linhas por idioma reutilizam o identificador real do APK durante a instalação.
+
+## Desenvolvimento · reconhecimento de obras e abertura do app
+
+- O catálogo pode confirmar títulos em idiomas diferentes, títulos compostos por dois nomes equivalentes e sinopses idênticas quando a fonte omite a autoria. Numeração incompatível, identidades conflitantes e separações escolhidas pelo usuário continuam respeitadas.
+- A consulta automática da versão roda a cada nova abertura do app, com uma consulta por janela e sem repetir após rotação da tela.
+- **Fontes** mostra as fontes prontas para leitura. Instalação, atualizações de extensões e repositórios ficam em **Gerenciar fontes**.
+
+## Desenvolvimento · gestão de fontes e backups
+
+- A tela Fontes abre em **Instalados**. Fontes locais e fontes de extensões têm seções próprias, com as atualizações no topo. **Internas** mostra os arquivos locais e **Externas** lista extensões para instalar. A migração e as light novels ficam no menu.
+- **Preparar fontes** abre na seleção de repositórios. **Consultar** lista os resultados em português e inglês por padrão. A confirmação de confiança continua na adição do repositório e na instalação. A atualização em lote processa um pacote por vez.
+- A atualização consulta os detalhes de obras sem capa. A recuperação pode buscar uma alternativa com capa mesmo quando a fonte atual tem capítulos legíveis.
+- Novos backups usam o prefixo Polaris. A rotação continua reconhecendo os nomes antigos e compara as datas independentemente do prefixo.
+
+## Desenvolvimento · prioridade para a obra aberta
+
+- A descoberta da obra aberta entra na fila de fontes na frente das atualizações pendentes da biblioteca. A busca pelo capítulo aberto pode encerrar ao encontrar uma alternativa legível com a mesma numeração.
+- O leitor tenta as edições compatíveis já conhecidas antes de ampliar a busca. A edição favoritada conserva o registro, o progresso e os arquivos locais.
+- A busca preserva a capa obtida no catálogo ou nos detalhes da fonte alternativa durante a consulta de capítulos.
+
+## Desenvolvimento · P20261122.2 — correções dos testes no Galaxy A
+
+- O leitor mantém o visualizador quando só os dados da obra mudam e adia a procura de fontes na abertura de capítulos locais.
+- Backup de categorias, vínculos e marcações verificado por exportação e restauração. A recuperação tenta a fonte original primeiro e pode obter capítulos e capa de uma alternativa compatível.
+- Favoritos antigos confirmados como a mesma obra podem aparecer em um único cartão. As edições, os arquivos e as categorias são preservados.
+- **Preparar fontes** fica visível na aba Extensões. A instalação privada confirma o carregamento antes de mostrar sucesso. A remoção fica manual enquanto a ausência no catálogo puder ser temporária.
+
+[Correções e cenários para verificar nos aparelhos](docs/CORRECOES_TESTE_GALAXY.md).
+
+## Desenvolvimento · P20261122.1 — abertura com catálogos grandes
+
+- Uma passagem para inventariar APKs de extensões. A checagem de atualizações reutiliza o catálogo carregado e roda fora da interface.
+- Ícones sob demanda e gravação de metadados apenas quando necessário. Busca com cinco operações ativas, fontes de mesmo nome preservadas e agrupamento fora da interface.
+- Liberação dos temporários internos de OCR em caso de falha. Downloads repetem automaticamente apenas erros transitórios.
+
+[Auditoria e verificação em aparelhos](docs/AUDITORIA_CATALOGO_GRANDE.md).
+
+## Desenvolvimento · P20261117.6 — 17/11/2026
+
+**Estado:** concorrência adaptada à visibilidade para a próxima versão; sem novo APK/Release.
+
+- Operações alternativas passam de duas fixas para quatro com o app visível e uma em segundo plano, compartilhadas entre obras/instâncias. Processo começa com uma; callbacks existentes ajustam as vagas.
+- Mudança de modo preserva operações admitidas. Fila em ordem de chegada, cancelamento/erro devolvendo capacidade, sem reservar uma obra inteira. Fonte original fora desse limite; pool textual de cinco e agendamento opcional existente preservados.
+- Tempos simulados: três catálogos de um segundo passam de 2→1 segundo em primeiro plano (três em segundo plano); quatro checagens passam de 2→1 segundo. Sem benchmark de rede/aparelho/bateria ou pico de memória; buffer pronto passa a quatro.
+- 12 testes novos e um caso renomeado para a política de quatro vagas. Validação completa: 989 app executados/aprovados + 87 domain anteriores/UP-TO-DATE = 1.076 casos, sem falha/skip ou ausência inesperada. Inclui controle com threads reais e troca de modo durante busca.
+- Overlay4/empacotamento27/comparador21 aprovados. Filtro +18 por obra, fontes mistas e confirmação ao liberar conteúdo sensível preservados.
+
+[Política e agendamento](docs/CONCORRENCIA_FONTES_P20261117_6.md) · [Evidências](integration/adaptive-source-discovery/20261117/README.md).
+
+## Desenvolvimento · P20261117.5 — 17/11/2026
+
+**Estado:** fontes mistas preservadas e aviso de conteúdo sensível para a próxima versão; sem novo APK/Release.
+
+- Filtro +18 continua ligado por padrão, agora por obra: tags, classificação e marcadores no título. Removido o bloqueio de fontes inteiras pela marcação da extensão, permitindo resultados comuns de fontes mistas.
+- Desligar pede confirmação **Estou ciente, liberar**; cancelar mantém o filtro. Religar é imediato. Biblioteca e escolhas independentes de fontes preservadas; conteúdo sem marcação pode escapar.
+- Sete controles da política anterior foram substituídos por sete de filtragem por obra, sem aumento do total. 86 controles focados e validação completa aprovados: 977 app executados + 87 domain anteriores/UP-TO-DATE = 1.064 casos. Nenhuma falha/skip ou ausência inesperada; as sete substituições estão listadas nas evidências.
+- Overlay4/empacotamento27/comparador21 aprovados. Aviso compilado/revisado no código, sem execução da interface no aparelho. Sem análise de imagens ou alteração da concorrência/agendamento.
+
+[Comportamento e aviso](docs/FONTES_MISTAS_P20261117_5.md) · [Evidências](integration/adult-items/20261117/README.md).
+
+## Desenvolvimento · P20261117.4 — 17/11/2026
+
+**Estado:** filtro +18 para a próxima versão; sem novo APK ou Release.
+
+- Filtro ligado por padrão e reversível em Navegar → Conteúdo adulto. Oculta fontes adultas e obras marcadas nas buscas geral/novels/migração, navegação de fonte e alternativas automáticas, inclusive após enriquecimento válido.
+- Mudança da opção reinicia buscas e invalida a descoberta. Biblioteca e leitura original/fixa preservadas. Conteúdo sem marcação ou identificado tardiamente pode aparecer; sem análise de imagens ou consultas extras para classificar.
+- Três falhas anteriores reproduzidas e 25 casos novos. Validação completa: 977 app executados/aprovados + 87 domain anteriores/UP-TO-DATE = 1.064 casos; overlay4/empacotamento27/comparador21 aprovados. Provedores simulados, interface compilada sem execução no aparelho.
+- Mais alternativas em primeiro plano e atualização periódica em segundo plano ficam como propostas. Concorrência atual preservada: cinco tarefas na busca geral e duas nas alternativas automáticas.
+
+[Configuração e limites](docs/FILTRO_ADULTO_P20261117_4.md) · [Evidências](integration/adult-search-filter/20261117/README.md).
+
+## Desenvolvimento · P20261117.3 — 17/11/2026
+
+**Estado:** descoberta entre fontes mais eficiente para a próxima versão; sem novo APK ou Release.
+
+- Atualização de catálogos confirmados e checagem de imagens passam a integrar operações paralelas limitadas a duas alternativas entre obras. Fila de resultados pronta limitada a dois; fonte original preservada fora dessa fila.
+- Catálogo confirmado já atualizado não provoca pesquisa repetida na mesma fonte. Busca que esgota orçamento fica incompleta e elegível após um minuto; conclusão normal conserva 24 horas. Painel de fontes avisa sobre a tentativa incompleta.
+- Quatro falhas anteriores reproduzidas. Tempos simulados de 3→2 segundos para três catálogos e 4→2 para quatro checagens; não são medições de fonte real/aparelho.
+- Quinze casos novos; 952 app executados/aprovados e 87 domain anteriores/UP-TO-DATE: 1.039 casos sem regressões. Compilação final 2min19s; overlay4/empacotamento27/comparador21 aprovados. Critérios de associação, numeração, idiomas, origem dos dados e fonte fixa preservados; amostras reutilizadas mantêm sua validade original.
+
+[Comportamento e limites](docs/BUSCA_FONTES_P20261117_3.md) · [Evidências](integration/source-discovery/20261117/README.md).
+
+## Desenvolvimento · P20261117.2 — 17/11/2026
+
+**Estado:** limpeza de recortes Paddle para a próxima versão; sem novo APK ou Release.
+
+- Recortes passam a pertencer ao lote antes da consulta de dimensões, dentro do fechamento que também cobre a preparação. Falha num recorte seguinte ou na consulta não deixa os já retornados sem liberação explícita; vazios ficam fora do reconhecimento.
+- Duas falhas anteriores reproduzidas no motor real com fronteiras nativas simuladas. Sete casos novos e 15 controles focados aprovados, incluindo ordem/índices, confiança, vazios, erro de reconhecimento e falha em lote posterior.
+- Modelos e algoritmos permanecem com a lógica anterior; alteração local de vida útil documentada no SDK. Não mede RAM nem cobre temporários internos de uma operação que falha antes de devolver o recorte.
+- Compilação/validação final aprovada em 2min34s; 939 testes do app executados/aprovados e 85 anteriores de domain/UP-TO-DATE: 1.024 casos sem regressões. Overlay4/empacotamento27/comparador21 aprovados.
+
+[Correção e limites](docs/LIMPEZA_RECORTE_OCR_P20261117_2.md) · [Evidências](integration/ocr-crop-ownership/20261117/README.md).
+
+## Desenvolvimento · P20261117.1 — 17/11/2026
+
+**Estado:** OpenCV oficial integrado/compilado para a próxima versão; sem novo APK ou Release.
+
+- Substituído o pin QuickBird por `org.opencv:opencv:4.12.0`, pelo catálogo realmente consumido no SDK. AAR resolvido coincide com o artefato oficial pesquisado; API mínima do app continua 26.
+- Saída nativa real conferida: 31 arquivos ARM32/ARM64, quatro OpenCV/C++ idênticos ao AAR e 27 restantes inalterados. Todas as ARM64 têm PT_LOAD de pelo menos 16 KiB e offsets/endereços congruentes; 204 importações C++ por ABI conferidas sem ausentes. Dois controles negativos recusados.
+- SDK/app/mesclagem compilados; 932 testes do app executados/aprovados e 85 anteriores de domain/UP-TO-DATE: 1.017 casos sem regressões. Overlay4/empacotamento27/comparador21 aprovados.
+- Conjunto nativo cresce 3.213.164 bytes brutos. Tamanho/alinhamento ZIP do futuro APK, JNI/OCR/qualidade e RAM nos aparelhos seguem pendentes.
+
+[Integração e limites](docs/OPENCV_P20261117_1.md) · [Evidências](integration/opencv-integration/20261117/README.md).
+
+## Desenvolvimento · P20261116.3 — 16/11/2026
+
+**Estado:** correções para a próxima versão; sem novo APK ou Release.
+
+- Decodificação raw/gzip limitada a 1/8 do heap máximo da VM, até 64 MiB de conteúdo descomprimido; cancelamento e fechamento/CRC preservados. O limite pode recusar backups legítimos maiores e não garante ausência de OOM.
+- Validação inicial da restauração movida para IO, com carregamento, ação bloqueada enquanto pendente e mensagem específica para excesso.
+- Criação automática recusa snapshot acima do orçamento antes de criar/podar arquivos ou mudar a data; exportação manual continua disponível. Snapshot/serialização ainda podem ter pico de memória.
+- Três falhas reproduzidas; 38 controles focados aprovados, 21 casos novos. 932 testes do app executados/aprovados e 85 anteriores de domain/UP-TO-DATE: 1.017 relatórios sem regressões. Overlay4/empacotamento27/comparador21 aprovados.
+- OpenCV oficial 4.12.0 inspecionado: ARM32/ARM64, minSdk21, PT_LOAD ARM64 de pelo menos 16 KiB e 59 referências Java presentes. Troca não integrada nem executada em aparelho; diferença bruta dos quatro binários ARM de +3.213.164 bytes, sem medir APK novo.
+
+[Escopo e limitações](docs/LEITURA_BACKUPS_P20261116_3.md) · [Evidências](integration/backup-read-budget/20261116/README.md).
+
+## Desenvolvimento · P20261116.2 — 16/11/2026
+
+**Estado:** auditoria após a beta.11 pública; correções para uma próxima versão. Sem novo APK ou Release.
+
+- Tamanho do manifesto passa pelas telas e pelo WorkManager até o downloader. Respostas inconsistentes/excessivas, cache e parciais respeitam o total antes da promoção; SHA-256 permanece exigido no fluxo oficial.
+- Trechos HTTP 206 completos continuam no offset seguinte até completar o arquivo; truncamentos preservam a retomada.
+- Três falhas reproduzidas antes da correção; 37 controles focados aprovados, dez novos. 911 testes do app beta e 85 de domain release executados/aprovados, total 996, sem casos anteriores ausentes. 4 testes de overlay, 27 de empacotamento e 21 do comparador aprovados.
+- Inspeção do APK público identifica duas bibliotecas ARM64 com PT_LOAD abaixo de 16 KB; compatibilidade em sistema 16 KB permanece a verificar. Bibliotecas nativas ocupam 192.286.636 bytes, 74,1% do APK.
+- Decoder de backups sem limite explícito de descompressão registrado para próxima correção. Quatro coordenadas Maven consultadas no OSV, sem avisos retornados; não é certificação do código nativo ou do grafo inteiro.
+
+[Achados e próximos passos](docs/AUDITORIA_POS_BETA11_P20261116_2.md) · [Evidências](integration/post-beta11-audit/20261116/README.md).
+
 ## Desenvolvimento · P20261116.1 — 16/11/2026
 
 **Estado:** APK interno beta.11/código 112 gerado e verificado; sem Release pública.

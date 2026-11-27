@@ -1,16 +1,19 @@
 # Beta.11 — checklist de consolidação
 
-Base pública: beta.10/código111. Base de engenharia: P20261112.1, commit 6952e5e.
+Base pública atual: beta.11/código 112 (P20261116.1, publicada em 16/11/2026). Base de engenharia: P20261112.1, commit 6952e5e.
+
+Última revisão de desenvolvimento em código é a [P20261122.2](CORRECOES_TESTE_GALAXY.md), que corrige a abertura de capítulos locais, a recuperação de obras antigas e a instalação privada de extensões. Ela inclui as [correções de abertura e busca com centenas de fontes](AUDITORIA_CATALOGO_GRANDE.md). A confirmação no A12 e no outro Galaxy depende do próximo APK.
 Este checklist acompanha o trabalho autorizado em 13/11. Não é uma declaração de lançamento.
 
 | Frente | Estado |
 | --- | --- |
 | Jornada, XP, conquistas e grimórios | Implementados no checkpoint anterior |
 | Sandbox e login isolado | PAUSADOS pelo usuário; fora do escopo de conclusão desta beta. Executor removido dos fontes compilados; histórico preservado na branch de arquivo (P20261115.2) |
-| Biblioteca, fontes reais e backups entre leitores | Criação segura, ordem de categorias e persistência/reexportação em SQLite real verificadas em JVM (P20261115.4); SQLite/interface Android e troca pela UI de leitores externos pendentes |
-| Leitura, OCR e tradução nos aparelhos | Proteção do cancelamento ML Kit implementada (P20261115.5); execução real/qualidade, diagnóstico do A12 e medições ARM pendentes |
+| Biblioteca, fontes reais e backups entre leitores | Criação segura, categorias e SQLite/reexportação verificados em JVM; P20261116.3 acrescenta leitura limitada/cancelável e validação em IO para a próxima versão. SQLite/interface Android, pico e troca pela UI de leitores externos pendentes |
+| Leitura, OCR e tradução nos aparelhos | Proteção do cancelamento ML Kit (P20261115.5) e limpeza de recortes Paddle retornados ao motor (P20261117.2) implementadas; execução real/qualidade, temporários internos, diagnóstico A12 e medições ARM pendentes |
 | Armazenamento | Importação/cache, retomada de cópias completas e revisão de cópias parciais/pastas antigas (P20261115.3) implementados; pico, SAF e validação final pendentes |
-| Atualização beta.10 → beta.11 e distribuição não depurável | APK interno P20261116.1 gerado/verificado sem depuração, com ID/certificado originais; atualização e dados no aparelho pendentes |
+| Atualização beta.10 → beta.11 e distribuição não depurável | Beta.11 pública instalada pelo mantenedor, mesmo ID/certificado e sem depuração; seus testes continuam. P20261116.2 corrige tamanho/retomada para a próxima versão; sem novo APK |
+| Bibliotecas nativas e páginas de 16 KiB | OpenCV oficial integrado/compilado (P20261117.1); 31 bibliotecas mescladas conferidas, C++ oficial selecionado e importações preservadas. APK final/ZIP, JNI/OCR e execução nos aparelhos ainda pendentes |
 
 Ordem ativa: armazenamento → backups → leitura → distribuição. A sandbox não bloqueia a consolidação desta beta.
 
@@ -22,7 +25,7 @@ Não repetir funcionalidades já entregues com base nos documentos históricos. 
 resultado de teste de componentes em aprovação da próxima beta inteira.
 
 A [primeira revisão](LOGIN_E_ARMAZENAMENTO_P20261113_1.md) e a [proteção de backups P20261113.2](../integration/backup-safety/20261113/README.md) registram código, testes e limites.
-A publicação não foi iniciada; a beta.10 continua sendo a versão pública.
+A beta.11 foi publicada como pré-lançamento por solicitação do mantenedor. Os aceites em aparelhos seguem pendentes nas notas da Release.
 
 O APK interno P20261113.3 foi gerado com a assinatura original recuperada e verificado como ARM32/ARM64; não é uma Release pública. A atualização em aparelho continua pendente. [Evidência do pacote](../integration/signing-recovery/20261113/README.md).
 
@@ -59,3 +62,7 @@ P20261115.4: [backups com SQLite real e progresso sem regressão](BACKUPS_SQLITE
 P20261115.5: [cancelamento do processamento ML Kit](CANCELAMENTO_MLKIT_P20261115_5.md) mantém o recurso reservado até a Task terminar e impede resultado tardio após cancelamento, nos caminhos OCR/tradução de quadrinhos/documentos. Três falhas de ciclo de vida reproduzidas com Tasks reais e coordenador de produção, sem inferência/modelos. BUILD SUCCESSFUL 2min29s; 901 testes do app aprovados (12 novos) e 85 anteriores de domain/UP-TO-DATE; 986 casos nos relatórios, nenhum anterior ausente. App/instrumentação compilados, overlay4/empacotamento16 aprovados; dois controles Android compilados, não executados. Diagnóstico A12/ARM e qualidade/desempenho continuam pendentes; sem novo APK/Release.
 
 P20261116.1: [APK beta não depurável](DISTRIBUICAO_BETA_P20261116_1.md) gerado e exportado. Mesmo ID/certificado da beta.10, código 112, ARM32/ARM64 num único arquivo; depuração/testOnly/profiling por shell desativados. Oito DEX/68.658 classes conferidos sem executor sandbox, harnesses ou bibliotecas JVM de teste. Worker Dbnet preservado. Compilação final aprovada em 3min42s; 901 casos do app beta executados/aprovados, mais 85 de domain release aprovados antes da retomada e UP-TO-DATE no final. Total 986 sem falhas/skips ou casos anteriores ausentes; 4 testes de overlay, 27 de empacotamento e 21 do comparador aprovados. Guias do pacote atualizados para beta.11. A primeira montagem foi interrompida por limite de disco após os testes; a retomada com os mesmos fontes foi concluída. Sem Release; faltam os aceites finais em aparelhos listados na tabela.
+
+P20261116.2: [auditoria após a publicação](AUDITORIA_POS_BETA11_P20261116_2.md), com correções do tamanho e da retomada dos downloads, dez testes novos e 996 casos JVM aprovados. Sem novo APK/Release. Bibliotecas para 16 KB e limite de memória dos backups ficam registrados como próximos trabalhos.
+
+P20261116.3: [leitura de backups](LEITURA_BACKUPS_P20261116_3.md) limitada a 1/8 do heap máximo da VM, até 64 MiB decodificados, com cancelamento e validação em IO. Criação automática excessiva preserva arquivos/data anteriores; exportação manual continua disponível. 38 controles focados e 21 casos novos aprovados; 932 app executados e 85 domain anteriores/UP-TO-DATE, total 1.017 sem regressões. Overlay4/empacotamento27/comparador21 aprovados. A política não garante ausência de OOM. OpenCV oficial 4.12.0 inspecionado sem integração, com +3.213.164 bytes brutos nos quatro binários ARM comparados; APK/tamanho final e qualidade nativa não medidos. Sem novo APK/Release ou nova instrumentação.

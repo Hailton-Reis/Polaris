@@ -1,0 +1,697 @@
+{
+  "scope": "Static ZIP sizes, ARM ELF machine and PT_LOAD headers; not device execution, installed size or RAM",
+  "apk_sha256": "27feeaadc4aec9f54c9a6b57760421dee601e9f3bfe7efef9866fd3ae7fa40e3",
+  "apk_bytes": 259481310,
+  "groups": {
+    "lib/arm64-v8a": {
+      "compressed_bytes": 120238808,
+      "uncompressed_bytes": 120238808,
+      "files": 16
+    },
+    "lib/armeabi-v7a": {
+      "compressed_bytes": 72047828,
+      "uncompressed_bytes": 72047828,
+      "files": 15
+    },
+    "assets": {
+      "compressed_bytes": 29595933,
+      "uncompressed_bytes": 36329526,
+      "files": 66
+    },
+    "DEX": {
+      "compressed_bytes": 29461103,
+      "uncompressed_bytes": 93382260,
+      "files": 8
+    },
+    "resources.arsc": {
+      "compressed_bytes": 5506320,
+      "uncompressed_bytes": 5506320,
+      "files": 1
+    },
+    "res": {
+      "compressed_bytes": 2073489,
+      "uncompressed_bytes": 3467982,
+      "files": 2013
+    },
+    "kotlin": {
+      "compressed_bytes": 12350,
+      "uncompressed_bytes": 53396,
+      "files": 8
+    },
+    "AndroidManifest.xml": {
+      "compressed_bytes": 7155,
+      "uncompressed_bytes": 35372,
+      "files": 1
+    },
+    "META-INF": {
+      "compressed_bytes": 2295,
+      "uncompressed_bytes": 4241,
+      "files": 12
+    },
+    "DebugProbesKt.bin": {
+      "compressed_bytes": 774,
+      "uncompressed_bytes": 1728,
+      "files": 1
+    },
+    "org": {
+      "compressed_bytes": 100,
+      "uncompressed_bytes": 163,
+      "files": 1
+    },
+    "play-services-mlkit-text-recognition-japanese.properties": {
+      "compressed_bytes": 76,
+      "uncompressed_bytes": 128,
+      "files": 1
+    },
+    "play-services-mlkit-text-recognition-chinese.properties": {
+      "compressed_bytes": 75,
+      "uncompressed_bytes": 126,
+      "files": 1
+    },
+    "play-services-mlkit-text-recognition-common.properties": {
+      "compressed_bytes": 74,
+      "uncompressed_bytes": 124,
+      "files": 1
+    },
+    "play-services-mlkit-text-recognition-korean.properties": {
+      "compressed_bytes": 74,
+      "uncompressed_bytes": 124,
+      "files": 1
+    },
+    "play-services-mlkit-text-recognition.properties": {
+      "compressed_bytes": 67,
+      "uncompressed_bytes": 110,
+      "files": 1
+    },
+    "text-recognition-bundled-common.properties": {
+      "compressed_bytes": 62,
+      "uncompressed_bytes": 100,
+      "files": 1
+    },
+    "text-recognition-japanese.properties": {
+      "compressed_bytes": 56,
+      "uncompressed_bytes": 88,
+      "files": 1
+    },
+    "text-recognition-chinese.properties": {
+      "compressed_bytes": 55,
+      "uncompressed_bytes": 86,
+      "files": 1
+    },
+    "text-recognition-korean.properties": {
+      "compressed_bytes": 54,
+      "uncompressed_bytes": 84,
+      "files": 1
+    },
+    "firebase-encoders-json.properties": {
+      "compressed_bytes": 53,
+      "uncompressed_bytes": 82,
+      "files": 1
+    },
+    "play-services-basement.properties": {
+      "compressed_bytes": 53,
+      "uncompressed_bytes": 82,
+      "files": 1
+    },
+    "transport-backend-cct.properties": {
+      "compressed_bytes": 52,
+      "uncompressed_bytes": 78,
+      "files": 1
+    },
+    "firebase-annotations.properties": {
+      "compressed_bytes": 51,
+      "uncompressed_bytes": 78,
+      "files": 1
+    },
+    "play-services-tasks.properties": {
+      "compressed_bytes": 51,
+      "uncompressed_bytes": 76,
+      "files": 1
+    },
+    "firebase-components.properties": {
+      "compressed_bytes": 50,
+      "uncompressed_bytes": 76,
+      "files": 1
+    },
+    "language-id-common.properties": {
+      "compressed_bytes": 50,
+      "uncompressed_bytes": 74,
+      "files": 1
+    },
+    "play-services-base.properties": {
+      "compressed_bytes": 50,
+      "uncompressed_bytes": 74,
+      "files": 1
+    },
+    "firebase-encoders.properties": {
+      "compressed_bytes": 48,
+      "uncompressed_bytes": 72,
+      "files": 1
+    },
+    "transport-runtime.properties": {
+      "compressed_bytes": 48,
+      "uncompressed_bytes": 70,
+      "files": 1
+    },
+    "text-recognition.properties": {
+      "compressed_bytes": 47,
+      "uncompressed_bytes": 70,
+      "files": 1
+    },
+    "vision-interfaces.properties": {
+      "compressed_bytes": 47,
+      "uncompressed_bytes": 72,
+      "files": 1
+    },
+    "transport-api.properties": {
+      "compressed_bytes": 44,
+      "uncompressed_bytes": 62,
+      "files": 1
+    },
+    "language-id.properties": {
+      "compressed_bytes": 42,
+      "uncompressed_bytes": 60,
+      "files": 1
+    },
+    "vision-common.properties": {
+      "compressed_bytes": 42,
+      "uncompressed_bytes": 64,
+      "files": 1
+    },
+    "image.properties": {
+      "compressed_bytes": 41,
+      "uncompressed_bytes": 58,
+      "files": 1
+    },
+    "translate.properties": {
+      "compressed_bytes": 40,
+      "uncompressed_bytes": 56,
+      "files": 1
+    },
+    "common.properties": {
+      "compressed_bytes": 38,
+      "uncompressed_bytes": 52,
+      "files": 1
+    }
+  },
+  "largest_entries": [
+    {
+      "path": "lib/arm64-v8a/libtdjni.so",
+      "compressed_bytes": 21735672,
+      "uncompressed_bytes": 21735672
+    },
+    {
+      "path": "assets/models/rec/inference.onnx",
+      "compressed_bytes": 18496984,
+      "uncompressed_bytes": 21159378
+    },
+    {
+      "path": "lib/arm64-v8a/libonnxruntime.so",
+      "compressed_bytes": 17908496,
+      "uncompressed_bytes": 17908496
+    },
+    {
+      "path": "lib/arm64-v8a/libopencv_java4.so",
+      "compressed_bytes": 17189512,
+      "uncompressed_bytes": 17189512
+    },
+    {
+      "path": "lib/arm64-v8a/libtranslate_jni.so",
+      "compressed_bytes": 16361048,
+      "uncompressed_bytes": 16361048
+    },
+    {
+      "path": "lib/arm64-v8a/libyomotsu_dbnet.so",
+      "compressed_bytes": 15569344,
+      "uncompressed_bytes": 15569344
+    },
+    {
+      "path": "lib/armeabi-v7a/libtdjni.so",
+      "compressed_bytes": 15383664,
+      "uncompressed_bytes": 15383664
+    },
+    {
+      "path": "lib/armeabi-v7a/libonnxruntime.so",
+      "compressed_bytes": 13039136,
+      "uncompressed_bytes": 13039136
+    },
+    {
+      "path": "lib/armeabi-v7a/libtranslate_jni.so",
+      "compressed_bytes": 11608808,
+      "uncompressed_bytes": 11608808
+    },
+    {
+      "path": "lib/arm64-v8a/libmlkit_google_ocr_pipeline.so",
+      "compressed_bytes": 11064544,
+      "uncompressed_bytes": 11064544
+    },
+    {
+      "path": "lib/armeabi-v7a/libopencv_java4.so",
+      "compressed_bytes": 10438812,
+      "uncompressed_bytes": 10438812
+    },
+    {
+      "path": "assets/models/det/inference.onnx",
+      "compressed_bytes": 7557842,
+      "uncompressed_bytes": 9880512
+    }
+  ],
+  "native_libraries": [
+    {
+      "path": "lib/arm64-v8a/libandroidx.graphics.path.so",
+      "elf_class_bits": 64,
+      "elf_machine": 183,
+      "abi_name_matches_elf": true,
+      "pt_load_alignments": [
+        16384,
+        16384,
+        16384
+      ],
+      "elf_minimum_alignment": 16384,
+      "zip_data_offset_multiple_16384": true,
+      "stored_uncompressed": true
+    },
+    {
+      "path": "lib/arm64-v8a/libarchive-jni.so",
+      "elf_class_bits": 64,
+      "elf_machine": 183,
+      "abi_name_matches_elf": true,
+      "pt_load_alignments": [
+        16384,
+        16384,
+        16384
+      ],
+      "elf_minimum_alignment": 16384,
+      "zip_data_offset_multiple_16384": true,
+      "stored_uncompressed": true
+    },
+    {
+      "path": "lib/arm64-v8a/libc++_shared.so",
+      "elf_class_bits": 64,
+      "elf_machine": 183,
+      "abi_name_matches_elf": true,
+      "pt_load_alignments": [
+        4096,
+        4096
+      ],
+      "elf_minimum_alignment": 4096,
+      "zip_data_offset_multiple_16384": true,
+      "stored_uncompressed": true
+    },
+    {
+      "path": "lib/arm64-v8a/libconscrypt_jni.so",
+      "elf_class_bits": 64,
+      "elf_machine": 183,
+      "abi_name_matches_elf": true,
+      "pt_load_alignments": [
+        16384,
+        16384,
+        16384
+      ],
+      "elf_minimum_alignment": 16384,
+      "zip_data_offset_multiple_16384": true,
+      "stored_uncompressed": true
+    },
+    {
+      "path": "lib/arm64-v8a/libimagedecoder.so",
+      "elf_class_bits": 64,
+      "elf_machine": 183,
+      "abi_name_matches_elf": true,
+      "pt_load_alignments": [
+        16384,
+        16384,
+        16384
+      ],
+      "elf_minimum_alignment": 16384,
+      "zip_data_offset_multiple_16384": true,
+      "stored_uncompressed": true
+    },
+    {
+      "path": "lib/arm64-v8a/liblanguage_id_l2c_jni.so",
+      "elf_class_bits": 64,
+      "elf_machine": 183,
+      "abi_name_matches_elf": true,
+      "pt_load_alignments": [
+        16384,
+        16384,
+        16384
+      ],
+      "elf_minimum_alignment": 16384,
+      "zip_data_offset_multiple_16384": true,
+      "stored_uncompressed": true
+    },
+    {
+      "path": "lib/arm64-v8a/libmlkit_google_ocr_pipeline.so",
+      "elf_class_bits": 64,
+      "elf_machine": 183,
+      "abi_name_matches_elf": true,
+      "pt_load_alignments": [
+        16384,
+        16384,
+        16384
+      ],
+      "elf_minimum_alignment": 16384,
+      "zip_data_offset_multiple_16384": true,
+      "stored_uncompressed": true
+    },
+    {
+      "path": "lib/arm64-v8a/libonnxruntime.so",
+      "elf_class_bits": 64,
+      "elf_machine": 183,
+      "abi_name_matches_elf": true,
+      "pt_load_alignments": [
+        16384,
+        16384,
+        16384
+      ],
+      "elf_minimum_alignment": 16384,
+      "zip_data_offset_multiple_16384": true,
+      "stored_uncompressed": true
+    },
+    {
+      "path": "lib/arm64-v8a/libonnxruntime4j_jni.so",
+      "elf_class_bits": 64,
+      "elf_machine": 183,
+      "abi_name_matches_elf": true,
+      "pt_load_alignments": [
+        16384,
+        16384
+      ],
+      "elf_minimum_alignment": 16384,
+      "zip_data_offset_multiple_16384": true,
+      "stored_uncompressed": true
+    },
+    {
+      "path": "lib/arm64-v8a/libopencv_java4.so",
+      "elf_class_bits": 64,
+      "elf_machine": 183,
+      "abi_name_matches_elf": true,
+      "pt_load_alignments": [
+        4096,
+        4096,
+        4096
+      ],
+      "elf_minimum_alignment": 4096,
+      "zip_data_offset_multiple_16384": true,
+      "stored_uncompressed": true
+    },
+    {
+      "path": "lib/arm64-v8a/libquickjs.so",
+      "elf_class_bits": 64,
+      "elf_machine": 183,
+      "abi_name_matches_elf": true,
+      "pt_load_alignments": [
+        16384,
+        16384,
+        16384
+      ],
+      "elf_minimum_alignment": 16384,
+      "zip_data_offset_multiple_16384": true,
+      "stored_uncompressed": true
+    },
+    {
+      "path": "lib/arm64-v8a/libsqliteJni.so",
+      "elf_class_bits": 64,
+      "elf_machine": 183,
+      "abi_name_matches_elf": true,
+      "pt_load_alignments": [
+        16384,
+        16384,
+        16384,
+        16384
+      ],
+      "elf_minimum_alignment": 16384,
+      "zip_data_offset_multiple_16384": true,
+      "stored_uncompressed": true
+    },
+    {
+      "path": "lib/arm64-v8a/libtdjni.so",
+      "elf_class_bits": 64,
+      "elf_machine": 183,
+      "abi_name_matches_elf": true,
+      "pt_load_alignments": [
+        16384,
+        16384,
+        16384
+      ],
+      "elf_minimum_alignment": 16384,
+      "zip_data_offset_multiple_16384": true,
+      "stored_uncompressed": true
+    },
+    {
+      "path": "lib/arm64-v8a/libtranslate_jni.so",
+      "elf_class_bits": 64,
+      "elf_machine": 183,
+      "abi_name_matches_elf": true,
+      "pt_load_alignments": [
+        16384,
+        16384,
+        16384
+      ],
+      "elf_minimum_alignment": 16384,
+      "zip_data_offset_multiple_16384": true,
+      "stored_uncompressed": true
+    },
+    {
+      "path": "lib/arm64-v8a/libyomotsu_dbnet.so",
+      "elf_class_bits": 64,
+      "elf_machine": 183,
+      "abi_name_matches_elf": true,
+      "pt_load_alignments": [
+        16384,
+        16384,
+        16384
+      ],
+      "elf_minimum_alignment": 16384,
+      "zip_data_offset_multiple_16384": true,
+      "stored_uncompressed": true
+    },
+    {
+      "path": "lib/arm64-v8a/libzstd-kmp.so",
+      "elf_class_bits": 64,
+      "elf_machine": 183,
+      "abi_name_matches_elf": true,
+      "pt_load_alignments": [
+        16384,
+        16384,
+        16384
+      ],
+      "elf_minimum_alignment": 16384,
+      "zip_data_offset_multiple_16384": true,
+      "stored_uncompressed": true
+    },
+    {
+      "path": "lib/armeabi-v7a/libandroidx.graphics.path.so",
+      "elf_class_bits": 32,
+      "elf_machine": 40,
+      "abi_name_matches_elf": true,
+      "pt_load_alignments": [
+        16384,
+        16384,
+        16384
+      ],
+      "elf_minimum_alignment": 16384,
+      "zip_data_offset_multiple_16384": true,
+      "stored_uncompressed": true
+    },
+    {
+      "path": "lib/armeabi-v7a/libarchive-jni.so",
+      "elf_class_bits": 32,
+      "elf_machine": 40,
+      "abi_name_matches_elf": true,
+      "pt_load_alignments": [
+        4096,
+        4096,
+        4096
+      ],
+      "elf_minimum_alignment": 4096,
+      "zip_data_offset_multiple_16384": true,
+      "stored_uncompressed": true
+    },
+    {
+      "path": "lib/armeabi-v7a/libc++_shared.so",
+      "elf_class_bits": 32,
+      "elf_machine": 40,
+      "abi_name_matches_elf": true,
+      "pt_load_alignments": [
+        4096,
+        4096
+      ],
+      "elf_minimum_alignment": 4096,
+      "zip_data_offset_multiple_16384": true,
+      "stored_uncompressed": true
+    },
+    {
+      "path": "lib/armeabi-v7a/libconscrypt_jni.so",
+      "elf_class_bits": 32,
+      "elf_machine": 40,
+      "abi_name_matches_elf": true,
+      "pt_load_alignments": [
+        16384,
+        16384,
+        16384
+      ],
+      "elf_minimum_alignment": 16384,
+      "zip_data_offset_multiple_16384": true,
+      "stored_uncompressed": true
+    },
+    {
+      "path": "lib/armeabi-v7a/libimagedecoder.so",
+      "elf_class_bits": 32,
+      "elf_machine": 40,
+      "abi_name_matches_elf": true,
+      "pt_load_alignments": [
+        4096,
+        4096,
+        4096
+      ],
+      "elf_minimum_alignment": 4096,
+      "zip_data_offset_multiple_16384": true,
+      "stored_uncompressed": true
+    },
+    {
+      "path": "lib/armeabi-v7a/liblanguage_id_l2c_jni.so",
+      "elf_class_bits": 32,
+      "elf_machine": 40,
+      "abi_name_matches_elf": true,
+      "pt_load_alignments": [
+        4096,
+        4096,
+        4096
+      ],
+      "elf_minimum_alignment": 4096,
+      "zip_data_offset_multiple_16384": true,
+      "stored_uncompressed": true
+    },
+    {
+      "path": "lib/armeabi-v7a/libmlkit_google_ocr_pipeline.so",
+      "elf_class_bits": 32,
+      "elf_machine": 40,
+      "abi_name_matches_elf": true,
+      "pt_load_alignments": [
+        4096,
+        4096,
+        4096
+      ],
+      "elf_minimum_alignment": 4096,
+      "zip_data_offset_multiple_16384": true,
+      "stored_uncompressed": true
+    },
+    {
+      "path": "lib/armeabi-v7a/libonnxruntime.so",
+      "elf_class_bits": 32,
+      "elf_machine": 40,
+      "abi_name_matches_elf": true,
+      "pt_load_alignments": [
+        16384,
+        16384,
+        16384
+      ],
+      "elf_minimum_alignment": 16384,
+      "zip_data_offset_multiple_16384": true,
+      "stored_uncompressed": true
+    },
+    {
+      "path": "lib/armeabi-v7a/libonnxruntime4j_jni.so",
+      "elf_class_bits": 32,
+      "elf_machine": 40,
+      "abi_name_matches_elf": true,
+      "pt_load_alignments": [
+        4096,
+        4096
+      ],
+      "elf_minimum_alignment": 4096,
+      "zip_data_offset_multiple_16384": true,
+      "stored_uncompressed": true
+    },
+    {
+      "path": "lib/armeabi-v7a/libopencv_java4.so",
+      "elf_class_bits": 32,
+      "elf_machine": 40,
+      "abi_name_matches_elf": true,
+      "pt_load_alignments": [
+        4096,
+        4096,
+        4096
+      ],
+      "elf_minimum_alignment": 4096,
+      "zip_data_offset_multiple_16384": true,
+      "stored_uncompressed": true
+    },
+    {
+      "path": "lib/armeabi-v7a/libquickjs.so",
+      "elf_class_bits": 32,
+      "elf_machine": 40,
+      "abi_name_matches_elf": true,
+      "pt_load_alignments": [
+        4096,
+        4096,
+        4096
+      ],
+      "elf_minimum_alignment": 4096,
+      "zip_data_offset_multiple_16384": true,
+      "stored_uncompressed": true
+    },
+    {
+      "path": "lib/armeabi-v7a/libsqliteJni.so",
+      "elf_class_bits": 32,
+      "elf_machine": 40,
+      "abi_name_matches_elf": true,
+      "pt_load_alignments": [
+        16384,
+        16384,
+        16384,
+        16384
+      ],
+      "elf_minimum_alignment": 16384,
+      "zip_data_offset_multiple_16384": true,
+      "stored_uncompressed": true
+    },
+    {
+      "path": "lib/armeabi-v7a/libtdjni.so",
+      "elf_class_bits": 32,
+      "elf_machine": 40,
+      "abi_name_matches_elf": true,
+      "pt_load_alignments": [
+        4096,
+        4096,
+        4096
+      ],
+      "elf_minimum_alignment": 4096,
+      "zip_data_offset_multiple_16384": true,
+      "stored_uncompressed": true
+    },
+    {
+      "path": "lib/armeabi-v7a/libtranslate_jni.so",
+      "elf_class_bits": 32,
+      "elf_machine": 40,
+      "abi_name_matches_elf": true,
+      "pt_load_alignments": [
+        4096,
+        4096,
+        4096
+      ],
+      "elf_minimum_alignment": 4096,
+      "zip_data_offset_multiple_16384": true,
+      "stored_uncompressed": true
+    },
+    {
+      "path": "lib/armeabi-v7a/libzstd-kmp.so",
+      "elf_class_bits": 32,
+      "elf_machine": 40,
+      "abi_name_matches_elf": true,
+      "pt_load_alignments": [
+        16384,
+        16384,
+        16384
+      ],
+      "elf_minimum_alignment": 16384,
+      "zip_data_offset_multiple_16384": true,
+      "stored_uncompressed": true
+    }
+  ],
+  "arm64_elf_below_16k": [
+    "lib/arm64-v8a/libc++_shared.so",
+    "lib/arm64-v8a/libopencv_java4.so"
+  ]
+}

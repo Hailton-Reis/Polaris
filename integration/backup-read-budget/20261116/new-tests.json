@@ -1,0 +1,132 @@
+{
+  "total": 21,
+  "scope": "JVM: actual decoder/streams and creator; controlled validator for ViewModel with dedicated Main and actual IO. No Android instrumentation/device execution.",
+  "cases": [
+    {
+      "module": "app",
+      "classname": "eu.kanade.presentation.more.settings.screen.data.RestoreBackupViewModelTest",
+      "name": "clearing the owner cancels a pending read without enabling restore or showing an error()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.presentation.more.settings.screen.data.RestoreBackupViewModelTest",
+      "name": "missing sources remain a warning that permits the existing restore options()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.presentation.more.settings.screen.data.RestoreBackupViewModelTest",
+      "name": "oversized readable backups report the device limit without labeling the file invalid()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.presentation.more.settings.screen.data.RestoreBackupViewModelTest",
+      "name": "slow validation runs off Main and restoration is disabled until completion()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.data.backup.BackupDecoderBoundedTest",
+      "name": "CRC failure at the exact payload limit is still rejected()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.data.backup.BackupDecoderBoundedTest",
+      "name": "already cancelled validation never opens the document()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.data.backup.BackupDecoderBoundedTest",
+      "name": "cancellation after closing the input does not return a decoded backup()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.data.backup.BackupDecoderBoundedTest",
+      "name": "cancelled reading stops before the payload is fully consumed()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.data.backup.BackupDecoderBoundedTest",
+      "name": "empty or truncated header closes the selected document()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.data.backup.BackupDecoderBoundedTest",
+      "name": "gzip exactly at the ceiling checks its trailer and decodes normally()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.data.backup.BackupDecoderBoundedTest",
+      "name": "invalid budget is rejected before opening a document()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.data.backup.BackupDecoderBoundedTest",
+      "name": "invalid protobuf within the budget is rejected and closed()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.data.backup.BackupDecoderBoundedTest",
+      "name": "raw input stops at its decoded byte limit and closes without parsing all data()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.data.backup.BackupDecoderBoundedTest",
+      "name": "raw payload exactly at the ceiling remains compatible()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.data.backup.BackupDecoderBoundedTest",
+      "name": "read budget reserves heap and has an absolute ceiling without overflowing()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.data.backup.BackupDecoderBoundedTest",
+      "name": "small gzip cannot bypass the decoded byte budget()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.data.backup.BackupDecoderBoundedTest",
+      "name": "trailing gzip bytes at the exact limit remain invalid()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.data.backup.BackupDecoderBoundedTest",
+      "name": "truncated gzip closes its stream and is not accepted()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.data.backup.BackupDecoderBoundedTest",
+      "name": "unavailable document reports an IO failure()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.data.backup.create.BackupCreatorTransactionTest",
+      "name": "explicit manual export remains available with a smaller automatic reading budget()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.data.backup.create.BackupCreatorTransactionTest",
+      "name": "oversized automatic backup leaves prior copies and timestamp intact before creating a file()",
+      "status": "passed"
+    }
+  ]
+}

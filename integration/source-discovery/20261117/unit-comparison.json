@@ -1,0 +1,37 @@
+{
+  "status": "NO_NEW_UNIT_REGRESSIONS",
+  "baseline": {
+    "total": 1024,
+    "passed": 1024,
+    "failed": 0,
+    "skipped": 0
+  },
+  "patched": {
+    "total": 1039,
+    "passed": 1039,
+    "failed": 0,
+    "skipped": 0
+  },
+  "preexisting_failures_still_present": 0,
+  "missing_baseline_tests": [],
+  "new_failures_or_skips": [],
+  "android_runtime_verified": false,
+  "gradle_exit_codes": {
+    "baseline": 0,
+    "patched": 0
+  },
+  "required_module_coverage": {
+    "app": 939,
+    "domain": 85
+  },
+  "report_tasks": {
+    "baseline": {
+      "app": "testBetaUnitTest",
+      "domain": "testReleaseUnitTest"
+    },
+    "patched": {
+      "app": "testBetaUnitTest",
+      "domain": "testReleaseUnitTest"
+    }
+  }
+}

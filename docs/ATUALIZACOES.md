@@ -1,10 +1,24 @@
 # Atualizações do Polaris
 
+A [beta.11 está publicada](https://github.com/Hailton-Reis/Polaris/releases/tag/v0.1.0-beta.11), P20261116.1/código 112. O atualizador exige o canal experimental ativado. A [auditoria P20261116.2](AUDITORIA_POS_BETA11_P20261116_2.md) corrige limites e retomada do download para a próxima versão, ainda sem APK. Uma publicação posterior deve comparar a identidade com o manifesto da beta.11 e aumentar versão/código; não substituir os anexos da beta.11 por esse código de desenvolvimento.
+
+A [continuação P20261117.1](OPENCV_P20261117_1.md) integra/compila o OpenCV oficial e confere a saída nativa, junto às [proteções de backups](LEITURA_BACKUPS_P20261116_3.md). Também permanece sem novo APK/Release; o pacote instalado não inclui essas revisões posteriores.
+
+A [P20261117.2](LIMPEZA_RECORTE_OCR_P20261117_2.md) acrescenta a limpeza de recortes Paddle em falhas de preparação. Continua no código de desenvolvimento, sem novo APK; a beta.11 instalada permanece no checkpoint público original.
+
+A [P20261117.3](BUSCA_FONTES_P20261117_3.md) melhora a busca entre fontes e o tratamento de tentativas incompletas. Também permanece no desenvolvimento, sem substituir a beta.11 pública ou gerar uma atualização disponível no app.
+
+A [P20261117.4](FILTRO_ADULTO_P20261117_4.md) acrescenta o filtro +18 de buscas, ligado por padrão e reversível. Conteúdo sem marcação pode aparecer. Também está somente no desenvolvimento; a biblioteca é preservada.
+
+A [P20261117.5](FONTES_MISTAS_P20261117_5.md) mantém fontes mistas disponíveis, aplica o filtro +18 por obra e pede confirmação ao desligá-lo. Continua sem novo APK/Release.
+
+A [P20261117.6](CONCORRENCIA_FONTES_P20261117_6.md) adapta a concorrência das alternativas à visibilidade: quatro com o app visível e uma em segundo plano. O agendamento da biblioteca continua opcional e inalterado. Revisão apenas de código, sem novo APK/Release.
+
 ## Escolha do canal
 
 Em **Configurações → Atualizações do aplicativo**:
 
-- **Buscar atualizações automaticamente** começa ativado. Ao abrir o app, ele consulta as Releases do Polaris, com no máximo uma tentativa automática por dia por canal. Não há consulta periódica com o app fechado.
+- **Buscar atualizações automaticamente** começa ativado. A beta.12 limita a consulta automática a uma por dia por canal. Na próxima revisão, o Polaris consulta as Releases a cada nova abertura do app e reaproveita a consulta ao voltar para a janela aberta ou girar a tela.
 - **Receber atualizações experimentais** começa **desativado**, inclusive quando o aplicativo instalado é um beta. Ative para incluir betas e outras prévias publicadas.
 - **Verificar atualizações** consulta imediatamente, mesmo com a busca automática desligada, respeitando a escolha do canal experimental. Também fica em **Sobre**.
 

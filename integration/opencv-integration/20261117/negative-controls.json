@@ -1,0 +1,23 @@
+{
+  "controls": [
+    {
+      "control": "old_cpp_selected",
+      "rejected": true,
+      "errors": [
+        "ARM64 PT_LOAD below 16 KiB: arm64-v8a/libc++_shared.so",
+        "ARM64 LOAD offset/address mismatch for 16 KiB: arm64-v8a/libc++_shared.so",
+        "Merged binary differs from the official AAR: arm64-v8a/libc++_shared.so"
+      ]
+    },
+    {
+      "control": "missing_arm32_opencv",
+      "rejected": true,
+      "errors": [
+        "Merged library paths differ from the baseline",
+        "Missing OpenCV/C++ pair for an ARM ABI"
+      ]
+    }
+  ],
+  "android_or_native_code_executed": false,
+  "production_merged_files_modified": false
+}

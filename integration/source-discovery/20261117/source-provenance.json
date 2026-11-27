@@ -1,0 +1,74 @@
+{
+  "previous_audit_commit": "62ba59bffbdd6e6ffb3b0c7d15d8e2e32c240fcb",
+  "overlay_prerequisite": "f037c5d85575e30694295df5d079e97dcc4a35b9",
+  "overlay_bytes": 4103784,
+  "overlay_sha256": "9d4bdf90e9d89579a778dcccce9189530aa59826ef309df0a45474ddf2082dea",
+  "overlay_git_blob_sha": "13287681ad44020a54c644adc8e883460bd6c28f",
+  "baseline_files": [
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalog.kt",
+      "sha256": "3f10f544294977249c492067843c4809a114cc499ecb16b3dee45498c73974b4"
+    },
+    {
+      "path": "domain/src/main/java/tachiyomi/domain/manga/model/WorkSources.kt",
+      "sha256": "7cb219488c13d3628f009d60ab2c0eac7c8032571e2d98f104a43d364075cd7c"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalogTest.kt",
+      "sha256": "f28c36389fefb46bf3e10413669cc9bbd4c9462173356fdddf14e31655041c44"
+    }
+  ],
+  "production_unchanged_for_red": true,
+  "files": [
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalog.kt",
+      "bytes": 26158,
+      "sha256": "5b2a2cadbc6773234da7100856c3c41063cd7f3c69c5811b2a4307b858f2a97b"
+    },
+    {
+      "path": "domain/src/main/java/tachiyomi/domain/manga/model/WorkSources.kt",
+      "bytes": 1634,
+      "sha256": "d311561333a02a42ae2ca8eca68df770319923eac38c965f3d6d74ca3cc93355"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalogTest.kt",
+      "bytes": 37567,
+      "sha256": "04d1d533487e644d1090d209fe8be885d06b0933bfba08881b191611b4a97f88"
+    },
+    {
+      "path": "domain/src/test/java/tachiyomi/domain/manga/model/WorkSourcesDiscoveryTest.kt",
+      "bytes": 2049,
+      "sha256": "7d279cd82b4d6d25670d82b601b079c455313b83214e6c04693c25ddfcd68f05"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/presentation/manga/WorkSourceDialog.kt",
+      "bytes": 3348,
+      "sha256": "f99e902b507da2db32d18d8d006273b258ca94fe7f5be09f7c98cf49512f2c74"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt",
+      "bytes": 10970,
+      "sha256": "507bee81e125fca0dce9e459d1168208222923cb84b3a9d4b0a599fc29f2924b"
+    },
+    {
+      "path": "i18n-at/src/commonMain/moko-resources/base/strings.xml",
+      "bytes": 38726,
+      "sha256": "7633b49cf7a39b43f0b791fef85036cd5d874a092df684171c4bf656a7081294"
+    },
+    {
+      "path": "i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml",
+      "bytes": 40897,
+      "sha256": "92929219c9e6cc04fa876f4b182acb32192f3a64c776c881b514f45c1bfc9b71"
+    }
+  ],
+  "engineering_scripts": [
+    {
+      "path": "scripts/beta/package_internal_beta.py",
+      "sha256": "be2cd7c3653fe45b0cc90d4c6fd47ad06e4e306e42f07982298bb3674410e07e"
+    },
+    {
+      "path": "scripts/r001/test_apply_document_reader.py",
+      "sha256": "4e8258f054ac272329fad0f766c80f52f37b5cd6441d4b3c9d9c10d0930705c8"
+    }
+  ]
+}

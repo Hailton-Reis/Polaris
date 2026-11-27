@@ -1,0 +1,596 @@
+{
+  "passed": 118,
+  "cases": [
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "a timed out scan becomes eligible again after a minute instead of waiting a day()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "parent cancellation releases all provider slots without returning partial success()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "failed original preserves rows and can refresh a previously confirmed alternative()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "Ragnarok aliases join forty Portuguese chapters with sixty English chapters()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "individual timeout keeps stored editions without cancelling another provider()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "bounded catalogs always retain the original provider()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "restored work with missing source and no previous alternatives can recover()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "image checks run inside the bounded provider pipeline instead of a serial collector()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "foreground discovery combines verified editions into a single logical sequence()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "catalog with working images outranks Portuguese catalog whose images fail()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "an individual source timeout schedules retry even when the whole scan finishes earlier()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "healthy Portuguese edition outranks larger English catalog()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "a finished retry clears the incomplete marker and restores the normal daily cache()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "installing a new enabled provider schedules discovery without waiting a day()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "discovery reuses a healthy confirmed catalog without searching that provider again()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "first provider refresh never waits for a slow alternative or samples images()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "explicit English pin prevents Portuguese search and health sampling()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "a source pin still prevents discovery and image checks with an incomplete marker()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "parent cancellation is not converted into a successful partial refresh()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "pin restricts network refresh while keeping original stored chapters()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "a discovery deadline preserves the fast catalog and marks only the scan incomplete()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "hidden providers are not queried during discovery()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "a remembered available provider does not prevent recovery when it now fails()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "confirmed catalog refreshes overlap in pairs instead of waiting in sequence()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "a real reader failure invalidates recent discovery and its sampled health()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "background refresh never searches all extensions()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "another work can use the shared provider slots before a slow whole scan finishes()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "Portuguese editions lead while English fills the remaining chapters without a language filter change()"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "obsolete Portuguese backup recovers aliases and complements without a migration request()"
+    },
+    {
+      "module": "app",
+      "classname": "mihon.domain.source.interactor.UpdateMangaFromRemoteTest",
+      "name": "details only refresh cannot remove or synchronize chapter editions()"
+    },
+    {
+      "module": "app",
+      "classname": "mihon.domain.source.interactor.UpdateMangaFromRemoteTest",
+      "name": "a source pin changed during network work is retained and stale synchronization aborts()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.chapter.model.ChapterOriginTest",
+      "name": "signed source ids and Unicode URLs survive portable memo roundtrip()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.chapter.model.ChapterOriginTest",
+      "name": "per work pin survives backup memo without local database ids()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.chapter.model.ChapterOriginTest",
+      "name": "fixed source restricts the sequence and switching back preserves every record()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.chapter.model.ChapterOriginTest",
+      "name": "invalid origin metadata falls back without interpreting remote URLs()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.chapter.model.ChapterOriginTest",
+      "name": "available edition beats stale retained metadata while downloads remain usable()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.history.interactor.GetNextChaptersTest",
+      "name": "next unread excludes a group already read through another edition()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.history.interactor.GetNextChaptersTest",
+      "name": "completed current chapter cannot restart the sequence at chapter one()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.history.interactor.GetNextChaptersTest",
+      "name": "partially read current edition remains the starting point()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.history.interactor.GetNextChaptersTest",
+      "name": "missing chapter does not silently jump to an unrelated beginning()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.chapter.model.ChapterVersionsTest",
+      "name": "decimals parts volumes seasons and extras remain distinct()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.chapter.model.ChapterVersionsTest",
+      "name": "unknown number sentinel never merges unrelated entries()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.chapter.model.ChapterVersionsTest",
+      "name": "read and bookmark state survive choosing a different representative()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.chapter.model.ChapterVersionsTest",
+      "name": "unofficial substring is never treated as an official label()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.chapter.model.ChapterVersionsTest",
+      "name": "official and unofficial chapter zero are one logical chapter()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.chapter.model.ChapterVersionsTest",
+      "name": "downloaded or started editions win over a cosmetic label()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.chapter.model.ChapterVersionsTest",
+      "name": "edition suffix is hidden without removing meaningful title words()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.chapter.model.ChapterVersionsTest",
+      "name": "current reading edition is not replaced mid chapter()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.manga.model.WorkSourcesDiscoveryTest",
+      "name": "partial discovery metadata round trips and can be cleared without losing other memo data()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.manga.model.WorkSourcesDiscoveryTest",
+      "name": "older source metadata without an incomplete marker retains its settings()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.library.model.LibraryFlagsTest",
+      "name": "Test Flag plus operator (LibrarySort)()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.library.model.LibraryFlagsTest",
+      "name": "Test Flag plus operator with old flag as base()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.library.model.LibraryFlagsTest",
+      "name": "Test Flag plus operator()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.library.model.LibraryFlagsTest",
+      "name": "Check the amount of flags()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.library.model.LibraryFlagsTest",
+      "name": "Test default flags()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.chapter.service.MissingChaptersTest",
+      "name": "missingChaptersCount returns number of missing chapters()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.chapter.service.MissingChaptersTest",
+      "name": "missingChaptersCount returns 0 when all unknown chapter numbers()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.chapter.service.MissingChaptersTest",
+      "name": "calculateChapterGap returns 0 if either are not valid chapter numbers()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.chapter.service.MissingChaptersTest",
+      "name": "calculateChapterGap returns difference()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.chapter.service.MissingChaptersTest",
+      "name": "missingChaptersCount handles repeated base chapter numbers()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.chapter.service.MissingChaptersTest",
+      "name": "missingChaptersCount returns 0 when empty list()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.chapter.service.ChapterRecognitionTest",
+      "name": "Basic Ch prefix with decimal()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.chapter.service.ChapterRecognitionTest",
+      "name": "Basic Ch prefix()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.chapter.service.ChapterRecognitionTest",
+      "name": "Number after unwanted tag()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.chapter.service.ChapterRecognitionTest",
+      "name": "Chapter title containing special and vol()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.chapter.service.ChapterRecognitionTest",
+      "name": "Name containing one number and decimal()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.chapter.service.ChapterRecognitionTest",
+      "name": "Chapter containing dot v2()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.chapter.service.ChapterRecognitionTest",
+      "name": "Chapters ending with s()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.chapter.service.ChapterRecognitionTest",
+      "name": "Unparseable chapter()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.chapter.service.ChapterRecognitionTest",
+      "name": "Chapters containing season()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.chapter.service.ChapterRecognitionTest",
+      "name": "Chapter containing manga title and number decimal()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.chapter.service.ChapterRecognitionTest",
+      "name": "Extreme case()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.chapter.service.ChapterRecognitionTest",
+      "name": "Number in manga title()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.chapter.service.ChapterRecognitionTest",
+      "name": "Chapters containing ordinals()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.chapter.service.ChapterRecognitionTest",
+      "name": "Chapter title containing hyphens()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.chapter.service.ChapterRecognitionTest",
+      "name": "Chapter with version before number()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.chapter.service.ChapterRecognitionTest",
+      "name": "Chapter title containing extra and vol()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.chapter.service.ChapterRecognitionTest",
+      "name": "Basic Ch prefix with alpha postfix()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.chapter.service.ChapterRecognitionTest",
+      "name": "Name containing one number and alpha()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.chapter.service.ChapterRecognitionTest",
+      "name": "Extreme case with alpha()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.chapter.service.ChapterRecognitionTest",
+      "name": "Space between ch x()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.chapter.service.ChapterRecognitionTest",
+      "name": "Version attached to chapter number()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.chapter.service.ChapterRecognitionTest",
+      "name": "Chapter title with ch substring()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.chapter.service.ChapterRecognitionTest",
+      "name": "Chapter containing manga title and number alpha()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.chapter.service.ChapterRecognitionTest",
+      "name": "Chapter with alpha without dot()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.chapter.service.ChapterRecognitionTest",
+      "name": "Chapter title containing commas()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.chapter.service.ChapterRecognitionTest",
+      "name": "Chapter containing manga title and number()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.chapter.service.ChapterRecognitionTest",
+      "name": "Basic Ch prefix with space after period()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.chapter.service.ChapterRecognitionTest",
+      "name": "Chapter title containing omake (japanese extra) and vol()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.chapter.service.ChapterRecognitionTest",
+      "name": "Name containing one number()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.chapter.service.ChapterRecognitionTest",
+      "name": "Number after manga title with chapter in chapter title case()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.chapter.service.ChapterRecognitionTest",
+      "name": "Chapter with time in title()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.chapter.service.ChapterRecognitionTest",
+      "name": "Extreme case with decimal()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.chapter.service.ChapterRecognitionTest",
+      "name": "Chapters in format sx - chapter xx()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.chapter.service.ChapterRecognitionTest",
+      "name": "Chapter containing multiple zeros()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.release.interactor.GetApplicationReleaseTest",
+      "name": "When has no update expect no new update()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.release.interactor.GetApplicationReleaseTest",
+      "name": "When has update expect new update()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.release.interactor.GetApplicationReleaseTest",
+      "name": "When has update but is preview expect new update()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.chapter.model.LogicalChapterCountsTest",
+      "name": "library counts logical chapters and aggregates read and bookmark flags()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.chapter.model.LogicalChapterCountsTest",
+      "name": "stale counts after a partial restore fall back safely()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.translation.OcrExperimentPreferencesTest",
+      "name": "DBNet alone remains a deliberate opt in()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.translation.OcrExperimentPreferencesTest",
+      "name": "restoring a prerequisite does not silently reenable a child()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.translation.OcrExperimentPreferencesTest",
+      "name": "legacy everything enabled preserves the chosen OCR and long page opt in()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.translation.OcrExperimentPreferencesTest",
+      "name": "turning off an experiment does not enable another one()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.translation.OcrExperimentPreferencesTest",
+      "name": "removing the English prerequisite turns off both dependent experiments()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.translation.OcrExperimentPreferencesTest",
+      "name": "choosing DBNet and strips are mutually exclusive through their preference callbacks()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.translation.OcrExperimentPreferencesTest",
+      "name": "unsupported DBNet architecture preserves the selected OCR and strips()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.translation.OcrExperimentPreferencesTest",
+      "name": "prerequisite reconciliation never changes translation or language choices()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.manga.interactor.FetchIntervalTest",
+      "name": "returns interval of 1 day when chapters are released every 1 day()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.manga.interactor.FetchIntervalTest",
+      "name": "returns interval based on more recent chapters()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.manga.interactor.FetchIntervalTest",
+      "name": "returns interval based on smaller subset of recent chapters if very few chapters()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.manga.interactor.FetchIntervalTest",
+      "name": "returns interval of 2 days when chapters are released just below every 2 days()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.manga.interactor.FetchIntervalTest",
+      "name": "returns interval of 2 days when chapters are released every 2 days()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.manga.interactor.FetchIntervalTest",
+      "name": "returns interval of 1 day when delta is less than 1 day()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.manga.interactor.FetchIntervalTest",
+      "name": "returns interval of 7 days when multiple chapters in 2 days()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.manga.interactor.FetchIntervalTest",
+      "name": "returns interval with floored value when interval is decimal()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.manga.interactor.FetchIntervalTest",
+      "name": "returns interval of 7 days when multiple chapters in 1 day()"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.manga.interactor.FetchIntervalTest",
+      "name": "returns default interval of 7 days when not enough distinct days()"
+    }
+  ],
+  "scope": "Focused controls before final queue/UI, confirmed-timeout and cached/expired image-timestamp refinements. Final full run covers all current code/cases."
+}

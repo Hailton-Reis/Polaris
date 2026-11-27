@@ -1,0 +1,67 @@
+{
+  "previous_audit_commit": "c915201ef81e97e22c63c15a58016a4d2473c794",
+  "overlay_prerequisite": "f037c5d85575e30694295df5d079e97dcc4a35b9",
+  "overlay": {
+    "path": "integration/document-reader/document-reader.patch",
+    "bytes": 4180171,
+    "sha256": "6c9180898e4856a1ea9ae88b7b81592be4a2677221553b099c4a36997f414d90"
+  },
+  "baseline_files": [
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/App.kt",
+      "sha256": "2b59ada75b3574225e09e02b51e7c83f014d2d66ae7bac304dc6fab5ebac26a1"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalog.kt",
+      "sha256": "3b98c9c3b3bd44dbbc2ea48b9f80061acaa58cf505d2083b46d75a46b3b1fb32"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalogTest.kt",
+      "sha256": "bc59e6ba5a2e596be55991adfd497b11b11cbac1f0b20bf1174099f67658135f"
+    }
+  ],
+  "files": [
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/App.kt",
+      "bytes": 12430,
+      "sha256": "6f8306281ee7a338d9485fcd2b89da751f1a4f7303b3b7c5fb464a08a58a4437"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalog.kt",
+      "bytes": 27178,
+      "sha256": "ac2b8b7f24fe81e7b41254c4f8c0767586fab4542da24deaae478a38f37debc5"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/source/selection/AutomaticSourceCatalogTest.kt",
+      "bytes": 47643,
+      "sha256": "ee93d9405a3eb6a10b65a184b8bb272765c981b29f39349783424f6bb55a9772"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/tachiyomi/source/selection/SourceDiscoveryConcurrency.kt",
+      "bytes": 2398,
+      "sha256": "c44af9ca561c4d44b43aec1cc0ea66c032243127a1c167b6628857b3920f9808"
+    },
+    {
+      "path": "app/src/test/java/eu/kanade/tachiyomi/source/selection/SourceDiscoveryConcurrencyTest.kt",
+      "bytes": 9145,
+      "sha256": "c9da6e9dbefe205a17857765310be0341a0574ecd4f0b6ce570dd7a7841e786a"
+    },
+    {
+      "path": "app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt",
+      "bytes": 10970,
+      "sha256": "e0fc183359a093f3769d13029d32ee4383638769ddd5ca43ddf52f90e6ef4772"
+    }
+  ],
+  "engineering_scripts": [
+    {
+      "path": "scripts/beta/package_internal_beta.py",
+      "bytes": 17621,
+      "sha256": "a2bde4e3392331dd1f27d877e24d292ff33cec866f3aea1bc39ac88af4c11d4a"
+    },
+    {
+      "path": "scripts/r001/test_apply_document_reader.py",
+      "bytes": 6424,
+      "sha256": "e37bf1f8d497c2849db21ee485d52a16b98806a66ba783904b1e1f5b157747f9"
+    }
+  ]
+}

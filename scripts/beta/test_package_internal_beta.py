@@ -142,7 +142,7 @@ class CompiledBuildSafetyTests(unittest.TestCase):
         self.assertTrue(validate_compiled_build(actual_badging_format, self.manifest, APPLICATION_ID)['compiled_identity_verified'])
 
     def test_metadata_cannot_disguise_another_compiled_package_version_or_api(self):
-        for text in [self.badging.replace(APPLICATION_ID, 'different.app'), self.badging.replace("versionCode='112'", "versionCode='111'"), self.badging.replace(VERSION, '0.1.0-beta.10'), self.badging.replace("sdkVersion:'26'", "sdkVersion:'28'"), '']:
+        for text in [self.badging.replace(APPLICATION_ID, 'different.app'), self.badging.replace(f"versionCode='{VERSION_CODE}'", f"versionCode='{VERSION_CODE - 1}'"), self.badging.replace(VERSION, '0.1.0-beta.11'), self.badging.replace("sdkVersion:'26'", "sdkVersion:'28'"), '']:
             with self.subTest(text=text), self.assertRaises(ValueError):
                 validate_compiled_build(text, self.manifest, APPLICATION_ID)
 
@@ -157,7 +157,7 @@ class CompiledBuildSafetyTests(unittest.TestCase):
 
     def test_update_code_must_increase_and_cannot_be_bool_or_missing(self):
         base = {'application_id': 'polaris.app', 'signer_sha256': 'a'*64}
-        for value in (None, True, 0, 112, 113, '111'):
+        for value in (None, True, 0, VERSION_CODE, VERSION_CODE + 1, str(VERSION_CODE - 1)):
             with self.subTest(value=value), self.assertRaisesRegex(ValueError, 'version code'):
                 validate_update_identity('polaris.app', 'a'*64, dict(base, version_code=value))
 

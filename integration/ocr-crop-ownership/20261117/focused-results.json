@@ -1,0 +1,65 @@
+{
+  "passed": 15,
+  "cases": [
+    {
+      "classname": "eu.kanade.translation.recognizer.PaddleOcrRuntimeTest",
+      "name": "fails before inference when opencv cannot be initialized()"
+    },
+    {
+      "classname": "eu.kanade.translation.recognizer.PaddleCropOwnershipTest",
+      "name": "dimension failure releases the returned crop before it can enter the recognition list()"
+    },
+    {
+      "classname": "eu.kanade.translation.recognizer.PaddleCropOwnershipTest",
+      "name": "a later crop failure releases earlier crops and the page while preserving the error()"
+    },
+    {
+      "classname": "eu.kanade.translation.recognizer.PaddleCropOwnershipTest",
+      "name": "empty crops and low scores do not shift accepted text to another source box()"
+    },
+    {
+      "classname": "eu.kanade.translation.recognizer.PaddleCropOwnershipTest",
+      "name": "recognition failure releases the prepared batch and preserves its error()"
+    },
+    {
+      "classname": "eu.kanade.translation.recognizer.PaddleCropOwnershipTest",
+      "name": "no detections release the page without cropping or recognition()"
+    },
+    {
+      "classname": "eu.kanade.translation.recognizer.PaddleCropOwnershipTest",
+      "name": "successful aspect batches keep reading order and release every crop once()"
+    },
+    {
+      "classname": "eu.kanade.translation.recognizer.PaddleCropOwnershipTest",
+      "name": "a later batch failure keeps previous batches released and closes its partial batch()"
+    },
+    {
+      "classname": "eu.kanade.translation.recognizer.PaddleTextBlockMapperTest",
+      "name": "maps a rotated quad to neutral geometry()"
+    },
+    {
+      "classname": "eu.kanade.translation.recognizer.PaddleTextBlockMapperTest",
+      "name": "rejects implausibly sparse text boxes()"
+    },
+    {
+      "classname": "eu.kanade.translation.recognizer.PaddleTextBlockMapperTest",
+      "name": "rejects low confidence paddle noise()"
+    },
+    {
+      "classname": "eu.kanade.translation.recognizer.PaddleTextBlockMapperTest",
+      "name": "rejects malformed paddle results()"
+    },
+    {
+      "classname": "eu.kanade.translation.recognizer.RecognitionBatchPlannerTest",
+      "name": "partitions recognition work into small ordered batches()"
+    },
+    {
+      "classname": "eu.kanade.translation.recognizer.RecognitionBatchPlannerTest",
+      "name": "groups similar crop widths while retaining each source index()"
+    },
+    {
+      "classname": "eu.kanade.translation.recognizer.RecognitionBatchPlannerTest",
+      "name": "invalid batch size falls back to one item per inference()"
+    }
+  ]
+}

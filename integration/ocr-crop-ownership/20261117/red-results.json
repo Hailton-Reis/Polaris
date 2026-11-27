@@ -1,0 +1,18 @@
+{
+  "methodology": "Actual preceding production OCREngine source unchanged by SHA-256; no optional routing parameters or alternate production implementation. Only test class and its compile dependency added. Two release-call verification failures after error identity/page cleanup/no recognition assertions. No induced native allocation/OOM.",
+  "gradle_exit_code": 1,
+  "failures": [
+    {
+      "classname": "eu.kanade.translation.recognizer.PaddleCropOwnershipTest",
+      "name": "dimension failure releases the returned crop before it can enter the recognition list()",
+      "type": "java.lang.AssertionError",
+      "message": "java.lang.AssertionError: Verification failed: call 1 of 1: Mat(#18).release()) was not called.\n\nCalls to same mock:\n1) Mat(#18).rows()\n2) Mat(#18).cols()\n"
+    },
+    {
+      "classname": "eu.kanade.translation.recognizer.PaddleCropOwnershipTest",
+      "name": "a later crop failure releases earlier crops and the page while preserving the error()",
+      "type": "java.lang.AssertionError",
+      "message": "java.lang.AssertionError: Verification failed: call 1 of 1: Mat(#39).release()) was not called.\n\nCalls to same mock:\n1) Mat(#39).rows()\n2) Mat(#39).cols()\n"
+    }
+  ]
+}

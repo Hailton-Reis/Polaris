@@ -1,0 +1,48 @@
+{
+  "revision": "P20261117.3",
+  "date": "2026-11-17",
+  "timezone": "America/Fortaleza",
+  "status": "VALIDATED_FOR_NEXT_VERSION_NOT_RELEASED",
+  "behavioral_red_failures": 4,
+  "focused_passed_before_final_refinements": 118,
+  "new_junit_cases": 15,
+  "policy": {
+    "shared_alternative_provider_operations": 2,
+    "prepared_result_buffer": 2,
+    "primary_uses_alternative_gate": false,
+    "catalog_timeout_ms": 30000,
+    "search_timeout_ms": 30000,
+    "alternative_pipeline_including_queue_timeout_ms": 60000,
+    "discovery_phase_including_queue_timeout_ms": 60000,
+    "partial_retry_eligibility_ms": 60000,
+    "complete_ttl_ms": 86400000,
+    "automatic_retry_timer_added": false,
+    "cooperative_cancellation_required": true,
+    "image_sample_cache_preserves_actual_check_timestamp": true
+  },
+  "final_validation": {
+    "gradle_exit_code": 0,
+    "duration": "2m19s",
+    "fresh_app_beta_passed": 952,
+    "previously_passed_domain_release_up_to_date": 87,
+    "total_reports_passed": 1039,
+    "failed": 0,
+    "skipped": 0,
+    "missing_baseline_cases": 0
+  },
+  "engineering_checks": {
+    "overlay_passed": 4,
+    "packaging_passed": 27,
+    "comparator_passed": 21
+  },
+  "matching_and_numbering_rules_changed": false,
+  "new_sql_or_protobuf_schema": false,
+  "new_optional_memo_field": "discoveryIncomplete, default false",
+  "native_libraries_unchanged": 31,
+  "new_android_instrumentation": false,
+  "ui_compiled_not_device_executed": true,
+  "real_provider_network_benchmarked": false,
+  "device_ram_or_performance_measured": false,
+  "new_apk": false,
+  "new_release": false
+}

@@ -1,0 +1,24 @@
+{
+  "methodology": "Original decoder body unchanged; optional maxDecodedBytes/checkCancelled parameters initially ignored to express the desired contract. Synthetic payloads and small injected budgets, no induced OOM.",
+  "gradle_exit_code": 1,
+  "failures": [
+    {
+      "classname": "eu.kanade.tachiyomi.data.backup.BackupDecoderBoundedTest",
+      "name": "raw input stops at its decoded byte limit and closes without parsing all data()",
+      "type": "org.opentest4j.AssertionFailedError",
+      "message": "org.opentest4j.AssertionFailedError: Expected eu.kanade.tachiyomi.data.backup.BackupTooLargeException to be thrown, but nothing was thrown."
+    },
+    {
+      "classname": "eu.kanade.tachiyomi.data.backup.BackupDecoderBoundedTest",
+      "name": "cancelled reading stops before the payload is fully consumed()",
+      "type": "org.opentest4j.AssertionFailedError",
+      "message": "org.opentest4j.AssertionFailedError: Expected java.util.concurrent.CancellationException to be thrown, but nothing was thrown."
+    },
+    {
+      "classname": "eu.kanade.tachiyomi.data.backup.BackupDecoderBoundedTest",
+      "name": "small gzip cannot bypass the decoded byte budget()",
+      "type": "org.opentest4j.AssertionFailedError",
+      "message": "org.opentest4j.AssertionFailedError: Expected eu.kanade.tachiyomi.data.backup.BackupTooLargeException to be thrown, but nothing was thrown."
+    }
+  ]
+}

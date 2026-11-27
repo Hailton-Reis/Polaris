@@ -1,0 +1,6 @@
+{
+  "configuration": "betaRuntimeClasspath",
+  "resolved_opencv": "org.opencv:opencv:4.12.0",
+  "old_quickbird_opencv_present": false,
+  "gradle_excerpt": "> Task :app:dependencyInsight\norg.opencv:opencv:4.12.0\n  Variant releaseVariantReleaseRuntimePublication:\n    | Attribute Name                                  | Provided     | Requested    |\n    |-------------------------------------------------|--------------|--------------|\n    | org.gradle.dependency.bundling                  | external     |              |\n    | org.gradle.libraryelements                      | aar          |              |\n    | org.gradle.status                               | release      |              |\n    | org.gradle.category                             | library      | library      |\n    | org.gradle.usage                                | java-runtime | java-runtime |\n    | com.android.build.api.attributes.AgpVersionAttr |              | 9.3.1        |\n    | com.android.build.api.attributes.BuildTypeAttr  |              | beta         |\n    | org.gradle.jvm.environment                      |              | android      |\n    | org.jetbrains.kotlin.platform.type              |              | androidJvm   |\n\norg.opencv:opencv:4.12.0\n\\--- project ':ppocr-sdk'\n     \\--- betaRuntimeClasspath"
+}

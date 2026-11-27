@@ -1,0 +1,44 @@
+{
+  "queried_at": "2026-11-16T16:06:47.577884+00:00",
+  "scope": "Four declared Maven coordinates; not a complete resolved runtime or native audit",
+  "queries": {
+    "queries": [
+      {
+        "package": {
+          "ecosystem": "Maven",
+          "name": "org.jsoup:jsoup"
+        },
+        "version": "1.23.2"
+      },
+      {
+        "package": {
+          "ecosystem": "Maven",
+          "name": "com.google.guava:guava"
+        },
+        "version": "33.7.2-android"
+      },
+      {
+        "package": {
+          "ecosystem": "Maven",
+          "name": "com.squareup.okhttp3:okhttp"
+        },
+        "version": "5.4.0"
+      },
+      {
+        "package": {
+          "ecosystem": "Maven",
+          "name": "org.jetbrains.kotlinx:kotlinx-serialization-protobuf"
+        },
+        "version": "1.11.0"
+      }
+    ]
+  },
+  "response": {
+    "results": [
+      {},
+      {},
+      {},
+      {}
+    ]
+  }
+}

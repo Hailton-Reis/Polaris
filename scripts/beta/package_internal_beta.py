@@ -13,9 +13,9 @@ import zipfile
 import zlib
 
 ROOT = Path(__file__).resolve().parents[2]
-REVISION = 'P20261116.1'
-VERSION = '0.1.0-beta.11'
-VERSION_CODE = 112
+REVISION = 'P20261127.1'
+VERSION = '0.1.0-beta.18'
+VERSION_CODE = 119
 ARM_ABIS = ['arm64-v8a', 'armeabi-v7a']
 APPLICATION_ID = 'app.mihon.tachiyomiat.dev'
 DEBUG_COMPONENTS = (
@@ -269,7 +269,7 @@ def package(apks, output, comparison, apksigner, previous_manifest=None):
             # refer to the SAME asset; users download and install one APK, never two copies.
             artifacts.extend({'abi': abi, 'file': name, 'bytes': apk.stat().st_size, 'sha256': digest}
                              for abi in ARM_ABIS)
-        shutil.copy2(ROOT / 'docs/COMECE_AQUI_BETA11.md', temporary / 'COMECE_AQUI.md')
+        shutil.copy2(ROOT / 'docs/CORRECOES_TESTE_GALAXY.md', temporary / 'COMECE_AQUI.md')
         shutil.copy2(ROOT / 'docs/EXTENSOES_BETA11.md', temporary / 'ISOLAMENTO_DE_EXTENSOES.md')
         shutil.copytree(ROOT / 'integration/internal-beta/language-fixtures', temporary / 'testes/idiomas')
         shutil.copytree(ROOT / 'integration/document-reader/fixtures', temporary / 'testes/documentos')

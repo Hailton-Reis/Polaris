@@ -1,0 +1,98 @@
+{
+  "total": 15,
+  "app": 13,
+  "domain": 2,
+  "scope": "Actual catalog, matching, chapter metadata and flow policy with fake HttpSource providers and coroutine-test virtual delays; no real provider network/device benchmark.",
+  "cases": [
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "a confirmed catalog timeout remains retryable without enabling searches in the foreground refresh()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "a discovery deadline preserves the fast catalog and marks only the scan incomplete()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "a finished retry clears the incomplete marker and restores the normal daily cache()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "a source pin still prevents discovery and image checks with an incomplete marker()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "a timed out scan becomes eligible again after a minute instead of waiting a day()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "an expired image check really probes again and stores a fresh timestamp()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "an individual source timeout schedules retry even when the whole scan finishes earlier()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "another work can use the shared provider slots before a slow whole scan finishes()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "confirmed catalog refreshes overlap in pairs instead of waiting in sequence()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "discovery reuses a healthy confirmed catalog without searching that provider again()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "image checks run inside the bounded provider pipeline instead of a serial collector()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "parent cancellation releases all provider slots without returning partial success()",
+      "status": "passed"
+    },
+    {
+      "module": "app",
+      "classname": "eu.kanade.tachiyomi.source.selection.AutomaticSourceCatalogTest",
+      "name": "reusing a recent image check keeps its real timestamp instead of extending its validity()",
+      "status": "passed"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.manga.model.WorkSourcesDiscoveryTest",
+      "name": "older source metadata without an incomplete marker retains its settings()",
+      "status": "passed"
+    },
+    {
+      "module": "domain",
+      "classname": "tachiyomi.domain.manga.model.WorkSourcesDiscoveryTest",
+      "name": "partial discovery metadata round trips and can be cleared without losing other memo data()",
+      "status": "passed"
+    }
+  ]
+}
