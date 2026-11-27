@@ -14269,7 +14269,7 @@ index 0ecf97e..87761ac 100644
          }
  
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/data/backup/restore/BackupRestorer.kt b/app/src/main/java/eu/kanade/tachiyomi/data/backup/restore/BackupRestorer.kt
-index ce21be4..dce57b7 100644
+index ce21be4..2846994 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/data/backup/restore/BackupRestorer.kt
 +++ b/app/src/main/java/eu/kanade/tachiyomi/data/backup/restore/BackupRestorer.kt
 @@ -4,6 +4,7 @@ import android.content.Context
@@ -14506,7 +14506,7 @@ index ce21be4..dce57b7 100644
          ensureActive()
          preferenceRestorer.restoreSource(preferences)
  
-@@ -217,31 +247,29 @@ class BackupRestorer(
+@@ -217,37 +247,35 @@ class BackupRestorer(
      }
  
      private fun CoroutineScope.restoreExtensionStores(
@@ -14556,6 +14556,13 @@ index ce21be4..dce57b7 100644
      }
  
      private fun writeErrorLog(): File {
+         try {
+             if (errors.isNotEmpty()) {
+-                val file = context.createFileInCacheDir("mihon_restore_error.txt")
++                val file = context.createFileInCacheDir("Polaris-backup-restore-errors.txt")
+                 val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", Locale.getDefault())
+ 
+                 file.bufferedWriter().use { out ->
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/data/backup/restore/restorers/ExtensionStoreRestorer.kt b/app/src/main/java/eu/kanade/tachiyomi/data/backup/restore/restorers/ExtensionStoreRestorer.kt
 index a8fc4dd..da9dda9 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/data/backup/restore/restorers/ExtensionStoreRestorer.kt
@@ -16960,7 +16967,7 @@ index de59138..a949e38 100644
      }
  }
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/data/library/LibraryUpdateJob.kt b/app/src/main/java/eu/kanade/tachiyomi/data/library/LibraryUpdateJob.kt
-index 8255de7..1d2c7ca 100644
+index 8255de7..a13a0f7 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/data/library/LibraryUpdateJob.kt
 +++ b/app/src/main/java/eu/kanade/tachiyomi/data/library/LibraryUpdateJob.kt
 @@ -22,19 +22,30 @@ import eu.kanade.tachiyomi.data.download.DownloadManager
@@ -17373,7 +17380,8 @@ index 8255de7..1d2c7ca 100644
      private fun writeErrorFile(errors: List<Pair<Manga, String?>>): File {
          try {
              if (errors.isNotEmpty()) {
-                 val file = context.createFileInCacheDir("mihon_update_errors.txt")
+-                val file = context.createFileInCacheDir("mihon_update_errors.txt")
++                val file = context.createFileInCacheDir("Polaris-library-update-errors.txt")
                  file.bufferedWriter().use { out ->
 -                    out.write(context.stringResource(MR.strings.library_errors_help, ERROR_LOG_HELP_URL) + "\n\n")
 +                    out.write(
@@ -32284,10 +32292,68 @@ index a52f2fb..40276b4 100644
          }
      }
 diff --git a/app/src/main/java/eu/kanade/tachiyomi/ui/main/MainActivity.kt b/app/src/main/java/eu/kanade/tachiyomi/ui/main/MainActivity.kt
-index ffdfc30..0e3a3bc 100644
+index ffdfc30..076a0c5 100644
 --- a/app/src/main/java/eu/kanade/tachiyomi/ui/main/MainActivity.kt
 +++ b/app/src/main/java/eu/kanade/tachiyomi/ui/main/MainActivity.kt
-@@ -82,6 +82,10 @@ import eu.kanade.tachiyomi.data.cache.ChapterCache
+@@ -5,7 +5,6 @@ import android.app.SearchManager
+ import android.app.assist.AssistContent
+ import android.content.Context
+ import android.content.Intent
+-import android.content.pm.PackageManager
+ import android.graphics.Color
+ import android.os.Build
+ import android.os.Bundle
+@@ -15,32 +14,18 @@ import androidx.activity.SystemBarStyle
+ import androidx.activity.enableEdgeToEdge
+ import androidx.compose.foundation.background
+ import androidx.compose.foundation.isSystemInDarkTheme
+-import androidx.compose.foundation.layout.Arrangement
+ import androidx.compose.foundation.layout.Box
+-import androidx.compose.foundation.layout.Column
+-import androidx.compose.foundation.layout.Row
+ import androidx.compose.foundation.layout.Spacer
+ import androidx.compose.foundation.layout.WindowInsets
+ import androidx.compose.foundation.layout.WindowInsetsSides
+ import androidx.compose.foundation.layout.consumeWindowInsets
+ import androidx.compose.foundation.layout.fillMaxWidth
+-import androidx.compose.foundation.layout.height
+ import androidx.compose.foundation.layout.navigationBars
+ import androidx.compose.foundation.layout.only
+ import androidx.compose.foundation.layout.padding
+ import androidx.compose.foundation.layout.windowInsetsBottomHeight
+ import androidx.compose.foundation.layout.windowInsetsPadding
+-import androidx.compose.foundation.rememberScrollState
+-import androidx.compose.foundation.verticalScroll
+-import androidx.compose.material.icons.Icons
+-import androidx.compose.material.icons.automirrored.filled.OpenInNew
+-import androidx.compose.material.icons.filled.VolunteerActivism
+-import androidx.compose.material3.Button
+-import androidx.compose.material3.HorizontalDivider
+-import androidx.compose.material3.Icon
+ import androidx.compose.material3.MaterialTheme
+-import androidx.compose.material3.OutlinedButton
+-import androidx.compose.material3.Text
+ import androidx.compose.runtime.Composable
+ import androidx.compose.runtime.LaunchedEffect
+ import androidx.compose.runtime.collectAsState
+@@ -53,8 +38,6 @@ import androidx.compose.ui.Modifier
+ import androidx.compose.ui.draw.alpha
+ import androidx.compose.ui.graphics.luminance
+ import androidx.compose.ui.platform.LocalContext
+-import androidx.compose.ui.platform.LocalUriHandler
+-import androidx.compose.ui.unit.dp
+ import androidx.core.animation.doOnEnd
+ import androidx.core.net.toUri
+ import androidx.core.splashscreen.SplashScreen
+@@ -69,7 +52,6 @@ import cafe.adriel.voyager.navigator.NavigatorDisposeBehavior
+ import cafe.adriel.voyager.navigator.currentOrThrow
+ import eu.kanade.domain.base.BasePreferences
+ import eu.kanade.domain.source.interactor.GetIncognitoState
+-import eu.kanade.presentation.components.AdaptiveSheet
+ import eu.kanade.presentation.components.AppStateBanners
+ import eu.kanade.presentation.components.DownloadedOnlyBannerBackgroundColor
+ import eu.kanade.presentation.components.IncognitoModeBannerBackgroundColor
+@@ -82,6 +64,10 @@ import eu.kanade.tachiyomi.data.cache.ChapterCache
  import eu.kanade.tachiyomi.data.download.DownloadCache
  import eu.kanade.tachiyomi.data.notification.NotificationReceiver
  import eu.kanade.tachiyomi.data.updater.AppUpdateChecker
@@ -32298,7 +32364,37 @@ index ffdfc30..0e3a3bc 100644
  import eu.kanade.tachiyomi.extension.api.ExtensionApi
  import eu.kanade.tachiyomi.ui.base.activity.BaseActivity
  import eu.kanade.tachiyomi.ui.browse.source.browse.BrowseSourceScreen
-@@ -311,16 +315,20 @@ class MainActivity : BaseActivity() {
+@@ -107,21 +93,15 @@ import kotlinx.coroutines.flow.onEach
+ import kotlinx.coroutines.launch
+ import logcat.LogPriority
+ import mihon.core.migration.Migrator
+-import mihon.feature.support.SupportUsScreen
+ import tachiyomi.core.common.Constants
+ import tachiyomi.core.common.util.lang.launchIO
+ import tachiyomi.core.common.util.system.logcat
+ import tachiyomi.domain.library.service.LibraryPreferences
+ import tachiyomi.domain.release.interactor.GetApplicationRelease
+-import tachiyomi.i18n.MR
+ import tachiyomi.presentation.core.components.material.Scaffold
+ import tachiyomi.presentation.core.components.material.padding
+-import tachiyomi.presentation.core.i18n.stringResource
+ import tachiyomi.presentation.core.util.collectAsState
+ import uy.kohesive.injekt.injectLazy
+-import kotlin.time.Clock
+-import kotlin.time.Duration.Companion.days
+-import kotlin.time.Instant
+ import kotlin.time.times
+ 
+ class MainActivity : BaseActivity() {
+@@ -261,7 +241,6 @@ class MainActivity : BaseActivity() {
+                 if (!isBenchmarkBuildType) {
+                     CheckForUpdates()
+                     ShowOnboarding()
+-                    ShowDonationCampaign()
+                 }
+             }
+         }
+@@ -311,16 +290,20 @@ class MainActivity : BaseActivity() {
          LaunchedEffect(Unit) {
              if (updaterEnabled) {
                  try {
@@ -32320,7 +32416,134 @@ index ffdfc30..0e3a3bc 100644
                  } catch (e: Exception) {
                      logcat(LogPriority.ERROR, e)
                  }
-@@ -605,3 +613,20 @@ class MainActivity : BaseActivity() {
+@@ -348,126 +331,6 @@ class MainActivity : BaseActivity() {
+         }
+     }
+ 
+-    @Composable
+-    private fun ShowDonationCampaign() {
+-        val navigator = LocalNavigator.currentOrThrow
+-
+-        var showCampaign by remember { mutableStateOf(false) }
+-        if (showCampaign) {
+-            val uriHandler = LocalUriHandler.current
+-            val dismissSupportMessage = {
+-                preferences.donationCampaignShown.set(true)
+-                showCampaign = false
+-            }
+-            AdaptiveSheet(
+-                onDismissRequest = dismissSupportMessage,
+-                enableImplicitDismiss = false,
+-            ) {
+-                Column {
+-                    Spacer(modifier = Modifier.height(16.dp))
+-                    Column(
+-                        modifier = Modifier
+-                            .verticalScroll(rememberScrollState())
+-                            .padding(16.dp)
+-                            .weight(1f, fill = false)
+-                            .fillMaxWidth(),
+-                        verticalArrangement = Arrangement.spacedBy(8.dp),
+-                    ) {
+-                        Text(
+-                            text = stringResource(MR.strings.donationCampaign_title),
+-                            color = MaterialTheme.colorScheme.primary,
+-                            style = MaterialTheme.typography.headlineSmall,
+-                        )
+-                        Text(
+-                            text = stringResource(MR.strings.donationCampaign_paragraph1),
+-                            style = MaterialTheme.typography.bodyMedium,
+-                        )
+-                        Text(
+-                            text = stringResource(MR.strings.donationCampaign_paragraph2),
+-                            style = MaterialTheme.typography.bodyMedium,
+-                        )
+-                        Text(
+-                            text = stringResource(MR.strings.donationCampaign_paragraph3),
+-                            style = MaterialTheme.typography.bodyMedium,
+-                        )
+-                    }
+-
+-                    HorizontalDivider()
+-
+-                    Button(
+-                        modifier = Modifier
+-                            .padding(top = MaterialTheme.padding.small)
+-                            .padding(horizontal = MaterialTheme.padding.medium)
+-                            .fillMaxWidth(),
+-                        onClick = {
+-                            navigator.push(SupportUsScreen())
+-                            dismissSupportMessage()
+-                        },
+-                    ) {
+-                        Row(
+-                            verticalAlignment = Alignment.CenterVertically,
+-                            horizontalArrangement = Arrangement.spacedBy(MaterialTheme.padding.small),
+-                        ) {
+-                            Icon(
+-                                imageVector = Icons.Default.VolunteerActivism,
+-                                contentDescription = null,
+-                            )
+-                            Text(
+-                                text = stringResource(MR.strings.label_support_us),
+-                                color = MaterialTheme.colorScheme.onPrimary,
+-                            )
+-                        }
+-                    }
+-                    Row(
+-                        horizontalArrangement = Arrangement.spacedBy(MaterialTheme.padding.small),
+-                        modifier = Modifier
+-                            .padding(bottom = MaterialTheme.padding.small)
+-                            .padding(horizontal = MaterialTheme.padding.medium),
+-                    ) {
+-                        OutlinedButton(
+-                            modifier = Modifier
+-                                .fillMaxWidth()
+-                                .weight(1f),
+-                            onClick = { uriHandler.openUri(Constants.URL_DISCORD) },
+-                        ) {
+-                            Row(
+-                                verticalAlignment = Alignment.CenterVertically,
+-                                horizontalArrangement = Arrangement.spacedBy(MaterialTheme.padding.small),
+-                            ) {
+-                                Text(
+-                                    text = stringResource(MR.strings.donationCampaign_contactPlatform),
+-                                )
+-                                Icon(
+-                                    imageVector = Icons.AutoMirrored.Default.OpenInNew,
+-                                    contentDescription = null,
+-                                )
+-                            }
+-                        }
+-                        OutlinedButton(
+-                            modifier = Modifier
+-                                .fillMaxWidth()
+-                                .weight(1f),
+-                            onClick = dismissSupportMessage,
+-                        ) {
+-                            Text(
+-                                text = stringResource(MR.strings.donationCampaign_dismiss),
+-                            )
+-                        }
+-                    }
+-                }
+-            }
+-        }
+-
+-        LaunchedEffect(Unit) {
+-            try {
+-                val firstInstallTime = packageManager.getPackageInfo(packageName, 0).firstInstallTime
+-                val eligibleTime = Instant.fromEpochMilliseconds(firstInstallTime).plus(6 * 30.days)
+-                showCampaign = (Clock.System.now() >= eligibleTime && !preferences.donationCampaignShown.get())
+-            } catch (_: PackageManager.NameNotFoundException) {
+-            }
+-        }
+-    }
+-
+     /**
+      * Sets custom splash screen exit animation on devices prior to Android 12.
+      *
+@@ -605,3 +468,20 @@ class MainActivity : BaseActivity() {
  private const val SPLASH_MIN_DURATION = 500 // ms
  private const val SPLASH_MAX_DURATION = 5000 // ms
  private const val SPLASH_EXIT_ANIM_DURATION = 400L // ms
@@ -84848,7 +85071,7 @@ index 9839272..0ac8bdd 100644
 \ No newline at end of file
 +voyager = ["voyager-navigator", "voyager-tabNavigator", "voyager-transitions"]
 diff --git a/i18n-at/src/commonMain/moko-resources/base/strings.xml b/i18n-at/src/commonMain/moko-resources/base/strings.xml
-index 7ed4795..dfd4abd 100644
+index 7ed4795..743a399 100644
 --- a/i18n-at/src/commonMain/moko-resources/base/strings.xml
 +++ b/i18n-at/src/commonMain/moko-resources/base/strings.xml
 @@ -10,7 +10,7 @@
@@ -84860,7 +85083,7 @@ index 7ed4795..dfd4abd 100644
      <string name="pref_group_setup">Translation Setup</string>
      <string name="pref_translate_from">Translate From</string>
      <string name="pref_translate_to">Translate To</string>
-@@ -73,12 +73,339 @@
+@@ -73,12 +73,342 @@
      <string name="repository_add_error">Could not add this repository. Check your connection and try again.</string>
      <string name="repository_refresh_error">Repository added, but extension listings could not be refreshed. Refresh the Extensions screen.</string>
      <string name="chapter_group_version">Group/version: %1$s</string>
@@ -85201,9 +85424,12 @@ index 7ed4795..dfd4abd 100644
 +    <string name="library_duplicate_title">Possible duplicates</string>
 +    <string name="library_duplicate_preferred_title">Suggested title: %1$s</string>
 +    <string name="library_duplicate_help">Open each work to compare the title, source, and chapters. Suggestions leave the library records in place.</string>
++    <string name="polaris_crash_title">Polaris closed unexpectedly</string>
++    <string name="polaris_crash_description">Share the crash report to help investigate the problem, or restart Polaris.</string>
++    <string name="polaris_crash_export_failed">Could not export the Polaris crash report</string>
  </resources>
 diff --git a/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml b/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
-index d1748bc..d003183 100644
+index d1748bc..e4ff476 100644
 --- a/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
 +++ b/i18n-at/src/commonMain/moko-resources/pt-rBR/strings.xml
 @@ -10,7 +10,7 @@
@@ -85215,7 +85441,7 @@ index d1748bc..d003183 100644
      <string name="pref_group_setup">Configuração da tradução</string>
      <string name="pref_translate_from">Traduzir de</string>
      <string name="pref_translate_to">Traduzir para</string>
-@@ -73,12 +73,339 @@
+@@ -73,12 +73,342 @@
      <string name="repository_add_error">Não foi possível adicionar o repositório. Confira a conexão e tente novamente.</string>
      <string name="repository_refresh_error">Repositório adicionado, mas não foi possível atualizar as extensões. Atualize a tela Extensões.</string>
      <string name="chapter_group_version">Grupo/versão: %1$s</string>
@@ -85556,6 +85782,9 @@ index d1748bc..d003183 100644
 +    <string name="library_duplicate_title">Possíveis duplicatas</string>
 +    <string name="library_duplicate_preferred_title">Título sugerido: %1$s</string>
 +    <string name="library_duplicate_help">Abra cada obra para comparar título, fonte e capítulos. As sugestões mantêm os registros da biblioteca.</string>
++    <string name="polaris_crash_title">O Polaris fechou inesperadamente</string>
++    <string name="polaris_crash_description">Compartilhe o relatório para ajudar a investigar o erro ou reinicie o Polaris.</string>
++    <string name="polaris_crash_export_failed">Não foi possível exportar o relatório do Polaris</string>
  </resources>
 diff --git a/i18n/src/commonMain/moko-resources/base/strings.xml b/i18n/src/commonMain/moko-resources/base/strings.xml
 index c0832ba..ebf8f48 100644
@@ -86615,3 +86844,65 @@ index 0000000..981980d
 +
 +    fun isPortuguese(title: String): Boolean = WorkIdentityText.title(title) in portuguese
 +}
+diff --git a/app/src/main/java/eu/kanade/presentation/crash/CrashScreen.kt b/app/src/main/java/eu/kanade/presentation/crash/CrashScreen.kt
+index 5be7a2c..7393de5 100644
+--- a/app/src/main/java/eu/kanade/presentation/crash/CrashScreen.kt
++++ b/app/src/main/java/eu/kanade/presentation/crash/CrashScreen.kt
+@@ -17,6 +17,7 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
+ import eu.kanade.presentation.theme.TachiyomiPreviewTheme
+ import eu.kanade.tachiyomi.util.CrashLogUtil
+ import kotlinx.coroutines.launch
++import tachiyomi.i18n.at.ATMR
+ import tachiyomi.i18n.MR
+ import tachiyomi.presentation.core.components.material.padding
+ import tachiyomi.presentation.core.i18n.stringResource
+@@ -32,8 +33,8 @@ fun CrashScreen(
+ 
+     InfoScreen(
+         icon = Icons.Outlined.BugReport,
+-        headingText = stringResource(MR.strings.crash_screen_title),
+-        subtitleText = stringResource(MR.strings.crash_screen_description, stringResource(MR.strings.app_name)),
++        headingText = stringResource(ATMR.strings.polaris_crash_title),
++        subtitleText = stringResource(ATMR.strings.polaris_crash_description),
+         acceptText = stringResource(MR.strings.pref_dump_crash_logs),
+         onAcceptClick = {
+             scope.launch {
+diff --git a/app/src/main/java/eu/kanade/tachiyomi/util/CrashLogUtil.kt b/app/src/main/java/eu/kanade/tachiyomi/util/CrashLogUtil.kt
+index 038444c..7a514ff 100644
+--- a/app/src/main/java/eu/kanade/tachiyomi/util/CrashLogUtil.kt
++++ b/app/src/main/java/eu/kanade/tachiyomi/util/CrashLogUtil.kt
+@@ -14,6 +14,8 @@ import eu.kanade.tachiyomi.util.system.toast
+ import kotlinx.datetime.TimeZone
+ import kotlinx.datetime.offsetAt
+ import kotlinx.datetime.toLocalDateTime
++import tachiyomi.core.common.i18n.stringResource
++import tachiyomi.i18n.at.ATMR
+ import tachiyomi.core.common.util.lang.withNonCancellableContext
+ import tachiyomi.core.common.util.lang.withUIContext
+ import uy.kohesive.injekt.Injekt
+@@ -29,7 +31,7 @@ class CrashLogUtil(
+ 
+     suspend fun dumpLogs(exception: Throwable? = null) = withNonCancellableContext {
+         try {
+-            val file = context.createFileInCacheDir("mihon_crash_logs.txt")
++            val file = context.createFileInCacheDir("Polaris-crash-logs.txt")
+ 
+             file.appendText(getDebugInfo() + "\n\n")
+             getExtensionsInfo()?.let { file.appendText("$it\n\n") }
+@@ -41,7 +43,7 @@ class CrashLogUtil(
+             val uri = file.getUriCompat(context)
+             context.startActivity(uri.toShareIntent(context, "text/plain"))
+         } catch (_: Throwable) {
+-            withUIContext { context.toast("Failed to get logs") }
++            withUIContext { context.toast(context.stringResource(ATMR.strings.polaris_crash_export_failed)) }
+         }
+     }
+ 
+@@ -49,6 +51,7 @@ class CrashLogUtil(
+         val now = Clock.System.now()
+         val tz = TimeZone.currentSystemDefault()
+         return """
++            App: Polaris
+             App ID: ${BuildConfig.APPLICATION_ID}
+             App version: ${BuildConfig.VERSION_NAME} (${BuildConfig.COMMIT_SHA}, ${BuildConfig.VERSION_CODE}, ${BuildConfig.BUILD_TIME})
+             Installation ID: ${preferences.installationId.get()}
