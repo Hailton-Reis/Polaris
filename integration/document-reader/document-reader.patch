@@ -21,7 +21,7 @@ index 79aff85..c2e70c6 100644
 +# Generated native build state
 +**/.cxx/
 diff --git a/app/build.gradle.kts b/app/build.gradle.kts
-index 63e2698..2d459d4 100644
+index 63e2698..f251a99 100644
 --- a/app/build.gradle.kts
 +++ b/app/build.gradle.kts
 @@ -3,6 +3,7 @@ import mihon.gradle.getBuildTime
@@ -47,8 +47,8 @@ index 63e2698..2d459d4 100644
  
 -        versionCode = 101
 -        versionName = "0.20.4-Y40"
-+        versionCode = 118
-+        versionName = "0.1.0-beta.17"
++        versionCode = 119
++        versionName = "0.1.0-beta.18"
  
          buildConfigField("String", "COMMIT_COUNT", "\"${getLatestCommitCount()}\"")
          buildConfigField("String", "COMMIT_SHA", "\"${getLatestCommitSha()}\"")
@@ -10209,7 +10209,7 @@ index a198c3f..9a3e84f 100644
                      preference = translationPreferences.translationEngineTemperature(),
                      title = stringResource(ATMR.strings.pref_engine_temperature),
 diff --git a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
-index 7f411fd..bba1bb9 100644
+index 7f411fd..b94e0b8 100644
 --- a/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
 +++ b/app/src/main/java/eu/kanade/presentation/more/settings/screen/about/AboutScreen.kt
 @@ -1,15 +1,18 @@
@@ -10274,7 +10274,7 @@ index 7f411fd..bba1bb9 100644
  
      // Identifies this overlay independently of the pinned upstream COMMIT_SHA.
 -    private const val POLARIS_READER_REVISION = "P20261031.2"
-+    private const val POLARIS_READER_REVISION = "P20261124.2"
++    private const val POLARIS_READER_REVISION = "P20261127.1"
  
      @Composable
      override fun Content() {
